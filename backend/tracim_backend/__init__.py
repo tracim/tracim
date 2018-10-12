@@ -38,6 +38,7 @@ from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import PageNotFound
 from tracim_backend.exceptions import UserNotActive
 from tracim_backend.exceptions import InvalidId
@@ -110,6 +111,7 @@ def web(global_config, **local_settings):
     context.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ContentInNotEditableState, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     context.handle_exception(InvalidId, HTTPStatus.BAD_REQUEST)
     context.handle_exception(SameValueError, HTTPStatus.BAD_REQUEST)

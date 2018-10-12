@@ -285,3 +285,7 @@ class UnavailablePreview(TracimException):
 
 class EmptyNotificationError(TracimException):
     pass
+
+
+class ContentInNotEditableState(TracimException):
+    pass

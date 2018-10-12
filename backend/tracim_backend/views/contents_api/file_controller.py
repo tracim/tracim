@@ -7,7 +7,7 @@ from hapic.data import HapicFile
 from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
@@ -92,7 +92,7 @@ class FileController(Controller):
         parent = None  # type: typing.Optional['Content']
         if parent_id:
             try:
-                parent = api.get_one(content_id=parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+                parent = api.get_one(content_id=parent_id, content_type=content_type_list.Any_SLUG)  # nopep8
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     'Parent with content_id {} not found'.format(parent_id)
@@ -139,7 +139,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         _file = hapic_data.files.files
         with new_revision(
@@ -176,7 +176,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         file = DepotManager.get().get(content.depot_file)
         return HapicFile(
@@ -206,7 +206,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -245,7 +245,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
@@ -281,7 +281,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
         filename = "{label}.pdf".format(label=content.label)
@@ -313,7 +313,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -351,7 +351,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -395,7 +395,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         allowed_dim = api.get_jpg_preview_allowed_dim()
         jpg_preview_path = api.get_jpg_preview_path(
@@ -438,7 +438,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
@@ -482,7 +482,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -547,7 +547,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         return api.get_content_in_context(content)
 
@@ -573,7 +573,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -613,7 +613,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         revisions = content.revisions
         return [
@@ -642,7 +642,7 @@ class FileController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,

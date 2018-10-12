@@ -5,7 +5,7 @@ import transaction
 from pyramid.config import Configurator
 
 from tracim_backend import TracimRequest
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -56,7 +56,7 @@ class FolderController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         return api.get_content_in_context(content)
 
@@ -82,7 +82,7 @@ class FolderController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -126,7 +126,7 @@ class FolderController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         revisions = content.revisions
         return [
@@ -154,7 +154,7 @@ class FolderController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,

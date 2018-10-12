@@ -4,7 +4,7 @@ import transaction
 from os.path import normpath as base_normpath
 
 from sqlalchemy.orm import Session
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from wsgidav import util
 from wsgidav import compat
 
@@ -179,7 +179,7 @@ class FakeFileStream(object):
         with self._session.no_autoflush:
             file = self._api.create(
                 filename=self._file_name,
-                content_type_slug=CONTENT_TYPES.File.slug,
+                content_type_slug=content_type_list.File.slug,
                 workspace=self._workspace,
                 parent=self._parent,
                 is_temporary=is_temporary,
@@ -191,7 +191,7 @@ class FakeFileStream(object):
                 util.guessMimeType(self._file_name),
                 self._file_stream.read()
             )
-        self._api.save(file)
+        self._api.save(file, ActionDescription.CREATION)
 
     def update_file(self):
         """

@@ -20,7 +20,7 @@ from tracim_backend.views.core_api.schemas import SetCommentSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.data import UserRoleInWorkspace
 
@@ -49,7 +49,7 @@ class CommentController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         comments = content.get_comments()
         comments.sort(key=lambda comment: comment.created)
@@ -78,7 +78,7 @@ class CommentController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         comment = api.create_comment(
             content.workspace,
@@ -115,12 +115,12 @@ class CommentController(Controller):
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
             hapic_data.path.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG,
+            content_type=content_type_list.Any_SLUG,
             workspace=workspace
         )
         comment = api.get_one(
             hapic_data.path.comment_id,
-            content_type=CONTENT_TYPES.Comment.slug,
+            content_type=content_type_list.Comment.slug,
             workspace=workspace,
             parent=parent,
         )

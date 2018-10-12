@@ -13,8 +13,8 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.models.data import ActionDescription
 
 
@@ -235,11 +235,11 @@ class CFG(object):
         ]
 
         self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-            CONTENT_TYPES.Page.slug,
-            CONTENT_TYPES.Thread.slug,
-            CONTENT_TYPES.File.slug,
-            CONTENT_TYPES.Comment.slug,
-            # CONTENT_TYPES.Folder.slug -- Folder is skipped
+            content_type_list.Page.slug,
+            content_type_list.Thread.slug,
+            content_type_list.File.slug,
+            content_type_list.Comment.slug,
+            # content_type_list.Folder.slug -- Folder is skipped
         ]
         if settings.get('email.notification.from'):
             raise Exception(
@@ -608,7 +608,7 @@ class CFG(object):
             slug='html-document',
             label='Text Document',
             creation_label='Write a document',
-            available_statuses=CONTENT_STATUS.get_all(),
+            available_statuses=content_status_list.get_all(),
             slug_alias=['page']
         )
 
@@ -625,7 +625,7 @@ class CFG(object):
             slug='file',
             label='File',
             creation_label='Upload a file',
-            available_statuses=CONTENT_STATUS.get_all(),
+            available_statuses=content_status_list.get_all(),
         )
 
         thread = Application(
@@ -641,7 +641,7 @@ class CFG(object):
             slug='thread',
             label='Thread',
             creation_label='Start a topic',
-            available_statuses=CONTENT_STATUS.get_all(),
+            available_statuses=content_status_list.get_all(),
         )
 
         folder = Application(
@@ -657,7 +657,7 @@ class CFG(object):
             slug='folder',
             label='Folder',
             creation_label='Create a folder',
-            available_statuses=CONTENT_STATUS.get_all(),
+            available_statuses=content_status_list.get_all(),
             allow_sub_content=True,
         )
 
@@ -676,7 +676,7 @@ class CFG(object):
             slug='markdownpage',
             label='Rich Markdown File',
             creation_label='Create a Markdown document',
-            available_statuses=CONTENT_STATUS.get_all(),
+            available_statuses=content_status_list.get_all(),
         )
 
         calendar = Application(

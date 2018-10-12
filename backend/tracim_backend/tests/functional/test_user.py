@@ -17,7 +17,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -92,14 +92,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -108,10 +108,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -211,14 +211,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
 
         with new_revision(
             session=dbsession,
@@ -228,10 +228,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -312,14 +312,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -328,10 +328,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -438,14 +438,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -454,10 +454,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -513,14 +513,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -529,10 +529,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -625,14 +625,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -641,10 +641,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -733,14 +733,14 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -749,10 +749,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -846,14 +846,14 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -862,10 +862,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -970,14 +970,14 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -986,10 +986,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -1083,9 +1083,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1192,9 +1192,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1277,9 +1277,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1362,9 +1362,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1462,9 +1462,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1547,9 +1547,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
         api.mark_unread(firstly_created)
         api.mark_unread(comments)
@@ -1665,9 +1665,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -1775,9 +1775,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -1860,9 +1860,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -1946,9 +1946,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -2042,9 +2042,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -2096,9 +2096,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
         api.mark_read(firstly_created)
         api.mark_read(comments)
@@ -2190,9 +2190,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
@@ -2288,9 +2288,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
@@ -2386,9 +2386,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)

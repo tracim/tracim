@@ -10,7 +10,7 @@ from lxml.html.diff import htmldiff
 from mako.template import Template
 from sqlalchemy.orm import Session
 
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyNotificationError
 from tracim_backend.lib.core.notifications import INotifier
@@ -240,14 +240,14 @@ class EmailManager(object):
             config=self.config,
             show_archived=True,
             show_deleted=True,
-        ).get_one(event_content_id, CONTENT_TYPES.Any_SLUG)
+        ).get_one(event_content_id, content_type_list.Any_SLUG)
         workspace_api = WorkspaceApi(
             session=self.session,
             current_user=user,
             config=self.config,
         )
         workpace_in_context = workspace_api.get_workspace_with_context(workspace_api.get_one(content.workspace_id))  # nopep8
-        main_content = content.parent if content.type == CONTENT_TYPES.Comment.slug else content  # nopep8
+        main_content = content.parent if content.type == content_type_list.Comment.slug else content  # nopep8
         notifiable_roles = WorkspaceApi(
             current_user=user,
             session=self.session,
@@ -548,7 +548,7 @@ class EmailManager(object):
             call_to_action_text = _('View online')
             content_intro = _('<span id="content-intro-username">{}</span> create a content:').format(actor.display_name)  # nopep8
 
-            if CONTENT_TYPES.Thread.slug == content.type:
+            if content_type_list.Thread.slug == content.type:
                 if content.get_last_comment_from(actor):
                     content_text = content.get_last_comment_from(actor).description  # nopep8
 
@@ -556,14 +556,14 @@ class EmailManager(object):
                 content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + content_text  # nopep8
 
-            elif CONTENT_TYPES.File.slug == content.type:
+            elif content_type_list.File.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
                 else:
                     content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
-            elif CONTENT_TYPES.Page.slug == content.type:
+            elif content_type_list.Page.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
                 content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
@@ -571,18 +571,18 @@ class EmailManager(object):
             content_text = content.description
             call_to_action_text = _('View online')
 
-            if CONTENT_TYPES.File.slug == content.type:
+            if content_type_list.File.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
                 content_text = content.description
 
         elif ActionDescription.EDITION == action:
             call_to_action_text = _('View online')
 
-            if CONTENT_TYPES.File.slug == content.type:
+            if content_type_list.File.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + content.description  # nopep8
 
-            elif CONTENT_TYPES.Thread.slug == content.type:
+            elif content_type_list.Thread.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
@@ -593,7 +593,7 @@ class EmailManager(object):
                     title_diff=title_diff,
                     content_diff=htmldiff(previous_revision.description, content.description)
                 )
-            elif CONTENT_TYPES.Page.slug == content.type:
+            elif content_type_list.Page.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
