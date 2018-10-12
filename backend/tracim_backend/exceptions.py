@@ -219,8 +219,16 @@ class BadStatusCode(TracimException):
     pass
 
 
-class UserNotActive(TracimException):
+class UserAuthenticatedIsNotActive(TracimException):
     error_code = error.AUTHENTICATION_FAILED
+
+
+class UserIsNotActive(TracimException):
+    error_code = error.USER_NOT_ACTIVE
+
+
+class UserIsDeleted(TracimException):
+    error_code = error.USER_DELETED
 
 
 class NoUserSetted(TracimException):

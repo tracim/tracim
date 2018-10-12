@@ -19,7 +19,7 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UserNotActive
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -202,7 +202,7 @@ class UserApi(object):
         try:
             user = self.get_one_by_email(email)
             if not user.is_active:
-                raise UserNotActive('User "{}" is not active'.format(email))
+                raise UserAuthenticatedIsNotActive('User "{}" is not active'.format(email))
             if user.validate_password(password):
                 return user
             else:

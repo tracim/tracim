@@ -4,7 +4,7 @@ from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import UserNotActive
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import InvalidUserId
 from tracim_backend.exceptions import InvalidWorkspaceId
@@ -328,7 +328,7 @@ class TracimRequest(Request):
                 raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
             user = uapi.get_one(login)
             if not user.is_active:
-                raise UserNotActive('User {} is not active'.format(login))
+                raise UserAuthenticatedIsNotActive('User {} is not active'.format(login))
         except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
             raise NotAuthenticated('User {} not found'.format(login)) from exc
         return user

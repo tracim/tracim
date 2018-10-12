@@ -1579,6 +1579,88 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['user_id'] == user_role['user_id']
         assert user_role_found['workspace_id'] == user_role['workspace_id']
 
+    def test_api__create_workspace_member_role__err_400__user_email__user_deactivated(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        lawrence = uapi.get_one_by_email('lawrence-not-real-email@fsf.local')
+        lawrence.is_active = False
+        uapi.save(lawrence)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_NOT_ACTIVE
+
+    def test_api__create_workspace_member_role__err_400__user_email__user_deleted(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        lawrence = uapi.get_one_by_email('lawrence-not-real-email@fsf.local')
+        lawrence.is_deleted = True
+        uapi.save(lawrence)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_DELETED
+
     def test_api__create_workspace_member_role__ok_200__user_public_name(self):
         """
         Create workspace member role

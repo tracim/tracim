@@ -40,7 +40,7 @@ from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import PageNotFound
-from tracim_backend.exceptions import UserNotActive
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import InvalidId
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
@@ -117,7 +117,7 @@ def web(global_config, **local_settings):
     context.handle_exception(SameValueError, HTTPStatus.BAD_REQUEST)
     # Auth exception
     context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    context.handle_exception(UserNotActive, HTTPStatus.FORBIDDEN)
+    context.handle_exception(UserAuthenticatedIsNotActive, HTTPStatus.FORBIDDEN)
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
     context.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)

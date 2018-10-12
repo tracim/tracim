@@ -5,7 +5,6 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend import BASE_API_V2
-from tracim_backend.extensions import hapic
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
@@ -14,7 +13,10 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserIsDeleted
+from tracim_backend.exceptions import UserIsNotActive
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -321,6 +323,8 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmailValidationFailed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
     @require_profile_and_workspace_role(
         minimal_profile=Group.TIM_USER,
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
@@ -359,6 +363,10 @@ class WorkspaceController(Controller):
                 email=hapic_data.body.user_email_or_public_name,
                 public_name=hapic_data.body.user_email_or_public_name
             )
+            if user.is_deleted:
+                raise UserIsDeleted('This user has been deleted. Unable to invite him.')  # nopep8
+            if not user.is_active:
+                raise UserIsNotActive('This user is not activated. Unable to invite him')  # nopep8
         except UserDoesNotExist as exc:
             if not app_config.EMAIL_NOTIFICATION_ACTIVATED:
                 raise exc
