@@ -84,15 +84,17 @@ export const putUserProfile = (apiUrl, idUser, newProfile) =>
     method: 'PUT'
   })
 
-export const postAddUser = (apiUrl, email, profile) =>
+export const postAddUser = (apiUrl, name, email, profile, emailNotif, password) =>
   fetch(`${apiUrl}/users`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
     body: JSON.stringify({
+      public_name: name,
       email,
-      email_notification: false,
+      email_notification: emailNotif || false,
+      password: password || '', // '' will generate the password by backend
       profile
     }),
     method: 'POST'

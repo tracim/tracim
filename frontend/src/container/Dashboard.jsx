@@ -33,7 +33,8 @@ import appFactory from '../appFactory.js'
 import {
   ROLE,
   PAGE,
-  findIdRoleUserWorkspace
+  findIdRoleUserWorkspace,
+  PROFILE
 } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
@@ -272,8 +273,7 @@ class Dashboard extends React.Component {
         slug: 'workspace_advanced',
         faIcon: 'bank',
         hexcolor: GLOBAL_primaryColor,
-        creationLabel: '',
-        roleList: ROLE
+        creationLabel: ''
       },
       props.user,
       findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
@@ -397,8 +397,9 @@ class Dashboard extends React.Component {
                 onChangeRole={this.handleChangeNewMemberRole}
                 onClickValidateNewMember={this.handleClickValidateNewMember}
                 onClickRemoveMember={this.handleClickRemoveMember}
-                displayRemoveMemberBtn={idRoleUserWorkspace >= 8}
-                displayAddMemberBtn={idRoleUserWorkspace >= 8}
+                idRoleUserWorkspace={idRoleUserWorkspace}
+                isLoggedUserAdmin={props.user.profile === PROFILE.ADMINISTRATOR.slug}
+                emailNotifActivated={props.system.config.email_notification_activated}
                 t={props.t}
               />
             </div>

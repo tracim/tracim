@@ -147,5 +147,8 @@
   "Your password has been changed, you can now login": "Votre mot de passe a été changé, vous pouvez vous connecter",
   "Information are missing, please use the link in the email your should have received to reset your password": "Informations manquantes, veuillez utiliser le lien de l'email que vous devez avoir reçu pour changer votre mot de passe",
   "Cancel": "Annuler",
-  "Server unreachable": "Serveur indisponible"
+  "Server unreachable": "Serveur indisponible",
+  "Unknown user": "Utilisateur inconnu",
+  "email notification not activated": "notification email désactivées",
+  "Please enter a login and a password": "Veuillez entrer un nom d'utilisateur et un mot de passe"
 }

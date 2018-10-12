@@ -147,5 +147,8 @@
   "Cancel": "Cancel",
   "Information are missing, please use the link in the email your should have received to reset your password": "Information are missing, please use the link in the email your should have received to reset your password",
   "Your password has been changed, you can now login": "Your password has been changed, you can now login",
-  "Server unreachable": "Server unreachable"
+  "Server unreachable": "Server unreachable",
+  "Unknown user": "Unknown user",
+  "email notification not activated": "email notification not activated",
+  "Please enter a login and a password": "Please enter a login and a password"
 }

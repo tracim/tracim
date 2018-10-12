@@ -8,7 +8,7 @@ import {
   handleFetchResult,
   CardPopup
 } from 'tracim_frontend_lib'
-import { debug, ROLE } from '../helper.js'
+import { debug } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
@@ -97,6 +97,15 @@ class AdminWorkspaceUser extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
+    type: 'addFlashMsg',
+    data: {
+      msg: msg,
+      type: type,
+      delay: undefined
+    }
+  })
+
   loadWorkspaceContent = async () => {
     const { props, state } = this
 
@@ -122,15 +131,7 @@ class AdminWorkspaceUser extends React.Component {
         }))
         break
 
-      default:
-        GLOBAL_dispatchEvent({
-          type: 'addFlashMsg',
-          data: {
-            msg: props.t('Error while loading shared spaces list'),
-            type: 'warning',
-            delay: undefined
-          }
-        })
+      default: this.sendGlobalFlashMsg(props.t('Error while loading shared spaces list', 'warning'))
     }
   }
 
@@ -153,15 +154,7 @@ class AdminWorkspaceUser extends React.Component {
           }
         }))
         break
-
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading users list'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMsg(props.t('Error while loading users list'), 'warning')
     }
   }
 
@@ -177,14 +170,7 @@ class AdminWorkspaceUser extends React.Component {
           data: {}
         })
         break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while deleting shared space'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMsg(props.t('Error while deleting shared space'), 'warning')
     }
     this.handleClosePopupDeleteWorkspace()
   }
@@ -204,14 +190,7 @@ class AdminWorkspaceUser extends React.Component {
     const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, idUser))
     switch (toggleUser.status) {
       case 204: this.loadUserContent(); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while enabling or disabling user'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMsg(props.t('Error while enabling or disabling user'), 'warning')
     }
   }
 
@@ -221,34 +200,48 @@ class AdminWorkspaceUser extends React.Component {
     const toggleManager = await handleFetchResult(await putUserProfile(state.config.apiUrl, idUser, newProfile))
     switch (toggleManager.status) {
       case 204: this.loadUserContent(); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while saving new profile'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
     }
   }
 
-  handleClickAddUser = async (email, profile) => {
+  handleClickAddUser = async (name, email, profile, password) => {
     const { props, state } = this
 
-    const newUserResult = await handleFetchResult(await postAddUser(state.config.apiUrl, email, profile))
+    if (password !== '') {
+      if (password.length < 6) {
+        this.sendGlobalFlashMsg(props.t('New password is too short (minimum 6 characters)'), 'warning')
+        return
+      }
+
+      if (password.length > 512) {
+        this.sendGlobalFlashMsg(props.t('New password is too long (maximum 512 characters)'), 'warning')
+        return
+      }
+    }
+
+    const newUserResult = await handleFetchResult(
+      await postAddUser(state.config.apiUrl, name, email, profile, state.config.system.email_notification_activated, password)
+    )
+
     switch (newUserResult.apiResponse.status) {
       case 200:
         this.loadUserContent()
-
-        break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while saving new user'),
-          type: 'warning',
-          delay: undefined
+        this.sendGlobalFlashMsg(
+          state.config.system.config.email_notification_activated
+            ? props.t('User created and email sent')
+            : props.t('User created'),
+          'info'
+        )
+        return true
+      case 400:
+        switch (newUserResult.body.code) {
+          case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
+          default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         }
-      })
+        return false
+      default:
+        this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+        return false
     }
   }
 
@@ -266,7 +259,7 @@ class AdminWorkspaceUser extends React.Component {
           faIcon: 'bank',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: '',
-          roleList: ROLE,
+          roleList: state.config.roleList,
           domContainer: 'appFeatureContainer',
           apiUrl: state.config.apiUrl,
           apiHeader: state.config.apiHeader,
@@ -310,6 +303,7 @@ class AdminWorkspaceUser extends React.Component {
             userList={state.content.userList}
             idLoggedUser={state.loggedUser.user_id}
             profile={state.content.profile}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}

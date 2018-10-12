@@ -59,6 +59,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       switch (fetchResult.status) {
         case 200:
         case 304:
+        case 400: // 400 should return the body in json to handle the backend error code in it
           return fetchResult.json()
         case 204:
           return ''
@@ -67,7 +68,6 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
             document.location.href = `${PAGE.LOGIN}?dc=1`
           }
           return ''
-        case 400:
         case 403:
         case 404:
         case 409:
