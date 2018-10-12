@@ -27,7 +27,7 @@
   "Item moved": "Item moved",
   "Item copied": "Item copied",
   "Item archived": "Item archived",
-  "Enter the name or email of the user": "Enter the name or email of the user",
-  "If you type an email that isn't associated to an account, an invitational email will be sent": "If you type an email that isn't associated to an account, an invitational email will be sent",
-  "Email notifications are disabled, you can't create new users from here": "Email notifications are disabled, you can't create new users from here"
+  "Invite someone to join the shared space": "Invite someone to join the shared space",
+  "If you type an unknown email address, an invitational email will be sent": "If you type an unknown email address, an invitational email will be sent",
+  "Due to disabled email notifications, only registered users can be invited": "Due to disabled email notifications, only registered users can be invited"
 }
