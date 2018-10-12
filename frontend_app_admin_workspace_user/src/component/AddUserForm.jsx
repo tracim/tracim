@@ -123,10 +123,11 @@ export class AddUserForm extends React.Component {
         <div className='adminUser__adduser__form__submit'>
           <button
             type='button'
-            className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+            className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
             onClick={this.handleClickAddUser}
           >
             {props.t('Create the user')}
+            <i class="fa fa-fw fa-check">
           </button>
         </div>
       </form>
