@@ -70,7 +70,7 @@ class Header extends React.Component {
   }
 
   render () {
-    const { lang, user } = this.props
+    const { props } = this
 
     return (
       <header className='header'>
@@ -88,19 +88,28 @@ class Header extends React.Component {
               onClickAbout={this.handleClickAbout}
             />
 
+            {props.location.pathname !== PAGE.LOGIN && !props.system.config.email_notification_activated && (
+              <div className='header__menu__system' title={props.t('email notification not activated')}>
+                <i className='header__menu__system__icon slowblink fa fa-warning' />
+                <span className='header__menu__system__text d-none d-xl-block'>
+                  {props.t('email notification not activated')}
+                </span>
+              </div>
+            )}
+
             <ul className='header__menu__rightside'>
               <MenuActionListItemSearch
                 onChangeInput={this.handleChangeInput}
                 onClickSubmit={this.handleClickSubmit}
               />
 
-              {user.profile === PROFILE.ADMINISTRATOR.slug &&
+              {props.user.profile === PROFILE.ADMINISTRATOR.slug &&
                 <MenuActionListAdminLink t={this.props.t} />
               }
 
               <MenuActionListItemDropdownLang
-                langList={lang}
-                idLangActive={user.lang ? user.lang : 'en'}
+                langList={props.lang}
+                idLangActive={props.user.lang ? props.user.lang : 'en'}
                 onChangeLang={this.handleChangeLang}
               />
 
@@ -111,7 +120,7 @@ class Header extends React.Component {
               <MenuActionListItemNotification />
 
               <MenuActionListItemMenuProfil
-                user={user}
+                user={props.user}
                 onClickLogout={this.handleClickLogout}
               />
             </ul>
@@ -122,5 +131,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user }) => ({ lang, user })
+const mapStateToProps = ({ lang, user, system }) => ({ lang, user, system })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

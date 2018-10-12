@@ -1,4 +1,4 @@
-import { login } from '../helpers/index.js'
+import { login, logout } from '../helpers/index.js'
 
 describe('content :: admin > workspace', function () {
     before(function () {
@@ -8,9 +8,7 @@ describe('content :: admin > workspace', function () {
         cy.url().should('include', '/admin/workspace')
     })
     after(function() {
-        cy.get('#dropdownMenuButton').click()
-        cy.get('div.setting__link').click()
-        cy.url().should('include', '/login')
+        logout (cy)
     })
     it ('', function(){
         cy.get('.adminWorkspace__description').should('be.visible')

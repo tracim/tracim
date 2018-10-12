@@ -1,5 +1,5 @@
 // Not connected
-import { login } from '../helpers/index.js'
+import { login, logout } from '../helpers/index.js'
 
 //describe('navigate :: workspace > create_new > folder', function () {
 //    before(function () {

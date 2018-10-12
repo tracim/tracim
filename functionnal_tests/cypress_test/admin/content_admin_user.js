@@ -1,4 +1,4 @@
-import { login } from '../helpers/index.js'
+import { login, logout } from '../helpers/index.js'
 
 //describe('navigation :: admin > user', function () {
 //    before(function () {

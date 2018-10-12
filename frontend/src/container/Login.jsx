@@ -14,10 +14,12 @@ import {
   setWorkspaceList,
   setWorkspaceListIsOpenInSidebar,
   setContentTypeList,
-  setAppList
+  setAppList,
+  setConfig
 } from '../action-creator.sync.js'
 import {
   getAppList,
+  getConfig,
   getContentTypeList,
   getWorkspaceList,
   postUserLogin
@@ -45,6 +47,7 @@ class Login extends React.Component {
 
   componentDidMount () {
     const { props } = this
+
     const query = qs.parse(props.location.search)
     if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
   }
@@ -62,6 +65,11 @@ class Login extends React.Component {
   handleClickSubmit = async () => {
     const { history, dispatch, t } = this.props
     const { inputLogin, inputPassword, inputRememberMe } = this.state
+
+    if (inputLogin.value === '' || inputPassword.value === '') {
+      dispatch(newFlashMessage(t('Please enter a login and a password'), 'warning'))
+      return
+    }
 
     const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
 
@@ -85,6 +93,9 @@ class Login extends React.Component {
   // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
   loadAppConfig = async () => {
     const { props } = this
+
+    const fetchGetConfig = await props.dispatch(getConfig())
+    if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
 
     const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
@@ -137,7 +148,7 @@ class Login extends React.Component {
                 </CardHeader>
 
                 <CardBody formClass='connection__form'>
-                  <div>
+                  <form>
                     <InputGroupText
                       parentClassName='connection__form__groupemail'
                       customClass='mb-3 mt-4'
@@ -200,7 +211,7 @@ class Login extends React.Component {
                         />
                       </div>
                     </div>
-                  </div>
+                  </form>
                 </CardBody>
               </Card>
             </div>

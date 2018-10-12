@@ -1,22 +1,18 @@
-import { login } from '../helpers/index.js'
+import { login, logout } from '../helpers/index.js'
 
 describe('content :: home_page', function () {
     before(function () {
-        login(cy)
+        login (cy)
     })
     after(function() {
-        cy.get('#dropdownMenuButton').click()
-        cy.get('div.setting__link').click()
-        cy.url().should('include', '/login')
+        logout (cy)
     })
     it ('', function () {
-        cy.get('#dropdownCreateBtn.workspace__header__btnaddcontent__label').click()
-        cy.get('.show .subdropdown__link__thread__icon').click()
-        cy.get('.createcontent__contentname').should('be.visible')
-        cy.get('.createcontent__form__input').should('have.attr', 'placeholder')
-        cy.get('.createcontent__form__input').type('thread1')
-        cy.get('.createcontent__form__input').should('have.attr', 'value', 'thread1')
-        cy.get('.cardPopup__close').click()
-        cy.get('.createcontent__contentname').should('not.be.visible')
+        cy.get('section.homepage').should('be.visible')
+        cy.get('.homepagecard__title').should('be.visible')
+        cy.get('.homepagecard__user').should('be.visible')
+        cy.get('.homepagecard__delimiter').should('be.visible')
+        cy.get('.homepagecard__text').should('be.visible')
+        cy.get('.homepagecard__endtext').should('be.visible')
     })
 })
