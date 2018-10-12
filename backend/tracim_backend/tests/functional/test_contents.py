@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-import pytest
-from tracim_backend.app_models.contents import CONTENT_TYPES
 import io
 
+import pytest
 import transaction
-from PIL import Image
 from depot.io.utils import FileIntent
+from PIL import Image
 
-from tracim_backend import models
 from tracim_backend import error
+from tracim_backend import models
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.fixtures.content import Content as ContentFixtures
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
@@ -16,8 +18,6 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import create_1000px_png_test_image
 from tracim_backend.tests import set_html_document_slug_to_legacy
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestFolder(FunctionalTest):
@@ -2675,6 +2675,159 @@ class TestFiles(FunctionalTest):
         assert res.body == b'Test file'
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
+
+    def test_api__create_file__ok__200__nominal_case(self) -> None:
+        """
+        create one file of a content
+        """
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=200,
+        )
+        res = res.json_body
+        assert res['parent_id'] is None
+        assert res['content_type'] == 'file'
+        assert res['is_archived'] is False
+        assert res['is_deleted'] is False
+        assert res['workspace_id'] == business_workspace.workspace_id
+        assert isinstance(res['content_id'], int)
+        content_id = res['content_id']
+        assert res['status'] == 'open'
+        assert res['label'] == 'test_image'
+        assert res['slug'] == 'test-image'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/files/{content_id}'.format(
+                workspace_id=business_workspace.workspace_id,
+                content_id=content_id
+            ),
+            status=200,
+        )
+
+        res = res.json_body
+        assert res['parent_id'] is None
+        assert res['content_type'] == 'file'
+        assert res['is_archived'] is False
+        assert res['is_deleted'] is False
+        assert res['workspace_id'] == business_workspace.workspace_id
+        assert isinstance(res['content_id'], int)
+        content_id = res['content_id']
+        assert res['status'] == 'open'
+        assert res['label'] == 'test_image'
+        assert res['slug'] == 'test-image'
+        assert res['author']['user_id'] == admin.user_id
+        assert res['page_nb'] == 1
+        assert res['mimetype'] == 'image/png'
+
+    def test_api__create_file__ok__200__in_folder(self) -> None:
+        """
+        create one file of a content
+        """
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=business_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': folder.content_id,
+        }
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            params=params,
+            status=200,
+        )
+        res = res.json_body
+        assert res['parent_id'] == folder.content_id
+        assert res['content_type'] == 'file'
+        assert res['is_archived'] is False
+        assert res['is_deleted'] is False
+        assert res['workspace_id'] == business_workspace.workspace_id
+        assert isinstance(res['content_id'], int)
+        content_id = res['content_id']
+        assert res['status'] == 'open'
+        assert res['label'] == 'test_image'
+        assert res['slug'] == 'test-image'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/files/{content_id}'.format(
+                workspace_id=business_workspace.workspace_id,
+                content_id=content_id
+            ),
+            status=200,
+        )
+
+        res = res.json_body
+        assert res['parent_id'] == folder.content_id
+        assert res['content_type'] == 'file'
+        assert res['is_archived'] is False
+        assert res['is_deleted'] is False
+        assert res['workspace_id'] == business_workspace.workspace_id
+        assert isinstance(res['content_id'], int)
+        content_id = res['content_id']
+        assert res['status'] == 'open'
+        assert res['label'] == 'test_image'
+        assert res['slug'] == 'test-image'
+        assert res['author']['user_id'] == admin.user_id
+        assert res['page_nb'] == 1
+        assert res['mimetype'] == 'image/png'
 
     def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
         """

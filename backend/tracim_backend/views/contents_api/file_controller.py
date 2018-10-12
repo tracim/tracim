@@ -3,14 +3,17 @@ import typing
 
 import transaction
 from depot.manager import DepotManager
+from hapic.data import HapicFile
+from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 
-from hapic.data import HapicFile
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
+from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnavailablePreview
@@ -21,13 +24,16 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
+from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
+from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FileRevisionSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
@@ -35,10 +41,12 @@ from tracim_backend.views.core_api.schemas import PageQuerySchema
 from tracim_backend.views.core_api.schemas import \
     RevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentRevisionIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -56,9 +64,65 @@ class FileController(Controller):
     # File data
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(ContentDigestSchema())
+    @hapic.input_forms(FileCreationFormSchema())
+    @hapic.input_files(SimpleFileSchema())
+    def create_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Create a file .This will create 2 new
+        revision.
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        _file = hapic_data.files.files
+        parent_id = hapic_data.forms.parent_id
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config
+        )
+
+        parent = None  # type: typing.Optional['Content']
+        if parent_id:
+            try:
+                parent = api.get_one(content_id=parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+            except ContentNotFound as exc:
+                raise ParentNotFound(
+                    'Parent with content_id {} not found'.format(parent_id)
+                ) from exc
+        content = api.create(
+            filename=_file.filename,
+            content_type_slug=FILE_TYPE,
+            workspace=request.current_workspace,
+            parent=parent,
+        )
+        api.save(content, ActionDescription.CREATION)
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.update_file_data(
+                content,
+                new_filename=_file.filename,
+                new_mimetype=_file.type,
+                new_content=_file.file,
+            )
+
+        return api.get_content_in_context(content)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    # TODO - G.M - 2018-07-24 - Use hapic for input file
+    @hapic.input_files(SimpleFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -77,7 +141,7 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=CONTENT_TYPES.Any_SLUG
         )
-        file = request.POST['files']
+        _file = hapic_data.files.files
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
@@ -85,9 +149,9 @@ class FileController(Controller):
         ):
             api.update_file_data(
                 content,
-                new_filename=file.filename,
-                new_mimetype=file.type,
-                new_content=file.file,
+                new_filename=_file.filename,
+                new_mimetype=_file.type,
+                new_content=_file.file,
             )
         api.save(content)
         return
@@ -614,6 +678,13 @@ class FileController(Controller):
         configurator.add_view(self.update_file_info, route_name='update_file_info')  # nopep8
 
         # raw file #
+        # create file
+        configurator.add_route(
+            'create_file',
+            '/workspaces/{workspace_id}/files',  # nopep8
+            request_method='POST'
+        )
+        configurator.add_view(self.create_file, route_name='create_file')  # nopep8
         # upload raw file
         configurator.add_route(
             'upload_file',
