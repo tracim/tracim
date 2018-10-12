@@ -45,7 +45,6 @@
   "known members list": "Liste des membres connus",
   "Please set a name or email": "Entrez un nom, s'il vous plaît",
   "Please set a role": "Choisissez un rôle s'il vous plaît",
-  "An error has happened while adding the member": "Une erreur s'est produite lors de l'ajout d'un membre",
   "Thank you for trusting us and using our collaborative tool": "Merci de nous faire confiance et d'utiliser notre outil collaboratif.",
   "Error while archiving document": "Erreur lors de l'archivage d'un document",
   "Error while deleting document": "Erreur lors de la suppression d'un document",
@@ -150,5 +149,7 @@
   "Server unreachable": "Serveur indisponible",
   "Unknown user": "Utilisateur inconnu",
   "email notification not activated": "notification email désactivées",
-  "Please enter a login and a password": "Veuillez entrer un nom d'utilisateur et un mot de passe"
+  "Please enter a login and a password": "Veuillez entrer un nom d'utilisateur et un mot de passe",
+  "This account is deactivated": "Ce compte est désactivé",
+  "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé"
 }

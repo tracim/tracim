@@ -45,7 +45,6 @@
   "Please set a name or email": "Please set a name or email",
   "Please set a role": "Please set a role",
   "Member added": "Member added",
-  "An error has happened while adding the member": "An error has happened while adding the member",
   "Member removed": "Member removed",
   "Error while removing the member": "Error while removing the member",
   "Open advanced Dashboard": "Open advanced Dashboard",
@@ -150,5 +149,7 @@
   "Server unreachable": "Server unreachable",
   "Unknown user": "Unknown user",
   "email notification not activated": "email notification not activated",
-  "Please enter a login and a password": "Please enter a login and a password"
+  "Please enter a login and a password": "Please enter a login and a password",
+  "This account is deactivated": "This account is deactivated",
+  "Error while adding the member to the shared space": "Error while adding the member to the shared space"
 }

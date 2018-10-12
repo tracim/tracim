@@ -22,5 +22,6 @@
   "Are you sure ?": "Are you sure ?",
   "Cancel": "Cancel",
   "Unknown user": "Unknown user",
-  "Error while deleting shared space": "Error while deleting shared space"
+  "Error while deleting shared space": "Error while deleting shared space",
+  "This account is deactivated": "This account is deactivated"
 }
