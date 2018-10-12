@@ -17,6 +17,8 @@ matrix:
         - docker
         - redis-server
       before_install:
+        # TODO - GM - 2018-10-12  find a better way to install exiftool
+        # download exiftool and compile it to have a working exiftool command (used by preview_generator)
         - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
         - docker pull mailhog/mailhog
         - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
