@@ -637,6 +637,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         required=True,
         example='My Workspace',
+        validate=Length(min=1),
     )
     description = marshmallow.fields.String(
         required=True,

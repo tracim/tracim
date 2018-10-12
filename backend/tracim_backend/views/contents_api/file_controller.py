@@ -15,6 +15,7 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -51,7 +52,6 @@ try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
-
 
 SWAGGER_TAG__FILE_ENDPOINTS = 'Files'
 
@@ -225,7 +225,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
-    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
@@ -262,8 +262,8 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
@@ -294,8 +294,8 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
@@ -332,8 +332,8 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])

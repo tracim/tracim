@@ -255,9 +255,19 @@ class WorkspaceAdvanced extends React.Component {
       this.sendGlobalFlashMessage(props.t('Please set a name or email', 'warning'))
       return
     }
+
     if (state.newMember.role === '') {
       this.sendGlobalFlashMessage(props.t('Please set a role', 'warning'))
       return
+    }
+
+    if (
+      !state.searchedKnownMemberList.find(u => u.public_name === state.newMember.name) &&
+      state.config.system && state.config.system &&
+      !state.config.system.email_notification_activated
+    ) {
+      props.sendGlobalFlashMessage(props.t('Unknown user'), 'warning')
+      return false
     }
 
     const fetchWorkspaceNewMember = await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
@@ -359,4 +369,4 @@ class WorkspaceAdvanced extends React.Component {
   }
 }
 
-export default Radium(translate()(WorkspaceAdvanced))
+export default translate()(Radium(WorkspaceAdvanced))
