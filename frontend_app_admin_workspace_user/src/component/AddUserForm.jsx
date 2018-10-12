@@ -127,7 +127,7 @@ export class AddUserForm extends React.Component {
             onClick={this.handleClickAddUser}
           >
             {props.t('Create the user')}
-            <i class="fa fa-fw fa-check">
+            <i class="fa fa-fw fa-check"/>
           </button>
         </div>
       </form>
