@@ -58,7 +58,7 @@ export function create_htmldocument (cy) {
     cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').click()
     cy.get('.html-document.visible').should('not.be.visible')
     cy.wait(2000)
-    cy.get('.content__name__text').contains(titre1).should('be.visible')
+    cy.get('.content__name').contains(titre1).should('be.visible')
 }
 
 export function delete_file (cy) {
@@ -68,10 +68,10 @@ export function delete_thread (cy) {
     cy.visit('/workspaces/1/contents')
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     var titre1='createthread'
-    cy.get('.content__name__text').each(($elm) => {
+    cy.get('.content__name').each(($elm) => {
         cy.wrap($elm).invoke('text').then((text) => {
         if (text === titre1) {
-            cy.get('.content__name__text').contains(titre1).click()
+            cy.get('.content__name').contains(titre1).click()
             cy.get('.thread.visible').should('be.visible')
             cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
             cy.get('.thread.visible .align-items-center button:nth-child(2)').click()
@@ -87,10 +87,10 @@ export function delete_htmldocument (cy) {
     cy.visit('/workspaces/1/contents')
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     var titre1='createhtml-document'
-    cy.get('.content__name__text').each(($elm) => {
+    cy.get('.content__name').each(($elm) => {
         cy.wrap($elm).invoke('text').then((text) => {
         if (text === titre1) {
-            cy.get('.content__name__text').contains(titre1).click()
+            cy.get('.content__name').contains(titre1).click()
             cy.get('.html-document.visible').should('be.visible')
             cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
             cy.wait(2000)

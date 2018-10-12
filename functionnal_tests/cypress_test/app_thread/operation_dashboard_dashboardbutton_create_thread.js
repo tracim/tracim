@@ -6,10 +6,10 @@ describe('operation :: workspace > create_new > thread', function () {
         cy.visit('/workspaces/1/contents')
         cy.get('.pageTitleGeneric__title__icon').should('be.visible')
         var titre1='dashboard button thread'
-        cy.get('.content__name__text').each(($elm) => {
+        cy.get('.content__name').each(($elm) => {
             cy.wrap($elm).invoke('text').then((text) => {
             if (text === titre1) {
-                cy.get('.content__name__text').contains(titre1).click()
+                cy.get('.content__name').contains(titre1).click()
                 cy.get('.thread.visible').should('be.visible')
                 cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
                 cy.get('.thread.visible .align-items-center button:nth-child(2)').click()
@@ -45,6 +45,6 @@ describe('operation :: workspace > create_new > thread', function () {
         cy.get('.thread.visible .thread__contentpage__header__close').click()
         cy.get('.thread.visible').should('not.be.visible')
 //        Need improvement to verified new content is in list
-//        cy.get('.workspace__content__fileandfolder .content__name__text').find(titre1)
+//        cy.get('.workspace__content__fileandfolder .content__name').find(titre1)
     })
 })
