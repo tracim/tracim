@@ -93,7 +93,7 @@ export const postAddUser = (apiUrl, name, email, profile, emailNotif, password) 
     body: JSON.stringify({
       public_name: name,
       email,
-      email_notification: emailNotif || false,
+      email_notification: emailNotif,
       password: password || '', // '' will generate the password by backend
       profile
     }),

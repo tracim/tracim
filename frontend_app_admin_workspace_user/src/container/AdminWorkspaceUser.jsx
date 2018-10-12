@@ -220,7 +220,7 @@ class AdminWorkspaceUser extends React.Component {
     }
 
     const newUserResult = await handleFetchResult(
-      await postAddUser(state.config.apiUrl, name, email, profile, state.config.system.email_notification_activated, password)
+      await postAddUser(state.config.apiUrl, name, email, profile, state.config.system.config.email_notification_activated, password)
     )
 
     switch (newUserResult.apiResponse.status) {
