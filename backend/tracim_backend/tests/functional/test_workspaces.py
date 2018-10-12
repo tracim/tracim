@@ -2163,6 +2163,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'current-menu'
         assert content['status'] == 'open'
+        assert content['modified']
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
         content = res[1]
@@ -2179,6 +2180,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'comment' in content['sub_content_types']
         assert 'folder' in content['sub_content_types']
         assert content['workspace_id'] == 1
+        assert content['modified']
         content = res[2]
         assert content['content_id'] == 1
         assert content['content_type'] == 'folder'
@@ -2193,6 +2195,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'comment' in content['sub_content_types']
         assert 'folder' in content['sub_content_types']
         assert content['workspace_id'] == 1
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_default_html_documents(self):
         """
@@ -2223,6 +2226,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
+        assert content['modified']
 
     # Root related
     def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):  # nopep8
@@ -2262,6 +2266,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
         content = res[1]
         assert content['content_type'] == 'html-document'
@@ -2275,6 +2280,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
         content = res[3]
         assert content['content_type'] == 'html-document'
@@ -2288,6 +2294,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_all_root_content(self):
         """
@@ -2325,6 +2332,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
         content = res[1]
         assert content['content_type'] == 'html-document'
@@ -2338,6 +2346,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
         content = res[3]
         assert content['content_type'] == 'html-document'
@@ -2351,6 +2360,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
@@ -2389,6 +2399,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
         """
@@ -2426,6 +2437,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):  # nopep8
         """
@@ -2462,6 +2474,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):  # nopep8
         """
@@ -2500,6 +2513,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_nothing_root_content(self):
         """
@@ -2632,6 +2646,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
         # prepare data
@@ -2740,6 +2755,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 1
         assert res[0]['content_id'] != res[1]['content_id']
+        assert content['modified']
         content = res[1]
         assert content['content_type'] == 'html-document'
         assert content['content_id']
@@ -2752,6 +2768,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 1
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_all_folder_content(self):
         """
@@ -2789,6 +2806,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
+        assert content['modified']
 
         content = res[1]
         assert content['content_type'] == 'html-document'
@@ -2802,6 +2820,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
+        assert content['modified']
 
         content = res[2]
         assert content['content_type'] == 'html-document'
@@ -2815,6 +2834,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):  # nopep8
         """
@@ -2851,6 +2871,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):  # nopep8
         """
@@ -2887,6 +2908,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):  # nopep8
         """
@@ -2924,6 +2946,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
+        assert content['modified']
 
     def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):  # nopep8
         """
@@ -3042,6 +3065,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['modified']
         params_active = {
             'parent_id': 0,
             'show_archived': 0,
@@ -3085,6 +3109,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['modified']
         params_active = {
             'parent_id': 0,
             'show_archived': 0,
@@ -3137,6 +3162,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['modified']
         params_active = {
             'parent_id': 0,
             'show_archived': 0,
@@ -3207,6 +3233,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] == 10
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['modified']
         params_active = {
             'parent_id': 10,
             'show_archived': 0,

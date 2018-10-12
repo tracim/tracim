@@ -930,6 +930,10 @@ class ContentDigestSchema(marshmallow.Schema):
                     'for sub-contents. Default is True. '
                     'In first version of the API, this field is always True',
     )
+    modified = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description='date of last modification of content',
+    )
 
 
 class ReadStatusSchema(marshmallow.Schema):
@@ -950,10 +954,6 @@ class ContentSchema(ContentDigestSchema):
         description='Content creation date',
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
-    modified = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT,
-        description='date of last modification of content',
-    )
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
 
