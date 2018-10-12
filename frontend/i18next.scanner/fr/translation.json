@@ -149,7 +149,7 @@
   "Cancel": "Annuler",
   "Server unreachable": "Serveur indisponible",
   "Unknown user": "Utilisateur inconnu",
-  "email notification not activated": "notification email désactivées",
+  "Email notifications are disabled": "Les notifications par email sont désactivées",
   "Please enter a login and a password": "Veuillez entrer un nom d'utilisateur et un mot de passe",
   "This account is deactivated": "Ce compte est désactivé",
   "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé"

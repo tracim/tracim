@@ -149,7 +149,7 @@
   "Your password has been changed, you can now login": "Your password has been changed, you can now login",
   "Server unreachable": "Server unreachable",
   "Unknown user": "Unknown user",
-  "email notification not activated": "email notification not activated",
+  "Email notifications are disabled": "Email notifications are disabled",
   "Please enter a login and a password": "Please enter a login and a password",
   "This account is deactivated": "This account is deactivated",
   "Error while adding the member to the shared space": "Error while adding the member to the shared space"
