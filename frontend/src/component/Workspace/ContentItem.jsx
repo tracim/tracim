@@ -14,6 +14,7 @@ const ContentItem = props => {
         classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
       }
       onClick={props.onClickItem}
+      title={props.label}
     >
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />

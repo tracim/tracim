@@ -33,7 +33,11 @@
       margin 0 25px
       font-size 25px
     &__name
-      word-break break-word
+      flex 1
+      width 0
+      overflow-x hidden
+      text-overflow ellipsis
+      white-space nowrap
       font-size 18px
   &__more
     display flex
