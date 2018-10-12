@@ -13,12 +13,11 @@ matrix:
           - imagemagick
           - libmagickwand-dev
           - ghostscript
-          - libimage-exiftool-perl
       services:
         - docker
         - redis-server
-
       before_install:
+        - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install
         - docker pull mailhog/mailhog
         - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
         - cd backend
@@ -31,7 +30,6 @@ matrix:
         # see https://github.com/z4r/python-coveralls/issues/66
         - pip install 'pytest-cov<2.6'
         - pip install python-coveralls
-
       script:
        - py.test --cov tracim_backend
 
