@@ -1,28 +1,30 @@
 # coding=utf-8
+import cgi
 import typing
 from datetime import datetime
 from enum import Enum
 
 from slugify import slugify
 from sqlalchemy.orm import Session
+
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.utils.utils import get_root_frontend_url
-from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import get_root_frontend_url
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models import User
-from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.app_models.contents import CONTENT_TYPES
 
 
 class AboutModel(object):
@@ -127,7 +129,7 @@ class SetEmail(object):
 
 
 class SimpleFile(object):
-    def __init__(self, files):
+    def __init__(self, files: cgi.FieldStorage):
         self.files = files
 
 

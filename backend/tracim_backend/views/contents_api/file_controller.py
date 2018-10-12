@@ -89,7 +89,7 @@ class FileController(Controller):
             config=app_config
         )
 
-        parent = None
+        parent = None  # type: typing.Optional['Content']
         if parent_id:
             try:
                 parent = api.get_one(content_id=parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
