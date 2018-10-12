@@ -13,9 +13,10 @@ export const NewMemberForm = props => {
       </div>
 
       <div className='memberlist__form__member'>
+        <h4>{props.t('Add a member')}</h4
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
-            {props.t('Invite someone to join the shared space')}
+            {props.t('Enter the name or email of the user')}
           </label>
 
           <input

@@ -27,7 +27,7 @@
   "Item moved": "Elément déplacé",
   "Item copied": "Elément copié",
   "Item archived": "Elément archivé",
-  "Invite someone to join the shared space": "Inviter quelqu'un à rejoindre l'espace partagé",
+  "Enter the name or email of the user": "Saisir le nom ou l'email de l'utilisateur",
   "If you type an unknown email address, an invitational email will be sent": "Si vous saisissez une adresse email inconnue, un email d'invitation sera envoyé",
   "Due to disabled email notifications, only registered users can be invited": "Notification email désactivées, vous ne pouvez pas créer un nouvel utilisateur depuis ce formulaire"
 }
