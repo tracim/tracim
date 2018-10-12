@@ -270,13 +270,13 @@ class WorkspaceAdvanced extends React.Component {
       return false
     }
 
-    const fetchWorkspaceNewMember = await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
+    const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || null,
       name: state.newMember.name,
       role: state.newMember.role
-    })
+    }))
 
-    switch (fetchWorkspaceNewMember.status) {
+    switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
         this.loadContent()
         this.setState({
@@ -285,6 +285,12 @@ class WorkspaceAdvanced extends React.Component {
         })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        break
+      case 400:
+        switch (fetchWorkspaceNewMember.body.code) {
+          case 2042: this.sendGlobalFlashMessage(props.t('This account is deactivated'), 'warning'); break
+          default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
+        }
         break
       default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space', 'warning'))
     }

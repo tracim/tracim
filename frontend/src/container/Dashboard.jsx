@@ -245,8 +245,17 @@ class Dashboard extends React.Component {
         this.setState({newMember: {id: '', avatarUrl: '', nameOrEmail: '', role: ''}})
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
+      case 400:
+        switch (fetchWorkspaceNewMember.json.code) {
+          case 2042:
+            props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
+            return false
+          default:
+            props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
+            return false
+        }
       default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
         return false
     }
   }
