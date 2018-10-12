@@ -503,4 +503,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default Radium(translate()(HtmlDocument))
+export default translate()(Radium(HtmlDocument))

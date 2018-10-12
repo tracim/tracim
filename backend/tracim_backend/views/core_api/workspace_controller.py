@@ -13,7 +13,6 @@ from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.exceptions import UserCreationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.content import ContentApi
@@ -320,7 +319,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmailValidationFailed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     @require_profile_and_workspace_role(
         minimal_profile=Group.TIM_USER,
@@ -351,6 +350,8 @@ class WorkspaceController(Controller):
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
+            show_deactivated=True,
+            show_deleted=True,
         )
         try:
             _, user = uapi.find(
@@ -362,19 +363,15 @@ class WorkspaceController(Controller):
             if not app_config.EMAIL_NOTIFICATION_ACTIVATED:
                 raise exc
 
-            try:
-                user = uapi.create_user(
-                    email=hapic_data.body.user_email_or_public_name,
-                    password=password_generator(),
-                    do_notify=True
-                )
-                newly_created = True
-                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                    app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
-                    email_sent = True
-
-            except EmailValidationFailed:
-                raise UserCreationFailed('no valid mail given')
+            user = uapi.create_user(
+                email=hapic_data.body.user_email_or_public_name,
+                password=password_generator(),
+                do_notify=True
+            )
+            newly_created = True
+            if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                email_sent = True
 
         role = rapi.create_one(
             user=user,
@@ -430,6 +427,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
     @hapic.output_body(ContentDigestSchema())

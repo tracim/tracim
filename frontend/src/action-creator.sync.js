@@ -89,5 +89,8 @@ export const CONTENT_TYPE = 'ContentType'
 export const CONTENT_TYPE_LIST = `${CONTENT_TYPE}/List`
 export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_TYPE_LIST}`, contentTypeList })
 
+export const CONFIG = 'Config'
+export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
+
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })

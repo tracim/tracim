@@ -77,8 +77,7 @@ export const debug = {
     email: 'osef@algoo.fr',
     lang: 'fr',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
-    auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`),
-    idRoleUserWorkspace: 1
+    idRoleUserWorkspace: 8
   },
   content: {
     author: {

@@ -1,17 +1,17 @@
-import { login } from '../helpers/index.js'
+import { login, logout } from '../helpers/index.js'
 
 describe('navigate :: workspace > create_new > file', function () {
     before(function () {
         login(cy)
     })
     after(function() {
-        cy.get('#dropdownMenuButton').click()
-        cy.get('div.setting__link').click()
-        cy.url().should('include', '/login')
+        logout (cy)
     })
     it ('dashboard > button', function() {
-        cy.get('a.[href="/workspaces/1/dashboard"]').should('be.visible')
-        cy.get('a.[href="/workspaces/1/dashboard"]').click()
+        cy.get('.sidebar__content__navigation__workspace__item__name').should('have.attr', 'title', 'cypress')
+        cy.get('.rah-static--height-auto').should('have.attr', 'aria-hidden', 'false')
+        cy.get('.fa-signal').should('be.visible')
+        cy.get('.fa-signal').click()
         cy.get('.dashboard__calltoaction .fa-paperclip').should('be.visible')
         cy.get('.dashboard__calltoaction .fa-paperclip').click()
         cy.get('.cardPopup__container').should('be.visible')

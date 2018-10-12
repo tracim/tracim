@@ -224,6 +224,14 @@ class Dashboard extends React.Component {
       return false
     }
 
+    if (
+      !state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail) &&
+      !props.system.config.email_notification_activated
+    ) {
+      props.dispatch(newFlashMessage(props.t('Unknown user'), 'warning'))
+      return false
+    }
+
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
       id: state.newMember.id || null,
       name: state.newMember.nameOrEmail,
@@ -413,5 +421,5 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType, appList, currentWorkspace }) => ({ user, contentType, appList, curWs: currentWorkspace })
+const mapStateToProps = ({ user, contentType, appList, currentWorkspace, system }) => ({ user, contentType, appList, curWs: currentWorkspace, system })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

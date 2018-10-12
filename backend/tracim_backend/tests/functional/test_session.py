@@ -1,10 +1,9 @@
 # coding=utf-8
 import datetime
-import pytest
 import transaction
-from sqlalchemy.exc import OperationalError
 from freezegun import freeze_time
 from tracim_backend import models
+from tracim_backend import error
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import get_tm_session
@@ -102,6 +101,9 @@ class TestLoginEndpoint(FunctionalTest):
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.AUTHENTICATION_FAILED
 
     def test_api__try_login_enpoint__err_403__bad_password(self):
         params = {
@@ -115,6 +117,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -130,6 +133,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.AUTHENTICATION_FAILED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -137,6 +141,8 @@ class TestLoginEndpoint(FunctionalTest):
         res = self.testapp.post_json('/api/v2/sessions/login', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -200,6 +206,12 @@ class TestWhoamiEndpoint(FunctionalTest):
         )
 
         res = self.testapp.get('/api/v2/sessions/whoami', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
+        assert res.json_body['code'] is None
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
     def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
         self.testapp.authorization = (
@@ -212,6 +224,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/sessions/whoami', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -274,6 +287,9 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
             status=401,
             headers=headers_auth
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
 
     def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
         headers_auth = {
@@ -287,6 +303,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -340,6 +357,75 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             )
             assert 'Set-Cookie' in res.headers
 
+    def test_api__test_cookie_auth_token__ok__change_email_dont_break_cookie(self):  # nopep8
+        """
+        Test if email change doesn't break cookie auth
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        with freeze_time("1999-12-31 23:59:58"):
+            params = {
+                'email': 'admin@admin.admin',
+                'password': 'admin@admin.admin',
+            }
+            res = self.testapp.post_json(
+                '/api/v2/sessions/login',
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_1 = self.testapp.cookies['session_key']
+
+        # change own email
+        with freeze_time("1999-12-31 23:59:59"):
+            params = {
+                'email': 'mysuperemail@email.fr',
+                'loggedin_user_password': 'admin@admin.admin',
+            }
+            self.testapp.put_json(
+                '/api/v2/users/{}/email'.format(admin.user_id),
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_2 = self.testapp.cookies['session_key']
+            assert user_session_key_1 == user_session_key_2
+
+        # session_id should not be return before x time
+        with freeze_time("2000-01-01 00:00:00"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' not in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_3 = self.testapp.cookies['session_key']
+            assert user_session_key_3 == user_session_key_2
+
+        # after x time session_id should be renew
+        with freeze_time("2000-01-01 00:02:01"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_4 = self.testapp.cookies['session_key']
+            assert user_session_key_4 != user_session_key_3
+
+        # after too much time, session_id should be revoked
+        with freeze_time("2000-01-01 00:12:02"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                params=params,
+                status=401,
+            )
+            assert 'Set-Cookie' in res.headers
     def test_api__test_cookie_auth_token__ok__revocation_case(self):
         with freeze_time("1999-12-31 23:59:59"):
             params = {
@@ -377,6 +463,11 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 status=401,
             )
             assert 'Set-Cookie' in res.headers
+            assert isinstance(res.json, dict)
+            assert 'code' in res.json.keys()
+            assert res.json_body['code'] is None
+            assert 'message' in res.json.keys()
+            assert 'details' in res.json.keys()
 
         # test replay old token
         with freeze_time("2000-01-01 00:00:04"):
@@ -386,6 +477,11 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 '/api/v2/sessions/whoami',
                 status=401,
             )
+            assert isinstance(res.json, dict)
+            assert 'code' in res.json.keys()
+            assert res.json_body['code'] is None
+            assert 'message' in res.json.keys()
+            assert 'details' in res.json.keys()
 
     def test_api__test_cookie_auth_token__ok__reissue_revocation_case(self):
         with freeze_time("1999-12-31 23:59:59"):
@@ -428,7 +524,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         with freeze_time("2000-01-01 00:02:03"):
             self.testapp.reset()
             self.testapp.set_cookie('session_key', user_session_key_1)
-            res = self.testapp.get(
+            self.testapp.get(
                 '/api/v2/sessions/whoami',
                 status=200,
             )
@@ -441,3 +537,8 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 '/api/v2/sessions/whoami',
                 status=401,
             )
+            assert isinstance(res.json, dict)
+            assert 'code' in res.json.keys()
+            assert res.json_body['code'] is None
+            assert 'message' in res.json.keys()
+            assert 'details' in res.json.keys()

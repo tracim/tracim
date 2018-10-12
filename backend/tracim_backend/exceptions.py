@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from tracim_backend import error
 
 
 class TracimError(Exception):
@@ -26,7 +27,7 @@ class ConfigurationError(TracimError):
 
 
 class UserAlreadyExistError(TracimError):
-    pass
+    error_code = error.USER_ALREADY_EXIST
 
 
 class ForceArgumentNeeded(TracimException):
@@ -66,7 +67,7 @@ class NotFound(TracimException):
 
 
 class SameValueError(ValueError):
-    pass
+    error_code = error.SAME_VALUE_ERROR
 
 
 class NotAuthenticated(TracimException):
@@ -74,19 +75,19 @@ class NotAuthenticated(TracimException):
 
 
 class WorkspaceNotFound(NotFound):
-    pass
+    error_code = error.WORKSPACE_NOT_FOUND
 
 
 class WorkspaceNotFoundInTracimRequest(NotFound):
-    pass
+    error_code = error.WORKSPACE_NOT_IN_TRACIM_REQUEST
 
 
 class InsufficientUserRoleInWorkspace(TracimException):
-    pass
+    error_code = error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
 
 
 class InsufficientUserProfile(TracimException):
-    pass
+    error_code = error.INSUFFICIENT_USER_PROFILE
 
 
 class ImmutableAttribute(TracimException):
@@ -98,19 +99,20 @@ class DigestAuthNotImplemented(Exception):
 
 
 class AuthenticationFailed(TracimException):
-    pass
+    error_code = error.AUTHENTICATION_FAILED
 
 
 class WrongUserPassword(TracimException):
-    pass
+    error_code = error.WRONG_USER_PASSWORD
 
 
 class UnvalidResetPasswordToken(TracimException):
+    error_code = error.INVALID_RESET_PASSWORD_TOKEN
     pass
 
 
 class ExpiredResetPasswordToken(TracimException):
-    pass
+    error_code = error.EXPIRED_RESET_PASSWORD_TOKEN
 
 
 class NotificationSendingFailed(TracimException):
@@ -134,15 +136,15 @@ class ContentTypeNotExist(TracimError):
 
 
 class UserDoesNotExist(TracimException):
-    pass
+    error_code = error.USER_NOT_FOUND
 
 
 class UserNotFoundInTracimRequest(TracimException):
-    pass
+    error_code = error.USER_NOT_IN_TRACIM_REQUEST
 
 
 class ContentNotFoundInTracimRequest(TracimException):
-    pass
+    error = error.CONTENT_NOT_IN_TRACIM_REQUEST
 
 
 class InvalidId(TracimException):
@@ -150,39 +152,43 @@ class InvalidId(TracimException):
 
 
 class InvalidContentId(InvalidId):
-    pass
+    error_code = error.CONTENT_INVALID_ID
 
 
 class InvalidCommentId(InvalidId):
-    pass
+    error_code = error.COMMENT_INVALID_ID
 
 
 class InvalidWorkspaceId(InvalidId):
-    pass
+    error_code = error.WORKSPACE_INVALID_ID
 
 
 class InvalidUserId(InvalidId):
-    pass
+    error_code = error.USER_INVALID_USER_ID
 
 
 class ContentNotFound(TracimException):
-    pass
+    error_code = error.CONTENT_NOT_FOUND
 
 
 class ContentTypeNotAllowed(TracimException):
-    pass
+    error_code = error.CONTENT_TYPE_NOT_ALLOWED
 
 
 class WorkspacesDoNotMatch(TracimException):
-    pass
+    error_code = error.WORKSPACE_DO_NOT_MATCH
 
 
 class PasswordDoNotMatch(TracimException):
-    pass
+    error_code = error.PASSWORD_DO_NOT_MATCH
 
 
 class EmptyValueNotAllowed(TracimException):
     pass
+
+
+class TracimUnavailablePreviewType(TracimException):
+    error_code = error.UNAVAILABLE_PREVIEW_TYPE
 
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):
@@ -214,7 +220,7 @@ class BadStatusCode(TracimException):
 
 
 class UserNotActive(TracimException):
-    pass
+    error_code = error.AUTHENTICATION_FAILED
 
 
 class NoUserSetted(TracimException):
@@ -226,11 +232,7 @@ class RoleDoesNotExist(TracimException):
 
 
 class EmailValidationFailed(TracimException):
-    pass
-
-
-class UserCreationFailed(TracimException):
-    pass
+    error_code = error.EMAIL_VALIDATION_FAILED
 
 
 class InconsistentDatabase(TracimException):
@@ -238,11 +240,11 @@ class InconsistentDatabase(TracimException):
 
 
 class ContentLabelAlreadyUsedHere(TracimException):
-    pass
+    error_code = error.CONTENT_LABEL_ALREADY_USED_THERE
 
 
 class ParentNotFound(NotFound):
-    pass
+    error_code = error.PARENT_NOT_FOUND
 
 
 class RevisionDoesNotMatchThisContent(TracimException):
@@ -250,15 +252,15 @@ class RevisionDoesNotMatchThisContent(TracimException):
 
 
 class PageOfPreviewNotFound(NotFound):
-    pass
+    error_code = error.PAGE_OF_PREVIEW_NOT_FOUND
 
 
 class PreviewDimNotAllowed(TracimException):
-    pass
+    error_code = error.PREVIEW_DIM_NOT_ALLOWED
 
 
 class UnallowedSubContent(TracimException):
-    pass
+    error_code = error.EMAIL_UNALLOWED_SUBCONTENT
 
 
 class TooShortAutocompleteString(TracimException):
@@ -274,11 +276,11 @@ class AppDoesNotExist(TracimException):
 
 
 class EmailAlreadyExistInDb(TracimException):
-    pass
+    error_code = error.EMAIL_ALREADY_EXIST_IN_DB
 
 
 class UnavailablePreview(TracimException):
-    pass
+    error_code = error.UNAIVALABLE_PREVIEW
 
 
 class EmptyNotificationError(TracimException):

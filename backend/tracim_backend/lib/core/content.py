@@ -9,6 +9,7 @@ import sqlalchemy
 import transaction
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
@@ -39,6 +40,7 @@ from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
@@ -422,16 +424,16 @@ class ContentApi(object):
     # 
     #     return result
 
-    def _is_content_label_free(
+    def _is_filename_available(
             self,
-            label: str,
+            filename: str,
             workspace: Workspace,
             parent: Content = None,
             exclude_content_id: int = None,
     ) -> bool:
         """
         Check if content label is free
-        :param label: content label
+        :param filename: content label
         :param workspace: workspace of the content
         :param parent: parent of the content
         :param exclude_content_id: exclude a specific content_id (useful
@@ -439,9 +441,10 @@ class ContentApi(object):
         :return: True if content label is available
         """
         # INFO - G.M - 2018-09-04 - Method should not be used by special content
-        # with empty label like comment.
-        assert label
+        # with empty filename like comment.
+        assert filename
         assert workspace
+        label, file_extension = os.path.splitext(filename)
         query = self.get_base_query(workspace)
 
         if parent:
@@ -453,21 +456,25 @@ class ContentApi(object):
             query = query.filter(Content.content_id != exclude_content_id)
         query = query.filter(Content.workspace_id == workspace.workspace_id)
 
-        nb_content_with_the_label = query.filter(Content.label == label).count()
-        if nb_content_with_the_label == 0:
+        nb_content_with_the_filename = query.\
+            filter(Content.label == label).\
+            filter(Content.file_extension == file_extension).\
+            count()
+        if nb_content_with_the_filename == 0:
             return True
-        elif nb_content_with_the_label == 1:
+        elif nb_content_with_the_filename == 1:
             return False
         else:
             critical_error_text = 'Something is wrong in the database ! '\
-                                  'Content label should be unique ' \
+                                  'Content filename should be unique ' \
                                   'in a same folder in database' \
                                   'but you have {nb} content with ' \
-                                  'label {label} in workspace {workspace_id}'
+                                  'filename {filename} ' \
+                                  'in workspace {workspace_id}'
 
             critical_error_text = critical_error_text.format(
-                nb=nb_content_with_the_label,
-                label=label,
+                nb=nb_content_with_the_filename,
+                filename=filename,
                 workspace_id=workspace.workspace_id,
             )
             if parent:
@@ -478,34 +485,54 @@ class ContentApi(object):
             logger.critical(self, critical_error_text)
             return False
 
-    def _is_content_label_free_or_raise(
+    def _prepare_filename(
+            self,
+            label: str,
+            file_extension: str,
+    ) -> str:
+        """
+        generate correct file_name from label and file_extension
+        :return: valid
+        """
+        # TODO - G.M - 2018-10-11 - Find a way to
+        # Refactor this in order to use same method
+        # in both contentLib and .file_name of content
+        return '{label}{file_extension}'.format(
+            label=label,
+            file_extension=file_extension
+        )
+
+    def _is_filename_available_or_raise(
         self,
-        label: str,
+        filename: str,
         workspace: Workspace,
         parent: Content = None,
         exclude_content_id: int = None,
-    ) -> None:
+    ) -> bool:
         """
-        Same as _is_content_label_free but raise exception instead of
-        returning boolean if content label is already used
+        Same as _is_filename_available but raise exception instead of
+        returning boolean if content filename is already used
         """
-        if not self._is_content_label_free(
-            label,
+        if self._is_filename_available(
+            filename,
             workspace,
             parent,
             exclude_content_id
         ):
-            text = 'A Content already exist with the same label {label} ' \
-                   ' in workspace {workspace_id}'.format(
-                      label=label,
-                      workspace_id=workspace.workspace_id,
-                   )
-            if parent:
-                text = '{text} and parent as content {parent_id}'.format(
-                    text=text,
-                    parent_id=parent.parent_id
-                )
-            raise ContentLabelAlreadyUsedHere(text)
+            return True
+        # INFO - G.M - 2018-10-11 - prepare exception message
+        exception_message = 'A Content already exist with the same filename ' \
+            '{filename}  in workspace {workspace_id}'
+        exception_message = exception_message.format(
+            filename=filename,
+            workspace_id=workspace.workspace_id,
+        )
+        if parent:
+            exception_message = '{text} and parent as content {parent_id}'.format(
+                text=exception_message,
+                parent_id=parent.parent_id
+            )
+        raise ContentLabelAlreadyUsedHere(exception_message)
 
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
@@ -539,29 +566,35 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
-        if filename:
-            label = os.path.splitext(filename)[0]
-        if label:
-            self._is_content_label_free_or_raise(
-                label,
+        content = None
+        if filename or label:
+            if label:
+                file_extension = ''
+                if content_type.slug in (
+                        content_type_list.Page.slug,
+                        content_type_list.Thread.slug,
+                ):
+                    file_extension = '.html'
+                filename = self._prepare_filename(label, file_extension)
+            self._is_filename_available_or_raise(
+                filename,
                 workspace,
                 parent,
             )
-
-        content = Content()
-        if filename:
+            content = Content()
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
-            content.file_name = label
-        elif label:
-            content.label = label
+            content.file_name = filename
         else:
             if content_type_slug == content_type_list.Comment.slug:
+                content = Content()
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ''
             else:
-                raise EmptyLabelNotAllowed('Content of this type should have a valid label')  # nopep8
+                raise EmptyLabelNotAllowed(
+                    'Content of type {} should have a valid label'.format(content_type_slug)  # nopep8
+                )
 
         content.owner = self._user
         content.parent = parent
@@ -570,12 +603,6 @@ class ContentApi(object):
         content.type = content_type.slug
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
-
-        if content.type in (
-                content_type_list.Page.slug,
-                content_type_list.Thread.slug,
-        ):
-            content.file_extension = '.html'
 
         if do_save:
             self._session.add(content)
@@ -911,15 +938,17 @@ class ContentApi(object):
                         content_id=content_id
                     ),
                 )
-            jpg_preview_path = self.preview_manager.get_pdf_preview(
+            pdf_preview_path = self.preview_manager.get_pdf_preview(
                 file_path,
                 page=page_number
             )
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id) # nopep8
             ) from exc
-        return jpg_preview_path
+        return pdf_preview_path
 
     def get_full_pdf_preview_path(self, revision_id: int) -> str:
         """
@@ -930,6 +959,8 @@ class ContentApi(object):
         file_path = self.get_one_revision_filepath(revision_id)
         try:
             pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
                 'No preview available for revision {}'.format(revision_id)
@@ -1341,8 +1372,8 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
-        self._is_content_label_free_or_raise(
-            item.label,
+        self._is_filename_available_or_raise(
+            item.file_name,
             item.workspace,
             item.parent,
             exclude_content_id=item.content_id
@@ -1376,8 +1407,8 @@ class ContentApi(object):
             workspace = item.workspace
             parent = item.parent
         label = new_label or item.label
-
-        self._is_content_label_free_or_raise(label, workspace, parent)
+        filename = self._prepare_filename(label, item.file_extension)
+        self._is_filename_available_or_raise(filename, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1388,7 +1419,7 @@ class ContentApi(object):
         ) as rev:
             rev.parent = parent
             rev.workspace = workspace
-            rev.label = label
+            rev.file_name = filename
             rev.revision_type = ActionDescription.COPY
             rev.properties['origin'] = {
                 'content': item.id,
@@ -1431,8 +1462,10 @@ class ContentApi(object):
         if not new_label:
             raise EmptyLabelNotAllowed()
 
-        self._is_content_label_free_or_raise(
-            new_label,
+        label = new_label or item.label
+        filename = self._prepare_filename(label, item.file_extension)
+        self._is_filename_available_or_raise(
+            filename,
             item.workspace,
             item.parent,
             exclude_content_id=item.content_id
@@ -1447,10 +1480,22 @@ class ContentApi(object):
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
         if not self.is_editable(item):
             raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
-        if new_mimetype == item.file_mimetype and \
-                new_content == item.depot_file.file.read():
-            raise SameValueError('The content did not changed')
+        # FIXME - G.M - 2018-09-25 - Repair and do a better same content check,
+        # as pyramid behaviour use buffered object
+        # new_content == item.depot_file.file.read() case cannot happened using
+        # whenever new_content.read() == item.depot_file.file.read().
+        # as this behaviour can create struggle with big file, simple solution
+        # using read can be used everytime.
+        # if new_mimetype == item.file_mimetype and \
+        #         new_content == item.depot_file.file.read():
+        #     raise SameValueError('The content did not changed')
         item.owner = self._user
+        self._is_filename_available_or_raise(
+            new_filename,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.depot_file = FileIntent(
@@ -1467,11 +1512,19 @@ class ContentApi(object):
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
         # un-archiving file.
-        content.label = '{label}-{action}-{date}'.format(
+        label = '{label}-{action}-{date}'.format(
             label=content.label,
             action='archived',
             date=current_date_for_filename()
         )
+        filename = self._prepare_filename(label, content.file_extension)
+        self._is_filename_available_or_raise(
+            filename,
+            content.workspace,
+            content.parent,
+            exclude_content_id=content.content_id
+        )
+        content.file_name = filename
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
@@ -1485,11 +1538,19 @@ class ContentApi(object):
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
         # un-deleting file.
-        content.label = '{label}-{action}-{date}'.format(
+        label = '{label}-{action}-{date}'.format(
             label=content.label,
             action='deleted',
             date=current_date_for_filename()
         )
+        filename = self._prepare_filename(label, content.file_extension)
+        self._is_filename_available_or_raise(
+            filename,
+            content.workspace,
+            content.parent,
+            exclude_content_id=content.content_id
+        )
+        content.file_name = filename
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
