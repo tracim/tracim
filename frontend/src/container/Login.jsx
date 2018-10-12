@@ -154,7 +154,7 @@ class Login extends React.Component {
                       customClass='mb-3 mt-4'
                       icon='fa-envelope-open-o'
                       type='email'
-                      placeHolder={props.t('Email Adress')}
+                      placeHolder={props.t('Email Address')}
                       invalidMsg='Email invalide.'
                       isInvalid={state.inputLogin.isInvalid}
                       value={state.inputLogin.value}
