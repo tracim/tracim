@@ -130,12 +130,9 @@ export class AdminUser extends React.Component {
                   </div>
                 )
                 : (
-                  <div className='primaryColorFont'>
-                    <span className='fa-stack fa-lg'>
-                      <i className='fa fa-envelope fa-stack-1x' />
-                      <i className='fa fa-ban fa-stack-2x text-danger' />
-                    </span>
-                    {props.t("Email notification deactivated, don't forget to tell the user about it's new account")}
+                  <div>
+                    <i className='primaryColorFont fa fa-fw fa-warning' />
+                    {props.t("Email notification are disabled, please notify users of any change")}
                   </div>
                 )
               }

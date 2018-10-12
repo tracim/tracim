@@ -40,5 +40,5 @@
   "Password": "Mot de passe",
   "Create the user": "Créer l'utilisateur",
   "Create a user": "Créer un utilisateur",
-  "Email notification deactivated, don't forget to tell the user about it's new account": "Notification email désactivées, n'oubliez pas d'informer l'utilisateur de son nouveau compte"
+  "Email notification are disabled, please notify users of any change": "Les notifications par email sont désactivées, pensez à notifier les utilisateurs de tout changement"
 }
