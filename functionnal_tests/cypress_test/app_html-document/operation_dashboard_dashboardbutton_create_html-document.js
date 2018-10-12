@@ -8,6 +8,7 @@ describe('operation :: workspace > create_new > html-document', function () {
         var titre1='dashboard button html'
 //        cy.get('.content__name').contains(titre1).should('be.visible').then(() => {
 //        if () {
+        cy.get('.content__name').should('be.visible')
         cy.get('.content__name').each(($elm) => {
             cy.wrap($elm).invoke('text').then((text) => {
             if (text === titre1) {

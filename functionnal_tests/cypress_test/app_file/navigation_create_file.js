@@ -23,8 +23,7 @@ describe('navigate :: workspace > create_new > file', function () {
         cy.get('.cardPopup__container .createcontent__form__button').should('be.visible')
         cy.get('.cardPopup__container .cardPopup__close').click()
         cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
-    })
-    it ('header button', function () {
+
         cy.get('#dropdownCreateBtn.workspace__header__btnaddcontent__label').should('be.visible')
         cy.get('#dropdownCreateBtn.workspace__header__btnaddcontent__label').click()
         cy.get('.show .subdropdown__link__file__icon').should('be.visible')
@@ -38,8 +37,7 @@ describe('navigate :: workspace > create_new > file', function () {
         cy.get('.cardPopup__container .createcontent__form__button').should('be.visible')
         cy.get('.cardPopup__container .cardPopup__close').click()
         cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
-    })
-    it ('content button', function () {
+
         cy.get('.workspace__content__button.dropdownCreateBtn .__label').should('be.visible')
         cy.get('.workspace__content__button.dropdownCreateBtn .__label').click()
         cy.get('.show .subdropdown__link__file__icon').should('be.visible')

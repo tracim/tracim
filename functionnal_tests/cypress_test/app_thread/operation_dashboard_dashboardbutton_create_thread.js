@@ -6,6 +6,7 @@ describe('operation :: workspace > create_new > thread', function () {
         cy.visit('/workspaces/1/contents')
         cy.get('.pageTitleGeneric__title__icon').should('be.visible')
         var titre1='dashboard button thread'
+        cy.get('.content__name').should('be.visible')
         cy.get('.content__name').each(($elm) => {
             cy.wrap($elm).invoke('text').then((text) => {
             if (text === titre1) {
