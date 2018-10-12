@@ -1,8 +1,5 @@
 {
-  "Please type a name and select a profile": "Please type a name and select a profile",
-  "Add a user": "Add a user",
   "Email": "Email",
-  "Add the user": "Add the user",
   "Active": "Active",
   "Administrator": "Administrator",
   "Description": "Description",
@@ -18,7 +15,6 @@
   "On this page you can manage the users of your Tracim instance.": "On this page you can manage the users of your Tracim instance.",
   "User": "User",
   "Choose the profile": "Choose the profile",
-  "Type the email": "Type the email",
   "Account deactivated": "Account deactivated",
   "Activated": "Activated",
   "Deactivated": "Deactivated",
@@ -31,5 +27,17 @@
   "Error while loading shared spaces list": "Error while loading shared spaces list",
   "Error while deleting shared space": "Error while deleting shared space",
   "You can't remove yourself from Administrator": "You can't remove yourself from Administrator",
-  "You can't deactivate your own account": "You can't deactivate your own account"
+  "You can't deactivate your own account": "You can't deactivate your own account",
+  "Email notification activated": "Email notification activated",
+  "New password is too short (minimum 6 characters)": "New password is too short (minimum 6 characters)",
+  "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
+  "User created and email sent": "User created and email sent",
+  "User created": "User created",
+  "Email already exists": "Email already exists",
+  "Please type a name, an email and select a profile": "Please type a name, an email and select a profile",
+  "Name": "Name",
+  "Password": "Password",
+  "Create the user": "Create the user",
+  "Create a user": "Create a user",
+  "Email notification deactivated, don't forget to tell the user about it's new account": "Email notification deactivated, don't forget to tell the user about it's new account"
 }

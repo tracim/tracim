@@ -20,5 +20,7 @@
   "Delete shared space": "Delete shared space",
   "Delete": "Delete",
   "Are you sure ?": "Are you sure ?",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "Unknown user": "Unknown user",
+  "Error while deleting shared space": "Error while deleting shared space"
 }

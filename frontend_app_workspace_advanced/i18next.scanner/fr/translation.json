@@ -20,5 +20,7 @@
   "Delete shared space": "Supprimer l'espace partagé",
   "Delete": "Supprimer",
   "Are you sure ?": "Êtes vous sûr ?",
-  "Cancel": "Annuler"
+  "Cancel": "Annuler",
+  "Unknown user": "Utilisateur inconnu",
+  "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé"
 }

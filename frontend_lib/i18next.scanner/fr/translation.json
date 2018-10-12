@@ -27,5 +27,7 @@
   "Item moved": "Elément déplacé",
   "Item copied": "Elément copié",
   "Item archived": "Elément archivé",
-  "Enter the name or email of the user": "Entrer le nom ou l'email de l'utilisateur"
+  "Enter the name or email of the user": "Entrer le nom ou l'email de l'utilisateur",
+  "If you type an email that isn't associated to an account, an invitational email will be sent": "Si vous entrez un email qui n'est associé à aucun compte, un email d'invitation sera envoyé",
+  "Email notifications are disabled, you can't create new users from here": "Notification email désactivées, vous ne pouvez pas créer un nouvel utilisateur depuis ce formulaire"
 }

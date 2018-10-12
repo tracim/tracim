@@ -71,6 +71,9 @@ export const debug = {
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
+    },
+    system: {
+      email_notification_activated: false
     }
   },
   loggedUser: {

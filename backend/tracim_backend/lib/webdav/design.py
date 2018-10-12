@@ -1,7 +1,7 @@
 #coding: utf8
 from datetime import datetime
 
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import VirtualEvent
 from tracim_backend.models import data
 
@@ -249,7 +249,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
         disc = ''
         participants = {}
         for t in allT:
-            if t.type == CONTENT_TYPES.Comment.slug:
+            if t.type == content_type_list.Comment.slug:
                 disc += '''
                     <div class="row comment comment-row">
                         <i class="fa fa-comment-o comment-icon"></i>

@@ -42,8 +42,20 @@ describe('operation :: workspace > create_new > html-document', function () {
         cy.get('.html-document.visible').should('be.visible')
         cy.get('.html-document.visible .html-document__contentpage__messagelist__version.revision').should('be.visible')
         cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
-//        cy.get('iframe#wysiwygNewVersion_ifr').should('be.visible')
-//        const $tinymce = Cypress.$.event(document)
+        cy.wait(2000)
+        cy.get('#wysiwygNewVersion_ifr').click()
+        cy.get('#wysiwygNewVersion_ifr').then(($iframe) => {
+
+            const iframe = $iframe.contents()
+
+            const myInput = iframe.find('#tinymce')
+            cy.wrap(myInput).type('example', { force: true })
+
+            //you don't need to trigger events like keyup or change
+
+        })
+
+        cy.get('button.html-document__editionmode__submit.editionmode__button__submit').click({force: true})
         cy.wait(2000)
         cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').should('be.visible')
         cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').click()

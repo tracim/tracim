@@ -263,10 +263,10 @@ class WorkspaceAdvanced extends React.Component {
 
     if (
       !state.searchedKnownMemberList.find(u => u.public_name === state.newMember.name) &&
-      state.config.system && state.config.system &&
-      !state.config.system.email_notification_activated
+      state.config.system && state.config.system.config &&
+      !state.config.system.config.email_notification_activated
     ) {
-      props.sendGlobalFlashMessage(props.t('Unknown user'), 'warning')
+      this.sendGlobalFlashMessage(props.t('Unknown user'), 'warning')
       return false
     }
 
@@ -361,6 +361,9 @@ class WorkspaceAdvanced extends React.Component {
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
+            idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
+            isLoggedUserAdmin={state.loggedUser.profile === state.config.profileObject.ADMINISTRATOR.slug}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>

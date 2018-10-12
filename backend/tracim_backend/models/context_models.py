@@ -7,7 +7,7 @@ from enum import Enum
 from slugify import slugify
 from sqlalchemy.orm import Session
 
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
@@ -734,7 +734,7 @@ class ContentInContext(object):
 
     @property
     def content_type(self) -> str:
-        content_type = CONTENT_TYPES.get_one_by_slug(self.content.type)
+        content_type = content_type_list.get_one_by_slug(self.content.type)
         return content_type.slug
 
     @property
@@ -914,7 +914,7 @@ class RevisionInContext(object):
 
     @property
     def content_type(self) -> str:
-        return CONTENT_TYPES.get_one_by_slug(self.revision.type).slug
+        return content_type_list.get_one_by_slug(self.revision.type).slug
 
     @property
     def sub_content_types(self) -> typing.List[str]:

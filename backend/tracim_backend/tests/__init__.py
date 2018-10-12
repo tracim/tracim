@@ -15,7 +15,7 @@ from tracim_backend.models import get_engine
 from tracim_backend.models import DeclarativeBase
 from tracim_backend.models import get_session_factory
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
@@ -287,13 +287,13 @@ class DefaultTest(StandardTest):
         workspace = self._create_workspace_and_test(workspace_name, user)
         folder = self._create_content_and_test(
             folder_name, workspace,
-            type=CONTENT_TYPES.Folder.slug,
+            type=content_type_list.Folder.slug,
             owner=user
         )
         thread = self._create_content_and_test(
             thread_name,
             workspace,
-            type=CONTENT_TYPES.Thread.slug,
+            type=content_type_list.Thread.slug,
             parent=folder,
             owner=user
         )

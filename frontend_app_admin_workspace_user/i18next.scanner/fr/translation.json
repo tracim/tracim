@@ -1,8 +1,5 @@
 {
-  "Please type a name and select a profile": "Veuillez saisir un nom et sélectionner un profil",
-  "Add a user": "Ajouter un utilisateur",
   "Email": "Email",
-  "Add the user": "Ajouter l'utilisateur",
   "Active": "Actif",
   "Administrator": "Administrateur",
   "Description": "Description",
@@ -18,7 +15,6 @@
   "On this page you can manage the users of your Tracim instance.": "Sur cette page, vous pouvez administrer les utilisateurs de votre instance de Tracim",
   "User": "Utilisateur",
   "Choose the profile": "Choisir un profil",
-  "Type the email": "Entrer l'email",
   "Account deactivated": "Compte désactivé",
   "Activated": "Activé",
   "Deactivated": "Désactivé",
@@ -31,5 +27,17 @@
   "Error while loading shared spaces list": "Erreur lors du chargemetn des espaces partagés",
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
   "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur",
-  "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte"
+  "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte",
+  "Email notification activated": "Notifications par email activées",
+  "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
+  "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)",
+  "User created and email sent": "Utilisateur créé et email envoyé",
+  "User created": "Utilisateur créé",
+  "Email already exists": "Email déjà utilisé",
+  "Please type a name, an email and select a profile": "Veuillez choisir un email et un profil",
+  "Name": "Nom",
+  "Password": "Mot de passe",
+  "Create the user": "Créer l'utilisateur",
+  "Create a user": "Créer un utilisateur",
+  "Email notification deactivated, don't forget to tell the user about it's new account": "Notification email désactivées, n'oubliez pas d'informer l'utilisateur de son nouveau compte"
 }

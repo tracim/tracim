@@ -37,11 +37,6 @@ describe('operation :: workspace > create_new > thread', function () {
         cy.get('.cardPopup__container .createcontent  .createcontent__contentname').should('not.be.visible')
         cy.get('.thread.visible').should('be.visible')
         cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
-//        Problem to write text in iframe
-//        cy.get('#wysiwygNewVersion_ifr').click()
-//        cy.get('body').type('Ceci est le début du document')
-//        cy.get('.html-document__editionmode__submit.editionmode__button__submit').click()
-//        cy.get('.html-document__contentpage__textnote__text span').contains('Ceci est le début du document')
         cy.get('.thread.visible .thread__contentpage__header__close').click()
         cy.get('.thread.visible').should('not.be.visible')
 //        Need improvement to verified new content is in list

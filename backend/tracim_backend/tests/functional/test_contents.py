@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+import transaction
+
+from tracim_backend import models
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.models import get_tm_session
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.models.revision_protection import new_revision
 import io
 
 import pytest
@@ -8,7 +16,7 @@ from PIL import Image
 
 from tracim_backend import error
 from tracim_backend import models
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
@@ -52,7 +60,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test-folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -129,7 +137,7 @@ class TestFolder(FunctionalTest):
         )
         thread = content_api.create(
             label='thread',
-            content_type_slug=CONTENT_TYPES.Thread.slug,
+            content_type_slug=content_type_list.Thread.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -215,7 +223,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -267,7 +275,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -312,7 +320,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -357,7 +365,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -403,7 +411,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -419,7 +427,7 @@ class TestFolder(FunctionalTest):
         params = {
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
-            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+            'sub_content_types': [content_type_list.Folder.slug]
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
@@ -458,7 +466,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -474,7 +482,7 @@ class TestFolder(FunctionalTest):
         params = {
             'label': 'My New label',
             'raw_content': '<p> Le nouveau contenu </p>',
-            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+            'sub_content_types': [content_type_list.Folder.slug]
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
@@ -506,7 +514,7 @@ class TestFolder(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
-        assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
+        assert content['sub_content_types'] == [content_type_list.Folder.slug]
 
     def test_api__update_folder__err_400__not_modified(self) -> None:
         """
@@ -532,7 +540,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -548,7 +556,7 @@ class TestFolder(FunctionalTest):
         params = {
             'label': 'My New label',
             'raw_content': '<p> Le nouveau contenu </p>',
-            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+            'sub_content_types': [content_type_list.Folder.slug]
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
@@ -580,7 +588,7 @@ class TestFolder(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
-        assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
+        assert content['sub_content_types'] == [content_type_list.Folder.slug]
 
         res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
@@ -618,14 +626,14 @@ class TestFolder(FunctionalTest):
         )
         content_api.create(
             label='already_used',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -641,7 +649,7 @@ class TestFolder(FunctionalTest):
         params = {
             'label': 'already_used',
             'raw_content': '<p> Le nouveau contenu </p>',
-            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+            'sub_content_types': [content_type_list.Folder.slug]
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
@@ -681,7 +689,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test-folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -850,7 +858,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -938,7 +946,7 @@ class TestFolder(FunctionalTest):
         )
         folder = content_api.create(
             label='test_folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
             do_save=True,
             do_notify=False
@@ -1564,9 +1572,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1651,9 +1659,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1723,9 +1731,9 @@ class TestFiles(FunctionalTest):
         )
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1,
-                                          content_type=CONTENT_TYPES.Any_SLUG)
+                                          content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1919,9 +1927,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1988,10 +1996,10 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         with dbsession.no_autoflush:
             test_file = content_api.create(
-                content_type_slug=CONTENT_TYPES.File.slug,
+                content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
                 parent=tool_folder,
                 label='Test file',
@@ -2087,6 +2095,200 @@ class TestFiles(FunctionalTest):
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
+    def test_api__update_file_info__err_400__content_status_closed(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        with dbsession.no_autoflush:
+            test_file = content_api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=business_workspace,
+                parent=tool_folder,
+                label='Test file',
+                do_save=False,
+                do_notify=False,
+            )
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        test_file.status = 'closed-validated'
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        # TODO - G.M - 2018-10-10 - Check result
+
+    def test_api__update_file_info__err_400__content_deleted(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        with dbsession.no_autoflush:
+            test_file = content_api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=business_workspace,
+                parent=tool_folder,
+                label='Test file',
+                do_save=False,
+                do_notify=False,
+            )
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            test_file.is_deleted = True
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        # TODO - G.M - 2018-10-10 - Check result
+
+    def test_api__update_file_info__err_400__content_archived(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        with dbsession.no_autoflush:
+            test_file = content_api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=business_workspace,
+                parent=tool_folder,
+                label='Test file',
+                do_save=False,
+                do_notify=False,
+            )
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            test_file.is_archived = True
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        # TODO - G.M - 2018-10-10 - Check result
+
     def test_api__update_file_info__err_400__not_modified(self) -> None:
         """
         Update(put) one file
@@ -2106,9 +2308,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2237,31 +2439,32 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='folder_used',
             do_save=True,
             do_notify=False,
         )
-        test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
-            workspace=business_workspace,
-            parent=tool_folder,
-            label='Test file',
-            do_save=False,
-            do_notify=False,
-        )
-        test_file.file_extension = '.txt'
-        test_file.depot_file = FileIntent(
-            b'Test file',
-            'Test_file.txt',
-            'text/plain',
-        )
+        with dbsession.no_autoflush:
+            test_file = content_api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=business_workspace,
+                parent=tool_folder,
+                label='Test file',
+                do_save=False,
+                do_notify=False,
+            )
+            test_file.file_extension = '.txt'
+            test_file.depot_file = FileIntent(
+                b'Test file',
+                'Test_file.txt',
+                'text/plain',
+            )
         test_file2 = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             filename='already_used.txt',
@@ -2333,9 +2536,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2420,9 +2623,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2501,9 +2704,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2574,9 +2777,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2632,9 +2835,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2769,7 +2972,7 @@ class TestFiles(FunctionalTest):
         business_workspace = workspace_api.get_one(1)
         folder = content_api.create(
             label='test-folder',
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=business_workspace,
             do_save=True,
             do_notify=False
@@ -2848,13 +3051,13 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
-            do_save=True,
+            do_save=False,
             do_notify=False,
         )
         dbsession.flush()
@@ -2883,6 +3086,56 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
 
+    def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.status = 'closed-validated'
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=400,
+        )
+        # TODO - G.M - 2018-10-10 - check res
+
     @pytest.mark.xfail(
         raises=AssertionError,
         reason='Broken feature dues to pyramid behaviour'
@@ -2906,9 +3159,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -2969,9 +3222,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3024,9 +3277,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3083,9 +3336,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3147,9 +3400,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3208,9 +3461,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3263,9 +3516,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3324,9 +3577,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3384,9 +3637,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3438,9 +3691,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3511,9 +3764,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3589,9 +3842,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3652,9 +3905,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3720,9 +3973,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3774,9 +4027,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3831,9 +4084,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3896,9 +4149,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -3955,9 +4208,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -4021,9 +4274,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -4088,9 +4341,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -4160,9 +4413,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -4230,9 +4483,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -4303,9 +4556,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
+            content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -4776,9 +5029,9 @@ class TestThreads(FunctionalTest):
             session=dbsession,
             config=self.app_config
         )
-        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
-            content_type_slug=CONTENT_TYPES.Thread.slug,
+            content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test Thread',
