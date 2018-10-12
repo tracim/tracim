@@ -357,6 +357,75 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             )
             assert 'Set-Cookie' in res.headers
 
+    def test_api__test_cookie_auth_token__ok__change_email_dont_break_cookie(self):  # nopep8
+        """
+        Test if email change doesn't break cookie auth
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        with freeze_time("1999-12-31 23:59:58"):
+            params = {
+                'email': 'admin@admin.admin',
+                'password': 'admin@admin.admin',
+            }
+            res = self.testapp.post_json(
+                '/api/v2/sessions/login',
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_1 = self.testapp.cookies['session_key']
+
+        # change own email
+        with freeze_time("1999-12-31 23:59:59"):
+            params = {
+                'email': 'mysuperemail@email.fr',
+                'loggedin_user_password': 'admin@admin.admin',
+            }
+            self.testapp.put_json(
+                '/api/v2/users/{}/email'.format(admin.user_id),
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_2 = self.testapp.cookies['session_key']
+            assert user_session_key_1 == user_session_key_2
+
+        # session_id should not be return before x time
+        with freeze_time("2000-01-01 00:00:00"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' not in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_3 = self.testapp.cookies['session_key']
+            assert user_session_key_3 == user_session_key_2
+
+        # after x time session_id should be renew
+        with freeze_time("2000-01-01 00:02:01"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_4 = self.testapp.cookies['session_key']
+            assert user_session_key_4 != user_session_key_3
+
+        # after too much time, session_id should be revoked
+        with freeze_time("2000-01-01 00:12:02"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                params=params,
+                status=401,
+            )
+            assert 'Set-Cookie' in res.headers
     def test_api__test_cookie_auth_token__ok__revocation_case(self):
         with freeze_time("1999-12-31 23:59:59"):
             params = {

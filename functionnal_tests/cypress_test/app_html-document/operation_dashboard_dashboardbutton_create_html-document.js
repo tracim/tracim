@@ -6,12 +6,12 @@ describe('operation :: workspace > create_new > html-document', function () {
         cy.visit('/workspaces/1/contents')
         cy.get('.pageTitleGeneric__title__icon').should('be.visible')
         var titre1='dashboard button html'
-//        cy.get('.content__name__text').contains(titre1).should('be.visible').then(() => {
+//        cy.get('.content__name').contains(titre1).should('be.visible').then(() => {
 //        if () {
-        cy.get('.content__name__text').each(($elm) => {
+        cy.get('.content__name').each(($elm) => {
             cy.wrap($elm).invoke('text').then((text) => {
             if (text === titre1) {
-                cy.get('.content__name__text').contains(titre1).click()
+                cy.get('.content__name').contains(titre1).click()
                 cy.get('.html-document.visible').should('be.visible')
                 cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
                 cy.wait(2000)
@@ -49,7 +49,7 @@ describe('operation :: workspace > create_new > html-document', function () {
         cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').click()
         cy.get('.html-document.visible').should('not.be.visible')
         cy.wait(2000)
-        cy.get('.content__name__text').contains(titre1).should('be.visible')
+        cy.get('.content__name').contains(titre1).should('be.visible')
 
 //        Problem to write text in iframe
 //        cy.get('#wysiwygNewVersion_ifr').click()

@@ -24,7 +24,7 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic>=0.53',
+    'hapic>=0.54',
     'marshmallow <3.0.0a1,>2.0.0',
     # CLI
     'cliff',
@@ -35,7 +35,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator',
+    'preview-generator==0.2.3',
     'colour',
     # mail-notifier
     'mako',
