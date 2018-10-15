@@ -932,7 +932,11 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     modified = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
-        description='date of last modification of content',
+        description='date of last modification of content'
+    )
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description='Content creation date',
     )
 
 
@@ -949,10 +953,6 @@ class ReadStatusSchema(marshmallow.Schema):
 
 class ContentSchema(ContentDigestSchema):
     current_revision_id = marshmallow.fields.Int(example=12)
-    created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT,
-        description='Content creation date',
-    )
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
