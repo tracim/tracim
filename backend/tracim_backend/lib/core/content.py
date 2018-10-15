@@ -583,7 +583,7 @@ class ContentApi(object):
             content.label = label
             content.file_extension = file_extension
         elif filename:
-            self._is_filename_available(
+            self._is_filename_available_or_raise(
                 filename,
                 workspace,
                 parent
@@ -593,7 +593,6 @@ class ContentApi(object):
             content.file_name = filename
         else:
             if content_type_slug == content_type_list.Comment.slug:
-                content = Content()
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ''
