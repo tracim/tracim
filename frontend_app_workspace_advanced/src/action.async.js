@@ -87,3 +87,12 @@ export const postWorkspaceMember = (apiUrl, idWorkspace, newMember) =>
       role: newMember.role
     })
   })
+
+export const deleteWorkspace = (apiUrl, idWorkspace) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/delete`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })

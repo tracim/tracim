@@ -12,7 +12,7 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
@@ -143,7 +143,7 @@ class TestNotificationsSync(MailHogTest):
             config=self.app_config,
         )
         item = api.create(
-            CONTENT_TYPES.Folder.slug,
+            content_type_list.Folder.slug,
             workspace,
             None,
             'parent',
@@ -151,7 +151,7 @@ class TestNotificationsSync(MailHogTest):
             do_notify=False,
         )
         item2 = api.create(
-            CONTENT_TYPES.File.slug,
+            content_type_list.File.slug,
             workspace,
             item,
             'file1',
@@ -252,7 +252,7 @@ class TestNotificationsAsync(MailHogTest):
             config=self.app_config,
         )
         item = api.create(
-            CONTENT_TYPES.Folder.slug,
+            content_type_list.Folder.slug,
             workspace,
             None,
             'parent',
@@ -260,7 +260,7 @@ class TestNotificationsAsync(MailHogTest):
             do_notify=False,
         )
         item2 = api.create(
-            CONTENT_TYPES.File.slug,
+            content_type_list.File.slug,
             workspace,
             item,
             'file1',

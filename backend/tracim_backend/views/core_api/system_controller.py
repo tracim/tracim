@@ -3,7 +3,7 @@ import datetime
 
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
@@ -52,8 +52,8 @@ class SystemController(Controller):
         """
         Get list of alls content types availables in this tracim instance.
         """
-        content_types_slugs = CONTENT_TYPES.endpoint_allowed_types_slug()
-        content_types = [CONTENT_TYPES.get_one_by_slug(slug) for slug in content_types_slugs]
+        content_types_slugs = content_type_list.endpoint_allowed_types_slug()
+        content_types = [content_type_list.get_one_by_slug(slug) for slug in content_types_slugs]
         return content_types
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])

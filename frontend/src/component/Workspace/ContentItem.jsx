@@ -11,28 +11,27 @@ const ContentItem = props => {
   return (
     <div
       className={
-        classnames('content align-items-center primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
+        classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
       }
       onClick={props.onClickItem}
+      title={props.label}
     >
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
 
       <div className='content__name'>
-        <div className='content__name__text'>
-          { props.label }
-        </div>
+        { props.label }
       </div>
 
-      {props.idRoleUserWorkspace >= 2 &&
-        <div className='d-none d-md-flex'>
+      {props.idRoleUserWorkspace >= 2 && (
+        <div className='d-none d-md-block'>
           <BtnExtandedAction
             idRoleUserWorkspace={props.idRoleUserWorkspace}
             onClickExtendedAction={props.onClickExtendedAction}
           />
         </div>
-      }
+      )}
 
       <div
         className='content__status d-sm-flex justify-content-between align-items-center'

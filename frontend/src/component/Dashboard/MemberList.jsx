@@ -39,7 +39,7 @@ export class MemberList extends React.Component {
           {state.displayNewMemberList
             ? (
               <div>
-                <ul className={classnames('memberlist__list', {'withAddBtn': props.displayAddMemberBtn})}>
+                <ul className={classnames('memberlist__list', {'withAddBtn': props.idRoleUserWorkspace >= 8})}>
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
@@ -56,7 +56,7 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      {props.displayRemoveMemberBtn && (
+                      {props.idRoleUserWorkspace >= 8 && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -68,7 +68,7 @@ export class MemberList extends React.Component {
                   )}
                 </ul>
 
-                {props.displayAddMemberBtn && (
+                {props.idRoleUserWorkspace >= 8 && (
                   <div className='memberlist__btnadd' onClick={this.handleClickAddMemberBtn}>
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>
@@ -97,6 +97,9 @@ export class MemberList extends React.Component {
                 role={props.role}
                 onChangeRole={props.onChangeRole}
                 onClickBtnValidate={this.handleClickBtnValidate}
+                emailNotifActivated={props.emailNotifActivated}
+                isLoggedUserAdmin={props.isLoggedUserAdmin}
+                idRoleUserWorkspace={props.idRoleUserWorkspace}
               />
             )
           }

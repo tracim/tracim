@@ -12,12 +12,9 @@
   "edit title": "edit title",
   "Archive": "Archive",
   "Delete": "Delete",
-  "Enter the name or email of the member": "Enter the name or email of the member",
   "Create an account": "Create an account",
   "Choose the role of the member": "Choose the role of the member",
   "Validate": "Validate",
-  "active": "active",
-  "inactive": "inactive",
   "No result": "No result",
   "Status": "Status",
   "Comment": "Comment",
@@ -29,5 +26,8 @@
   "Item restored": "Item restored",
   "Item moved": "Item moved",
   "Item copied": "Item copied",
-  "Item archived": "Item archived"
+  "Item archived": "Item archived",
+  "Enter the name or email of the user": "Enter the name or email of the user",
+  "If you type an unknown email address, an invitational email will be sent": "If you type an unknown email address, an invitational email will be sent",
+  "Due to disabled email notifications, only registered users can be invited": "Due to disabled email notifications, only registered users can be invited"
 }

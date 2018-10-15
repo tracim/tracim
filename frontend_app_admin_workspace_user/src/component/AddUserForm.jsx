@@ -6,23 +6,29 @@ export class AddUserForm extends React.Component {
     super(props)
 
     this.state = {
+      newUserName: '',
       newUserEmail: '',
+      newUserPassword: '',
       newUserProfile: ''
     }
   }
 
+  handleChangeNewUserName = e => this.setState({newUserName: e.target.value})
+
   handleChangeNewUserEmail = e => this.setState({newUserEmail: e.target.value})
+
+  handleChangeNewUserPassword = e => this.setState({newUserPassword: e.target.value})
 
   handleChangeNewUserProfile = e => this.setState({newUserProfile: e.currentTarget.value})
 
   handleClickAddUser = () => {
     const { props, state } = this
 
-    if (state.newUserEmail === '' || state.newUserProfile === '') {
+    if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
-          msg: props.t('Please type a name and select a profile'),
+          msg: props.t('Please type a name, an email and select a profile'),
           type: 'warning',
           delay: undefined
         }
@@ -30,7 +36,7 @@ export class AddUserForm extends React.Component {
       return
     }
 
-    props.onClickAddUser(state.newUserEmail, state.newUserProfile)
+    props.onClickAddUser(state.newUserName, state.newUserEmail, state.newUserProfile, state.newUserPassword)
   }
 
   render () {
@@ -39,25 +45,48 @@ export class AddUserForm extends React.Component {
     return (
       <form className='adminUser__adduser__form'>
         <div className='adminUser__adduser__form__username'>
-          <label className='username__text' htmlFor='adduser'>
-            {props.t('Type the email')}
+          <label className='username__text' htmlFor='adduser_name'>
+            {props.t('Name')}
           </label>
 
           <input
             type='text'
             className='username__input form-control'
-            id='adduser'
+            id='adduser_name'
+            placeholder={props.t('Name')}
+            value={state.newUserName}
+            onChange={this.handleChangeNewUserName}
+          />
+
+          <label className='username__text' htmlFor='adduser_email'>
+            {props.t('Email')}
+          </label>
+
+          <input
+            type='text'
+            className='username__input form-control'
+            id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
             onChange={this.handleChangeNewUserEmail}
           />
 
-          {/*
-          <div className='username__createaccount'>
-            <input type='radio' id='createuseraccount' />
-            <label className='ml-2' htmlFor='createuseraccount'>Create an account for this user</label>
-          </div>
-          */}
+          {!props.emailNotifActivated && (
+            <div>
+              <label className='username__text' htmlFor='adduser_password'>
+                {props.t('Password')}
+              </label>
+
+              <input
+                type='text'
+                className='username__input form-control'
+                id='adduser_password'
+                placeholder={props.t('Password')}
+                value={state.newUserPassword}
+                onChange={this.handleChangeNewUserPassword}
+              />
+            </div>
+          )}
         </div>
 
         <div className='adminUser__adduser__form__profile'>
@@ -94,10 +123,11 @@ export class AddUserForm extends React.Component {
         <div className='adminUser__adduser__form__submit'>
           <button
             type='button'
-            className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+            className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
             onClick={this.handleClickAddUser}
           >
-            {props.t('Add the user')}
+            {props.t('Create the user')}
+            <i class="fa fa-fw fa-check"/>
           </button>
         </div>
       </form>

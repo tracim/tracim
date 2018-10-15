@@ -4,6 +4,8 @@ import classnames from 'classnames'
 import CardHeader from './CardHeader.jsx'
 import CardBody from './CardBody.jsx'
 
+require('./Card.styl')
+
 const Card = props => {
   return (
     <div className={classnames(props.customClass, 'card')}>

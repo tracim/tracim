@@ -168,7 +168,7 @@ class HtmlDocument extends React.Component {
 
         this.setState({
           timeline: revisionWithComment,
-          mode: resRevision.body.length === 1 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
+          mode: resRevision.body.length === 1 && loggedUser.idRoleUserWorkspace >= 2 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
         })
       })
       .catch(e => {
@@ -487,6 +487,7 @@ class HtmlDocument extends React.Component {
             customColor={config.hexcolor}
             loggedUser={loggedUser}
             timelineData={timeline}
+            showHeader
             newComment={newComment}
             disableComment={mode === MODE.REVISION || content.is_archived || content.is_deleted}
             wysiwyg={timelineWysiwyg}
@@ -502,4 +503,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default Radium(translate()(HtmlDocument))
+export default translate()(Radium(HtmlDocument))

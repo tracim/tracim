@@ -28,6 +28,7 @@ export const RecentActivity = props =>
             <div
               className={classnames('activity__workspace primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
               onClick={() => props.onClickRecentContent(content.id, content.type)}
+              title={content.label}
               key={content.id}
             >
               <div className='activity__workspace__icon' style={{color: contentType.hexcolor}}>

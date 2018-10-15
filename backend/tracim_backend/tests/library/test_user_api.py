@@ -6,7 +6,7 @@ from tracim_backend import models
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import UserNotActive
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -379,7 +379,7 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
         api.disable(user)
-        with pytest.raises(UserNotActive):
+        with pytest.raises(UserAuthenticatedIsNotActive):
             api.authenticate_user('test@test.test', 'test@test.test')
 
     def test_unit__authenticate_user___err__wrong_password(self):

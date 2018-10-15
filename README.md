@@ -31,6 +31,7 @@ default config file, sqlite database, etc...
 
     ./setup_default_backend.sh
 
+This script use command with sudo, make sure you have installed and configured sudo.
 For each conf file missing, this script will generated them from default conf.
 If sqlite default database is missing, script will generate it.
 This script is also able to serve for update. If you want to update a script
@@ -46,6 +47,8 @@ and [Backend setting file doc](backend/doc/setting.md).
 
     ./install_frontend_dependencies.sh
     ./build_full_frontend.sh
+
+This script use command with sudo, make sure you have installed and configured sudo.
 
 ## Running Tracim using pserve ##
 

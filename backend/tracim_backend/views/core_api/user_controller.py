@@ -7,7 +7,7 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import hapic
+from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models import Group
 from tracim_backend.lib.core.group import GroupApi
@@ -25,9 +25,9 @@ from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
-from tracim_backend.views.core_api.schemas import UserInfosSchema
+from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
-from tracim_backend.views.core_api.schemas import UserProfileSchema
+from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
@@ -37,7 +37,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
@@ -114,6 +114,7 @@ class UserController(Controller):
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
+            show_deactivated=False,
         )
         users = uapi.get_known_user(acp=hapic_data.query.acp)
         context_users = [
@@ -174,7 +175,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
-    @hapic.input_body(UserInfosSchema())
+    @hapic.input_body(SetUserInfoSchema())
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserSchema())
     def set_user_infos(self, context, request: TracimRequest, hapic_data=None):
@@ -301,7 +302,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_body(UserProfileSchema())
+    @hapic.input_body(SetUserProfileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def set_profile(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -355,7 +356,7 @@ class UserController(Controller):
             before_content = api.get_one(
                 content_id=content_filter.before_content_id,
                 workspace=workspace,
-                content_type=CONTENT_TYPES.Any_SLUG
+                content_type=content_type_list.Any_SLUG
             )
         last_actives = api.get_last_active(
             workspace=workspace,

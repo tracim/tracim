@@ -15,7 +15,6 @@
   align-items center
   padding 10px 0
   border-bottom 0
-  width 100%
   cursor pointer
   font-weight bold
   &.read
@@ -25,22 +24,17 @@
   &:hover > .content__status
     color offWhite
   &__type
-    flex-grow 0
     padding 0 25px
     font-size 30px
     text-align center
   &__name
-    display flex
-    align-items center
-    justify-content space-between
-    flex-grow 2
-    flex-shrink 2
-    &__text
-      margin-right 10px
-      font-size 17px
-      white-space nowrap
-      overflow hidden
-      text-overflow ellipsis
+    flex 1
+    width 0 // keep me ! without it, it breaks the design
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    margin-right 10px
+    font-size 17px
   &__status
     width 180px
     padding 0 15px
@@ -62,6 +56,11 @@
 
 @media (max-width: max-xs)
 
-  .content__status__icon
-    display flex
-    justify-content flex-end
+  .content
+    &__name__text
+      width 200px
+    &__status
+      width 70px
+      &__icon
+        display flex
+        justify-content flex-end

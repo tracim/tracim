@@ -71,7 +71,9 @@ export const debug = {
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
-      // 'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    },
+    system: {
+      email_notification_activated: false
     }
   },
   loggedUser: {
@@ -79,8 +81,7 @@ export const debug = {
     public_name: 'Global Manager',
     email: 'osef@algoo.fr',
     lang: 'en',
-    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
-    auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
   },
   content: {
     profile: {

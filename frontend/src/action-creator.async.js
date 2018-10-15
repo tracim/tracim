@@ -1,7 +1,9 @@
-import { FETCH_CONFIG } from './helper.js'
+import {FETCH_CONFIG, PAGE, unLoggedAllowedPageList} from './helper.js'
+import i18n from './i18n.js'
 import {
   USER_LOGIN,
   USER_LOGOUT,
+  USER_REQUEST_PASSWORD,
   USER_CONNECTED,
   USER_KNOWN_MEMBER_LIST,
   USER_NAME,
@@ -16,6 +18,7 @@ import {
   WORKSPACE_MEMBER_REMOVE,
   FOLDER,
   setFolderData,
+  CONFIG,
   APP_LIST,
   CONTENT_TYPE_LIST,
   WORKSPACE_CONTENT_ARCHIVED,
@@ -24,7 +27,8 @@ import {
   WORKSPACE_READ_STATUS,
   USER_WORKSPACE_DO_NOTIFY,
   USER,
-  USER_WORKSPACE_LIST
+  USER_WORKSPACE_LIST,
+  newFlashMessage
 } from './action-creator.sync.js'
 
 /*
@@ -49,54 +53,63 @@ import {
 const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
-  const fetchResult = await fetch(url, param)
-  fetchResult.json = await (async () => {
+  try {
+    const fetchResult = await fetch(url, param)
+    fetchResult.json = await (async () => {
+      switch (fetchResult.status) {
+        case 200:
+        case 304:
+        case 400: // 400 should return the body in json to handle the backend error code in it
+          return fetchResult.json()
+        case 204:
+          return ''
+        case 401:
+          if (!unLoggedAllowedPageList.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
+            document.location.href = `${PAGE.LOGIN}?dc=1`
+          }
+          return ''
+        case 403:
+        case 404:
+        case 409:
+        case 500:
+        case 501:
+        case 502:
+        case 503:
+        case 504:
+          return '' // @TODO : handle errors
+      }
+    })()
+    if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
+
+    // if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+    // else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
     switch (fetchResult.status) {
       case 200:
-      case 304:
-        return fetchResult.json()
       case 204:
-        return ''
-      case 401:
-        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
-        return ''
+      case 304:
+        dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+        break
       case 400:
+      case 401:
       case 403:
       case 404:
-      case 409:
       case 500:
-      case 501:
-      case 502:
-      case 503:
-      case 504:
-        return '' // @TODO : handle errors
+        dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+        break
     }
-  })()
-  if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
-
-  // if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-  // else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
-  switch (fetchResult.status) {
-    case 200:
-    case 204:
-    case 304:
-      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-      break
-    case 400:
-    case 401:
-    case 403:
-    case 404:
-    case 500:
-      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
-      break
+    return fetchResult
+  } catch (e) {
+    if (e instanceof TypeError) {
+      dispatch(newFlashMessage(i18n.t('Server unreachable'), 'danger'))
+      console.error(e)
+    }
+    return {status: 'failedToFetch'} // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
   }
-
-  return fetchResult
 }
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/login`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/login`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -112,9 +125,44 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
   })
 }
 
+export const postForgotPassword = email => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/reset_password/request`,
+    param: {
+      credentials: 'include',
+      headers: {...FETCH_CONFIG.headers},
+      method: 'POST',
+      body: JSON.stringify({
+        email: email
+      })
+    },
+    actionName: USER_REQUEST_PASSWORD,
+    dispatch
+  })
+}
+
+export const postResetPassword = (newPassword, newPassword2, email, token) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/reset_password/modify`,
+    param: {
+      credentials: 'include',
+      headers: {...FETCH_CONFIG.headers},
+      method: 'POST',
+      body: JSON.stringify({
+        email: email,
+        new_password: newPassword,
+        new_password2: newPassword2,
+        reset_password_token: token
+      })
+    },
+    actionName: USER_REQUEST_PASSWORD,
+    dispatch
+  })
+}
+
 export const postUserLogout = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/logout`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/logout`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -157,7 +205,7 @@ export const getUserWorkspaceList = idUser => async dispatch => {
 
 export const getUserIsConnected = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`,
     param: {
       credentials: 'include',
       headers: {
@@ -431,7 +479,22 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
   if (fetchGetFolderContent.status === 200) dispatch(setFolderData(idFolder, fetchGetFolderContent.json))
 }
 
-export const getAppList = user => dispatch => {
+export const getConfig = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/config`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: CONFIG,
+    dispatch
+  })
+}
+
+export const getAppList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/applications`,
     param: {
@@ -446,7 +509,7 @@ export const getAppList = user => dispatch => {
   })
 }
 
-export const getContentTypeList = user => dispatch => {
+export const getContentTypeList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/content_types`,
     param: {

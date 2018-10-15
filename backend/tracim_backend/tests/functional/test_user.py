@@ -8,6 +8,7 @@ import requests
 import transaction
 
 from tracim_backend import models
+from tracim_backend import error
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
@@ -16,7 +17,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -91,14 +92,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -107,10 +108,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -210,14 +211,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
 
         with new_revision(
             session=dbsession,
@@ -227,10 +228,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -245,6 +246,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=400)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__get_recently_active_content__ok__200__user_itself(self):
 
@@ -308,14 +312,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -324,10 +328,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -372,7 +376,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]['content_id'] == main_folder.content_id
 
-    def test_api__get_recently_active_content__ok__200__other_user(self):
+    def test_api__get_recently_active_content__err__403__other_user(self):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -434,14 +438,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -450,10 +454,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -468,6 +472,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             user_id=admin.user_id,
             workspace_id=workspace.workspace_id
         ), status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
     def test_api__get_recently_active_content__ok__200__limit_2_multiple(self):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
@@ -506,14 +513,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -522,10 +529,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -581,7 +588,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         assert res[0]['content_id'] == firstly_created_but_recently_updated.content_id
         assert res[1]['content_id'] == secondly_created_but_not_updated.content_id
 
-    def test_api__get_recently_active_content__ok__200__bad_before_content_id_doesnt_exist(self):  # nopep8
+    def test_api__get_recently_active_content__err__400__bad_before_content_id(self):  # nopep8
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
         # anymore to fix datetime lack of precision.
 
@@ -618,14 +625,14 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -634,10 +641,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -656,6 +663,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             status=400,
             params=params
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
 
 class TestUserReadStatusEndpoint(FunctionalTest):
@@ -723,14 +733,14 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -739,10 +749,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -836,14 +846,14 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -852,10 +862,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -899,7 +909,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[3]['content_id'] == main_folder.content_id
 
-    def test_api__get_read_status__ok__200__other_user(self):
+    def test_api__get_read_status__err__403__other_user(self):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -960,14 +970,14 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(content_type_list.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(content_type_list.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -976,10 +986,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(content_type_list.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(content_type_list.Page.slug, workspace2, main_folder_workspace2, 'content_workspace_2', '', True)  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -1008,6 +1018,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             url=url,
             status=403,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestUserSetContentAsRead(FunctionalTest):
@@ -1070,9 +1083,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1179,9 +1192,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1195,7 +1208,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             )
         )
         # read
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
                 workspace_id=4000,
                 content_id=firstly_created.content_id,
@@ -1203,6 +1216,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             ),
             status=400,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api_set_content_as_read__ok__200__admin_content_do_not_exist(self):
         # init DB
@@ -1261,9 +1277,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1277,7 +1293,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             )
         )
         # read
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=4000,
@@ -1285,6 +1301,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             ),
             status=400,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api_set_content_as_read__ok__200__user_itself(self):
         # init DB
@@ -1343,9 +1362,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1443,9 +1462,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         dbsession.flush()
@@ -1459,7 +1478,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             )
         )
         # read
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
@@ -1467,6 +1486,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             ),
             status=403,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
     def test_api_set_content_as_read__ok__200__admin_with_comments(self):
         # init DB
@@ -1525,9 +1547,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
         api.mark_unread(firstly_created)
         api.mark_unread(comments)
@@ -1643,9 +1665,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -1753,9 +1775,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -1769,7 +1791,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             )
         )
         # unread
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
                 workspace_id=4000,
                 content_id=firstly_created.content_id,
@@ -1777,6 +1799,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             ),
             status=400,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api_set_content_as_unread__err__400__admin_content_do_not_exist(self):
         # init DB
@@ -1835,9 +1860,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -1852,7 +1877,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
 
         # unread
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=4000,
@@ -1860,6 +1885,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             ),
             status=400,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api_set_content_as_unread__ok__200__user_itself(self):
         # init DB
@@ -1918,9 +1946,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -2014,9 +2042,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         dbsession.flush()
@@ -2031,7 +2059,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
 
         # unread
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
@@ -2039,6 +2067,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             ),
             status=403,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
     def test_api_set_content_as_unread__ok__200__with_comments(self):
         # init DB
@@ -2065,9 +2096,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
         api.mark_read(firstly_created)
         api.mark_read(comments)
@@ -2159,9 +2190,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
@@ -2257,9 +2288,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
@@ -2355,9 +2386,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
@@ -2372,7 +2403,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
                 'pass'
             )
         )
-        self.testapp.put(
+        res = self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/read'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
@@ -2380,6 +2411,9 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             ),
             status=403,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestUserEnableWorkspaceNotification(FunctionalTest):
@@ -2595,10 +2629,13 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
                 'pass',
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
+        res = self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestUserDisableWorkspaceNotification(FunctionalTest):
@@ -2814,10 +2851,13 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
                 'pass',
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
+        res = self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestUserWorkspaceEndpoint(FunctionalTest):
@@ -2884,6 +2924,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/1/workspaces', status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2902,6 +2943,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/1/workspaces', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2921,6 +2963,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/5/workspaces', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -3082,10 +3125,13 @@ class TestUserEndpoint(FunctionalTest):
                 'pass'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
             status=403
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
     def test_api__create_user__ok_200__full_admin(self):
         self.testapp.authorization = (
@@ -3222,6 +3268,9 @@ class TestUserEndpoint(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EMAIL_ALREADY_EXIST_IN_DB
 
     def test_api__create_user__err_403__other_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3272,6 +3321,9 @@ class TestUserEndpoint(FunctionalTest):
             status=403,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestUserWithNotificationEndpoint(FunctionalTest):
@@ -3536,10 +3588,13 @@ class TestUsersEndpoint(FunctionalTest):
                 'pass'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/users',
             status=403
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestKnownMembersEndpoint(FunctionalTest):
@@ -3614,6 +3669,69 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[1]['user_id'] == test_user2.user_id
         assert res[1]['public_name'] == test_user2.display_name
         assert res[1]['avatar_url'] is None
+
+    def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2.is_active = False
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'bob',
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
 
     def test_api__get_user__ok_200__admin__by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3736,6 +3854,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
             status=400,
             params=params
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__get_user__ok_200__normal_user_by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3956,11 +4077,14 @@ class TestSetEmailEndpoint(FunctionalTest):
             'email': 'admin@admin.admin',
             'loggedin_user_password': 'admin@admin.admin',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=400,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.EMAIL_ALREADY_EXIST_IN_DB
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4019,11 +4143,14 @@ class TestSetEmailEndpoint(FunctionalTest):
             'email': 'mysuperemail@email.fr',
             'loggedin_user_password': 'badpassword',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WRONG_USER_PASSWORD  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4082,11 +4209,15 @@ class TestSetEmailEndpoint(FunctionalTest):
             'email': 'thatisnotandemail',
             'loggedin_user_password': 'admin@admin.admin',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=400,
         )
+        # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4209,20 +4340,23 @@ class TestSetEmailEndpoint(FunctionalTest):
         self.testapp.authorization = (
             'Basic',
             (
-                'test@test.test',
+                'test2@test2.test2',
                 'pass'
             )
         )
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'test2@test2.test2',
+            'loggedin_user_password': 'pass',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestSetPasswordEndpoint(FunctionalTest):
@@ -4342,11 +4476,14 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'new_password2': 'mynewpassword',
             'loggedin_user_password': 'wrongpassword',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/password'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WRONG_USER_PASSWORD
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
             current_user=admin,
@@ -4406,11 +4543,14 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'new_password2': 'mynewpassword2',
             'loggedin_user_password': 'admin@admin.admin',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/password'.format(user_id),
             params=params,
             status=400,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.PASSWORD_DO_NOT_MATCH
         # Check After
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
@@ -4530,20 +4670,23 @@ class TestSetPasswordEndpoint(FunctionalTest):
         self.testapp.authorization = (
             'Basic',
             (
-                'test@test.test',
+                'test2@test2.test2',
                 'pass'
             )
         )
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'test2@test2.test2',
+            'loggedin_user_password': 'pass',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserInfoEndpoint(FunctionalTest):
@@ -4745,11 +4888,14 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             'timezone': 'Europe/London',
             'lang': 'en'
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserProfilEndpoint(FunctionalTest):
@@ -4871,11 +5017,14 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         params = {
             'profile': 'administrators',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/profile'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4937,11 +5086,14 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         params = {
             'profile': 'administrators',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/profile'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserEnableDisableEndpoints(FunctionalTest):
@@ -5119,10 +5271,13 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
                 'pass'
             )
         )
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/enable'.format(user_id),
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -5173,10 +5328,13 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
                 'pass'
             )
         )
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/disable'.format(user_id),
             status=403,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -5224,10 +5382,13 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         res = res.json_body
         assert res['user_id'] == user_id
         assert res['is_active'] is True
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/disable'.format(user_id),
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),

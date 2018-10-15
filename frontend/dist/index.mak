@@ -78,6 +78,11 @@
   <body>
     <div id='content'></div>
 
+    <script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
+
+    <script type='text/javascript' src='/asset/tracim/appInterface.js'></script>
+    <script type='text/javascript' src='/asset/tracim/tinymceInit.js'></script>
+
     <script type='text/javascript' src='/asset/tracim.vendor.bundle.js'></script>
     <script type='text/javascript' src='/asset/tracim.app.entry.js'></script>
 
@@ -94,8 +99,5 @@
 
     <script type='text/javascript' src='/asset/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
     <script type='text/javascript' src='/asset/tinymce/js/tinymce/tinymce.min.js'></script>
-
-    <script type='text/javascript' src='/asset/tracim/appInterface.js'></script>
-    <script type='text/javascript' src='/asset/tracim/tinymceInit.js'></script>
   </body>
 </html>

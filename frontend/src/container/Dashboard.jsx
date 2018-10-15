@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { withRouter } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
@@ -32,7 +33,8 @@ import appFactory from '../appFactory.js'
 import {
   ROLE,
   PAGE,
-  findIdRoleUserWorkspace
+  findIdRoleUserWorkspace,
+  PROFILE
 } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
@@ -103,6 +105,10 @@ class Dashboard extends React.Component {
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      case 400:
+        props.history.push(PAGE.HOME)
+        props.dispatch(newFlashMessage('Unknown shared space'))
+        break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
     }
   }
@@ -113,6 +119,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(state.workspaceIdInUrl))
     switch (fetchWorkspaceMemberList.status) {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
+      case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
     }
   }
@@ -125,11 +132,13 @@ class Dashboard extends React.Component {
 
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
+      case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
     }
 
     switch (fetchWorkspaceReadStatusList.status) {
       case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
+      case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
   }
@@ -216,6 +225,14 @@ class Dashboard extends React.Component {
       return false
     }
 
+    if (
+      !state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail) &&
+      !props.system.config.email_notification_activated
+    ) {
+      props.dispatch(newFlashMessage(props.t('Unknown user'), 'warning'))
+      return false
+    }
+
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
       id: state.newMember.id || null,
       name: state.newMember.nameOrEmail,
@@ -228,8 +245,17 @@ class Dashboard extends React.Component {
         this.setState({newMember: {id: '', avatarUrl: '', nameOrEmail: '', role: ''}})
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
+      case 400:
+        switch (fetchWorkspaceNewMember.json.code) {
+          case 2042:
+            props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
+            return false
+          default:
+            props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
+            return false
+        }
       default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
         return false
     }
   }
@@ -256,8 +282,7 @@ class Dashboard extends React.Component {
         slug: 'workspace_advanced',
         faIcon: 'bank',
         hexcolor: GLOBAL_primaryColor,
-        creationLabel: '',
-        roleList: ROLE
+        creationLabel: ''
       },
       props.user,
       findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
@@ -368,7 +393,7 @@ class Dashboard extends React.Component {
 
               <MemberList
                 customClass='dashboard__memberlist'
-                memberList={props.curWs.memberList}
+                memberList={props.curWs.memberList.filter(u => u.isActive)}
                 roleList={ROLE}
                 searchedKnownMemberList={state.searchedKnownMemberList}
                 autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
@@ -381,8 +406,9 @@ class Dashboard extends React.Component {
                 onChangeRole={this.handleChangeNewMemberRole}
                 onClickValidateNewMember={this.handleClickValidateNewMember}
                 onClickRemoveMember={this.handleClickRemoveMember}
-                displayRemoveMemberBtn={idRoleUserWorkspace >= 8}
-                displayAddMemberBtn={idRoleUserWorkspace >= 8}
+                idRoleUserWorkspace={idRoleUserWorkspace}
+                isLoggedUserAdmin={props.user.profile === PROFILE.ADMINISTRATOR.slug}
+                emailNotifActivated={props.system.config.email_notification_activated}
                 t={props.t}
               />
             </div>
@@ -405,5 +431,5 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType, appList, currentWorkspace }) => ({ user, contentType, appList, curWs: currentWorkspace })
-export default connect(mapStateToProps)(appFactory(translate()(Dashboard)))
+const mapStateToProps = ({ user, contentType, appList, currentWorkspace, system }) => ({ user, contentType, appList, curWs: currentWorkspace, system })
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

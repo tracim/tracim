@@ -4,7 +4,7 @@ from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import UserNotActive
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import InvalidUserId
 from tracim_backend.exceptions import InvalidWorkspaceId
@@ -16,7 +16,7 @@ from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import ImmutableAttribute
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -236,7 +236,7 @@ class TracimRequest(Request):
             )
             comment = api.get_one(
                 comment_id,
-                content_type=CONTENT_TYPES.Comment.slug,
+                content_type=content_type_list.Comment.slug,
                 workspace=workspace,
                 parent=content,
             )
@@ -276,7 +276,7 @@ class TracimRequest(Request):
                 session=request.dbsession,
                 config=request.registry.settings['CFG']
             )
-            content = api.get_one(content_id=content_id, workspace=workspace, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+            content = api.get_one(content_id=content_id, workspace=workspace, content_type=content_type_list.Any_SLUG)  # nopep8
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content {} does not exist '
@@ -326,9 +326,9 @@ class TracimRequest(Request):
             login = request.authenticated_userid
             if not login:
                 raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
-            user = uapi.get_one_by_email(login)
+            user = uapi.get_one(login)
             if not user.is_active:
-                raise UserNotActive('User {} is not active'.format(login))
+                raise UserAuthenticatedIsNotActive('User {} is not active'.format(login))
         except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
             raise NotAuthenticated('User {} not found'.format(login)) from exc
         return user

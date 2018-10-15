@@ -44,7 +44,10 @@ class PopinFixedHeader extends React.Component {
           <i className={`fa fa-${faIcon}`} />
         </div>
 
-        <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
+        <div
+          className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
+          title={title}
+        >
           {state.editTitle
             ? <input
               className='wsContentGeneric__header__title__editiontitle editiontitle'
@@ -52,7 +55,7 @@ class PopinFixedHeader extends React.Component {
               onChange={this.onChangeTitle}
               onKeyDown={this.handleInputKeyPress}
             />
-            : <div>{title}</div>
+            : title
           }
         </div>
 

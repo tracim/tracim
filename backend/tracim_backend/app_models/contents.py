@@ -36,6 +36,9 @@ class ContentStatus(object):
         self.fa_icon = fa_icon
         self.hexcolor = hexcolor
 
+    def is_editable(self):
+        return self.global_status == GlobalStatus.OPEN.value
+
 
 open_status = ContentStatus(
     slug='open',
@@ -96,7 +99,7 @@ class ContentStatusList(object):
         return self.OPEN
 
 
-CONTENT_STATUS = ContentStatusList(
+content_status_list = ContentStatusList(
     [
         closed_validated_status,
         closed_unvalidated_status,
@@ -145,7 +148,7 @@ event_type = ContentType(
     hexcolor='',
     label='Event',
     creation_label='Event',
-    available_statuses=CONTENT_STATUS.get_all(),
+    available_statuses=content_status_list.get_all(),
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
@@ -155,8 +158,9 @@ comment_type = ContentType(
     hexcolor='',
     label='Comment',
     creation_label='Comment',
-    available_statuses=CONTENT_STATUS.get_all(),
+    available_statuses=content_status_list.get_all(),
 )
+
 
 class ContentTypeList(object):
     """
@@ -254,4 +258,4 @@ class ContentTypeList(object):
         return properties_dict
 
 
-CONTENT_TYPES = ContentTypeList(app_list)
+content_type_list = ContentTypeList(app_list)

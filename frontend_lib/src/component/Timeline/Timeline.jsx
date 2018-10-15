@@ -30,6 +30,7 @@ class Timeline extends React.Component {
   }
 
   componentDidUpdate () {
+    if (window.innerWidth < 1200) return
     this.props.shouldScrollToBottom && this.scrollToBottom()
   }
 
@@ -194,7 +195,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default Radium(translate()(Timeline))
+export default translate()(Radium(Timeline))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
@@ -215,6 +216,7 @@ Timeline.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
   onClickRestoreDeleted: PropTypes.func
+  // toggleRightPart: PropsTypes.func // this props comes from PopinFixedContent
 }
 
 Timeline.defaultProps = {

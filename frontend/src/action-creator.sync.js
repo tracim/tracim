@@ -18,6 +18,7 @@ export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, 
 export const USER = 'User'
 export const USER_LOGIN = `${USER}/Login`
 export const USER_LOGOUT = `${USER}/Logout`
+export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
 export const setUserConnected = user => ({ type: `${SET}/${USER}/Connected`, user })
@@ -87,6 +88,9 @@ export const setAppList = appList => ({ type: `${SET}/${APP_LIST}`, appList })
 export const CONTENT_TYPE = 'ContentType'
 export const CONTENT_TYPE_LIST = `${CONTENT_TYPE}/List`
 export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_TYPE_LIST}`, contentTypeList })
+
+export const CONFIG = 'Config'
+export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })

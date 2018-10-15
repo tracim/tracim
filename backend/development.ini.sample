@@ -257,7 +257,7 @@ sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 ###
 
 [loggers]
-keys = root, tracim, sqlalchemy, alembic
+keys = root, tracim, sqlalchemy, alembic, hapic
 
 [handlers]
 keys = console
@@ -286,6 +286,11 @@ qualname = sqlalchemy.engine
 level = INFO
 handlers =
 qualname = alembic
+
+[logger_hapic]
+level = DEBUG
+handlers =
+qualname = hapic
 
 [handler_console]
 class = StreamHandler

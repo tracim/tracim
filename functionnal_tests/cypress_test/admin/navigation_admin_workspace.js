@@ -1,16 +1,11 @@
+import { login, logout } from '../helpers/index.js'
+
 describe('navigation :: admin > workspace', function () {
     before(function () {
-        //login
-        cy.visit('/login')
-        cy.get('input[type=email]').should('be.visible')
-        cy.get('input[type=email]').type('admin@admin.admin')
-        cy.get('input[type=password]').type('admin@admin.admin')
-        cy.get('form').find('button').get('.connection__form__btnsubmit').click()
+        login(cy)
     })
     after(function() {
-        cy.get('#dropdownMenuButton').click()
-        cy.get('div.setting__link').click()
-        cy.url().should('include', '/login')
+        logout (cy)
     })
     it ('', function() {
         cy.get('.adminlink.dropdown').should('be.visible')

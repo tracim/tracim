@@ -541,10 +541,9 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            downloadRawUrl={
-              (({config, content, mode}) =>
-                `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw?force_download=1`
-              )(state)}
+            downloadRawUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw?force_download=1`
+            )(state)}
             downloadPdfPageUrl={(({config, content, mode}) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${state.fileCurrentPage}&force_download=1`
             )(state)}

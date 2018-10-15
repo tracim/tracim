@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend import CFG
 from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
     SpecialFolderExtension
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
@@ -176,7 +176,7 @@ class Provider(DAVProvider):
             content_revision = content_api.get_one_revision(revision_id)
             content = self.get_content_from_revision(content_revision, content_api)
 
-            if content.type == CONTENT_TYPES.File.slug:
+            if content.type == content_type_list.File.slug:
                 return resources.HistoryFileResource(
                     path=path,
                     environ=environ,
@@ -200,7 +200,7 @@ class Provider(DAVProvider):
 
         if content is None:
             return None
-        if content.type == CONTENT_TYPES.Folder.slug:
+        if content.type == content_type_list.Folder.slug:
             return resources.FolderResource(
                 path=path,
                 environ=environ,
@@ -209,7 +209,7 @@ class Provider(DAVProvider):
                 session=session,
                 user=user,
             )
-        elif content.type == CONTENT_TYPES.File.slug:
+        elif content.type == content_type_list.File.slug:
             return resources.FileResource(
                 path=path,
                 environ=environ,
@@ -358,7 +358,7 @@ class Provider(DAVProvider):
 
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:
-            return api.get_one(revision.content_id, CONTENT_TYPES.Any_SLUG)
+            return api.get_one(revision.content_id, content_type_list.Any_SLUG)
         except NoResultFound:
             return None
 

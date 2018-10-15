@@ -19,8 +19,7 @@ const debug = { // outdated
     apiUrl: 'http://localhost:3001',
     apiHeader: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+      'Content-Type': 'application/json'
     },
     translation: {
       en: {translation: {}},

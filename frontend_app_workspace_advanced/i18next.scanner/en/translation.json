@@ -16,5 +16,12 @@
   "Error while saving new shared space label": "Error while saving new shared space label",
   "Error while removing user from shared space": "Error while removing user from shared space",
   "Error while adding the member to the shared space": "Error while adding the member to the shared space",
-  "Shared space's description": "Shared space's description"
+  "Shared space's description": "Shared space's description",
+  "Delete shared space": "Delete shared space",
+  "Delete": "Delete",
+  "Are you sure ?": "Are you sure ?",
+  "Cancel": "Cancel",
+  "Unknown user": "Unknown user",
+  "Error while deleting shared space": "Error while deleting shared space",
+  "This account is deactivated": "This account is deactivated"
 }

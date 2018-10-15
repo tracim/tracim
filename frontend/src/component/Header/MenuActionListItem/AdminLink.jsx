@@ -13,7 +13,7 @@ const AdminLink = props => {
         <div className='adminlink__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
           <Link className='setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ADMIN.WORKSPACE}>
             <i className={`fa fa-fw fa-${workspaceConfig.faIcon} mr-2`} />
-            {props.t('Shared space')}
+            {props.t('Shared spaces')}
           </Link>
 
           <Link className='setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ADMIN.USER}>

@@ -20,7 +20,8 @@ import {
   putMemberRole,
   deleteMember,
   getUserKnownMember,
-  postWorkspaceMember
+  postWorkspaceMember,
+  deleteWorkspace
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -41,7 +42,8 @@ class WorkspaceAdvanced extends React.Component {
         avatarUrl: ''
       },
       autoCompleteFormNewMemberActive: true,
-      searchedKnownMemberList: []
+      searchedKnownMemberList: [],
+      displayPopupValidateDeleteWorkspace: false
     }
 
     // i18n has been init, add resources from frontend
@@ -253,18 +255,28 @@ class WorkspaceAdvanced extends React.Component {
       this.sendGlobalFlashMessage(props.t('Please set a name or email', 'warning'))
       return
     }
+
     if (state.newMember.role === '') {
       this.sendGlobalFlashMessage(props.t('Please set a role', 'warning'))
       return
     }
 
-    const fetchWorkspaceNewMember = await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
+    if (
+      !state.searchedKnownMemberList.find(u => u.public_name === state.newMember.name) &&
+      state.config.system && state.config.system.config &&
+      !state.config.system.config.email_notification_activated
+    ) {
+      this.sendGlobalFlashMessage(props.t('Unknown user'), 'warning')
+      return false
+    }
+
+    const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || null,
       name: state.newMember.name,
       role: state.newMember.role
-    })
+    }))
 
-    switch (fetchWorkspaceNewMember.status) {
+    switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
         this.loadContent()
         this.setState({
@@ -274,7 +286,31 @@ class WorkspaceAdvanced extends React.Component {
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
+      case 400:
+        switch (fetchWorkspaceNewMember.body.code) {
+          case 2042: this.sendGlobalFlashMessage(props.t('This account is deactivated'), 'warning'); break
+          default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
+        }
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space', 'warning'))
+    }
+  }
+
+  handleClickDeleteWorkspaceBtn = () => this.setState({displayPopupValidateDeleteWorkspace: true})
+
+  handleClickClosePopupDeleteWorkspace = () => this.setState({displayPopupValidateDeleteWorkspace: false})
+
+  handleClickValidateDeleteWorkspace = async () => {
+    const { props, state } = this
+
+    const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
+    switch (fetchDeleteWorkspace.status) {
+      case 204:
+        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/'}})
+        // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
+        this.handleClickBtnCloseApp()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting shared space', 'warning'))
     }
   }
 
@@ -327,6 +363,13 @@ class WorkspaceAdvanced extends React.Component {
             searchedKnownMemberList={state.searchedKnownMemberList}
             onClickKnownMember={this.handleClickKnownMember}
             onClickValidateNewMember={this.handleClickValidateNewMember}
+            displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
+            onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
+            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
+            idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
+            isLoggedUserAdmin={state.loggedUser.profile === state.config.profileObject.ADMINISTRATOR.slug}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>
@@ -335,4 +378,4 @@ class WorkspaceAdvanced extends React.Component {
   }
 }
 
-export default Radium(translate()(WorkspaceAdvanced))
+export default translate()(Radium(WorkspaceAdvanced))

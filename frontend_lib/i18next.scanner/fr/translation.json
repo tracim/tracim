@@ -12,12 +12,9 @@
   "edit title": "modifier le titre",
   "Archive": "archiver",
   "Delete": "supprimer",
-  "Enter the name or email of the member": "Entrer le nom ou l'email du membre",
   "Create an account": "Créer un compte",
   "Choose the role of the member": "Choissir le role du membre",
   "Validate": "Valider",
-  "active": "activé",
-  "inactive": "désactivé",
   "No result": "Aucun résultat",
   "Status": "Statut ",
   "Comment": "Commentaire",
@@ -29,5 +26,8 @@
   "Item restored": "Elément restauré",
   "Item moved": "Elément déplacé",
   "Item copied": "Elément copié",
-  "Item archived": "Elément archivé"
+  "Item archived": "Elément archivé",
+  "Enter the name or email of the user": "Saisir le nom ou l'email de l'utilisateur",
+  "If you type an unknown email address, an invitational email will be sent": "Si vous saisissez une adresse email inconnue, un email d'invitation sera envoyé",
+  "Due to disabled email notifications, only registered users can be invited": "Notification email désactivées, vous ne pouvez pas créer un nouvel utilisateur depuis ce formulaire"
 }

@@ -1,10 +1,11 @@
 # coding=utf-8
 import transaction
+from tracim_backend import error
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.tests import FunctionalTest
 
 """
@@ -58,6 +59,7 @@ class TestApplicationEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/applications', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -80,11 +82,11 @@ class TestContentsTypesEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/system/content_types', status=200)
         res = res.json_body
-        assert len(res) == len(CONTENT_TYPES.endpoint_allowed_types_slug())
-        content_types = CONTENT_TYPES.endpoint_allowed_types_slug()
+        assert len(res) == len(content_type_list.endpoint_allowed_types_slug())
+        content_types = content_type_list.endpoint_allowed_types_slug()
 
         for counter, content_type_slug in enumerate(content_types):
-            content_type = CONTENT_TYPES.get_one_by_slug(content_type_slug)
+            content_type = content_type_list.get_one_by_slug(content_type_slug)
             assert res[counter]['slug'] == content_type.slug
             assert res[counter]['fa_icon'] == content_type.fa_icon
             assert res[counter]['hexcolor'] == content_type.hexcolor
@@ -110,6 +112,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/content_types', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -152,6 +155,7 @@ class TestTimezonesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/timezones', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
