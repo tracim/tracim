@@ -643,12 +643,23 @@ class ContentRevisionRO(DeclarativeBase):
             RevisionReadStatus(user=k, view_datetime=v)
     )
 
-    @property
-    def file_name(self):
+    @hybrid_property
+    def file_name(self) -> str:
         return '{0}{1}'.format(
             self.label,
             self.file_extension,
         )
+
+    @file_name.setter
+    def file_name(self, value: str) -> None:
+        file_name, file_extension = os.path.splitext(value)
+        self.label = file_name
+        self.file_extension = file_extension
+
+    @file_name.expression
+    def file_name(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.label + ContentRevisionRO.file_extension
+
 
     @classmethod
     def new_from(cls, revision: 'ContentRevisionRO') -> 'ContentRevisionRO':
@@ -881,20 +892,17 @@ class Content(DeclarativeBase):
 
     @hybrid_property
     def file_name(self) -> str:
-        return '{0}{1}'.format(
-            self.revision.label,
-            self.revision.file_extension,
-        )
+        return self.revision.file_name
 
     @file_name.setter
     def file_name(self, value: str) -> None:
         file_name, file_extension = os.path.splitext(value)
-        self.revision.label = file_name
-        self.revision.file_extension = file_extension
+        self.label = file_name
+        self.file_extension = file_extension
 
     @file_name.expression
     def file_name(cls) -> InstrumentedAttribute:
-        return ContentRevisionRO.file_name + ContentRevisionRO.file_extension
+        return Content.label + Content.file_extension
 
     @hybrid_property
     def file_extension(self) -> str:

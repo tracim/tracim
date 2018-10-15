@@ -456,10 +456,10 @@ class ContentApi(object):
             query = query.filter(Content.content_id != exclude_content_id)
         query = query.filter(Content.workspace_id == workspace.workspace_id)
 
-        nb_content_with_the_filename = query.\
-            filter(Content.label == label).\
-            filter(Content.file_extension == file_extension).\
-            count()
+
+        nb_content_with_the_filename = query.filter(
+            Content.file_name == filename
+        ).count()
         if nb_content_with_the_filename == 0:
             return True
         elif nb_content_with_the_filename == 1:
