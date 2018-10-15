@@ -932,7 +932,8 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     modified = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
-        description='date of last modification of content'
+        description='date of last modification of content.'
+                    ' note: this does not include comments or any subcontents.',
     )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
