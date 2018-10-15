@@ -31,7 +31,8 @@ class ResetPasswordController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_request(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
-        Request to reset password
+        Send a request to reset password. This will result in a new email sent to the user
+        with a token to be used for password reset operation.
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(
@@ -50,7 +51,8 @@ class ResetPasswordController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_check_token(self, context, request: TracimRequest, hapic_data=None):   # nopep8
         """
-        check reset_password token
+        Check reset_password token. The token sent by email has a limited life duration,
+        this API allow to check that the token is existing and still valid.
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(
@@ -70,7 +72,8 @@ class ResetPasswordController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_modify(self, context, request: TracimRequest, hapic_data=None):   # nopep8
         """
-        change password with reset_password token
+        Do change the password. This requires the token received by email.
+        After this request returns a 200, the user password is effectively changed
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(

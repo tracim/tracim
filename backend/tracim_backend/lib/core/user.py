@@ -220,7 +220,7 @@ class UserApi(object):
             do_save: bool=True
     ):
         """
-        Set User password if loggedin user password is correct
+        Set User password if logged-in user password is correct
         and both new_password are the same.
         :param user: User who need password changed
         :param loggedin_user_password: cleartext password of logged user (not
