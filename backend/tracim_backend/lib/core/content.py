@@ -569,8 +569,8 @@ class ContentApi(object):
         content = Content()
         if label:
             file_extension = ''
-            if content_type.default_file_extension:
-                file_extension = content_type.default_file_extension
+            if content_type.file_extension:
+                file_extension = content_type.file_extension
             filename = self._prepare_filename(label, file_extension)
             self._is_filename_available_or_raise(
                 filename,
