@@ -31,7 +31,7 @@ default config file, sqlite database, etc...
 
     ./setup_default_backend.sh
 
-This script use command with sudo, make sure you have installed and configured sudo.
+This script use command with sudo, make sure you have installed and configured sudo (you can run script in root if you add root in parameter of this script).
 For each conf file missing, this script will generated them from default conf.
 If sqlite default database is missing, script will generate it.
 This script is also able to serve for update. If you want to update a script
@@ -48,7 +48,7 @@ and [Backend setting file doc](backend/doc/setting.md).
     ./install_frontend_dependencies.sh
     ./build_full_frontend.sh
 
-This script use command with sudo, make sure you have installed and configured sudo.
+This script use command with sudo, make sure you have installed and configured sudo (you can run script in root if you add root in parameter of this script).
 
 ## Running Tracim using pserve ##
 
@@ -72,7 +72,10 @@ You can now enter the application at
 
 This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress and his dependency's.
 
-    ./install_cypress.sh
+    ./setup_functionnal_tests.sh
+
+This script use command with sudo, make sure you have installed and configured sudo (you can run script in root if you add root in parameter of this script).
+If you need to run cypress with external server of tracim, modify "baseurl" in cypress.json (look here for more detail: https://docs.cypress.io/guides/references/configuration.html#Options ).
 
 ## Run tests with command line ##
 
