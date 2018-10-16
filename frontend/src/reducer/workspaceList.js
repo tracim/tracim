@@ -22,15 +22,12 @@ export function workspaceList (state = [], action) {
           hexcolor: sbe.hexcolor,
           label: sbe.label
         })),
-        isOpenInSidebar: false,
+        isOpenInSidebar: ws.isOpenInSidebar,
         memberList: []
       }))
 
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
-      return state.map(ws => ws.id === action.workspaceId
-        ? {...ws, isOpenInSidebar: action.isOpenInSidebar}
-        : ws
-      )
+      return state.map(ws => ({...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar}))
 
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({
