@@ -53,7 +53,7 @@ class Dashboard extends React.Component {
         nameOrEmail: '',
         role: ''
       },
-      autoCompleteFormNewMemberActive: true,
+      autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
       displayNewMemberDashboard: false,
       displayNotifBtn: false,
@@ -178,22 +178,20 @@ class Dashboard extends React.Component {
     const { props } = this
     const fetchUserKnownMemberList = await props.dispatch(getUserKnownMember(props.user, userNameToSearch))
     switch (fetchUserKnownMemberList.status) {
-      case 200:
-        this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
-      default:
-        props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
+      case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
     }
   }
 
   handleChangeNewMemberNameOrEmail = newNameOrEmail => {
     if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
-    else if (newNameOrEmail.length === 0) this.setState({searchedKnownMemberList: []})
+
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
         nameOrEmail: newNameOrEmail
       },
-      autoCompleteFormNewMemberActive: true
+      autoCompleteFormNewMemberActive: newNameOrEmail.length >= 2
     }))
   }
 
@@ -205,8 +203,7 @@ class Dashboard extends React.Component {
         nameOrEmail: knownMember.public_name,
         avatarUrl: knownMember.avatar_url
       },
-      autoCompleteFormNewMemberActive: false,
-      searchedKnownMemberList: []
+      autoCompleteFormNewMemberActive: false
     }))
   }
 
@@ -242,7 +239,15 @@ class Dashboard extends React.Component {
     switch (fetchWorkspaceNewMember.status) {
       case 200:
         this.loadMemberList()
-        this.setState({newMember: {id: '', avatarUrl: '', nameOrEmail: '', role: ''}})
+        this.setState({
+          newMember: {
+            id: '',
+            avatarUrl: '',
+            nameOrEmail: '',
+            role: ''
+          },
+          autoCompleteFormNewMemberActive: false
+        })
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true
       case 400:

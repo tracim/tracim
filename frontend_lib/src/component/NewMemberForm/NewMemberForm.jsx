@@ -19,6 +19,16 @@ export const NewMemberForm = props => {
             {props.t('Enter the name or email of the user')}
           </label>
 
+          {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
+            <div className='name__adminmsg'>
+              <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
+              {props.emailNotifActivated
+                ? props.t("If you type an email that isn't associated to an account, an invitational email will be sent")
+                : props.t("Email notifications are disabled, you can't create new users from here")
+              }
+            </div>
+          )}
+
           <input
             type='text'
             className='name__input form-control'
@@ -28,16 +38,6 @@ export const NewMemberForm = props => {
             onChange={e => props.onChangeNameOrEmail(e.target.value)}
             autoComplete='off'
           />
-
-          {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
-            <div className='name__adminmsg'>
-              <i className='name__adminmsg__icon fa fa-fw fa-warning' />
-              {props.emailNotifActivated
-                ? props.t("If you type an unknown email address, an invitational email will be sent")
-                : props.t("Due to disabled email notifications, only registered users can be invited")
-              }
-            </div>
-          )}
 
           {props.searchedKnownMemberList.length > 0
             ? (
@@ -130,7 +130,7 @@ export const NewMemberForm = props => {
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}
-          <i class="fa fa-fw fa-check"/>
+          <i class="fa fa-fw fa-check" />
         </button>
       </div>
     </div>
