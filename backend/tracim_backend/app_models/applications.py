@@ -30,7 +30,7 @@ class Application(object):
         @param main_route: the route of the frontend "home" screen of
         the application. For exemple, if you have an application
         called "calendar", the main route will be something
-        like /#/workspace/{wid}/calendar.
+        like /workspace/{wid}/calendar.
         """
         self.label = label
         self.slug = slug

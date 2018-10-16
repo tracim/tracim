@@ -664,7 +664,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
     slug = marshmallow.fields.String(example='markdown-pages')
     label = marshmallow.fields.String(example='Markdown Documents')
     route = marshmallow.fields.String(
-        example='/#/workspace/{workspace_id}/contents/?type=mardown-page',
+        example='/workspace/{workspace_id}/contents/?type=mardown-page',
         description='the route is the frontend route. '
                     'It may include workspace_id '
                     'which must be replaced on backend size '
