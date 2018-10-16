@@ -875,6 +875,13 @@ class ContentInContext(object):
         """
         return self.content.file_extension
 
+    @property
+    def filename(self) -> str:
+        """
+        :return: complete filename with both label and file extension part
+        """
+        return self.content.file_name
+
 
 class RevisionInContext(object):
     """
@@ -1086,3 +1093,10 @@ class RevisionInContext(object):
         :return: file extension with "." at the beginning, example : .txt
         """
         return self.revision.file_extension
+
+    @property
+    def filename(self) -> str:
+        """
+        :return: complete filename with both label and file extension part
+        """
+        return self.revision.file_name

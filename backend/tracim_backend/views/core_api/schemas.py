@@ -933,6 +933,9 @@ class ContentDigestSchema(marshmallow.Schema):
     file_extension = marshmallow.fields.String(
         example='.txt'
     )
+    filename = marshmallow.fields.String(
+        example='nameofthefile.txt'
+    )
 
 
 class ReadStatusSchema(marshmallow.Schema):
