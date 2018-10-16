@@ -20,6 +20,7 @@ from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
@@ -283,6 +284,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

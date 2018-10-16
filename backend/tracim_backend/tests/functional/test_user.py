@@ -5222,6 +5222,53 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
 
+    def test_api_disable_user__err_400__cant_disable_myself(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # check before
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['user_id'] == user_id
+        assert res['is_active'] is True
+        self.testapp.put_json(
+            '/api/v2/users/{}/disable'.format(user_id),
+            status=400,
+        )
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+
+        assert res['user_id'] == user_id
+        assert res['is_active'] is True
+
     def test_api_enable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
