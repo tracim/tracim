@@ -131,10 +131,12 @@ function translate_email {
 ############################################
 
 # Check if not running with sudoers
-if [ "$PARAM1" == "root" ]; then
+if [ "$1" == "root" ]; then
     SUDO=""
+    SUDOCURL=""
 else
-    SUDO=sudo
+    SUDO="sudo"
+    SUDOCURL="sudo -E"
 fi
 
 DEFAULTDIR=$(pwd)

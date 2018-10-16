@@ -31,7 +31,10 @@ class SessionController(Controller):
     @hapic.output_body(UserSchema())
     def login(self, context, request: TracimRequest, hapic_data=None):
         """
-        Logs user into the system
+        Logs the user into the system.
+        In case of success, the JSON returned is the user profile.
+        In that case, a cookie is created with a session_key and an expiration date.
+        Eg. : `session_key=932d2ad68f3a094c2d4da563ccb921e6479729f5b5f707eba91d4194979df20831be48a0; expires=Mon, 22-Oct-2018 19:37:02 GMT; Path=/; SameSite=Lax`
         """
 
         login = hapic_data.body
@@ -49,7 +52,7 @@ class SessionController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
-        Logs out current logged in user session
+        Logs out current logged in user. This also trashes the associated session
         """
         request.session.delete()
         return
@@ -58,7 +61,9 @@ class SessionController(Controller):
     @hapic.output_body(UserSchema(),)
     def whoami(self, context, request: TracimRequest, hapic_data=None):
         """
-        Return current logged in user or 401
+        Return current logged-in user.
+        If user is not authenticated or the session has expired, a 401 is returned.
+        This is the recommanded way to check if the user is already authenticated
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(

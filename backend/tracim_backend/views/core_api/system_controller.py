@@ -70,7 +70,8 @@ class SystemController(Controller):
     @hapic.output_body(AboutSchema(),)
     def about(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get some info about Tracim
+        Returns information about current tracim instance.
+        This is the equivalent of classical "help > about" menu in classical software.
         """
         app_config = request.registry.settings['CFG']
         system_api = SystemApi(app_config)
@@ -81,7 +82,8 @@ class SystemController(Controller):
     @hapic.output_body(ConfigSchema(),)
     def config(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get some config info of tracim instance
+        Returns configuration information required for frontend.
+        At the moment it only returns if email notifications are activated.
         """
         app_config = request.registry.settings['CFG']
         system_api = SystemApi(app_config)

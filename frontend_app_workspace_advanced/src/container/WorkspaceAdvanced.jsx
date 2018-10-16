@@ -41,7 +41,7 @@ class WorkspaceAdvanced extends React.Component {
         role: '',
         avatarUrl: ''
       },
-      autoCompleteFormNewMemberActive: true,
+      autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false
     }
@@ -58,6 +58,7 @@ class WorkspaceAdvanced extends React.Component {
       case 'workspace_advanced_showApp':
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
+        this.loadContent()
         break
       case 'workspace_advanced_hideApp':
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
@@ -198,13 +199,13 @@ class WorkspaceAdvanced extends React.Component {
 
   handleChangeNewMemberName = newName => {
     if (newName.length >= 2) this.handleSearchUser(newName)
-    else if (newName.length === 0) this.setState({searchedKnownMemberList: []})
+
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
         name: newName
       },
-      autoCompleteFormNewMemberActive: true
+      autoCompleteFormNewMemberActive: newName.length >= 2
     }))
   }
 
@@ -243,8 +244,7 @@ class WorkspaceAdvanced extends React.Component {
         name: knownMember.public_name,
         avatarUrl: knownMember.avatar_url
       },
-      autoCompleteFormNewMemberActive: false,
-      searchedKnownMemberList: []
+      autoCompleteFormNewMemberActive: false
     }))
   }
 
@@ -281,7 +281,13 @@ class WorkspaceAdvanced extends React.Component {
         this.loadContent()
         this.setState({
           displayFormNewMember: false,
-          newMember: {id: '', name: '', role: '', avatarUrl: ''}
+          newMember: {
+            id: '',
+            name: '',
+            role: '',
+            avatarUrl: ''
+          },
+          autoCompleteFormNewMemberActive: false
         })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace

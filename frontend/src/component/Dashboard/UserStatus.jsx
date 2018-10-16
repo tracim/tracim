@@ -15,18 +15,16 @@ export const UserStatus = props => {
       </div>
 
       <div className='userstatus__role'>
-        <div className='d-flex align-items-center'>
-          <div className='userstatus__role__icon'>
-            <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
-          </div>
+        <div className='userstatus__role__icon'>
+          <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
+        </div>
 
-          <div
-            className='userstatus__role__text ml-3'
-            title={props.t('your role in the shared space')}
-            style={{color: myRole.hexcolor}}
-          >
-            {props.t(myRole.label)}
-          </div>
+        <div
+          className='userstatus__role__text'
+          title={props.t('your role in the shared space')}
+          style={{color: myRole.hexcolor}}
+        >
+          {props.t(myRole.label)}
         </div>
       </div>
 
@@ -39,7 +37,7 @@ export const UserStatus = props => {
         </div>
 
         <div
-          className='userstatus__notification__text ml-3'
+          className='userstatus__notification__text'
           title={props.t('you can change your notification status by clicking here')}
         >
           {mySelf.doNotify

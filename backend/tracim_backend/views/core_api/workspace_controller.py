@@ -88,7 +88,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema(many=True), )
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of all workspaces
+        Returns the list of all workspaces. This route is for admin only.
+        Standard users must use their own route: /api/v2/users/me/workspaces
         """
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
@@ -115,7 +116,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema())
     def update_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
-        Update workspace informations
+        Update a workspace. This route is for trusted users and administrators.
+        Note : a trusted user can only update spaces on which he/she is space manager
         """
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
@@ -138,7 +140,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema())
     def create_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
-        create workspace
+        Create a workspace. This route is for trusted users and administrators.
         """
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
@@ -164,7 +166,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
-        delete workspace
+        Delete a workspace. This route is for trusted users and administrators.
+        Note : a trusted user can only delete spaces on which he/she is space manager
         """
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
@@ -186,7 +189,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def undelete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
-        restore deleted workspace
+        Restore a deleted space.
+        Note : a trusted user can only restore spaces on which he/she is space manager
         """
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
@@ -213,7 +217,7 @@ class WorkspaceController(Controller):
             hapic_data=None
     ) -> typing.List[UserRoleWorkspaceInContext]:
         """
-        Get Members of this workspace
+        Returns the list of space members with their role, avatar, etc.
         """
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
@@ -243,7 +247,7 @@ class WorkspaceController(Controller):
             hapic_data=None
     ) -> UserRoleWorkspaceInContext:
         """
-        Get role of user in workspace
+        Returns given space member with its role, avatar, etc.
         """
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
@@ -274,7 +278,8 @@ class WorkspaceController(Controller):
             hapic_data=None
     ) -> UserRoleWorkspaceInContext:
         """
-        Update Members to this workspace
+        Update role of the given space member.
+        This feature is for workspace managers, trusted users and administrators.
         """
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
@@ -308,6 +313,11 @@ class WorkspaceController(Controller):
             request: TracimRequest,
             hapic_data=None
     ) -> None:
+        """
+        Remove the user from the space.
+        This feature is for workspace managers and administrators.
+        """
+
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
             current_user=request.current_user,
@@ -340,7 +350,8 @@ class WorkspaceController(Controller):
             hapic_data=None
     ) -> UserRoleWorkspaceInContext:
         """
-        Add Members to this workspace
+        Add a member to this workspace.
+        This feature is for workspace managers and administrators.
         """
         newly_created = False
         email_sent = False
@@ -406,7 +417,10 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> typing.List[ContentInContext]:
         """
-        return list of contents found in the workspace
+        return a list of contents of the space.
+        This is NOT the full content list: by default, returned contents are the ones at root level.
+        In order to get contents in a given folder, then use parent_id query filter.
+        You can also show.hide archived/deleted contents.
         """
         app_config = request.registry.settings['CFG']
         content_filter = hapic_data.query
@@ -446,7 +460,10 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> ContentInContext:
         """
-        create a generic empty content
+        Creates a generic empty content. The minimum viable content has a label and a content type.
+        Creating a content generally starts with a request to this endpoint.
+        For specific contents like files, it is recommended to use the dedicated endpoint.
+        This feature is accessible to contributors and higher role only.
         """
         app_config = request.registry.settings['CFG']
         creation_data = hapic_data.body
@@ -484,7 +501,8 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> None:
         """
-        redirect to correct content file endpoint
+        Convenient route allowing to get detail about a content without to known routes associated to its content type.
+        This route generate a HTTP 302 with the right url
         """
         app_config = request.registry.settings['CFG']
         content = request.current_content
@@ -509,7 +527,8 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> None:
         """
-        redirect to correct content file endpoint
+        Convenient route allowing to get detail about a content without to known routes associated to its content type.
+        This route generate a HTTP 302 with the right url
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -547,7 +566,8 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> ContentInContext:
         """
-        move a content
+        Move a content to specified new place.
+        This requires to be content manager in both input and output spaces (which may be the same)
         """
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
@@ -598,7 +618,9 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> None:
         """
-        delete a content
+        Move a content to the trash. After that, the content will be invisible by default.
+        This action requires the user to be a content manager.
+        Note: the content is still accessible but becomes read-only.
         """
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
@@ -632,7 +654,7 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> None:
         """
-        undelete a content
+        Restore a content from the trash. The content will be visible and editable again.
         """
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
@@ -666,7 +688,11 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> None:
         """
-        archive a content
+        Archives a content. The content will be invisible but still available.
+        Difference with delete is that optimizing workspace will not delete archived contents
+        This action requires the user to be a content manager.
+        Note: the content is still accessible but becomes read-only.
+        the difference with delete is that optimizing workspace will not delete archived contents
         """
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
@@ -697,7 +723,7 @@ class WorkspaceController(Controller):
             hapic_data=None,
     ) -> None:
         """
-        unarchive a content
+        Restore a content from archive. The content will be visible and editable again.
         """
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path

@@ -154,7 +154,7 @@ def require_candidate_workspace_role(minimal_required_role: int) -> typing.Calla
     :return: decorator
     """
     def decorator(func: typing.Callable) -> typing.Callable:
-
+        @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             user = request.current_user
             workspace = request.candidate_workspace

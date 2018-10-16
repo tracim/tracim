@@ -23,26 +23,42 @@ function logerror {
 ##################################################################
 
 # Check if not running with sudoers
-if [ $PARAM1 == "root" ]; then
-    PREFIX=""
+if [ "$1" == "root" ]; then
+    SUDO=""
+    SUDOCURL=""
 else
-    PREFIX=sudo
+    SUDO="sudo"
+    SUDOCURL="sudo -E"
 fi
 
 
-# install nodjs if not installed
-log "Verify if nodjs is installed."
-dpkg -l | grep '^ii' | grep 'nodejs\s'
-
+# install npm and nodjs if not installed
+log "verify if npm is installed"
+npm -v
 if [ $? -eq 0 ]; then
-    loggood "nodejs is installed."
+    loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
 else
-    log "Install nodejs"
-    $PREFIX apt update
-    $PREFIX apt install -y curl && loggood "success" || logerror "some error"
-    curl -sL https://deb.nodesource.com/setup_8.x | $PREFIX -E bash -
-    $PREFIX apt install -y nodejs && loggood "success" || logerror "some error"
-    loggood "nodejs is now installed."
+    logerror "npm not installed"
+    log "install npm with nodejs"
+    $SUDO apt install -y curl && loggood "success" || logerror "some error"
+    curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
+    $SUDO apt update
+    $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
+    log "verify if nodejs 8.x is now installed"
+    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
+    if [ $? -eq 0 ]; then
+        loggood "node \"$(node -v)\" is correctly installed"
+        npm -v
+        if [ $? -eq 0 ]; then
+            loggood  "npm \"$(npm -v)\" is correctly installed"
+        else
+            logerror "npm is not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+        exit 1
+        fi
+    else
+        logerror "nodejs 8.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+        exit 1
+    fi
 fi
 
 
@@ -60,8 +76,8 @@ else
     loggood "package.json exist."
 fi
 log "Install cypress."
-$PREFIX apt update && loggood "success" || logerror "some error"
-$PREFIX apt install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 && loggood "success" || logerror "some error"
+$SUDO apt update && loggood "success" || logerror "some error"
+$SUDO apt install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 && loggood "success" || logerror "some error"
 npm install cypress --save-dev && loggood "success" || logerror "some error"
 loggood "Cypress is now installed."
 

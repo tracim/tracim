@@ -103,49 +103,46 @@ class PopupCreateFile extends React.Component {
       }
     })
 
-    const fetchPostContent = await handleFetchResult(await postFileContent(state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
-    switch (fetchPostContent.apiResponse.status) {
-      case 200:
-        const formData = new FormData()
-        formData.append('files', state.uploadFile)
+    // const fetchPostContent = await handleFetchResult(await postFileContent(state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
 
-        // fetch still doesn't handle event progress. So we need to use old school xhr object
-        const xhr = new XMLHttpRequest()
-        xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
-        const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
-        xhr.upload.addEventListener('progress', uploadInProgress, false)
-        xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+    const formData = new FormData()
+    formData.append('files', state.uploadFile)
 
-        xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.idWorkspace}/files/${fetchPostContent.body.content_id}/raw`, true)
-        // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
-        xhr.setRequestHeader('Accept', 'application/json')
-        xhr.withCredentials = true
+    // fetch still doesn't handle event progress. So we need to use old school xhr object
+    const xhr = new XMLHttpRequest()
+    xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+    const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
+    xhr.upload.addEventListener('progress', uploadInProgress, false)
+    xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4) {
-            switch (xhr.status) {
-              case 204:
-                this.handleClose()
+    xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.idWorkspace}/files`, true)
 
-                GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.withCredentials = true
 
-                GLOBAL_dispatchEvent({
-                  type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
-                  data: {
-                    idWorkspace: fetchPostContent.body.workspace_id,
-                    contentType: state.appName,
-                    idContent: fetchPostContent.body.content_id
-                  }
-                }); break
-              default: displayFlashMsgError()
-            }
-          }
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        switch (xhr.status) {
+          case 200:
+            const jsonResult = JSON.parse(xhr.responseText)
+            this.handleClose()
+
+            GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+
+            GLOBAL_dispatchEvent({
+              type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
+              data: {
+                idWorkspace: jsonResult.workspace_id,
+                contentType: state.appName,
+                idContent: jsonResult.content_id
+              }
+            }); break
+          default: displayFlashMsgError()
         }
-
-        xhr.send(formData)
-        break
-      default: displayFlashMsgError()
+      }
     }
+
+    xhr.send(formData)
   }
 
   render () {
