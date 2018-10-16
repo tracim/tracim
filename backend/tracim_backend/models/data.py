@@ -643,12 +643,23 @@ class ContentRevisionRO(DeclarativeBase):
             RevisionReadStatus(user=k, view_datetime=v)
     )
 
-    @property
-    def file_name(self):
+    @hybrid_property
+    def file_name(self) -> str:
         return '{0}{1}'.format(
             self.label,
             self.file_extension,
         )
+
+    @file_name.setter
+    def file_name(self, value: str) -> None:
+        file_name, file_extension = os.path.splitext(value)
+        self.label = file_name
+        self.file_extension = file_extension
+
+    @file_name.expression
+    def file_name(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.label + ContentRevisionRO.file_extension
+
 
     @classmethod
     def new_from(cls, revision: 'ContentRevisionRO') -> 'ContentRevisionRO':
@@ -761,19 +772,6 @@ class ContentRevisionRO(DeclarativeBase):
             return True
 
         return False
-
-    def get_label_as_file(self):
-        file_extension = self.file_extension or ''
-
-        if self.type == content_type_list.Thread.slug:
-            file_extension = '.html'
-        elif self.type == content_type_list.Page.slug:
-            file_extension = '.html'
-
-        return '{0}{1}'.format(
-            self.label,
-            file_extension,
-        )
 
 # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
@@ -894,20 +892,17 @@ class Content(DeclarativeBase):
 
     @hybrid_property
     def file_name(self) -> str:
-        return '{0}{1}'.format(
-            self.revision.label,
-            self.revision.file_extension,
-        )
+        return self.revision.file_name
 
     @file_name.setter
     def file_name(self, value: str) -> None:
         file_name, file_extension = os.path.splitext(value)
-        self.revision.label = file_name
-        self.revision.file_extension = file_extension
+        self.label = file_name
+        self.file_extension = file_extension
 
     @file_name.expression
     def file_name(cls) -> InstrumentedAttribute:
-        return ContentRevisionRO.file_name + ContentRevisionRO.file_extension
+        return Content.label + Content.file_extension
 
     @hybrid_property
     def file_extension(self) -> str:
@@ -1230,12 +1225,6 @@ class Content(DeclarativeBase):
 
     def get_label(self):
         return self.label or self.file_name or ''
-
-    def get_label_as_file(self) -> str:
-        """
-        :return: Return content label in file representation context
-        """
-        return self.revision.get_label_as_file()
 
     def get_status(self) -> ContentStatus:
         return self.revision.get_status()
