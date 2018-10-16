@@ -231,6 +231,10 @@ class UserIsDeleted(TracimException):
     error_code = error.USER_DELETED
 
 
+class UserCantDisableHimself(TracimException):
+    error_code = error.USER_CANT_DISABLE_ITSELF
+
+
 class NoUserSetted(TracimException):
     pass
 
