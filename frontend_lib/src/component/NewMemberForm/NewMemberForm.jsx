@@ -14,19 +14,26 @@ export const NewMemberForm = props => {
 
       <div className='memberlist__form__member'>
         <h4>{props.t('Add a member')}</h4>
+
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
             {props.t('Enter the name or email of the user')}
           </label>
 
           {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
-            <div className='name__adminmsg'>
-              <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
-              {props.emailNotifActivated
-                ? props.t("If you type an email that isn't associated to an account, an invitational email will be sent")
-                : props.t("Email notifications are disabled, you can't create new users from here")
-              }
-            </div>
+            props.emailNotifActivated
+              ? (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
+                  {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
+                </div>
+              )
+              : (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
+                  {props.t("Email notifications are disabled, you can't create new users from here")}
+                </div>
+              )
           )}
 
           <input
