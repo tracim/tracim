@@ -22,6 +22,8 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import \
+    disallow_auth_user_as_candidate
+from tracim_backend.lib.utils.authorization import \
     require_candidate_workspace_role
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.authorization import \
@@ -305,6 +307,7 @@ class WorkspaceController(Controller):
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
         allow_superadmin=True
     )
+    @disallow_auth_user_as_candidate()
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_workspaces_members_role(

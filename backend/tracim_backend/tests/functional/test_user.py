@@ -3492,6 +3492,30 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         ).json_body
         assert res['is_deleted'] is True
 
+    def test_api_delete_user__err_403__admin_itself(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put(
+            '/api/v2/users/{}/delete'.format(admin.user_id),
+            status=403
+        )
+        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(admin.user_id),
+            status=200
+        ).json_body
+        assert res['is_deleted'] is False
+
 
 class TestUsersEndpoint(FunctionalTest):
     # -*- coding: utf-8 -*-
@@ -4834,7 +4858,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['timezone'] == 'Europe/London'
         assert res['lang'] == 'en'
 
-    def test_api__set_user_email__err_403__other_normal_user(self):
+    def test_api__set_user_info__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -4898,14 +4922,14 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
-class TestSetUserProfilEndpoint(FunctionalTest):
+class TestSetUserProfileEndpoint(FunctionalTest):
     # -*- coding: utf-8 -*-
     """
     Tests for PUT /api/v2/users/{user_id}/profile
     """
     fixtures = [BaseFixture]
 
-    def test_api__set_user_info__ok_200__admin(self):
+    def test_api__set_user_profile__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -4968,7 +4992,48 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['profile'] == 'administrators'
 
-    def test_api__set_user_info__err_403__user_itself(self):
+    def test_api__set_user_profile__err_403__admin_itself(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # check before
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(admin.user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['user_id'] == admin.user_id
+        assert res['profile'] == 'administrators'
+        # Set params
+        params = {
+            'profile': 'users',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/profile'.format(admin.user_id),
+            params=params,
+            status=403,
+        )
+        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(admin.user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['user_id'] == admin.user_id
+        assert res['profile'] == 'administrators'
+
+    def test_api__set_user_profile__err_403__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5034,7 +5099,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['profile'] == 'users'
 
-    def test_api__set_user_email__err_403__other_normal_user(self):
+    def test_api__set_user_profile__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5222,6 +5287,41 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
 
+    def test_api_disable_user__err_403__admin_itself(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # check before
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(admin.user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['user_id'] == admin.user_id
+        assert res['is_active'] is True
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/disable'.format(admin.user_id),
+            status=403,
+        )
+        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(admin.user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['user_id'] == admin.user_id
+        assert res['is_active'] is True
+
     def test_api_enable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -5336,7 +5436,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
-    def test_api_disable_user__ok_200__user_itself(self):
+    def test_api_disable_user__err_403__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \

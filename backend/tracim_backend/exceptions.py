@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from tracim_backend import error
+from tracim_backend.error import ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF
 
 
 class TracimError(Exception):
@@ -297,3 +298,7 @@ class EmptyNotificationError(TracimException):
 
 class ContentInNotEditableState(TracimException):
     pass
+
+
+class ActionUnauthorizedOnAuthUserHimself(TracimException):
+    error_code = ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF
