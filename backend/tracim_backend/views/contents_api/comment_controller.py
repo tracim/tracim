@@ -2,34 +2,44 @@
 import transaction
 from pyramid.config import Configurator
 
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import EmptyCommentContentNotAllowed
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.authorization import \
+    require_comment_ownership_or_role
+from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import CommentsPathSchema
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import SetCommentSchema
+from tracim_backend.views.core_api.schemas import \
+    WorkspaceAndContentIdPathSchema
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__CONTENT_ENDPOINTS
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.utils.authorization import require_workspace_role
-from tracim_backend.lib.utils.authorization import require_comment_ownership_or_role
-from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import CommentSchema
-from tracim_backend.views.core_api.schemas import CommentsPathSchema
-from tracim_backend.views.core_api.schemas import SetCommentSchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.data import UserRoleInWorkspace
 
-SWAGGER_TAG__COMMENT_ENDPOINTS = 'Comments'
+SWAGGER_TAG__CONTENT_COMMENT_SECTION = 'Comments'
+SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__CONTENT_ENDPOINTS,
+    SWAGGER_TAG__CONTENT_COMMENT_SECTION
+)
 
 
 class CommentController(Controller):
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__COMMENT_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(CommentSchema(many=True))
@@ -57,7 +67,7 @@ class CommentController(Controller):
                 for comment in comments
         ]
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__COMMENT_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)  # nopep8
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -88,7 +98,7 @@ class CommentController(Controller):
         )
         return api.get_content_in_context(comment)
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__COMMENT_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @require_comment_ownership_or_role(
         minimal_required_role_for_anyone=UserRoleInWorkspace.WORKSPACE_MANAGER,
         minimal_required_role_for_owner=UserRoleInWorkspace.CONTRIBUTOR,

@@ -1,50 +1,79 @@
 from pyramid.config import Configurator
+
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.authorization import require_profile
+from tracim_backend.lib.utils.authorization import require_same_user_or_profile
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
+from tracim_backend.models import Group
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import \
+    ActiveContentFilterQuerySchema
+from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
+from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import ReadStatusSchema
+from tracim_backend.views.core_api.schemas import SetEmailSchema
+from tracim_backend.views.core_api.schemas import SetPasswordSchema
+from tracim_backend.views.core_api.schemas import SetUserInfoSchema
+from tracim_backend.views.core_api.schemas import SetUserProfileSchema
+from tracim_backend.views.core_api.schemas import UserCreationSchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import \
+    UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__CONTENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__NOTIFICATION_SECTION
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.models import Group
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.views.controllers import Controller
-from tracim_backend.lib.utils.authorization import require_same_user_or_profile
-from tracim_backend.lib.utils.authorization import require_profile
-from tracim_backend.exceptions import WrongUserPassword
-from tracim_backend.exceptions import EmailAlreadyExistInDb
-from tracim_backend.exceptions import PasswordDoNotMatch
-from tracim_backend.views.core_api.schemas import UserSchema
-from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
-from tracim_backend.views.core_api.schemas import UserDigestSchema
-from tracim_backend.views.core_api.schemas import SetEmailSchema
-from tracim_backend.views.core_api.schemas import SetPasswordSchema
-from tracim_backend.views.core_api.schemas import SetUserInfoSchema
-from tracim_backend.views.core_api.schemas import UserCreationSchema
-from tracim_backend.views.core_api.schemas import SetUserProfileSchema
-from tracim_backend.views.core_api.schemas import UserIdPathSchema
-from tracim_backend.views.core_api.schemas import ReadStatusSchema
-from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
-from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
-from tracim_backend.views.core_api.schemas import ContentDigestSchema
-from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.app_models.contents import content_type_list
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
+SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+)
+
+SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
+)
+SWAGGER_TAG__USER_CONTENT_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__CONTENT_ENDPOINTS,
+)
+SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__NOTIFICATION_SECTION,
+)
 
 
 class UserController(Controller):
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True),)
@@ -230,7 +259,7 @@ class UserController(Controller):
         )
         return uapi.get_user_with_context(user)
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -247,7 +276,7 @@ class UserController(Controller):
         uapi.enable(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -264,7 +293,7 @@ class UserController(Controller):
         uapi.delete(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -282,7 +311,7 @@ class UserController(Controller):
         uapi.undelete(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -327,7 +356,7 @@ class UserController(Controller):
         )
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ActiveContentFilterQuerySchema())
@@ -368,7 +397,7 @@ class UserController(Controller):
             for content in last_actives
         ]
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ContentIdsQuerySchema(), as_list=['contents_ids'])
@@ -403,7 +432,7 @@ class UserController(Controller):
             for content in last_actives
         ]
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -422,7 +451,7 @@ class UserController(Controller):
         api.mark_read(request.current_content, do_flush=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -441,7 +470,7 @@ class UserController(Controller):
         api.mark_unread(request.current_content, do_flush=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -460,7 +489,7 @@ class UserController(Controller):
         api.mark_read__workspace(request.current_workspace)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -490,7 +519,7 @@ class UserController(Controller):
         wapi.save(workspace)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
