@@ -35,7 +35,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator==0.2.3',
+    'preview-generator>=0.5',
     'colour',
     # mail-notifier
     'mako',
