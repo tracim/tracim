@@ -22,6 +22,7 @@ export const libHandleFetchResult = async fetchResult => {
     case 502:
     case 503:
     case 504:
+    default:
       const resultJson = await fetchResult.clone().json()
       return new Promise((resolve, reject) => resolve({
         apiResponse: fetchResult,

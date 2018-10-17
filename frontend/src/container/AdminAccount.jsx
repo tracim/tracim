@@ -130,7 +130,10 @@ class Account extends React.Component {
       switch (fetchPutUserName.status) {
         case 200:
           this.setState(prev => ({userToEdit: {...prev.userToEdit, public_name: newName}}))
-          if (newEmail === '') props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
+          if (newEmail === '') {
+            props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
+            return true
+          }
           // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
@@ -144,10 +147,12 @@ class Account extends React.Component {
           this.setState(prev => ({userToEdit: {...prev.userToEdit, email: newEmail}}))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Email has been changed'), 'info'))
-          break
+          return true
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); break
       }
     }
+
+    return false
   }
 
   handleChangeSubscriptionNotif = async (idWorkspace, doNotify) => {
