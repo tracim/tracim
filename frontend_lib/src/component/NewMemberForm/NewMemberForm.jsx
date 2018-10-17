@@ -137,7 +137,7 @@ export const NewMemberForm = props => {
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}
-          <i class="fa fa-fw fa-check" />
+          <i className='fa fa-fw fa-check' />
         </button>
       </div>
     </div>

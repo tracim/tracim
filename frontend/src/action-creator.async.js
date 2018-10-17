@@ -71,12 +71,14 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
         case 403:
         case 404:
         case 409:
+          return ''
         case 500:
         case 501:
         case 502:
         case 503:
         case 504:
-          return '' // @TODO : handle errors
+          dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger'))
+          break
       }
     })()
     if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
