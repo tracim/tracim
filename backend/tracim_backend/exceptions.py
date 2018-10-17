@@ -119,9 +119,12 @@ class NotificationSendingFailed(TracimException):
     error_code = error.NOTIFICATION_SENDING_FAILED
 
 
-class NotificationDisabled(TracimException):
-    error_code = error.NOTIFICATION_DISABLED
+class NotificationDisabledCantCreateUserWithInvitation(TracimException):
+    error_code = error.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
 
+
+class NotificationDisabledCantResetPassword(TracimException):
+    error_code = error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 class GroupDoesNotExist(TracimError):
     pass

@@ -68,7 +68,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.NOTIFICATION_DISABLED
+        assert res.json_body['code'] == error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
 
 
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
