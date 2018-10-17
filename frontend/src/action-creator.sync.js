@@ -16,13 +16,15 @@ const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg }) // onl
 export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, msg })
 
 export const USER = 'User'
-export const USER_LOGIN = `${USER}/Login`
+export const LOGIN = 'Login'
+export const USER_LOGIN = `${USER}/${LOGIN}`
 export const USER_LOGOUT = `${USER}/Logout`
 export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
 export const setUserConnected = user => ({ type: `${SET}/${USER}/Connected`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER}/Disconnected` })
+export const setRedirectLogin = url => ({ type: `${SET}/${LOGIN}/Redirect`, url })
 
 export const USER_LANG = `${USER}/Lang`
 export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })

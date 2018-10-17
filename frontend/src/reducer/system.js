@@ -3,10 +3,11 @@ import {
   CONTENT_TYPE_LIST,
   SET,
   WORKSPACE_LIST,
-  CONFIG
+  CONFIG, LOGIN
 } from '../action-creator.sync.js'
 
 const defaultSystem = {
+  redirectLogin: '',
   workspaceListLoaded: false,
   appListLoaded: false,
   contentTypeListLoaded: false,
@@ -15,6 +16,9 @@ const defaultSystem = {
 
 export function system (state = defaultSystem, action) {
   switch (action.type) {
+    case `${SET}/${LOGIN}/Redirect`:
+      return {...state, redirectLogin: action.url}
+
     case `${SET}/${WORKSPACE_LIST}`:
       return {...state, workspaceListLoaded: true}
 

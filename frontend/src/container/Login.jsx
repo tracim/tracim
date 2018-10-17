@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
+import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -63,30 +64,38 @@ class Login extends React.Component {
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
   handleClickSubmit = async () => {
-    const { history, dispatch, t } = this.props
-    const { inputLogin, inputPassword, inputRememberMe } = this.state
+    const { props, state } = this
 
-    if (inputLogin.value === '' || inputPassword.value === '') {
-      dispatch(newFlashMessage(t('Please enter a login and a password'), 'warning'))
+    if (state.inputLogin.value === '' || state.inputPassword.value === '') {
+      props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
-    const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
+    const fetchPostUserLogin = await props.dispatch(postUserLogin(state.inputLogin.value, state.inputPassword.value, state.inputRememberMe))
 
-    if (fetchPostUserLogin.status === 200) {
-      const loggedUser = {
-        ...fetchPostUserLogin.json,
-        logged: true
-      }
+    switch (fetchPostUserLogin.status) {
+      case 200:
+        const loggedUser = {
+          ...fetchPostUserLogin.json,
+          logged: true
+        }
 
-      dispatch(setUserConnected(loggedUser))
+        Cookies.set('lastConnection', '1', {expires: 180})
+        props.dispatch(setUserConnected(loggedUser))
 
-      this.loadAppConfig()
-      this.loadWorkspaceList(loggedUser)
+        this.loadAppConfig()
+        this.loadWorkspaceList(loggedUser)
 
-      history.push(PAGE.HOME)
-    } else if (fetchPostUserLogin.status === 403) {
-      dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
+        if (props.system.redirectLogin !== '') {
+          props.history.push(props.system.redirectLogin)
+          return
+        }
+
+        props.history.push(PAGE.HOME)
+        break
+      case 403:
+        props.dispatch(newFlashMessage(props.t('Email or password invalid'), 'danger'))
+        break
     }
   }
 
@@ -130,99 +139,103 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{pathname: '/'}} />
 
     return (
-      <section className='unLoggedPage loginpage primaryColorBg'>
-        <div className='container-fluid'>
-          { /*
-            AC - 11/09/2018 - disable the logo to leave more space for the login form
-            <LoginLogo
-              customClass='loginpage__logo'
-              logoSrc={LoginLogoImg}
-            />
-          */ }
+      <div className='sidebarpagecontainer'>
+        <div className='tracim__content'>
+          <section className='unLoggedPage loginpage primaryColorBg'>
+            <div className='container-fluid'>
+              { /*
+                AC - 11/09/2018 - disable the logo to leave more space for the login form
+                <LoginLogo
+                  customClass='loginpage__logo'
+                  logoSrc={LoginLogoImg}
+                />
+              */ }
 
-          <div className='row justify-content-center'>
-            <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-              <Card customClass='loginpage__connection'>
-                <CardHeader customClass='connection__header primaryColorBgLighten text-center'>
-                  {props.t('Connection')}
-                </CardHeader>
+              <div className='row justify-content-center'>
+                <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
+                  <Card customClass='loginpage__connection'>
+                    <CardHeader customClass='connection__header primaryColorBgLighten text-center'>
+                      {props.t('Connection')}
+                    </CardHeader>
 
-                <CardBody formClass='connection__form'>
-                  <form>
-                    <InputGroupText
-                      parentClassName='connection__form__groupemail'
-                      customClass='mb-3 mt-4'
-                      icon='fa-envelope-open-o'
-                      type='email'
-                      placeHolder={props.t('Email Address')}
-                      invalidMsg='Email invalide.'
-                      isInvalid={state.inputLogin.isInvalid}
-                      value={state.inputLogin.value}
-                      onChange={this.handleChangeLogin}
-                      onKeyDown={this.handleInputKeyDown}
-                      maxLength={512}
-                    />
-
-                    <InputGroupText
-                      parentClassName='connection__form__groupepw'
-                      customClass=''
-                      icon='fa-lock'
-                      type='password'
-                      placeHolder={props.t('Password')}
-                      invalidMsg='Mot de passe invalide.'
-                      isInvalid={state.inputPassword.isInvalid}
-                      value={state.inputPassword.value}
-                      onChange={this.handleChangePassword}
-                      onKeyDown={this.handleInputKeyDown}
-                      maxLength={512}
-                    />
-
-                    <div className='row mt-4 mb-4'>
-                      <div className='col-12 col-sm-6'>
-                        <div
-                          className='connection__form__rememberme'
-                          onClick={this.handleChangeRememberMe}
-                          style={{'display': 'none'}}
-                          // AC - 10/09/2018 - not included in v2.0 roadmap
-                        >
-                          <Checkbox
-                            name='inputRememberMe'
-                            checked={state.inputRememberMe}
-                            onClickCheckbox={() => {}}
-                          />
-                          {props.t('Remember me')}
-                        </div>
-
-                        <div
-                          className='connection__form__pwforgot'
-                          onClick={this.handleClickForgotPassword}
-                        >
-                          {props.t('Forgotten password ?')}
-                        </div>
-                      </div>
-
-                      <div className='col-12 col-sm-6 d-flex align-items-end'>
-                        <Button
-                          htmlType='button'
-                          bootstrapType='primary'
-                          customClass='btnSubmit connection__form__btnsubmit ml-auto'
-                          label={props.t('Connection')}
-                          onClick={this.handleClickSubmit}
+                    <CardBody formClass='connection__form'>
+                      <form>
+                        <InputGroupText
+                          parentClassName='connection__form__groupemail'
+                          customClass='mb-3 mt-4'
+                          icon='fa-envelope-open-o'
+                          type='email'
+                          placeHolder={props.t('Email Address')}
+                          invalidMsg='Email invalide.'
+                          isInvalid={state.inputLogin.isInvalid}
+                          value={state.inputLogin.value}
+                          onChange={this.handleChangeLogin}
+                          onKeyDown={this.handleInputKeyDown}
+                          maxLength={512}
                         />
-                      </div>
-                    </div>
-                  </form>
-                </CardBody>
-              </Card>
-            </div>
-          </div>
-        </div>
 
-        <FooterLogin />
-      </section>
+                        <InputGroupText
+                          parentClassName='connection__form__groupepw'
+                          customClass=''
+                          icon='fa-lock'
+                          type='password'
+                          placeHolder={props.t('Password')}
+                          invalidMsg='Mot de passe invalide.'
+                          isInvalid={state.inputPassword.isInvalid}
+                          value={state.inputPassword.value}
+                          onChange={this.handleChangePassword}
+                          onKeyDown={this.handleInputKeyDown}
+                          maxLength={512}
+                        />
+
+                        <div className='row mt-4 mb-4'>
+                          <div className='col-12 col-sm-6'>
+                            <div
+                              className='connection__form__rememberme'
+                              onClick={this.handleChangeRememberMe}
+                              style={{'display': 'none'}}
+                              // AC - 10/09/2018 - not included in v2.0 roadmap
+                            >
+                              <Checkbox
+                                name='inputRememberMe'
+                                checked={state.inputRememberMe}
+                                onClickCheckbox={() => {}}
+                              />
+                              {props.t('Remember me')}
+                            </div>
+
+                            <div
+                              className='connection__form__pwforgot'
+                              onClick={this.handleClickForgotPassword}
+                            >
+                              {props.t('Forgotten password ?')}
+                            </div>
+                          </div>
+
+                          <div className='col-12 col-sm-6 d-flex align-items-end'>
+                            <Button
+                              htmlType='button'
+                              bootstrapType='primary'
+                              customClass='btnSubmit connection__form__btnsubmit ml-auto'
+                              label={props.t('Connection')}
+                              onClick={this.handleClickSubmit}
+                            />
+                          </div>
+                        </div>
+                      </form>
+                    </CardBody>
+                  </Card>
+                </div>
+              </div>
+            </div>
+
+            <FooterLogin />
+          </section>
+        </div>
+      </div>
     )
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, system }) => ({ user, system })
 export default withRouter(connect(mapStateToProps)(translate()(Login)))

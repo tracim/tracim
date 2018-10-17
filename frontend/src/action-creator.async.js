@@ -1,10 +1,17 @@
-import {FETCH_CONFIG, PAGE, unLoggedAllowedPageList} from './helper.js'
+import {
+  FETCH_CONFIG,
+  PAGE,
+  unLoggedAllowedPageList
+} from './helper.js'
 import i18n from './i18n.js'
+import * as Cookies from 'js-cookie'
 import {
   USER_LOGIN,
   USER_LOGOUT,
   USER_REQUEST_PASSWORD,
   USER_CONNECTED,
+  setRedirectLogin,
+  setUserDisconnected,
   USER_KNOWN_MEMBER_LIST,
   USER_NAME,
   USER_EMAIL,
@@ -30,6 +37,7 @@ import {
   USER_WORKSPACE_LIST,
   newFlashMessage
 } from './action-creator.sync.js'
+import { history } from './index.js'
 
 /*
  * fetchWrapper(obj)
@@ -64,8 +72,10 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
         case 204:
           return ''
         case 401:
-          if (!unLoggedAllowedPageList.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
-            document.location.href = `${PAGE.LOGIN}?dc=1`
+          if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
+            dispatch(setRedirectLogin(document.location.pathname + document.location.search))
+            dispatch(setUserDisconnected())
+            history.push(`${PAGE.LOGIN}${Cookies.get('lastConnection') ? '?dc=1' : ''}`)
           }
           return ''
         case 403:
