@@ -1,7 +1,8 @@
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailAlreadyExistInDb, \
+    UserCantDeleteHimself, UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
@@ -10,8 +11,6 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.utils.authorization import \
-    disallow_auth_user_as_candidate
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.request import TracimRequest
@@ -254,8 +253,8 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantDeleteHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
-    @disallow_auth_user_as_candidate()
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_user(self, context, request: TracimRequest, hapic_data=None):
@@ -292,7 +291,6 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
-    @disallow_auth_user_as_candidate()
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def disable_user(self, context, request: TracimRequest, hapic_data=None):
@@ -309,8 +307,8 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantChangeIsOwnProfile, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
-    @disallow_auth_user_as_candidate()
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetUserProfileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

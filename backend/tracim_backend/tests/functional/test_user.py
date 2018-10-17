@@ -3492,7 +3492,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         ).json_body
         assert res['is_deleted'] is True
 
-    def test_api_delete_user__err_403__admin_itself(self):
+    def test_api_delete_user__err_400__admin_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -3507,9 +3507,9 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         )
         res = self.testapp.put(
             '/api/v2/users/{}/delete'.format(admin.user_id),
-            status=403
+            status=400
         )
-        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        assert res.json_body['code'] == error.USER_CANT_DELETE_HIMSELF  # nopep8
         res = self.testapp.get(
             '/api/v2/users/{}'.format(admin.user_id),
             status=200
@@ -5021,9 +5021,9 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         res = self.testapp.put_json(
             '/api/v2/users/{}/profile'.format(admin.user_id),
             params=params,
-            status=403,
+            status=400,
         )
-        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        assert res.json_body['code'] == error.USER_CANT_CHANGE_IS_OWN_PROFILE  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(admin.user_id),
@@ -5287,7 +5287,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
 
-    def test_api_disable_user__err_403__cant_disable_myself(self):
+    def test_api_disable_user__err_400__cant_disable_myself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5322,9 +5322,9 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['is_active'] is True
         res = self.testapp.put_json(
             '/api/v2/users/{}/disable'.format(user_id),
-            status=403,
+            status=400,
         )
-        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        assert res.json_body['code'] == error.USER_CANT_DISABLE_HIMSELF  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),

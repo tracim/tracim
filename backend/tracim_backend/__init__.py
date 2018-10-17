@@ -52,7 +52,6 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import ContentTypeNotAllowed
-from tracim_backend.exceptions import ActionUnauthorizedOnAuthUserHimself
 
 
 def web(global_config, **local_settings):
@@ -122,7 +121,6 @@ def web(global_config, **local_settings):
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
     context.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
-    context.handle_exception(ActionUnauthorizedOnAuthUserHimself, HTTPStatus.FORBIDDEN)  # nopep8
     # Internal server error
     context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
     context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)

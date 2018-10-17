@@ -8,7 +8,6 @@ from zope.interface import implementer
 
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ActionUnauthorizedOnAuthUserHimself
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
@@ -143,26 +142,6 @@ def require_workspace_role(minimal_required_role: int) -> typing.Callable:
                 return func(self, context, request)
             raise InsufficientUserRoleInWorkspace()
 
-        return wrapper
-    return decorator
-
-
-def disallow_auth_user_as_candidate() -> typing.Callable:
-    """
-    Do not allow auth user to access to this endpoint if candidate_user is him.
-    This is useful to disallow user to disable itself or thing like this.
-    :return: decorator
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            user = request.current_user
-            candidate_user = request.candidate_user
-            if user.user_id == candidate_user.user_id:
-                raise ActionUnauthorizedOnAuthUserHimself(
-                    "Authenticated user can't do this on himself."
-                )
-            return func(self, context, request)
         return wrapper
     return decorator
 

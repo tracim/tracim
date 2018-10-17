@@ -1076,7 +1076,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1196,7 +1196,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1251,7 +1251,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1421,7 +1421,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1490,7 +1490,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1813,7 +1813,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1895,7 +1895,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -2107,9 +2107,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 workspace_id=workspace.workspace_id,
                 user_id=user2.user_id,
             ),
-            status=403,
+            status=400,
         )
-        assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
+        assert res.json_body['code'] == error.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE  # nopep8
         # after
         roles = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace.workspace_id), status=200).json_body   # nopep8
         assert user2.user_id in [role['user_id'] for role in roles]
