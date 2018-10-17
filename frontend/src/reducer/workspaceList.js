@@ -5,7 +5,6 @@ import {
   WORKSPACE_LIST,
   WORKSPACE_LIST_MEMBER
 } from '../action-creator.sync.js'
-import { handleRouteFromApi } from '../helper.js'
 
 export function workspaceList (state = [], action) {
   switch (action.type) {
@@ -17,7 +16,7 @@ export function workspaceList (state = [], action) {
         // description: ws.description, // not returned by /api/v2/users/:idUser/workspaces
         sidebarEntry: ws.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
-          route: handleRouteFromApi(sbe.route),
+          route: sbe.route,
           faIcon: sbe.fa_icon,
           hexcolor: sbe.hexcolor,
           label: sbe.label
