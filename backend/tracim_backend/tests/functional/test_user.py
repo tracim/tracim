@@ -5287,7 +5287,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
 
-    def test_api_disable_user__err_400__cant_disable_myself(self):
+    def test_api_disable_user__err_403__cant_disable_myself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5320,7 +5320,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         res = res.json_body
         assert res['user_id'] == user_id
         assert res['is_active'] is True
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/disable'.format(user_id),
             status=403,
         )
