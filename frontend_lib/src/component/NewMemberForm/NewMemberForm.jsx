@@ -46,10 +46,10 @@ export const NewMemberForm = props => {
             autoComplete='off'
           />
 
-          {props.searchedKnownMemberList.length > 0
-            ? (
-              <div className='autocomplete primaryColorBorder'>
-                {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+          {props.autoCompleteActive && props.nameOrEmail.length >= 2 && (
+            <div className='autocomplete primaryColorBorder'>
+              {props.searchedKnownMemberList.length > 0
+                ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
                   <div
                     className='autocomplete__item primaryColorBgHover'
                     onClick={() => props.onClickKnownMember(u)}
@@ -63,19 +63,17 @@ export const NewMemberForm = props => {
                       {u.public_name}
                     </div>
                   </div>
-                )}
-              </div>
-            )
-            : props.autoCompleteActive && props.searchedKnownMemberList.length === 0 && props.nameOrEmail.length >= 2 && (
-              <div className='autocomplete primaryColorBorder'>
-                <div className='autocomplete__item'>
-                  <div className='autocomplete__item__name'>
-                    {props.t('No result')}
+                )
+                : (
+                  <div className='autocomplete__item'>
+                    <div className='autocomplete__item__name'>
+                      {props.t('No result')}
+                    </div>
                   </div>
-                </div>
-              </div>
-            )
-          }
+                )
+              }
+            </div>
+          )}
         </div>
 
         {/*

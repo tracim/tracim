@@ -66,6 +66,34 @@ export const debug = {
       hexcolor: '#ed0007',
       label: i18n.t('Shared space manager')
     }],
+    system: {
+      config: {
+        email_notification_activated: true
+      }
+    },
+    profileObject: {
+      ADMINISTRATOR: {
+        id: 1,
+        slug: 'administrators',
+        faIcon: 'shield',
+        hexcolor: '#ed0007',
+        label: i18n.t('Administrator')
+      },
+      MANAGER: {
+        id: 2,
+        slug: 'trusted-users',
+        faIcon: 'graduation-cap',
+        hexcolor: '#f2af2d',
+        label: i18n.t('Trusted user')
+      },
+      USER: {
+        id: 4,
+        slug: 'users',
+        faIcon: 'user',
+        hexcolor: '#3145f7',
+        label: i18n.t('User')
+      }
+    },
     translation: {
       en: {
         translation: {
