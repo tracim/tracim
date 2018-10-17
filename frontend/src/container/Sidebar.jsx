@@ -27,10 +27,10 @@ class Sidebar extends React.Component {
     // }
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    const { props } = this
-
+  componentDidMount () {
     if (!this.shouldDisplaySidebar()) return
+
+    const { props } = this
 
     if (
       props.match.params &&
@@ -43,6 +43,24 @@ class Sidebar extends React.Component {
         props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceInUrl, true))
       }
     }
+  }
+
+  shouldComponentUpdate (nextProps) {
+    // Côme - 2018/10/16 - this is to avoid rerender workspace list if a workspace is open and if it isn't required.
+    // the point is to avoid rerender the height animation
+    const { props } = this
+
+    // no ws open, rerender in case one gets opened by componentDidUpdate
+    if (props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined) return true
+
+    // check if a label has been changed (if label changed, slug changed too)
+    if (JSON.stringify(props.workspaceList.map(ws => ws.slug)) !== JSON.stringify(nextProps.workspaceList.map(ws => ws.slug))) return true
+
+    const oldOpenedList = props.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
+    const newOpenedList = nextProps.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
+
+    // stringify compare doesn't work if array contain objects
+    return JSON.stringify(oldOpenedList) !== JSON.stringify(newOpenedList)
   }
 
   componentWillUnmount () {

@@ -1,9 +1,5 @@
 @import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-detail()
-  margin-left calc(50% - 120px)
-  font-size 25px
-
 .userstatus
   width 27%
   position relative
@@ -11,18 +7,23 @@ detail()
   border-radius 5px
   padding 40px
   background-color lightGrey
-  &__username
-    text-align center
-    font-size 25px
+  text-align center
+  font-size 23px
   &__role
-    detail()
+    display flex
+    align-items center
     padding 25px 0 15px 0
+    &__text
+      margin-left 15px
+      text-align left
   &__notification
     display flex
     align-items center
-    detail()
     padding 20px 0 10px 0
     cursor pointer
+    &__text
+      margin-left 15px
+      text-align left
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .userstatus

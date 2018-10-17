@@ -270,8 +270,8 @@ class TestWebDav(StandardTest):
                 content_names,
         )
 
-        assert 'Best Cakesʔ.html' in content_names,\
-            'Best Cakesʔ.html should be in names ({0})'.format(
+        assert 'Best Cakesʔ.thread.html' in content_names,\
+            'Best Cakesʔ.thread.html should be in names ({0})'.format(
                 content_names,
         )
         assert 'Apple_Pie.txt' in content_names,\
@@ -282,8 +282,8 @@ class TestWebDav(StandardTest):
                 content_names,
         )
 
-        assert 'Tiramisu Recipe.html' in content_names,\
-            'Tiramisu Recipe.html should be in names ({0})'.format(
+        assert 'Tiramisu Recipe.document.html' in content_names,\
+            'Tiramisu Recipe.document.html should be in names ({0})'.format(
                 content_names,
         )
 

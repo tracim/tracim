@@ -132,7 +132,7 @@ export class AdminUser extends React.Component {
                 : (
                   <div>
                     <i className='primaryColorFont fa fa-fw fa-warning' />
-                    {props.t("Email notification are disabled, please notify users of any change")}
+                    {props.t('Email notification are disabled, please notify users of any change')}
                   </div>
                 )
               }

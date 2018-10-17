@@ -3210,6 +3210,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['sub_content_types']
         assert res.json_body['modified']
         assert res.json_body['created']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         params_active = {
             'parent_id': 0,
             'show_archived': 0,
@@ -3253,6 +3255,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
@@ -3307,6 +3311,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
@@ -3345,7 +3351,6 @@ class TestWorkspaceContents(FunctionalTest):
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
         assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
-
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
         """
         Create generic content in folder
@@ -3379,6 +3384,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] == 10
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {

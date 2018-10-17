@@ -5287,11 +5287,23 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
 
-    def test_api_disable_user__err_403__admin_itself(self):
+    def test_api_disable_user__err_400__cant_disable_myself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
             .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user_id = int(admin.user_id)
 
         self.testapp.authorization = (
             'Basic',
@@ -5302,24 +5314,25 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         )
         # check before
         res = self.testapp.get(
-            '/api/v2/users/{}'.format(admin.user_id),
+            '/api/v2/users/{}'.format(user_id),
             status=200
         )
         res = res.json_body
-        assert res['user_id'] == admin.user_id
+        assert res['user_id'] == user_id
         assert res['is_active'] is True
-        res = self.testapp.put_json(
-            '/api/v2/users/{}/disable'.format(admin.user_id),
+        self.testapp.put_json(
+            '/api/v2/users/{}/disable'.format(user_id),
             status=403,
         )
         assert res.json_body['code'] == error.ACTION_UNAUTHORIZED_ON_AUTH_USER_HIMSELF  # nopep8
         # Check After
         res = self.testapp.get(
-            '/api/v2/users/{}'.format(admin.user_id),
+            '/api/v2/users/{}'.format(user_id),
             status=200
         )
         res = res.json_body
-        assert res['user_id'] == admin.user_id
+
+        assert res['user_id'] == user_id
         assert res['is_active'] is True
 
     def test_api_enable_user__err_403__other_account(self):

@@ -31,7 +31,6 @@ import {
   setAppList,
   setContentTypeList,
   setUserConnected,
-  setWorkspaceListIsOpenInSidebar,
   setWorkspaceList
 } from '../action-creator.sync.js'
 import Dashboard from './Dashboard.jsx'
@@ -108,14 +107,15 @@ class Tracim extends React.Component {
   loadWorkspaceList = async (idOpenInSidebar = undefined) => {
     const { props } = this
 
+    const idWsToOpen = idOpenInSidebar || (props.workspaceList.find(ws => ws.isOpenInSidebar) || {id: undefined}).id
+
     const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(props.user))
 
     if (fetchGetWorkspaceList.status === 200) {
+      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
+
+      props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.setState({workspaceListLoaded: true})
-
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-
-      idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
 
       return true
     }

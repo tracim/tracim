@@ -14,10 +14,27 @@ export const NewMemberForm = props => {
 
       <div className='memberlist__form__member'>
         <h4>{props.t('Add a member')}</h4>
+
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
             {props.t('Enter the name or email of the user')}
           </label>
+
+          {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
+            props.emailNotifActivated
+              ? (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
+                  {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
+                </div>
+              )
+              : (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
+                  {props.t("Email notifications are disabled, you can't create new users from here")}
+                </div>
+              )
+          )}
 
           <input
             type='text'
@@ -28,16 +45,6 @@ export const NewMemberForm = props => {
             onChange={e => props.onChangeNameOrEmail(e.target.value)}
             autoComplete='off'
           />
-
-          {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
-            <div className='name__adminmsg'>
-              <i className='name__adminmsg__icon fa fa-fw fa-warning' />
-              {props.emailNotifActivated
-                ? props.t("If you type an unknown email address, an invitational email will be sent")
-                : props.t("Due to disabled email notifications, only registered users can be invited")
-              }
-            </div>
-          )}
 
           {props.searchedKnownMemberList.length > 0
             ? (
@@ -130,7 +137,7 @@ export const NewMemberForm = props => {
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}
-          <i class="fa fa-fw fa-check"/>
+          <i class="fa fa-fw fa-check" />
         </button>
       </div>
     </div>

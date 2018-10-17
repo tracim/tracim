@@ -18,6 +18,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
+from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.views.core_api.schemas import \
     ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
@@ -289,6 +290,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @disallow_auth_user_as_candidate()
     @hapic.input_path(UserIdPathSchema())
