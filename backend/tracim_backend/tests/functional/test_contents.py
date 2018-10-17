@@ -1314,6 +1314,39 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
 
+    def test_api__update_html_document__err_400__not_editable(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'closed-deprecated',
+        }
+        self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6/status',
+            params=params,
+            status=204
+        )
+
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu ! </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+
     def test_api__update_html_document__err_400__not_modified(self) -> None:
         """
         Update(put) one html document of a content

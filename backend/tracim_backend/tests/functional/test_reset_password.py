@@ -61,11 +61,14 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         params = {
             'email': 'admin@admin.admin'
         }
-        self.testapp.post_json(
+        res = self.testapp.post_json(
             '/api/v2/reset_password/request',
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.NOTIFICATION_DISABLED
 
 
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
