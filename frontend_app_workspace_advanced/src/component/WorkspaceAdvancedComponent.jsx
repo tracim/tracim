@@ -139,8 +139,10 @@ const WorkspaceAdvancedComponent = props => {
             onClickBtnValidate={props.onClickValidateNewMember}
             autoCompleteActive={props.autoCompleteFormNewMemberActive}
             emailNotifActivated={props.emailNotifActivated}
-            isLoggedUserAdmin={props.isLoggedUserAdmin}
+            canSendInviteNewUser={props.canSendInviteNewUser}
             idRoleUserWorkspace={props.idRoleUserWorkspace}
+            autoCompleteClicked={props.autoCompleteClicked}
+            onClickAutoComplete={props.onClickAutoComplete}
           />
         )}
       </div>
