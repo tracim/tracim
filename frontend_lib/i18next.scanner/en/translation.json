@@ -15,7 +15,6 @@
   "Create an account": "Create an account",
   "Choose the role of the member": "Choose the role of the member",
   "Validate": "Validate",
-  "No result": "No result",
   "Status": "Status",
   "Comment": "Comment",
   "Item created": "Item created",
@@ -28,6 +27,10 @@
   "Item copied": "Item copied",
   "Item archived": "Item archived",
   "Enter the name or email of the user": "Enter the name or email of the user",
-  "If you type an unknown email address, an invitational email will be sent": "If you type an unknown email address, an invitational email will be sent",
-  "Due to disabled email notifications, only registered users can be invited": "Due to disabled email notifications, only registered users can be invited"
+  "Add a member": "Add a member",
+  "If you type an email that isn't associated to an account, an invitational email will be sent": "If you type an email that isn't associated to an account, an invitational email will be sent",
+  "Email notifications are disabled, you can't create new users from here": "Email notifications are disabled, you can't create new users from here",
+  "Send an invitational email to this user": "Send an invitational email to this user",
+  "I know this user exist": "I know this user exist",
+  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator"
 }

@@ -15,7 +15,6 @@
   "Create an account": "Créer un compte",
   "Choose the role of the member": "Choissir le role du membre",
   "Validate": "Valider",
-  "No result": "Aucun résultat",
   "Status": "Statut ",
   "Comment": "Commentaire",
   "Item created": "Elément créé",
@@ -28,6 +27,10 @@
   "Item copied": "Elément copié",
   "Item archived": "Elément archivé",
   "Enter the name or email of the user": "Saisir le nom ou l'email de l'utilisateur",
-  "If you type an unknown email address, an invitational email will be sent": "Si vous saisissez une adresse email inconnue, un email d'invitation sera envoyé",
-  "Due to disabled email notifications, only registered users can be invited": "Notification email désactivées, vous ne pouvez pas créer un nouvel utilisateur depuis ce formulaire"
+  "Add a member": "__NOT_TRANSLATED__",
+  "If you type an email that isn't associated to an account, an invitational email will be sent": "__NOT_TRANSLATED__",
+  "Email notifications are disabled, you can't create new users from here": "__NOT_TRANSLATED__",
+  "Send an invitational email to this user": "__NOT_TRANSLATED__",
+  "I know this user exist": "__NOT_TRANSLATED__",
+  "Unexpected error, please inform an administrator": "__NOT_TRANSLATED__"
 }

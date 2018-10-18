@@ -136,7 +136,6 @@
   "Have a good day !": "Have a good day !",
   "Please select a shared space in the left sidebar by clicking on it": "Please select a shared space in the left sidebar by clicking on it",
   "Email sent. Don't forget to check your spam.": "Email sent. Don't forget to check your spam.",
-  "Email unknown": "Email unknown",
   "An error has happened. Please try again.": "An error has happened. Please try again.",
   "Forgot password": "Forgot password",
   "Did you forget your password ?": "Did you forget your password ?",
@@ -152,5 +151,8 @@
   "Email notifications are disabled": "Email notifications are disabled",
   "Please enter a login and a password": "Please enter a login and a password",
   "This account is deactivated": "This account is deactivated",
-  "Error while adding the member to the shared space": "Error while adding the member to the shared space"
+  "Error while adding the member to the shared space": "Error while adding the member to the shared space",
+  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
+  "Unknown email": "Unknown email",
+  "Cannot reset password while email are disabled, please contact an administrator": "Cannot reset password while email are disabled, please contact an administrator"
 }

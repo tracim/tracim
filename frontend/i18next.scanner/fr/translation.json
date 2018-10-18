@@ -136,7 +136,6 @@
   "Have a good day !": "Bonne journée !",
   "Please select a shared space in the left sidebar by clicking on it": "Veuillez sélectionner un espace partagé présent dans la barre latérale en cliquant dessus",
   "Email sent. Don't forget to check your spam.": "Email envoyé. Pensez à vérifier votre dossier spam.",
-  "Email unknown": "Email inconnu",
   "An error has happened. Please try again.": "Une erreur est survenue. Veuillez réessayer.",
   "Forgot password": "Mot de passe oublié",
   "Did you forget your password ?": "Vous avez oublié votre mot de passe ?",
@@ -152,5 +151,8 @@
   "Email notifications are disabled": "Les notifications par email sont désactivées",
   "Please enter a login and a password": "Veuillez entrer un nom d'utilisateur et un mot de passe",
   "This account is deactivated": "Ce compte est désactivé",
-  "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé"
+  "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé",
+  "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
+  "Unknown email": "Email inconnu",
+  "Cannot reset password while email are disabled, please contact an administrator": "Impossible de réinitialiser votre mot de passe si les emails sont désactivés, veuillez contacter un administrateur"
 }
