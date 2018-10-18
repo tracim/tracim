@@ -154,5 +154,6 @@
   "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre à l'espace partagé",
   "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
   "Unknown email": "Email inconnu",
-  "Cannot reset password while email are disabled, please contact an administrator": "Impossible de réinitialiser votre mot de passe si les emails sont désactivés, veuillez contacter un administrateur"
+  "Cannot reset password while email are disabled, please contact an administrator": "Impossible de réinitialiser votre mot de passe si les emails sont désactivés, veuillez contacter un administrateur",
+  "Not a valid email": "Email invalide"
 }
