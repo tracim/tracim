@@ -1,6 +1,4 @@
 #!/bin/bash
-# . bash_library.sh # source bash_library.sh
-# . backend_lib.sh # source backend_lib.sh
 
 # Main in bottom
 

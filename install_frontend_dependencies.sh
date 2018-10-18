@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# shellcheck disable=SC1091
-#. bash_library.sh # source bash_library.sh
-
 # Main in bottom
 
 YELLOW='\033[1;33m'
