@@ -1,43 +1,49 @@
 from pyramid.config import Configurator
+
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import UserCantDeleteHimself
+from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.authorization import require_profile
+from tracim_backend.lib.utils.authorization import require_same_user_or_profile
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import password_generator
+from tracim_backend.models import Group
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import \
+    ActiveContentFilterQuerySchema
+from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
+from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import ReadStatusSchema
+from tracim_backend.views.core_api.schemas import SetEmailSchema
+from tracim_backend.views.core_api.schemas import SetPasswordSchema
+from tracim_backend.views.core_api.schemas import SetUserInfoSchema
+from tracim_backend.views.core_api.schemas import SetUserProfileSchema
+from tracim_backend.views.core_api.schemas import UserCreationSchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import \
+    UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.models import Group
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.views.controllers import Controller
-from tracim_backend.lib.utils.authorization import require_same_user_or_profile
-from tracim_backend.lib.utils.authorization import require_profile
-from tracim_backend.exceptions import WrongUserPassword
-from tracim_backend.exceptions import EmailAlreadyExistInDb
-from tracim_backend.exceptions import PasswordDoNotMatch
-from tracim_backend.views.core_api.schemas import UserSchema
-from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
-from tracim_backend.views.core_api.schemas import UserDigestSchema
-from tracim_backend.views.core_api.schemas import SetEmailSchema
-from tracim_backend.views.core_api.schemas import SetPasswordSchema
-from tracim_backend.views.core_api.schemas import SetUserInfoSchema
-from tracim_backend.views.core_api.schemas import UserCreationSchema
-from tracim_backend.views.core_api.schemas import SetUserProfileSchema
-from tracim_backend.views.core_api.schemas import UserIdPathSchema
-from tracim_backend.views.core_api.schemas import ReadStatusSchema
-from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
-from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
-from tracim_backend.views.core_api.schemas import ContentDigestSchema
-from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
-from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.app_models.contents import content_type_list
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
@@ -248,6 +254,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantDeleteHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -283,6 +290,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -300,6 +308,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantChangeIsOwnProfile, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetUserProfileSchema())

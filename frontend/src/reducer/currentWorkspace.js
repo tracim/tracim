@@ -8,7 +8,6 @@ import {
   WORKSPACE_RECENT_ACTIVITY_LIST,
   WORKSPACE_MEMBER, UPDATE, USER_WORKSPACE_DO_NOTIFY
 } from '../action-creator.sync.js'
-import { handleRouteFromApi } from '../helper.js'
 import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
@@ -34,7 +33,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         description: action.workspaceDetail.description,
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
-          route: handleRouteFromApi(sbe.route),
+          route: sbe.route,
           faIcon: sbe.fa_icon,
           hexcolor: sbe.hexcolor,
           label: sbe.label

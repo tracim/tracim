@@ -14,19 +14,26 @@ export const NewMemberForm = props => {
 
       <div className='memberlist__form__member'>
         <h4>{props.t('Add a member')}</h4>
+
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
             {props.t('Enter the name or email of the user')}
           </label>
 
           {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
-            <div className='name__adminmsg'>
-              <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
-              {props.emailNotifActivated
-                ? props.t("If you type an email that isn't associated to an account, an invitational email will be sent")
-                : props.t("Email notifications are disabled, you can't create new users from here")
-              }
-            </div>
+            props.emailNotifActivated
+              ? (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
+                  {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
+                </div>
+              )
+              : (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
+                  {props.t("Email notifications are disabled, you can't create new users from here")}
+                </div>
+              )
           )}
 
           <input
@@ -39,10 +46,10 @@ export const NewMemberForm = props => {
             autoComplete='off'
           />
 
-          {props.searchedKnownMemberList.length > 0
-            ? (
-              <div className='autocomplete primaryColorBorder'>
-                {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+          {props.autoCompleteActive && props.nameOrEmail.length >= 2 && (
+            <div className='autocomplete primaryColorBorder'>
+              {props.searchedKnownMemberList.length > 0
+                ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
                   <div
                     className='autocomplete__item primaryColorBgHover'
                     onClick={() => props.onClickKnownMember(u)}
@@ -56,19 +63,17 @@ export const NewMemberForm = props => {
                       {u.public_name}
                     </div>
                   </div>
-                )}
-              </div>
-            )
-            : props.autoCompleteActive && props.searchedKnownMemberList.length === 0 && props.nameOrEmail.length >= 2 && (
-              <div className='autocomplete primaryColorBorder'>
-                <div className='autocomplete__item'>
-                  <div className='autocomplete__item__name'>
-                    {props.t('No result')}
+                )
+                : (
+                  <div className='autocomplete__item'>
+                    <div className='autocomplete__item__name'>
+                      {props.t('No result')}
+                    </div>
                   </div>
-                </div>
-              </div>
-            )
-          }
+                )
+              }
+            </div>
+          )}
         </div>
 
         {/*
@@ -130,7 +135,7 @@ export const NewMemberForm = props => {
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}
-          <i class="fa fa-fw fa-check" />
+          <i className='fa fa-fw fa-check' />
         </button>
       </div>
     </div>

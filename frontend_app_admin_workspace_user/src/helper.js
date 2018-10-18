@@ -73,7 +73,9 @@ export const debug = {
       'Content-Type': 'application/json'
     },
     system: {
-      email_notification_activated: false
+      config: {
+        email_notification_activated: true
+      }
     }
   },
   loggedUser: {

@@ -100,7 +100,7 @@ class TestThread(DefaultTest):
         )
         rapi = RoleApi(
             session=self.session,
-            current_user=u,
+            current_user=None,
             config=self.app_config,
         )
         rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)

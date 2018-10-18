@@ -8,6 +8,7 @@ import {
   ROLE,
   findIdRoleUserWorkspace
 } from '../helper.js'
+import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -118,14 +119,21 @@ class WorkspaceContent extends React.Component {
     const wsMember = await dispatch(getWorkspaceMemberList(idWorkspace))
     const wsReadStatus = await dispatch(getWorkspaceReadStatusList(user, idWorkspace))
 
-    if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json))
-    else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+    switch (wsContent.status) {
+      case 200: dispatch(setWorkspaceContentList(wsContent.json)); break
+      case 401: break
+      default: dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+    }
 
-    if (wsMember.status === 200) dispatch(setWorkspaceMemberList(wsMember.json))
-    else dispatch(newFlashMessage('Error while loading members list', 'warning'))
+    switch (wsMember.status) {
+      case 200: dispatch(setWorkspaceMemberList(wsMember.json)); break
+      case 401: break
+      default: dispatch(newFlashMessage('Error while loading members list', 'warning'))
+    }
 
     switch (wsReadStatus.status) {
       case 200: dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
+      case 401: break
       default: dispatch(newFlashMessage(`${t('Error while loading read status list')}`, 'warning'))
     }
 
@@ -225,109 +233,115 @@ class WorkspaceContent extends React.Component {
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
     return (
-      <div className='WorkspaceContent' style={{width: '100%'}}>
-        {state.contentLoaded &&
-          <OpenContentApp
-            // automatically open the app for the idContent in url
-            idWorkspace={this.state.workspaceIdInUrl}
-            appOpenedType={this.state.appOpenedType}
-            updateAppOpenedType={this.handleUpdateAppOpenedType}
-          />
-        }
+      <div className='sidebarpagecontainer'>
+        <Sidebar />
 
-        {state.contentLoaded &&
-          <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
-            <OpenCreateContentApp
-              // automatically open the popup create content of the app in url
-              idWorkspace={this.state.workspaceIdInUrl}
-              appOpenedType={this.state.appOpenedType}
-            />
-          } />
-        }
-
-        <PageWrapper customeClass='workspace'>
-          <PageTitle
-            parentClass='workspace__header'
-            customClass='justify-content-between align-items-center'
-            title={this.getTitle(urlFilter)}
-            subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
-          >
-            {idRoleUserWorkspace >= 2 &&
-              <DropdownCreateButton
-                parentClass='workspace__header__btnaddcontent'
-                idFolder={null} // null because it is workspace root content
-                onClickCreateContent={this.handleClickCreateContent}
-                availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+        <div className='tracim__content'>
+          <div className='WorkspaceContent' style={{width: '100%'}}>
+            {state.contentLoaded &&
+              <OpenContentApp
+                // automatically open the app for the idContent in url
+                idWorkspace={this.state.workspaceIdInUrl}
+                appOpenedType={this.state.appOpenedType}
+                updateAppOpenedType={this.handleUpdateAppOpenedType}
               />
             }
-          </PageTitle>
 
-          <PageContent parentClass='workspace__content'>
-            <div className='workspace__content__fileandfolder folder__content active'>
-              <ContentItemHeader />
-
-              {state.contentLoaded && workspaceContentList.length === 0
-                ? (
-                  <div className='workspace__content__fileandfolder__empty'>
-                    {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
-                  </div>
-                )
-                : filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
-                  ? (
-                    <Folder
-                      availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
-                      folderData={c}
-                      onClickItem={this.handleClickContentItem}
-                      idRoleUserWorkspace={idRoleUserWorkspace}
-                      onClickExtendedAction={{
-                        edit: this.handleClickEditContentItem,
-                        move: this.handleClickMoveContentItem,
-                        download: this.handleClickDownloadContentItem,
-                        archive: this.handleClickArchiveContentItem,
-                        delete: this.handleClickDeleteContentItem
-                      }}
-                      onClickFolder={this.handleClickFolder}
-                      onClickCreateContent={this.handleClickCreateContent}
-                      isLast={i === filteredWorkspaceContentList.length - 1}
-                      key={c.id}
-                    />
-                  )
-                  : (
-                    <ContentItem
-                      label={c.label}
-                      type={c.type}
-                      faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
-                      statusSlug={c.statusSlug}
-                      read={currentWorkspace.contentReadStatusList.includes(c.id)}
-                      contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
-                      onClickItem={() => this.handleClickContentItem(c)}
-                      idRoleUserWorkspace={idRoleUserWorkspace}
-                      onClickExtendedAction={{
-                        edit: e => this.handleClickEditContentItem(e, c),
-                        move: e => this.handleClickMoveContentItem(e, c),
-                        download: e => this.handleClickDownloadContentItem(e, c),
-                        archive: e => this.handleClickArchiveContentItem(e, c),
-                        delete: e => this.handleClickDeleteContentItem(e, c)
-                      }}
-                      onClickCreateContent={this.handleClickCreateContent}
-                      isLast={i === filteredWorkspaceContentList.length - 1}
-                      key={c.id}
-                    />
-                  )
-                )
-              }
-
-              {idRoleUserWorkspace >= 2 &&
-                <DropdownCreateButton
-                  customClass='workspace__content__button'
-                  idFolder={null}
-                  onClickCreateContent={this.handleClickCreateContent}
-                  availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+            {state.contentLoaded &&
+              <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
+                <OpenCreateContentApp
+                  // automatically open the popup create content of the app in url
+                  idWorkspace={this.state.workspaceIdInUrl}
+                  appOpenedType={this.state.appOpenedType}
                 />
-              }
-            </div>
-          </PageContent>
-        </PageWrapper>
+              } />
+            }
+
+            <PageWrapper customeClass='workspace'>
+              <PageTitle
+                parentClass='workspace__header'
+                customClass='justify-content-between align-items-center'
+                title={this.getTitle(urlFilter)}
+                subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
+              >
+                {idRoleUserWorkspace >= 2 &&
+                  <DropdownCreateButton
+                    parentClass='workspace__header__btnaddcontent'
+                    idFolder={null} // null because it is workspace root content
+                    onClickCreateContent={this.handleClickCreateContent}
+                    availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                  />
+                }
+              </PageTitle>
+
+              <PageContent parentClass='workspace__content'>
+                <div className='workspace__content__fileandfolder folder__content active'>
+                  <ContentItemHeader />
+
+                  {state.contentLoaded && workspaceContentList.length === 0
+                    ? (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
+                      </div>
+                    )
+                    : filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
+                      ? (
+                        <Folder
+                          availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                          folderData={c}
+                          onClickItem={this.handleClickContentItem}
+                          idRoleUserWorkspace={idRoleUserWorkspace}
+                          onClickExtendedAction={{
+                            edit: this.handleClickEditContentItem,
+                            move: this.handleClickMoveContentItem,
+                            download: this.handleClickDownloadContentItem,
+                            archive: this.handleClickArchiveContentItem,
+                            delete: this.handleClickDeleteContentItem
+                          }}
+                          onClickFolder={this.handleClickFolder}
+                          onClickCreateContent={this.handleClickCreateContent}
+                          isLast={i === filteredWorkspaceContentList.length - 1}
+                          key={c.id}
+                        />
+                      )
+                      : (
+                        <ContentItem
+                          label={c.label}
+                          type={c.type}
+                          faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
+                          statusSlug={c.statusSlug}
+                          read={currentWorkspace.contentReadStatusList.includes(c.id)}
+                          contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
+                          onClickItem={() => this.handleClickContentItem(c)}
+                          idRoleUserWorkspace={idRoleUserWorkspace}
+                          onClickExtendedAction={{
+                            edit: e => this.handleClickEditContentItem(e, c),
+                            move: e => this.handleClickMoveContentItem(e, c),
+                            download: e => this.handleClickDownloadContentItem(e, c),
+                            archive: e => this.handleClickArchiveContentItem(e, c),
+                            delete: e => this.handleClickDeleteContentItem(e, c)
+                          }}
+                          onClickCreateContent={this.handleClickCreateContent}
+                          isLast={i === filteredWorkspaceContentList.length - 1}
+                          key={c.id}
+                        />
+                      )
+                    )
+                  }
+
+                  {idRoleUserWorkspace >= 2 &&
+                    <DropdownCreateButton
+                      customClass='workspace__content__button'
+                      idFolder={null}
+                      onClickCreateContent={this.handleClickCreateContent}
+                      availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                    />
+                  }
+                </div>
+              </PageContent>
+            </PageWrapper>
+          </div>
+        </div>
       </div>
     )
   }

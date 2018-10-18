@@ -7,7 +7,7 @@ import pytest
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import BadCommandError
-from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
@@ -127,7 +127,7 @@ class TestCommands(CommandFunctionalTest):
         Test User creation with email with notification disable
         """
         app = TracimCLI()
-        with pytest.raises(NotificationDisabled):
+        with pytest.raises(NotificationDisabledCantCreateUserWithInvitation):
             app.run([
                 '--debug',
                 'user', 'create',

@@ -456,10 +456,10 @@ class ContentApi(object):
             query = query.filter(Content.content_id != exclude_content_id)
         query = query.filter(Content.workspace_id == workspace.workspace_id)
 
-        nb_content_with_the_filename = query.\
-            filter(Content.label == label).\
-            filter(Content.file_extension == file_extension).\
-            count()
+
+        nb_content_with_the_filename = query.filter(
+            Content.file_name == filename
+        ).count()
         if nb_content_with_the_filename == 0:
             return True
         elif nb_content_with_the_filename == 1:
@@ -566,28 +566,33 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
-        content = None
-        if filename or label:
-            if label:
-                file_extension = ''
-                if content_type.slug in (
-                        content_type_list.Page.slug,
-                        content_type_list.Thread.slug,
-                ):
-                    file_extension = '.html'
-                filename = self._prepare_filename(label, file_extension)
+        content = Content()
+        if label:
+            file_extension = ''
+            if content_type.file_extension:
+                file_extension = content_type.file_extension
+            filename = self._prepare_filename(label, file_extension)
             self._is_filename_available_or_raise(
                 filename,
                 workspace,
                 parent,
             )
-            content = Content()
+            # TODO - G.M - 2018-10-15 - Set file extension and label
+            # explicitly instead of filename in order to have correct
+            # label/file-extension separation.
+            content.label = label
+            content.file_extension = file_extension
+        elif filename:
+            self._is_filename_available_or_raise(
+                filename,
+                workspace,
+                parent
+            )
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
             content.file_name = filename
         else:
             if content_type_slug == content_type_list.Comment.slug:
-                content = Content()
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ''
@@ -873,7 +878,7 @@ class ContentApi(object):
         Apply normalised filters to found Content corresponding as given label.
         :param query: query to modify
         :param content_label_as_file: label in this
-        FILE version, use Content.get_label_as_file().
+        FILE version, use Content.file_name.
         :param is_case_sensitive: Take care about case or not
         :return: modified query
         """

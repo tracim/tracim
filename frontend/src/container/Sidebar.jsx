@@ -8,7 +8,11 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
-import {PAGE, workspaceConfig, getUserProfile, unLoggedAllowedPageList} from '../helper.js'
+import {
+  PAGE,
+  workspaceConfig,
+  getUserProfile
+} from '../helper.js'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -27,10 +31,8 @@ class Sidebar extends React.Component {
     // }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidMount () {
     const { props } = this
-
-    if (!this.shouldDisplaySidebar()) return
 
     if (
       props.match.params &&
@@ -45,16 +47,26 @@ class Sidebar extends React.Component {
     }
   }
 
-  componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  shouldComponentUpdate (nextProps) {
+    // Côme - 2018/10/16 - this is to avoid rerender workspace list if a workspace is open and if it isn't required.
+    // the point is to avoid rerender the height animation
+    const { props } = this
+
+    // no ws open, rerender in case one gets opened by componentDidUpdate
+    if (props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined) return true
+
+    // check if a label has been changed (if label changed, slug changed too)
+    if (JSON.stringify(props.workspaceList.map(ws => ws.slug)) !== JSON.stringify(nextProps.workspaceList.map(ws => ws.slug))) return true
+
+    const oldOpenedList = props.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
+    const newOpenedList = nextProps.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
+
+    // stringify compare doesn't work if array contain objects
+    return JSON.stringify(oldOpenedList) !== JSON.stringify(newOpenedList)
   }
 
-  shouldDisplaySidebar = () => {
-    return ![
-      ...unLoggedAllowedPageList,
-      ...this.props.workspaceList.length > 0 ? [] : [PAGE.HOME]
-    ]
-      .includes(this.props.location.pathname)
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
@@ -68,8 +80,6 @@ class Sidebar extends React.Component {
   render () {
     const { sidebarClose } = this.state
     const { user, activeLang, workspaceList, t } = this.props
-
-    if (!this.shouldDisplaySidebar()) return null
 
     return (
       <div className={classnames('sidebar primaryColorBg', {'sidebarclose': sidebarClose})}>

@@ -116,11 +116,15 @@ class ExpiredResetPasswordToken(TracimException):
 
 
 class NotificationSendingFailed(TracimException):
-    pass
+    error_code = error.NOTIFICATION_SENDING_FAILED
 
 
-class NotificationDisabled(TracimException):
-    pass
+class NotificationDisabledCantCreateUserWithInvitation(TracimException):
+    error_code = error.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
+
+
+class NotificationDisabledCantResetPassword(TracimException):
+    error_code = error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 
 class GroupDoesNotExist(TracimError):
@@ -231,6 +235,22 @@ class UserIsDeleted(TracimException):
     error_code = error.USER_DELETED
 
 
+class UserCantDisableHimself(TracimException):
+    error_code = error.USER_CANT_DISABLE_HIMSELF
+
+
+class UserCantDeleteHimself(TracimException):
+    error_code = error.USER_CANT_DELETE_HIMSELF
+
+
+class UserCantRemoveHisOwnRoleInWorkspace(TracimException):
+    error_code = error.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
+
+
+class UserCantChangeIsOwnProfile(TracimException):
+    error_code = error.USER_CANT_CHANGE_IS_OWN_PROFILE
+
+
 class NoUserSetted(TracimException):
     pass
 
@@ -296,4 +316,5 @@ class EmptyNotificationError(TracimException):
 
 
 class ContentInNotEditableState(TracimException):
-    pass
+    error_code = error.CONTENT_IN_NOT_EDITABLE_STATE
+

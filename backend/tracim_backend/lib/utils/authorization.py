@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
+import functools
 import typing
 from typing import TYPE_CHECKING
-import functools
+
 from pyramid.interfaces import IAuthorizationPolicy
-from tracim_backend.models import Group
 from zope.interface import implementer
 
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.exceptions import ContentTypeNotAllowed
+from tracim_backend.exceptions import InsufficientUserProfile
+from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.models import Group
 
 try:
     from json.decoder import JSONDecodeError
 except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
-from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
-from tracim_backend.exceptions import ContentTypeNotAllowed
-from tracim_backend.exceptions import InsufficientUserProfile
 if TYPE_CHECKING:
     from tracim_backend import TracimRequest
 ###
