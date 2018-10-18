@@ -96,11 +96,11 @@ class Login extends React.Component {
       case 400:
         switch (fetchPostUserLogin.json.code) {
           case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
+          default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
         }
         break
-      case 403:
-        props.dispatch(newFlashMessage(props.t('Email or password invalid'), 'warning'))
-        break
+      case 403: props.dispatch(newFlashMessage(props.t('Email or password invalid'), 'warning')); break
+      default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
     }
   }
 

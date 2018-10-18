@@ -155,5 +155,6 @@
   "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
   "Unknown email": "Email inconnu",
   "Cannot reset password while email are disabled, please contact an administrator": "Impossible de réinitialiser votre mot de passe si les emails sont désactivés, veuillez contacter un administrateur",
-  "Not a valid email": "Email invalide"
+  "Not a valid email": "Email invalide",
+  "An error has happened": "Une erreur est survenue"
 }

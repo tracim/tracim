@@ -155,5 +155,6 @@
   "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
   "Unknown email": "Unknown email",
   "Cannot reset password while email are disabled, please contact an administrator": "Cannot reset password while email are disabled, please contact an administrator",
-  "Not a valid email": "Not a valid email"
+  "Not a valid email": "Not a valid email",
+  "An error has happened": "An error has happened"
 }
