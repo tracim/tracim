@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import Sidebar from './Sidebar.jsx'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -168,30 +169,36 @@ class Account extends React.Component {
     })()
 
     return (
-      <PageWrapper customClass='account'>
-        <PageTitle
-          parentClass={'account'}
-          title={props.t('My account')}
-        />
+      <div className='sidebarpagecontainer'>
+        <Sidebar />
 
-        <PageContent parentClass='account'>
-          <UserInfo user={props.user} />
-
-          <Delimiter customClass={'account__delimiter'} />
-
-          <div className='account__userpreference'>
-            <MenuSubComponent
-              activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
-              onClickMenuItem={this.handleClickSubComponentMenuItem}
+        <div className='tracim__content'>
+          <PageWrapper customClass='account'>
+            <PageTitle
+              parentClass={'account'}
+              title={props.t('My account')}
             />
 
-            <div className='account__userpreference__setting'>
-              { subComponent }
-            </div>
-          </div>
+            <PageContent parentClass='account'>
+              <UserInfo user={props.user} />
 
-        </PageContent>
-      </PageWrapper>
+              <Delimiter customClass={'account__delimiter'} />
+
+              <div className='account__userpreference'>
+                <MenuSubComponent
+                  activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
+                  onClickMenuItem={this.handleClickSubComponentMenuItem}
+                />
+
+                <div className='account__userpreference__setting'>
+                  { subComponent }
+                </div>
+              </div>
+
+            </PageContent>
+          </PageWrapper>
+        </div>
+      </div>
     )
   }
 }

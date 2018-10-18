@@ -11,7 +11,8 @@ from tracim_backend.command import AppContextCommand
 from tracim_backend.command import Extender
 from tracim_backend.exceptions import BadCommandError
 from tracim_backend.exceptions import GroupDoesNotExist
-from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import \
+    NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.lib.core.group import GroupApi
@@ -146,7 +147,7 @@ class UserCommand(AppContextCommand):
         except IntegrityError as exception:
             self._session.rollback()
             raise UserAlreadyExistError() from exception
-        except (NotificationSendingFailed, NotificationDisabled) as exception:
+        except (NotificationSendingFailed, NotificationDisabledCantCreateUserWithInvitation) as exception:
             self._session.rollback()
             raise exception from exception
         return user
@@ -195,8 +196,8 @@ class UserCommand(AppContextCommand):
                 raise UserAlreadyExistError("Error: User already exist (use `user update` command instead)") from exc # nopep8
             except NotificationSendingFailed as exc:
                 raise NotificationSendingFailed("Error: Cannot send email notification due to error, user not created.") from exc  # nopep8
-            except NotificationDisabled as exc:
-                raise NotificationDisabled("Error: Email notification disabled but notification required, user not created.") from exc  # nopep8
+            except NotificationDisabledCantCreateUserWithInvitation as exc:
+                raise NotificationDisabledCantCreateUserWithInvitation("Error: Email notification disabled but notification required, user not created.") from exc  # nopep8
         else:
             if parsed_args.password:
                 self._update_password_for_login(

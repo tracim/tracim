@@ -12,7 +12,6 @@ export default function workspaceContentList (state = [], action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT}`:
       return action.workspaceContentList
-        .sort((a, b) => a.slug < b.slug ? -1 : 1)
         .map(wsc => ({
           id: wsc.content_id,
           label: wsc.label,

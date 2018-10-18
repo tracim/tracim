@@ -13,14 +13,16 @@ from tracim_backend.exceptions import AuthenticationFailed, \
     UserCantDeleteHimself, UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
-from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import \
+    NotificationDisabledCantCreateUserWithInvitation
+from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
-from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
@@ -395,7 +397,7 @@ class UserApi(object):
         do_notify: bool=True,
     ) -> User:
         if do_notify and not self._config.EMAIL_NOTIFICATION_ACTIVATED:
-            raise NotificationDisabled(
+            raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because "
                 "notification are disabled."
             )
@@ -462,7 +464,7 @@ class UserApi(object):
         :return: reset_password_token
         """
         if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
-            raise NotificationDisabled("cant reset password with notification disabled")  # nopep8
+            raise NotificationDisabledCantResetPassword("cant reset password with notification disabled")  # nopep8
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)

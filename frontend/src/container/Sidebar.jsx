@@ -8,7 +8,11 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
-import {PAGE, workspaceConfig, getUserProfile, unLoggedAllowedPageList} from '../helper.js'
+import {
+  PAGE,
+  workspaceConfig,
+  getUserProfile
+} from '../helper.js'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -28,8 +32,6 @@ class Sidebar extends React.Component {
   }
 
   componentDidMount () {
-    if (!this.shouldDisplaySidebar()) return
-
     const { props } = this
 
     if (
@@ -67,14 +69,6 @@ class Sidebar extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  shouldDisplaySidebar = () => {
-    return ![
-      ...unLoggedAllowedPageList,
-      ...this.props.workspaceList.length > 0 ? [] : [PAGE.HOME]
-    ]
-      .includes(this.props.location.pathname)
-  }
-
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
@@ -86,8 +80,6 @@ class Sidebar extends React.Component {
   render () {
     const { sidebarClose } = this.state
     const { user, activeLang, workspaceList, t } = this.props
-
-    if (!this.shouldDisplaySidebar()) return null
 
     return (
       <div className={classnames('sidebar primaryColorBg', {'sidebarclose': sidebarClose})}>

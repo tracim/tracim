@@ -1,9 +1,11 @@
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import EmailAlreadyExistInDb, \
-    UserCantDeleteHimself, UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import UserCantDeleteHimself
+from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -17,7 +19,6 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
-from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.views.core_api.schemas import \
     ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
