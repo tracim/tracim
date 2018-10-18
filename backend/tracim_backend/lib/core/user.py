@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import AuthenticationFailed, \
+    UserCantDeleteHimself, UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import \
@@ -366,6 +367,10 @@ class UserApi(object):
             user.lang = lang
 
         if groups is not None:
+            if self._user and self._user == user:
+                raise UserCantChangeIsOwnProfile(
+                    "User {} can't change is own profile".format(user.user_id)
+                )
             # INFO - G.M - 2018-07-18 - Delete old groups
             for group in user.groups:
                 if group not in groups:
@@ -483,13 +488,19 @@ class UserApi(object):
 
     def disable(self, user: User, do_save=False):
         if self._user and self._user == user:
-            raise UserCantDisableHimself
+            raise UserCantDisableHimself(
+                "User {} can't disable himself".format(user.user_id)
+            )
 
         user.is_active = False
         if do_save:
             self.save(user)
 
     def delete(self, user: User, do_save=False):
+        if self._user and self._user == user:
+            raise UserCantDeleteHimself(
+                "User {} can't delete himself".format(user.user_id)
+            )
         user.is_deleted = True
         if do_save:
             self.save(user)
