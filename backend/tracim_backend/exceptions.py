@@ -116,12 +116,15 @@ class ExpiredResetPasswordToken(TracimException):
 
 
 class NotificationSendingFailed(TracimException):
-    pass
+    error_code = error.NOTIFICATION_SENDING_FAILED
 
 
-class NotificationDisabled(TracimException):
-    pass
+class NotificationDisabledCantCreateUserWithInvitation(TracimException):
+    error_code = error.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
 
+
+class NotificationDisabledCantResetPassword(TracimException):
+    error_code = error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 class GroupDoesNotExist(TracimError):
     pass
@@ -300,4 +303,4 @@ class EmptyNotificationError(TracimException):
 
 
 class ContentInNotEditableState(TracimException):
-    pass
+    error_code = error.CONTENT_IN_NOT_EDITABLE_STATE
