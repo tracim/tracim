@@ -138,16 +138,22 @@ class File extends React.Component {
   loadContent = async () => {
     const { loggedUser, content, config, fileCurrentPage } = this.state
 
-    const fetchResultFile = getFileContent(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultFile = await handleFetchResult(await getFileContent(config.apiUrl, content.workspace_id, content.content_id))
 
-    await handleFetchResult(await fetchResultFile)
-      .then(async resFile => this.setState({
-        content: {
-          ...resFile.body,
-          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/500x500?page=${fileCurrentPage}`,
-          contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/1920x1080?page=${fileCurrentPage}`
-        }
-      }))
+    switch (fetchResultFile.apiResponse.status) {
+      case 200:
+        this.setState({
+          content: {
+            ...fetchResultFile.body,
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500?page=${fileCurrentPage}`,
+            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080?page=${fileCurrentPage}`
+          }
+        })
+        break
+      default:
+        this.sendGlobalFlashMessage(this.props.t('Error while loading file'))
+        return
+    }
 
     await putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
     GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
