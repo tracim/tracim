@@ -30,7 +30,7 @@ class Application(object):
         @param main_route: the route of the frontend "home" screen of
         the application. For exemple, if you have an application
         called "calendar", the main route will be something
-        like /#/workspace/{wid}/calendar.
+        like /workspace/{wid}/calendar.
         """
         self.label = label
         self.slug = slug
@@ -55,6 +55,7 @@ class Application(object):
             available_statuses: typing.List['ContentStatus'],
             slug_alias: typing.List[str] = None,
             allow_sub_content: bool = False,
+            file_extension: typing.Optional[str] = None,
     ):
         content_type = ContentType(
             slug=slug,
@@ -65,6 +66,7 @@ class Application(object):
             available_statuses=available_statuses,
             slug_alias=slug_alias,
             allow_sub_content=allow_sub_content,
+            file_extension=file_extension,
         )
         self.content_types.append(content_type)
 

@@ -399,3 +399,70 @@ class TestUserApi(DefaultTest):
         )
         with pytest.raises(AuthenticationFailed):
             api.authenticate_user('admin@admin.admin', 'wrong_password')
+
+    def test_unit__disable_user___ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        gapi = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = api.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        user2 = api.create_user(
+            email='test2@test.test',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+
+        api2 = UserApi(current_user=user,session=self.session, config=self.config)
+        from tracim_backend.exceptions import UserCantDisableHimself
+        api2.disable(user2)
+        updated_user2 = api.get_one(user2.user_id)
+        assert updated_user2.is_active == False
+        assert updated_user2.user_id == user2.user_id
+        assert updated_user2.email == user2.email
+
+    def test_unit__disable_user___err__user_cant_disable_itself(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        gapi = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = api.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+
+        api2 = UserApi(current_user=user,session=self.session, config=self.config)
+        from tracim_backend.exceptions import UserCantDisableHimself
+        with pytest.raises(UserCantDisableHimself):
+            api2.disable(user)
+

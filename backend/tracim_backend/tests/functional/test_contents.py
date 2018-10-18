@@ -1015,6 +1015,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
+        assert content['file_extension'] == '.document.html'
 
     def test_api__get_html_document__ok_200__nominal_case(self) -> None:
         """
@@ -1056,6 +1057,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
+        assert content['file_extension'] == '.document.html'
 
     def test_api__get_html_document__ok_200__archived_content(self) -> None:
         """
@@ -1286,6 +1288,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['file_extension'] == '.document.html'
 
         res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/6',
@@ -1313,6 +1316,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['file_extension'] == '.document.html'
 
     def test_api__update_html_document__err_400__not_editable(self) -> None:
         """
@@ -1511,6 +1515,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['author']['user_id'] == 3
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Bob i.'
+        assert revision['file_extension'] == '.document.html'
 
     def test_api__set_html_document_status__ok_200__nominal_case(self) -> None:
         """
@@ -1670,6 +1675,7 @@ class TestFiles(FunctionalTest):
         assert content['mimetype'] == 'plain/text'
         assert content['size'] == len(b'Test file')
         assert content['file_extension'] == '.txt'
+        assert content['filename'] == 'Test_file.txt'
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
@@ -1739,6 +1745,7 @@ class TestFiles(FunctionalTest):
         assert content['raw_content'] == ''
         assert content['mimetype'] == ''
         assert content['file_extension'] == ''
+        assert content['filename'] == 'Test file'
         assert content['size'] is None
         assert content['page_nb'] is None
         assert content['pdf_available'] is False
@@ -1824,6 +1831,7 @@ class TestFiles(FunctionalTest):
         assert content['mimetype'] == 'application/octet-stream'
         assert content['size'] == 100
         assert content['file_extension'] == '.bin'
+        assert content['filename'] == 'Test_file.bin'
         assert content['page_nb'] is None
         assert content['pdf_available'] is False
 
@@ -4711,6 +4719,8 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == 'What is the best cake?'  # nopep8
+        assert content['file_extension'] == '.thread.html'
+        assert content['filename'] == 'Best Cakes?.thread.html'
 
     def test_api__get_thread__err_400__content_does_not_exist(self) -> None:
         """
@@ -4849,6 +4859,8 @@ class TestThreads(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['file_extension'] == '.thread.html'
+        assert content['filename'] == 'My New label.thread.html'
 
         res = self.testapp.get(
             '/api/v2/workspaces/2/threads/7',
@@ -4876,6 +4888,8 @@ class TestThreads(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['file_extension'] == '.thread.html'
+        assert content['filename'] == 'My New label.thread.html'
 
     def test_api__update_thread__err_400__not_modified(self) -> None:
         """
@@ -5021,6 +5035,8 @@ class TestThreads(FunctionalTest):
         assert revision['author']['user_id'] == 1
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Global manager'
+        assert revision['file_extension'] == '.thread.html'
+        assert revision['filename'] == 'Best Cake.thread.html'
         revision = revisions[1]
         assert revision['content_type'] == 'thread'
         assert revision['content_id'] == 7
@@ -5042,6 +5058,8 @@ class TestThreads(FunctionalTest):
         assert revision['author']['user_id'] == 3
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Bob i.'
+        assert revision['file_extension'] == '.thread.html'
+        assert revision['filename'] == 'Best Cakes?.thread.html'
 
     def test_api__get_thread_revisions__ok_200__most_revision_type(self) -> None:
         """

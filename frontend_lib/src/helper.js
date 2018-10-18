@@ -6,28 +6,32 @@ var dateFnsLocale = {
   en: require('date-fns/locale/en')
 }
 
+const generateFetchResponse = async fetchResult => {
+  const resultJson = await fetchResult.clone().json()
+  return new Promise((resolve, reject) => resolve({
+    apiResponse: fetchResult,
+    body: resultJson
+  }))
+}
+
 export const libHandleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
-    case 200:
-    case 304:
-    case 400: // 400 should return the body to handle the backend error code in it
-      const resultJson = await fetchResult.clone().json()
-      return new Promise((resolve, reject) => resolve({
-        apiResponse: fetchResult,
-        body: resultJson
-      }))
-    case 204:
-      return fetchResult
+    case 204: return fetchResult
     case 401:
-      GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}}) // no break/return to return the promise
-    case 404:
-    case 409:
+      GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}})
+      return generateFetchResponse(fetchResult)
     case 500:
-    case 501:
-    case 502:
-    case 503:
-    case 504:
-      return new Promise((resolve, reject) => reject(fetchResult)) // @TODO : handle errors from api result
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: i18n.t('Unexpected error, please inform an administrator'),
+          type: 'danger',
+          delay: undefined
+        }
+      })
+      return generateFetchResponse(fetchResult)
+    default:
+      return generateFetchResponse(fetchResult)
   }
 }
 

@@ -664,7 +664,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
     slug = marshmallow.fields.String(example='markdown-pages')
     label = marshmallow.fields.String(example='Markdown Documents')
     route = marshmallow.fields.String(
-        example='/#/workspace/{workspace_id}/contents/?type=mardown-page',
+        example='/workspace/{workspace_id}/contents/?type=mardown-page',
         description='the route is the frontend route. '
                     'It may include workspace_id '
                     'which must be replaced on backend size '
@@ -930,6 +930,12 @@ class ContentDigestSchema(marshmallow.Schema):
                     'for sub-contents. Default is True. '
                     'In first version of the API, this field is always True',
     )
+    file_extension = marshmallow.fields.String(
+        example='.txt'
+    )
+    filename = marshmallow.fields.String(
+        example='nameofthefile.txt'
+    )
     modified = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
         description='date of last modification of content.'
@@ -986,9 +992,6 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     pdf_available = marshmallow.fields.Bool(
         description="Is pdf version of file available ?",
         example=True,
-    )
-    file_extension = marshmallow.fields.String(
-        example='.txt'
     )
 
 

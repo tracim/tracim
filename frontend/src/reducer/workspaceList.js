@@ -5,7 +5,6 @@ import {
   WORKSPACE_LIST,
   WORKSPACE_LIST_MEMBER
 } from '../action-creator.sync.js'
-import { handleRouteFromApi } from '../helper.js'
 
 export function workspaceList (state = [], action) {
   switch (action.type) {
@@ -17,20 +16,17 @@ export function workspaceList (state = [], action) {
         // description: ws.description, // not returned by /api/v2/users/:idUser/workspaces
         sidebarEntry: ws.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
-          route: handleRouteFromApi(sbe.route),
+          route: sbe.route,
           faIcon: sbe.fa_icon,
           hexcolor: sbe.hexcolor,
           label: sbe.label
         })),
-        isOpenInSidebar: false,
+        isOpenInSidebar: ws.isOpenInSidebar,
         memberList: []
       }))
 
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
-      return state.map(ws => ws.id === action.workspaceId
-        ? {...ws, isOpenInSidebar: action.isOpenInSidebar}
-        : ws
-      )
+      return state.map(ws => ({...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar}))
 
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({

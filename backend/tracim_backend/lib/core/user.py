@@ -22,6 +22,7 @@ from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -481,6 +482,9 @@ class UserApi(object):
             self.save(user)
 
     def disable(self, user: User, do_save=False):
+        if self._user and self._user == user:
+            raise UserCantDisableHimself
+
         user.is_active = False
         if do_save:
             self.save(user)
