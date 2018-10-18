@@ -137,7 +137,7 @@ export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).
 // and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
-const translationKeyFromBackend = [
+const translationKeyFromBackend = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
   i18n.t('All Contents'),
   i18n.t('Open'),
