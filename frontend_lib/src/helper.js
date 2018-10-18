@@ -14,7 +14,7 @@ const generateFetchResponse = async fetchResult => {
   }))
 }
 
-export const libHandleFetchResult = async fetchResult => {
+export const handleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
     case 204: return fetchResult
     case 401:
@@ -35,7 +35,7 @@ export const libHandleFetchResult = async fetchResult => {
   }
 }
 
-export const libAddAllResourceI18n = (i18n, translation) => {
+export const addAllResourceI18n = (i18n, translation) => {
   Object.keys(translation).forEach(lang =>
     Object.keys(translation[lang]).forEach(namespace =>
       i18n.addResources(lang, namespace, translation[lang][namespace])
@@ -43,7 +43,7 @@ export const libAddAllResourceI18n = (i18n, translation) => {
   )
 }
 
-export const libGenerateAvatarFromPublicName = publicName => {
+export const generateAvatarFromPublicName = publicName => {
   // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
   const stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
 
@@ -74,11 +74,11 @@ export const libGenerateAvatarFromPublicName = publicName => {
   return canvas.toDataURL('image/png', '')
 }
 
-export const libDisplayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
+export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
 
-export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
+export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
-export const libRevisionTypeList = lang => {
+export const revisionTypeList = lang => {
   i18n.changeLanguage(lang)
   return [{
     id: 'archiving',

@@ -1,70 +1,65 @@
 import {
-  libAddAllResourceI18n,
-  libHandleFetchResult,
-  libGenerateAvatarFromPublicName,
-  libDisplayDistanceDate,
-  libConvertBackslashNToBr,
-  libRevisionTypeList
+  addAllResourceI18n,
+  handleFetchResult,
+  generateAvatarFromPublicName,
+  displayDistanceDate,
+  convertBackslashNToBr,
+  revisionTypeList,
 } from './helper.js'
 
-import libPopinFixed from './component/PopinFixed/PopinFixed.jsx'
-import libPopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
-import libPopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
-import libPopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
+import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
+import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
+import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
+import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
-import libTimeline from './component/Timeline/Timeline.jsx'
+import Timeline from './component/Timeline/Timeline.jsx'
 
-import libTextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
-import libBtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
-import libCheckbox from './component/Input/Checkbox.jsx'
+import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
+import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
+import Checkbox from './component/Input/Checkbox.jsx'
 
-import libPageWrapper from './component/Layout/PageWrapper.jsx'
-import libPageTitle from './component/Layout/PageTitle.jsx'
-import libPageContent from './component/Layout/PageContent.jsx'
+import PageWrapper from './component/Layout/PageWrapper.jsx'
+import PageTitle from './component/Layout/PageTitle.jsx'
+import PageContent from './component/Layout/PageContent.jsx'
 
-import libDelimiter from './component/Delimiter/Delimiter.jsx'
+import Delimiter from './component/Delimiter/Delimiter.jsx'
 
-import libCardPopup from './component/CardPopup/CardPopup.jsx'
-import libCardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
+import CardPopup from './component/CardPopup/CardPopup.jsx'
+import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
-import libNewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
-import libArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
-import libSelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
+import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
+import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
+import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 
-import libNewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
+import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
-export const libEnTranslation = require('../i18next.scanner/en/translation.json')
-export const libFrTranslation = require('../i18next.scanner/fr/translation.json')
+export const enTranslation = require('../i18next.scanner/en/translation.json')
+export const frTranslation = require('../i18next.scanner/fr/translation.json')
 
-export const addAllResourceI18n = libAddAllResourceI18n
-export const handleFetchResult = libHandleFetchResult
-export const generateAvatarFromPublicName = libGenerateAvatarFromPublicName
-export const displayDistanceDate = libDisplayDistanceDate
-export const convertBackslashNToBr = libConvertBackslashNToBr
-export const revisionTypeList = libRevisionTypeList
+export {
+  addAllResourceI18n,
+  handleFetchResult,
+  generateAvatarFromPublicName,
+  displayDistanceDate,
+  convertBackslashNToBr,
+  revisionTypeList,
+  PopinFixed,
+  PopinFixedHeader,
+  PopinFixedOption,
+  PopinFixedContent,
+  Timeline,
+  TextAreaApp,
+  BtnSwitch,
+  Checkbox,
+  PageWrapper,
+  PageTitle,
+  PageContent,
+  Delimiter,
+  CardPopup,
+  CardPopupCreateContent,
+  NewVersionBtn,
+  ArchiveDeleteContent,
+  SelectStatus,
+  NewMemberForm
+}
 
-export const PopinFixed = libPopinFixed
-export const PopinFixedHeader = libPopinFixedHeader
-export const PopinFixedOption = libPopinFixedOption
-export const PopinFixedContent = libPopinFixedContent
-
-export const Timeline = libTimeline
-
-export const TextAreaApp = libTextAreaApp
-export const BtnSwitch = libBtnSwitch
-export const Checkbox = libCheckbox
-
-export const PageWrapper = libPageWrapper
-export const PageTitle = libPageTitle
-export const PageContent = libPageContent
-
-export const Delimiter = libDelimiter
-
-export const CardPopup = libCardPopup
-export const CardPopupCreateContent = libCardPopupCreateContent
-
-export const NewVersionBtn = libNewVersionBtn
-export const ArchiveDeleteContent = libArchiveDeleteContent
-export const SelectStatus = libSelectStatus
-
-export const NewMemberForm = libNewMemberForm
