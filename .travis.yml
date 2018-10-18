@@ -13,6 +13,8 @@ matrix:
           - imagemagick
           - libmagickwand-dev
           - ghostscript
+          - libfile-mimeinfo-perl
+          - poppler-utils
       services:
         - docker
         - redis-server

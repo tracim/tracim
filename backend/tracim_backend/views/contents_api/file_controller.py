@@ -250,7 +250,8 @@ class FileController(Controller):
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
             content.revision_id,
-            page_number=hapic_data.query.page
+            page_number=hapic_data.query.page,
+            file_extension=content.file_extension,
         )
         filename = "{}_page_{}.pdf".format(content.label, hapic_data.query.page)
         return HapicFile(
@@ -283,7 +284,10 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=content_type_list.Any_SLUG
         )
-        pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
+        pdf_preview_path = api.get_full_pdf_preview_path(
+            content.revision_id,
+            file_extension=content.file_extension,
+        )
         filename = "{label}.pdf".format(label=content.label)
         return HapicFile(
             file_path=pdf_preview_path,
@@ -321,6 +325,7 @@ class FileController(Controller):
         )
         pdf_preview_path = api.get_full_pdf_preview_path(
             revision.revision_id,
+            file_extension=revision.file_extension,
         )
         filename = "{label}.pdf".format(label=revision.label)
         return HapicFile(
@@ -360,7 +365,8 @@ class FileController(Controller):
         pdf_preview_path = api.get_pdf_preview_path(
             revision.content_id,
             revision.revision_id,
-            page_number=hapic_data.query.page
+            page_number=hapic_data.query.page,
+            file_extension=revision.file_extension,
         )
         filename = "{label}_page_{page_number}.pdf".format(
             label=content.label,
@@ -402,6 +408,7 @@ class FileController(Controller):
             content_id=content.content_id,
             revision_id=content.revision_id,
             page_number=hapic_data.query.page,
+            file_extension=content.file_extension,
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
@@ -443,6 +450,7 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
+            file_extension=content.file_extension,
             page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
@@ -494,6 +502,7 @@ class FileController(Controller):
             page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
+            file_extension=revision.file_extension,
         )
         filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
             label=revision.label,

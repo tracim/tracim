@@ -831,7 +831,10 @@ class ContentInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.get_preview_page_nb(self.content.revision_id)
+            return content_api.get_preview_page_nb(
+                self.content.revision_id,
+                file_extension=self.content.file_extension
+            )
         else:
             return None
 
@@ -864,7 +867,10 @@ class ContentInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.has_pdf_preview(self.content.revision_id)
+            return content_api.has_pdf_preview(
+                self.content.revision_id,
+                file_extension=self.content.file_extension
+            )
         else:
             return False
 
@@ -1050,7 +1056,10 @@ class RevisionInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.get_preview_page_nb(self.revision.revision_id)
+            return content_api.get_preview_page_nb(
+                self.revision.revision_id,
+                file_extension=self.revision.file_extension
+            )
         else:
             return None
 
@@ -1083,7 +1092,10 @@ class RevisionInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.has_pdf_preview(self.revision.revision_id)
+            return content_api.has_pdf_preview(
+                self.revision.revision_id,
+                file_extension=self.revision.file_extension,
+            )
         else:
             return False
 
