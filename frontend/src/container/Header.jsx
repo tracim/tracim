@@ -26,7 +26,12 @@ import {
 import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
-  handleClickLogo = () => this.props.history.push(PAGE.HOME)
+  handleClickLogo = () => {
+    const { props } = this
+
+    if (props.user.logged) props.history.push(PAGE.HOME)
+    else props.history.push(PAGE.LOGIN)
+  }
 
   handleClickFeature = () => {}
   handleClickExplore = () => {}
