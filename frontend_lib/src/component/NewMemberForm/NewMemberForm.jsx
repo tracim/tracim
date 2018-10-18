@@ -20,7 +20,7 @@ export const NewMemberForm = props => {
             {props.t('Enter the name or email of the user')}
           </label>
 
-          {(props.isLoggedUserAdmin || props.idRoleUserWorkspace >= 8) && (
+          {(props.canSendInviteNewUser || props.idRoleUserWorkspace >= 8) && (
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>
@@ -47,9 +47,10 @@ export const NewMemberForm = props => {
           />
 
           {props.autoCompleteActive && props.nameOrEmail.length >= 2 && (
-            <div className='autocomplete primaryColorBorder'>
-              {props.searchedKnownMemberList.length > 0
-                ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+            // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
+            props.searchedKnownMemberList.length > 0
+              ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+                <div className='autocomplete primaryColorBorder'>
                   <div
                     className='autocomplete__item primaryColorBgHover'
                     onClick={() => props.onClickKnownMember(u)}
@@ -63,16 +64,41 @@ export const NewMemberForm = props => {
                       {u.public_name}
                     </div>
                   </div>
-                )
-                : (
-                  <div className='autocomplete__item'>
-                    <div className='autocomplete__item__name'>
-                      {props.t('No result')}
-                    </div>
-                  </div>
-                )
-              }
-            </div>
+                </div>
+              )
+              : (
+                <div className='autocomplete primaryColorBorder'>
+                  {props.isEmail
+                    ? (
+                      <div className='autocomplete__item primaryColorBgHover' onClick={props.onClickAutoComplete}>
+                        <div className='autocomplete__item__icon'>
+                          <i className='fa fa-fw fa-user-plus' />
+                        </div>
+
+                        <div className='autocomplete__item__name'>
+                          {props.t('Send an invitational email to this user')}
+                        </div>
+                      </div>
+                    )
+                    : (
+                      <div className='autocomplete__item primaryColorBgHover' onClick={props.onClickAutoComplete}>
+                        <div className='autocomplete__item__icon'>
+                          <i className='fa fa-fw fa-user-secret' />
+                        </div>
+
+                        <div className='autocomplete__item__name'>
+                          <div className='autocomplete__item__name__unknownuser'>
+                            {props.nameOrEmail}
+                            <div className='autocomplete__item__name__unknownuser__msg'>
+                              {props.t('I know this user exist')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                </div>
+              )
           )}
         </div>
 
@@ -132,6 +158,7 @@ export const NewMemberForm = props => {
       <div className='memberlist__form__submitbtn'>
         <button
           className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
+          disabled={!props.autoCompleteClicked}
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}

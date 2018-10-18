@@ -89,6 +89,7 @@ export class MemberList extends React.Component {
               <NewMemberForm
                 onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
                 nameOrEmail={props.nameOrEmail}
+                isEmail={props.isEmail}
                 onChangeNameOrEmail={props.onChangeNameOrEmail}
                 searchedKnownMemberList={props.searchedKnownMemberList}
                 autoCompleteActive={props.autoCompleteFormNewMemberActive}
@@ -98,8 +99,10 @@ export class MemberList extends React.Component {
                 onChangeRole={props.onChangeRole}
                 onClickBtnValidate={this.handleClickBtnValidate}
                 emailNotifActivated={props.emailNotifActivated}
-                isLoggedUserAdmin={props.isLoggedUserAdmin}
+                canSendInviteNewUser={props.canSendInviteNewUser}
                 idRoleUserWorkspace={props.idRoleUserWorkspace}
+                autoCompleteClicked={props.autoCompleteClicked}
+                onClickAutoComplete={props.onClickAutoComplete}
               />
             )
           }
