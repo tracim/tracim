@@ -4992,7 +4992,11 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['profile'] == 'administrators'
 
-    def test_api__set_user_profile__err_403__admin_itself(self):
+    def test_api__set_user_profile__err_400__admin_itself(self):
+        """
+        Trying to set is own profile as user with admin right.
+        Return 400 because of "not allow to set own profile check"
+        """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5034,6 +5038,11 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         assert res['profile'] == 'administrators'
 
     def test_api__set_user_profile__err_403__user_itself(self):
+        """
+        Trying to set is own profile as user with user right.
+        Return 403 error because right check is before "not allow to set
+        own profile check"
+        """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5100,6 +5109,10 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         assert res['profile'] == 'users'
 
     def test_api__set_user_profile__err_403__other_normal_user(self):
+        """
+        Set user profile of user normal user as normal user
+        Return 403 error because of no right to do this as simple user
+        """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5287,7 +5300,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
 
-    def test_api_disable_user__err_400__cant_disable_myself(self):
+    def test_api_disable_user__err_400__cant_disable_myself_admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -5449,7 +5462,12 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
-    def test_api_disable_user__err_403__user_itself(self):
+    def test_api_disable_user__err_403__cant_disable_myself_user(self):
+        """
+        Trying to disable himself as simple user, raise 403 because no
+        right to disable anyone as simple user. (check of right is before
+        self-disable not allowed_check).
+        """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \

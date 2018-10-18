@@ -2058,9 +2058,10 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         for role in roles:
             assert role['user_id'] != user2.user_id
 
-    def test_api__delete_workspace_member_role__err_403__user_itself(self):
+    def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):  # nopep8
         """
-        Delete worskpace member role
+        Delete worskpace member role.
+        Unallow to delete himself as workspace_manager
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
