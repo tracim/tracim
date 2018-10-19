@@ -419,6 +419,7 @@ class Dashboard extends React.Component {
 
                 <MemberList
                   customClass='dashboard__memberlist'
+                  loggedUser={props.user}
                   memberList={props.curWs.memberList.filter(u => u.isActive)}
                   roleList={ROLE}
                   searchedKnownMemberList={state.searchedKnownMemberList}

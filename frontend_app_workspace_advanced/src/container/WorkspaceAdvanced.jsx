@@ -399,6 +399,7 @@ class WorkspaceAdvanced extends React.Component {
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
+            loggedUser={state.loggedUser}
             idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
             canSendInviteNewUser={
               [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)

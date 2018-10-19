@@ -56,7 +56,7 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      {props.idRoleUserWorkspace >= 8 && (
+                      {props.idRoleUserWorkspace >= 8 && m.id !== props.loggedUser.user_id && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}

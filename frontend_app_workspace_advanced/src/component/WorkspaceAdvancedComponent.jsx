@@ -98,12 +98,17 @@ const WorkspaceAdvancedComponent = props => {
                     </div>
                   </div>
 
-                  <div
-                    className='workspace_advanced__userlist__list__item__delete'
-                    onClick={() => props.onClickDeleteMember(m.user_id)}
-                  >
-                    <i className='fa fa-trash-o' />
-                  </div>
+                  {m.user_id !== props.loggedUser.user_id
+                    ? (
+                      <div
+                        className='workspace_advanced__userlist__list__item__delete'
+                        onClick={() => props.onClickDeleteMember(m.user_id)}
+                      >
+                        <i className='fa fa-trash-o' />
+                      </div>
+                    )
+                    : <div className='workspace_advanced__userlist__list__item__delete' />
+                  }
                 </li>
               )}
             </ul>
