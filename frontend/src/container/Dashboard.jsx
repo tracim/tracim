@@ -55,6 +55,7 @@ class Dashboard extends React.Component {
         isEmail: false
       },
       firstLoadKnownMemberCompleted: false,
+      displayNewMemberForm: false,
       autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
@@ -91,6 +92,7 @@ class Dashboard extends React.Component {
     }
 
     if (prevState.workspaceIdInUrl !== state.workspaceIdInUrl) {
+      this.setState({displayNewMemberForm: false})
       this.loadWorkspaceDetail()
       this.loadMemberList()
       this.loadRecentActivity()
@@ -144,6 +146,10 @@ class Dashboard extends React.Component {
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
   }
+
+  handleClickAddMemberBtn = () => this.setState({displayNewMemberForm: true})
+
+  handleClickCloseAddMemberBtn = () => this.setState({displayNewMemberForm: false})
 
   handleToggleNotifBtn = () => this.setState(prevState => ({displayNotifBtn: !prevState.displayNotifBtn}))
 
@@ -433,6 +439,9 @@ class Dashboard extends React.Component {
                   role={state.newMember.role}
                   onChangeRole={this.handleChangeNewMemberRole}
                   onClickValidateNewMember={this.handleClickValidateNewMember}
+                  displayNewMemberForm={state.displayNewMemberForm}
+                  onClickAddMemberBtn={this.handleClickAddMemberBtn}
+                  onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
                   onClickRemoveMember={this.handleClickRemoveMember}
                   idRoleUserWorkspace={idRoleUserWorkspace}
                   canSendInviteNewUser={[PROFILE.ADMINISTRATOR.slug, PROFILE.MANAGER.slug].includes(props.user.profile)}
