@@ -50,11 +50,10 @@ export const NewMemberForm = props => {
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
             props.searchedKnownMemberList.length > 0
               ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
-                <div className='autocomplete primaryColorBorder'>
+                <div className='autocomplete primaryColorBorder' key={u.user_id}>
                   <div
                     className='autocomplete__item primaryColorBgHover'
                     onClick={() => props.onClickKnownMember(u)}
-                    key={u.user_id}
                   >
                     <div className='autocomplete__item__avatar'>
                       <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
@@ -158,7 +157,7 @@ export const NewMemberForm = props => {
       <div className='memberlist__form__submitbtn'>
         <button
           className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
-          disabled={!props.autoCompleteClicked}
+          disabled={!props.autoCompleteClicked || props.role === ''}
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}
