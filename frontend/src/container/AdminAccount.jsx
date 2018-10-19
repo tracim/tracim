@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import Sidebar from './Sidebar.jsx'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -211,35 +210,31 @@ class Account extends React.Component {
     })()
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
+      <div className='tracim__content'>
+        <PageWrapper customClass='account'>
+          <PageTitle
+            parentClass={'account'}
+            title={props.t('Admin account page')}
+          />
 
-        <div className='tracim__content'>
-          <PageWrapper customClass='account'>
-            <PageTitle
-              parentClass={'account'}
-              title={props.t('Admin account page')}
-            />
+          <PageContent parentClass='account'>
+            <UserInfo user={state.userToEdit} />
 
-            <PageContent parentClass='account'>
-              <UserInfo user={state.userToEdit} />
+            <Delimiter customClass={'account__delimiter'} />
 
-              <Delimiter customClass={'account__delimiter'} />
+            <div className='account__userpreference'>
+              <MenuSubComponent
+                activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
+                onClickMenuItem={this.handleClickSubComponentMenuItem}
+              />
 
-              <div className='account__userpreference'>
-                <MenuSubComponent
-                  activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
-                  onClickMenuItem={this.handleClickSubComponentMenuItem}
-                />
-
-                <div className='account__userpreference__setting'>
-                  { subComponent }
-                </div>
+              <div className='account__userpreference__setting'>
+                { subComponent }
               </div>
+            </div>
 
-            </PageContent>
-          </PageWrapper>
-        </div>
+          </PageContent>
+        </PageWrapper>
       </div>
     )
   }

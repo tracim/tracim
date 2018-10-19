@@ -36,7 +36,6 @@ import {
   findIdRoleUserWorkspace,
   PROFILE
 } from '../helper.js'
-import Sidebar from './Sidebar.jsx'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -340,126 +339,122 @@ class Dashboard extends React.Component {
     const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
+      <div className='tracim__content'>
+        <div className='dashboard'>
+          <PageWrapper customeClass='dashboard'>
+            <PageTitle
+              parentClass='dashboard__header'
+              title={props.t('Dashboard')}
+              subtitle={''}
+            >
+              <div className='dashboard__header__advancedmode ml-3'>
+                {idRoleUserWorkspace >= 8 &&
+                  <button
+                    type='button'
+                    className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                    onClick={this.handleClickOpenAdvancedDashboard}
+                  >
+                    {props.t('Open advanced Dashboard')}
+                  </button>
+                }
+              </div>
+            </PageTitle>
 
-        <div className='tracim__content'>
-          <div className='dashboard'>
-            <PageWrapper customeClass='dashboard'>
-              <PageTitle
-                parentClass='dashboard__header'
-                title={props.t('Dashboard')}
-                subtitle={''}
-              >
-                <div className='dashboard__header__advancedmode ml-3'>
-                  {idRoleUserWorkspace >= 8 &&
-                    <button
-                      type='button'
-                      className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                      onClick={this.handleClickOpenAdvancedDashboard}
-                    >
-                      {props.t('Open advanced Dashboard')}
-                    </button>
-                  }
-                </div>
-              </PageTitle>
-
-              <PageContent>
-                <div className='dashboard__workspace'>
-                  <div className='dashboard__workspace__detail'>
-                    <div className='dashboard__workspace__detail__title primaryColorFont'>
-                      {props.curWs.label}
-                    </div>
-
-                    <div
-                      className='dashboard__workspace__detail__description'
-                      dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
-                    />
-
-                    {idRoleUserWorkspace >= 2 && (
-                      <div className='dashboard__calltoaction'>
-                        {props.appList.map(app => {
-                          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-                          return (
-                            <ContentTypeBtn
-                              customClass='dashboard__calltoaction__button'
-                              hexcolor={app.hexcolor}
-                              label={app.label}
-                              faIcon={app.faIcon}
-                              // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
-                              // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
-                              creationLabel={props.t(contentType.creationLabel)}
-                              onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
-                              key={app.label}
-                            />
-                          )
-                        })}
-                      </div>
-                    )}
+            <PageContent>
+              <div className='dashboard__workspace'>
+                <div className='dashboard__workspace__detail'>
+                  <div className='dashboard__workspace__detail__title primaryColorFont'>
+                    {props.curWs.label}
                   </div>
 
-                  <UserStatus
-                    user={props.user}
-                    curWs={props.curWs}
-                    displayNotifBtn={state.displayNotifBtn}
-                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                    onClickAddNotify={this.handleClickAddNotification}
-                    onClickRemoveNotify={this.handleClickRemoveNotification}
-                    t={props.t}
+                  <div
+                    className='dashboard__workspace__detail__description'
+                    dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
                   />
+
+                  {idRoleUserWorkspace >= 2 && (
+                    <div className='dashboard__calltoaction'>
+                      {props.appList.map(app => {
+                        const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+                        return (
+                          <ContentTypeBtn
+                            customClass='dashboard__calltoaction__button'
+                            hexcolor={app.hexcolor}
+                            label={app.label}
+                            faIcon={app.faIcon}
+                            // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
+                            // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                            creationLabel={props.t(contentType.creationLabel)}
+                            onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                            key={app.label}
+                          />
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
 
-                <div className='dashboard__workspaceInfo'>
-                  <RecentActivity
-                    customClass='dashboard__activity'
-                    recentActivityList={props.curWs.recentActivityList}
-                    readByUserList={props.curWs.contentReadStatusList}
-                    contentTypeList={props.contentType}
-                    onClickRecentContent={this.handleClickRecentContent}
-                    onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
-                    onClickSeeMore={this.handleClickSeeMore}
-                    t={props.t}
-                  />
+                <UserStatus
+                  user={props.user}
+                  curWs={props.curWs}
+                  displayNotifBtn={state.displayNotifBtn}
+                  onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                  onClickAddNotify={this.handleClickAddNotification}
+                  onClickRemoveNotify={this.handleClickRemoveNotification}
+                  t={props.t}
+                />
+              </div>
 
-                  <MemberList
-                    customClass='dashboard__memberlist'
-                    memberList={props.curWs.memberList.filter(u => u.isActive)}
-                    roleList={ROLE}
-                    searchedKnownMemberList={state.searchedKnownMemberList}
-                    autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                    nameOrEmail={state.newMember.nameOrEmail}
-                    isEmail={state.newMember.isEmail}
-                    onChangeNameOrEmail={this.handleChangeNewMemberNameOrEmail}
-                    onClickKnownMember={this.handleClickKnownMember}
-                    // createAccount={state.newMember.createAccount}
-                    // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
-                    role={state.newMember.role}
-                    onChangeRole={this.handleChangeNewMemberRole}
-                    onClickValidateNewMember={this.handleClickValidateNewMember}
-                    onClickRemoveMember={this.handleClickRemoveMember}
-                    idRoleUserWorkspace={idRoleUserWorkspace}
-                    canSendInviteNewUser={[PROFILE.ADMINISTRATOR.slug, PROFILE.MANAGER.slug].includes(props.user.profile)}
-                    emailNotifActivated={props.system.config.email_notification_activated}
-                    autoCompleteClicked={state.autoCompleteClicked}
-                    onClickAutoComplete={this.handleClickAutoComplete}
-                    t={props.t}
-                  />
-                </div>
+              <div className='dashboard__workspaceInfo'>
+                <RecentActivity
+                  customClass='dashboard__activity'
+                  recentActivityList={props.curWs.recentActivityList}
+                  readByUserList={props.curWs.contentReadStatusList}
+                  contentTypeList={props.contentType}
+                  onClickRecentContent={this.handleClickRecentContent}
+                  onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
+                  onClickSeeMore={this.handleClickSeeMore}
+                  t={props.t}
+                />
 
-                {/*
-                  AC - 11/09/2018 - not included in v2.0 roadmap
-                  <MoreInfo
-                    onClickToggleWebdav={this.handleToggleWebdavBtn}
-                    displayWebdavBtn={state.displayWebdavBtn}
-                    onClickToggleCalendar={this.handleToggleCalendarBtn}
-                    displayCalendarBtn={state.displayCalendarBtn}
-                    t={props.t}
-                  />
-                */}
+                <MemberList
+                  customClass='dashboard__memberlist'
+                  memberList={props.curWs.memberList.filter(u => u.isActive)}
+                  roleList={ROLE}
+                  searchedKnownMemberList={state.searchedKnownMemberList}
+                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                  nameOrEmail={state.newMember.nameOrEmail}
+                  isEmail={state.newMember.isEmail}
+                  onChangeNameOrEmail={this.handleChangeNewMemberNameOrEmail}
+                  onClickKnownMember={this.handleClickKnownMember}
+                  // createAccount={state.newMember.createAccount}
+                  // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
+                  role={state.newMember.role}
+                  onChangeRole={this.handleChangeNewMemberRole}
+                  onClickValidateNewMember={this.handleClickValidateNewMember}
+                  onClickRemoveMember={this.handleClickRemoveMember}
+                  idRoleUserWorkspace={idRoleUserWorkspace}
+                  canSendInviteNewUser={[PROFILE.ADMINISTRATOR.slug, PROFILE.MANAGER.slug].includes(props.user.profile)}
+                  emailNotifActivated={props.system.config.email_notification_activated}
+                  autoCompleteClicked={state.autoCompleteClicked}
+                  onClickAutoComplete={this.handleClickAutoComplete}
+                  t={props.t}
+                />
+              </div>
 
-              </PageContent>
-            </PageWrapper>
-          </div>
+              {/*
+                AC - 11/09/2018 - not included in v2.0 roadmap
+                <MoreInfo
+                  onClickToggleWebdav={this.handleToggleWebdavBtn}
+                  displayWebdavBtn={state.displayWebdavBtn}
+                  onClickToggleCalendar={this.handleToggleCalendarBtn}
+                  displayCalendarBtn={state.displayCalendarBtn}
+                  t={props.t}
+                />
+              */}
+
+            </PageContent>
+          </PageWrapper>
         </div>
       </div>
     )

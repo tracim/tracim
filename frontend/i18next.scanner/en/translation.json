@@ -135,7 +135,6 @@
   "Not subscribed to notifications": "Not subscribed to notifications",
   "Have a good day !": "Have a good day !",
   "Please select a shared space in the left sidebar by clicking on it": "Please select a shared space in the left sidebar by clicking on it",
-  "An error has happened. Please try again.": "An error has happened. Please try again.",
   "Forgot password": "Forgot password",
   "Did you forget your password ?": "Did you forget your password ?",
   "Email": "Email",
@@ -156,5 +155,6 @@
   "Cannot reset password while email are disabled, please contact an administrator": "Cannot reset password while email are disabled, please contact an administrator",
   "Not a valid email": "Not a valid email",
   "An error has happened": "An error has happened",
-  "Email sent, don't forget to check your spam": "Email sent, don't forget to check your spam"
+  "Email sent, don't forget to check your spam": "Email sent, don't forget to check your spam",
+  "An error has happened, please try again.": "An error has happened, please try again."
 }

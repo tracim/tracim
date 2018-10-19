@@ -11,7 +11,8 @@ import {
 import {
   PAGE,
   workspaceConfig,
-  getUserProfile
+  getUserProfile,
+  unLoggedAllowedPageList
 } from '../helper.js'
 
 class Sidebar extends React.Component {
@@ -33,6 +34,7 @@ class Sidebar extends React.Component {
 
   componentDidMount () {
     const { props } = this
+    if (!this.shouldDisplaySidebar(props)) return
 
     if (
       props.match.params &&
@@ -52,6 +54,8 @@ class Sidebar extends React.Component {
     // the point is to avoid rerender the height animation
     const { props } = this
 
+    if (!this.shouldDisplaySidebar(nextProps)) return true
+
     // no ws open, rerender in case one gets opened by componentDidUpdate
     if (props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined) return true
 
@@ -69,6 +73,14 @@ class Sidebar extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  shouldDisplaySidebar = props => { // pass props to allow to pass nextProps in shouldComponentUpdate
+    return ![
+      ...unLoggedAllowedPageList,
+      ...props.workspaceList.length > 0 ? [] : [PAGE.HOME]
+    ]
+      .includes(props.location.pathname)
+  }
+
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
@@ -80,6 +92,8 @@ class Sidebar extends React.Component {
   render () {
     const { sidebarClose } = this.state
     const { user, activeLang, workspaceList, t } = this.props
+
+    if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
       <div className={classnames('sidebar primaryColorBg', {'sidebarclose': sidebarClose})}>

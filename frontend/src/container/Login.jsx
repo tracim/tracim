@@ -144,100 +144,96 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{pathname: '/'}} />
 
     return (
-      <div className='sidebarpagecontainer'>
-        <div className='tracim__content'>
-          <section className='unLoggedPage loginpage primaryColorBg'>
-            <div className='container-fluid'>
-              { /*
-                AC - 11/09/2018 - disable the logo to leave more space for the login form
-                <LoginLogo
-                  customClass='loginpage__logo'
-                  logoSrc={LoginLogoImg}
-                />
-              */ }
+      <section className='unLoggedPage loginpage primaryColorBg'>
+        <div className='container-fluid'>
+          { /*
+            AC - 11/09/2018 - disable the logo to leave more space for the login form
+            <LoginLogo
+              customClass='loginpage__logo'
+              logoSrc={LoginLogoImg}
+            />
+          */ }
 
-              <div className='row justify-content-center'>
-                <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-                  <Card customClass='loginpage__connection'>
-                    <CardHeader customClass='connection__header primaryColorBgLighten text-center'>
-                      {props.t('Connection')}
-                    </CardHeader>
+          <div className='row justify-content-center'>
+            <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
+              <Card customClass='loginpage__connection'>
+                <CardHeader customClass='connection__header primaryColorBgLighten text-center'>
+                  {props.t('Connection')}
+                </CardHeader>
 
-                    <CardBody formClass='connection__form'>
-                      <form>
-                        <InputGroupText
-                          parentClassName='connection__form__groupemail'
-                          customClass='mb-3 mt-4'
-                          icon='fa-envelope-open-o'
-                          type='email'
-                          placeHolder={props.t('Email Address')}
-                          invalidMsg='Email invalide.'
-                          isInvalid={state.inputLogin.isInvalid}
-                          value={state.inputLogin.value}
-                          onChange={this.handleChangeLogin}
-                          onKeyDown={this.handleInputKeyDown}
-                          maxLength={512}
-                        />
+                <CardBody formClass='connection__form'>
+                  <form>
+                    <InputGroupText
+                      parentClassName='connection__form__groupemail'
+                      customClass='mb-3 mt-4'
+                      icon='fa-envelope-open-o'
+                      type='email'
+                      placeHolder={props.t('Email Address')}
+                      invalidMsg='Email invalide.'
+                      isInvalid={state.inputLogin.isInvalid}
+                      value={state.inputLogin.value}
+                      onChange={this.handleChangeLogin}
+                      onKeyDown={this.handleInputKeyDown}
+                      maxLength={512}
+                    />
 
-                        <InputGroupText
-                          parentClassName='connection__form__groupepw'
-                          customClass=''
-                          icon='fa-lock'
-                          type='password'
-                          placeHolder={props.t('Password')}
-                          invalidMsg='Mot de passe invalide.'
-                          isInvalid={state.inputPassword.isInvalid}
-                          value={state.inputPassword.value}
-                          onChange={this.handleChangePassword}
-                          onKeyDown={this.handleInputKeyDown}
-                          maxLength={512}
-                        />
+                    <InputGroupText
+                      parentClassName='connection__form__groupepw'
+                      customClass=''
+                      icon='fa-lock'
+                      type='password'
+                      placeHolder={props.t('Password')}
+                      invalidMsg='Mot de passe invalide.'
+                      isInvalid={state.inputPassword.isInvalid}
+                      value={state.inputPassword.value}
+                      onChange={this.handleChangePassword}
+                      onKeyDown={this.handleInputKeyDown}
+                      maxLength={512}
+                    />
 
-                        <div className='row mt-4 mb-4'>
-                          <div className='col-12 col-sm-6'>
-                            <div
-                              className='connection__form__rememberme'
-                              onClick={this.handleChangeRememberMe}
-                              style={{'display': 'none'}}
-                              // AC - 10/09/2018 - not included in v2.0 roadmap
-                            >
-                              <Checkbox
-                                name='inputRememberMe'
-                                checked={state.inputRememberMe}
-                                onClickCheckbox={() => {}}
-                              />
-                              {props.t('Remember me')}
-                            </div>
-
-                            <div
-                              className='connection__form__pwforgot'
-                              onClick={this.handleClickForgotPassword}
-                            >
-                              {props.t('Forgotten password ?')}
-                            </div>
-                          </div>
-
-                          <div className='col-12 col-sm-6 d-flex align-items-end'>
-                            <Button
-                              htmlType='button'
-                              bootstrapType='primary'
-                              customClass='btnSubmit connection__form__btnsubmit ml-auto'
-                              label={props.t('Connection')}
-                              onClick={this.handleClickSubmit}
-                            />
-                          </div>
+                    <div className='row mt-4 mb-4'>
+                      <div className='col-12 col-sm-6'>
+                        <div
+                          className='connection__form__rememberme'
+                          onClick={this.handleChangeRememberMe}
+                          style={{'display': 'none'}}
+                          // AC - 10/09/2018 - not included in v2.0 roadmap
+                        >
+                          <Checkbox
+                            name='inputRememberMe'
+                            checked={state.inputRememberMe}
+                            onClickCheckbox={() => {}}
+                          />
+                          {props.t('Remember me')}
                         </div>
-                      </form>
-                    </CardBody>
-                  </Card>
-                </div>
-              </div>
-            </div>
 
-            <FooterLogin />
-          </section>
+                        <div
+                          className='connection__form__pwforgot'
+                          onClick={this.handleClickForgotPassword}
+                        >
+                          {props.t('Forgotten password ?')}
+                        </div>
+                      </div>
+
+                      <div className='col-12 col-sm-6 d-flex align-items-end'>
+                        <Button
+                          htmlType='button'
+                          bootstrapType='primary'
+                          customClass='btnSubmit connection__form__btnsubmit ml-auto'
+                          label={props.t('Connection')}
+                          onClick={this.handleClickSubmit}
+                        />
+                      </div>
+                    </div>
+                  </form>
+                </CardBody>
+              </Card>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <FooterLogin />
+      </section>
     )
   }
 }

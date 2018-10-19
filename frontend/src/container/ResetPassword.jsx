@@ -61,7 +61,7 @@ export class ResetPassword extends React.Component {
         props.history.push(PAGE.LOGIN)
         props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login'), 'info'))
         break
-      default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning'))
+      default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again.'), 'warning'))
     }
   }
 
@@ -69,65 +69,61 @@ export class ResetPassword extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='sidebarpagecontainer'>
-        <div className='tracim__content'>
-          <section className='unLoggedPage resetpassword primaryColorBg'>
-            <div className='container-fluid'>
-              <div className='row justify-content-center'>
-                <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-                  <Card customClass='resetpassword__card'>
-                    <CardHeader customClass='resetpassword__card__header primaryColorBgLighten text-center'>
-                      {props.t('Reset password')}
-                    </CardHeader>
+      <section className='unLoggedPage resetpassword primaryColorBg'>
+        <div className='container-fluid'>
+          <div className='row justify-content-center'>
+            <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
+              <Card customClass='resetpassword__card'>
+                <CardHeader customClass='resetpassword__card__header primaryColorBgLighten text-center'>
+                  {props.t('Reset password')}
+                </CardHeader>
 
-                    <CardBody formClass='resetpassword__card__body'>
-                      <div>
-                        <InputGroupText
-                          parentClassName='resetpassword__card__body__groupemail'
-                          customClass=''
-                          icon='fa-lock'
-                          type='password'
-                          placeHolder={props.t('Password')}
-                          value={state.newPassword}
-                          invalidMsg=''
-                          onChange={this.handleChangePassword}
-                          onKeyDown={this.handleInputKeyDown}
-                          maxLength={512}
-                        />
+                <CardBody formClass='resetpassword__card__body'>
+                  <div>
+                    <InputGroupText
+                      parentClassName='resetpassword__card__body__groupemail'
+                      customClass=''
+                      icon='fa-lock'
+                      type='password'
+                      placeHolder={props.t('Password')}
+                      value={state.newPassword}
+                      invalidMsg=''
+                      onChange={this.handleChangePassword}
+                      onKeyDown={this.handleInputKeyDown}
+                      maxLength={512}
+                    />
 
-                        <InputGroupText
-                          parentClassName='resetpassword__card__body__groupemail'
-                          customClass=''
-                          icon='fa-lock'
-                          type='password'
-                          placeHolder={props.t('Confirm password')}
-                          value={state.newPassword2}
-                          invalidMsg=''
-                          onChange={this.handleChangePassword2}
-                          onKeyDown={this.handleInputKeyDown}
-                          maxLength={512}
-                        />
+                    <InputGroupText
+                      parentClassName='resetpassword__card__body__groupemail'
+                      customClass=''
+                      icon='fa-lock'
+                      type='password'
+                      placeHolder={props.t('Confirm password')}
+                      value={state.newPassword2}
+                      invalidMsg=''
+                      onChange={this.handleChangePassword2}
+                      onKeyDown={this.handleInputKeyDown}
+                      maxLength={512}
+                    />
 
-                        <div className='d-flex align-items-end'>
-                          <Button
-                            htmlType='button'
-                            bootstrapType=''
-                            customClass='btnSubmit resetpassword__card__body__btnsubmit ml-auto'
-                            label={props.t('Validate')}
-                            onClick={this.handleClickSubmit}
-                          />
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </div>
-              </div>
+                    <div className='d-flex align-items-end'>
+                      <Button
+                        htmlType='button'
+                        bootstrapType=''
+                        customClass='btnSubmit resetpassword__card__body__btnsubmit ml-auto'
+                        label={props.t('Validate')}
+                        onClick={this.handleClickSubmit}
+                      />
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
             </div>
-
-            <FooterLogin />
-          </section>
+          </div>
         </div>
-      </div>
+
+        <FooterLogin />
+      </section>
     )
   }
 }

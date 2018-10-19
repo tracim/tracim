@@ -34,6 +34,7 @@ import {
   setWorkspaceList
 } from '../action-creator.sync.js'
 import Dashboard from './Dashboard.jsx'
+import Sidebar from './Sidebar.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -147,48 +148,56 @@ class Tracim extends React.Component {
         <Header />
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
-        <Route path={PAGE.LOGIN} component={Login} />
+        <div className='sidebarpagecontainer'>
+          <Route
+            // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
+            // able to access props.match.params.idws
+            // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
+            path='/:first?/:idws?/*' render={() => <Sidebar />}
+          />
 
-        <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
+          <div className='tracim__content'>
+            <Route path={PAGE.LOGIN} component={Login} />
 
-        <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
+            <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
 
-        <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
+            <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
-        <Route path='/workspaces/:idws?' render={() => // Workspace Router
-          <div>
-            <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
-              <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
+            <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
+
+            <Route path='/workspaces/:idws?' render={() => // Workspace Router
+              <div>
+                <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
+                  <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
+                } />
+
+                <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
+                  <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
+                } />
+
+                <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
+                <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
+                <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
+                <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
+              </div>
             } />
 
-            <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-              <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
-            } />
+            <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
-            <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
-            <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
-            <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
-            <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
+            <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() => <AdminAccount />} />
+
+            <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
+
+            <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
+
+            <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
+
+            {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
+            <div id='appFullscreenContainer' />
+            <div id='appFeatureContainer' />
+            <div id='popupCreateContentContainer' />
           </div>
-        } />
-
-        <Route path={PAGE.ACCOUNT} render={() =>
-          <Account />
-        } />
-
-        <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
-          <AdminAccount />
-        } />
-
-        <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
-        <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
-
-        <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
-
-        {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
-        <div id='appFeatureContainer' />
-        <div id='appFullscreenContainer' />
-        <div id='popupCreateContentContainer' />
+        </div>
       </div>
     )
   }

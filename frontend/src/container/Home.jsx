@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import { workspaceConfig } from '../helper.js'
-import Sidebar from './Sidebar.jsx'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -31,31 +30,27 @@ class Home extends React.Component {
     }
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
+      <div className='tracim__content'>
+        <section
+          className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
+          style={styleHomepage}
+        >
+          <div className='container-fluid nopadding'>
+            <Card customClass='homepagecard'>
+              <CardHeader displayHeader={false} />
 
-        <div className='tracim__content'>
-          <section
-            className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
-            style={styleHomepage}
-          >
-            <div className='container-fluid nopadding'>
-              <Card customClass='homepagecard'>
-                <CardHeader displayHeader={false} />
-
-                <CardBody customClass='homepagecard'>
-                  {props.workspaceList.length > 0
-                    ? <HomeHasWorkspace user={props.user} />
-                    : <HomeNoWorkspace
-                      canCreateWorkspace={props.canCreateWorkspace}
-                      onClickCreateWorkspace={this.handleClickCreateWorkspace}
-                    />
-                  }
-                </CardBody>
-              </Card>
-            </div>
-          </section>
-        </div>
+              <CardBody customClass='homepagecard'>
+                {props.workspaceList.length > 0
+                  ? <HomeHasWorkspace user={props.user} />
+                  : <HomeNoWorkspace
+                    canCreateWorkspace={props.canCreateWorkspace}
+                    onClickCreateWorkspace={this.handleClickCreateWorkspace}
+                  />
+                }
+              </CardBody>
+            </Card>
+          </div>
+        </section>
       </div>
     )
   }

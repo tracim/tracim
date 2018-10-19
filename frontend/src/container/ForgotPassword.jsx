@@ -39,10 +39,10 @@ export class ForgotPassword extends React.Component {
           case 1001: props.dispatch(newFlashMessage(props.t('Unknown email'), 'warning')); break
           case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
           case 2046: props.dispatch(newFlashMessage(props.t('Cannot reset password while email are disabled, please contact an administrator'), 'warning')); break
-          default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning')); break
+          default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again.'), 'warning')); break
         }
         break
-      default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning'))
+      default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again.'), 'warning'))
     }
   }
 
@@ -50,69 +50,65 @@ export class ForgotPassword extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='sidebarpagecontainer'>
-        <div className='tracim__content'>
-          <section className='unLoggedPage forgotpassword primaryColorBg'>
-            <div className='container-fluid'>
-              <div className='row justify-content-center'>
-                <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-                  <Card customClass='forgotpassword__card'>
-                    <CardHeader customClass='forgotpassword__card__header primaryColorBgLighten text-center'>
-                      {props.t('Forgot password')}
-                    </CardHeader>
+      <section className='unLoggedPage forgotpassword primaryColorBg'>
+        <div className='container-fluid'>
+          <div className='row justify-content-center'>
+            <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
+              <Card customClass='forgotpassword__card'>
+                <CardHeader customClass='forgotpassword__card__header primaryColorBgLighten text-center'>
+                  {props.t('Forgot password')}
+                </CardHeader>
 
-                    <CardBody formClass='forgotpassword__card__body'>
-                      <div>
-                        <div className='forgotpassword__card__body__title'>
-                          {props.t('Did you forget your password ?')}
-                        </div>
+                <CardBody formClass='forgotpassword__card__body'>
+                  <div>
+                    <div className='forgotpassword__card__body__title'>
+                      {props.t('Did you forget your password ?')}
+                    </div>
 
-                        <InputGroupText
-                          parentClassName='forgotpassword__card__body__groupemail'
-                          customClass=''
-                          icon='fa-envelope-open-o'
-                          type='email'
-                          placeHolder={props.t('Email')}
-                          invalidMsg='Email invalide.'
-                          // isInvalid={this.state.inputLogin.isInvalid}
-                          value={state.backupEmail.value}
-                          onChange={this.handleChangeBackupEmail}
-                          onKeyDown={this.handleInputKeyDown}
-                          maxLength={512}
-                        />
+                    <InputGroupText
+                      parentClassName='forgotpassword__card__body__groupemail'
+                      customClass=''
+                      icon='fa-envelope-open-o'
+                      type='email'
+                      placeHolder={props.t('Email')}
+                      invalidMsg='Email invalide.'
+                      // isInvalid={this.state.inputLogin.isInvalid}
+                      value={state.backupEmail.value}
+                      onChange={this.handleChangeBackupEmail}
+                      onKeyDown={this.handleInputKeyDown}
+                      maxLength={512}
+                    />
 
-                        <div className='forgotpassword__card__body__submsg'>
-                          {props.t('We are going to send you an email containing a link to reset your password')}
-                        </div>
+                    <div className='forgotpassword__card__body__submsg'>
+                      {props.t('We are going to send you an email containing a link to reset your password')}
+                    </div>
 
-                        <div className='forgotpassword__card__body__btn'>
-                          <Button
-                            htmlType='button'
-                            bootstrapType=''
-                            customClass='outlineTextBtn nohover forgotpassword__card__body__btncancel btn primaryColorFont primaryColorBorder'
-                            label={props.t('Cancel')}
-                            onClick={this.handleClickCancel}
-                          />
+                    <div className='forgotpassword__card__body__btn'>
+                      <Button
+                        htmlType='button'
+                        bootstrapType=''
+                        customClass='outlineTextBtn nohover forgotpassword__card__body__btncancel btn primaryColorFont primaryColorBorder'
+                        label={props.t('Cancel')}
+                        onClick={this.handleClickCancel}
+                      />
 
-                          <Button
-                            htmlType='button'
-                            bootstrapType=''
-                            customClass='btnSubmit forgotpassword__card__body__btnsubmit'
-                            label={props.t('Validate')}
-                            onClick={this.handleClickSubmit}
-                          />
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </div>
-              </div>
+                      <Button
+                        htmlType='button'
+                        bootstrapType=''
+                        customClass='btnSubmit forgotpassword__card__body__btnsubmit'
+                        label={props.t('Validate')}
+                        onClick={this.handleClickSubmit}
+                      />
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
             </div>
-
-            <FooterLogin />
-          </section>
+          </div>
         </div>
-      </div>
+
+        <FooterLogin />
+      </section>
     )
   }
 }
