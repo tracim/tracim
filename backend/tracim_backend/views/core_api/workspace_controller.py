@@ -790,9 +790,9 @@ class WorkspaceController(Controller):
         configurator.add_route('create_workspace', '/workspaces', request_method='POST')  # nopep8
         configurator.add_view(self.create_workspace, route_name='create_workspace')  # nopep8
         # Delete/Undelete workpace
-        configurator.add_route('delete_workspace', '/workspaces/{workspace_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_route('delete_workspace', '/workspaces/{workspace_id}/trashed', request_method='PUT')  # nopep8
         configurator.add_view(self.delete_workspace, route_name='delete_workspace')  # nopep8
-        configurator.add_route('undelete_workspace', '/workspaces/{workspace_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_route('undelete_workspace', '/workspaces/{workspace_id}/trashed/restore', request_method='PUT')  # nopep8
         configurator.add_view(self.undelete_workspace, route_name='undelete_workspace')  # nopep8
         # Update Workspace
         configurator.add_route('update_workspace', '/workspaces/{workspace_id}', request_method='PUT')  # nopep8
@@ -828,12 +828,12 @@ class WorkspaceController(Controller):
         configurator.add_route('move_content', '/workspaces/{workspace_id}/contents/{content_id}/move', request_method='PUT')  # nopep8
         configurator.add_view(self.move_content, route_name='move_content')  # nopep8
         # Delete/Undelete Content
-        configurator.add_route('delete_content', '/workspaces/{workspace_id}/contents/{content_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_route('delete_content', '/workspaces/{workspace_id}/contents/{content_id}/trashed', request_method='PUT')  # nopep8
         configurator.add_view(self.delete_content, route_name='delete_content')  # nopep8
-        configurator.add_route('undelete_content', '/workspaces/{workspace_id}/contents/{content_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_route('undelete_content', '/workspaces/{workspace_id}/contents/{content_id}/trashed/restore', request_method='PUT')  # nopep8
         configurator.add_view(self.undelete_content, route_name='undelete_content')  # nopep8
         # # Archive/Unarchive Content
-        configurator.add_route('archive_content', '/workspaces/{workspace_id}/contents/{content_id}/archive', request_method='PUT')  # nopep8
+        configurator.add_route('archive_content', '/workspaces/{workspace_id}/contents/{content_id}/archived', request_method='PUT')  # nopep8
         configurator.add_view(self.archive_content, route_name='archive_content')  # nopep8
-        configurator.add_route('unarchive_content', '/workspaces/{workspace_id}/contents/{content_id}/unarchive', request_method='PUT')  # nopep8
+        configurator.add_route('unarchive_content', '/workspaces/{workspace_id}/contents/{content_id}/archived/restore', request_method='PUT')  # nopep8
         configurator.add_view(self.unarchive_content, route_name='unarchive_content')  # nopep8

@@ -3483,7 +3483,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/users/{}/delete'.format(user_id),
+            '/api/v2/users/{}/trashed'.format(user_id),
             status=204
         )
         res = self.testapp.get(
@@ -5099,8 +5099,8 @@ class TestSetUserProfilEndpoint(FunctionalTest):
 class TestSetUserEnableDisableEndpoints(FunctionalTest):
     # -*- coding: utf-8 -*-
     """
-    Tests for PUT /api/v2/users/{user_id}/enable
-    and PUT /api/v2/users/{user_id}/disable
+    Tests for PUT /api/v2/users/{user_id}/enabled
+    and PUT /api/v2/users/{user_id}/disabled
     """
     fixtures = [BaseFixture]
 
@@ -5151,7 +5151,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is False
         self.testapp.put_json(
-            '/api/v2/users/{}/enable'.format(user_id),
+            '/api/v2/users/{}/enabled'.format(user_id),
             status=204,
         )
         # Check After
@@ -5210,7 +5210,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is True
         self.testapp.put_json(
-            '/api/v2/users/{}/disable'.format(user_id),
+            '/api/v2/users/{}/disabled'.format(user_id),
             status=204,
         )
         # Check After
@@ -5272,7 +5272,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             )
         )
         res = self.testapp.put_json(
-            '/api/v2/users/{}/enable'.format(user_id),
+            '/api/v2/users/{}/enabled'.format(user_id),
             status=403,
         )
         assert res.json_body
@@ -5329,7 +5329,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             )
         )
         res = self.testapp.put_json(
-            '/api/v2/users/{}/disable'.format(user_id),
+            '/api/v2/users/{}/disabled'.format(user_id),
             status=403,
         )
         assert isinstance(res.json, dict)
@@ -5383,7 +5383,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['is_active'] is True
         res = self.testapp.put_json(
-            '/api/v2/users/{}/disable'.format(user_id),
+            '/api/v2/users/{}/disabled'.format(user_id),
             status=403,
         )
         assert res.json_body

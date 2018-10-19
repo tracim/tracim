@@ -1069,7 +1069,7 @@ class TestHtmlDocuments(FunctionalTest):
             )
         )
         res = self.testapp.put_json(
-            '/api/v2/workspaces/2/contents/6/archive',
+            '/api/v2/workspaces/2/contents/6/archived',
             status=204
         )
         res = self.testapp.get(
@@ -1093,7 +1093,7 @@ class TestHtmlDocuments(FunctionalTest):
             )
         )
         res = self.testapp.put_json(
-            '/api/v2/workspaces/2/contents/6/delete',
+            '/api/v2/workspaces/2/contents/6/trashed',
             status=204
         )
         res = self.testapp.get(

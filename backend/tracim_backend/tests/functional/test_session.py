@@ -14,10 +14,10 @@ from tracim_backend.tests import FunctionalTestNoDB
 class TestLogoutEndpoint(FunctionalTest):
 
     def test_api__access_logout_get_enpoint__ok__nominal_case(self):
-        res = self.testapp.post_json('/api/v2/sessions/logout', status=204)
+        res = self.testapp.post_json('/api/v2/auth/logout', status=204)
 
     def test_api__access_logout_post_enpoint__ok__nominal_case(self):
-        res = self.testapp.get('/api/v2/sessions/logout', status=204)
+        res = self.testapp.get('/api/v2/auth/logout', status=204)
 
 
 class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
@@ -28,7 +28,7 @@ class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
             'password': 'admin@admin.admin',
         }
         res = self.testapp.post_json(
-            '/api/v2/sessions/login',
+            '/api/v2/auth/login',
             params=params,
             status=500,
         )
@@ -46,7 +46,7 @@ class TestLoginEndpoint(FunctionalTest):
             'password': 'admin@admin.admin',
         }
         res = self.testapp.post_json(
-            '/api/v2/sessions/login',
+            '/api/v2/auth/login',
             params=params,
             status=200,
         )
@@ -97,7 +97,7 @@ class TestLoginEndpoint(FunctionalTest):
             'password': 'test@test.test',
         }
         res = self.testapp.post_json(
-            '/api/v2/sessions/login',
+            '/api/v2/auth/login',
             params=params,
             status=403,
         )
@@ -111,7 +111,7 @@ class TestLoginEndpoint(FunctionalTest):
             'password': 'bad_password',
         }
         res = self.testapp.post_json(
-            '/api/v2/sessions/login',
+            '/api/v2/auth/login',
             status=403,
             params=params,
         )
@@ -127,7 +127,7 @@ class TestLoginEndpoint(FunctionalTest):
             'password': 'bad_password',
         }
         res = self.testapp.post_json(
-            '/api/v2/sessions/login',
+            '/api/v2/auth/login',
             status=403,
             params=params,
         )
@@ -138,7 +138,7 @@ class TestLoginEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
     def test_api__try_login_enpoint__err_400__no_json_body(self):
-        res = self.testapp.post_json('/api/v2/sessions/login', status=400)
+        res = self.testapp.post_json('/api/v2/auth/login', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
@@ -157,7 +157,7 @@ class TestWhoamiEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/sessions/whoami', status=200)
+        res = self.testapp.get('/api/v2/auth/whoami', status=200)
         assert res.json_body['public_name'] == 'Global manager'
         assert res.json_body['email'] == 'admin@admin.admin'
         assert res.json_body['created']
@@ -205,7 +205,7 @@ class TestWhoamiEndpoint(FunctionalTest):
             )
         )
 
-        res = self.testapp.get('/api/v2/sessions/whoami', status=401)
+        res = self.testapp.get('/api/v2/auth/whoami', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
@@ -221,7 +221,7 @@ class TestWhoamiEndpoint(FunctionalTest):
                 'lapin'
             )
         )
-        res = self.testapp.get('/api/v2/sessions/whoami', status=401)
+        res = self.testapp.get('/api/v2/auth/whoami', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert res.json_body['code'] is None
@@ -237,7 +237,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
                 'Tracim-Api-Login': 'admin@admin.admin',
         }
         res = self.testapp.get(
-            '/api/v2/sessions/whoami',
+            '/api/v2/auth/whoami',
             status=200,
             headers=headers_auth
         )
@@ -283,7 +283,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
                 'Tracim-Api-Login': 'test@test.test',
         }
         res = self.testapp.get(
-            '/api/v2/sessions/whoami',
+            '/api/v2/auth/whoami',
             status=401,
             headers=headers_auth
         )
@@ -297,7 +297,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
                 'Tracim-Api-Login': 'john@doe.doe',
         }
         res = self.testapp.get(
-            '/api/v2/sessions/whoami',
+            '/api/v2/auth/whoami',
             status=401,
             headers=headers_auth
         )
@@ -318,7 +318,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 'password': 'admin@admin.admin',
             }
             res = self.testapp.post_json(
-                '/api/v2/sessions/login',
+                '/api/v2/auth/login',
                 params=params,
                 status=200,
             )
@@ -329,7 +329,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # session_id should not be return before x time
         with freeze_time("2000-01-01 00:00:00"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' not in res.headers
@@ -340,7 +340,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # after x time session_id should be renew
         with freeze_time("2000-01-01 00:02:01"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' in res.headers
@@ -351,7 +351,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # after too much time, session_id should be revoked
         with freeze_time("2000-01-01 00:12:02"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 params=params,
                 status=401,
             )
@@ -372,7 +372,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 'password': 'admin@admin.admin',
             }
             res = self.testapp.post_json(
-                '/api/v2/sessions/login',
+                '/api/v2/auth/login',
                 params=params,
                 status=200,
             )
@@ -399,7 +399,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # session_id should not be return before x time
         with freeze_time("2000-01-01 00:00:00"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' not in res.headers
@@ -410,7 +410,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # after x time session_id should be renew
         with freeze_time("2000-01-01 00:02:01"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' in res.headers
@@ -421,7 +421,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # after too much time, session_id should be revoked
         with freeze_time("2000-01-01 00:12:02"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 params=params,
                 status=401,
             )
@@ -433,7 +433,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 'password': 'admin@admin.admin',
             }
             res = self.testapp.post_json(
-                '/api/v2/sessions/login',
+                '/api/v2/auth/login',
                 params=params,
                 status=200,
             )
@@ -443,7 +443,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
 
         with freeze_time("2000-01-01 00:00:00"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' not in res.headers
@@ -452,14 +452,14 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             assert user_session_key_1 == user_session_key_2
 
             res = self.testapp.post_json(
-                '/api/v2/sessions/logout',
+                '/api/v2/auth/logout',
                 status=204,
             )
             assert 'Set-Cookie' in res.headers
 
         with freeze_time("2000-01-01 00:00:02"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=401,
             )
             assert 'Set-Cookie' in res.headers
@@ -474,7 +474,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             self.testapp.reset()
             self.testapp.set_cookie('session_key', user_session_key_1)
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=401,
             )
             assert isinstance(res.json, dict)
@@ -490,7 +490,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 'password': 'admin@admin.admin',
             }
             res = self.testapp.post_json(
-                '/api/v2/sessions/login',
+                '/api/v2/auth/login',
                 params=params,
                 status=200,
             )
@@ -501,7 +501,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # session_id should not be return before x time
         with freeze_time("2000-01-01 00:00:00"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' not in res.headers
@@ -512,7 +512,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         # after x time session_id should be renew
         with freeze_time("2000-01-01 00:02:01"):
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
             assert 'Set-Cookie' in res.headers
@@ -525,7 +525,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             self.testapp.reset()
             self.testapp.set_cookie('session_key', user_session_key_1)
             self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=200,
             )
 
@@ -534,7 +534,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             self.testapp.reset()
             self.testapp.set_cookie('session_key', user_session_key_1)
             res = self.testapp.get(
-                '/api/v2/sessions/whoami',
+                '/api/v2/auth/whoami',
                 status=401,
             )
             assert isinstance(res.json, dict)

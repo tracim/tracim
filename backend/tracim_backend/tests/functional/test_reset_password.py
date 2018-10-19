@@ -20,7 +20,7 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
             'email': 'admin@admin.admin'
         }
         self.testapp.post_json(
-            '/api/v2/reset_password/request',
+            '/api/v2/auth/password/reset/request',
             status=204,
             params=params,
         )
@@ -39,7 +39,7 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
             'email': 'this@does.notexist'
         }
         res = self.testapp.post_json(
-            '/api/v2/reset_password/request',
+            '/api/v2/auth/password/reset/request',
             status=400,
             params=params,
         )
@@ -62,7 +62,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
             'email': 'admin@admin.admin'
         }
         self.testapp.post_json(
-            '/api/v2/reset_password/request',
+            '/api/v2/auth/password/reset/request',
             status=400,
             params=params,
         )
@@ -88,7 +88,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
             'reset_password_token': reset_password_token
         }
         self.testapp.post_json(
-            '/api/v2/reset_password/check_token',
+            '/api/v2/auth/password/reset/token/check',
             status=204,
             params=params,
         )
@@ -110,7 +110,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
             'reset_password_token': reset_password_token
         }
         res = self.testapp.post_json(
-            '/api/v2/reset_password/check_token',
+            '/api/v2/auth/password/reset/token/check',
             status=400,
             params=params,
         )
@@ -141,7 +141,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             'new_password2': 'mynewpassword',
         }
         self.testapp.post_json(
-            '/api/v2/reset_password/modify',
+            '/api/v2/auth/password/reset/modify',
             status=204,
             params=params,
         )
@@ -164,7 +164,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             'new_password2': 'mynewpassword',
         }
         res = self.testapp.post_json(
-            '/api/v2/reset_password/modify',
+            '/api/v2/auth/password/reset/modify',
             status=400,
             params=params,
         )
@@ -196,7 +196,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             transaction.commit()
         with freeze_time("2000-01-01 00:00:05"):
             res = self.testapp.post_json(
-                '/api/v2/reset_password/modify',
+                '/api/v2/auth/password/reset/modify',
                 status=400,
                 params=params,
             )
@@ -223,7 +223,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             'new_password2': 'anotherpassword',
         }
         res = self.testapp.post_json(
-            '/api/v2/reset_password/modify',
+            '/api/v2/auth/password/reset/modify',
             status=400,
             params=params,
         )

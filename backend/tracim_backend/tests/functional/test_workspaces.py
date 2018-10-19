@@ -272,7 +272,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed'.format(workspace_id),
             status=204
         )
         res = self.testapp.get(
@@ -347,7 +347,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed'.format(workspace_id),
             status=204
         )
         res = self.testapp.get(
@@ -408,7 +408,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed'.format(workspace_id),
             status=403
         )
         assert isinstance(res.json, dict)
@@ -472,7 +472,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed'.format(workspace_id),
             status=403
         )
         assert isinstance(res.json, dict)
@@ -532,7 +532,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed'.format(workspace_id),
             status=400
         )
         assert isinstance(res.json, dict)
@@ -585,7 +585,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
             status=204
         )
         res = self.testapp.get(
@@ -662,7 +662,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
             status=204
         )
         res = self.testapp.get(
@@ -724,7 +724,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
             status=403
         )
         assert isinstance(res.json, dict)
@@ -789,7 +789,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
             status=403
         )
         assert isinstance(res.json, dict)
@@ -849,7 +849,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         # delete
         res = self.testapp.put(
-            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
             status=400
         )
         assert isinstance(res.json, dict)
@@ -3759,7 +3759,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
-            '/api/v2/workspaces/2/contents/8/delete',
+            '/api/v2/workspaces/2/contents/8/trashed',
             status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
@@ -3796,7 +3796,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert [content for content in active_contents if content['content_id'] == 8]  # nopep8
         assert not [content for content in archived_contents if content['content_id'] == 8]  # nopep8
         res = self.testapp.put_json(
-            '/api/v2/workspaces/2/contents/8/archive',
+            '/api/v2/workspaces/2/contents/8/archived',
             status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
@@ -3833,7 +3833,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert not [content for content in active_contents if content['content_id'] == 14]  # nopep8
         assert [content for content in deleted_contents if content['content_id'] == 14]  # nopep8
         res = self.testapp.put_json(
-            '/api/v2/workspaces/2/contents/14/undelete',
+            '/api/v2/workspaces/2/contents/14/trashed/restore',
             status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
@@ -3870,7 +3870,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert not [content for content in active_contents if content['content_id'] == 13]  # nopep8
         assert [content for content in archived_contents if content['content_id'] == 13]  # nopep8
         res = self.testapp.put_json(
-            '/api/v2/workspaces/2/contents/13/unarchive',
+            '/api/v2/workspaces/2/contents/13/archived/restore',
             status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8

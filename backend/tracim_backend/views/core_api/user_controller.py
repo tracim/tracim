@@ -582,19 +582,19 @@ class UserController(Controller):
         configurator.add_view(self.create_user, route_name='create_user')
 
         # enable user
-        configurator.add_route('enable_user', '/users/{user_id}/enable', request_method='PUT')  # nopep8
+        configurator.add_route('enable_user', '/users/{user_id}/enabled', request_method='PUT')  # nopep8
         configurator.add_view(self.enable_user, route_name='enable_user')
 
         # disable user
-        configurator.add_route('disable_user', '/users/{user_id}/disable', request_method='PUT')  # nopep8
+        configurator.add_route('disable_user', '/users/{user_id}/disabled', request_method='PUT')  # nopep8
         configurator.add_view(self.disable_user, route_name='disable_user')
 
         # delete user
-        configurator.add_route('delete_user', '/users/{user_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_route('delete_user', '/users/{user_id}/trashed', request_method='PUT')  # nopep8
         configurator.add_view(self.delete_user, route_name='delete_user')
 
         # undelete user
-        configurator.add_route('undelete_user', '/users/{user_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_route('undelete_user', '/users/{user_id}/trashed/restore', request_method='PUT')  # nopep8
         configurator.add_view(self.undelete_user, route_name='undelete_user')
 
         # set user profile

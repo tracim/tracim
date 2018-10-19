@@ -73,13 +73,13 @@ class SessionController(Controller):
     def bind(self, configurator: Configurator):
 
         # Login
-        configurator.add_route('login', '/sessions/login', request_method='POST')  # nopep8
+        configurator.add_route('login', '/auth/login', request_method='POST')  # nopep8
         configurator.add_view(self.login, route_name='login')
         # Logout
-        configurator.add_route('logout', '/sessions/logout', request_method='POST')  # nopep8
+        configurator.add_route('logout', '/auth/logout', request_method='POST')  # nopep8
         configurator.add_view(self.logout, route_name='logout')
-        configurator.add_route('logout_get', '/sessions/logout', request_method='GET')  # nopep8
+        configurator.add_route('logout_get', '/auth/logout', request_method='GET')  # nopep8
         configurator.add_view(self.logout, route_name='logout_get')
         # Whoami
-        configurator.add_route('whoami', '/sessions/whoami', request_method='GET')  # nopep8
+        configurator.add_route('whoami', '/auth/whoami', request_method='GET')  # nopep8
         configurator.add_view(self.whoami, route_name='whoami',)
