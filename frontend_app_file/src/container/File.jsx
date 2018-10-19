@@ -488,6 +488,7 @@ class File extends React.Component {
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== MODE.VIEW || state.content.is_archived || state.content.is_deleted}
+                  label={props.t('Update')}
                 />
               }
 

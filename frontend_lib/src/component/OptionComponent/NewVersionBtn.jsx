@@ -21,7 +21,7 @@ const NewVersionBtn = props => {
       }}
     >
       <i className='fa fa-plus-circle mr-3' />
-      {props.t('Edit')}
+      {props.label}
     </button>
   )
 }
