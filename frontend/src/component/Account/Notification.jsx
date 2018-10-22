@@ -40,7 +40,7 @@ export const Notification = props =>
                         <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
                       </div>
                       <div className='notification__table__role__text d-none d-sm-flex'>
-                        {myRole.label}
+                        {props.t(myRole.label)}
                       </div>
                     </div>
                   </td>
