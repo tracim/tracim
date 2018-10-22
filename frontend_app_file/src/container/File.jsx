@@ -551,6 +551,7 @@ class File extends React.Component {
             downloadRawUrl={(({config, content, mode}) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw?force_download=1`
             )(state)}
+            isPdfAvailable={state.content.pdf_available}
             downloadPdfPageUrl={(({config, content, mode}) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${state.fileCurrentPage}&force_download=1`
             )(state)}
