@@ -263,7 +263,7 @@ class WorkspaceAdvanced extends React.Component {
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while removing user from shared space', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while removing member', 'warning'))
     }
   }
 
