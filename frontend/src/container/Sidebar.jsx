@@ -49,15 +49,18 @@ class Sidebar extends React.Component {
     }
   }
 
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate (nextProps, nextState) {
     // Côme - 2018/10/16 - this is to avoid rerender workspace list if a workspace is open and if it isn't required.
     // the point is to avoid rerender the height animation
-    const { props } = this
+    const { props, state } = this
 
     if (!this.shouldDisplaySidebar(nextProps)) return true
 
     // no ws open, rerender in case one gets opened by componentDidUpdate
     if (props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined) return true
+
+    // check if state sidebarClose has changed
+    if (state.sidebarClose !== nextState.sidebarClose) return true
 
     // check if a label has been changed (if label changed, slug changed too)
     if (JSON.stringify(props.workspaceList.map(ws => ws.slug)) !== JSON.stringify(nextProps.workspaceList.map(ws => ws.slug))) return true
