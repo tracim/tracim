@@ -4,9 +4,9 @@ import typing
 import transaction
 from depot.manager import DepotManager
 from hapic.data import HapicFile
-from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 
+from preview_generator.exception import UnavailablePreviewType
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
@@ -31,16 +31,18 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
-from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
+from tracim_backend.views.core_api.schemas import FilePathSchema
+from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
+from tracim_backend.views.core_api.schemas import FileRevisionPathSchema
+from tracim_backend.views.core_api.schemas import \
+    FileRevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PageQuerySchema
-from tracim_backend.views.core_api.schemas import \
-    RevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import \
@@ -128,7 +130,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
@@ -167,7 +169,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.input_query(FileQuerySchema())
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
     def download_file(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -186,10 +188,13 @@ class FileController(Controller):
             content_type=content_type_list.Any_SLUG
         )
         file = DepotManager.get().get(content.depot_file)
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = content.file_name
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,
-            filename=content.file_name,
+            filename=filename,
             as_attachment=hapic_data.query.force_download
         )
 
@@ -197,7 +202,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.input_query(FileQuerySchema())
-    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])
     def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -220,10 +225,13 @@ class FileController(Controller):
             content=content
         )
         file = DepotManager.get().get(revision.depot_file)
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = revision.file_name
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,
-            filename=revision.file_name,
+            filename=filename,
             as_attachment=hapic_data.query.force_download
         )
 
@@ -236,7 +244,7 @@ class FileController(Controller):
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
     def preview_pdf(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -259,7 +267,9 @@ class FileController(Controller):
             content.revision_id,
             page_number=hapic_data.query.page
         )
-        filename = "{}_page_{}.pdf".format(content.label, hapic_data.query.page)
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{}_page_{}.pdf".format(content.label, hapic_data.query.page)
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
@@ -272,7 +282,7 @@ class FileController(Controller):
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -291,7 +301,9 @@ class FileController(Controller):
             content_type=content_type_list.Any_SLUG
         )
         pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
-        filename = "{label}.pdf".format(label=content.label)
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{label}.pdf".format(label=content.label)
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
@@ -303,7 +315,7 @@ class FileController(Controller):
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
-    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
     def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -329,7 +341,9 @@ class FileController(Controller):
         pdf_preview_path = api.get_full_pdf_preview_path(
             revision.revision_id,
         )
-        filename = "{label}.pdf".format(label=revision.label)
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{label}.pdf".format(label=revision.label)
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
@@ -341,7 +355,7 @@ class FileController(Controller):
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
-    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -369,10 +383,12 @@ class FileController(Controller):
             revision.revision_id,
             page_number=hapic_data.query.page
         )
-        filename = "{label}_page_{page_number}.pdf".format(
-            label=content.label,
-            page_number=hapic_data.query.page
-        )
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{label}_page_{page_number}.pdf".format(
+                label=content.label,
+                page_number=hapic_data.query.page
+            )
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
@@ -385,7 +401,7 @@ class FileController(Controller):
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(FilePathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def preview_jpg(self, context, request: TracimRequest, hapic_data=None):
@@ -412,10 +428,12 @@ class FileController(Controller):
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
-        filename = "{label}_page_{page_number}.jpg".format(
-            label=content.label,
-            page_number=hapic_data.query.page
-        )
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{label}_page_{page_number}.jpg".format(
+                label=content.label,
+                page_number=hapic_data.query.page
+            )
         return HapicFile(
             file_path=jpg_preview_path,
             filename=filename,
@@ -429,7 +447,7 @@ class FileController(Controller):
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
-    @hapic.input_path(ContentPreviewSizedPathSchema())
+    @hapic.input_path(FilePreviewSizedPathSchema())
     @hapic.output_file([])
     def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -454,12 +472,14 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
-        filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
-            label=content.label,
-            page_number=hapic_data.query.page,
-            width=hapic_data.path.width,
-            height=hapic_data.path.height
-        )
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
+                label=content.label,
+                page_number=hapic_data.query.page,
+                width=hapic_data.path.width,
+                height=hapic_data.path.height
+            )
         return HapicFile(
             file_path=jpg_preview_path,
             filename=filename,
@@ -472,7 +492,7 @@ class FileController(Controller):
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.input_path(RevisionPreviewSizedPathSchema())
+    @hapic.input_path(FileRevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -502,12 +522,14 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
-        filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
-            label=revision.label,
-            page_number=hapic_data.query.page,
-            width=hapic_data.path.width,
-            height=hapic_data.path.height
-        )
+        filename = hapic_data.path.filename
+        if not filename or filename == 'raw':
+            filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
+                label=revision.label,
+                page_number=hapic_data.query.page,
+                width=hapic_data.path.width,
+                height=hapic_data.path.height
+            )
         return HapicFile(
             file_path=jpg_preview_path,
             filename=filename,
@@ -695,21 +717,21 @@ class FileController(Controller):
         # upload raw file
         configurator.add_route(
             'upload_file',
-            '/workspaces/{workspace_id}/files/{content_id}/raw',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}',  # nopep8
             request_method='PUT'
         )
         configurator.add_view(self.upload_file, route_name='upload_file')  # nopep8
         # download raw file
         configurator.add_route(
             'download_file',
-            '/workspaces/{workspace_id}/files/{content_id}/raw',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.download_file, route_name='download_file')  # nopep8
         # download raw file of revision
         configurator.add_route(
             'download_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.download_revisions_file, route_name='download_revision')  # nopep8
@@ -718,14 +740,14 @@ class FileController(Controller):
         # get preview pdf full
         configurator.add_route(
             'preview_pdf_full',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.preview_pdf_full, route_name='preview_pdf_full')  # nopep8
         # get preview pdf
         configurator.add_route(
             'preview_pdf',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.preview_pdf, route_name='preview_pdf')  # nopep8
@@ -739,35 +761,35 @@ class FileController(Controller):
         # get preview jpg
         configurator.add_route(
             'preview_jpg',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.preview_jpg, route_name='preview_jpg')  # nopep8
         # get preview jpg with size
         configurator.add_route(
             'sized_preview_jpg',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.sized_preview_jpg, route_name='sized_preview_jpg')  # nopep8
         # get jpg preview for revision
         configurator.add_route(
             'sized_preview_jpg_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.sized_preview_jpg_revision, route_name='sized_preview_jpg_revision')  # nopep8
         # get full pdf preview for revision
         configurator.add_route(
             'preview_pdf_full_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.preview_pdf_full_revision, route_name='preview_pdf_full_revision')  # nopep8
         # get pdf preview for revision
         configurator.add_route(
             'preview_pdf_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.preview_pdf_revision, route_name='preview_pdf_revision')  # nopep8

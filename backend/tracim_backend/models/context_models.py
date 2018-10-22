@@ -211,33 +211,50 @@ class WorkspaceAndContentRevisionPath(object):
     """
     Paths params with workspace id and content_id model
     """
-    def __init__(self, workspace_id: int, content_id: int, revision_id) -> None:
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int) -> None:
         self.content_id = content_id
         self.revision_id = revision_id
         self.workspace_id = workspace_id
 
 
-class ContentPreviewSizedPath(object):
+class FilePath(object):
+    def __init__(self, workspace_id: int, content_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.filename = filename
+
+
+class FileRevisionPath(object):
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.revision_id = revision_id
+        self.filename = filename
+
+
+class FilePreviewSizedPath(object):
     """
     Paths params with workspace id and content_id, width, heigth
     """
-    def __init__(self, workspace_id: int, content_id: int, width: int, height: int) -> None:  # nopep8
+    def __init__(self, workspace_id: int, content_id: int, width: int, height: int, filename: str) -> None:  # nopep8
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.width = width
         self.height = height
+        self.filename = filename
 
 
 class RevisionPreviewSizedPath(object):
     """
     Paths params with workspace id and content_id, revision_id width, heigth
     """
-    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int) -> None:  # nopep8
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int, filename: str) -> None:  # nopep8
         self.content_id = content_id
         self.revision_id = revision_id
         self.workspace_id = workspace_id
         self.width = width
         self.height = height
+        self.filename = filename
 
 
 class WorkspaceAndUserPath(object):

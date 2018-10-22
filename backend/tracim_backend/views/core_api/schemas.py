@@ -5,9 +5,9 @@ from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 
+from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
@@ -20,9 +20,11 @@ from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
-from tracim_backend.models.context_models import ContentPreviewSizedPath
 from tracim_backend.models.context_models import FileCreation
+from tracim_backend.models.context_models import FilePath
+from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
+from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
@@ -323,6 +325,10 @@ class WorkspaceAndContentIdPathSchema(
         return WorkspaceAndContentPath(**data)
 
 
+class FilenamePathSchema(marshmallow.Schema):
+    filename = marshmallow.fields.String('filename.ext')
+
+
 class WidthAndHeightPathSchema(marshmallow.Schema):
     width = marshmallow.fields.Int(example=256)
     height = marshmallow.fields.Int(example=256)
@@ -351,18 +357,38 @@ class WorkspaceAndContentRevisionIdPathSchema(
         return WorkspaceAndContentRevisionPath(**data)
 
 
-class ContentPreviewSizedPathSchema(
+class FilePathSchema(
     WorkspaceAndContentIdPathSchema,
-    WidthAndHeightPathSchema
+    FilenamePathSchema
 ):
     @post_load
     def make_path_object(self, data):
-        return ContentPreviewSizedPath(**data)
+        return FilePath(**data)
 
 
-class RevisionPreviewSizedPathSchema(
+class FileRevisionPathSchema(
     WorkspaceAndContentRevisionIdPathSchema,
-    WidthAndHeightPathSchema
+    FilenamePathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return FileRevisionPath(**data)
+
+
+class FilePreviewSizedPathSchema(
+    WorkspaceAndContentIdPathSchema,
+    WidthAndHeightPathSchema,
+    FilenamePathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return FilePreviewSizedPath(**data)
+
+
+class FileRevisionPreviewSizedPathSchema(
+    WorkspaceAndContentRevisionIdPathSchema,
+    WidthAndHeightPathSchema,
+    FilenamePathSchema
 ):
     @post_load
     def make_path_object(self, data):

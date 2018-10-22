@@ -2808,8 +2808,9 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
+        filename = 'Test_file.txt'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, filename),
             status=200
         )
         assert res.body == b'Test file'
@@ -2869,12 +2870,13 @@ class TestFiles(FunctionalTest):
         params = {
             'force_download': 1,
         }
+        filename = 'Test_file.txt'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, filename),
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.txt"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(filename)  # nopep8
         assert res.body == b'Test file'
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
@@ -3072,14 +3074,14 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             status=200
         )
         assert res.body == image.getvalue()
@@ -3128,7 +3130,7 @@ class TestFiles(FunctionalTest):
             )
         )
         res = self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
@@ -3180,14 +3182,14 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             status=200
         )
         assert res.body == image.getvalue()
@@ -3195,7 +3197,7 @@ class TestFiles(FunctionalTest):
         assert res.content_length == len(image.getvalue())
 
         res = self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
@@ -3304,14 +3306,14 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/jpg/'.format(content_id),
             status=200
         )
         assert res.body != image.getvalue()
@@ -3363,7 +3365,7 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
@@ -3373,7 +3375,7 @@ class TestFiles(FunctionalTest):
             'force_download': 1,
         }
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/jpg/raw'.format(content_id),
             status=200,
             params=params
         )
@@ -3434,7 +3436,7 @@ class TestFiles(FunctionalTest):
             'force_download': 0,
         }
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/jpg/'.format(content_id),
             status=400,
             params=params
         )
@@ -3482,14 +3484,14 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}'.format(content_id, image.name),  # nopep8
             status=200
         )
         assert res.body != image.getvalue()
@@ -3550,7 +3552,7 @@ class TestFiles(FunctionalTest):
             'force_download': 0,
         }
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}'.format(content_id, 'Test_file.bin'),  # nopep8
             status=400,
             params=params,
         )
@@ -3598,7 +3600,7 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
@@ -3607,13 +3609,136 @@ class TestFiles(FunctionalTest):
         params = {
             'force_download': 1,
         }
+        dl_filename = 'test_image_page_1_256x256.jpg'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}'.format(content_id, dl_filename),  # nopep8
             status=200,
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1_256x256.jpg"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.content_type == 'image/jpeg'
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 256, 256 == new_image.size
+
+    def test_api__get_sized_jpeg_preview__ok__200__force_download_case_no_filename(self) -> None:
+        """
+        get 256x256 preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        params = {
+            'force_download': 1,
+        }
+        dl_filename = 'test_image_page_1_256x256.jpg'
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256/'.format(content_id),  # nopep8
+            status=200,
+            params=params,
+        )
+        assert res.body != image.getvalue()
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.content_type == 'image/jpeg'
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 256, 256 == new_image.size
+
+    def test_api__get_sized_jpeg_preview__ok__200__force_download_case_filename_is_raw(self) -> None:
+        """
+        get 256x256 preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        params = {
+            'force_download': 1,
+        }
+        dl_filename = 'test_image_page_1_256x256.jpg'
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256/raw'.format(content_id),  # nopep8
+            status=200,
+            params=params,
+        )
+        assert res.body != image.getvalue()
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3658,14 +3783,15 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
+        filename = 'test_image_512x512.jpg'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg/512x512'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/jpg/512x512/{}'.format(content_id, filename),  # nopep8
             status=400
         )
         assert res.json_body
@@ -3719,24 +3845,28 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
+        filename = "test_file.txt"
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename=filename
             ),
             status=200
         )
         assert res.content_type == 'text/plain'
+        filename = "test_image_256x256.jpg"
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename=filename,
             ),
             status=200
         )
@@ -3792,16 +3922,17 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename=image.name
             ),
             status=200
         )
@@ -3810,7 +3941,7 @@ class TestFiles(FunctionalTest):
             'force_download': 1,
         }
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
             ),
@@ -3874,14 +4005,15 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, test_file.file_name),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
             ],
             status=204,
         )
+        filename = 'test_image.pdf'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full/{}'.format(content_id, filename),  # nopep8
             status=200
         )
         assert res.content_type == 'application/pdf'
@@ -3936,8 +4068,9 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
+        filename = 'Test_file.txt'
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, filename),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
             ],
@@ -3947,7 +4080,15 @@ class TestFiles(FunctionalTest):
             'force_download': 1,
         }
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full/{}'.format(content_id, filename),  # nopep8
+            status=200,
+            params=params
+        )
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.txt"'  # nopep8
+        assert res.content_type == 'application/pdf'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full/{}'.format(content_id, 'Test_file.pdf'),  # nopep8
             status=200,
             params=params
         )
@@ -3994,14 +4135,14 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full/{}'.format(content_id, image.name),  # nopep8
             status=400
         )
         assert res.json_body
@@ -4057,8 +4198,9 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
+        filename = 'Test_file.bin'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full/{}'.format(content_id, filename),  # nopep8
             status=400
         )
         assert isinstance(res.json, dict)
@@ -4116,15 +4258,16 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, test_file.file_name),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
             ],
             status=204,
         )
         params = {'page': 1}
+        filename = 'test_file.pdf'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/pdf/{}'.format(content_id, filename),
             status=200,
             params=params,
         )
@@ -4181,7 +4324,7 @@ class TestFiles(FunctionalTest):
         )
         params = {'page': 1}
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/pdf/'.format(content_id),
             status=400,
             params=params,
         )
@@ -4239,21 +4382,23 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
+        filename = 'test_file.txt'
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, filename),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
             ],
             status=204,
         )
+        filename = 'Test_file_page_1.pdf'
         params = {'page': 1, 'force_download': 1}
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/pdf/{}'.format(content_id, filename),
             status=200,
             params=params,
         )
         assert res.content_type == 'application/pdf'
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file_page_1.pdf"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(filename)  # nopep8
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
         """
@@ -4306,7 +4451,7 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/'.format(content_id),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
             ],
@@ -4314,7 +4459,7 @@ class TestFiles(FunctionalTest):
         )
         params = {'page': 2}
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/pdf/'.format(content_id),
             status=400,
             params=params,
         )
@@ -4369,26 +4514,30 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
+        filename = image.name
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename=filename,
             ),
             status=200
         )
         assert res.content_type == 'text/plain'
         params = {'page': 1}
+        filename = 'test_image__page_1.pdf'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
                 params=params,
+                filename=filename,
             ),
             status=200
         )
@@ -4441,14 +4590,14 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
             ),
@@ -4456,7 +4605,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'text/plain'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
             ),
@@ -4511,30 +4660,32 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename=image.name
             ),
             status=200
         )
         assert res.content_type == 'text/plain'
         params = {'force_download': 1}
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename='Test_file.pdf'
             ),
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file.pdf"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.pdf"'  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
@@ -4584,25 +4735,27 @@ class TestFiles(FunctionalTest):
             )
         )
         self.testapp.put(
-            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
             upload_files=[
                 ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename=image.name
             ),
             status=200
         )
         assert res.content_type == 'text/plain'
         params = {'page': 1, 'force_download': 1}
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf'.format(  # nopep8
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                filename='test_image_page_1.pdf'
             ),
             status=200,
             params=params,
