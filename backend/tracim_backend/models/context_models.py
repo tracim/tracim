@@ -257,6 +257,14 @@ class RevisionPreviewSizedPath(object):
         self.filename = filename
 
 
+class WorkspacePath(object):
+    """
+    Paths params with workspace id and user_id
+    """
+    def __init__(self, workspace_id: int):
+        self.workspace_id = workspace_id
+
+
 class WorkspaceAndUserPath(object):
     """
     Paths params with workspace id and user_id

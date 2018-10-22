@@ -13,7 +13,8 @@ from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import ActiveContentFilter, \
+    WorkspacePath
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
@@ -292,6 +293,10 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
         description='id of a valid workspace',
         validate=Range(min=1, error="Value must be greater than 0"),
     )
+
+    @post_load
+    def make_path_object(self, data):
+        return WorkspacePath(**data)
 
 
 class ContentIdPathSchema(marshmallow.Schema):
