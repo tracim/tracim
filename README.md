@@ -52,6 +52,8 @@ and [Backend setting file doc](backend/doc/setting.md).
 
 This script use command with sudo, make sure you have installed and configured sudo.
 You can run also with root if you add root in parameter of this script.
+  
+You can add "-d" to build_full_frontend.sh to disabled obfuscation and reduce build time. 
 
 ## Running Tracim using pserve ##
 

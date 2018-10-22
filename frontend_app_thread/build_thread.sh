@@ -21,12 +21,17 @@ function logerror {
 }
 
 windoz=""
-if  [[ $1 = "-w" ]]; then
+if [[ $1 = "-w" || $2 = "-w" ]]; then
     windoz="windoz"
 fi
 
+dev=""
+if [[ $1 = "-d" || $2 = "-d" ]]; then
+    dev="-dev"
+fi
+
 log "build frontend_app_thread"
-npm run build$windoz  && loggood "success" || logerror "some error"
+npm run build$dev$windoz  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
 cp dist/thread.app.js ../frontend/dist/app && loggood "success" || logerror "some error"
 log "copying en translation.json"

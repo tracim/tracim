@@ -21,8 +21,13 @@ function logerror {
 }
 
 windoz=""
-if  [[ $1 = "-w" ]]; then
+if [[ $1 = "-w" || $2 = "-w" ]]; then
     windoz="windoz"
+fi
+
+dev=""
+if [[ $1 = "-d" || $2 = "-d" ]]; then
+    dev="-d"
 fi
 
 echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ ${NC}"
@@ -45,37 +50,37 @@ npm run buildtracimlib$windoz && loggood "success" || logerror "some error"
 # app Html Document
 log "cd $DEFAULTDIR/frontend_app_html-document"
 cd $DEFAULTDIR/frontend_app_html-document || exit 1
-./build_html-document.sh
+./build_html-document.sh $dev
 
 
 # app Thread
 log "cd $DEFAULTDIR/frontend_app_thread"
 cd $DEFAULTDIR/frontend_app_thread || exit 1
-./build_thread.sh
+./build_thread.sh $dev
 
 
 # app Workspace
 log "cd $DEFAULTDIR/frontend_app_workspace"
 cd $DEFAULTDIR/frontend_app_workspace || exit 1
-./build_workspace.sh
+./build_workspace.sh $dev
 
 
 # app Workspace Advanced
 log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
 cd $DEFAULTDIR/frontend_app_workspace_advanced || exit 1
-./build_workspace_advanced.sh
+./build_workspace_advanced.sh $dev
 
 
 # app File
 log "cd $DEFAULTDIR/frontend_app_file"
 cd $DEFAULTDIR/frontend_app_file || exit 1
-./build_file.sh
+./build_file.sh $dev
 
 
 # app Admin Workspace User
 log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
 cd $DEFAULTDIR/frontend_app_admin_workspace_user || exit 1
-./build_admin_workspace_user.sh
+./build_admin_workspace_user.sh $dev
 
 
 # build Tracim
