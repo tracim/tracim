@@ -304,7 +304,7 @@ class AdminWorkspaceUser extends React.Component {
           <AdminUser
             userList={state.content.userList}
             idLoggedUser={state.loggedUser.user_id}
-            profile={state.content.profile}
+            profile={state.content.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
