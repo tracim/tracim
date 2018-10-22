@@ -102,7 +102,6 @@
   "Remember me": "Se souvenir de moi",
   "Member added": "Membre ajouté",
   "Member removed": "Membre supprimé",
-  "Error while removing the member": "Erreur lors de la suppresion du membre",
   "All Contents": "Tous les contenus",
   "Open": "Ouvert",
   "Validated": "Validé",
@@ -156,5 +155,6 @@
   "Not a valid email": "Email invalide",
   "An error has happened": "Une erreur est survenue",
   "Email sent, don't forget to check your spam": "Email envoyé, pensez à vérifier votre dossier spam",
-  "An error has happened, please try again.": "Une erreur est survenue, veuillez réessayer"
+  "An error has happened, please try again.": "Une erreur est survenue, veuillez réessayer",
+  "Error while removing member": "Erreur lors de la suppression du membre"
 }

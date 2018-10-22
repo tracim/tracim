@@ -46,7 +46,6 @@
   "Please set a role": "Please set a role",
   "Member added": "Member added",
   "Member removed": "Member removed",
-  "Error while removing the member": "Error while removing the member",
   "Open advanced Dashboard": "Open advanced Dashboard",
   "Error while saving new lang": "Error while saving new lang",
   "Disconnection error": "Disconnection error",
@@ -156,5 +155,6 @@
   "Not a valid email": "Not a valid email",
   "An error has happened": "An error has happened",
   "Email sent, don't forget to check your spam": "Email sent, don't forget to check your spam",
-  "An error has happened, please try again.": "An error has happened, please try again."
+  "An error has happened, please try again.": "An error has happened, please try again.",
+  "Error while removing member": "Error while removing member"
 }

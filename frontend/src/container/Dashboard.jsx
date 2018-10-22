@@ -302,7 +302,7 @@ class Dashboard extends React.Component {
         props.dispatch(removeWorkspaceMember(idMember))
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
         break
-      default: props.dispatch(newFlashMessage(props.t('Error while removing the member'), 'warning')); break
+      default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
     }
   }
 
