@@ -47,6 +47,7 @@ class Dashboard extends React.Component {
     super(props)
     this.state = {
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
+      advancedDashboardOpenedId: null,
       newMember: {
         id: '',
         avatarUrl: '',
@@ -100,6 +101,7 @@ class Dashboard extends React.Component {
   }
 
   componentWillUnmount () {
+    this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -305,20 +307,26 @@ class Dashboard extends React.Component {
   }
 
   handleClickOpenAdvancedDashboard = () => {
-    const { props } = this
+    const { props, state } = this
 
-    props.renderAppFeature(
-      {
-        label: 'Advanced dashboard',
-        slug: 'workspace_advanced',
-        faIcon: 'bank',
-        hexcolor: GLOBAL_primaryColor,
-        creationLabel: ''
-      },
-      props.user,
-      findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
-      {...props.curWs, workspace_id: props.curWs.id}
-    )
+    if (state.advancedDashboardOpenedId === null) {
+      props.renderAppFeature(
+        {
+          label: 'Advanced dashboard',
+          slug: 'workspace_advanced',
+          faIcon: 'bank',
+          hexcolor: GLOBAL_primaryColor,
+          creationLabel: ''
+        },
+        props.user,
+        findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
+        {...props.curWs, workspace_id: props.curWs.id}
+      )
+    } else {
+      props.dispatchCustomEvent('workspace_advanced_reloadContent', {workspace_id: props.curWs.id})
+    }
+
+    this.setState({advancedDashboardOpenedId: props.curWs.id})
   }
 
   handleClickAddNotification = async () => {

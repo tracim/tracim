@@ -8,6 +8,7 @@
     "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9873 -- webpack-dev-server --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack -p",
+    "build-dev": "NODE_ENV=production webpack",
     "build-translation": "node i18next.scanner.js",
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"

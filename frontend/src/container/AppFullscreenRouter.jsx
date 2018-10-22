@@ -41,7 +41,6 @@ class AppFullscreenRouter extends React.Component {
               if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
 
               const content = {
-                profile: PROFILE,
                 workspaceList: [],
                 userList: []
               }

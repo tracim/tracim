@@ -54,6 +54,7 @@ class Sidebar extends React.Component {
     // the point is to avoid rerender the height animation
     const { props, state } = this
 
+    // return true if sidebar should not be rendered because it'll only go into the return null on the render ()
     if (!this.shouldDisplaySidebar(nextProps)) return true
 
     // no ws open, rerender in case one gets opened by componentDidUpdate
