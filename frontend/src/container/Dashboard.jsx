@@ -274,7 +274,8 @@ class Dashboard extends React.Component {
             role: '',
             isEmail: false
           },
-          autoCompleteFormNewMemberActive: false
+          autoCompleteFormNewMemberActive: false,
+          displayNewMemberForm: false
         })
         props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
         return true

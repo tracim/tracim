@@ -305,7 +305,6 @@ class WorkspaceAdvanced extends React.Component {
       case 200:
         this.loadContent()
         this.setState({
-          displayFormNewMember: false,
           newMember: {
             id: '',
             nameOrEmail: '',
@@ -313,7 +312,8 @@ class WorkspaceAdvanced extends React.Component {
             avatarUrl: '',
             isEmail: false
           },
-          autoCompleteFormNewMemberActive: false
+          autoCompleteFormNewMemberActive: false,
+          displayFormNewMember: false
         })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
