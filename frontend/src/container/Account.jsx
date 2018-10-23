@@ -168,7 +168,7 @@ class Account extends React.Component {
     })()
 
     return (
-      <div className='tracim__content'>
+      <div className='tracim__content fullWidthFullHeight'>
         <PageWrapper customClass='account'>
           <PageTitle
             parentClass={'account'}

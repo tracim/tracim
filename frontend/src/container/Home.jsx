@@ -30,7 +30,7 @@ class Home extends React.Component {
     }
 
     return (
-      <div className='tracim__content'>
+      <div className='tracim__content fullWidthFullHeight'>
         <section
           className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
           style={styleHomepage}

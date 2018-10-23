@@ -232,7 +232,7 @@ class WorkspaceContent extends React.Component {
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
     return (
-      <div className='tracim__content'>
+      <div className='tracim__content fullWidthFullHeight'>
         <div className='WorkspaceContent' style={{width: '100%'}}>
           {state.contentLoaded &&
             <OpenContentApp

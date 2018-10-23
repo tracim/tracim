@@ -354,7 +354,7 @@ class Dashboard extends React.Component {
     const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
 
     return (
-      <div className='tracim__content'>
+      <div className='tracim__content fullWidthFullHeight'>
         <div className='dashboard'>
           <PageWrapper customeClass='dashboard'>
             <PageTitle
