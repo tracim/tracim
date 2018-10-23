@@ -152,10 +152,6 @@ class Thread extends React.Component {
           loggedUser: this.state.config.loggedUser
         }))
       ], [])
-      .filter(r => // filter last because we need all revision since comments are attached to it
-        r.timelineType === 'comment' ||
-        ['comment', 'archiving', 'deletion', 'status-update', 'unarchiving', 'undeletion', 'move', 'edition'].includes(r.revision_type)
-      )
 
     const resThread = await handleFetchResult(await fetchResultThread)
 
