@@ -18,6 +18,7 @@ import {
 import {
   getThreadContent,
   getThreadComment,
+  getThreadRevision,
   postThreadNewComment,
   putThreadStatus,
   putThreadContent,
@@ -111,32 +112,60 @@ class Thread extends React.Component {
 
     const fetchResultThread = getThreadContent(config.apiUrl, content.workspace_id, content.content_id)
     const fetchResultThreadComment = getThreadComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getThreadRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    Promise.all([
-      handleFetchResult(await fetchResultThread),
-      handleFetchResult(await fetchResultThreadComment)
+    const [resComment, resRevision] = await Promise.all([
+      handleFetchResult(await fetchResultThreadComment),
+      handleFetchResult(await fetchResultRevision)
     ])
-      .then(async ([resThread, resComment]) => {
-        this.setState({
-          content: resThread.body,
-          listMessage: resComment.body.map(c => ({
-            ...c,
-            timelineType: 'comment',
-            created_raw: c.created,
-            created: displayDistanceDate(c.created, loggedUser.lang),
-            author: {
-              ...c.author,
-              avatar_url: c.author.avatar_url
-                ? c.author.avatar_url
-                : generateAvatarFromPublicName(c.author.public_name)
-            }
-          }))
-        })
 
-        await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-        GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
-      })
-      .catch(e => console.log('Error loading Thread data.', e))
+    const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+      ...c,
+      created_raw: c.created,
+      created: displayDistanceDate(c.created, loggedUser.lang),
+      author: {
+        ...c.author,
+        avatar_url: c.author.avatar_url
+          ? c.author.avatar_url
+          : generateAvatarFromPublicName(c.author.public_name)
+      }
+    }))
+
+    const revisionWithComment = resRevision.body
+      .map((r, i) => ({
+        ...r,
+        created_raw: r.created,
+        created: displayDistanceDate(r.created, loggedUser.lang),
+        timelineType: 'revision',
+        commentList: r.comment_ids.map(ci => ({
+          timelineType: 'comment',
+          ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
+        })),
+        number: i + 1
+      }))
+      .reduce((acc, rev) => [
+        ...acc,
+        rev,
+        ...rev.commentList.map(comment => ({
+          ...comment,
+          customClass: '',
+          loggedUser: this.state.config.loggedUser
+        }))
+      ], [])
+      .filter(r => // filter last because we need all revision since comments are attached to it
+        r.timelineType === 'comment' ||
+        ['comment', 'archiving', 'deletion', 'status-update', 'unarchiving', 'undeletion', 'move', 'edition'].includes(r.revision_type)
+      )
+
+    const resThread = await handleFetchResult(await fetchResultThread)
+
+    this.setState({
+      content: resThread.body,
+      listMessage: revisionWithComment
+    })
+
+    await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
   }
 
   handleClickBtnCloseApp = () => {
@@ -204,7 +233,10 @@ class Thread extends React.Component {
 
     const fetchResultArchive = await putThreadIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -221,7 +253,10 @@ class Thread extends React.Component {
 
     const fetchResultArchive = await putThreadIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -238,7 +273,10 @@ class Thread extends React.Component {
 
     const fetchResultRestore = await putThreadRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -255,7 +293,10 @@ class Thread extends React.Component {
 
     const fetchResultRestore = await putThreadRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -323,6 +364,7 @@ class Thread extends React.Component {
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
+            allowClickOnRevision={false}
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
             showHeader={false}
