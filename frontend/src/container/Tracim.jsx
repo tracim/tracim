@@ -192,7 +192,7 @@ class Tracim extends React.Component {
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
-          <div id='appFullscreenContainer' />
+          <div id='appFullscreenContainer' className='fullWidthFullHeight' />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />
         </div>
