@@ -55,7 +55,7 @@ export class MemberList extends React.Component {
                         </div>
 
                         <div className='memberlist__list__item__info__role'>
-                          {props.roleList.find(r => r.slug === m.role).label}
+                          {props.t(props.roleList.find(r => r.slug === m.role).label)}
                         </div>
                       </div>
 
