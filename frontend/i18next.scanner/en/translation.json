@@ -46,7 +46,6 @@
   "Please set a role": "Please set a role",
   "Member added": "Member added",
   "Member removed": "Member removed",
-  "Error while removing the member": "Error while removing the member",
   "Open advanced Dashboard": "Open advanced Dashboard",
   "Error while saving new lang": "Error while saving new lang",
   "Disconnection error": "Disconnection error",
@@ -135,9 +134,6 @@
   "Not subscribed to notifications": "Not subscribed to notifications",
   "Have a good day !": "Have a good day !",
   "Please select a shared space in the left sidebar by clicking on it": "Please select a shared space in the left sidebar by clicking on it",
-  "Email sent. Don't forget to check your spam.": "Email sent. Don't forget to check your spam.",
-  "Email unknown": "Email unknown",
-  "An error has happened. Please try again.": "An error has happened. Please try again.",
   "Forgot password": "Forgot password",
   "Did you forget your password ?": "Did you forget your password ?",
   "Email": "Email",
@@ -152,5 +148,13 @@
   "Email notifications are disabled": "Email notifications are disabled",
   "Please enter a login and a password": "Please enter a login and a password",
   "This account is deactivated": "This account is deactivated",
-  "Error while adding the member to the shared space": "Error while adding the member to the shared space"
+  "Error while adding the member to the shared space": "Error while adding the member to the shared space",
+  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
+  "Unknown email": "Unknown email",
+  "Cannot reset password while email are disabled, please contact an administrator": "Cannot reset password while email are disabled, please contact an administrator",
+  "Not a valid email": "Not a valid email",
+  "An error has happened": "An error has happened",
+  "Email sent, don't forget to check your spam": "Email sent, don't forget to check your spam",
+  "An error has happened, please try again.": "An error has happened, please try again.",
+  "Error while removing member": "Error while removing member"
 }

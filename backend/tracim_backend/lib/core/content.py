@@ -456,10 +456,10 @@ class ContentApi(object):
             query = query.filter(Content.content_id != exclude_content_id)
         query = query.filter(Content.workspace_id == workspace.workspace_id)
 
-        nb_content_with_the_filename = query.\
-            filter(Content.label == label).\
-            filter(Content.file_extension == file_extension).\
-            count()
+
+        nb_content_with_the_filename = query.filter(
+            Content.file_name == filename
+        ).count()
         if nb_content_with_the_filename == 0:
             return True
         elif nb_content_with_the_filename == 1:
@@ -566,28 +566,33 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
-        content = None
-        if filename or label:
-            if label:
-                file_extension = ''
-                if content_type.slug in (
-                        content_type_list.Page.slug,
-                        content_type_list.Thread.slug,
-                ):
-                    file_extension = '.html'
-                filename = self._prepare_filename(label, file_extension)
+        content = Content()
+        if label:
+            file_extension = ''
+            if content_type.file_extension:
+                file_extension = content_type.file_extension
+            filename = self._prepare_filename(label, file_extension)
             self._is_filename_available_or_raise(
                 filename,
                 workspace,
                 parent,
             )
-            content = Content()
+            # TODO - G.M - 2018-10-15 - Set file extension and label
+            # explicitly instead of filename in order to have correct
+            # label/file-extension separation.
+            content.label = label
+            content.file_extension = file_extension
+        elif filename:
+            self._is_filename_available_or_raise(
+                filename,
+                workspace,
+                parent
+            )
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
             content.file_name = filename
         else:
             if content_type_slug == content_type_list.Comment.slug:
-                content = Content()
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ''
@@ -873,7 +878,7 @@ class ContentApi(object):
         Apply normalised filters to found Content corresponding as given label.
         :param query: query to modify
         :param content_label_as_file: label in this
-        FILE version, use Content.get_label_as_file().
+        FILE version, use Content.file_name.
         :param is_case_sensitive: Take care about case or not
         :return: modified query
         """
@@ -916,49 +921,54 @@ class ContentApi(object):
         ))
 
     def get_pdf_preview_path(
-            self,
-            content_id: int,
-            revision_id: int,
-            page_number: int
+        self,
+        content_id: int,
+        revision_id: int,
+        page_number: int,
+        file_extension: str,
     ) -> str:
         """
         Get pdf preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page_number: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage
+        content
+        :param file_extension: file extension of the file
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
         try:
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path):
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
-                    'page_number {page_number} of content {content_id} does not exist'.format(
+                    'page_number {page_number} of content {content_id} does not exist'.format(  # nopep8
                         page_number=page_number,
                         content_id=content_id
                     ),
                 )
             pdf_preview_path = self.preview_manager.get_pdf_preview(
                 file_path,
-                page=page_number
+                page=page_number,
+                file_ext=file_extension,
             )
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id) # nopep8
+                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
         return pdf_preview_path
 
-    def get_full_pdf_preview_path(self, revision_id: int) -> str:
+    def get_full_pdf_preview_path(self, revision_id: int, file_extension: str) -> str:
         """
         Get full(multiple page) pdf preview of revision of content
         :param revision_id: id of revision
+                :param file_extension: file extension of the file
         :return: path of the full pdf preview of this revision
         """
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path, file_ext=file_extension)  # nopep8
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
@@ -981,6 +991,7 @@ class ContentApi(object):
         content_id: int,
         revision_id: int,
         page_number: int,
+        file_extension: str,
         width: int = None,
         height: int = None,
     ) -> str:
@@ -988,7 +999,9 @@ class ContentApi(object):
         Get jpg preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page_number: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage
+        content
+        :param file_extension: file extension of the file
         :param width: width in pixel
         :param height: height in pixel
         :return: preview_path as string
@@ -996,7 +1009,7 @@ class ContentApi(object):
         file_path = self.get_one_revision_filepath(revision_id)
         try:
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path):
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
                     'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
                         page_number=page_number,
@@ -1026,6 +1039,7 @@ class ContentApi(object):
                 page=page_number,
                 width=width,
                 height=height,
+                file_ext=file_extension,
             )
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
@@ -1558,18 +1572,24 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def get_preview_page_nb(self, revision_id: int) -> typing.Optional[int]:
+    def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:  # nopep8
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            nb_pages = self.preview_manager.get_page_nb(file_path)
+            nb_pages = self.preview_manager.get_page_nb(
+                file_path,
+                file_ext=file_extension
+            )
         except UnsupportedMimeType:
             return None
         return nb_pages
 
-    def has_pdf_preview(self, revision_id: int) -> bool:
+    def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            has_pdf_preview = self.preview_manager.has_pdf_preview(file_path)
+            has_pdf_preview = self.preview_manager.has_pdf_preview(
+                file_path,
+                file_ext=file_extension
+            )
         except UnsupportedMimeType:
             has_pdf_preview = False
         return has_pdf_preview

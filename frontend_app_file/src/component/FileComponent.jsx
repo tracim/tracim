@@ -42,6 +42,7 @@ export const FileComponent = props =>
       <PreviewComponent
         color={props.customColor}
         downloadRawUrl={props.downloadRawUrl}
+        isPdfAvailable={props.isPdfAvailable}
         downloadPdfPageUrl={props.downloadPdfPageUrl}
         downloadPdfFullUrl={props.downloadPdfFullUrl}
         previewUrl={props.previewUrl}

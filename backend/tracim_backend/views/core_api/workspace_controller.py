@@ -6,7 +6,8 @@ from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend import BASE_API_V2
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere, \
+    UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -333,6 +334,7 @@ class WorkspaceController(Controller):
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
         allow_superadmin=True
     )
+    @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_workspaces_members_role(

@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
+import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -63,30 +64,43 @@ class Login extends React.Component {
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
   handleClickSubmit = async () => {
-    const { history, dispatch, t } = this.props
-    const { inputLogin, inputPassword, inputRememberMe } = this.state
+    const { props, state } = this
 
-    if (inputLogin.value === '' || inputPassword.value === '') {
-      dispatch(newFlashMessage(t('Please enter a login and a password'), 'warning'))
+    if (state.inputLogin.value === '' || state.inputPassword.value === '') {
+      props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
-    const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
+    const fetchPostUserLogin = await props.dispatch(postUserLogin(state.inputLogin.value, state.inputPassword.value, state.inputRememberMe))
 
-    if (fetchPostUserLogin.status === 200) {
-      const loggedUser = {
-        ...fetchPostUserLogin.json,
-        logged: true
-      }
+    switch (fetchPostUserLogin.status) {
+      case 200:
+        const loggedUser = {
+          ...fetchPostUserLogin.json,
+          logged: true
+        }
 
-      dispatch(setUserConnected(loggedUser))
+        Cookies.set('lastConnection', '1', {expires: 180})
+        props.dispatch(setUserConnected(loggedUser))
 
-      this.loadAppConfig()
-      this.loadWorkspaceList(loggedUser)
+        this.loadAppConfig()
+        this.loadWorkspaceList(loggedUser)
 
-      history.push(PAGE.HOME)
-    } else if (fetchPostUserLogin.status === 403) {
-      dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
+        if (props.system.redirectLogin !== '') {
+          props.history.push(props.system.redirectLogin)
+          return
+        }
+
+        props.history.push(PAGE.HOME)
+        break
+      case 400:
+        switch (fetchPostUserLogin.json.code) {
+          case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
+          default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
+        }
+        break
+      case 403: props.dispatch(newFlashMessage(props.t('Email or password invalid'), 'warning')); break
+      default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
     }
   }
 
@@ -224,5 +238,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, system }) => ({ user, system })
 export default withRouter(connect(mapStateToProps)(translate()(Login)))

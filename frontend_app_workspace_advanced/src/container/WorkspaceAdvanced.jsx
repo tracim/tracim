@@ -37,11 +37,14 @@ class WorkspaceAdvanced extends React.Component {
       displayFormNewMember: false,
       newMember: {
         id: '',
-        name: '',
+        nameOrEmail: '',
         role: '',
-        avatarUrl: ''
+        avatarUrl: '',
+        isEmail: false
       },
+      firstLoadKnownMemberCompleted: false,
       autoCompleteFormNewMemberActive: false,
+      autoCompleteClicked: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false
     }
@@ -90,7 +93,7 @@ class WorkspaceAdvanced extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-    console.log('%c<WorkspaceAdvanced> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<WorkspaceAdvanced> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
       this.loadContent()
@@ -197,23 +200,51 @@ class WorkspaceAdvanced extends React.Component {
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({newMember: {...prev.newMember, role: slugRole}}))
 
-  handleChangeNewMemberName = newName => {
-    if (newName.length >= 2) this.handleSearchUser(newName)
+  isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
+
+  handleChangeNewMemberName = newNameOrEmail => {
+    if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
 
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
-        name: newName
+        nameOrEmail: newNameOrEmail,
+        isEmail: this.isEmail(newNameOrEmail)
       },
-      autoCompleteFormNewMemberActive: newName.length >= 2
+      autoCompleteFormNewMemberActive: this.state.firstLoadKnownMemberCompleted && newNameOrEmail.length >= 2,
+      autoCompleteClicked: false
     }))
   }
+
+  handleClickKnownMember = knownMember => {
+    this.setState(prev => ({
+      newMember: {
+        ...prev.newMember,
+        id: knownMember.user_id,
+        nameOrEmail: knownMember.public_name,
+        avatarUrl: knownMember.avatar_url,
+        isEmail: false
+      },
+      autoCompleteFormNewMemberActive: false,
+      autoCompleteClicked: true
+    }))
+  }
+
+  handleClickAutoComplete = () => this.setState({
+    autoCompleteFormNewMemberActive: false,
+    autoCompleteClicked: true
+  })
 
   handleSearchUser = async userNameToSearch => {
     const { props, state } = this
     const fetchUserKnownMemberList = await handleFetchResult(await getUserKnownMember(state.config.apiUrl, state.loggedUser.user_id, userNameToSearch))
     switch (fetchUserKnownMemberList.apiResponse.status) {
-      case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.body}); break
+      case 200:
+        this.setState({
+          searchedKnownMemberList: fetchUserKnownMemberList.body,
+          firstLoadKnownMemberCompleted: true
+        })
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while fetching known members list', 'warning'))
     }
   }
@@ -232,26 +263,14 @@ class WorkspaceAdvanced extends React.Component {
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while removing user from shared space', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while removing member', 'warning'))
     }
-  }
-
-  handleClickKnownMember = knownMember => {
-    this.setState(prev => ({
-      newMember: {
-        ...prev.newMember,
-        id: knownMember.user_id,
-        name: knownMember.public_name,
-        avatarUrl: knownMember.avatar_url
-      },
-      autoCompleteFormNewMemberActive: false
-    }))
   }
 
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    if (state.newMember.name === '') {
+    if (state.newMember.nameOrEmail === '') {
       this.sendGlobalFlashMessage(props.t('Please set a name or email', 'warning'))
       return
     }
@@ -261,18 +280,24 @@ class WorkspaceAdvanced extends React.Component {
       return
     }
 
+    const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.public_name === state.newMember.nameOrEmail)
+
     if (
-      !state.searchedKnownMemberList.find(u => u.public_name === state.newMember.name) &&
       state.config.system && state.config.system.config &&
-      !state.config.system.config.email_notification_activated
+      !state.config.system.config.email_notification_activated &&
+      !newMemberInKnownMemberList
     ) {
       this.sendGlobalFlashMessage(props.t('Unknown user'), 'warning')
       return false
     }
 
+    if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
+      this.setState({newMember: {...state.newMember, id: newMemberInKnownMemberList.user_id}})
+    }
+
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
-      id: state.newMember.id || null,
-      name: state.newMember.name,
+      id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
+      nameOrEmail: state.newMember.nameOrEmail,
       role: state.newMember.role
     }))
 
@@ -280,14 +305,15 @@ class WorkspaceAdvanced extends React.Component {
       case 200:
         this.loadContent()
         this.setState({
-          displayFormNewMember: false,
           newMember: {
             id: '',
-            name: '',
+            nameOrEmail: '',
             role: '',
-            avatarUrl: ''
+            avatarUrl: '',
+            isEmail: false
           },
-          autoCompleteFormNewMemberActive: false
+          autoCompleteFormNewMemberActive: false,
+          displayFormNewMember: false
         })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
@@ -361,7 +387,7 @@ class WorkspaceAdvanced extends React.Component {
             displayFormNewMember={state.displayFormNewMember}
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
             onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-            newMemberName={state.newMember.name}
+            newMemberName={state.newMember.nameOrEmail}
             onChangeNewMemberName={this.handleChangeNewMemberName}
             newMemberRole={state.newMember.role}
             onClickNewMemberRole={this.handleClickNewMemberRole}
@@ -373,9 +399,14 @@ class WorkspaceAdvanced extends React.Component {
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
+            loggedUser={state.loggedUser}
             idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
-            isLoggedUserAdmin={state.loggedUser.profile === state.config.profileObject.ADMINISTRATOR.slug}
+            canSendInviteNewUser={
+              [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
+            }
             emailNotifActivated={state.config.system.config.email_notification_activated}
+            autoCompleteClicked={state.autoCompleteClicked}
+            onClickAutoComplete={this.handleClickAutoComplete}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>

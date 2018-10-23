@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
-import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
@@ -31,10 +31,10 @@ import {
   setAppList,
   setContentTypeList,
   setUserConnected,
-  setWorkspaceListIsOpenInSidebar,
   setWorkspaceList
 } from '../action-creator.sync.js'
 import Dashboard from './Dashboard.jsx'
+import Sidebar from './Sidebar.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -79,6 +79,7 @@ class Tracim extends React.Component {
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
+        Cookies.set('lastConnection', '1', {expires: 180})
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
         this.loadAppConfig()
         this.loadWorkspaceList()
@@ -108,14 +109,15 @@ class Tracim extends React.Component {
   loadWorkspaceList = async (idOpenInSidebar = undefined) => {
     const { props } = this
 
+    const idWsToOpen = idOpenInSidebar || (props.workspaceList.find(ws => ws.isOpenInSidebar) || {id: undefined}).id
+
     const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(props.user))
 
     if (fetchGetWorkspaceList.status === 200) {
+      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
+
+      props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.setState({workspaceListLoaded: true})
-
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-
-      idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
 
       return true
     }
@@ -129,9 +131,9 @@ class Tracim extends React.Component {
 
     if (props.user.logged === null) return null // @TODO show loader
 
-    if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
-      return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
-    }
+    // if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
+    //   return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
+    // }
 
     if (
       !unLoggedAllowedPageList.includes(props.location.pathname) && (
@@ -142,7 +144,7 @@ class Tracim extends React.Component {
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
-      <div className='tracim'>
+      <div className='tracim fullWidthFullHeight'>
         <Header />
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
@@ -154,56 +156,45 @@ class Tracim extends React.Component {
             path='/:first?/:idws?/*' render={() => <Sidebar />}
           />
 
-          <div className='tracim__content'>
-            <Route path={PAGE.LOGIN} component={Login} />
+          <Route path={PAGE.LOGIN} component={Login} />
 
-            <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
+          <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
 
-            <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
+          <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
-            <Route exact path={PAGE.HOME} component={() => {
-              switch (props.user.logged) {
-                case true: return <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
-                case false: return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
-                case null: return null
-              }
-            }} />
+          <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
 
-            <Route path='/workspaces/:idws?' render={() => // Workspace Router
-              <div>
-                <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
-                  <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
-                } />
+          <Route path='/workspaces/:idws?' render={() => // Workspace Router
+            <div className='fullWidthFullHeight'>
+              <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
+                <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
+              } />
 
-                <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-                  <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
-                } />
+              <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
+                <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
+              } />
 
-                <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
-                <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
-                <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
-                <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
-              </div>
-            } />
+              <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
+              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
+              <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
+              <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
+            </div>
+          } />
 
-            <Route path={PAGE.ACCOUNT} render={() =>
-              <Account />
-            } />
+          <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
-            <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
-              <AdminAccount />
-            } />
+          <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() => <AdminAccount />} />
 
-            <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
-            <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
+          <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
 
-            <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
+          <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
-            {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
-            <div id='appFeatureContainer' />
-            <div id='appFullscreenContainer' />
-            <div id='popupCreateContentContainer' />
-          </div>
+          <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
+
+          {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
+          <div id='appFullscreenContainer' />
+          <div id='appFeatureContainer' />
+          <div id='popupCreateContentContainer' />
         </div>
       </div>
     )

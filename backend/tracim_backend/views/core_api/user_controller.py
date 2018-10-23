@@ -3,6 +3,9 @@ from pyramid.config import Configurator
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import UserCantDeleteHimself
+from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -277,6 +280,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
+    @hapic.handle_exception(UserCantDeleteHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -312,6 +316,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
+    @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -329,6 +334,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(UserCantChangeIsOwnProfile, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetUserProfileSchema())

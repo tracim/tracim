@@ -23,7 +23,6 @@
   "Shared space management": "Gestion des espaces partagés",
   "List of every shared spaces": "Liste de tous les espaces partagés",
   "Shared space": "Espace partagé",
-  "Shared spaces": "Espaces partagés",
   "There is no shared space yet": "Il n'y a aucun espace partagé",
   "Error while loading shared spaces list": "Erreur lors du chargemetn des espaces partagés",
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
@@ -35,10 +34,10 @@
   "User created and email sent": "Utilisateur créé et email envoyé",
   "User created": "Utilisateur créé",
   "Email already exists": "Email déjà utilisé",
-  "Please type a name, an email and select a profile": "Veuillez choisir un email et un profil",
   "Name": "Nom",
   "Password": "Mot de passe",
   "Create the user": "Créer l'utilisateur",
   "Create a user": "Créer un utilisateur",
-  "Email notification are disabled, please notify users of any change": "Les notifications par email sont désactivées, pensez à notifier les utilisateurs de tout changement"
+  "Email notification are disabled, please notify users of any change": "Les notifications par email sont désactivées, pensez à notifier les utilisateurs de tout changement",
+  "Please type a name, an email, a password and select a profile": "Veuillez entrer un nom, un email, un mot de passe et choisir un profil"
 }

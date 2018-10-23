@@ -14,7 +14,6 @@
   "Member added": "Member added",
   "Error while loading shared space details": "Error while loading shared space details",
   "Error while saving new shared space label": "Error while saving new shared space label",
-  "Error while removing user from shared space": "Error while removing user from shared space",
   "Error while adding the member to the shared space": "Error while adding the member to the shared space",
   "Shared space's description": "Shared space's description",
   "Delete shared space": "Delete shared space",
@@ -23,5 +22,6 @@
   "Cancel": "Cancel",
   "Unknown user": "Unknown user",
   "Error while deleting shared space": "Error while deleting shared space",
-  "This account is deactivated": "This account is deactivated"
+  "This account is deactivated": "This account is deactivated",
+  "Error while removing member": "Error while removing member"
 }

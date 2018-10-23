@@ -28,7 +28,7 @@ export class AddUserForm extends React.Component {
       GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
-          msg: props.t('Please type a name, an email and select a profile'),
+          msg: props.t('Please type a name, an email, a password and select a profile'),
           type: 'warning',
           delay: undefined
         }
@@ -127,7 +127,7 @@ export class AddUserForm extends React.Component {
             onClick={this.handleClickAddUser}
           >
             {props.t('Create the user')}
-            <i class="fa fa-fw fa-check"/>
+            <i className='fa fa-fw fa-check' />
           </button>
         </div>
       </form>

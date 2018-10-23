@@ -251,7 +251,7 @@ class AdminWorkspaceUser extends React.Component {
       GLOBAL_renderAppFeature({
         loggedUser: {
           ...state.loggedUser,
-          idRoleUserWorkspace: 8 // only global admin can see this app
+          idRoleUserWorkspace: 8 // only global admin can see this app, he is workspace manager of any workspace. So, force idRoleUserWorkspace to 8
         },
         config: {
           label: 'Advanced dashboard',
@@ -259,10 +259,12 @@ class AdminWorkspaceUser extends React.Component {
           faIcon: 'bank',
           hexcolor: GLOBAL_primaryColor,
           creationLabel: '',
-          roleList: state.config.roleList,
           domContainer: 'appFeatureContainer',
           apiUrl: state.config.apiUrl,
           apiHeader: state.config.apiHeader,
+          roleList: state.config.roleList,
+          profileObject: state.config.profileObject,
+          system: {...state.config.system},
           translation: state.config.translation
         },
         content: {
@@ -302,7 +304,7 @@ class AdminWorkspaceUser extends React.Component {
           <AdminUser
             userList={state.content.userList}
             idLoggedUser={state.loggedUser.user_id}
-            profile={state.content.profile}
+            profile={state.config.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}

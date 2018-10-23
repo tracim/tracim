@@ -23,7 +23,6 @@
   "Shared space management": "Shared space management",
   "List of every shared spaces": "List of every shared spaces",
   "Shared space": "Shared space",
-  "Shared spaces": "Shared spaces",
   "There is no shared space yet": "There is no shared space yet",
   "Error while loading shared spaces list": "Error while loading shared spaces list",
   "Error while deleting shared space": "Error while deleting shared space",
@@ -35,10 +34,10 @@
   "User created and email sent": "User created and email sent",
   "User created": "User created",
   "Email already exists": "Email already exists",
-  "Please type a name, an email and select a profile": "Please type a name, an email and select a profile",
   "Name": "Name",
   "Password": "Password",
   "Create the user": "Create the user",
   "Create a user": "Create a user",
-  "Email notification are disabled, please notify users of any change": "Email notification are disabled, please notify users of any change"
+  "Email notification are disabled, please notify users of any change": "Email notification are disabled, please notify users of any change",
+  "Please type a name, an email, a password and select a profile": "Please type a name, an email, a password and select a profile"
 }

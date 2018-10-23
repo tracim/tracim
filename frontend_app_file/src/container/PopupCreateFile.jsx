@@ -2,12 +2,8 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
-  handleFetchResult,
   addAllResourceI18n
 } from 'tracim_frontend_lib'
-import {
-  postFileContent
-} from '../action.async.js'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
 import FileDropzone from '../component/FileDropzone.jsx'

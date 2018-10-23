@@ -6,32 +6,36 @@ var dateFnsLocale = {
   en: require('date-fns/locale/en')
 }
 
-export const libHandleFetchResult = async fetchResult => {
+const generateFetchResponse = async fetchResult => {
+  const resultJson = await fetchResult.clone().json()
+  return new Promise((resolve, reject) => resolve({
+    apiResponse: fetchResult,
+    body: resultJson
+  }))
+}
+
+export const handleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
-    case 200:
-    case 304:
-    case 400: // 400 should return the body to handle the backend error code in it
-      const resultJson = await fetchResult.clone().json()
-      return new Promise((resolve, reject) => resolve({
-        apiResponse: fetchResult,
-        body: resultJson
-      }))
-    case 204:
-      return fetchResult
+    case 204: return fetchResult
     case 401:
-      GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}}) // no break/return to return the promise
-    case 404:
-    case 409:
+      GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}})
+      return generateFetchResponse(fetchResult)
     case 500:
-    case 501:
-    case 502:
-    case 503:
-    case 504:
-      return new Promise((resolve, reject) => reject(fetchResult)) // @TODO : handle errors from api result
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: i18n.t('Unexpected error, please inform an administrator'),
+          type: 'danger',
+          delay: undefined
+        }
+      })
+      return generateFetchResponse(fetchResult)
+    default:
+      return generateFetchResponse(fetchResult)
   }
 }
 
-export const libAddAllResourceI18n = (i18n, translation) => {
+export const addAllResourceI18n = (i18n, translation) => {
   Object.keys(translation).forEach(lang =>
     Object.keys(translation[lang]).forEach(namespace =>
       i18n.addResources(lang, namespace, translation[lang][namespace])
@@ -39,7 +43,7 @@ export const libAddAllResourceI18n = (i18n, translation) => {
   )
 }
 
-export const libGenerateAvatarFromPublicName = publicName => {
+export const generateAvatarFromPublicName = publicName => {
   // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
   const stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
 
@@ -70,11 +74,11 @@ export const libGenerateAvatarFromPublicName = publicName => {
   return canvas.toDataURL('image/png', '')
 }
 
-export const libDisplayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
+export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
 
-export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
+export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
-export const libRevisionTypeList = lang => {
+export const revisionTypeList = lang => {
   i18n.changeLanguage(lang)
   return [{
     id: 'archiving',

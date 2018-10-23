@@ -1405,6 +1405,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         assert res[1]['public_name'] == test_user2.display_name
         assert res[1]['avatar_url'] is None
 
+
 class TestSetEmailEndpoint(FunctionalTest):
     # -*- coding: utf-8 -*-
     """

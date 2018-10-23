@@ -2,6 +2,7 @@
 import typing
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.roles import WorkspaceRoles
 
@@ -141,6 +142,10 @@ class RoleApi(object):
         return role
 
     def delete_one(self, user_id: int, workspace_id: int, flush=True) -> None:
+        if self._user and self._user.user_id == user_id:
+            raise UserCantRemoveHisOwnRoleInWorkspace(
+                "user {} can't remove is own role in workspace".format(user_id)
+            )
         self._get_one_rsc(user_id, workspace_id).delete()
         if flush:
             self._session.flush()

@@ -133,13 +133,11 @@ export const PROFILE = {
 
 export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}
 
-export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
-
 // Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
-const translationKeyFromBackend = [
+const translationKeyFromBackend = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
   i18n.t('All Contents'),
   i18n.t('Open'),

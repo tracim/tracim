@@ -26,7 +26,7 @@ export class PersonalData extends React.Component {
     const { props, state } = this
 
     if (state.newEmail !== '' && state.checkPassword === '') {
-      props.dispatch(newFlashMessage(props.t('Please type your password in order to change your email. (For security reasons)'), 'info'))
+      props.dispatch(newFlashMessage(props.t('Please type your password in order to change your email. (For security reasons)'), 'warning'))
       return
     }
 

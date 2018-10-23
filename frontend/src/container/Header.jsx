@@ -26,7 +26,12 @@ import {
 import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
-  handleClickLogo = () => this.props.history.push(PAGE.HOME)
+  handleClickLogo = () => {
+    const { props } = this
+
+    if (props.user.logged) props.history.push(PAGE.HOME)
+    else props.history.push(PAGE.LOGIN)
+  }
 
   handleClickFeature = () => {}
   handleClickExplore = () => {}
@@ -88,7 +93,7 @@ class Header extends React.Component {
               onClickAbout={this.handleClickAbout}
             />
 
-            {props.location.pathname !== PAGE.LOGIN && !props.system.config.email_notification_activated && (
+            {![PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD].includes(props.location.pathname) && !props.system.config.email_notification_activated && (
               <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                 <i className='header__menu__system__icon slowblink fa fa-warning' />
                 <span className='header__menu__system__text d-none d-xl-block'>

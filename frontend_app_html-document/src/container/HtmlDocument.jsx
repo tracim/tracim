@@ -424,6 +424,7 @@ class HtmlDocument extends React.Component {
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={mode !== MODE.VIEW || content.is_archived || content.is_deleted}
+                  label={t('Edit')}
                 />
               }
 

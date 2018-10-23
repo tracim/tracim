@@ -239,7 +239,7 @@ class WorkspaceResource(DAVCollection):
             # the purpose is to display .history only if there's at least one content's type that has a history
             if content.type != content_type_list.Folder.slug:
                 self._file_count += 1
-            retlist.append(content.get_label_as_file())
+            retlist.append(content.file_name)
 
         return retlist
 
@@ -327,7 +327,7 @@ class WorkspaceResource(DAVCollection):
         children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
+            content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
 
             if content.type == content_type_list.Folder.slug:
                 members.append(
@@ -434,7 +434,7 @@ class FolderResource(WorkspaceResource):
         return mktime(self.content.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return transform_to_display(self.content.get_label_as_file())
+        return transform_to_display(self.content.file_name)
 
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
@@ -551,7 +551,7 @@ class FolderResource(WorkspaceResource):
         )
 
         for content in visible_children:
-            content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
+            content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
 
             try:
                 if content.type == content_type_list.Folder.slug:
@@ -692,7 +692,7 @@ class HistoryFolderResource(FolderResource):
         )
 
         return HistoryFileFolderResource(
-            path='%s/%s' % (self.path, content.get_label_as_file()),
+            path='%s/%s' % (self.path, content.file_name),
             environ=self.environ,
             content=content,
             session=self.session,
@@ -708,7 +708,7 @@ class HistoryFolderResource(FolderResource):
                 self._is_deleted and content.is_deleted or
                 not (content.is_archived or self._is_archived or content.is_deleted or self._is_deleted))\
                     and content.type != content_type_list.Folder.slug:
-                ret.append(content.get_label_as_file())
+                ret.append(content.file_name)
 
         return ret
 
@@ -741,7 +741,7 @@ class HistoryFolderResource(FolderResource):
         for content in children:
             if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
                 members.append(HistoryFileFolderResource(
-                    path='%s/%s' % (self.path, content.get_label_as_file()),
+                    path='%s/%s' % (self.path, content.file_name),
                     environ=self.environ,
                     content=content,
                     user=self.user,
@@ -797,7 +797,7 @@ class DeletedFolderResource(HistoryFolderResource):
         )
 
         return self.provider.getResourceInst(
-            path='%s/%s' % (self.path, transform_to_display(content.get_label_as_file())),
+            path='%s/%s' % (self.path, transform_to_display(content.file_name)),
             environ=self.environ
             )
 
@@ -811,7 +811,7 @@ class DeletedFolderResource(HistoryFolderResource):
 
         for content in children:
             if content.is_deleted:
-                retlist.append(content.get_label_as_file())
+                retlist.append(content.file_name)
 
                 if content.type != content_type_list.Folder.slug:
                     self._file_count += 1
@@ -828,7 +828,7 @@ class DeletedFolderResource(HistoryFolderResource):
 
         for content in children:
             if content.is_deleted:
-                content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
+                content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
 
                 if content.type == content_type_list.Folder.slug:
                     members.append(
@@ -923,7 +923,7 @@ class ArchivedFolderResource(HistoryFolderResource):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + '/' + transform_to_display(content.get_label_as_file()),
+            path=self.path + '/' + transform_to_display(content.file_name),
             environ=self.environ
         )
 
@@ -932,7 +932,7 @@ class ArchivedFolderResource(HistoryFolderResource):
 
         for content in self.content_api.get_all_with_filter(
                 self.content if self.content is None else self.content.id, content_type_list.Any_SLUG):
-            retlist.append(content.get_label_as_file())
+            retlist.append(content.file_name)
 
             if content.type != content_type_list.Folder.slug:
                 self._file_count += 1
@@ -949,7 +949,7 @@ class ArchivedFolderResource(HistoryFolderResource):
 
         for content in children:
             if content.is_archived:
-                content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
+                content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
 
                 if content.type == content_type_list.Folder.slug:
                     members.append(
@@ -1025,7 +1025,7 @@ class HistoryFileFolderResource(HistoryFolderResource):
         return "<DAVCollection: HistoryFileFolderResource (%s)" % self.content.file_name
 
     def getDisplayName(self) -> str:
-        return self.content.get_label_as_file()
+        return self.content.file_name
 
     def createCollection(self, name):
         raise DAVError(HTTP_FORBIDDEN)
@@ -1059,7 +1059,7 @@ class HistoryFileFolderResource(HistoryFolderResource):
             )
         else:
             return HistoryOtherFile(
-                path='%s%s' % (left_side, transform_to_display(revision.get_label_as_file())),
+                path='%s%s' % (left_side, transform_to_display(revision.file_name)),
                 environ=self.environ,
                 content=self.content,
                 content_revision=revision,
@@ -1154,7 +1154,7 @@ class FileResource(DAVNonCollection):
         return FakeFileStream(
             content=self.content,
             content_api=self.content_api,
-            file_name=self.content.get_label_as_file(),
+            file_name=self.content.file_name,
             workspace=self.content.workspace,
             path=self.path,
             session=self.session,
@@ -1398,7 +1398,7 @@ class OtherFileResource(FileResource):
             self.path += '.html'
 
     def getDisplayName(self) -> str:
-        return self.content.get_label_as_file()
+        return self.content.file_name
 
     def getPreferredPath(self):
         return self.path
@@ -1456,7 +1456,7 @@ class HistoryOtherFile(OtherFileResource):
 
     def getDisplayName(self) -> str:
         left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, transform_to_display(self.content_revision.get_label_as_file()))
+        return '%s%s' % (left_side, transform_to_display(self.content_revision.file_name))
 
     def getContent(self):
         filestream = compat.BytesIO()

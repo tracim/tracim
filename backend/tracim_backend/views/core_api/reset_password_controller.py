@@ -2,7 +2,7 @@
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
-from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.extensions import hapic
@@ -34,7 +34,7 @@ class ResetPasswordController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
     @hapic.input_body(ResetPasswordRequestSchema())
-    @hapic.handle_exception(NotificationDisabled, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_request(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """

@@ -34,5 +34,7 @@
   "ZB": "ZB",
   "YB": "YB",
   "Files": "Files",
-  "Please wait until the upload ends": "Please wait until the upload ends"
+  "Please wait until the upload ends": "Please wait until the upload ends",
+  "Error while loading file": "Error while loading file",
+  "Update": "Update"
 }

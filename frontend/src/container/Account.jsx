@@ -168,30 +168,32 @@ class Account extends React.Component {
     })()
 
     return (
-      <PageWrapper customClass='account'>
-        <PageTitle
-          parentClass={'account'}
-          title={props.t('My account')}
-        />
+      <div className='tracim__content fullWidthFullHeight'>
+        <PageWrapper customClass='account'>
+          <PageTitle
+            parentClass={'account'}
+            title={props.t('My account')}
+          />
 
-        <PageContent parentClass='account'>
-          <UserInfo user={props.user} />
+          <PageContent parentClass='account'>
+            <UserInfo user={props.user} />
 
-          <Delimiter customClass={'account__delimiter'} />
+            <Delimiter customClass={'account__delimiter'} />
 
-          <div className='account__userpreference'>
-            <MenuSubComponent
-              activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
-              onClickMenuItem={this.handleClickSubComponentMenuItem}
-            />
+            <div className='account__userpreference'>
+              <MenuSubComponent
+                activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
+                onClickMenuItem={this.handleClickSubComponentMenuItem}
+              />
 
-            <div className='account__userpreference__setting'>
-              { subComponent }
+              <div className='account__userpreference__setting'>
+                { subComponent }
+              </div>
             </div>
-          </div>
 
-        </PageContent>
-      </PageWrapper>
+          </PageContent>
+        </PageWrapper>
+      </div>
     )
   }
 }

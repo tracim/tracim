@@ -6,27 +6,10 @@ import { NewMemberForm } from 'tracim_frontend_lib'
 require('./MemberList.styl')
 
 export class MemberList extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      displayNewMemberList: true
-    }
-  }
-
-  handleClickAddMemberBtn = () => this.setState({displayNewMemberList: false})
-
-  handleClickCloseAddMemberBtn = () => this.setState({displayNewMemberList: true})
-
-  handleClickCheckboxCreateAccount = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    this.props.onChangeCreateAccount(!this.props.createAccount)
-  }
-
   handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({displayNewMemberList: true})
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
     return (
       <div className='memberlist'>
@@ -36,8 +19,28 @@ export class MemberList extends React.Component {
         </div>
 
         <div className='memberlist__wrapper'>
-          {state.displayNewMemberList
+          {props.displayNewMemberForm
             ? (
+              <NewMemberForm
+                onClickCloseAddMemberBtn={props.onClickCloseAddMemberBtn}
+                nameOrEmail={props.nameOrEmail}
+                isEmail={props.isEmail}
+                onChangeNameOrEmail={props.onChangeNameOrEmail}
+                searchedKnownMemberList={props.searchedKnownMemberList}
+                autoCompleteActive={props.autoCompleteFormNewMemberActive}
+                onClickKnownMember={props.onClickKnownMember}
+                roleList={props.roleList}
+                role={props.role}
+                onChangeRole={props.onChangeRole}
+                onClickBtnValidate={this.handleClickBtnValidate}
+                emailNotifActivated={props.emailNotifActivated}
+                canSendInviteNewUser={props.canSendInviteNewUser}
+                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                autoCompleteClicked={props.autoCompleteClicked}
+                onClickAutoComplete={props.onClickAutoComplete}
+              />
+            )
+            : (
               <div>
                 <ul className={classnames('memberlist__list', {'withAddBtn': props.idRoleUserWorkspace >= 8})}>
                   {props.memberList.map(m =>
@@ -52,11 +55,11 @@ export class MemberList extends React.Component {
                         </div>
 
                         <div className='memberlist__list__item__info__role'>
-                          {props.roleList.find(r => r.slug === m.role).label}
+                          {props.t(props.roleList.find(r => r.slug === m.role).label)}
                         </div>
                       </div>
 
-                      {props.idRoleUserWorkspace >= 8 && (
+                      {props.idRoleUserWorkspace >= 8 && m.id !== props.loggedUser.user_id && (
                         <div
                           className='memberlist__list__item__delete primaryColorFontHover'
                           onClick={() => props.onClickRemoveMember(m.id)}
@@ -69,7 +72,7 @@ export class MemberList extends React.Component {
                 </ul>
 
                 {props.idRoleUserWorkspace >= 8 && (
-                  <div className='memberlist__btnadd' onClick={this.handleClickAddMemberBtn}>
+                  <div className='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>
                         <div className='memberlist__btnadd__button__avatar__icon'>
@@ -84,23 +87,6 @@ export class MemberList extends React.Component {
                   </div>
                 )}
               </div>
-            )
-            : (
-              <NewMemberForm
-                onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
-                nameOrEmail={props.nameOrEmail}
-                onChangeNameOrEmail={props.onChangeNameOrEmail}
-                searchedKnownMemberList={props.searchedKnownMemberList}
-                autoCompleteActive={props.autoCompleteFormNewMemberActive}
-                onClickKnownMember={props.onClickKnownMember}
-                roleList={props.roleList}
-                role={props.role}
-                onChangeRole={props.onChangeRole}
-                onClickBtnValidate={this.handleClickBtnValidate}
-                emailNotifActivated={props.emailNotifActivated}
-                isLoggedUserAdmin={props.isLoggedUserAdmin}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
-              />
             )
           }
         </div>

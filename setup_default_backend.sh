@@ -1,6 +1,4 @@
 #!/bin/bash
-# . bash_library.sh # source bash_library.sh
-# . backend_lib.sh # source backend_lib.sh
 
 # Main in bottom
 
@@ -32,7 +30,7 @@ function install_backend_system_dep {
 
     log "install deps for dealing with most preview..."
     $SUDO apt install -y zlib1g-dev libjpeg-dev && loggood "success" || logerror "some error"
-    $SUDO apt install -y imagemagick libmagickwand-dev ghostscript && loggood "success" || logerror "some error"
+    $SUDO apt install -y imagemagick libmagickwand-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl && loggood "success" || logerror "some error"
     $SUDO apt install -y libreoffice && loggood "success" || logerror "some error" # most office documents file and text format
     $SUDO apt install -y inkscape && loggood "success" || logerror "some error" # for .svg files.
 }

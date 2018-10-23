@@ -30,26 +30,28 @@ class Home extends React.Component {
     }
 
     return (
-      <section
-        className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
-        style={styleHomepage}
-      >
-        <div className='container-fluid nopadding'>
-          <Card customClass='homepagecard'>
-            <CardHeader displayHeader={false} />
+      <div className='tracim__content fullWidthFullHeight'>
+        <section
+          className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
+          style={styleHomepage}
+        >
+          <div className='container-fluid nopadding'>
+            <Card customClass='homepagecard'>
+              <CardHeader displayHeader={false} />
 
-            <CardBody customClass='homepagecard'>
-              {props.workspaceList.length > 0
-                ? <HomeHasWorkspace user={props.user} />
-                : <HomeNoWorkspace
-                  canCreateWorkspace={props.canCreateWorkspace}
-                  onClickCreateWorkspace={this.handleClickCreateWorkspace}
-                />
-              }
-            </CardBody>
-          </Card>
-        </div>
-      </section>
+              <CardBody customClass='homepagecard'>
+                {props.workspaceList.length > 0
+                  ? <HomeHasWorkspace user={props.user} />
+                  : <HomeNoWorkspace
+                    canCreateWorkspace={props.canCreateWorkspace}
+                    onClickCreateWorkspace={this.handleClickCreateWorkspace}
+                  />
+                }
+              </CardBody>
+            </Card>
+          </div>
+        </section>
+      </div>
     )
   }
 }

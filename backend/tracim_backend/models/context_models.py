@@ -856,7 +856,10 @@ class ContentInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.get_preview_page_nb(self.content.revision_id)
+            return content_api.get_preview_page_nb(
+                self.content.revision_id,
+                file_extension=self.content.file_extension
+            )
         else:
             return None
 
@@ -889,7 +892,10 @@ class ContentInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.has_pdf_preview(self.content.revision_id)
+            return content_api.has_pdf_preview(
+                self.content.revision_id,
+                file_extension=self.content.file_extension
+            )
         else:
             return False
 
@@ -899,6 +905,13 @@ class ContentInContext(object):
         :return: file extension with "." at the beginning, example : .txt
         """
         return self.content.file_extension
+
+    @property
+    def filename(self) -> str:
+        """
+        :return: complete filename with both label and file extension part
+        """
+        return self.content.file_name
 
 
 class RevisionInContext(object):
@@ -1068,7 +1081,10 @@ class RevisionInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.get_preview_page_nb(self.revision.revision_id)
+            return content_api.get_preview_page_nb(
+                self.revision.revision_id,
+                file_extension=self.revision.file_extension
+            )
         else:
             return None
 
@@ -1101,7 +1117,10 @@ class RevisionInContext(object):
                 session=self.dbsession,
                 config=self.config
             )
-            return content_api.has_pdf_preview(self.revision.revision_id)
+            return content_api.has_pdf_preview(
+                self.revision.revision_id,
+                file_extension=self.revision.file_extension,
+            )
         else:
             return False
 
@@ -1111,3 +1130,10 @@ class RevisionInContext(object):
         :return: file extension with "." at the beginning, example : .txt
         """
         return self.revision.file_extension
+
+    @property
+    def filename(self) -> str:
+        """
+        :return: complete filename with both label and file extension part
+        """
+        return self.revision.file_name

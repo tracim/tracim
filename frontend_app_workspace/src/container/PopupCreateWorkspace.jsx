@@ -18,7 +18,7 @@ const debug = { // outdated
     apiUrl: 'http://localhost:6543',
     apiHeader: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     translation: {
       en: {},

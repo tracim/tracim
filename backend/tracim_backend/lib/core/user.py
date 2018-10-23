@@ -9,17 +9,21 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import AuthenticationFailed, \
+    UserCantDeleteHimself, UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
-from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import \
+    NotificationDisabledCantCreateUserWithInvitation
+from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
-from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -363,6 +367,10 @@ class UserApi(object):
             user.lang = lang
 
         if groups is not None:
+            if self._user and self._user == user:
+                raise UserCantChangeIsOwnProfile(
+                    "User {} can't change is own profile".format(user.user_id)
+                )
             # INFO - G.M - 2018-07-18 - Delete old groups
             for group in user.groups:
                 if group not in groups:
@@ -389,7 +397,7 @@ class UserApi(object):
         do_notify: bool=True,
     ) -> User:
         if do_notify and not self._config.EMAIL_NOTIFICATION_ACTIVATED:
-            raise NotificationDisabled(
+            raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because "
                 "notification are disabled."
             )
@@ -456,7 +464,7 @@ class UserApi(object):
         :return: reset_password_token
         """
         if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
-            raise NotificationDisabled("cant reset password with notification disabled")  # nopep8
+            raise NotificationDisabledCantResetPassword("cant reset password with notification disabled")  # nopep8
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
@@ -479,11 +487,20 @@ class UserApi(object):
             self.save(user)
 
     def disable(self, user: User, do_save=False):
+        if self._user and self._user == user:
+            raise UserCantDisableHimself(
+                "User {} can't disable himself".format(user.user_id)
+            )
+
         user.is_active = False
         if do_save:
             self.save(user)
 
     def delete(self, user: User, do_save=False):
+        if self._user and self._user == user:
+            raise UserCantDeleteHimself(
+                "User {} can't delete himself".format(user.user_id)
+            )
         user.is_deleted = True
         if do_save:
             self.save(user)

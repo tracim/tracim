@@ -2,12 +2,12 @@ import React from 'react'
 import classnames from 'classnames'
 import Radium from 'radium'
 import color from 'color'
-import { libRevisionTypeList } from '../../helper.js'
+import { revisionTypeList } from '../../helper.js'
 
 require('./Revision.styl')
 
 const Revision = props => {
-  const revisionType = libRevisionTypeList(props.lang).find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
+  const revisionType = revisionTypeList(props.lang).find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
   return (
       <li
         className={classnames(`${props.customClass}__messagelist__version`, 'revision')}

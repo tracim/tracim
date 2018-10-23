@@ -1076,7 +1076,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1196,7 +1196,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1251,7 +1251,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1421,7 +1421,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1490,7 +1490,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1813,7 +1813,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -1895,7 +1895,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
         rapi = RoleApi(
-            current_user=admin,
+            current_user=None,
             session=dbsession,
             config=self.app_config,
         )
@@ -2057,6 +2057,63 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         roles = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace.workspace_id), status=200).json_body   # nopep8
         for role in roles:
             assert role['user_id'] != user2.user_id
+
+    def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):  # nopep8
+        """
+        Delete worskpace member role.
+        Unallow to delete himself as workspace_manager
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'test2@test2.test2'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user2.user_id,
+            ),
+            status=400,
+        )
+        assert res.json_body['code'] == error.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE  # nopep8
+        # after
+        roles = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace.workspace_id), status=200).json_body   # nopep8
+        assert user2.user_id in [role['user_id'] for role in roles]
 
     def test_api__delete_workspace_member_role__err_400__simple_user(self):
         """
@@ -3154,6 +3211,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['sub_content_types']
         assert res.json_body['modified']
         assert res.json_body['created']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         params_active = {
             'parent_id': 0,
             'show_archived': 0,
@@ -3197,6 +3256,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
@@ -3251,6 +3312,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
@@ -3289,7 +3352,6 @@ class TestWorkspaceContents(FunctionalTest):
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
         assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
-
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
         """
         Create generic content in folder
@@ -3323,6 +3385,8 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] == 10
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
+        assert res.json_body['file_extension'] == '.document.html'
+        assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
