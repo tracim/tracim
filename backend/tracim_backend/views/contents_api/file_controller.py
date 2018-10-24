@@ -79,8 +79,7 @@ class FileController(Controller):
     @hapic.input_files(SimpleFileSchema())
     def create_file(self, context, request: TracimRequest, hapic_data=None):
         """
-        Create a file .This will create 2 new
-        revision.
+        Create a file .This will create 2 new revision.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -137,6 +136,8 @@ class FileController(Controller):
         """
         Upload a new version of raw file of content. This will create a new
         revision.
+        Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -174,6 +175,8 @@ class FileController(Controller):
     def download_file(self, context, request: TracimRequest, hapic_data=None):
         """
         Download raw file of last revision of content.
+        Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -207,6 +210,8 @@ class FileController(Controller):
     def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Download raw file for specific revision of content.
+        Good pratice for filename is filename is `{label}_r{revision_id}{file_extension}`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -227,7 +232,11 @@ class FileController(Controller):
         file = DepotManager.get().get(revision.depot_file)
         filename = hapic_data.path.filename
         if not filename or filename == 'raw':
-            filename = revision.file_name
+            filename = "{label}_r{revision_id}{file_extension}".format(
+                label=revision.file_name,
+                revision_id=revision.revision_id,
+                file_extension=revision.file_extension
+            )
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,
@@ -249,6 +258,8 @@ class FileController(Controller):
     def preview_pdf(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain a specific page pdf preview of last revision of content.
+        Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -270,7 +281,10 @@ class FileController(Controller):
         )
         filename = hapic_data.path.filename
         if not filename or filename == 'raw':
-            filename = "{}_page_{}.pdf".format(content.label, hapic_data.query.page)
+            filename = "{label}_page_{page_number}.pdf".format(
+                label=content.label,
+                page_number=hapic_data.query.page
+            )
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
@@ -288,6 +302,8 @@ class FileController(Controller):
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Obtain a full pdf preview (all page) of last revision of content.
+        Good pratice for filename is filename is `{label}.pdf`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -325,6 +341,8 @@ class FileController(Controller):
     def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Obtain full pdf preview of a specific revision of content.
+        Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -348,7 +366,10 @@ class FileController(Controller):
         )
         filename = hapic_data.path.filename
         if not filename or filename == 'raw':
-            filename = "{label}.pdf".format(label=revision.label)
+            filename = "{label}_r{revision_id}.pdf".format(
+                revision_id=revision.revision_id,
+                label=revision.label
+            )
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
@@ -366,6 +387,8 @@ class FileController(Controller):
     def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Obtain a specific page pdf preview of a specific revision of content.
+        Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -412,7 +435,9 @@ class FileController(Controller):
     @hapic.output_file([])
     def preview_jpg(self, context, request: TracimRequest, hapic_data=None):
         """
-        Obtain normally sied jpg preview of last revision of content.
+        Obtain normally sized jpg preview of last revision of content.
+        Good pratice for filename is `filename is {label}_page_{page_number}.jpg`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -459,6 +484,8 @@ class FileController(Controller):
     def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Obtain resized jpg preview of last revision of content.
+        Good pratice for filename is filename is `{label}_page_{page_number}_{width}x{height}.jpg`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -506,6 +533,8 @@ class FileController(Controller):
     def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Obtain resized jpg preview of a specific revision of content.
+        Good pratice for filename is filename is `{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg`.
+        Default filename value is 'raw' (without file extension) or nothing.
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
@@ -533,7 +562,8 @@ class FileController(Controller):
         )
         filename = hapic_data.path.filename
         if not filename or filename == 'raw':
-            filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
+            filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(  # nopep8
+                revision_id=revision.revision_id,
                 label=revision.label,
                 page_number=hapic_data.query.page,
                 width=hapic_data.path.width,
