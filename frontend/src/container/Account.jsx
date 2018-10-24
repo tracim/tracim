@@ -23,10 +23,10 @@ import {
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
-  putUserName,
-  putUserEmail,
-  putUserPassword,
-  putUserWorkspaceDoNotify
+  putMyselfName,
+  putMyselfEmail,
+  putMyselfPassword,
+  putMyselfWorkspaceDoNotify
 } from '../action-creator.async.js'
 
 class Account extends React.Component {
@@ -88,7 +88,7 @@ class Account extends React.Component {
     const { props } = this
 
     if (newName !== '') {
-      const fetchPutUserName = await props.dispatch(putUserName(props.user, newName))
+      const fetchPutUserName = await props.dispatch(putMyselfName(props.user, newName))
       switch (fetchPutUserName.status) {
         case 200:
           props.dispatch(updateUserName(newName))
@@ -106,7 +106,7 @@ class Account extends React.Component {
     }
 
     if (newEmail !== '') {
-      const fetchPutUserEmail = await props.dispatch(putUserEmail(props.user, newEmail, checkPassword))
+      const fetchPutUserEmail = await props.dispatch(putMyselfEmail(newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
@@ -121,7 +121,7 @@ class Account extends React.Component {
   handleChangeSubscriptionNotif = async (idWorkspace, doNotify) => {
     const { props } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(props.user, idWorkspace, doNotify))
+    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(idWorkspace, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
       case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
@@ -131,7 +131,7 @@ class Account extends React.Component {
   handleSubmitPassword = async (oldPassword, newPassword, newPassword2) => {
     const { props } = this
 
-    const fetchPutUserPassword = await props.dispatch(putUserPassword(props.user, oldPassword, newPassword, newPassword2))
+    const fetchPutUserPassword = await props.dispatch(putMyselfPassword(oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
       case 204: props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info')); return true
       case 403: props.dispatch(newFlashMessage(props.t('Wrong old password'), 'warning')); return false

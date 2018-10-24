@@ -19,7 +19,7 @@ import {
   putDescription,
   putMemberRole,
   deleteMember,
-  getUserKnownMember,
+  getMyselfKnownMember,
   postWorkspaceMember,
   deleteWorkspace
 } from '../action.async.js'
@@ -237,7 +237,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props, state } = this
-    const fetchUserKnownMemberList = await handleFetchResult(await getUserKnownMember(state.config.apiUrl, state.loggedUser.user_id, userNameToSearch))
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch))
     switch (fetchUserKnownMemberList.apiResponse.status) {
       case 200:
         this.setState({

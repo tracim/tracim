@@ -25,7 +25,7 @@ import {
   getFolderContent,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
-  getWorkspaceReadStatusList
+  getMyselfWorkspaceReadStatusList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -103,7 +103,7 @@ class WorkspaceContent extends React.Component {
       this.loadContentList(idWorkspace)
     }
 
-    // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, idWorkspace))
+    // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getMyselfWorkspaceList(user.user_id, idWorkspace))
   }
 
   componentWillUnmount () {
@@ -116,7 +116,7 @@ class WorkspaceContent extends React.Component {
 
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
     const wsMember = await dispatch(getWorkspaceMemberList(idWorkspace))
-    const wsReadStatus = await dispatch(getWorkspaceReadStatusList(user, idWorkspace))
+    const wsReadStatus = await dispatch(getMyselfWorkspaceReadStatusList(idWorkspace))
 
     switch (wsContent.status) {
       case 200: dispatch(setWorkspaceContentList(wsContent.json)); break

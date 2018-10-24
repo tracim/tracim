@@ -79,7 +79,7 @@ export const postHtmlDocContent = (apiUrl, idWorkspace, idFolder, contentType, n
   })
 
 export const putHtmlDocIsArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -89,7 +89,7 @@ export const putHtmlDocIsArchived = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const putHtmlDocIsDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -99,7 +99,7 @@ export const putHtmlDocIsDeleted = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const putHtmlDocRestoreArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -109,7 +109,7 @@ export const putHtmlDocRestoreArchived = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const putHtmlDocRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

@@ -11,13 +11,13 @@ import {
 import {
   getWorkspaceDetail,
   getWorkspaceMemberList,
-  getWorkspaceRecentActivityList,
-  getWorkspaceReadStatusList,
-  getUserKnownMember,
+  getMyselfWorkspaceRecentActivityList,
+  getMyselfWorkspaceReadStatusList,
+  getMyselfKnownMember,
   postWorkspaceMember,
-  putUserWorkspaceRead,
+  putMyselfWorkspaceRead,
   deleteWorkspaceMember,
-  putUserWorkspaceDoNotify
+  putMyselfWorkspaceDoNotify
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -133,8 +133,8 @@ class Dashboard extends React.Component {
   loadRecentActivity = async () => {
     const { props, state } = this
 
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl))
-    const fetchWorkspaceReadStatusList = await props.dispatch(getWorkspaceReadStatusList(props.user, state.workspaceIdInUrl))
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl))
+    const fetchWorkspaceReadStatusList = await props.dispatch(getMyselfWorkspaceReadStatusList(state.workspaceIdInUrl))
 
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
@@ -163,7 +163,7 @@ class Dashboard extends React.Component {
 
   handleClickMarkRecentActivityAsRead = async () => {
     const { props } = this
-    const fetchUserWorkspaceAllRead = await props.dispatch(putUserWorkspaceRead(props.user, props.curWs.id))
+    const fetchUserWorkspaceAllRead = await props.dispatch(putMyselfWorkspaceRead(props.curWs.id))
     switch (fetchUserWorkspaceAllRead.status) {
       case 204: this.loadRecentActivity(); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while setting "mark all as read"')}`, 'warning')); break
@@ -175,7 +175,7 @@ class Dashboard extends React.Component {
 
     const idLastRecentActivity = props.curWs.recentActivityList[props.curWs.recentActivityList.length - 1].id
 
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl, idLastRecentActivity))
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl, idLastRecentActivity))
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
@@ -184,7 +184,7 @@ class Dashboard extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getUserKnownMember(props.user, userNameToSearch))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch))
     switch (fetchUserKnownMemberList.status) {
       case 200:
         this.setState({
@@ -332,7 +332,7 @@ class Dashboard extends React.Component {
 
   handleClickAddNotification = async () => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putUserWorkspaceDoNotify(props.user, props.curWs.id, true))
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.user, props.curWs.id, true))
     switch (fetchWorkspaceUserAddNotification.status) {
       case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, true)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
@@ -341,7 +341,7 @@ class Dashboard extends React.Component {
 
   handleClickRemoveNotification = async () => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putUserWorkspaceDoNotify(props.user, props.curWs.id, false))
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.user, props.curWs.id, false))
     switch (fetchWorkspaceUserAddNotification.status) {
       case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, false)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))

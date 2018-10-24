@@ -88,7 +88,7 @@ export const postFileContent = (apiUrl, idWorkspace, idFolder, contentType, uplo
   })
 
 export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -98,7 +98,7 @@ export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -108,7 +108,7 @@ export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -118,7 +118,7 @@ export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -127,8 +127,8 @@ export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFileRead = (user, apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+export const putMyselfFileRead = (apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/users/me/workspaces/${idWorkspace}/contents/${idContent}/read`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

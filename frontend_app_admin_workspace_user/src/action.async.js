@@ -28,7 +28,7 @@ export const getWorkspaceDetail = (apiUrl, idWorkspace) =>
   })
 
 export const deleteWorkspace = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/delete`, {
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -55,7 +55,7 @@ export const getUserDetail = (apiUrl, idUser) =>
   })
 
 export const putUserDisable = (apiUrl, idUser) =>
-  fetch(`${apiUrl}/users/${idUser}/disable`, {
+  fetch(`${apiUrl}/users/${idUser}/disabled`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -64,11 +64,23 @@ export const putUserDisable = (apiUrl, idUser) =>
   })
 
 export const putUserEnable = (apiUrl, idUser) =>
-  fetch(`${apiUrl}/users/${idUser}/enable`, {
+  fetch(`${apiUrl}/users/${idUser}/enabled`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
+    method: 'PUT'
+  })
+
+export const putMyselfProfile = (apiUrl, idUser, newProfile) =>
+  fetch(`${apiUrl}/users/${idUser}/profile`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    body: JSON.stringify({
+      profile: newProfile
+    }),
     method: 'PUT'
   })
 

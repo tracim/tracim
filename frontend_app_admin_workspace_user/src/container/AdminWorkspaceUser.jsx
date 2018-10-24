@@ -197,7 +197,8 @@ class AdminWorkspaceUser extends React.Component {
   handleUpdateProfile = async (idUser, newProfile) => {
     const { props, state } = this
 
-    const toggleManager = await handleFetchResult(await putUserProfile(state.config.apiUrl, idUser, newProfile))
+    const endPoint = idUser === state.loggedUser.user_id ? putMyselfProfile : putUserProfile
+    const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, idUser, newProfile))
     switch (toggleManager.status) {
       case 204: this.loadUserContent(); break
       default: this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
