@@ -151,8 +151,8 @@ class File extends React.Component {
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: removeExtensionOfFilename(fetchResultFile.body.filename),
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500?page=${fileCurrentPage}`,
-            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080?page=${fileCurrentPage}`
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${content.filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
+            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${content.filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`
           }
         })
         break
@@ -554,15 +554,15 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            downloadRawUrl={(({config: {apiUrl}, content: {workspace_id, content_id, current_revision_id, filenameNoExtension, current_revision_id, file_extension}, mode}) =>
-              `${apiUrl}/workspaces/${workspace_id}/files/${content_id}/${mode === MODE.REVISION ? `revisions/${current_revision_id}/` : ''}raw/${filenameNoExtension}-r${current_revision_id}${file_extension}?force_download=1`
+            downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}-r${content.current_revision_id}${content.file_extension}?force_download=1`
             )(state)}
             isPdfAvailable={state.content.pdf_available}
-            downloadPdfPageUrl={(({config: {apiUrl}, content: {workspace_id, content_id, current_revision_id, filenameNoExtension}, mode, fileCurrentPage}) =>
-              `${apiUrl}/workspaces/${workspace_id}/files/${content_id}/${mode === MODE.REVISION ? `revisions/${current_revision_id}/` : ''}preview/pdf/${filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1`
+            downloadPdfPageUrl={(({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1`
             )(state)}
-            downloadPdfFullUrl={(({config: {apiUrl}, content: {workspace_id, content_id, current_revision_id, filenameNoExtension}, mode}) =>
-              `${apiUrl}/workspaces/${workspace_id}/files/${content_id}/${mode === MODE.REVISION ? `revisions/${current_revision_id}/` : ''}preview/pdf/full/${filenameNoExtension + '.pdf'}?force_download=1`
+            downloadPdfFullUrl={(({config: {apiUrl}, content, mode}) =>
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1`
             )(state)}
             contentFullScreenUrl={state.content.contentFullScreenUrl}
             onChangeFile={this.handleChangeFile}

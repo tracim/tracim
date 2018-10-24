@@ -19,6 +19,7 @@ import {
   putUserDisable,
   putUserEnable,
   putUserProfile,
+  putMyselfProfile,
   postAddUser
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'

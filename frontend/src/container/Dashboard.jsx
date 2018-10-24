@@ -332,7 +332,7 @@ class Dashboard extends React.Component {
 
   handleClickAddNotification = async () => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.user, props.curWs.id, true))
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, true))
     switch (fetchWorkspaceUserAddNotification.status) {
       case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, true)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
@@ -341,7 +341,7 @@ class Dashboard extends React.Component {
 
   handleClickRemoveNotification = async () => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.user, props.curWs.id, false))
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, false))
     switch (fetchWorkspaceUserAddNotification.status) {
       case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, false)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
