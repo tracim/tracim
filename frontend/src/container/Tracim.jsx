@@ -18,12 +18,17 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { PAGE, unLoggedAllowedPageList, getUserProfile } from '../helper.js'
+import {
+  PAGE,
+  unLoggedAllowedPageList,
+  getUserProfile
+} from '../helper.js'
 import {
   getConfig,
   getAppList,
   getContentTypeList,
-  getUserIsConnected, getWorkspaceList
+  getUserIsConnected,
+  getMyselfWorkspaceList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -112,7 +117,7 @@ class Tracim extends React.Component {
 
     const idWsToOpen = idOpenInSidebar || (props.workspaceList.find(ws => ws.isOpenInSidebar) || {id: undefined}).id
 
-    const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(props.user))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
     if (fetchGetWorkspaceList.status === 200) {
       const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))

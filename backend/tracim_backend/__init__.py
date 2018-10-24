@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid_multiauth import MultiAuthenticationPolicy
+from tracim_backend.views.core_api.account_controller import AccountController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -129,6 +130,7 @@ def web(global_config, **local_settings):
     session_controller = SessionController()
     system_controller = SystemController()
     user_controller = UserController()
+    account_controller = AccountController()
     reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
@@ -139,6 +141,7 @@ def web(global_config, **local_settings):
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(account_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)  # nopep8
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)

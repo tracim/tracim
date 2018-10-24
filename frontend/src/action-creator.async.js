@@ -121,7 +121,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/login`,
+    url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -139,7 +139,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
 
 export const postForgotPassword = email => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/reset_password/request`,
+    url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -155,7 +155,7 @@ export const postForgotPassword = email => async dispatch => {
 
 export const postResetPassword = (newPassword, newPassword2, email, token) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/reset_password/modify`,
+    url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/modify`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -174,7 +174,7 @@ export const postResetPassword = (newPassword, newPassword2, email, token) => as
 
 export const postUserLogout = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/logout`,
+    url: `${FETCH_CONFIG.apiUrl}/auth/logout`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -217,7 +217,7 @@ export const getUserWorkspaceList = idUser => async dispatch => {
 
 export const getUserIsConnected = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`,
+    url: `${FETCH_CONFIG.apiUrl}/auth/whoami`,
     param: {
       credentials: 'include',
       headers: {
@@ -230,9 +230,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
+export const getMyselfKnownMember = userNameToSearch => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/known_members?acp=${userNameToSearch}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}`,
     param: {
       credentials: 'include',
       headers: {
@@ -241,6 +241,26 @@ export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
       method: 'GET'
     },
     actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
+export const putMyselfName = (user, newName) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/me`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        public_name: newName,
+        timezone: user.timezone,
+        lang: user.lang
+      })
+    },
+    actionName: USER_NAME,
     dispatch
   })
 }
@@ -265,6 +285,25 @@ export const putUserName = (user, newName) => dispatch => {
   })
 }
 
+export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/me/email`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        email: newEmail,
+        loggedin_user_password: checkPassword
+      })
+    },
+    actionName: USER_EMAIL,
+    dispatch
+  })
+}
+
 export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/email`,
@@ -280,6 +319,26 @@ export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
       })
     },
     actionName: USER_EMAIL,
+    dispatch
+  })
+}
+
+export const putMyselfPassword = (oldPassword, newPassword, newPassword2) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/me/password`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        loggedin_user_password: oldPassword,
+        new_password: newPassword,
+        new_password2: newPassword2
+      })
+    },
+    actionName: USER_PASSWORD,
     dispatch
   })
 }
@@ -324,9 +383,9 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
+export const putMyselfWorkspaceRead = idWorkspace => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/read`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/read`,
     param: {
       credentials: 'include',
       headers: {
@@ -335,6 +394,21 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
       method: 'PUT'
     },
     actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
+export const putMyselfWorkspaceDoNotify = (idWorkspace, doNotify) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT'
+    },
+    actionName: USER_WORKSPACE_DO_NOTIFY,
     dispatch
   })
 }
@@ -354,9 +428,9 @@ export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatc
   })
 }
 
-export const getWorkspaceList = user => dispatch => {
+export const getMyselfWorkspaceList = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces`,
     param: {
       credentials: 'include',
       headers: {
@@ -414,9 +488,9 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
   })
 }
 
-export const getWorkspaceRecentActivityList = (user, idWorkspace, beforeId = null) => dispatch => {
+export const getMyselfWorkspaceRecentActivityList = (idWorkspace, beforeId = null) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
     param: {
       credentials: 'include',
       headers: {
@@ -429,9 +503,9 @@ export const getWorkspaceRecentActivityList = (user, idWorkspace, beforeId = nul
   })
 }
 
-export const getWorkspaceReadStatusList = (user, idWorkspace) => dispatch => {
+export const getMyselfWorkspaceReadStatusList = idWorkspace => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/read_status`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/contents/read_status`,
     param: {
       credentials: 'include',
       headers: {
@@ -538,7 +612,7 @@ export const getContentTypeList = () => dispatch => {
 
 export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`,
     param: {
       credentials: 'include',
       headers: {
@@ -553,7 +627,7 @@ export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dis
 
 export const putWorkspaceContentDeleted = (user, idWorkspace, idContent) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`,
     param: {
       credentials: 'include',
       headers: {

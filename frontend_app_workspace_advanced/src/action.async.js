@@ -65,8 +65,8 @@ export const deleteMember = (apiUrl, idWorkspace, idMember) =>
     method: 'DELETE'
   })
 
-export const getUserKnownMember = (apiUrl, idLoggedUser, userNameToSearch) =>
-  fetch(`${apiUrl}/users/${idLoggedUser}/known_members?acp=${userNameToSearch}`, {
+export const getMyselfKnownMember = (apiUrl, userNameToSearch) =>
+  fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

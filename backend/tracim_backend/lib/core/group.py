@@ -4,7 +4,7 @@ import typing
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.exceptions import GroupDoesNotExist
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 
 
 __author__ = 'damien'

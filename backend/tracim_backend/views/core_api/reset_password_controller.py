@@ -8,11 +8,14 @@ from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ResetPasswordCheckTokenSchema
 from tracim_backend.views.core_api.schemas import ResetPasswordModifySchema
 from tracim_backend.views.core_api.schemas import ResetPasswordRequestSchema
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__AUTHENTICATION_ENDPOINTS
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -20,12 +23,16 @@ except ImportError:
     from http import client as HTTPStatus
 
 
-SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS = 'Reset Password'
+SWAGGER_TAG__RESET_PASSWORD_SECTION = 'Reset Password'
+SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+    SWAGGER_TAG__AUTHENTICATION_ENDPOINTS,
+    SWAGGER_TAG__RESET_PASSWORD_SECTION
+)
 
 
 class ResetPasswordController(Controller):
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
     @hapic.input_body(ResetPasswordRequestSchema())
     @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -44,7 +51,7 @@ class ResetPasswordController(Controller):
         uapi.reset_password_notification(user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_body(ResetPasswordCheckTokenSchema())
@@ -64,7 +71,7 @@ class ResetPasswordController(Controller):
         uapi.validate_reset_password_token(user, hapic_data.body.reset_password_token)  # nopep8
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(PasswordDoNotMatch, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
@@ -93,11 +100,11 @@ class ResetPasswordController(Controller):
 
     def bind(self, configurator: Configurator):
         # reset password request
-        configurator.add_route('reset_password_request', '/reset_password/request', request_method='POST')  # nopep8
+        configurator.add_route('reset_password_request', '/auth/password/reset/request', request_method='POST')  # nopep8
         configurator.add_view(self.reset_password_request, route_name='reset_password_request')  # nopep8
         # check reset password token
-        configurator.add_route('reset_password_check_token', '/reset_password/check_token', request_method='POST')  # nopep8
+        configurator.add_route('reset_password_check_token', '/auth/password/reset/token/check', request_method='POST')  # nopep8
         configurator.add_view(self.reset_password_check_token, route_name='reset_password_check_token')  # nopep8
         # reset password, set password
-        configurator.add_route('reset_password_modify', '/reset_password/modify', request_method='POST')  # nopep8
+        configurator.add_route('reset_password_modify', '/auth/password/reset/modify', request_method='POST')  # nopep8
         configurator.add_view(self.reset_password_modify, route_name='reset_password_modify')  # nopep8

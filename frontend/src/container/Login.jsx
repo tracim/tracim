@@ -22,7 +22,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getWorkspaceList,
+  getMyselfWorkspaceList,
   postUserLogin
 } from '../action-creator.async.js'
 import { PAGE } from '../helper.js'
@@ -84,7 +84,7 @@ class Login extends React.Component {
         props.dispatch(setUserConnected(loggedUser))
 
         this.loadAppConfig()
-        this.loadWorkspaceList(loggedUser)
+        this.loadWorkspaceList()
 
         if (props.system.redirectLogin !== '') {
           props.history.push(props.system.redirectLogin)
@@ -122,7 +122,7 @@ class Login extends React.Component {
   loadWorkspaceList = async user => {
     const { props } = this
 
-    const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(user))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
     if (fetchGetWorkspaceList.status === 200) {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))

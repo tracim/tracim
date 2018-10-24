@@ -16,6 +16,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
@@ -38,6 +39,14 @@ from tracim_backend.views.core_api.schemas import \
     UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__CONTENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__NOTIFICATION_SECTION
+from tracim_backend.views.swagger_generic_section import \
+    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -46,11 +55,28 @@ except ImportError:
 
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
+SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+)
+
+SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
+)
+SWAGGER_TAG__USER_CONTENT_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__CONTENT_ENDPOINTS,
+)
+SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__USER_ENDPOINTS,
+    SWAGGER_TAG__NOTIFICATION_SECTION,
+)
 
 
 class UserController(Controller):
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True),)
@@ -236,7 +262,7 @@ class UserController(Controller):
         )
         return uapi.get_user_with_context(user)
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -253,7 +279,7 @@ class UserController(Controller):
         uapi.enable(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(UserCantDeleteHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
@@ -271,7 +297,7 @@ class UserController(Controller):
         uapi.delete(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -289,7 +315,7 @@ class UserController(Controller):
         uapi.undelete(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
     @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
@@ -336,7 +362,7 @@ class UserController(Controller):
         )
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ActiveContentFilterQuerySchema())
@@ -377,7 +403,7 @@ class UserController(Controller):
             for content in last_actives
         ]
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ContentIdsQuerySchema(), as_list=['contents_ids'])
@@ -412,7 +438,7 @@ class UserController(Controller):
             for content in last_actives
         ]
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -431,7 +457,7 @@ class UserController(Controller):
         api.mark_read(request.current_content, do_flush=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -450,7 +476,7 @@ class UserController(Controller):
         api.mark_unread(request.current_content, do_flush=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -469,7 +495,7 @@ class UserController(Controller):
         api.mark_read__workspace(request.current_workspace)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -499,7 +525,7 @@ class UserController(Controller):
         wapi.save(workspace)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -530,11 +556,11 @@ class UserController(Controller):
         """
 
         # user workspace
-        configurator.add_route('user_workspace', '/users/{user_id}/workspaces', request_method='GET')  # nopep8
+        configurator.add_route('user_workspace', '/users/{user_id:\d+}/workspaces', request_method='GET')  # nopep8
         configurator.add_view(self.user_workspace, route_name='user_workspace')
 
         # user info
-        configurator.add_route('user', '/users/{user_id}', request_method='GET')  # nopep8
+        configurator.add_route('user', '/users/{user_id:\d+}', request_method='GET')  # nopep8
         configurator.add_view(self.user, route_name='user')
 
         # users lists
@@ -542,19 +568,19 @@ class UserController(Controller):
         configurator.add_view(self.users, route_name='users')
 
         # known members lists
-        configurator.add_route('known_members', '/users/{user_id}/known_members', request_method='GET')  # nopep8
+        configurator.add_route('known_members', '/users/{user_id:\d+}/known_members', request_method='GET')  # nopep8
         configurator.add_view(self.known_members, route_name='known_members')
 
         # set user email
-        configurator.add_route('set_user_email', '/users/{user_id}/email', request_method='PUT')  # nopep8
+        configurator.add_route('set_user_email', '/users/{user_id:\d+}/email', request_method='PUT')  # nopep8
         configurator.add_view(self.set_user_email, route_name='set_user_email')
 
         # set user password
-        configurator.add_route('set_user_password', '/users/{user_id}/password', request_method='PUT')  # nopep8
+        configurator.add_route('set_user_password', '/users/{user_id:\d+}/password', request_method='PUT')  # nopep8
         configurator.add_view(self.set_user_password, route_name='set_user_password')  # nopep8
 
         # set user_info
-        configurator.add_route('set_user_info', '/users/{user_id}', request_method='PUT')  # nopep8
+        configurator.add_route('set_user_info', '/users/{user_id:\d+}', request_method='PUT')  # nopep8
         configurator.add_view(self.set_user_infos, route_name='set_user_info')
 
         # create user
@@ -562,46 +588,46 @@ class UserController(Controller):
         configurator.add_view(self.create_user, route_name='create_user')
 
         # enable user
-        configurator.add_route('enable_user', '/users/{user_id}/enable', request_method='PUT')  # nopep8
+        configurator.add_route('enable_user', '/users/{user_id:\d+}/enabled', request_method='PUT')  # nopep8
         configurator.add_view(self.enable_user, route_name='enable_user')
 
         # disable user
-        configurator.add_route('disable_user', '/users/{user_id}/disable', request_method='PUT')  # nopep8
+        configurator.add_route('disable_user', '/users/{user_id:\d+}/disabled', request_method='PUT')  # nopep8
         configurator.add_view(self.disable_user, route_name='disable_user')
 
         # delete user
-        configurator.add_route('delete_user', '/users/{user_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_route('delete_user', '/users/{user_id:\d+}/trashed', request_method='PUT')  # nopep8
         configurator.add_view(self.delete_user, route_name='delete_user')
 
         # undelete user
-        configurator.add_route('undelete_user', '/users/{user_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_route('undelete_user', '/users/{user_id:\d+}/trashed/restore', request_method='PUT')  # nopep8
         configurator.add_view(self.undelete_user, route_name='undelete_user')
 
         # set user profile
-        configurator.add_route('set_user_profile', '/users/{user_id}/profile', request_method='PUT')  # nopep8
+        configurator.add_route('set_user_profile', '/users/{user_id:\d+}/profile', request_method='PUT')  # nopep8
         configurator.add_view(self.set_profile, route_name='set_user_profile')
 
         # user content
-        configurator.add_route('contents_read_status', '/users/{user_id}/workspaces/{workspace_id}/contents/read_status', request_method='GET')  # nopep8
+        configurator.add_route('contents_read_status', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status', request_method='GET')  # nopep8
         configurator.add_view(self.contents_read_status, route_name='contents_read_status')  # nopep8
         # last active content for user
-        configurator.add_route('last_active_content', '/users/{user_id}/workspaces/{workspace_id}/contents/recently_active', request_method='GET')  # nopep8
+        configurator.add_route('last_active_content', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active', request_method='GET')  # nopep8
         configurator.add_view(self.last_active_content, route_name='last_active_content')  # nopep8
 
         # set content as read/unread
-        configurator.add_route('read_content', '/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read', request_method='PUT')  # nopep8
+        configurator.add_route('read_content', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read', request_method='PUT')  # nopep8
         configurator.add_view(self.set_content_as_read, route_name='read_content')  # nopep8
-        configurator.add_route('unread_content', '/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread', request_method='PUT')  # nopep8
+        configurator.add_route('unread_content', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread', request_method='PUT')  # nopep8
         configurator.add_view(self.set_content_as_unread, route_name='unread_content')  # nopep8
 
         # set workspace as read
-        configurator.add_route('read_workspace', '/users/{user_id}/workspaces/{workspace_id}/read', request_method='PUT')  # nopep8
+        configurator.add_route('read_workspace', '/users/{user_id:\d+}/workspaces/{workspace_id}/read', request_method='PUT')  # nopep8
         configurator.add_view(self.set_workspace_as_read, route_name='read_workspace')  # nopep8
 
         # enable workspace notification
-        configurator.add_route('enable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/notifications/activate', request_method='PUT')  # nopep8
+        configurator.add_route('enable_workspace_notification', '/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate', request_method='PUT')  # nopep8
         configurator.add_view(self.enable_workspace_notification, route_name='enable_workspace_notification')  # nopep8
 
         # enable workspace notification
-        configurator.add_route('disable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate', request_method='PUT')  # nopep8
+        configurator.add_route('disable_workspace_notification', '/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate', request_method='PUT')  # nopep8
         configurator.add_view(self.disable_workspace_notification, route_name='disable_workspace_notification')  # nopep8

@@ -14,6 +14,8 @@ export const MODE = {
   REVISION: 'revision'
 }
 
+export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+
 export const displayFileSize = (bytes, decimals) => {
   if (bytes === 0) return '0 Bytes'
   const k = 1024

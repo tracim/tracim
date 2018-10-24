@@ -16,7 +16,12 @@ import {
   SelectStatus,
   displayDistanceDate
 } from 'tracim_frontend_lib'
-import { MODE, displayFileSize, debug } from '../helper.js'
+import {
+  MODE,
+  removeExtensionOfFilename,
+  displayFileSize,
+  debug
+} from '../helper.js'
 import {
   getFileContent,
   getFileComment,
@@ -28,7 +33,7 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putFileRead
+  putMyselfFileRead
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -136,7 +141,7 @@ class File extends React.Component {
   })
 
   loadContent = async () => {
-    const { loggedUser, content, config, fileCurrentPage } = this.state
+    const { content, config, fileCurrentPage } = this.state
 
     const fetchResultFile = await handleFetchResult(await getFileContent(config.apiUrl, content.workspace_id, content.content_id))
 
@@ -145,8 +150,9 @@ class File extends React.Component {
         this.setState({
           content: {
             ...fetchResultFile.body,
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500?page=${fileCurrentPage}`,
-            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080?page=${fileCurrentPage}`
+            filenameNoExtension: removeExtensionOfFilename(fetchResultFile.body.filename),
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${content.filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
+            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${content.filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`
           }
         })
         break
@@ -155,7 +161,7 @@ class File extends React.Component {
         return
     }
 
-    await putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    await putMyselfFileRead(config.apiUrl, content.workspace_id, content.content_id)
     GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
   }
 
@@ -371,8 +377,8 @@ class File extends React.Component {
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500?page=${state.fileCurrentPage}`,
-        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080?page=${state.fileCurrentPage}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${state.content.filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`
       },
       mode: MODE.REVISION
     }))
@@ -449,8 +455,8 @@ class File extends React.Component {
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500?page=${nextPageNumber}`,
-        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080?page=${nextPageNumber}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`
       }
     }))
   }
@@ -548,15 +554,15 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            downloadRawUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw?force_download=1`
+            downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}-r${content.current_revision_id}${content.file_extension}?force_download=1`
             )(state)}
             isPdfAvailable={state.content.pdf_available}
-            downloadPdfPageUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${state.fileCurrentPage}&force_download=1`
+            downloadPdfPageUrl={(({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1`
             )(state)}
-            downloadPdfFullUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full?force_download=1`
+            downloadPdfFullUrl={(({config: {apiUrl}, content, mode}) =>
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1`
             )(state)}
             contentFullScreenUrl={state.content.contentFullScreenUrl}
             onChangeFile={this.handleChangeFile}

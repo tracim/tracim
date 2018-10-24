@@ -18,6 +18,13 @@ CONTENT_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}/contents/{content_type}
 WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8
 
 
+def generate_documentation_swagger_tag(*sections: str) -> str:
+    """
+    Generate documentation swagger tag according to section in order
+    """
+    return ' > '.join(sections)
+
+
 def preview_manager_page_format(page_number: int) -> int:
     """
     Convert page real number of page(begin at 1) to preview_manager page

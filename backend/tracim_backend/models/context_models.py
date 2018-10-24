@@ -35,7 +35,7 @@ class AboutModel(object):
         version: typing.Optional[str],
         datetime: datetime,
         website: str,
-    ):
+    ) -> None:
         self.name = name
         self.version = version
         self.datetime = datetime
@@ -47,7 +47,7 @@ class ConfigModel(object):
     def __init__(
         self,
         email_notification_activated: bool
-    ):
+    ) -> None:
         self.email_notification_activated = email_notification_activated
 
 
@@ -129,7 +129,7 @@ class SetEmail(object):
 
 
 class SimpleFile(object):
-    def __init__(self, files: cgi.FieldStorage):
+    def __init__(self, files: cgi.FieldStorage) -> None:
         self.files = files
 
 
@@ -137,7 +137,7 @@ class FileCreation(object):
     """
     Simple parent_id object
     """
-    def __init__(self, parent_id: int = 0):
+    def __init__(self, parent_id: int = 0) -> None:
         self.parent_id = parent_id
 
 class SetPassword(object):
@@ -211,40 +211,65 @@ class WorkspaceAndContentRevisionPath(object):
     """
     Paths params with workspace id and content_id model
     """
-    def __init__(self, workspace_id: int, content_id: int, revision_id) -> None:
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int) -> None:
         self.content_id = content_id
         self.revision_id = revision_id
         self.workspace_id = workspace_id
 
 
-class ContentPreviewSizedPath(object):
+class FilePath(object):
+    def __init__(self, workspace_id: int, content_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.filename = filename
+
+
+class FileRevisionPath(object):
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int, filename: str) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.revision_id = revision_id
+        self.filename = filename
+
+
+class FilePreviewSizedPath(object):
     """
     Paths params with workspace id and content_id, width, heigth
     """
-    def __init__(self, workspace_id: int, content_id: int, width: int, height: int) -> None:  # nopep8
+    def __init__(self, workspace_id: int, content_id: int, width: int, height: int, filename: str) -> None:  # nopep8
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.width = width
         self.height = height
+        self.filename = filename
 
 
 class RevisionPreviewSizedPath(object):
     """
     Paths params with workspace id and content_id, revision_id width, heigth
     """
-    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int) -> None:  # nopep8
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int, filename: str) -> None:  # nopep8
         self.content_id = content_id
         self.revision_id = revision_id
         self.workspace_id = workspace_id
         self.width = width
         self.height = height
+        self.filename = filename
+
+
+class WorkspacePath(object):
+    """
+    Paths params with workspace id and user_id
+    """
+    def __init__(self, workspace_id: int) -> None:
+        self.workspace_id = workspace_id
 
 
 class WorkspaceAndUserPath(object):
     """
     Paths params with workspace id and user_id
     """
-    def __init__(self, workspace_id: int, user_id: int):
+    def __init__(self, workspace_id: int, user_id: int) -> None:
         self.workspace_id = workspace_id
         self.user_id = user_id
 
@@ -278,7 +303,7 @@ class AutocompleteQuery(object):
     """
     Autocomplete query model
     """
-    def __init__(self, acp: str):
+    def __init__(self, acp: str) -> None:
         self.acp = acp
 
 
@@ -289,7 +314,7 @@ class FileQuery(object):
     def __init__(
         self,
         force_download: int = 0,
-    ):
+    ) -> None:
         self.force_download = force_download
 
 
@@ -301,7 +326,7 @@ class PageQuery(object):
             self,
             force_download: int = 0,
             page: int = 1
-    ):
+    ) -> None:
         self.force_download = force_download
         self.page = page
 
@@ -338,7 +363,7 @@ class ActiveContentFilter(object):
             self,
             limit: int = None,
             before_content_id: datetime = None,
-    ):
+    ) -> None:
         self.limit = limit
         self.before_content_id = before_content_id
 
@@ -347,7 +372,7 @@ class ContentIdsQuery(object):
     def __init__(
             self,
             contents_ids: typing.List[int] = None,
-    ):
+    ) -> None:
         self.contents_ids = contents_ids
 
 
@@ -358,7 +383,7 @@ class RoleUpdate(object):
     def __init__(
         self,
         role: str,
-    ):
+    ) -> None:
         self.role = role
 
 
@@ -371,7 +396,7 @@ class WorkspaceMemberInvitation(object):
         user_id: int = None,
         user_email_or_public_name: str = None,
         role: str = None,
-    ):
+    ) -> None:
         self.role = role
         self.user_email_or_public_name = user_email_or_public_name
         self.user_id = user_id
@@ -385,7 +410,7 @@ class WorkspaceUpdate(object):
         self,
         label: str,
         description: str,
-    ):
+    ) -> None:
         self.label = label
         self.description = description
 
@@ -467,7 +492,7 @@ class UserInContext(object):
     Interface to get User data and User data related to context.
     """
 
-    def __init__(self, user: User, dbsession: Session, config: CFG):
+    def __init__(self, user: User, dbsession: Session, config: CFG) -> None:
         self.user = user
         self.dbsession = dbsession
         self.config = config
@@ -537,7 +562,7 @@ class WorkspaceInContext(object):
     Interface to get Workspace data and Workspace data related to context.
     """
 
-    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG):
+    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:  # nopep8
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
@@ -706,7 +731,7 @@ class ContentInContext(object):
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content: Content, dbsession: Session, config: CFG, user: User=None):  # nopep8
+    def __init__(self, content: Content, dbsession: Session, config: CFG, user: User=None) -> None:  # nopep8
         self.content = content
         self.dbsession = dbsession
         self.config = config
