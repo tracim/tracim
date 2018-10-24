@@ -21,8 +21,6 @@ WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8
 def generate_documentation_swagger_tag(*sections: str) -> str:
     """
     Generate documentation swagger tag according to section in order
-    :param sections:
-    :return:
     """
     return ' > '.join(sections)
 
