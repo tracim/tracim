@@ -11,11 +11,16 @@ const Revision = props => {
   return (
       <li
         className={classnames(`${props.customClass}__messagelist__version`, 'revision')}
-        onClick={props.onClickRevision}
+        onClick={props.allowClickOnRevision ? props.onClickRevision : () => {}}
         style={{
-          ':hover': {
-            backgroundColor: color(props.customColor).lighten(0.60).hexString()
-          }
+          cursor: props.allowClickOnRevision ? 'pointer' : 'auto',
+          ...props.allowClickOnRevision
+            ? {
+              ':hover': {
+                backgroundColor: color(props.customColor).lighten(0.60).hexString()
+              }
+            }
+            : {}
         }}
       >
         <div className={classnames(`${props.customClass}__messagelist__version__data`, 'revision__data')}>

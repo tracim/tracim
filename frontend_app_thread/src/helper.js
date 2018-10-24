@@ -13,8 +13,7 @@ export const debug = { // copied from html-document => outdated
     hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:6543/api/v2',
-    mockApiUrl: 'http://localhost:3001',
+    apiUrl: 'http://192.168.1.153:6543/api/v2',
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'

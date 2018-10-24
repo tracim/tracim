@@ -122,6 +122,7 @@ class Timeline extends React.Component {
                     createdDistance={content.created}
                     number={content.number}
                     key={`revision_${content.revision_id}`}
+                    allowClickOnRevision={props.allowClickOnRevision}
                     onClickRevision={() => props.onClickRevisionBtn(content)}
                   />
               }
@@ -209,6 +210,7 @@ Timeline.propTypes = {
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
+  allowClickOnRevision: PropTypes.bool,
   shouldScrollToBottom: PropTypes.bool,
   showHeader: PropTypes.bool,
   rightPartOpen: PropTypes.bool, // irrelevant if showHeader is false
@@ -232,6 +234,8 @@ Timeline.defaultProps = {
   timelineData: [],
   wysiwyg: false,
   onClickWysiwygBtn: () => {},
+  onClickRevisionBtn: () => {},
+  allowClickOnRevision: true,
   shouldScrollToBottom: true,
   showHeader: true,
   rightPartOpen: false,

@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import classnames from 'classnames'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
 import Header from './Header.jsx'
@@ -148,6 +149,8 @@ class Tracim extends React.Component {
       )
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
+    console.log(props)
+
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header />
@@ -197,7 +200,12 @@ class Tracim extends React.Component {
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
-          <div id='appFullscreenContainer' />
+          <div
+            id='appFullscreenContainer'
+            className={
+              classnames({'fullWidthFullHeight': [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER].includes(props.location.pathname)})
+            }
+          />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />
         </div>
