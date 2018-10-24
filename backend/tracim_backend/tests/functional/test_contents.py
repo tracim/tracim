@@ -3989,7 +3989,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1_256x256.jpg"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_r{}_page_1_256x256.jpg"'.format(revision_id)  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))

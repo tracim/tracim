@@ -1,4 +1,6 @@
 # coding=utf-8
+import typing
+
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import Length
@@ -53,7 +55,8 @@ from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
 
-FIELD_LANG_DESC = "User langage in ISO 639 format. See https://fr.wikipedia.org/wiki/ISO_639"
+FIELD_LANG_DESC = "User langage in ISO 639 format. " \
+                  "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 
@@ -67,7 +70,7 @@ class SimpleFileSchema(marshmallow.Schema):
     files = marshmallow.fields.Raw(required=False, description='a file')
 
     @post_load
-    def create_file(self, data):
+    def create_file(self, data: typing.Dict[str, typing.Any]) -> object:
         return SimpleFile(**data)
 
 
@@ -80,7 +83,7 @@ class FileCreationFormSchema(marshmallow.Schema):
     )
 
     @post_load
-    def file_creation_object(self, data):
+    def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return FileCreation(**data)
 
 
@@ -94,7 +97,8 @@ class UserDigestSchema(marshmallow.Schema):
         example="/api/v2/asset/avatars/john-doe.jpg",
         description="avatar_url is the url of the image file. "
                     "If no avatar, then set it to an empty string "
-                    "(frontend should interpret an empty url as default avatar)",
+                    "(frontend should interpret "
+                    "an empty url as default avatar)",
     )
     public_name = marshmallow.fields.String(
         example='John Doe',
@@ -115,11 +119,14 @@ class UserSchema(UserDigestSchema):
     )
     is_active = marshmallow.fields.Bool(
         example=True,
-        description='true if the user is active, false if the user has been deactivated by an admin. Default is true'
+        description='true if the user is active, '
+                    'false if the user has been deactivated'
+                    ' by an admin. Default is true'
     )
     is_deleted = marshmallow.fields.Bool(
         example=False,
-        description='true if the user account has been deleted. Default is false'
+        description='true if the user account has been deleted. '
+                    'Default is false'
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
@@ -166,7 +173,7 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
     )
 
     @post_load
-    def create_set_email_object(self, data):
+    def create_set_email_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return SetEmail(**data)
 
 
@@ -181,13 +188,14 @@ class SetPasswordSchema(LoggedInUserPasswordSchema):
     )
 
     @post_load
-    def create_set_password_object(self, data):
+    def create_set_password_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return SetPassword(**data)
 
 
 class SetUserInfoSchema(marshmallow.Schema):
     """
-    Schema used for setting user information. This schema is for write access only
+    Schema used for setting user information.
+    This schema is for write access only
     """
 
     timezone = marshmallow.fields.String(
@@ -209,7 +217,7 @@ class SetUserInfoSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_user_info_object(self, data):
+    def create_user_info_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return UserInfos(**data)
 
 
@@ -223,8 +231,9 @@ class SetUserProfileSchema(marshmallow.Schema):
         example='trusted-users',
         description=FIELD_PROFILE_DESC,
     )
+
     @post_load
-    def create_user_profile(self, data):
+    def create_user_profile(self, data: typing.Dict[str, typing.Any]) -> object:
         return UserProfile(**data)
 
 
@@ -271,7 +280,7 @@ class UserCreationSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_user(self, data):
+    def create_user(self, data: typing.Dict[str, typing.Any]) -> object:
         return UserCreation(**data)
 
 
@@ -295,7 +304,7 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)
 
 
@@ -317,7 +326,7 @@ class WorkspaceAndUserIdPathSchema(
     WorkspaceIdPathSchema
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndUserPath(**data)
 
 
@@ -326,7 +335,7 @@ class WorkspaceAndContentIdPathSchema(
     ContentIdPathSchema
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndContentPath(**data)
 
 
@@ -358,7 +367,7 @@ class WorkspaceAndContentRevisionIdPathSchema(
     RevisionIdPathSchema,
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndContentRevisionPath(**data)
 
 
@@ -367,7 +376,7 @@ class FilePathSchema(
     FilenamePathSchema
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return FilePath(**data)
 
 
@@ -376,7 +385,7 @@ class FileRevisionPathSchema(
     FilenamePathSchema
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return FileRevisionPath(**data)
 
 
@@ -386,7 +395,7 @@ class FilePreviewSizedPathSchema(
     FilenamePathSchema
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return FilePreviewSizedPath(**data)
 
 
@@ -396,7 +405,7 @@ class FileRevisionPreviewSizedPathSchema(
     FilenamePathSchema
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return RevisionPreviewSizedPath(**data)
 
 
@@ -406,7 +415,7 @@ class UserWorkspaceAndContentIdPathSchema(
     ContentIdPathSchema,
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return UserWorkspaceAndContentPath(**data)
 
 
@@ -415,7 +424,7 @@ class UserWorkspaceIdPathSchema(
     WorkspaceIdPathSchema,
 ):
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceAndUserPath(**data)
 
 
@@ -428,7 +437,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     )
 
     @post_load
-    def make_path_object(self, data):
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return CommentPath(**data)
 
 
@@ -439,8 +448,9 @@ class AutocompleteQuerySchema(marshmallow.Schema):
         validate=Length(min=2),
         required=True,
     )
+
     @post_load
-    def make_autocomplete(self, data):
+    def make_autocomplete(self, data: typing.Dict[str, typing.Any]) -> object:
         return AutocompleteQuery(**data)
 
 
@@ -454,7 +464,7 @@ class FileQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query(self, data):
+    def make_query(self, data: typing.Dict[str, typing.Any]) -> object:
         return FileQuery(**data)
 
 
@@ -467,7 +477,7 @@ class PageQuerySchema(FileQuerySchema):
     )
 
     @post_load
-    def make_query(self, data):
+    def make_query(self, data: typing.Dict[str, typing.Any]) -> object:
         return PageQuery(**data)
 
 
@@ -520,7 +530,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_content_filter(self, data):
+    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentFilter(**data)
 
 
@@ -538,8 +548,9 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
         allow_none=True,
         description='return only content updated before this content',
     )
+
     @post_load
-    def make_content_filter(self, data):
+    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return ActiveContentFilter(**data)
 
 
@@ -550,8 +561,9 @@ class ContentIdsQuerySchema(marshmallow.Schema):
             validate=Range(min=1, error="Value must be greater than 0"),
         )
     )
+
     @post_load
-    def make_contents_ids(self, data):
+    def make_contents_ids(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentIdsQuery(**data)
 
 
@@ -566,7 +578,7 @@ class RoleUpdateSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_role(self, data):
+    def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
         return RoleUpdate(**data)
 
 
@@ -587,7 +599,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_role(self, data):
+    def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceMemberInvitation(**data)
 
 
@@ -598,7 +610,7 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_object(self, data):
+    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return ResetPasswordRequest(**data)
 
 
@@ -613,7 +625,7 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_object(self, data):
+    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return ResetPasswordCheckToken(**data)
 
 
@@ -636,7 +648,7 @@ class ResetPasswordModifySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_object(self, data):
+    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return ResetPasswordModify(**data)
 
 
@@ -656,7 +668,7 @@ class BasicAuthSchema(marshmallow.Schema):
         description = 'Entry for HTTP Basic Auth'
 
     @post_load
-    def make_login(self, data):
+    def make_login(self, data: typing.Dict[str, typing.Any]) -> object:
         return LoginCredentials(**data)
 
 
@@ -676,7 +688,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_workspace_modifications(self, data):
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return WorkspaceUpdate(**data)
 
 
@@ -886,7 +898,7 @@ class ContentMoveSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_move_params(self, data):
+    def make_move_params(self, data: typing.Dict[str, typing.Any]) -> object:
         return MoveParams(**data)
 
 
@@ -904,15 +916,15 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
-        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.', # nopep8
+        description='content_id of parent content, if content should be placed '
+                    'in a folder, this should be folder content_id.',
         allow_none=True,
         default=None,
         validate=Range(min=1, error="Value must be positive"),
     )
 
-
     @post_load
-    def make_content_creation(self, data):
+    def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return ContentCreation(**data)
 
 
@@ -1095,7 +1107,7 @@ class SetCommentSchema(marshmallow.Schema):
     )
 
     @post_load()
-    def create_comment(self, data):
+    def create_comment(self, data: typing.Dict[str, typing.Any]) -> object:
         return CommentCreation(**data)
 
 
@@ -1111,11 +1123,11 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
 class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep8
 
     @post_load
-    def text_based_content_update(self, data):
+    def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return TextBasedContentUpdate(**data)
 
 
-class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep
+class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep8
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-document',
@@ -1127,7 +1139,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
     )
 
     @post_load
-    def folder_content_update(self, data):
+    def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
         return FolderContentUpdate(**data)
 
 
@@ -1145,5 +1157,5 @@ class SetContentStatusSchema(marshmallow.Schema):
     )
 
     @post_load
-    def set_status(self, data):
+    def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
