@@ -417,7 +417,7 @@ class File extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-    xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw`, true)
+    xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
     // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
