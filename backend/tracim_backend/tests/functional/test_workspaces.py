@@ -2200,12 +2200,43 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         Create workspace member role
         :return:
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
-                'admin@admin.admin',
-                'admin@admin.admin'
+                'test@test.test',
+                'test@test.test'
             )
         )
         # create workspace role
@@ -2216,7 +2247,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
-            '/api/v2/workspaces/1/members',
+            '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -2224,11 +2255,18 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['role'] == 'content-manager'
         assert user_role_found['user_id']
         user_id = user_role_found['user_id']
-        assert user_role_found['workspace_id'] == 1
+        assert user_role_found['workspace_id'] == workspace.workspace_id
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is True
         assert user_role_found['do_notify'] is False
 
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
             status=200,
@@ -2248,6 +2286,65 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
+    def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_NOT_FOUND
 
 class TestUserInvitationWithMailActivatedASync(FunctionalTest):
 
