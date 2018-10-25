@@ -36,5 +36,6 @@
   "Files": "Files",
   "Please wait until the upload ends": "Please wait until the upload ends",
   "Error while loading file": "Error while loading file",
-  "Update": "Update"
+  "Update": "Update",
+  "A content with the same name already exists": "A content with the same name already exists"
 }

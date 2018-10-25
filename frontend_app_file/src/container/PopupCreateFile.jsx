@@ -90,15 +90,6 @@ class PopupCreateFile extends React.Component {
   handleValidate = async () => {
     const { state } = this
 
-    const displayFlashMsgError = () => GLOBAL_dispatchEvent({
-      type: 'addFlashMsg',
-      data: {
-        msg: this.props.t('Error while creating file'),
-        type: 'warning',
-        delay: undefined
-      }
-    })
-
     // const fetchPostContent = await handleFetchResult(await postFileContent(state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
 
     const formData = new FormData()
@@ -120,7 +111,7 @@ class PopupCreateFile extends React.Component {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
           case 200:
-            const jsonResult = JSON.parse(xhr.responseText)
+            const jsonResult200 = JSON.parse(xhr.responseText)
             this.handleClose()
 
             GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
@@ -128,12 +119,35 @@ class PopupCreateFile extends React.Component {
             GLOBAL_dispatchEvent({
               type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
               data: {
-                idWorkspace: jsonResult.workspace_id,
+                idWorkspace: jsonResult200.workspace_id,
                 contentType: state.appName,
-                idContent: jsonResult.content_id
+                idContent: jsonResult200.content_id
               }
-            }); break
-          default: displayFlashMsgError()
+            })
+            break
+          case 400:
+            const jsonResult400 = JSON.parse(xhr.responseText)
+            switch (jsonResult400.body.code) {
+              case 3002:
+                GLOBAL_dispatchEvent({
+                  type: 'addFlashMsg',
+                  data: {
+                    msg: this.props.t('A content with the same name already exists'),
+                    type: 'warning',
+                    delay: undefined
+                  }
+                })
+                break
+            }
+            break
+          default: GLOBAL_dispatchEvent({
+            type: 'addFlashMsg',
+            data: {
+              msg: this.props.t('Error while creating file'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
         }
       }
     }
@@ -154,7 +168,7 @@ class PopupCreateFile extends React.Component {
         contentName={state.uploadFile ? 'allowValidate' : ''} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
-        customStyle={{top: 'calc(50% - 202px)'}}
+        customStyle={{top: 'calc(50% - 177px)'}}
       >
         <div>
           {state.progressUpload.display &&

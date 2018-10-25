@@ -6,5 +6,7 @@
   "Error while deleting thread": "Erreur lors de la suppression du fil de discussion",
   "Error while restoring thread": "Erreur lors de la restoration du fil de discussion",
   "Threads": "Discussions",
-  "Start a topic": "Lancer une discussion"
+  "Start a topic": "Lancer une discussion",
+  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
+  "Error while creating thread": "Error lors de la création de la discussion"
 }
