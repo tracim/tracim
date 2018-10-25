@@ -401,19 +401,19 @@ class WorkspaceController(Controller):
         try:
             _, user = uapi.find(
                 user_id=hapic_data.body.user_id,
-                email=hapic_data.body.user_email_or_public_name,
-                public_name=hapic_data.body.user_email_or_public_name
+                email=hapic_data.body.user_email,
+                public_name=hapic_data.body.user_public_name
             )
             if user.is_deleted:
                 raise UserIsDeleted('This user has been deleted. Unable to invite him.')  # nopep8
             if not user.is_active:
                 raise UserIsNotActive('This user is not activated. Unable to invite him')  # nopep8
         except UserDoesNotExist as exc:
-            if not app_config.EMAIL_NOTIFICATION_ACTIVATED:
+            if not hapic_data.body.user_email or not app_config.EMAIL_NOTIFICATION_ACTIVATED:  # nopep8
                 raise exc
 
             user = uapi.create_user(
-                email=hapic_data.body.user_email_or_public_name,
+                email=hapic_data.body.user_email,
                 password=password_generator(),
                 do_notify=True
             )

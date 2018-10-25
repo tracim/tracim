@@ -585,15 +585,21 @@ class RoleUpdateSchema(marshmallow.Schema):
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
     role = marshmallow.fields.String(
         example='contributor',
-        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+        validate=OneOf(UserRoleInWorkspace.get_all_role_slug()),
+        required=True
     )
     user_id = marshmallow.fields.Int(
         example=5,
         default=None,
         allow_none=True,
     )
-    user_email_or_public_name = marshmallow.fields.String(
+    user_email = marshmallow.fields.String(
         example='suri@cate.fr',
+        default=None,
+        allow_none=True,
+    )
+    user_public_name = marshmallow.fields.String(
+        example='John',
         default=None,
         allow_none=True,
     )
