@@ -139,7 +139,7 @@ class DeleteDBCommand(AppContextCommand):
             except FileNotFoundError:
                 print(
                     'Warning ! Can delete depots file, is depot path correctly'
-                    'configured ?'
+                    ' configured ?'
                 )
         else:
             raise ForceArgumentNeeded(

@@ -143,6 +143,10 @@ class FunctionalTestNoDB(FunctionalTest):
 
 class CommandFunctionalTest(FunctionalTest):
 
+    def _set_logger(self):
+        super()._set_logger()
+        logging.getLogger('_jb_pytest_runner').setLevel('CRITICAL')
+
     def run_app(self):
         self.session = get_tm_session(self.session_factory, transaction.manager)
 
