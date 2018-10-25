@@ -1490,7 +1490,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
-    def test_api_set_content_as_read__ok__200__admin_with_comments(self):
+    def test_api_set_content_as_read__ok__200__admin_with_comments_read_content(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -1591,8 +1591,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         ), status=200) # nopep8
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is True
-        # comment is also set as read
-        assert comments.has_new_information_for(test_user) is False
 
         res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
             user_id=admin.user_id,
@@ -1600,8 +1598,115 @@ class TestUserSetContentAsRead(FunctionalTest):
         ), status=200) # nopep8
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is False
-        # comment is also set as read
-        assert comments.has_new_information_for(admin) is True
+
+    def test_api_set_content_as_read__ok__200__admin_with_comments_read_comment(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
+        api.mark_read(firstly_created)
+        api.mark_unread(comments)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # before
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=comments.content_id,
+                user_id=test_user.user_id,
+            )
+        )
+        # after
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
 
 
 class TestUserSetContentAsUnread(FunctionalTest):
@@ -2071,7 +2176,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
-    def test_api_set_content_as_unread__ok__200__with_comments(self):
+    def test_api_set_content_as_unread__ok__200__with_comments_read_content(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2126,7 +2231,60 @@ class TestUserSetContentAsUnread(FunctionalTest):
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is False
 
-        assert comments.has_new_information_for(admin) is True
+    def test_api_set_content_as_unread__ok__200__with_comments_read_comment_only(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(content_type_list.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(content_type_list.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
+        api.mark_read(firstly_created)
+        api.mark_read(comments)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=comments.content_id,
+                user_id=admin.user_id,
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
 
 
 class TestUserSetWorkspaceAsRead(FunctionalTest):
@@ -3567,13 +3725,15 @@ class TestUsersEndpoint(FunctionalTest):
         )
         res = res.json_body
         assert len(res) == 2
-        assert res[0]['user_id'] == admin.user_id
-        assert res[0]['public_name'] == admin.display_name
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
         assert res[0]['avatar_url'] is None
 
-        assert res[1]['user_id'] == test_user.user_id
-        assert res[1]['public_name'] == test_user.display_name
+        assert res[1]['user_id'] == admin.user_id
+        assert res[1]['public_name'] == admin.display_name
         assert res[1]['avatar_url'] is None
+
+
 
     def test_api__get_user__err_403__normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)

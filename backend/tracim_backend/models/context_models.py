@@ -1034,7 +1034,8 @@ class RevisionInContext(object):
         # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
         revision_comments = [
             comment for comment in comments
-            if comment.created > self.revision.updated
+            if comment.created > self.revision.updated or
+               comment.revision_id > self.revision.revision_id
         ]
         if self.next_revision:
             # INFO - G.M - 2018-06-177 - if there is a revision more recent
@@ -1042,11 +1043,12 @@ class RevisionInContext(object):
             # than next_revision.)
             revision_comments = [
                 comment for comment in revision_comments
-                if comment.created < self.next_revision.updated
+                if comment.created < self.next_revision.updated or
+                   comment.revision_id < self.next_revision.revision_id
             ]
         sorted_revision_comments = sorted(
             revision_comments,
-            key=lambda revision: revision.created
+            key=lambda revision: revision.revision_id
         )
         comment_ids = []
         for comment in sorted_revision_comments:

@@ -156,6 +156,7 @@ class RoleApi(object):
     ) -> typing.List[UserRoleInWorkspace]:
         return self._session.query(UserRoleInWorkspace)\
             .filter(UserRoleInWorkspace.workspace_id==workspace.workspace_id)\
+            .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)\
             .all()
 
     def save(self, role: UserRoleInWorkspace) -> None:

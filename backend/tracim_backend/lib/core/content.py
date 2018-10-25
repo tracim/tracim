@@ -1221,7 +1221,7 @@ class ContentApi(object):
                 )
             )
 
-        resultset = resultset.order_by(desc(Content.updated))
+        resultset = resultset.order_by(desc(ContentRevisionRO.updated), desc(ContentRevisionRO.revision_id), desc(ContentRevisionRO.content_id))
 
         active_contents = []
         too_recent_content = []

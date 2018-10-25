@@ -1529,13 +1529,13 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace_id), status=200).json_body   # nopep8
         assert len(res) == 2
         user_role = res[0]
-        assert user_role['role'] == 'workspace-manager'
-        assert user_role['user_id'] == user_id
-        assert user_role['workspace_id'] == workspace_id
-        user_role = res[1]
         assert user_role_found['role'] == user_role['role']
         assert user_role_found['user_id'] == user_role['user_id']
         assert user_role_found['workspace_id'] == user_role['workspace_id']
+        user_role = res[1]
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == user_id
+        assert user_role['workspace_id'] == workspace_id
 
     def test_api__create_workspace_member_role__ok_200__user_email(self):
         """
@@ -3221,7 +3221,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
-        assert res.json_body in active_contents
+        content_ids = [content['content_id'] for content in active_contents]
+        assert res.json_body['content_id'] in content_ids
 
     def test_api__post_content_create_generic_content__err_400__label_already_used(self) -> None:  # nopep8
         """
@@ -3268,7 +3269,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
-        assert res.json_body in active_contents
+        content_ids = [content['content_id'] for content in active_contents]
+        assert res.json_body['content_id'] in content_ids
 
         # recreate same content
         res = self.testapp.post_json(
@@ -3324,7 +3326,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
-        assert res.json_body in active_contents
+        content_ids = [content['content_id'] for content in active_contents]
+        assert res.json_body['content_id'] in content_ids
 
     def test_api__post_content_create_generic_content__err_400__parent_id_0(self) -> None:  # nopep8
         """
@@ -3397,7 +3400,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
-        assert res.json_body in active_contents
+        content_ids = [content['content_id'] for content in active_contents]
+        assert res.json_body['content_id'] in content_ids
 
     def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
         """

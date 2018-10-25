@@ -83,6 +83,13 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy):
 
     def authenticated_userid(self, request):
         # check if user is correct
+        # INFO - G.M - 2018-10-23 - skip non-int user_id
+        # if we are using basic_auth policy, unauthenticated_userid is string,
+        # this means this policy is not the correct one. Explictly not checking
+        # this avoid issue in some database because int is expected not string.
+        if not isinstance(request.unauthenticated_userid, int):
+            request.session.delete()
+            return None
         user = _get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)  # nopep8
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:

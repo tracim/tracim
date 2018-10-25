@@ -3,14 +3,14 @@ import typing as typing
 from smtplib import SMTPException
 
 import transaction
+from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AuthenticationFailed, \
-    UserCantDeleteHimself, UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import \
@@ -22,8 +22,10 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
-from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -116,7 +118,7 @@ class UserApi(object):
         return self._user
 
     def _get_all_query(self) -> Query:
-        return self._session.query(User).order_by(User.display_name)
+        return self._session.query(User).order_by(func.lower(User.display_name))
 
     def get_all(self) -> typing.Iterable[User]:
         return self._get_all_query().all()

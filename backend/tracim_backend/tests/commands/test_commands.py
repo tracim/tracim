@@ -3,18 +3,23 @@ import os
 import subprocess
 
 import pytest
+import transaction
 
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import BadCommandError
-from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import InvalidSettingFile
+from tracim_backend.exceptions import \
+    NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.models import get_engine
+from tracim_backend.models import get_session_factory
+from tracim_backend.models import get_tm_session
 from tracim_backend.tests import CommandFunctionalTest
 
 
@@ -52,6 +57,7 @@ class TestCommands(CommandFunctionalTest):
         )
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('command_test@user')
+        self.disconnect_database()
         app = TracimCLI()
         result = app.run([
             'user', 'create',
@@ -61,6 +67,12 @@ class TestCommands(CommandFunctionalTest):
             '--debug',
         ])
         assert result == 0
+        self.connect_database()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         new_user = api.get_one_by_email('command_test@user')
         assert new_user.email == 'command_test@user'
         assert new_user.validate_password('new_password')
@@ -77,6 +89,7 @@ class TestCommands(CommandFunctionalTest):
         )
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('command_test@user')
+        self.disconnect_database()
         app = TracimCLI()
         result = app.run([
             'user', 'create',
@@ -87,6 +100,12 @@ class TestCommands(CommandFunctionalTest):
             '--debug',
         ])
         assert result == 0
+        self.connect_database()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         new_user = api.get_one_by_email('command_test@user')
         assert new_user.email == 'command_test@user'
         assert new_user.validate_password('new_password')
@@ -96,6 +115,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation with an unknown group
         """
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(GroupDoesNotExist):
             app.run([
@@ -111,6 +131,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation with existing user login
         """
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(UserAlreadyExistError):
             app.run([
@@ -126,6 +147,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation with email with notification disable
         """
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(NotificationDisabledCantCreateUserWithInvitation):
             app.run([
@@ -142,6 +164,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation without filling password
         """
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(BadCommandError):
             app.run([
@@ -165,7 +188,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         result = app.run([
             'user', 'update',
@@ -175,6 +198,12 @@ class TestCommands(CommandFunctionalTest):
             '--debug',
         ])
         assert result == 0
+        self.connect_database()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         new_user = api.get_one_by_email('admin@admin.admin')
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
@@ -194,6 +223,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
         assert user.profile.name == 'administrators'
+        self.disconnect_database()
         app = TracimCLI()
         result = app.run([
             'user', 'update',
@@ -204,6 +234,12 @@ class TestCommands(CommandFunctionalTest):
             '--debug',
         ])
         assert result == 0
+        self.connect_database()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         new_user = api.get_one_by_email('admin@admin.admin')
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
@@ -223,7 +259,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(DatabaseInitializationFailed):
             app.run([
@@ -245,7 +281,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         # delete config to be sure command will work
         app.run([
@@ -273,6 +309,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
+        self.disconnect_database()
 
         app = TracimCLI()
         with pytest.raises(FileNotFoundError):
@@ -300,7 +337,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(InvalidSettingFile):
             app.run([
@@ -327,7 +364,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         result = app.run([
             'db', 'delete', '--force',
@@ -349,7 +386,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(ForceArgumentNeeded):
             app.run([
@@ -376,7 +413,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(FileNotFoundError):
             app.run([
@@ -403,7 +440,7 @@ class TestCommands(CommandFunctionalTest):
         assert user.email == 'admin@admin.admin'
         assert user.validate_password('admin@admin.admin')
         assert not user.validate_password('new_password')
-
+        self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(InvalidSettingFile):
             app.run([
