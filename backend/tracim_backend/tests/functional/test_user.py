@@ -3854,6 +3854,266 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[1]['public_name'] == test_user2.display_name
         assert res[1]['avatar_url'] is None
 
+    def test_api__get_user__ok_200__admin__by_name_exclude_user(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'bob',
+            'exclude_user_ids': [test_user2.user_id]
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
+    def test_api__get_user__ok_200__admin__by_name_exclude_workspace(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        role_api = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'bob',
+            'exclude_workspace_ids': [workspace2.workspace_id]
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
+    def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email='test3@test3.test3',
+            password='pass',
+            name='bob3',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        role_api = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'bob',
+            'exclude_workspace_ids': [workspace2.workspace_id],
+            'exclude_user_ids': [test_user3.user_id]
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \

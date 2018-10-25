@@ -17,7 +17,7 @@ from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import ActiveContentFilter, \
     WorkspacePath
-from tracim_backend.models.context_models import AutocompleteQuery
+from tracim_backend.models.context_models import KnownMemberQuery
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
@@ -441,17 +441,31 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         return CommentPath(**data)
 
 
-class AutocompleteQuerySchema(marshmallow.Schema):
+class KnownMemberQuerySchema(marshmallow.Schema):
     acp = marshmallow.fields.Str(
         example='test',
         description='search text to query',
         validate=Length(min=2),
         required=True,
     )
+    exclude_user_ids = marshmallow.fields.List(
+        marshmallow.fields.Integer(
+             example=6,
+             validate=Range(min=1, error="Value must be greater than 0"),
+        ),
+        description='list of excluded user',
+    )
+    exclude_workspace_ids = marshmallow.fields.List(
+        marshmallow.fields.Integer(
+            example=3,
+            validate=Range(min=1, error="Value must be greater than 0"),
+        ),
+        description='list of excluded workspace: user of this workspace are excluded from result',  # nopep8
+    )
 
     @post_load
-    def make_autocomplete(self, data: typing.Dict[str, typing.Any]) -> object:
-        return AutocompleteQuery(**data)
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return KnownMemberQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):

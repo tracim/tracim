@@ -126,19 +126,32 @@ class UserApi(object):
     def get_known_user(
             self,
             acp: str,
+            exclude_user_ids: typing.List[int] = None,
+            exclude_workspace_ids: typing.List[int] = None,
     ) -> typing.Iterable[User]:
         """
         Return list of know user by current UserApi user.
         :param acp: autocomplete filter by name/email
+        :param exclude_user_ids: user id to exclude from result
+        :param exclude_workspace_ids: workspace user to exclude from result
         :return: List of found users
         """
         if len(acp) < 2:
             raise TooShortAutocompleteString(
                 '"{acp}" is a too short string, acp string need to have more than one character'.format(acp=acp)  # nopep8
             )
+        exclude_workspace_ids = exclude_workspace_ids or []  # DFV
+        exclude_user_ids = exclude_user_ids or []  # DFV
+        if exclude_workspace_ids:
+            user_ids_in_workspaces_tuples = self._session\
+                .query(UserRoleInWorkspace.user_id)\
+                .distinct(UserRoleInWorkspace.user_id) \
+                .filter(UserRoleInWorkspace.workspace_id.in_(exclude_workspace_ids))\
+                .all()
+            user_ids_in_workspaces = [item[0] for item in user_ids_in_workspaces_tuples]
+            exclude_user_ids.extend(user_ids_in_workspaces)
         query = self._base_query().order_by(User.display_name)
         query = query.filter(or_(User.display_name.ilike('%{}%'.format(acp)), User.email.ilike('%{}%'.format(acp))))  # nopep8
-
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
         if self._user and self._user.profile.id <= Group.TIM_USER:
@@ -151,6 +164,8 @@ class UserApi(object):
                 distinct(UserRoleInWorkspace.user_id).\
                 filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery())).subquery()  # nopep8
             query = query.filter(User.user_id.in_(users_in_workspaces))
+        if exclude_user_ids:
+            query = query.filter(~User.user_id.in_(exclude_user_ids))
         return query.all()
 
     def find(

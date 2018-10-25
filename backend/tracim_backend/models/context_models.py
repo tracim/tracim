@@ -299,12 +299,20 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
-class AutocompleteQuery(object):
+class KnownMemberQuery(object):
     """
     Autocomplete query model
     """
-    def __init__(self, acp: str) -> None:
+    def __init__(
+            self,
+            acp: str,
+            exclude_user_ids: typing.List[int] = None,
+            exclude_workspace_ids: typing.List[int] = None
+    ) -> None:
         self.acp = acp
+        self.exclude_user_ids = exclude_user_ids or []  # DFV
+        self.exclude_workspace_ids = exclude_workspace_ids or []  # DFV
+
 
 
 class FileQuery(object):
