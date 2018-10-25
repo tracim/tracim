@@ -617,6 +617,10 @@ class ContentApi(object):
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
         assert parent and parent.type != FOLDER_TYPE
+        if not self.is_editable(parent):
+            raise ContentInNotEditableState(
+                "Can't create comment on content, you need to change his status or state (deleted/archived) before any change."
+            )
         if not content:
             raise EmptyCommentContentNotAllowed()
 
