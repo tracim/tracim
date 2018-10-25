@@ -279,11 +279,11 @@ class EmailManager(object):
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
             replyto_addr = self.config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
-                '{content_id}', str(content.content_id)
+                '{content_id}', str(main_content.content_id)
             )
 
             reference_addr = self.config.EMAIL_NOTIFICATION_REFERENCES_EMAIL.replace( #nopep8
-                '{content_id}',str(content.content_id)
+                '{content_id}',str(main_content.content_id)
              )
             #
             #  INFO - D.A. - 2014-11-06

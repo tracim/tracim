@@ -614,7 +614,7 @@ class ContentApi(object):
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
         return content
 
-    def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
+    def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False, do_notify=True) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
         assert parent and parent.type != FOLDER_TYPE
         if not content:
@@ -632,7 +632,7 @@ class ContentApi(object):
         item.revision_type = ActionDescription.COMMENT
 
         if do_save:
-            self.save(item, ActionDescription.COMMENT)
+            self.save(item, ActionDescription.COMMENT, do_notify=do_notify)
         return item
 
     def get_one_from_revision(self, content_id: int, content_type: str, workspace: Workspace=None, revision_id=None) -> Content:
