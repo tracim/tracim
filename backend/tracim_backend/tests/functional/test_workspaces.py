@@ -40,17 +40,108 @@ class TestWorkspaceEndpoint(FunctionalTest):
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
             .one()
-
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
         workspace_api = WorkspaceApi(
             session=dbsession,
             current_user=admin,
             config=self.app_config,
         )
-        workspace = workspace_api.get_one(1)
+        workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = ApplicationApi(
             app_list
         )
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/{}'.format(workspace.workspace_id), status=200)
+        workspace_dict = res.json_body
+        assert workspace_dict['workspace_id'] == workspace.workspace_id
+        assert workspace_dict['label'] == workspace.label
+        assert workspace_dict['description'] == workspace.description
+        assert workspace_dict['is_deleted'] is False
+
+        assert len(workspace_dict['sidebar_entries']) == len(default_sidebar_entry)
+        for counter, sidebar_entry in enumerate(default_sidebar_entry):
+            workspace_dict['sidebar_entries'][counter]['slug'] = sidebar_entry.slug
+            workspace_dict['sidebar_entries'][counter]['label'] = sidebar_entry.label
+            workspace_dict['sidebar_entries'][counter]['route'] = sidebar_entry.route
+            workspace_dict['sidebar_entries'][counter]['hexcolor'] = sidebar_entry.hexcolor  # nopep8
+            workspace_dict['sidebar_entries'][counter]['fa_icon'] = sidebar_entry.fa_icon  # nopep8
+
+    def test_api__get_workspace__ok_200__admin_and_not_in_workspace(self) -> None:
+        """
+        Check obtain workspace reachable for user.
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=None,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace = workspace_api.get_one(workspace.workspace_id)
+        app_api = ApplicationApi(
+            app_list
+        )
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
+        transaction.commit()
 
         self.testapp.authorization = (
             'Basic',
@@ -59,21 +150,20 @@ class TestWorkspaceEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/1', status=200)
-        workspace = res.json_body
-        assert workspace['workspace_id'] == 1
-        assert workspace['slug'] == 'business'
-        assert workspace['label'] == 'Business'
-        assert workspace['description'] == 'All importants documents'
-        assert workspace['is_deleted'] is False
+        res = self.testapp.get('/api/v2/workspaces/{}'.format(workspace.workspace_id), status=200)
+        workspace_dict = res.json_body
+        assert workspace_dict['workspace_id'] == workspace.workspace_id
+        assert workspace_dict['label'] == workspace.label
+        assert workspace_dict['description'] == workspace.description
+        assert workspace_dict['is_deleted'] is False
 
-        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
+        assert len(workspace_dict['sidebar_entries']) == len(default_sidebar_entry)
         for counter, sidebar_entry in enumerate(default_sidebar_entry):
-            workspace['sidebar_entries'][counter]['slug'] = sidebar_entry.slug
-            workspace['sidebar_entries'][counter]['label'] = sidebar_entry.label
-            workspace['sidebar_entries'][counter]['route'] = sidebar_entry.route
-            workspace['sidebar_entries'][counter]['hexcolor'] = sidebar_entry.hexcolor  # nopep8
-            workspace['sidebar_entries'][counter]['fa_icon'] = sidebar_entry.fa_icon  # nopep8
+            workspace_dict['sidebar_entries'][counter]['slug'] = sidebar_entry.slug
+            workspace_dict['sidebar_entries'][counter]['label'] = sidebar_entry.label
+            workspace_dict['sidebar_entries'][counter]['route'] = sidebar_entry.route
+            workspace_dict['sidebar_entries'][counter]['hexcolor'] = sidebar_entry.hexcolor  # nopep8
+            workspace_dict['sidebar_entries'][counter]['fa_icon'] = sidebar_entry.fa_icon  # nopep8
 
     def test_api__update_workspace__ok_200__nominal_case(self) -> None:
         """
@@ -252,7 +342,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('administrators')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -266,8 +356,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         self.testapp.authorization = (
             'Basic',
             (
-                'test@test.test',
-                'test@test.test'
+                'admin@admin.admin',
+                'admin@admin.admin'
             )
         )
         # delete
@@ -275,13 +365,20 @@ class TestWorkspaceEndpoint(FunctionalTest):
             '/api/v2/workspaces/{}/trashed'.format(workspace_id),
             status=204
         )
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
-            status=403
+            status=400
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND  # nopep8
         self.testapp.authorization = (
             'Basic',
             (
@@ -564,7 +661,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('administrators')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -576,6 +673,18 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_api.delete(workspace, flush=True)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
+        # undelete
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
+            status=204
+        )
         self.testapp.authorization = (
             'Basic',
             (
@@ -583,18 +692,13 @@ class TestWorkspaceEndpoint(FunctionalTest):
                 'test@test.test'
             )
         )
-        # delete
-        res = self.testapp.put(
-            '/api/v2/workspaces/{}/trashed/restore'.format(workspace_id),
-            status=204
-        )
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
-            status=403
+            status=400
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND  # nopep8
 
         self.testapp.authorization = (
             'Basic',
