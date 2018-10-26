@@ -172,7 +172,11 @@ class FunctionalTestNoDB(FunctionalTest):
 
 class CommandFunctionalTest(FunctionalTest):
 
-    def run_app(self) -> None:
+    def _set_logger(self):
+        super()._set_logger()
+        logging.getLogger('_jb_pytest_runner').setLevel('CRITICAL')
+
+    def run_app(self):
         """ Disable run pyramid app for command functional test"""
         pass
 
