@@ -1471,7 +1471,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': 2,
-            'user_email_or_public_name': None,
+            'user_email': None,
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1543,7 +1544,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'user_email': 'lawrence-not-real-email@fsf.local',
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1614,7 +1616,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'user_email': 'lawrence-not-real-email@fsf.local',
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1656,7 +1659,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'user_email': 'lawrence-not-real-email@fsf.local',
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1712,7 +1716,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'user_email': 'lawrence-not-real-email@fsf.local',
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1753,7 +1758,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'user_email': 'lawrence-not-real-email@fsf.local',
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1780,7 +1786,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'Lawrence L.',
+            'user_email': None,
+            'user_public_name': 'Lawrence L.',
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1822,7 +1829,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': None,
+            'user_email': None,
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1849,7 +1857,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': 47,
-            'user_email_or_public_name': None,
+            'user_email': None,
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -1876,7 +1885,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'nothing@nothing.nothing',
+            'user_email': 'nothing@nothing.nothing',
+            'user_public_name': None,
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -2305,7 +2315,8 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'bob@bob.bob',
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
@@ -2362,7 +2373,8 @@ class TestUserInvitationWithMailActivatedASync(FunctionalTest):
         # create workspace role
         params = {
             'user_id': None,
-            'user_email_or_public_name': 'bob@bob.bob',
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
             'role': 'content-manager',
         }
         res = self.testapp.post_json(
