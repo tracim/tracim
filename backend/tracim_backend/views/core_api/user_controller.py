@@ -22,7 +22,7 @@ from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import \
     ActiveContentFilterQuerySchema
-from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
+from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
@@ -135,7 +135,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_MANAGER)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(AutocompleteQuerySchema())
+    @hapic.input_query(KnownMemberQuerySchema(), as_list=['exclude_user_ids', 'exclude_workspace_ids'])  # nopep8
     @hapic.output_body(UserDigestSchema(many=True))
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -148,7 +148,11 @@ class UserController(Controller):
             config=app_config,
             show_deactivated=False,
         )
-        users = uapi.get_known_user(acp=hapic_data.query.acp)
+        users = uapi.get_known_user(
+            acp=hapic_data.query.acp,
+            exclude_user_ids=hapic_data.query.exclude_user_ids,
+            exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
+        )
         context_users = [
             uapi.get_user_with_context(user) for user in users
         ]

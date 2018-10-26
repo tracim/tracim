@@ -97,7 +97,11 @@ SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = generate_documentation_
 class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.READER,
+        allow_superadmin=True
+    )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceSchema())
     def workspace(self, context, request: TracimRequest, hapic_data=None):

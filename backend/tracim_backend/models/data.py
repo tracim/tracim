@@ -820,13 +820,18 @@ class Content(DeclarativeBase):
     # So for now, we order by "revision_id" explicitly, but remember to switch
     # to "created" once "updated" removed.
     # https://github.com/tracim/tracim/issues/336
-    revisions = relationship("ContentRevisionRO",
-                             foreign_keys=[ContentRevisionRO.content_id],
-                             back_populates="node",
-                             order_by="ContentRevisionRO.revision_id")
-    children_revisions = relationship("ContentRevisionRO",
-                                      foreign_keys=[ContentRevisionRO.parent_id],
-                                      back_populates="parent")
+    revisions = relationship(
+        "ContentRevisionRO",
+        foreign_keys=[ContentRevisionRO.content_id],
+        back_populates="node",
+        order_by="ContentRevisionRO.revision_id"
+    )
+    children_revisions = relationship(
+        "ContentRevisionRO",
+        foreign_keys=[ContentRevisionRO.parent_id],
+        back_populates="parent",
+        order_by='ContentRevisionRO.revision_id',
+    )
 
     @hybrid_property
     def content_id(self) -> int:
@@ -1117,7 +1122,12 @@ class Content(DeclarativeBase):
         :rtype Content
         """
         # Return a list of unique revisions parent content
-        return list(set([revision.node for revision in self.children_revisions]))
+        # TODO - G.M - 2018-10-24 - Set is just here to avoid distinct object,
+        # check if possible to do this better, probably using database sorting
+        # and sql distinct.
+        revisions = set([revision.node for revision in self.children_revisions])
+        revisions = sorted(revisions, key=lambda r: r.revision_id)
+        return revisions
 
     @property
     def revision(self) -> ContentRevisionRO:

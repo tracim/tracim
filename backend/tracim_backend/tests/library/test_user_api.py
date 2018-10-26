@@ -222,6 +222,249 @@ class TestUserApi(DefaultTest):
         assert users[0] == u1
         assert users[1] == u2
 
+    def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        u2 = api.create_user(
+            email='email2@email2',
+            name='name2',
+            do_notify=False,
+            do_save=True,
+        )
+        u3 = api.create_user(
+            email='notfound@notfound',
+            name='notfound',
+            do_notify=False,
+            do_save=True,
+        )
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace_2 = wapi.create_workspace(
+            'test workspace n°2',
+            save_now=True)
+        role_api = RoleApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        api2 = UserApi(
+            current_user=u3,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('name', exclude_workspace_ids=[workspace.workspace_id])
+        assert len(users) == 1
+        assert users[0] == u2
+
+    def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace_and_name(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        u2 = api.create_user(
+            email='email2@email2',
+            name='name2',
+            do_notify=False,
+            do_save=True,
+        )
+        u3 = api.create_user(
+            email='notfound@notfound',
+            name='notfound',
+            do_notify=False,
+            do_save=True,
+        )
+        u4 = api.create_user(
+            email='email3@email3',
+            name='name3',
+            do_notify=False,
+            do_save=True,
+        )
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace_2 = wapi.create_workspace(
+            'test workspace n°2',
+            save_now=True)
+        role_api = RoleApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u4, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        api2 = UserApi(
+            current_user=u3,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('name', exclude_workspace_ids=[workspace.workspace_id], exclude_user_ids=[u4.user_id])
+        assert len(users) == 1
+        assert users[0] == u2
+
+    def test_unit__get_known__user__distinct_workspaces_users_by_name(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        u2 = api.create_user(
+            email='email2@email2',
+            name='name2',
+            do_notify=False,
+            do_save=True,
+        )
+        u3 = api.create_user(
+            email='notfound@notfound',
+            name='notfound',
+            do_notify=False,
+            do_save=True,
+        )
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace_2 = wapi.create_workspace(
+            'test workspace n°2',
+            save_now=True)
+        role_api = RoleApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        api2 = UserApi(
+            current_user=u3,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('name')
+        assert len(users) == 2
+        assert users[0] == u1
+        assert users[1] == u2
+
+    def test_unit__get_known__user__same_workspaces_users_by_name__exclude_user(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        u2 = api.create_user(
+            email='email2@email2',
+            name='name2',
+            do_notify=False,
+            do_save=True,
+        )
+        u3 = api.create_user(
+            email='notfound@notfound',
+            name='notfound',
+            do_notify=False,
+            do_save=True,
+        )
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        role_api = RoleApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        api2 = UserApi(
+            current_user=u1,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('name', exclude_user_ids=[u1.user_id])
+        assert len(users) == 1
+        assert users[0] == u2
+
     def test_unit__get_known__user__same_workspaces_users_by_email(self):
         admin = self.session.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \

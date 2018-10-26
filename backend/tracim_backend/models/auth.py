@@ -131,6 +131,16 @@ class User(DeclarativeBase):
     """
 
     __tablename__ = 'users'
+    # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
+    # utf8bm4 for mysql only in order to avoid max length of key issue with
+    # long varchar in utf8bm4 column. This issue is related to email
+    # field and is uniqueness. As far we search, there is to be no way to apply
+    # mysql specific (which is ignored by other database)
+    #  collation only on email field.
+    __table_args__ = {
+        'mysql_charset': 'utf8',
+        'mysql_collate': 'utf8_general_ci'
+    }
 
     user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
     email = Column(Unicode(255), unique=True, nullable=False)

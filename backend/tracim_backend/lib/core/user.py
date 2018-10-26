@@ -3,14 +3,14 @@ import typing as typing
 from smtplib import SMTPException
 
 import transaction
+from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AuthenticationFailed, \
-    UserCantDeleteHimself, UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import \
@@ -22,8 +22,10 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
-from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserCantChangeIsOwnProfile
+from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -116,7 +118,7 @@ class UserApi(object):
         return self._user
 
     def _get_all_query(self) -> Query:
-        return self._session.query(User).order_by(User.display_name)
+        return self._session.query(User).order_by(func.lower(User.display_name))
 
     def get_all(self) -> typing.Iterable[User]:
         return self._get_all_query().all()
@@ -124,19 +126,32 @@ class UserApi(object):
     def get_known_user(
             self,
             acp: str,
+            exclude_user_ids: typing.List[int] = None,
+            exclude_workspace_ids: typing.List[int] = None,
     ) -> typing.Iterable[User]:
         """
         Return list of know user by current UserApi user.
         :param acp: autocomplete filter by name/email
+        :param exclude_user_ids: user id to exclude from result
+        :param exclude_workspace_ids: workspace user to exclude from result
         :return: List of found users
         """
         if len(acp) < 2:
             raise TooShortAutocompleteString(
                 '"{acp}" is a too short string, acp string need to have more than one character'.format(acp=acp)  # nopep8
             )
+        exclude_workspace_ids = exclude_workspace_ids or []  # DFV
+        exclude_user_ids = exclude_user_ids or []  # DFV
+        if exclude_workspace_ids:
+            user_ids_in_workspaces_tuples = self._session\
+                .query(UserRoleInWorkspace.user_id)\
+                .distinct(UserRoleInWorkspace.user_id) \
+                .filter(UserRoleInWorkspace.workspace_id.in_(exclude_workspace_ids))\
+                .all()
+            user_ids_in_workspaces = [item[0] for item in user_ids_in_workspaces_tuples]
+            exclude_user_ids.extend(user_ids_in_workspaces)
         query = self._base_query().order_by(User.display_name)
         query = query.filter(or_(User.display_name.ilike('%{}%'.format(acp)), User.email.ilike('%{}%'.format(acp))))  # nopep8
-
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
         if self._user and self._user.profile.id <= Group.TIM_USER:
@@ -149,6 +164,8 @@ class UserApi(object):
                 distinct(UserRoleInWorkspace.user_id).\
                 filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery())).subquery()  # nopep8
             query = query.filter(User.user_id.in_(users_in_workspaces))
+        if exclude_user_ids:
+            query = query.filter(~User.user_id.in_(exclude_user_ids))
         return query.all()
 
     def find(
