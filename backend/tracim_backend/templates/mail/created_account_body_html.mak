@@ -57,12 +57,8 @@
             ))}
 
             <ul>
-                <li>
-                    <b>${_('Login')}</b>: ${user.email}
-                </li>
-                <li>
-                    <b>${_('Password')}</b>: ${password}
-                </li>
+                <li><b>${_('Login')}</b>: ${user.email}</li>
+                <li><b>${_('Password')}</b>: ${password}</li>
             </ul>
 
         </div>

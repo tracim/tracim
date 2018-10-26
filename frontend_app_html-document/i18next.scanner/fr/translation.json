@@ -12,5 +12,7 @@
   "latest version :": "Dernière version",
   "Write a document": "Rédiger un document",
   "Text Documents": "Documents texte",
-  "Edit": "Modifier"
+  "Edit": "Modifier",
+  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
+  "Error while creating document": "Erreur lors de la création du document"
 }

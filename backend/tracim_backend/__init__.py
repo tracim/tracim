@@ -69,7 +69,8 @@ def web(global_config, **local_settings):
     configurator.include("pyramid_beaker")
     configurator.include("pyramid_multiauth")
     policies = [
-        CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
+        CookieSessionAuthentificationPolicy(
+            reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
         ApiTokenAuthentificationPolicy(
             api_key_header=TRACIM_API_KEY_HEADER,
             api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER

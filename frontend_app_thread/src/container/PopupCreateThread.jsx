@@ -95,23 +95,46 @@ class PopupCreateThread extends React.Component {
 
     const fetchSaveThreadDoc = postThreadContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
 
-    handleFetchResult(await fetchSaveThreadDoc)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.handleClose()
+    const resSave = await handleFetchResult(await fetchSaveThreadDoc)
 
-          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+    switch (resSave.apiResponse.status) {
+      case 200:
+        this.handleClose()
 
-          GLOBAL_dispatchEvent({
-            type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
-            data: {
-              idWorkspace: resSave.body.workspace_id,
-              contentType: appName,
-              idContent: resSave.body.content_id
-            }
-          })
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+
+        GLOBAL_dispatchEvent({
+          type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
+          data: {
+            idWorkspace: resSave.body.workspace_id,
+            contentType: appName,
+            idContent: resSave.body.content_id
+          }
+        })
+        break
+      case 400:
+        switch (resSave.body.code) {
+          case 3002:
+            GLOBAL_dispatchEvent({
+              type: 'addFlashMsg',
+              data: {
+                msg: this.props.t('A content with the same name already exists'),
+                type: 'warning',
+                delay: undefined
+              }
+            })
+            break
+        }
+        break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while creating thread'),
+          type: 'warning',
+          delay: undefined
         }
       })
+    }
   }
 
   render () {

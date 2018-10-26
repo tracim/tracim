@@ -1,7 +1,6 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 .thread
-  width 70%
   .comment
     &.received
       .comment__header__text
@@ -29,16 +28,7 @@
       &__texteditor
         flex 0 0 auto
 
-// MEDIAQUERIES
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .thread
-    top 68px
-    width 100%
-
 @media (max-width: max-xs)
   .thread
-    top 68px
-    width 100%
     &__contentpage__content
       height calc(100% - 185px) // wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height

@@ -93,7 +93,8 @@ class TestCommentsEndpoint(FunctionalTest):
 
         res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)  # nopep8
         assert len(res.json_body) == 4
-        assert comment == res.json_body[3]
+        assert comment['content_id'] == res.json_body[3]['content_id']
+        assert comment['raw_content'] == res.json_body[3]['raw_content']
 
     def test_api__post_content_comment__err_400__empty_raw_content(self) -> None:
         """
