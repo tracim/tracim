@@ -593,7 +593,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         default=None,
         allow_none=True,
     )
-    user_email = marshmallow.fields.String(
+    user_email = marshmallow.fields.Email(
         example='suri@cate.fr',
         default=None,
         allow_none=True,
