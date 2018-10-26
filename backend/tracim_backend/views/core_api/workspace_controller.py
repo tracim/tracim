@@ -409,14 +409,7 @@ class WorkspaceController(Controller):
             if not user.is_active:
                 raise UserIsNotActive('This user is not activated. Unable to invite him')  # nopep8
         except UserDoesNotExist as exc:
-            # INFO - G.M - 2018-10-25 - do not allow simple user
-            # to create account through invitation system despite they are
-            # workspace manager.
-            if not request.current_user.profile.id >= Group.TIM_MANAGER:
-                raise exc
-            # INFO - G.M - 2018-10-25 - disallow account creation if no
-            # email provided or email_notification disabled.
-            if not hapic_data.body.user_email or not app_config.EMAIL_NOTIFICATION_ACTIVATED:  # nopep8
+            if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
                 raise exc
 
             user = uapi.create_user(

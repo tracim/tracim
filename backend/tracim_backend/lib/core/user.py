@@ -540,3 +540,19 @@ class UserApi(object):
         #     calendar_class=UserCalendar,
         #     related_object_id=created_user.user_id,
         # )
+
+    def allowed_to_invite_new_user(self, email: str) -> bool:
+        # INFO - G.M - 2018-10-25 - disallow account creation if no
+        # email provided or email_notification disabled.
+        if not email:
+            return False
+        if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
+            return False
+        # INFO - G.M - 2018-10-25 - do not allow all profile to invite new user
+        gapi = GroupApi(self._session, self._user, self._config)
+        invite_minimal_profile = gapi.get_one_with_name(group_name=self._config.INVITE_NEW_USER_MINIMAL_PROFILE)  # nopep8
+
+        if not self._user.profile.id >= invite_minimal_profile.group_id:
+            return False
+
+        return True
