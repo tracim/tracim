@@ -15,6 +15,7 @@ from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.models import Group
 from tracim_backend.models.data import ActionDescription
 
 
@@ -414,7 +415,10 @@ class CFG(object):
             'email.async.redis.db',
             0,
         ))
-
+        self.INVITE_NEW_USER_MINIMAL_PROFILE = settings.get(
+            'invitation.new_user.minimal_profile',
+            Group.TIM_MANAGER_GROUPNAME
+        )
         ###
         # WSGIDAV (Webdav server)
         ###
