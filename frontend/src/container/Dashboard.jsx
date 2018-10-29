@@ -184,7 +184,7 @@ class Dashboard extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
       case 200:
         this.setState({
