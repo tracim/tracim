@@ -2,6 +2,9 @@
 import datetime
 import random
 import string
+from urllib.parse import urljoin
+from urllib.parse import urlencode
+
 from colour import Color
 import pytz
 from redis import Redis
@@ -16,7 +19,9 @@ DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
 CONTENT_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}/contents/{content_type}/{content_id}'  # nopep8
 WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8
-
+FRONTEND_UI_SUBPATH = 'ui'
+LOGIN_SUBPATH = 'login'
+RESET_PASSWORD_SUBPATH = 'reset-password'
 
 def generate_documentation_swagger_tag(*sections: str) -> str:
     """
@@ -37,19 +42,23 @@ def get_root_frontend_url(config: 'CFG') -> str:
     """
     Return website base url with always '/' at the end
     """
-    base_url = ''
-    if config.WEBSITE_BASE_URL[-1] == '/':
-        base_url = config.WEBSITE_BASE_URL
-    else:
-        base_url = config.WEBSITE_BASE_URL + '/'
-    return base_url
+    return as_url_folder(config.WEBSITE_BASE_URL)
+
+
+def get_frontend_ui_base_url(config: 'CFG') -> str:
+    """
+    Return ui base url
+    """
+    return as_url_folder(
+        urljoin(get_root_frontend_url(config), FRONTEND_UI_SUBPATH)
+    )
 
 
 def get_login_frontend_url(config: 'CFG'):
     """
     Return login page url
     """
-    return get_root_frontend_url(config) + 'login'
+    return urljoin(get_frontend_ui_base_url(config), LOGIN_SUBPATH)
 
 
 def get_reset_password_frontend_url(
@@ -60,12 +69,19 @@ def get_reset_password_frontend_url(
     """
     Return reset password url
     """
-    return '{base_url}{path}?token={token}&email={email}'.format(
-        base_url=get_root_frontend_url(config),
-        path='reset-password',
-        token=token,
-        email=email,
-    )
+    path = urljoin(get_frontend_ui_base_url(config), RESET_PASSWORD_SUBPATH)
+    params = {
+        'token': token,
+        'email': email,
+    }
+
+    return '{path}?{params}'.format(path=path, params=urlencode(params))
+
+
+def as_url_folder(url: str) -> str:
+    if url[-1] != '/':
+        url = '{}/'.format(url)
+    return url
 
 
 def get_email_logo_frontend_url(config: 'CFG'):
