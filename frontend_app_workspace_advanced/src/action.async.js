@@ -90,7 +90,7 @@ export const postWorkspaceMember = (apiUrl, idWorkspace, newMember) =>
   })
 
 export const deleteWorkspace = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/delete`, {
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
