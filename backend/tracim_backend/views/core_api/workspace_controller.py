@@ -18,6 +18,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
 from tracim_backend.exceptions import UserRoleNotFound
+from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -170,6 +171,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_MANAGER)
     @hapic.input_body(WorkspaceCreationSchema())
     @hapic.output_body(WorkspaceSchema())

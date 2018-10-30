@@ -293,6 +293,35 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_2 = res.json_body
         assert workspace == workspace_2
 
+    def test_api__create_workspace_err_400__label_already_used(self) -> None:
+        """
+        Test create workspace : label already used
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'superworkspace',
+            'description': 'mysuperdescription'
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces',
+            status=200,
+            params=params,
+        )
+        res = self.testapp.post_json(
+            '/api/v2/workspaces',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.WORKSPACE_LABEL_ALREADY_USED
+
     def test_api__create_workspace__err_400__empty_label(self) -> None:
         """
         Test create workspace with empty label
