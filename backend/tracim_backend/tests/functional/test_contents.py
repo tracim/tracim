@@ -2198,7 +2198,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_deleted(self) -> None:
         """
@@ -2263,7 +2265,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_archived(self) -> None:
         """
@@ -2328,7 +2332,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__not_modified(self) -> None:
         """
