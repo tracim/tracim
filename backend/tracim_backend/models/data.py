@@ -45,6 +45,11 @@ class Workspace(DeclarativeBase):
 
     workspace_id = Column(Integer, Sequence('seq__workspaces__workspace_id'), autoincrement=True, primary_key=True)
 
+    # TODO - G.M - 2018-10-30 - Make workspace label unique
+    # Uniqueness of label is only check in high level when workspace is created,
+    # we should be sure at database level that workspace label are unique
+    # nb: be careful about mysql compat with long unicode, forcing utf8 charset
+    # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
     calendar_enabled = Column(Boolean, unique=False, nullable=False, default=False)

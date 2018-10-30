@@ -7,11 +7,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
-from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
-
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
@@ -87,6 +87,10 @@ class WorkspaceApi(object):
         if not label:
             raise EmptyLabelNotAllowed('Workspace label cannot be empty')
 
+        if self._session.query(Workspace).filter(Workspace.label == label).count() > 0:  # nopep8
+            raise WorkspaceLabelAlreadyUsed(
+                'A workspace with label {} already exist.'.format(label)
+            )
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
