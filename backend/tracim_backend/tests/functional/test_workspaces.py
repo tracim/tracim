@@ -2450,6 +2450,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
 
+
 class TestUserInvitationWithMailActivatedASync(FunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
@@ -2583,7 +2584,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         assert content['modified']
         assert content['created']
-    # Root related
+
     def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):  # nopep8
         """
         Check obtain workspace all root contents
@@ -2718,6 +2719,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
         Check obtain workspace all root contents
@@ -2757,6 +2759,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
         """
         Check obtain workspace root active contents
@@ -2795,6 +2798,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):  # nopep8
         """
         Check obtain workspace root archived contents
@@ -2832,6 +2836,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):  # nopep8
         """
          Check obtain workspace root deleted contents
@@ -2871,6 +2876,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_nothing_root_content(self):
         """
         Check obtain workspace root content who does not match any type
@@ -3004,6 +3010,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3127,6 +3134,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_all_folder_content(self):
         """
          Check obtain workspace folder all contents
@@ -3193,6 +3201,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):  # nopep8
         """
          Check obtain workspace folder active contents
@@ -3230,6 +3239,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):  # nopep8
         """
          Check obtain workspace folder archived contents
@@ -3267,6 +3277,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):  # nopep8
         """
          Check obtain workspace folder deleted contents
