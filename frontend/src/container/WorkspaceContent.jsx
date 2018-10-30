@@ -202,31 +202,34 @@ class WorkspaceContent extends React.Component {
 
   getTitle = urlFilter => {
     const { props } = this
-    switch (urlFilter) {
-      case undefined: return props.t('List of contents')
-      case 'html-document': return props.t('List of documents')
-      case 'file': return props.t('List of files')
-      case 'thread': return props.t('List of threads')
-    }
+    const contentType = props.contentType.find(ct => ct.slug === urlFilter)
+    return contentType
+      ? `${props.t('List of')} ${props.t(contentType.label.toLowerCase() + 's')}`
+      : props.t('List of contents')
   }
+
+  getIcon = urlFilter => {
+    const contentType = this.props.contentType.find(ct => ct.slug === urlFilter)
+    return contentType
+      ? contentType.faIcon
+      : 'th'
+  }
+
+  filterWorkspaceContent = (contentList, filter) => filter.length === 0
+    ? contentList
+    : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
+    // @FIXME we need to filter subfolder too, but right now, we dont handle subfolder
+    // .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
+    // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty
 
   render () {
     const { user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
     const { state } = this
 
-    const filterWorkspaceContent = (contentList, filter) => {
-      return filter.length === 0
-        ? contentList
-        : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
-      // @FIXME we need to filter subfolder too, but right now, we dont handle subfolder
-      // .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
-    }
-    // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty
-
     const urlFilter = qs.parse(location.search).type
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
-      ? filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
+      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
@@ -258,7 +261,7 @@ class WorkspaceContent extends React.Component {
               parentClass='workspace__header'
               customClass='justify-content-between align-items-center'
               title={this.getTitle(urlFilter)}
-              subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
+              icon={this.getIcon(urlFilter)}
             >
               {idRoleUserWorkspace >= 2 &&
                 <DropdownCreateButton

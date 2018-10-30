@@ -230,9 +230,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getMyselfKnownMember = userNameToSearch => dispatch => {
+export const getMyselfKnownMember = (userNameToSearch, idWorkspaceToExclude) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${idWorkspaceToExclude}`,
     param: {
       credentials: 'include',
       headers: {
@@ -529,7 +529,8 @@ export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch =>
       method: 'POST',
       body: JSON.stringify({
         user_id: newMember.id || null,
-        user_email_or_public_name: newMember.name,
+        user_email: newMember.email || null,
+        user_public_name: newMember.publicName || null,
         role: newMember.role
       })
     },

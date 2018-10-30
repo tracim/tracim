@@ -237,7 +237,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props, state } = this
-    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch))
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, state.content.workspace_id))
     switch (fetchUserKnownMemberList.apiResponse.status) {
       case 200:
         this.setState({
@@ -297,7 +297,8 @@ class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      nameOrEmail: state.newMember.nameOrEmail,
+      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
+      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
       role: state.newMember.role
     }))
 
