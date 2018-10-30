@@ -28,7 +28,6 @@ import {
   putThreadRestoreDeleted,
   putThreadRead
 } from '../action.async.js'
-import {MODE} from '../../../frontend_app_html-document/src/helper.js'
 
 class Thread extends React.Component {
   constructor (props) {
