@@ -1,9 +1,21 @@
 import React from 'react'
+import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
-import { Link } from 'react-router-dom'
+
+const qs = require('query-string')
+
+const shouldDisplayAsActive = (location, idWorkspace, activeIdWorkspace, app) => {
+  if (idWorkspace !== activeIdWorkspace) return false
+
+  const filterType = qs.parse(location.search).type
+
+  return filterType
+    ? app.slug === `contents/${filterType}`
+    : location.pathname.includes(app.route)
+}
 
 const WorkspaceListItem = props => {
   return (
@@ -35,7 +47,7 @@ const WorkspaceListItem = props => {
               <Link to={aa.route}>
                 <div className={classnames(
                   'sidebar__content__navigation__workspace__item__submenu__dropdown primaryColorBgLighten primaryColorBgHover primaryColorBorderDarken',
-                  {'activeFilter': props.activeFilterList.includes(aa.slug)}
+                  {'activeFilter': shouldDisplayAsActive(props.location, props.idWs, props.activeIdWorkspace, aa)}
                 )}>
                   <div className='dropdown__icon'>
                     <i className={classnames(`fa fa-${aa.faIcon}`)} style={{backgroudColor: aa.hexcolor}} />
@@ -58,18 +70,22 @@ const WorkspaceListItem = props => {
   )
 }
 
-export default translate()(WorkspaceListItem)
+export default withRouter(translate()(WorkspaceListItem))
 
 WorkspaceListItem.propTypes = {
   label: PropTypes.string.isRequired,
   allowedApp: PropTypes.array,
   onClickTitle: PropTypes.func,
   onClickAllContent: PropTypes.func,
-  isOpenInSidebar: PropTypes.bool
+  isOpenInSidebar: PropTypes.bool,
+  activeFilterList: PropTypes.array,
+  activeIdWorkspace: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
   onClickTitle: () => {},
   onClickAllContent: () => {},
-  isOpenInSidebar: false
+  isOpenInSidebar: false,
+  activeFilterList: [],
+  activeIdWorkspace: -1
 }

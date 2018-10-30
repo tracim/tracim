@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 import typing
 
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
+
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
+from tracim_backend.exceptions import UserRoleNotFound
+from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.roles import WorkspaceRoles
 
 __author__ = 'damien'
 
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import Query
-from tracim_backend.models.auth import User
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import UserRoleInWorkspace
 
 
 class RoleApi(object):
@@ -97,7 +101,17 @@ class RoleApi(object):
             filter(UserRoleInWorkspace.user_id == user_id)
 
     def get_one(self, user_id: int, workspace_id: int) -> UserRoleInWorkspace:
-        return self._get_one_rsc(user_id, workspace_id).one()
+        try:
+            user_role = self._get_one_rsc(user_id, workspace_id).one()
+        except NoResultFound as exc:
+            raise UserRoleNotFound(
+                'Role for user {user_id} '
+                'in workspace {workspace_id} was not found.'.format(
+                    user_id=user_id,
+                    workspace_id=workspace_id,
+                )
+            )
+        return user_role
 
     def update_role(
         self,
@@ -131,7 +145,15 @@ class RoleApi(object):
         flush: bool=True
     ) -> UserRoleInWorkspace:
 
-        # TODO - G.M - 2018-08-24 - Check if role already exist
+        # INFO - G.M - 2018-10-29 - Check if role already exist
+        query = self._get_one_rsc(user.user_id, workspace.workspace_id)
+        if query.count() > 0:
+            raise RoleAlreadyExistError(
+                'Role already exist for user {} in workspace {}.'.format(
+                    user.user_id,
+                    workspace.workspace_id
+                )
+            )
         role = UserRoleInWorkspace()
         role.user_id = user.user_id
         role.workspace = workspace
@@ -145,6 +167,14 @@ class RoleApi(object):
         if self._user and self._user.user_id == user_id:
             raise UserCantRemoveHisOwnRoleInWorkspace(
                 "user {} can't remove is own role in workspace".format(user_id)
+            )
+        if self._get_one_rsc(user_id, workspace_id).count() == 0:
+            raise UserRoleNotFound(
+                'Role for user {user_id} '
+                'in workspace {workspace_id} was not found.'.format(
+                    user_id=user_id,
+                    workspace_id=workspace_id,
+                )
             )
         self._get_one_rsc(user_id, workspace_id).delete()
         if flush:

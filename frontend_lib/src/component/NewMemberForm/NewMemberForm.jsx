@@ -20,22 +20,6 @@ export const NewMemberForm = props => {
             {props.t('Enter the name or email of the user')}
           </label>
 
-          {(props.canSendInviteNewUser || props.idRoleUserWorkspace >= 8) && (
-            props.emailNotifActivated
-              ? (
-                <div className='name__adminmsg'>
-                  <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
-                  {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
-                </div>
-              )
-              : (
-                <div className='name__adminmsg'>
-                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
-                  {props.t("Email notifications are disabled, you can't create new users from here")}
-                </div>
-              )
-          )}
-
           <input
             type='text'
             className='name__input form-control'
@@ -102,23 +86,23 @@ export const NewMemberForm = props => {
               }
             </div>
           )}
-        </div>
 
-        {/*
-          <div className='memberlist__form__member__create'>
-            <div className='memberlist__form__member__create__checkbox mr-3'>
-            <Checkbox
-              name='createAccountCheckbox'
-              onClickCheckbox={e => this.handleClickCheckboxCreateAccount(e)}
-              checked={state.createAccountCheckbox}
-            />
-          </div>
-
-          <div className='create__text'>
-            {props.t('Create an account')}
-          </div>
+          {(props.canSendInviteNewUser || props.idRoleUserWorkspace >= 8) && (
+            props.emailNotifActivated
+              ? (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-lightbulb-o' />
+                  {props.t("If you type an email that isn't associated to an account, an invitational email will be sent")}
+                </div>
+              )
+              : (
+                <div className='name__adminmsg'>
+                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
+                  {props.t("Email notifications are disabled, you can't create new users from here")}
+                </div>
+              )
+          )}
         </div>
-        */}
       </div>
 
       <div className='memberlist__form__role'>

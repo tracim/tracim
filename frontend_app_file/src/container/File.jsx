@@ -147,12 +147,13 @@ class File extends React.Component {
 
     switch (fetchResultFile.apiResponse.status) {
       case 200:
+        const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
         this.setState({
           content: {
             ...fetchResultFile.body,
-            filenameNoExtension: removeExtensionOfFilename(fetchResultFile.body.filename),
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${content.filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
-            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${content.filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`
+            filenameNoExtension: filenameNoExtension,
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
+            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`
           }
         })
         break
