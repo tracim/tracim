@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 import typing
 
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
+
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
+from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.roles import WorkspaceRoles
 
 __author__ = 'damien'
 
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import Query
-from tracim_backend.models.auth import User
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import UserRoleInWorkspace
 
 
 class RoleApi(object):
@@ -131,7 +133,15 @@ class RoleApi(object):
         flush: bool=True
     ) -> UserRoleInWorkspace:
 
-        # TODO - G.M - 2018-08-24 - Check if role already exist
+        # INFO - G.M - 2018-10-29 - Check if role already exist
+        query = self._get_one_rsc(user.user_id, workspace.workspace_id)
+        if query.count() > 0:
+            raise RoleAlreadyExistError(
+                'Role already exist for user {} in workspace {}.'.format(
+                    user.user_id,
+                    workspace.workspace_id
+                )
+            )
         role = UserRoleInWorkspace()
         role.user_id = user.user_id
         role.workspace = workspace

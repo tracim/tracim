@@ -1814,7 +1814,40 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['user_id'] == user_role['user_id']
         assert user_role_found['workspace_id'] == user_role['workspace_id']
 
-    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):
+    def test_api__create_workspace_member_role__ok_400__user_public_name_user_already_in_workspace(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email': None,
+            'user_public_name': 'Lawrence L.',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_ALREADY_EXIST
+
+    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):  # nopep8
         """
         Create workspace member role
         :return:

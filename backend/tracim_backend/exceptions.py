@@ -30,6 +30,10 @@ class UserAlreadyExistError(TracimError):
     error_code = error.USER_ALREADY_EXIST
 
 
+class RoleAlreadyExistError(TracimError):
+    error_code = error.USER_ROLE_ALREADY_EXIST
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 

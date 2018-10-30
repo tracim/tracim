@@ -6,13 +6,14 @@ from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend import BASE_API_V2
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere, \
-    UserCantRemoveHisOwnRoleInWorkspace
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
+from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
@@ -369,6 +370,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
     @require_profile_and_workspace_role(
         minimal_profile=Group.TIM_USER,
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
