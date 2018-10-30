@@ -362,6 +362,7 @@ class Dashboard extends React.Component {
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
               subtitle={''}
+              icon='signal'
             >
               <div className='dashboard__header__advancedmode ml-3'>
                 {idRoleUserWorkspace >= 8 &&
