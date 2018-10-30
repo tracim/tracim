@@ -215,6 +215,7 @@ class Account extends React.Component {
           <PageTitle
             parentClass={'account'}
             title={props.t('Admin account page')}
+            icon='user-o'
           />
 
           <PageContent parentClass='account'>

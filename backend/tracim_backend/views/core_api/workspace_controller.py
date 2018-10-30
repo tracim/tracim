@@ -11,11 +11,13 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
+from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
+from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
@@ -298,6 +300,7 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
+    @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
     @require_profile_and_workspace_role(
         minimal_profile=Group.TIM_USER,
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
@@ -340,6 +343,7 @@ class WorkspaceController(Controller):
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
         allow_superadmin=True
     )
+    @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -371,6 +375,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
     @require_profile_and_workspace_role(
         minimal_profile=Group.TIM_USER,
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,

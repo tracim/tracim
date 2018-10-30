@@ -1843,7 +1843,40 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['user_id'] == user_role['user_id']
         assert user_role_found['workspace_id'] == user_role['workspace_id']
 
-    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):
+    def test_api__create_workspace_member_role__ok_400__user_public_name_user_already_in_workspace(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email': None,
+            'user_public_name': 'Lawrence L.',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_ALREADY_EXIST
+
+    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -1871,7 +1904,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
 
-    def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):
+    def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -2008,6 +2041,64 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['do_notify'] is False
         assert user_role['user_id'] == user2.user_id
         assert user_role['workspace_id'] == workspace.workspace_id
+
+    def test_api__update_workspace_member_role__err_400__role_not_exist(self):
+        """
+        Update worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=None,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        transaction.commit()
+        # update workspace role
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'role': 'content-manager',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user2.user_id
+            ),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__as_admin(self):
         """
@@ -2200,6 +2291,59 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         roles = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace.workspace_id), status=200).json_body   # nopep8
         for role in roles:
             assert role['user_id'] != user2.user_id
+
+    def test_api__delete_workspace_member_role__err_400__role_not_exist(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user2.user_id,
+            ),
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_NOT_FOUND
 
     def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):  # nopep8
         """
