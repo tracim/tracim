@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend import BASE_API_V2
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere, \
+from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder, \
     UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
@@ -482,7 +482,7 @@ class WorkspaceController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
@@ -587,7 +587,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

@@ -3505,7 +3505,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:  # nopep8
         """

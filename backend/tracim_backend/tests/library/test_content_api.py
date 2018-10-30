@@ -5,7 +5,7 @@ import transaction
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentInNotEditableState
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
@@ -313,7 +313,7 @@ class TestContentApi(DefaultTest):
             label='file',
             do_save=True
         )
-        with pytest.raises(ContentLabelAlreadyUsedHere):
+        with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             api.create(
                 content_type_slug=content_type_list.Page.slug,
                 workspace=workspace,
@@ -1559,7 +1559,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(ContentLabelAlreadyUsedHere):
+        with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             api2.copy(
                 item=text_file,
                 new_label='already_exist'
@@ -2203,7 +2203,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with pytest.raises(ContentLabelAlreadyUsedHere):
+        with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             with new_revision(
                     session=self.session,
                     tm=transaction.manager,

@@ -661,7 +661,7 @@ class TestFolder(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
@@ -2560,7 +2560,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -3056,7 +3056,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__create_file__ok__200__in_folder(self) -> None:
         """
@@ -3412,7 +3412,7 @@ class TestFiles(FunctionalTest):
         assert res.status == 400
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)

@@ -267,8 +267,8 @@ class InconsistentDatabase(TracimException):
     pass
 
 
-class ContentLabelAlreadyUsedHere(TracimException):
-    error_code = error.CONTENT_LABEL_ALREADY_USED_THERE
+class ContentFilenameAlreadyUsedInFolder(TracimException):
+    error_code = error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
 
 class ParentNotFound(NotFound):
