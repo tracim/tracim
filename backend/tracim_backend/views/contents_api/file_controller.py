@@ -16,6 +16,7 @@ from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import TracimUnavailablePreviewType
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -72,6 +73,9 @@ class FileController(Controller):
 
     # File data
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
