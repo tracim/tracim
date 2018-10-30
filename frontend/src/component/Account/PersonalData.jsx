@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import {newFlashMessage} from '../../action-creator.sync.js'
+import { newFlashMessage } from '../../action-creator.sync.js'
 
 require('./PersonalData.styl')
 
@@ -106,5 +106,5 @@ PersonalData.propTypes = {
   onClickSubmit: PropTypes.func
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = () => ({}) // connect for .dispatch()
 export default connect(mapStateToProps)(translate()(PersonalData))

@@ -4,7 +4,8 @@ import {
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
-  USER_NAME
+  USER_NAME,
+  USER_EMAIL
 } from '../action-creator.sync.js'
 import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
@@ -46,6 +47,9 @@ export default function user (state = defaultUser, action) {
 
     case `${UPDATE}/${USER_NAME}`:
       return {...state, public_name: action.newName}
+
+    case `${UPDATE}/${USER_EMAIL}`:
+      return {...state, email: action.newEmail}
 
     default:
       return state

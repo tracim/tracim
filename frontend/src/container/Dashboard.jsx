@@ -261,7 +261,7 @@ class Dashboard extends React.Component {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
       email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
-      role: state.newMember.role,
+      role: state.newMember.role
     }))
 
     switch (fetchWorkspaceNewMember.status) {
