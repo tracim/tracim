@@ -263,6 +263,10 @@ class RoleDoesNotExist(TracimException):
     pass
 
 
+class UserRoleNotFound(TracimException):
+    error_code = error.USER_ROLE_NOT_FOUND
+
+
 class EmailValidationFailed(TracimException):
     error_code = error.EMAIL_VALIDATION_FAILED
 
