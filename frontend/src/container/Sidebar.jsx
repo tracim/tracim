@@ -15,6 +15,8 @@ import {
   unLoggedAllowedPageList
 } from '../helper.js'
 
+const qs = require('query-string')
+
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
@@ -66,6 +68,12 @@ class Sidebar extends React.Component {
     // check if a label has been changed (if label changed, slug changed too)
     if (JSON.stringify(props.workspaceList.map(ws => ws.slug)) !== JSON.stringify(nextProps.workspaceList.map(ws => ws.slug))) return true
 
+    // check if pathname has changed
+    if (props.location.pathname !== nextProps.location.pathname) return true
+
+    // check if url filter of workspace content has changed
+    if (qs.parse(props.location.search).type !== qs.parse(nextProps.location.search).type) return true
+
     const oldOpenedList = props.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
     const newOpenedList = nextProps.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
 
@@ -114,7 +122,7 @@ class Sidebar extends React.Component {
                   label={ws.label}
                   allowedApp={ws.sidebarEntry}
                   lang={activeLang}
-                  activeFilterList={[]} // @fixme
+                  activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}
                   isOpenInSidebar={ws.isOpenInSidebar}
                   onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                   onClickAllContent={this.handleClickAllContent}
