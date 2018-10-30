@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import quote
+
 import transaction
 
 from tracim_backend import models
@@ -2923,7 +2925,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.body == b'Test file'
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
@@ -3585,7 +3587,8 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1.jpg"'  # nopep8
+        filename = 'test_image_page_1.jpg'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
 
@@ -3822,7 +3825,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(dl_filename, dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3883,7 +3886,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(dl_filename, dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3944,7 +3947,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(dl_filename, dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -4154,7 +4157,9 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_r{}_page_1_256x256.jpg"'.format(revision_id)  # nopep8
+        filename = 'Test file_r{}_page_1_256x256.jpg'.format(revision_id)
+        urlencoded_filename = quote(filename)
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, urlencoded_filename)  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
@@ -4290,7 +4295,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.txt"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
         res = self.testapp.get(
@@ -4298,7 +4303,8 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.pdf"'  # nopep8
+        filename = "Test_file.pdf"
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:  # nopep8
@@ -4604,7 +4610,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.content_type == 'application/pdf'
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
         """
@@ -4882,6 +4888,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'text/plain'
         params = {'force_download': 1}
+        filename = 'Test_file.pdf'
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename}'.format(  # nopep8
                 content_id=content_id,
@@ -4891,7 +4898,8 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.pdf"'  # nopep8
+
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
@@ -4957,16 +4965,17 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'text/plain'
         params = {'page': 1, 'force_download': 1}
+        filename = 'test_image_page_1.pdf'
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
-                filename='test_image_page_1.pdf'
+                filename=filename
             ),
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1.pdf"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
 
