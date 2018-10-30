@@ -31,7 +31,7 @@ from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.exceptions import ContentInNotEditableState
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
@@ -532,7 +532,7 @@ class ContentApi(object):
                 text=exception_message,
                 parent_id=parent.parent_id
             )
-        raise ContentLabelAlreadyUsedHere(exception_message)
+        raise ContentFilenameAlreadyUsedInFolder(exception_message)
 
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert

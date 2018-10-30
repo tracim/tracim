@@ -661,7 +661,7 @@ class TestFolder(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
@@ -2198,7 +2198,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_deleted(self) -> None:
         """
@@ -2263,7 +2265,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_archived(self) -> None:
         """
@@ -2328,7 +2332,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__not_modified(self) -> None:
         """
@@ -2554,7 +2560,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -2924,7 +2930,7 @@ class TestFiles(FunctionalTest):
 
     def test_api__create_file__ok__200__nominal_case(self) -> None:
         """
-        create one file of a content
+        create one file of a content at workspace root
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2993,9 +2999,68 @@ class TestFiles(FunctionalTest):
         assert res['page_nb'] == 1
         assert res['mimetype'] == 'image/png'
 
+    def test_api__create_file__err_400__filename_already_used(self) -> None:
+        """
+        create one file of a content but filename is already used here
+        """
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=200,
+        )
+        res = res.json_body
+        assert res['parent_id'] is None
+        assert res['content_type'] == 'file'
+        assert res['is_archived'] is False
+        assert res['is_deleted'] is False
+        assert res['workspace_id'] == business_workspace.workspace_id
+        assert isinstance(res['content_id'], int)
+        content_id = res['content_id']
+        assert res['status'] == 'open'
+        assert res['label'] == 'test_image'
+        assert res['slug'] == 'test-image'
+
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+
     def test_api__create_file__ok__200__in_folder(self) -> None:
         """
-        create one file of a content
+        create one file of a content in a folder
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3074,6 +3139,106 @@ class TestFiles(FunctionalTest):
         assert res['author']['user_id'] == admin.user_id
         assert res['page_nb'] == 1
         assert res['mimetype'] == 'image/png'
+
+    def test_api__create_file__err__400__unallow_subcontent(self) -> None:
+        """
+        create one file of a content but subcontent of type file unallowed here
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=business_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        with new_revision(
+                session=dbsession,
+                tm=transaction.manager,
+                content=folder,
+        ):
+            content_api.set_allowed_content(folder, [])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': folder.content_id,
+        }
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT
+
+    def test_api__create_file__err__400__parent_not_found(self) -> None:
+        """
+        create one file of a content but parent_id is not valid
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 3000
+        }
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.PARENT_NOT_FOUND
 
     def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -3247,7 +3412,7 @@ class TestFiles(FunctionalTest):
         assert res.status == 400
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
