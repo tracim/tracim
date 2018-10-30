@@ -1,6 +1,7 @@
 # coding=utf-8
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
+from tracim_backend.exceptions import UserRoleNotFound
 
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.models import User
@@ -32,7 +33,7 @@ class TestRoleApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        with pytest.raises(NoResultFound):
+        with pytest.raises(UserRoleNotFound):
             rapi.get_one(admin.user_id, 100)  # workspace 100 does not exist
 
     def test_unit__create_one__nominal_case(self):
