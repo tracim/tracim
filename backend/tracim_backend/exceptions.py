@@ -288,7 +288,7 @@ class PreviewDimNotAllowed(TracimException):
 
 
 class UnallowedSubContent(TracimException):
-    error_code = error.EMAIL_UNALLOWED_SUBCONTENT
+    error_code = error.UNALLOWED_SUBCONTENT
 
 
 class TooShortAutocompleteString(TracimException):

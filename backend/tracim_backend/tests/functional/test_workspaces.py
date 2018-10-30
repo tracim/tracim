@@ -3305,6 +3305,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):  # nopep8
         """
         Check obtain workspace folder content who does not match any type
@@ -3556,7 +3557,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'parent_id': 0,
             'label': 'GenericCreatedContent',
-            'content_type': 'markdownpage',
+            'content_type': content_type_list.Page.slug
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/contents',
@@ -3567,6 +3568,31 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
         assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+
+    def test_api__post_content_create_generic_content__err_400__parent_not_found(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1000,
+            'label': 'GenericCreatedContent',
+            'content_type': content_type_list.Page.slug,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.PARENT_NOT_FOUND  # nopep8
 
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
         """
@@ -3629,7 +3655,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         params = {
             'label': '',
-            'content_type': 'html-document',
+            'content_type': content_type_list.Page.slug,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/contents',
@@ -3704,7 +3730,7 @@ class TestWorkspaceContents(FunctionalTest):
         # unallowed_content_type
         params = {
             'label': 'GenericCreatedContent',
-            'content_type': 'markdownpage',
+            'content_type': content_type_list.Page.slug,
             'parent_id': folder.content_id
         }
         res = self.testapp.post_json(
@@ -3712,8 +3738,9 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT  # nopep8
         # allowed_content_type
         params = {
             'label': 'GenericCreatedContent',
