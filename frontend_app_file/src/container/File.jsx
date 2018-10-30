@@ -71,6 +71,7 @@ class File extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
     switch (type) {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
@@ -86,6 +87,12 @@ class File extends React.Component {
         break
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
+
+        if (state.timelineWysiwyg) {
+          tinymce.remove('#wysiwygTimelineComment')
+          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
+        }
+
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -122,7 +129,7 @@ class File extends React.Component {
       wysiwyg('#wysiwygNewVersion', this.handleChangeDescription)
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 

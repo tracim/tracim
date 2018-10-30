@@ -28,6 +28,7 @@ import {
   putThreadRestoreDeleted,
   putThreadRead
 } from '../action.async.js'
+import {MODE} from '../../../frontend_app_html-document/src/helper.js'
 
 class Thread extends React.Component {
   constructor (props) {
@@ -55,6 +56,7 @@ class Thread extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
     switch (type) {
       case 'thread_showApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
@@ -70,6 +72,12 @@ class Thread extends React.Component {
         break
       case 'allApp_changeLang':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
+
+        if (state.timelineWysiwyg) {
+          tinymce.remove('#wysiwygTimelineComment')
+          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
+        }
+
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -96,7 +104,7 @@ class Thread extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) this.loadContent()
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 

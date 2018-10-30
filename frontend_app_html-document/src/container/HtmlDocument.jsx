@@ -60,6 +60,7 @@ class HtmlDocument extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
     switch (type) {
       case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
@@ -75,6 +76,16 @@ class HtmlDocument extends React.Component {
         break
       case 'allApp_changeLang':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+
+        if (state.timelineWysiwyg) {
+          tinymce.remove('#wysiwygTimelineComment')
+          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
+        }
+        if (state.mode === MODE.EDIT) {
+          tinymce.remove('#wysiwygNewVersion')
+          wysiwyg('#wysiwygNewVersion', data, this.handleChangeText)
+        }
+
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -104,10 +115,10 @@ class HtmlDocument extends React.Component {
 
     if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', this.handleChangeText)
+      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 
