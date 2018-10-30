@@ -3392,7 +3392,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content as workspace root
         """
         self.testapp.authorization = (
             'Basic',
@@ -3438,9 +3438,9 @@ class TestWorkspaceContents(FunctionalTest):
         content_ids = [content['content_id'] for content in active_contents]
         assert res.json_body['content_id'] in content_ids
 
-    def test_api__post_content_create_generic_content__err_400__label_already_used(self) -> None:  # nopep8
+    def test_api__post_content_create_generic_content__err_400__filename_already_used(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but filename is already used here
         """
         self.testapp.authorization = (
             'Basic',
@@ -3498,7 +3498,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content without provided parent_id param
         """
         self.testapp.authorization = (
             'Basic',
@@ -3545,7 +3545,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__parent_id_0(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but parent_id=0
         """
         self.testapp.authorization = (
             'Basic',
@@ -3571,7 +3571,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__parent_not_found(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but parent id is not valable
         """
         self.testapp.authorization = (
             'Basic',
@@ -3644,7 +3644,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but label provided is empty
         """
         self.testapp.authorization = (
             'Basic',
@@ -3667,7 +3667,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but content type is uncorrect
         """
         self.testapp.authorization = (
             'Basic',
@@ -3690,7 +3690,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but content_type is not allowed in this folder
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
