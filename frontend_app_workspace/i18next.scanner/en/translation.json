@@ -1,5 +1,7 @@
 {
   "Validate and create": "Validate and create",
   "Shared space's name": "Shared space's name",
-  "New shared space": "New shared space"
+  "New shared space": "New shared space",
+  "A shared space with that name already exists": "A shared space with that name already exists",
+  "Error while saving new shared space": "Error while saving new shared space"
 }

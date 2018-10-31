@@ -135,7 +135,7 @@ class Sidebar extends React.Component {
           {getUserProfile(user.profile).id <= 2 &&
             <div className='sidebar__content__btnnewworkspace'>
               <button
-                className='sidebar__content__btnnewworkspace__btn btn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover  mb-5'
+                className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover mb-5'
                 onClick={this.handleClickNewWorkspace}
               >
                 {t('Create a shared space')}

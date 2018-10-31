@@ -1,5 +1,7 @@
 {
   "Validate and create": "Valider et créer",
   "Shared space's name": "Nom de l'espace partagé",
-  "New shared space": "Nouvel espace partagé"
+  "New shared space": "Nouvel espace partagé",
+  "A shared space with that name already exists": "Un espace partagé avec ce nom existe déjà",
+  "Error while saving new shared space": "Erreur lors de la sauvegarde de l'espace partagé"
 }
