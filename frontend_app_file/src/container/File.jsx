@@ -441,6 +441,13 @@ class File extends React.Component {
             this.loadContent()
             this.loadTimeline()
             break
+          case 400:
+            const jsonResult400 = JSON.parse(xhr.responseText)
+            switch (jsonResult400.code) {
+              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+            }
+            break
           default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
       }
