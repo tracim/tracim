@@ -10,6 +10,26 @@ python:
 
 jobs:
   include:
+  - stage: check-requirement
+    name: Check requirement.txt
+    python:
+    - "3.6"
+    addons:
+    services:
+    before_install:
+      # TODO - GM - 2018-10-12  find a better way to install exiftool
+      # download exiftool and compile it to have a working exiftool command (used by preview_generator)
+      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
+      - cd backend
+    install:
+      - pip install --upgrade pip setuptools
+      - pip install pip-tools
+    before_script:
+      - mv requirements.txt requirements_from_source.txt
+    script:
+      - pip-compile
+      - diff -u requirements.txt requirements_from_source.txt
+    after_success: true
   - stage: quick-backend-unit-test
     name : Quick Unit-Test for Backend
     env:
@@ -40,6 +60,7 @@ jobs:
     - pytest tracim_backend
 
 stages:
+  - check-requirement
   - quick-backend-unit-test
   - backend-sqlite
   - backend-postgresql
