@@ -8,42 +8,68 @@ language: python
 python:
   - "3.6"
 
+
+language: node_js
+node_js:
+  # Node 10.3+ includes npm@6 which has good "npm ci" command
+  - 10.8
+
 jobs:
   include:
-  - stage: quick-backend-unit-test
-    name : Quick Unit-Test for Backend
-    env:
-    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
-    python:
-      - "3.5"
-      - "3.6"
-      - "3.7"
+  # - stage: quick-backend-unit-test
+  #   name : Quick Unit-Test for Backend
+  #   env:
+  #   - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+  #   python:
+  #     - "3.5"
+  #     - "3.6"
+  #     - "3.7"
+  #   script:
+  #   - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
+  # - stage: backend-sqlite
+  #   name: Test Backend with sqlite
+  #   env:
+  #   - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+  #   script:
+  #   - pytest --cov tracim_backend
+  # - stage: backend-postgresql
+  #   name: Test Backend with postgresql
+  #   env:
+  #   - DB=postgres
+  #   script:
+  #   - pytest tracim_backend
+  # - stage: backend-mysql
+  #   name: Test Backend with mysql
+  #   env:
+  #   - DB=mysql
+  #   script:
+  #   - pytest tracim_backend
+  - stage: functional
+    name: Functional tests using Cypress
+    before_install:
+      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
+    install:
+      - pip install --upgrade pip setuptools
+      - pip install -e \".[postgresql,testing]\"
+      - sh setup_default_backend.sh
+      - sh install_frontend_dependencies.sh
+      - sh build_full_frontend.sh
+      - sh setup_functionnal_tests.sh
+      - npm ci
+    before_script:
+      - psql -c 'create database tracim_test;' -U postgres
+      - source backend/env/bin/activate
+      - pserve backend/development.ini
+      - cd functionnal_tests
+
     script:
-    - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
-  - stage: backend-sqlite
-    name: Test Backend with sqlite
-    env:
-    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
-    script:
-    - pytest --cov tracim_backend
-  - stage: backend-postgresql
-    name: Test Backend with postgresql
-    env:
-    - DB=postgres
-    script:
-    - pytest tracim_backend
-  - stage: backend-mysql
-    name: Test Backend with mysql
-    env:
-    - DB=mysql
-    script:
-    - pytest tracim_backend
+      - $(npm bin)/cypress run --record
+    after_success:
+      - echo "override"
 
 stages:
-  - quick-backend-unit-test
-  - backend-sqlite
-  - backend-postgresql
-  - backend-mysql
+  - functional
+
 
 addons:
   postgresql: "9.3"

@@ -13,5 +13,5 @@ color.json
 functionnal_tests/package.json
 functionnal_tests/cypress.json
 functionnal_tests/node_modules/
-functionnal_tests/cypress/
+functionnal_tests/cypress/videos
 

@@ -2,5 +2,4 @@
   "baseUrl": "http://localhost:6543",
   "viewportWidth": 1280,
   "viewportHeight": 1024,
-  "integrationFolder": "{path_test_file}"
 }
