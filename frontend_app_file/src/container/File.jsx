@@ -14,7 +14,8 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDistanceDate
+  displayDistanceDate,
+  convertBackslashNToBr
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -274,21 +275,25 @@ class File extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { config, content, newComment } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveNewComment = await postFileNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
+    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+    // see https://github.com/tracim/tracim/issues/1101
+    const newCommentForApi = state.timelineWysiwyg
+      ? state.newComment
+      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
 
-    handleFetchResult(await fetchResultSaveNewComment)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.setState({newComment: ''})
-          if (this.state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-          this.loadContent()
-          this.loadTimeline()
-        } else {
-          console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    const fetchResultSaveNewComment = await handleFetchResult(await postFileNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
+
+    switch (fetchResultSaveNewComment.apiResponse.status) {
+      case 200:
+        this.setState({newComment: ''})
+        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+        this.loadContent()
+        this.loadTimeline()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))

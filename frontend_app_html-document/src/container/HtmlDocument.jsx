@@ -14,7 +14,8 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDistanceDate
+  displayDistanceDate,
+  convertBackslashNToBr
 } from 'tracim_frontend_lib'
 import { MODE, debug } from '../helper.js'
 import {
@@ -126,6 +127,15 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: 'addFlashMsg',
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
@@ -256,20 +266,23 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { config, content, newComment } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveNewComment = await postHtmlDocNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
+    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+    // see https://github.com/tracim/tracim/issues/1101
+    const newCommentForApi = state.timelineWysiwyg
+      ? state.newComment
+      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
 
-    handleFetchResult(await fetchResultSaveNewComment)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.setState({newComment: ''})
-          if (this.state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-          this.loadContent()
-        } else {
-          console.warn('Error saving html-document comment. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
+    switch (fetchResultSaveNewComment.apiResponse.status) {
+      case 200:
+        this.setState({newComment: ''})
+        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+        this.loadContent()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
