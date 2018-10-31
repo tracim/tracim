@@ -50,10 +50,10 @@ jobs:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
     install:
       - pip install --upgrade pip setuptools
-      - sh setup_default_backend.sh
-      - sh install_frontend_dependencies.sh
-      - sh build_full_frontend.sh
-      - sh setup_functionnal_tests.sh
+      - ./setup_default_backend.sh
+      - ./install_frontend_dependencies.sh
+      - ./build_full_frontend.sh
+      - ./setup_functionnal_tests.sh
       - npm ci
     before_script:
       - sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}
