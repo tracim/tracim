@@ -23,5 +23,6 @@
   "Unknown user": "Unknown user",
   "Error while deleting shared space": "Error while deleting shared space",
   "This account is deactivated": "This account is deactivated",
-  "Error while removing member": "Error while removing member"
+  "Error while removing member": "Error while removing member",
+  "Note, only administrators can send invitational email": "Note, only administrators can send invitational email"
 }

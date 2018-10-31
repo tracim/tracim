@@ -322,6 +322,15 @@ class WorkspaceAdvanced extends React.Component {
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
           case 2042: this.sendGlobalFlashMessage(props.t('This account is deactivated'), 'warning'); break
+          case 1001:
+            const ErrorMsg = () => (
+              <div>
+                {props.t('Unknown user')}<br />
+                {props.t('Note, only administrators can send invitational email')}
+              </div>
+            )
+            this.sendGlobalFlashMessage(<ErrorMsg />, 'warning')
+            break
           default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
         }
         break
@@ -389,6 +398,7 @@ class WorkspaceAdvanced extends React.Component {
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
             onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
             newMemberName={state.newMember.nameOrEmail}
+            isEmail={state.newMember.isEmail}
             onChangeNewMemberName={this.handleChangeNewMemberName}
             newMemberRole={state.newMember.role}
             onClickNewMemberRole={this.handleClickNewMemberRole}
