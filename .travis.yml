@@ -50,15 +50,13 @@ jobs:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
     install:
       - pip install --upgrade pip setuptools
-      - pip install -e \".[postgresql,testing]\"
       - sh setup_default_backend.sh
       - sh install_frontend_dependencies.sh
       - sh build_full_frontend.sh
       - sh setup_functionnal_tests.sh
       - npm ci
     before_script:
-      - psql -c 'create database tracim_test;' -U postgres
-      - source backend/env/bin/activate
+      - sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}
       - pserve backend/development.ini
       - cd functionnal_tests
 
