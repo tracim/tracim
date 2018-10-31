@@ -14,5 +14,6 @@
   "Text Documents": "Text Documents",
   "Edit": "Edit",
   "A content with the same name already exists": "A content with the same name already exists",
-  "Error while creating document": "Error while creating document"
+  "Error while creating document": "Error while creating document",
+  "Error while saving new comment": "Error while saving new comment"
 }
