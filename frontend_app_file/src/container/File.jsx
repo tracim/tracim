@@ -379,19 +379,19 @@ class File extends React.Component {
 
     if (state.mode === MODE.VIEW && isLastRevision) return
 
+    const filenameNoExtension = removeExtensionOfFilename(revision.filename)
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        label: revision.label,
-        raw_content: revision.raw_content,
-        number: revision.number,
-        status: revision.status,
+        ...revision,
+        filenameNoExtension: filenameNoExtension,
         current_revision_id: revision.revision_id,
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`,
-        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${state.content.filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`
       },
       mode: MODE.REVISION
     }))
@@ -575,7 +575,7 @@ class File extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}-r${content.current_revision_id}${content.file_extension}?force_download=1`
+              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1`
             )(state)}
             isPdfAvailable={state.content.pdf_available}
             downloadPdfPageUrl={(({config: {apiUrl}, content, mode, fileCurrentPage}) =>
