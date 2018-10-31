@@ -3296,6 +3296,73 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
 
+    def test_api__set_file_raw__ok_200__filename_already_used(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file_2 = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file2',
+            do_save=False,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        content2_id = int(test_file_2.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content2_id, image.name),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+
+
     def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
         """
         Set one file of a content

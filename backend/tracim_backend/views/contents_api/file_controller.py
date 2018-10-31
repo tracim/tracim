@@ -134,6 +134,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
