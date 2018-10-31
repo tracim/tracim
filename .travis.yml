@@ -13,7 +13,7 @@ jobs:
   - stage: check-requirement
     name: Check requirement.txt
     python:
-    - "3.6"
+    - "3.5"
     addons:
     services:
     before_install:
