@@ -9,10 +9,10 @@ python:
   - "3.6"
 
 
-language: node_js
-node_js:
-  # Node 10.3+ includes npm@6 which has good "npm ci" command
-  - 10.8
+# language: node_js
+# node_js:
+#   # Node 10.3+ includes npm@6 which has good "npm ci" command
+#   - 10.8
 
 jobs:
   include:
