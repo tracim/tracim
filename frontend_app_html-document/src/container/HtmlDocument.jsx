@@ -433,7 +433,7 @@ class HtmlDocument extends React.Component {
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={content.is_archived || content.is_deleted}
+          disableChangeTitle={!content.is_editable}
         />
 
         <PopinFixedOption
@@ -447,7 +447,7 @@ class HtmlDocument extends React.Component {
                 <NewVersionBtn
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== MODE.VIEW || content.is_archived || content.is_deleted}
+                  disabled={mode !== MODE.VIEW || !content.is_editable}
                   label={t('Edit')}
                 />
               }
@@ -514,7 +514,7 @@ class HtmlDocument extends React.Component {
             timelineData={timeline}
             showHeader
             newComment={newComment}
-            disableComment={mode === MODE.REVISION || content.is_archived || content.is_deleted}
+            disableComment={mode === MODE.REVISION || !content.is_editable}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

@@ -340,7 +340,7 @@ class Thread extends React.Component {
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={content.is_archived || content.is_deleted}
+          disableChangeTitle={!content.is_editable}
         />
 
         <PopinFixedOption
@@ -376,7 +376,7 @@ class Thread extends React.Component {
             loggedUser={loggedUser}
             timelineData={listMessage}
             newComment={newComment}
-            disableComment={content.is_archived || content.is_deleted}
+            disableComment={!content.is_editable}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

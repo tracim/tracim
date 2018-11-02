@@ -499,7 +499,7 @@ class File extends React.Component {
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={state.content.is_archived || state.content.is_deleted}
+          disableChangeTitle={!state.content.is_editable}
         />
 
         <PopinFixedOption
@@ -513,7 +513,7 @@ class File extends React.Component {
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== MODE.VIEW || state.content.is_archived || state.content.is_deleted}
+                  disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
                   label={props.t('Update')}
                 />
               }
@@ -572,6 +572,7 @@ class File extends React.Component {
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
+            isEditable={state.content.is_editable}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
@@ -601,7 +602,7 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
             newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+            disableComment={state.mode === MODE.REVISION || !state.content.is_editable}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
