@@ -1,6 +1,8 @@
 env:
   global:
     - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
+    # Node 10.3+ includes npm@6 which has good "npm ci" command
+    - TRAVIS_NODE_VERSION="10.8"
 
 
 sudo: false
@@ -8,11 +10,6 @@ language: python
 python:
   - "3.6"
 
-
-# language: node_js
-# node_js:
-#   # Node 10.3+ includes npm@6 which has good "npm ci" command
-#   - 10.8
 
 jobs:
   include:
