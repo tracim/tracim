@@ -24,7 +24,7 @@ const defaultUser = {
   avatar_url: null,
   created: '',
   public_name: '',
-  lang: ''
+  lang: 'en'
 }
 
 export default function user (state = defaultUser, action) {

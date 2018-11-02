@@ -265,6 +265,12 @@ class File extends React.Component {
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
+      case 400:
+        switch (fetchResultSaveFile.body.code) {
+          case 2041: break // same description sent, no need for error msg
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+        }
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
     }
   }
