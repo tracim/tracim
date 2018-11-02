@@ -327,6 +327,7 @@ class File extends React.Component {
     switch (fetchResultArchive.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
@@ -340,6 +341,7 @@ class File extends React.Component {
     switch (fetchResultArchive.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
@@ -353,6 +355,7 @@ class File extends React.Component {
     switch (fetchResultRestore.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
@@ -366,6 +369,7 @@ class File extends React.Component {
     switch (fetchResultRestore.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
