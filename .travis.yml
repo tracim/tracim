@@ -94,6 +94,7 @@ install:
   # see https://github.com/z4r/python-coveralls/issues/66
   - pip install 'pytest-cov<2.6'
   - pip install python-coveralls
+  - pip install -r "requirements.txt"
   # postgresql
   - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
   # mysql
