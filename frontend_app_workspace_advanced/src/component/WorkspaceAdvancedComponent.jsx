@@ -135,6 +135,7 @@ const WorkspaceAdvancedComponent = props => {
           <NewMemberForm
             onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
             nameOrEmail={props.newMemberName}
+            isEmail={props.isEmail}
             onChangeNameOrEmail={props.onChangeNewMemberName}
             searchedKnownMemberList={props.searchedKnownMemberList}
             onClickKnownMember={props.onClickKnownMember}

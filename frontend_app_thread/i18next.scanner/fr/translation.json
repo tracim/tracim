@@ -8,5 +8,6 @@
   "Threads": "Discussions",
   "Start a topic": "Lancer une discussion",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
-  "Error while creating thread": "Error lors de la création de la discussion"
+  "Error while creating thread": "Error lors de la création de la discussion",
+  "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire"
 }

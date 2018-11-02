@@ -14,7 +14,8 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDistanceDate
+  displayDistanceDate,
+  convertBackslashNToBr
 } from 'tracim_frontend_lib'
 import { MODE, debug } from '../helper.js'
 import {
@@ -60,6 +61,7 @@ class HtmlDocument extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
     switch (type) {
       case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
@@ -75,6 +77,16 @@ class HtmlDocument extends React.Component {
         break
       case 'allApp_changeLang':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+
+        if (state.timelineWysiwyg) {
+          tinymce.remove('#wysiwygTimelineComment')
+          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
+        }
+        if (state.mode === MODE.EDIT) {
+          tinymce.remove('#wysiwygNewVersion')
+          wysiwyg('#wysiwygNewVersion', data, this.handleChangeText)
+        }
+
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -104,10 +116,10 @@ class HtmlDocument extends React.Component {
 
     if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', this.handleChangeText)
+      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 
@@ -115,6 +127,15 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: 'addFlashMsg',
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
@@ -245,20 +266,23 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { config, content, newComment } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveNewComment = await postHtmlDocNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
+    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+    // see https://github.com/tracim/tracim/issues/1101
+    const newCommentForApi = state.timelineWysiwyg
+      ? state.newComment
+      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
 
-    handleFetchResult(await fetchResultSaveNewComment)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.setState({newComment: ''})
-          if (this.state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
-          this.loadContent()
-        } else {
-          console.warn('Error saving html-document comment. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
+    switch (fetchResultSaveNewComment.apiResponse.status) {
+      case 200:
+        this.setState({newComment: ''})
+        if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
+        this.loadContent()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+    }
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))

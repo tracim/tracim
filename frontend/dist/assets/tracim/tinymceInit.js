@@ -1,46 +1,52 @@
 (function () {
-  wysiwyg = function (selector, handleOnChange) {
-    function base64EncodeAndTinyMceInsert (files) { // @todo move this function out of wysiwyg = { ... }
-      for (var i = 0; i < files.length; i++) {
-        if (files[i].size > 1000000)
-          files[i].allowed = confirm(files[i].name + " fait plus de 1mo et peut prendre du temps à insérer, voulez-vous continuer ?")
-      }
+  function base64EncodeAndTinyMceInsert (files) { // @todo move this function out of wysiwyg = { ... }
+    for (var i = 0; i < files.length; i++) {
+      if (files[i].size > 1000000)
+        files[i].allowed = confirm(files[i].name + ' is bigger than 1mo, it can takes some time to upload, do you wish to continue?')
+    }
 
-      for (var i = 0; i < files.length; i++) {
-        if (files[i].allowed !== false && files[i].type.match('image.*')) {
-          var img = document.createElement('img')
+    for (var i = 0; i < files.length; i++) {
+      if (files[i].allowed !== false && files[i].type.match('image.*')) {
+        var img = document.createElement('img')
 
-          var fr = new FileReader()
+        var fr = new FileReader()
 
-          fr.readAsDataURL(files[i])
+        fr.readAsDataURL(files[i])
 
-          fr.onloadend = function (e) {
-            img.src = e.target.result
-            tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
-          }
+        fr.onloadend = function (e) {
+          img.src = e.target.result
+          tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
         }
       }
     }
+  }
 
+  wysiwyg = function (selector, lang, handleOnChange) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
     $(document).on('focusin', function(e) {
       if ($(e.target).closest(".mce-window").length) {
-        e.stopImmediatePropagation();
+        e.stopImmediatePropagation()
       }
-    });
+    })
 
     tinymce.init({
       selector: selector,
+      language: lang === 'fr' ? 'fr_FR' : lang,
       menubar: false,
       resize: false,
-      skin: "lightgray",
+      skin: 'lightgray',
       plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
-      toolbar: 'insert | formatselect | bold italic underline strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | table | code | fullscreen ',
-      content_style: "div {height: 100%;}",
+      toolbar: [
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | fullscreen'
+      ],
+      insert_button_items: 'media anchor insertdatetime',
+      // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
+      content_style: 'div {height: 100%;}',
       setup: function ($editor) {
-        $editor.on('change', function(e) {
+        $editor.on('change', function (e) {
           handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
         })
 

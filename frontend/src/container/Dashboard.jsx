@@ -184,7 +184,7 @@ class Dashboard extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
       case 200:
         this.setState({
@@ -259,7 +259,8 @@ class Dashboard extends React.Component {
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      name: state.newMember.nameOrEmail,
+      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
+      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
       role: state.newMember.role
     }))
 
@@ -283,6 +284,15 @@ class Dashboard extends React.Component {
         switch (fetchWorkspaceNewMember.json.code) {
           case 2042:
             props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
+            return false
+          case 1001:
+            const ErrorMsg = () => (
+              <div>
+                {props.t('Unknown user')}<br />
+                {props.t('Note, only administrators can send invitational email')}
+              </div>
+            )
+            props.dispatch(newFlashMessage(<ErrorMsg />))
             return false
           default:
             props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
@@ -361,6 +371,7 @@ class Dashboard extends React.Component {
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
               subtitle={''}
+              icon='signal'
             >
               <div className='dashboard__header__advancedmode ml-3'>
                 {idRoleUserWorkspace >= 8 &&

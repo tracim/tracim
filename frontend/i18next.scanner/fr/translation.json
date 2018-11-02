@@ -89,9 +89,6 @@
   "Create": "Créer ",
   "Validate": "Valider",
   "No recent activity": "Aucune activité récente",
-  "List of documents": "Liste des documents",
-  "List of files": "Liste des fichiers",
-  "List of threads": "Liste des discussions",
   "Users": "Utilisateurs",
   "Wrong old password": "Ancien mot de passe incorrect",
   "New passwords are different": "Les nouveaux mots de passe sont différents",
@@ -156,5 +153,13 @@
   "An error has happened": "Une erreur est survenue",
   "Email sent, don't forget to check your spam": "Email envoyé, pensez à vérifier votre dossier spam",
   "An error has happened, please try again.": "Une erreur est survenue, veuillez réessayer",
-  "Error while removing member": "Erreur lors de la suppression du membre"
+  "Error while removing member": "Erreur lors de la suppression du membre",
+  "List of": "Liste des",
+  "text document": "document texte",
+  "thread": "discussion",
+  "file": "fichier",
+  "text documents": "documents texte",
+  "threads": "discussions",
+  "files": "fichiers",
+  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail"
 }

@@ -65,8 +65,8 @@ export const deleteMember = (apiUrl, idWorkspace, idMember) =>
     method: 'DELETE'
   })
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch) =>
-  fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}`, {
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, idWorkspaceToExclude) =>
+  fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${idWorkspaceToExclude}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -83,7 +83,8 @@ export const postWorkspaceMember = (apiUrl, idWorkspace, newMember) =>
     method: 'POST',
     body: JSON.stringify({
       user_id: newMember.id || null,
-      user_email_or_public_name: newMember.nameOrEmail,
+      user_email: newMember.email || null,
+      user_public_name: newMember.publicName || null,
       role: newMember.role
     })
   })

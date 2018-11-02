@@ -1,6 +1,5 @@
 import React from 'react'
 import classnames from 'classnames'
-import { convertBackslashNToBr } from '../../helper.js'
 
 require('./Comment.styl')
 
@@ -46,7 +45,7 @@ const Comment = props => {
         <div
           className={classnames(`${props.customClass}__body`, 'comment__body')}
           style={props.fromMe ? styleSent : styleReceived}
-          dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.text)}}
+          dangerouslySetInnerHTML={{__html: props.text}}
         />
       </div>
     </li>

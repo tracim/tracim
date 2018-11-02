@@ -127,7 +127,7 @@ class PopupCreateFile extends React.Component {
             break
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
-            switch (jsonResult400.body.code) {
+            switch (jsonResult400.code) {
               case 3002:
                 GLOBAL_dispatchEvent({
                   type: 'addFlashMsg',

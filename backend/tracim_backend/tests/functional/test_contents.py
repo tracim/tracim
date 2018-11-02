@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import quote
+
 import transaction
 
 from tracim_backend import models
@@ -86,6 +88,7 @@ class TestFolder(FunctionalTest):
         assert content['content_id'] == folder.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'test-folder'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
@@ -497,6 +500,7 @@ class TestFolder(FunctionalTest):
         assert content['content_id'] == folder.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
@@ -571,6 +575,7 @@ class TestFolder(FunctionalTest):
         assert content['content_id'] == folder.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
@@ -661,7 +666,7 @@ class TestFolder(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
@@ -745,6 +750,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'test-folder'
         assert revision['parent_id'] is None
         assert revision['show_in_ui'] is True
@@ -768,6 +774,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'test-folder-updated'
         assert revision['parent_id'] is None
         assert revision['show_in_ui'] is True
@@ -791,6 +798,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is True
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] != 'test-folder-updated'
         assert revision['label'].startswith('test-folder-updated')
         assert revision['parent_id'] is None
@@ -816,6 +824,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'].startswith('test-folder-updated')
         assert revision['parent_id'] is None
         assert revision['show_in_ui'] is True
@@ -995,6 +1004,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Tiramisu Recipe'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1037,6 +1047,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Tiramisu Recipe'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1271,6 +1282,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1299,6 +1311,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1376,6 +1389,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1403,6 +1417,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1454,6 +1469,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'Tiramisu Recipes!!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -1476,6 +1492,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'Tiramisu Recipes!!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -1498,6 +1515,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'] == 'Tiramisu Recipe'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -1655,6 +1673,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Test_file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -1726,6 +1745,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Test file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -1811,6 +1831,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Test_file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2083,6 +2104,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2114,6 +2136,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2198,7 +2221,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_deleted(self) -> None:
         """
@@ -2263,7 +2288,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_archived(self) -> None:
         """
@@ -2328,7 +2355,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
-        # TODO - G.M - 2018-10-10 - Check result
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__not_modified(self) -> None:
         """
@@ -2399,6 +2428,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2430,6 +2460,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2554,7 +2585,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -2624,6 +2655,7 @@ class TestFiles(FunctionalTest):
         assert revision['content_id'] == test_file.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'] == 'Test_file'
         assert revision['parent_id'] == 1
         assert revision['show_in_ui'] is True
@@ -2917,14 +2949,14 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.body == b'Test file'
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
 
     def test_api__create_file__ok__200__nominal_case(self) -> None:
         """
-        create one file of a content
+        create one file of a content at workspace root
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2963,6 +2995,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -2983,6 +3016,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -2993,9 +3027,69 @@ class TestFiles(FunctionalTest):
         assert res['page_nb'] == 1
         assert res['mimetype'] == 'image/png'
 
+    def test_api__create_file__err_400__filename_already_used(self) -> None:
+        """
+        create one file of a content but filename is already used here
+        """
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=200,
+        )
+        res = res.json_body
+        assert res['parent_id'] is None
+        assert res['content_type'] == 'file'
+        assert res['is_archived'] is False
+        assert res['is_deleted'] is False
+        assert res['is_editable'] is True
+        assert res['workspace_id'] == business_workspace.workspace_id
+        assert isinstance(res['content_id'], int)
+        content_id = res['content_id']
+        assert res['status'] == 'open'
+        assert res['label'] == 'test_image'
+        assert res['slug'] == 'test-image'
+
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+
     def test_api__create_file__ok__200__in_folder(self) -> None:
         """
-        create one file of a content
+        create one file of a content in a folder
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3045,6 +3139,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -3065,6 +3160,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -3074,6 +3170,106 @@ class TestFiles(FunctionalTest):
         assert res['author']['user_id'] == admin.user_id
         assert res['page_nb'] == 1
         assert res['mimetype'] == 'image/png'
+
+    def test_api__create_file__err__400__unallow_subcontent(self) -> None:
+        """
+        create one file of a content but subcontent of type file unallowed here
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=business_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        with new_revision(
+                session=dbsession,
+                tm=transaction.manager,
+                content=folder,
+        ):
+            content_api.set_allowed_content(folder, [])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': folder.content_id,
+        }
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT
+
+    def test_api__create_file__err__400__parent_not_found(self) -> None:
+        """
+        create one file of a content but parent_id is not valid
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 3000
+        }
+        image = create_1000px_png_test_image()
+        res = self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.PARENT_NOT_FOUND
 
     def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -3129,6 +3325,73 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
 
+    def test_api__set_file_raw__ok_200__filename_already_used(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file_2 = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file2',
+            do_save=False,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        content2_id = int(test_file_2.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content_id, image.name),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw/{}'.format(content2_id, image.name),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+
+
     def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
         """
         Set one file of a content
@@ -3177,7 +3440,9 @@ class TestFiles(FunctionalTest):
             ],
             status=400,
         )
-        # TODO - G.M - 2018-10-10 - check res
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
 
     @pytest.mark.xfail(
         raises=AssertionError,
@@ -3247,7 +3512,7 @@ class TestFiles(FunctionalTest):
         assert res.status == 400
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3420,7 +3685,8 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1.jpg"'  # nopep8
+        filename = 'test_image_page_1.jpg'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
 
@@ -3657,7 +3923,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(dl_filename, dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3718,7 +3984,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(dl_filename, dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3779,7 +4045,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(dl_filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(dl_filename, dl_filename)  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3989,7 +4255,9 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_r{}_page_1_256x256.jpg"'.format(revision_id)  # nopep8
+        filename = 'Test file_r{}_page_1_256x256.jpg'.format(revision_id)
+        urlencoded_filename = quote(filename)
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, urlencoded_filename)  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
@@ -4125,7 +4393,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.txt"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
         res = self.testapp.get(
@@ -4133,7 +4401,8 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.pdf"'  # nopep8
+        filename = "Test_file.pdf"
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:  # nopep8
@@ -4439,7 +4708,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.content_type == 'application/pdf'
-        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"'.format(filename)  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
         """
@@ -4717,6 +4986,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'text/plain'
         params = {'force_download': 1}
+        filename = 'Test_file.pdf'
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename}'.format(  # nopep8
                 content_id=content_id,
@@ -4726,7 +4996,8 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.pdf"'  # nopep8
+
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
@@ -4792,16 +5063,17 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'text/plain'
         params = {'page': 1, 'force_download': 1}
+        filename = 'test_image_page_1.pdf'
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
-                filename='test_image_page_1.pdf'
+                filename=filename
             ),
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1.pdf"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
 
@@ -4852,6 +5124,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Best Cakes?'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -4995,6 +5268,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5024,6 +5298,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5069,6 +5344,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5096,6 +5372,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5172,6 +5449,7 @@ class TestThreads(FunctionalTest):
         assert revision['content_id'] == 7
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'Best Cake'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -5195,6 +5473,7 @@ class TestThreads(FunctionalTest):
         assert revision['content_id'] == 7
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'] == 'Best Cakes?'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -5300,19 +5579,27 @@ class TestThreads(FunctionalTest):
         revisions = res.json_body
         assert len(revisions) == 6
         for revision in revisions:
-            revision['content_type'] == 'thread'
-            revision['workspace_id'] == 1
-            revision['content_id'] == test_thread.content_id
+            assert revision['content_type'] == 'thread'
+            assert revision['workspace_id'] == 1
+            assert revision['content_id'] == test_thread.content_id
         revision = revisions[0]
-        revision['revision_type'] == 'creation'
+        assert revision['revision_type'] == 'creation'
+        assert revision['is_editable'] is False
         revision = revisions[1]
-        revision['revision_type'] == 'archiving'
+        assert revision['revision_type'] == 'edition'
+        assert revision['is_editable'] is False
         revision = revisions[2]
-        revision['revision_type'] == 'unarchiving'
+        assert revision['revision_type'] == 'archiving'
+        assert revision['is_editable'] is False
         revision = revisions[3]
-        revision['revision_type'] == 'deletion'
+        assert revision['revision_type'] == 'unarchiving'
+        assert revision['is_editable'] is False
         revision = revisions[4]
-        revision['revision_type'] == 'undeletion'
+        assert revision['revision_type'] == 'deletion'
+        assert revision['is_editable'] is False
+        revision = revisions[5]
+        assert revision['revision_type'] == 'undeletion'
+        assert revision['is_editable'] is True
 
     def test_api__set_thread_status__ok_200__nominal_case(self) -> None:
         """
@@ -5338,7 +5625,7 @@ class TestThreads(FunctionalTest):
         assert content['content_type'] == 'thread'
         assert content['content_id'] == 7
         assert content['status'] == 'open'
-
+        assert content['is_editable'] is True
         # set status
         self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7/status',
@@ -5355,6 +5642,7 @@ class TestThreads(FunctionalTest):
         assert content['content_type'] == 'thread'
         assert content['content_id'] == 7
         assert content['status'] == 'closed-deprecated'
+        assert content['is_editable'] is False
 
     def test_api__set_thread_status__ok_400__wrong_status(self) -> None:
         """

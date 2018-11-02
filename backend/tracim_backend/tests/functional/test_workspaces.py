@@ -293,6 +293,35 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_2 = res.json_body
         assert workspace == workspace_2
 
+    def test_api__create_workspace_err_400__label_already_used(self) -> None:
+        """
+        Test create workspace : label already used
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'superworkspace',
+            'description': 'mysuperdescription'
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces',
+            status=200,
+            params=params,
+        )
+        res = self.testapp.post_json(
+            '/api/v2/workspaces',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.WORKSPACE_LABEL_ALREADY_USED
+
     def test_api__create_workspace__err_400__empty_label(self) -> None:
         """
         Test create workspace with empty label
@@ -1814,7 +1843,40 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['user_id'] == user_role['user_id']
         assert user_role_found['workspace_id'] == user_role['workspace_id']
 
-    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):
+    def test_api__create_workspace_member_role__ok_400__user_public_name_user_already_in_workspace(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email': None,
+            'user_public_name': 'Lawrence L.',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_ALREADY_EXIST
+
+    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -1842,7 +1904,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
 
-    def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):
+    def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -1979,6 +2041,64 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['do_notify'] is False
         assert user_role['user_id'] == user2.user_id
         assert user_role['workspace_id'] == workspace.workspace_id
+
+    def test_api__update_workspace_member_role__err_400__role_not_exist(self):
+        """
+        Update worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=None,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        transaction.commit()
+        # update workspace role
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'role': 'content-manager',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user2.user_id
+            ),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__as_admin(self):
         """
@@ -2171,6 +2291,59 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         roles = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace.workspace_id), status=200).json_body   # nopep8
         for role in roles:
             assert role['user_id'] != user2.user_id
+
+    def test_api__delete_workspace_member_role__err_400__role_not_exist(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user2.user_id,
+            ),
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_ROLE_NOT_FOUND
 
     def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):  # nopep8
         """
@@ -2450,6 +2623,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
 
+
 class TestUserInvitationWithMailActivatedASync(FunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
@@ -2583,7 +2757,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         assert content['modified']
         assert content['created']
-    # Root related
+
     def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):  # nopep8
         """
         Check obtain workspace all root contents
@@ -2718,6 +2892,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
         Check obtain workspace all root contents
@@ -2757,6 +2932,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
         """
         Check obtain workspace root active contents
@@ -2795,6 +2971,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):  # nopep8
         """
         Check obtain workspace root archived contents
@@ -2832,6 +3009,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):  # nopep8
         """
          Check obtain workspace root deleted contents
@@ -2871,6 +3049,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 3
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_nothing_root_content(self):
         """
         Check obtain workspace root content who does not match any type
@@ -3004,6 +3183,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3127,6 +3307,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_all_folder_content(self):
         """
          Check obtain workspace folder all contents
@@ -3193,6 +3374,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):  # nopep8
         """
          Check obtain workspace folder active contents
@@ -3230,6 +3412,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):  # nopep8
         """
          Check obtain workspace folder archived contents
@@ -3267,6 +3450,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):  # nopep8
         """
          Check obtain workspace folder deleted contents
@@ -3305,6 +3489,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 2
         assert content['modified']
         assert content['created']
+
     def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):  # nopep8
         """
         Check obtain workspace folder content who does not match any type
@@ -3391,7 +3576,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content as workspace root
         """
         self.testapp.authorization = (
             'Basic',
@@ -3437,9 +3622,9 @@ class TestWorkspaceContents(FunctionalTest):
         content_ids = [content['content_id'] for content in active_contents]
         assert res.json_body['content_id'] in content_ids
 
-    def test_api__post_content_create_generic_content__err_400__label_already_used(self) -> None:  # nopep8
+    def test_api__post_content_create_generic_content__err_400__filename_already_used(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but filename is already used here
         """
         self.testapp.authorization = (
             'Basic',
@@ -3493,11 +3678,11 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE
+        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content without provided parent_id param
         """
         self.testapp.authorization = (
             'Basic',
@@ -3544,7 +3729,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__parent_id_0(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but parent_id=0
         """
         self.testapp.authorization = (
             'Basic',
@@ -3556,7 +3741,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'parent_id': 0,
             'label': 'GenericCreatedContent',
-            'content_type': 'markdownpage',
+            'content_type': content_type_list.Page.slug
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/contents',
@@ -3567,6 +3752,31 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
         assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+
+    def test_api__post_content_create_generic_content__err_400__parent_not_found(self) -> None:  # nopep8
+        """
+        Create generic content but parent id is not valable
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1000,
+            'label': 'GenericCreatedContent',
+            'content_type': content_type_list.Page.slug,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.PARENT_NOT_FOUND  # nopep8
 
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
         """
@@ -3618,7 +3828,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but label provided is empty
         """
         self.testapp.authorization = (
             'Basic',
@@ -3629,7 +3839,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         params = {
             'label': '',
-            'content_type': 'html-document',
+            'content_type': content_type_list.Page.slug,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/contents',
@@ -3641,7 +3851,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but content type is uncorrect
         """
         self.testapp.authorization = (
             'Basic',
@@ -3664,7 +3874,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
-        Create generic content
+        Create generic content but content_type is not allowed in this folder
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -3704,7 +3914,7 @@ class TestWorkspaceContents(FunctionalTest):
         # unallowed_content_type
         params = {
             'label': 'GenericCreatedContent',
-            'content_type': 'markdownpage',
+            'content_type': content_type_list.Page.slug,
             'parent_id': folder.content_id
         }
         res = self.testapp.post_json(
@@ -3712,8 +3922,9 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT  # nopep8
         # allowed_content_type
         params = {
             'label': 'GenericCreatedContent',

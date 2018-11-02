@@ -789,6 +789,16 @@ class ContentInContext(object):
         return self.content.is_deleted
 
     @property
+    def is_editable(self) -> bool:
+        from tracim_backend.lib.core.content import ContentApi
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config
+        )
+        return content_api.is_editable(self.content)
+
+    @property
     def raw_content(self) -> str:
         return self.content.description
 
@@ -980,6 +990,25 @@ class RevisionInContext(object):
     @property
     def is_deleted(self) -> bool:
         return self.revision.is_deleted
+
+    @property
+    def is_editable(self) -> bool:
+        from tracim_backend.lib.core.content import ContentApi
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config
+        )
+        # INFO - G.M - 2018-11-02 - check if revision is last one and if it is,
+        # return editability of content.
+        content = content_api.get_one(
+            content_id=self.revision.content_id,
+            content_type=content_type_list.Any_SLUG
+        )
+        if content.revision_id == self.revision_id:
+            return content_api.is_editable(content)
+        # INFO - G.M - 2018-11-02 - old revision are not editable
+        return False
 
     @property
     def raw_content(self) -> str:
