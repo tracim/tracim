@@ -6,7 +6,7 @@ from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -69,7 +69,7 @@ class ThreadController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([THREAD_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

@@ -109,6 +109,7 @@ export class AdminUser extends React.Component {
         <PageTitle
           parentClass={'adminUser'}
           title={props.t('User account management')}
+          icon='users'
         />
 
         <PageContent parentClass='adminUser'>

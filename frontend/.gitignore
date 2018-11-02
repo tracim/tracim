@@ -1,7 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .git/
 node_modules/
-dist/asset/tracim.app.entry.js
-dist/asset/tracim.vendor.bundle.js
-dist/asset/images/
+dist/assets/tracim.app.entry.js
+dist/assets/tracim.vendor.bundle.js
+dist/assets/images/
 configEnv.json

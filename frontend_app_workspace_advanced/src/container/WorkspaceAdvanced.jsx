@@ -237,7 +237,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleSearchUser = async userNameToSearch => {
     const { props, state } = this
-    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch))
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, state.content.workspace_id))
     switch (fetchUserKnownMemberList.apiResponse.status) {
       case 200:
         this.setState({
@@ -297,7 +297,8 @@ class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      nameOrEmail: state.newMember.nameOrEmail,
+      publicName: state.newMember.isEmail ? '' : state.newMember.nameOrEmail,
+      email: state.newMember.isEmail ? state.newMember.nameOrEmail : '',
       role: state.newMember.role
     }))
 
@@ -321,6 +322,15 @@ class WorkspaceAdvanced extends React.Component {
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
           case 2042: this.sendGlobalFlashMessage(props.t('This account is deactivated'), 'warning'); break
+          case 1001:
+            const ErrorMsg = () => (
+              <div>
+                {props.t('Unknown user')}<br />
+                {props.t('Note, only administrators can send invitational email')}
+              </div>
+            )
+            this.sendGlobalFlashMessage(<ErrorMsg />, 'warning')
+            break
           default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
         }
         break
@@ -338,7 +348,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
     switch (fetchDeleteWorkspace.status) {
       case 204:
-        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/'}})
+        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/ui'}})
         // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
         this.handleClickBtnCloseApp()
         break
@@ -388,6 +398,7 @@ class WorkspaceAdvanced extends React.Component {
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
             onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
             newMemberName={state.newMember.nameOrEmail}
+            isEmail={state.newMember.isEmail}
             onChangeNewMemberName={this.handleChangeNewMemberName}
             newMemberRole={state.newMember.role}
             onClickNewMemberRole={this.handleClickNewMemberRole}

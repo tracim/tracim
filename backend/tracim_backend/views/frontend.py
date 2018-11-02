@@ -1,13 +1,16 @@
 import os
+from urllib.parse import urljoin
 
-from pyramid.renderers import render_to_response
 from pyramid.config import Configurator
-from tracim_backend.extensions import app_list
+from pyramid.renderers import render_to_response
+
 from tracim_backend.exceptions import PageNotFound
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.views import BASE_API_V2
-from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = 'index.mak'
@@ -26,10 +29,9 @@ class FrontendController(Controller):
         return index_file_path
 
     def not_found_view(self, context, request: TracimRequest):
-
-        if request.path.startswith(BASE_API_V2):
-            raise PageNotFound('{} is not a valid path'.format(request.path)) from context  # nopep8
-        return self.index(context, request)
+        if request.path.startswith(urljoin('/', FRONTEND_UI_SUBPATH)):
+            return self.index(context, request)
+        raise PageNotFound('{} is not a valid path'.format(request.path)) from context  # nopep8
 
     def index(self, context, request: TracimRequest):
         app_config = request.registry.settings['CFG']

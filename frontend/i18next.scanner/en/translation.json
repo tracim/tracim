@@ -63,9 +63,6 @@
   "Error while archiving document": "Error while archiving document",
   "Error while deleting document": "Error while deleting document",
   "List of contents": "List of contents",
-  "List of documents": "List of documents",
-  "List of files": "List of files",
-  "List of threads": "List of threads",
   "This shared space has no content yet, create the first content by clicking on the button 'Create'": "This shared space has no content yet, create the first content by clicking on the button 'Create'",
   "Calendar": "Calendar",
   "Access your personal calendar": "Access your personal calendar",
@@ -156,5 +153,13 @@
   "An error has happened": "An error has happened",
   "Email sent, don't forget to check your spam": "Email sent, don't forget to check your spam",
   "An error has happened, please try again.": "An error has happened, please try again.",
-  "Error while removing member": "Error while removing member"
+  "Error while removing member": "Error while removing member",
+  "List of": "List of",
+  "text document": "text document",
+  "thread": "thread",
+  "file": "file",
+  "text documents": "text documents",
+  "threads": "threads",
+  "files": "files",
+  "Note, only administrators can send invitational email": "Note, only administrators can send invitational email"
 }

@@ -4,15 +4,15 @@
     <meta charset='utf-8' />
     <meta name='viewport' content='width=device-width, user-scalable=no'>
     <title>Tracim</title>
-    <link rel='shortcut icon' type='image/x-icon' href='/asset/favicon.ico' >
+    <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico' >
 
-    <link rel='stylesheet' type='text/css' href='/asset/font/font-awesome-4.7.0/css/font-awesome.css'>
+    <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
     <!--
     <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700' rel='stylesheet'>
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css' integrity='sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M' crossorigin='anonymous'>
     -->
-    <link rel='stylesheet' type='text/css' href='/asset/hamburger/hamburgers.min.css'>
-    <link rel='stylesheet' type='text/css' href='/asset/bootstrap/bootstrap-4.0.0-beta.css'>
+    <link rel='stylesheet' type='text/css' href='/assets/hamburger/hamburgers.min.css'>
+    <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
 
     <style>
       <%
@@ -62,7 +62,7 @@
     <style>
       @font-face {
         font-family: 'Quicksand';
-        src: url('/asset/font/Quicksand/Quicksand-Regular.ttf');
+        src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
       }
 
       body {
@@ -80,11 +80,11 @@
 
     <script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
 
-    <script type='text/javascript' src='/asset/tracim/appInterface.js'></script>
-    <script type='text/javascript' src='/asset/tracim/tinymceInit.js'></script>
+    <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
+    <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
 
-    <script type='text/javascript' src='/asset/tracim.vendor.bundle.js'></script>
-    <script type='text/javascript' src='/asset/tracim.app.entry.js'></script>
+    <script type='text/javascript' src='/assets/tracim.vendor.bundle.js'></script>
+    <script type='text/javascript' src='/assets/tracim.app.entry.js'></script>
 
     <script type='text/javascript' src='/app/workspace.app.js'></script>
     % for app in applications:
@@ -93,11 +93,11 @@
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
     <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
 
-    <script type='text/javascript' src='/asset/bootstrap/jquery-3.2.1.js'></script>
-    <script type='text/javascript' src='/asset/bootstrap/popper-1.12.3.js'></script>
-    <script type='text/javascript' src='/asset/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
+    <script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
+    <script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
+    <script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
 
-    <script type='text/javascript' src='/asset/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
-    <script type='text/javascript' src='/asset/tinymce/js/tinymce/tinymce.min.js'></script>
+    <script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
+    <script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js'></script>
   </body>
 </html>

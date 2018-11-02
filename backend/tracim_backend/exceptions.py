@@ -30,6 +30,10 @@ class UserAlreadyExistError(TracimError):
     error_code = error.USER_ALREADY_EXIST
 
 
+class RoleAlreadyExistError(TracimError):
+    error_code = error.USER_ROLE_ALREADY_EXIST
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 
@@ -259,6 +263,10 @@ class RoleDoesNotExist(TracimException):
     pass
 
 
+class UserRoleNotFound(TracimException):
+    error_code = error.USER_ROLE_NOT_FOUND
+
+
 class EmailValidationFailed(TracimException):
     error_code = error.EMAIL_VALIDATION_FAILED
 
@@ -267,8 +275,12 @@ class InconsistentDatabase(TracimException):
     pass
 
 
-class ContentLabelAlreadyUsedHere(TracimException):
-    error_code = error.CONTENT_LABEL_ALREADY_USED_THERE
+class ContentFilenameAlreadyUsedInFolder(TracimException):
+    error_code = error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+
+
+class WorkspaceLabelAlreadyUsed(TracimException):
+    error_code = error.WORKSPACE_LABEL_ALREADY_USED
 
 
 class ParentNotFound(NotFound):
@@ -288,7 +300,7 @@ class PreviewDimNotAllowed(TracimException):
 
 
 class UnallowedSubContent(TracimException):
-    error_code = error.EMAIL_UNALLOWED_SUBCONTENT
+    error_code = error.UNALLOWED_SUBCONTENT
 
 
 class TooShortAutocompleteString(TracimException):

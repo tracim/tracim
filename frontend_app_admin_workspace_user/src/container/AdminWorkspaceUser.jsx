@@ -282,7 +282,7 @@ class AdminWorkspaceUser extends React.Component {
     GLOBAL_dispatchEvent({
       type: 'redirect',
       data: {
-        url: `/admin/user/${idUser}`
+        url: `/ui/admin/user/${idUser}`
       }
     })
   }

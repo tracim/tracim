@@ -137,6 +137,8 @@ class Tracim extends React.Component {
 
     if (props.user.logged === null) return null // @TODO show loader
 
+    if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
+
     // if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
     //   return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
     // }
@@ -149,8 +151,6 @@ class Tracim extends React.Component {
       )
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
-    console.log(props)
-
     return (
       <div className='tracim fullWidthFullHeight'>
         <Header />
@@ -161,8 +161,10 @@ class Tracim extends React.Component {
             // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
             // able to access props.match.params.idws
             // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
-            path='/:first?/:idws?/*' render={() => <Sidebar />}
+            path='/ui/:first?/:idws?/*' render={() => <Sidebar />}
+            // @FIXME - Côme - 2018/11/02 - upgrade ReactRouter and refactor the route path='/ui' with array of string in this route path
           />
+          <Route exact path='/ui' render={() => <Sidebar />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
@@ -172,7 +174,7 @@ class Tracim extends React.Component {
 
           <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
 
-          <Route path='/workspaces/:idws?' render={() => // Workspace Router
+          <Route path='/ui/workspaces/:idws?' render={() => // Workspace Router
             <div className='fullWidthFullHeight'>
               <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
                 <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />

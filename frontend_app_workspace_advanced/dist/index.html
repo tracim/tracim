@@ -6,6 +6,10 @@
   <title>Workspace Advanced App Tracim</title>
   <link rel='shortcut icon' href='favicon.ico'>
 
+  <link rel="stylesheet" type="text/css" href="./assets/font/font-awesome-4.7.0/css/font-awesome.css">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
+
   <style>
     .primaryColorFont { color: #7d4e24; }
     .primaryColorFontDarken { color: #522c00; }
@@ -37,7 +41,7 @@
   <style>
     @font-face {
       font-family: 'Quicksand';
-      src: url('/asset/font/Quicksand/Quicksand-Regular.ttf');
+      src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
     }
 
     body {
@@ -48,107 +52,16 @@
   <script type='text/javascript'>
     GLOBAL_primaryColor = '#7d4e24'
   </script>
-
-  <link rel="stylesheet" type="text/css" href="./asset/font/font-awesome-4.7.0/css/font-awesome.css">
-  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="./asset/bootstrap/bootstrap-4.0.0-beta.css">
 </head>
 <body>
-  <script src="./asset/bootstrap/jquery-3.2.1.js"></script>
-  <script src="./asset/bootstrap/popper-1.12.3.js"></script>
-  <script src="./asset/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+<script src="./assets/bootstrap/jquery-3.2.1.js"></script>
+<script src="./assets/bootstrap/popper-1.12.3.js"></script>
+<script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
 
-  <script type="text/javascript" src="./asset/tinymce/js/tinymce/jquery.tinymce.min.js"></script>
-  <script type="text/javascript" src="./asset/tinymce/js/tinymce/tinymce.min.js"></script>
+<div id='content'></div>
 
-  <div id='content'></div>
+<script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
 
-  <script type='text/javascript'>
-    (function () {
-      wysiwyg = function (selector, handleOnChange) {
-        function base64EncodeAndTinyMceInsert (files) {
-          for (var i = 0; i < files.length; i++) {
-            if (files[i].size > 1000000)
-              files[i].allowed = confirm(files[i].name + " fait plus de 1mo et peut prendre du temps à insérer, voulez-vous continuer ?")
-          }
-
-          for (var i = 0; i < files.length; i++) {
-            if (files[i].allowed !== false && files[i].type.match('image.*')) {
-              var img = document.createElement('img')
-
-              var fr = new FileReader()
-
-              fr.readAsDataURL(files[i])
-
-              fr.onloadend = function (e) {
-                img.src = e.target.result
-                tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
-              }
-            }
-          }
-        }
-
-        // HACK: The tiny mce source code modal contain a textarea, but we
-        // can't edit it (like it's readonly). The following solution
-        // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
-        $(document).on('focusin', function(e) {
-          if ($(e.target).closest(".mce-window").length) {
-            e.stopImmediatePropagation();
-          }
-        });
-
-        tinymce.init({
-          selector: selector,
-          menubar: false,
-          resize: false,
-          skin: "lightgray",
-          plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
-          toolbar: 'insert | formatselect | bold italic underline strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | table | code ',
-          content_style: "div {height: 100%;}",
-          setup: function ($editor) {
-            $editor.on('change', function(e) {
-              handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
-            })
-
-            //////////////////////////////////////////////
-            // add custom btn to handle image by selecting them with system explorer
-            $editor.addButton('customInsertImage', {
-              icon: 'mce-ico mce-i-image',
-              title: 'Image',
-              onclick: function () {
-                if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
-
-                fileTag = document.createElement('input')
-                fileTag.id = 'hidden_tinymce_fileinput'
-                fileTag.type = 'file'
-                $('body').append(fileTag)
-
-                $('#hidden_tinymce_fileinput').on('change', function () {
-                  base64EncodeAndTinyMceInsert($(this)[0].files)
-                })
-
-                $('#hidden_tinymce_fileinput').click()
-              }
-            })
-
-            //////////////////////////////////////////////
-            // Handle drag & drop image into TinyMce by encoding them in base64 (to avoid uploading them somewhere and keep saving comment in string format)
-            $editor
-              .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
-                e.preventDefault()
-                e.stopPropagation()
-              })
-              .on('drop', function(e) {
-                base64EncodeAndTinyMceInsert(e.dataTransfer.files)
-              })
-          }
-        })
-      }
-    })()
-  </script>
-
-  <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
-
-  <script src='./workspace_advanced.app.dev.js'></script>
+<script src='./workspace_advanced.app.dev.js'></script>
 </body>
 </html>

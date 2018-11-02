@@ -44,7 +44,8 @@ function setup_pyenv {
 function install_backend_python_packages {
     log "install pip and setuptools"
     pip install --upgrade pip setuptools && loggood "success" || logerror "some error"
-
+    log "install dependencies from requirements.txt"
+    pip install -r "requirements.txt" && loggood "success" || logerror "some error"
     log "install tracim-backend (sqlite_backend)..."
     pip install -e ".[testing]" && loggood "success" || logerror "some error"
 }

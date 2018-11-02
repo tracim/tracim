@@ -20,25 +20,25 @@ export const workspaceConfig = {
 }
 
 export const PAGE = {
-  HOME: '/',
+  HOME: '/ui',
   WORKSPACE: {
-    ROOT: '/workspaces',
-    DASHBOARD: (idws = ':idws') => `/workspaces/${idws}/dashboard`,
-    NEW: (idws, type) => `/workspaces/${idws}/contents/${type}/new`,
-    CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
-    CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/workspaces/${idws}/contents/${type}/${idcts}`,
-    ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
+    ROOT: '/ui/workspaces',
+    DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
+    NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
+    CALENDAR: (idws = ':idws') => `/ui/workspaces/${idws}/calendar`,
+    CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
+    ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`
   },
-  LOGIN: '/login',
-  FORGOT_PASSWORD: '/forgot-password',
-  RESET_PASSWORD: '/reset-password',
-  ACCOUNT: '/account',
+  LOGIN: '/ui/login',
+  FORGOT_PASSWORD: '/ui/forgot-password',
+  RESET_PASSWORD: '/ui/reset-password',
+  ACCOUNT: '/ui/account',
   ADMIN: {
-    ROOT: '/admin',
-    WORKSPACE: '/admin/workspace',
-    USER: '/admin/user',
-    USER_EDIT: (idUser = ':iduser') => `/admin/user/${idUser}`
+    ROOT: '/ui/admin',
+    WORKSPACE: '/ui/admin/workspace',
+    USER: '/ui/admin/user',
+    USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
   }
 }
 
@@ -143,5 +143,11 @@ const translationKeyFromBackend = [ // eslint-disable-line no-unused-vars
   i18n.t('Open'),
   i18n.t('Validated'),
   i18n.t('Cancelled'),
-  i18n.t('Deprecated')
+  i18n.t('Deprecated'),
+  i18n.t('text document'),
+  i18n.t('text documents'),
+  i18n.t('thread'),
+  i18n.t('threads'),
+  i18n.t('file'),
+  i18n.t('files')
 ]

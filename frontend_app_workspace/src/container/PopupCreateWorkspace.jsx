@@ -73,6 +73,15 @@ class PopupCreateWorkspace extends React.Component {
     }
   }
 
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: 'addFlashMsg',
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
   handleChangeNewWorkspaceName = e => this.setState({newWorkspaceName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -83,25 +92,24 @@ class PopupCreateWorkspace extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, newWorkspaceName } = this.state
+    const { props, state } = this
 
-    const fetchSaveNewWorkspace = postWorkspace(config.apiUrl, newWorkspaceName)
+    const fetchSaveNewWorkspace = await handleFetchResult(await postWorkspace(state.config.apiUrl, state.newWorkspaceName))
 
-    handleFetchResult(await fetchSaveNewWorkspace)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.handleClose()
-
-          GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: resSave.body.workspace_id} })
-
-          GLOBAL_dispatchEvent({
-            type: 'redirect',
-            data: {
-              url: `/workspaces/${resSave.body.workspace_id}/dashboard`
-            }
-          })
+    switch (fetchSaveNewWorkspace.apiResponse.status) {
+      case 200:
+        this.handleClose()
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
+        GLOBAL_dispatchEvent({type: 'redirect', data: {url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
+        break
+      case 400:
+        switch (fetchSaveNewWorkspace.body.code) {
+          case 3007: this.sendGlobalFlashMessage(props.t('A shared space with that name already exists')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
         }
-      })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+    }
   }
 
   render () {

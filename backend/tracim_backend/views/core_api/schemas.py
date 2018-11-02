@@ -15,9 +15,7 @@ from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.context_models import ActiveContentFilter, \
-    WorkspacePath
-from tracim_backend.models.context_models import KnownMemberQuery
+from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
@@ -29,6 +27,7 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import KnownMemberQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
@@ -51,6 +50,7 @@ from tracim_backend.models.context_models import \
     WorkspaceAndContentRevisionPath
 from tracim_backend.models.context_models import WorkspaceAndUserPath
 from tracim_backend.models.context_models import WorkspaceMemberInvitation
+from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -986,6 +986,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     is_archived = marshmallow.fields.Bool(example=False, default=False)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
+    is_editable = marshmallow.fields.Bool(example=True, default=True)
     show_in_ui = marshmallow.fields.Bool(
         example=True,
         description='if false, then do not show content in the treeview. '

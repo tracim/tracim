@@ -23,5 +23,6 @@
   "Unknown user": "Utilisateur inconnu",
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
   "This account is deactivated": "Ce compte est désactivé",
-  "Error while removing member": "Erreur lors de la suppression du membre"
+  "Error while removing member": "Erreur lors de la suppression du membre",
+  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail"
 }

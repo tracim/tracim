@@ -10,7 +10,7 @@ subdir, default config is [development.ini.sample](../development.ini.sample) wi
 ## Fix URL for access to tracim from network (simple) ##
 
 To have a working tracim, you need to explicitly explain where backend and frontend are.
-If backend serve frontend or if you do not need frontend at all, you can just set :
+If backend serve frontend or if you do not need frontend at all, you can just set:
 
     website.base_url = http://mysuperdomainame.ndd
     # website.server_name = mysuperdomainename.ndd
@@ -41,7 +41,7 @@ If the website.base_url trick is not enough for your own configuration, you can:
 
 ## Activating Mail Notification feature ##
 
-to activate mail notification, smallest config is this :
+to activate mail notification, smallest config is this:
 
     email.notification.activated = True
     # from header of mail, need to be a valid adress
@@ -61,6 +61,22 @@ to activate mail notification, smallest config is this :
 
 don't forgot to set website.base_url and website.title for frontend, as some feature use this to return
 link to frontend in email.
+
+## Activating Email reply feature ##
+
+to activate reply by email, smallest config is this:
+
+    # Email reply configuration
+    email.reply.activated = True
+    email.reply.imap.server = superimapserver.ndd
+    email.reply.imap.port = 993
+    email.reply.imap.user = imap_user
+    email.reply.imap.password = imap_password
+    email.reply.imap.folder = INBOX
+    email.reply.imap.use_ssl = true
+    email.reply.imap.use_idle = true
+
+don't forgot to start mail_fetcher daemon, documentation here /backend/README.md and chapter "Run daemons according to your config"
 
 ## Listening port (for pserve only) ##
 

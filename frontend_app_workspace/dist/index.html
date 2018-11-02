@@ -2,109 +2,85 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <meta name="viewport" content="width=device-width, user-scalable=no" />
-  <title>Workspace App Tracim</title>
-  <link rel='shortcut icon' href='favicon.ico'>
+  <meta name='viewport' content='width=device-width, user-scalable=no'>
+  <title>Tracim App Workspace</title>
+  <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico' >
 
-  <link rel="stylesheet" type="text/css" href="./asset/font/font-awesome-4.7.0/css/font-awesome.css">
-  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="./asset/bootstrap/bootstrap-4.0.0-beta.css">
+  <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
+  <!--
+  <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700' rel='stylesheet'>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css' integrity='sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M' crossorigin='anonymous'>
+  -->
+  <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
+
+  <style>
+    .primaryColorFont { color: #7d4e24; }
+    .primaryColorFontDarken { color: #522c00; }
+    .primaryColorFontLighten { color: #a37346; }
+
+    .primaryColorFontHover:hover { color: #7d4e24; }
+    .primaryColorFontDarkenHover:hover { color: #522c00; }
+    .primaryColorFontLightenHover:hover { color: #a37346; }
+
+
+    .primaryColorBg { background-color: #7d4e24; }
+    .primaryColorBgDarken { background-color: #522c00; }
+    .primaryColorBgLighten { background-color: #a37346; }
+
+    .primaryColorBgHover:hover { background-color: #7d4e24; }
+    .primaryColorBgDarkenHover:hover { background-color: #522c00; }
+    .primaryColorBgLightenHover:hover { background-color: #a37346; }
+
+
+    .primaryColorBorder { border-color: #7d4e24; }
+    .primaryColorBorderDarken { border-color: #522c00; }
+    .primaryColorBorderLighten { border-color: #a37346; }
+
+    .primaryColorBorderHover:hover { border-color: #7d4e24; }
+    .primaryColorBorderDarkenHover:hover { border-color: #522c00; }
+    .primaryColorBorderLightenHover:hover { border-color: #a37346; }
+  </style>
+
+  <style>
+    @font-face {
+      font-family: 'Quicksand';
+      src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
+    }
+
+    body {
+      font-family: 'Quicksand';
+    }
+  </style>
+
+  <script type='text/javascript'>
+    GLOBAL_primaryColor = '#7d4e24'
+  </script>
 </head>
 
 <body>
-  <script src="./asset/bootstrap/jquery-3.2.1.js"></script>
-  <script src="./asset/bootstrap/popper-1.12.3.js"></script>
-  <script src="./asset/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+<div id='content'></div>
 
-  <script type="text/javascript" src="./asset/tinymce/js/tinymce/jquery.tinymce.min.js"></script>
-  <script type="text/javascript" src="./asset/tinymce/js/tinymce/tinymce.min.js"></script>
+<script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
 
-  <div id='content'></div>
+<script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
+<script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
 
-  <script type='text/javascript'>
-    (function () {
-      wysiwyg = function (selector, handleOnChange) {
-        function base64EncodeAndTinyMceInsert (files) {
-          for (var i = 0; i < files.length; i++) {
-            if (files[i].size > 1000000)
-              files[i].allowed = confirm(files[i].name + " fait plus de 1mo et peut prendre du temps à insérer, voulez-vous continuer ?")
-          }
+<script type='text/javascript' src='/assets/tracim.vendor.bundle.js'></script>
+<script type='text/javascript' src='/assets/tracim.app.entry.js'></script>
 
-          for (var i = 0; i < files.length; i++) {
-            if (files[i].allowed !== false && files[i].type.match('image.*')) {
-              var img = document.createElement('img')
+<script type='text/javascript' src='/app/workspace.app.js'></script>
+<script type='text/javascript' src='/app/html-document.app.js'></script>
+<script type='text/javascript' src='/app/thread.app.js'></script>
+<script type='text/javascript' src='/app/file.app.js'></script>
+<script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
+<script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
+<script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
 
-              var fr = new FileReader()
+<script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
+<script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
+<script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
 
-              fr.readAsDataURL(files[i])
-
-              fr.onloadend = function (e) {
-                img.src = e.target.result
-                tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
-              }
-            }
-          }
-        }
-
-        // HACK: The tiny mce source code modal contain a textarea, but we
-        // can't edit it (like it's readonly). The following solution
-        // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
-        $(document).on('focusin', function(e) {
-          if ($(e.target).closest(".mce-window").length) {
-            e.stopImmediatePropagation();
-          }
-        });
-
-        tinymce.init({
-          selector: selector,
-          menubar: false,
-          resize: false,
-          skin: "lightgray",
-          plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
-          toolbar: 'insert | formatselect | bold italic underline strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | table | code ',
-          content_style: "div {height: 100%;}",
-          setup: function ($editor) {
-            $editor.on('change', function(e) {
-              handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
-            })
-
-            //////////////////////////////////////////////
-            // add custom btn to handle image by selecting them with system explorer
-            $editor.addButton('customInsertImage', {
-              icon: 'mce-ico mce-i-image',
-              title: 'Image',
-              onclick: function () {
-                if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
-
-                fileTag = document.createElement('input')
-                fileTag.id = 'hidden_tinymce_fileinput'
-                fileTag.type = 'file'
-                $('body').append(fileTag)
-
-                $('#hidden_tinymce_fileinput').on('change', function () {
-                  base64EncodeAndTinyMceInsert($(this)[0].files)
-                })
-
-                $('#hidden_tinymce_fileinput').click()
-              }
-            })
-
-            //////////////////////////////////////////////
-            // Handle drag & drop image into TinyMce by encoding them in base64 (to avoid uploading them somewhere and keep saving comment in string format)
-            $editor
-              .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
-                e.preventDefault()
-                e.stopPropagation()
-              })
-              .on('drop', function(e) {
-                base64EncodeAndTinyMceInsert(e.dataTransfer.files)
-              })
-          }
-        })
-      }
-    })()
-  </script>
-
-  <script src='./workspace.app.dev.js'></script>
+<script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
+<script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js'></script>
 </body>
 </html>
