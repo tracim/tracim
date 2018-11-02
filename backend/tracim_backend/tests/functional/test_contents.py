@@ -88,6 +88,7 @@ class TestFolder(FunctionalTest):
         assert content['content_id'] == folder.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'test-folder'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
@@ -499,6 +500,7 @@ class TestFolder(FunctionalTest):
         assert content['content_id'] == folder.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
@@ -573,6 +575,7 @@ class TestFolder(FunctionalTest):
         assert content['content_id'] == folder.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
@@ -747,6 +750,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'test-folder'
         assert revision['parent_id'] is None
         assert revision['show_in_ui'] is True
@@ -770,6 +774,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'test-folder-updated'
         assert revision['parent_id'] is None
         assert revision['show_in_ui'] is True
@@ -793,6 +798,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is True
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] != 'test-folder-updated'
         assert revision['label'].startswith('test-folder-updated')
         assert revision['parent_id'] is None
@@ -818,6 +824,7 @@ class TestFolder(FunctionalTest):
         assert revision['content_id'] == folder.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'].startswith('test-folder-updated')
         assert revision['parent_id'] is None
         assert revision['show_in_ui'] is True
@@ -997,6 +1004,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Tiramisu Recipe'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1039,6 +1047,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Tiramisu Recipe'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1273,6 +1282,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1301,6 +1311,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1378,6 +1389,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1405,6 +1417,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -1456,6 +1469,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'Tiramisu Recipes!!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -1478,6 +1492,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'Tiramisu Recipes!!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -1500,6 +1515,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'] == 'Tiramisu Recipe'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -1657,6 +1673,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Test_file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -1728,6 +1745,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Test file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -1813,6 +1831,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Test_file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2085,6 +2104,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2116,6 +2136,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2407,6 +2428,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2438,6 +2460,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2632,6 +2655,7 @@ class TestFiles(FunctionalTest):
         assert revision['content_id'] == test_file.content_id
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'] == 'Test_file'
         assert revision['parent_id'] == 1
         assert revision['show_in_ui'] is True
@@ -2971,6 +2995,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -2991,6 +3016,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -3042,6 +3068,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -3112,6 +3139,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -3132,6 +3160,7 @@ class TestFiles(FunctionalTest):
         assert res['content_type'] == 'file'
         assert res['is_archived'] is False
         assert res['is_deleted'] is False
+        assert res['is_editable'] is True
         assert res['workspace_id'] == business_workspace.workspace_id
         assert isinstance(res['content_id'], int)
         content_id = res['content_id']
@@ -5095,6 +5124,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'Best Cakes?'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5238,6 +5268,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5267,6 +5298,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5312,6 +5344,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5339,6 +5372,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
+        assert content['is_editable'] is True
         assert content['label'] == 'My New label'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
@@ -5415,6 +5449,7 @@ class TestThreads(FunctionalTest):
         assert revision['content_id'] == 7
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is False
         assert revision['label'] == 'Best Cake'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -5438,6 +5473,7 @@ class TestThreads(FunctionalTest):
         assert revision['content_id'] == 7
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
+        assert revision['is_editable'] is True
         assert revision['label'] == 'Best Cakes?'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
@@ -5543,19 +5579,27 @@ class TestThreads(FunctionalTest):
         revisions = res.json_body
         assert len(revisions) == 6
         for revision in revisions:
-            revision['content_type'] == 'thread'
-            revision['workspace_id'] == 1
-            revision['content_id'] == test_thread.content_id
+            assert revision['content_type'] == 'thread'
+            assert revision['workspace_id'] == 1
+            assert revision['content_id'] == test_thread.content_id
         revision = revisions[0]
-        revision['revision_type'] == 'creation'
+        assert revision['revision_type'] == 'creation'
+        assert revision['is_editable'] is False
         revision = revisions[1]
-        revision['revision_type'] == 'archiving'
+        assert revision['revision_type'] == 'edition'
+        assert revision['is_editable'] is False
         revision = revisions[2]
-        revision['revision_type'] == 'unarchiving'
+        assert revision['revision_type'] == 'archiving'
+        assert revision['is_editable'] is False
         revision = revisions[3]
-        revision['revision_type'] == 'deletion'
+        assert revision['revision_type'] == 'unarchiving'
+        assert revision['is_editable'] is False
         revision = revisions[4]
-        revision['revision_type'] == 'undeletion'
+        assert revision['revision_type'] == 'deletion'
+        assert revision['is_editable'] is False
+        revision = revisions[5]
+        assert revision['revision_type'] == 'undeletion'
+        assert revision['is_editable'] is True
 
     def test_api__set_thread_status__ok_200__nominal_case(self) -> None:
         """
@@ -5581,7 +5625,7 @@ class TestThreads(FunctionalTest):
         assert content['content_type'] == 'thread'
         assert content['content_id'] == 7
         assert content['status'] == 'open'
-
+        assert content['is_editable'] is True
         # set status
         self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7/status',
@@ -5598,6 +5642,7 @@ class TestThreads(FunctionalTest):
         assert content['content_type'] == 'thread'
         assert content['content_id'] == 7
         assert content['status'] == 'closed-deprecated'
+        assert content['is_editable'] is False
 
     def test_api__set_thread_status__ok_400__wrong_status(self) -> None:
         """
