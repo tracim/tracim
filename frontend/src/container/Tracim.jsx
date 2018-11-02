@@ -137,6 +137,8 @@ class Tracim extends React.Component {
 
     if (props.user.logged === null) return null // @TODO show loader
 
+    if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
+
     // if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
     //   return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
     // }
