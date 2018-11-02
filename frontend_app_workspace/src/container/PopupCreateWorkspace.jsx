@@ -100,7 +100,7 @@ class PopupCreateWorkspace extends React.Component {
       case 200:
         this.handleClose()
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
-        GLOBAL_dispatchEvent({type: 'redirect', data: {url: `/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
+        GLOBAL_dispatchEvent({type: 'redirect', data: {url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
         break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {

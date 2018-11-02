@@ -15,7 +15,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
-from tracim_backend.lib.utils.utils import get_root_frontend_url
+from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models import User
 from tracim_backend.models.auth import Group
@@ -635,7 +635,7 @@ class WorkspaceInContext(object):
 
     @property
     def frontend_url(self):
-        root_frontend_url = get_root_frontend_url(self.config)
+        root_frontend_url = get_frontend_ui_base_url(self.config)
         workspace_frontend_url = WORKSPACE_FRONTEND_URL_SCHEMA.format(
             workspace_id=self.workspace_id,
         )
@@ -855,7 +855,7 @@ class ContentInContext(object):
 
     @property
     def frontend_url(self) -> str:
-        root_frontend_url = get_root_frontend_url(self.config)
+        root_frontend_url = get_frontend_ui_base_url(self.config)
         content_frontend_url = CONTENT_FRONTEND_URL_SCHEMA.format(
             workspace_id=self.workspace_id,
             content_type=self.content_type,

@@ -28,10 +28,10 @@ module.exports = {
     ]
   },
   output: {
-    path: path.resolve(__dirname, 'dist/asset'),
+    path: path.resolve(__dirname, 'dist/assets'),
     filename: 'tracim.app.entry.js',
     pathinfo: !isProduction,
-    publicPath: '/asset/'
+    publicPath: '/assets/'
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),

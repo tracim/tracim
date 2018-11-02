@@ -605,7 +605,7 @@ class CFG(object):
             fa_icon='file-text-o',
             is_active=True,
             config={},
-            main_route='/workspaces/{workspace_id}/contents?type=html-document',
+            main_route='/ui/workspaces/{workspace_id}/contents?type=html-document',
             app_config=self
         )
         html_documents.add_content_type(
@@ -623,7 +623,7 @@ class CFG(object):
             fa_icon='paperclip',
             is_active=True,
             config={},
-            main_route='/workspaces/{workspace_id}/contents?type=file',
+            main_route='/ui/workspaces/{workspace_id}/contents?type=file',
             app_config=self,
         )
         _file.add_content_type(
@@ -639,7 +639,7 @@ class CFG(object):
             fa_icon='comments-o',
             is_active=True,
             config={},
-            main_route='/workspaces/{workspace_id}/contents?type=thread',
+            main_route='/ui/workspaces/{workspace_id}/contents?type=thread',
             app_config=self
         )
         thread.add_content_type(
@@ -674,7 +674,7 @@ class CFG(object):
             fa_icon='file-code-o',
             is_active=False,
             config={},
-            main_route='/workspaces/{workspace_id}/contents?type=markdownpluspage',
+            main_route='/ui/workspaces/{workspace_id}/contents?type=markdownpluspage',
             # nopep8
             app_config=self,
         )
@@ -691,7 +691,7 @@ class CFG(object):
             fa_icon='calendar',
             is_active=False,
             config={},
-            main_route='/workspaces/{workspace_id}/calendar',
+            main_route='/ui/workspaces/{workspace_id}/calendar',
             app_config=self
         )
 
