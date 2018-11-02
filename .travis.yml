@@ -10,7 +10,27 @@ python:
 
 jobs:
   include:
-  - stage: quick-backend-unit-test
+  - stage: quick-tests
+    name: Check requirement.txt
+    python:
+    - "3.5"
+    addons:
+    services:
+    before_install:
+      # TODO - GM - 2018-10-12  find a better way to install exiftool
+      # download exiftool and compile it to have a working exiftool command (used by preview_generator)
+      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
+      - cd backend
+    install:
+      - pip install --upgrade pip setuptools
+      - pip install pip-tools
+    before_script:
+      - mv requirements.txt requirements_from_source.txt
+    script:
+      - pip-compile
+      - diff -u requirements.txt requirements_from_source.txt
+    after_success: true
+  - stage: quick-tests
     name : Quick Unit-Test for Backend
     env:
     - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
@@ -40,7 +60,7 @@ jobs:
     - pytest tracim_backend
 
 stages:
-  - quick-backend-unit-test
+  - quick-tests
   - backend-sqlite
   - backend-postgresql
   - backend-mysql
@@ -73,6 +93,7 @@ install:
   # see https://github.com/z4r/python-coveralls/issues/66
   - pip install 'pytest-cov<2.6'
   - pip install python-coveralls
+  - pip install -r "requirements.txt"
   # postgresql
   - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
   # mysql

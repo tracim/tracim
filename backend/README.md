@@ -48,6 +48,10 @@ Upgrade packaging tools:
 
     pip install --upgrade pip setuptools
 
+(Optional) Install strict supported version of dependencies with requirement.txt :
+
+    pip install -r requirements.txt
+
 Install the project in editable mode with its testing requirements :
 
     pip install -e ".[testing]"
