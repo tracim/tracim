@@ -1,50 +1,47 @@
 env:
   global:
     - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
-    # Node 10.3+ includes npm@6 which has good "npm ci" command
-    - TRAVIS_NODE_VERSION="10"
-
 
 sudo: false
 language: python
 python:
   - "3.6"
 
-
 jobs:
   include:
-  # - stage: quick-backend-unit-test
-  #   name : Quick Unit-Test for Backend
-  #   env:
-  #   - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
-  #   python:
-  #     - "3.5"
-  #     - "3.6"
-  #     - "3.7"
-  #   script:
-  #   - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
-  # - stage: backend-sqlite
-  #   name: Test Backend with sqlite
-  #   env:
-  #   - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
-  #   script:
-  #   - pytest --cov tracim_backend
-  # - stage: backend-postgresql
-  #   name: Test Backend with postgresql
-  #   env:
-  #   - DB=postgres
-  #   script:
-  #   - pytest tracim_backend
-  # - stage: backend-mysql
-  #   name: Test Backend with mysql
-  #   env:
-  #   - DB=mysql
-  #   script:
-  #   - pytest tracim_backend
+  - stage: quick-backend-unit-test
+    name : Quick Unit-Test for Backend
+    env:
+    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+    python:
+      - "3.5"
+      - "3.6"
+      - "3.7"
+    script:
+    - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
+  - stage: backend-sqlite
+    name: Test Backend with sqlite
+    env:
+    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+    script:
+    - pytest --cov tracim_backend
+  - stage: backend-postgresql
+    name: Test Backend with postgresql
+    env:
+    - DB=postgres
+    script:
+    - pytest tracim_backend
+  - stage: backend-mysql
+    name: Test Backend with mysql
+    env:
+    - DB=mysql
+    script:
+    - pytest tracim_backend
   - stage: functional
     name: Functional tests using Cypress
     env:
       - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      - TRAVIS_NODE_VERSION="10"
     before_install:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
     install:
@@ -56,7 +53,7 @@ jobs:
     before_script:
       - cd backend
       - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-      - pserve development.ini&
+      - nohup pserve development.ini&
       - cd ../functionnal_tests
 
     script:
@@ -65,6 +62,10 @@ jobs:
       - echo "override"
 
 stages:
+  - quick-tests
+  - backend-sqlite
+  - backend-postgresql
+  - backend-mysql
   - functional
 
 
