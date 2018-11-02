@@ -794,7 +794,11 @@ class ContentInContext(object):
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
-            config=self.config
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
         )
         return content_api.is_editable(self.content)
 
@@ -874,7 +878,11 @@ class ContentInContext(object):
             content_api = ContentApi(
                 current_user=self._user,
                 session=self.dbsession,
-                config=self.config
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
             )
             return content_api.get_preview_page_nb(
                 self.content.revision_id,
@@ -910,7 +918,11 @@ class ContentInContext(object):
             content_api = ContentApi(
                 current_user=self._user,
                 session=self.dbsession,
-                config=self.config
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
             )
             return content_api.has_pdf_preview(
                 self.content.revision_id,
@@ -997,7 +1009,11 @@ class RevisionInContext(object):
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
-            config=self.config
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
         )
         # INFO - G.M - 2018-11-02 - check if revision is last one and if it is,
         # return editability of content.
@@ -1120,7 +1136,11 @@ class RevisionInContext(object):
             content_api = ContentApi(
                 current_user=self._user,
                 session=self.dbsession,
-                config=self.config
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
             )
             return content_api.get_preview_page_nb(
                 self.revision.revision_id,
@@ -1156,7 +1176,11 @@ class RevisionInContext(object):
             content_api = ContentApi(
                 current_user=self._user,
                 session=self.dbsession,
-                config=self.config
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
             )
             return content_api.has_pdf_preview(
                 self.revision.revision_id,
