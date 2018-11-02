@@ -2,7 +2,7 @@ env:
   global:
     - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
     # Node 10.3+ includes npm@6 which has good "npm ci" command
-    - TRAVIS_NODE_VERSION="10.8"
+    - TRAVIS_NODE_VERSION="10"
 
 
 sudo: false
@@ -47,11 +47,10 @@ jobs:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
     install:
       - pip install --upgrade pip setuptools
-      - ./setup_default_backend.sh
-      - ./install_frontend_dependencies.sh
-      - ./build_full_frontend.sh
-      - ./setup_functionnal_tests.sh
-      - npm ci
+      - ./setup_default_backend.sh root
+      - ./install_frontend_dependencies.sh root
+      - ./build_full_frontend.sh root
+      - ./setup_functionnal_tests.sh root
     before_script:
       - sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}
       - pserve backend/development.ini
