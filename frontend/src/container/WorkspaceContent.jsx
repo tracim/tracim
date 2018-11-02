@@ -237,8 +237,8 @@ class WorkspaceContent extends React.Component {
           {state.contentLoaded &&
             <OpenContentApp
               // automatically open the app for the idContent in url
-              idWorkspace={this.state.workspaceIdInUrl}
-              appOpenedType={this.state.appOpenedType}
+              idWorkspace={state.workspaceIdInUrl}
+              appOpenedType={state.appOpenedType}
               updateAppOpenedType={this.handleUpdateAppOpenedType}
             />
           }
@@ -247,8 +247,8 @@ class WorkspaceContent extends React.Component {
             <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
               <OpenCreateContentApp
                 // automatically open the popup create content of the app in url
-                idWorkspace={this.state.workspaceIdInUrl}
-                appOpenedType={this.state.appOpenedType}
+                idWorkspace={state.workspaceIdInUrl}
+                appOpenedType={state.appOpenedType}
               />
             } />
           }

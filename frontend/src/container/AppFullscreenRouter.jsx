@@ -26,7 +26,7 @@ class AppFullscreenRouter extends React.Component {
         {this.state.isMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
           <div className='emptyDivForRoute'>
             <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
+              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/ui'}} />
 
               const content = {
                 workspaceList: [],
@@ -38,7 +38,7 @@ class AppFullscreenRouter extends React.Component {
             }} />
 
             <Route exact path={PAGE.ADMIN.USER} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
+              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/ui'}} />
 
               const content = {
                 workspaceList: [],

@@ -97,7 +97,7 @@ class PopupCreateWorkspace extends React.Component {
           GLOBAL_dispatchEvent({
             type: 'redirect',
             data: {
-              url: `/workspaces/${resSave.body.workspace_id}/dashboard`
+              url: `/ui/workspaces/${resSave.body.workspace_id}/dashboard`
             }
           })
         }

@@ -338,7 +338,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
     switch (fetchDeleteWorkspace.status) {
       case 204:
-        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/'}})
+        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/ui'}})
         // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
         this.handleClickBtnCloseApp()
         break

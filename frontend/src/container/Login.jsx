@@ -141,7 +141,7 @@ class Login extends React.Component {
 
   render () {
     const { props, state } = this
-    if (props.user.logged) return <Redirect to={{pathname: '/'}} />
+    if (props.user.logged) return <Redirect to={{pathname: '/ui'}} />
 
     return (
       <section className='unLoggedPage loginpage primaryColorBg'>
