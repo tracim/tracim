@@ -43,6 +43,8 @@ jobs:
   #   - pytest tracim_backend
   - stage: functional
     name: Functional tests using Cypress
+    env:
+      - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
     before_install:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
     install:
@@ -52,8 +54,8 @@ jobs:
       - ./build_full_frontend.sh root
       - ./setup_functionnal_tests.sh root
     before_script:
-      - sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}
-      - pserve backend/development.ini
+      - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+      - pserve backend/development.ini&
       - cd functionnal_tests
 
     script:
