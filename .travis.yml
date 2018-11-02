@@ -51,12 +51,13 @@ jobs:
       - pip install --upgrade pip setuptools
       - ./setup_default_backend.sh root
       - ./install_frontend_dependencies.sh root
-      - ./build_full_frontend.sh root
+      # - ./build_full_frontend.sh root
       - ./setup_functionnal_tests.sh root
     before_script:
+      - cd backend
       - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-      - pserve backend/development.ini&
-      - cd functionnal_tests
+      - pserve development.ini&
+      - cd ../functionnal_tests
 
     script:
       - $(npm bin)/cypress run --record
