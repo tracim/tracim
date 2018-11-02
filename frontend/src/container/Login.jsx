@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -82,6 +83,7 @@ class Login extends React.Component {
 
         Cookies.set('lastConnection', '1', {expires: 180})
         props.dispatch(setUserConnected(loggedUser))
+        i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppConfig()
         this.loadWorkspaceList()
