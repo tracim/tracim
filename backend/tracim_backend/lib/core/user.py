@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import typing as typing
 from smtplib import SMTPException
+from smtplib import SMTPRecipientsRefused
 
 import transaction
 from sqlalchemy import func
@@ -29,6 +30,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
@@ -434,6 +436,16 @@ class UserApi(object):
                 email_manager.notify_created_account(
                     new_user,
                     password=password
+                )
+            # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
+            # this should be fixed to find a solution to allow "fake" email but
+            # also have clear error case for valid mail.
+            except SMTPRecipientsRefused as exc:
+                logger.warning(
+                    self,
+                    "Account created for {email} but SMTP server refuse to send notification".format(  # nopep8
+                        email=email
+                    )
                 )
             except SMTPException as exc:
                 raise NotificationSendingFailed(
