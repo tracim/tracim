@@ -114,7 +114,7 @@ class Header extends React.Component {
 
               <MenuActionListItemDropdownLang
                 langList={props.lang}
-                idLangActive={props.user.lang ? props.user.lang : 'en'}
+                idLangActive={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 

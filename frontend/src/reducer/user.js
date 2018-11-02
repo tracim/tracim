@@ -40,7 +40,7 @@ export default function user (state = defaultUser, action) {
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
-      return {...defaultUser, logged: false}
+      return {...defaultUser, lang: state.lang, logged: false}
 
     case `${SET}/${USER_LANG}`:
       return {...state, lang: action.lang}
