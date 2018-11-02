@@ -442,6 +442,7 @@ class UserApi(object):
             # also have clear error case for valid mail.
             except SMTPRecipientsRefused as exc:
                 logger.warning(
+                    self,
                     "Account created for {email} but SMTP server refuse to send notification".format(  # nopep8
                         email=email
                     )
