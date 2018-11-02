@@ -6,7 +6,7 @@ describe('content :: account', () => {
 
   beforeEach(() => {
     cy.login('users')
-    cy.visit('/account')
+    cy.visit('/ui/account')
   })
 
   it('content :: account exist', () => {

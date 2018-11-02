@@ -8,7 +8,7 @@ describe('operation :: workspace > delete > thread', function () {
     cy.login('administrators')
   })
   it('all content > delete thread', function () {
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-comments-o').click()
@@ -23,7 +23,7 @@ describe('operation :: workspace > delete > thread', function () {
     cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
     cy.get('.thread.visible .thread__contentpage__header__close').click()
     cy.get('.thread.visible').should('not.be.visible')
-    cy.visit('/workspaces/1/contents')
+    cy.visit('/ui/workspaces/1/contents')
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     var titre1 = 'createthread'
     cy.get('.content__name').each(($elm) => {

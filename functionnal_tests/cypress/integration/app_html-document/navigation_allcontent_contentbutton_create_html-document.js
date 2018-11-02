@@ -1,4 +1,4 @@
-const WORKSPACE_URL = '/workspaces/1/contents'
+const WORKSPACE_URL = '/ui/workspaces/1/contents'
 
 describe('navigate :: workspace > create_new > html-document', function () {
   before(() => {

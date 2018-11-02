@@ -6,7 +6,7 @@ describe('navigate :: create_new > workspace', function () {
 
   beforeEach(function () {
     cy.login('administrators')
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
   })
   it('', function () {
     cy.get('button.sidebar__content__btnnewworkspace__btn.btn').should('be.visible')

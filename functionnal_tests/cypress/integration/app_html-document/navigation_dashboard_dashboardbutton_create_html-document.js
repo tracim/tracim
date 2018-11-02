@@ -6,10 +6,9 @@ describe('navigate :: workspace > create_new > html-document_dashboard', functio
 
   beforeEach(function () {
     cy.login('users')
-    cy.visit('/')
   })
   it('dashboard > button', function () {
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').click()

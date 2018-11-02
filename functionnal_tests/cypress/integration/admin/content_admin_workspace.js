@@ -6,7 +6,7 @@ describe('content :: admin > workspace', function () {
 
   beforeEach(function () {
     cy.login('administrators')
-    cy.visit('/admin/workspace')
+    cy.visit('/ui/admin/workspace')
   })
   it('', function () {
     cy.get('.adminWorkspace__description').should('be.visible')

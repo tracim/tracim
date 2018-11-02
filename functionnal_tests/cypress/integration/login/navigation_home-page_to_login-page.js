@@ -5,7 +5,7 @@ describe('login :: navigate > disconnect', function () {
   })
 
   it('login and logout', function () {
-    cy.visit('/login')
+    cy.visit('/ui/login')
     cy.get('input[type=email]').should('be.visible')
     cy.get('input[type=email]').type('admin@admin.admin')
     cy.get('input[type=password]').should('be.visible')

@@ -6,7 +6,7 @@ describe('navigate :: workspace > create_new > thread', function () {
 
   beforeEach(function () {
     cy.login('users')
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
   })
   it('dashboard > button', function () {
     cy.get('.pageWrapperGeneric .dashboard__workspace__detail').should('be.visible')

@@ -6,12 +6,12 @@ describe('content :: home_page', function () {
 
   beforeEach(function () {
     cy.login('users')
-    cy.visit('/')
+    cy.visit('/ui')
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
   it('', function () {
     cy.get('.sidebar__content .fa-chevron-up').should('be.visible')
-    cy.get('li').contains('All Contents').should('have.attr', 'href', '/workspaces/1/contents')
+    cy.get('li').contains('All Contents').should('have.attr', 'href', '/ui/workspaces/1/contents')
     cy.get('.fa-th').should('be.visible')
     cy.get('.fa-th').click()
     cy.url().should('include', '/workspaces/1/contents')

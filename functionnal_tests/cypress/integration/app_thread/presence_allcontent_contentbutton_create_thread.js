@@ -8,7 +8,7 @@ describe('navigate :: workspace > create_new > thread', function () {
 
   beforeEach(function () {
     cy.login('users')
-    cy.visit('/workspaces/1/contents')
+    cy.visit('/ui/workspaces/1/contents')
   })
   it('allcontent > button', function () {
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')

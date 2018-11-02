@@ -6,7 +6,7 @@ describe('content :: workspace > dashbord', function () {
 
   beforeEach(function () {
     cy.login('administrators')
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
   })
   it('part of dashbord', function () {
     cy.get('.dashboard.pageWrapperGeneric').should('be.visible')

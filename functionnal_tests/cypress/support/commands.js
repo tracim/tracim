@@ -4,7 +4,7 @@ Cypress.Commands.add('create_file', () => {
 })
 
 Cypress.Commands.add('create_thread', () => {
-  cy.visit('/workspaces/1/dashboard')
+  cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
   cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
   cy.get('.dashboard__calltoaction .fa-comments-o').click()
@@ -22,7 +22,7 @@ Cypress.Commands.add('create_thread', () => {
 })
 
 Cypress.Commands.add('create_htmldocument', () => {
-  cy.visit('/workspaces/1/dashboard')
+  cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
   cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
   cy.get('.dashboard__calltoaction .fa-file-text-o').click()
@@ -50,7 +50,7 @@ Cypress.Commands.add('delete_file', () => {
 })
 
 Cypress.Commands.add('delete_thread', () => {
-  cy.visit('/workspaces/1/contents')
+  cy.visit('/ui/workspaces/1/contents')
   cy.get('.pageTitleGeneric__title__icon').should('be.visible')
   var titre1 = 'createthread'
   cy.get('.content__name').each(($elm) => {
@@ -69,7 +69,7 @@ Cypress.Commands.add('delete_thread', () => {
 })
 
 Cypress.Commands.add('delete_htmldocument', () => {
-  cy.visit('/workspaces/1/contents')
+  cy.visit('/ui/workspaces/1/contents')
   cy.get('.pageTitleGeneric__title__icon').should('be.visible')
   var titre1 = 'createhtml-document'
   cy.get('.content__name').each(($elm) => {

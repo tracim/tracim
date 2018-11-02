@@ -6,10 +6,9 @@ describe('operation :: workspace > delete > html-document', function () {
 
   beforeEach(function () {
     cy.login('administrators')
-    cy.visit('/')
   })
   it('all content > delete html-doc', function () {
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').click()
@@ -31,7 +30,7 @@ describe('operation :: workspace > delete > html-document', function () {
     cy.get('.html-document.visible').should('not.be.visible')
     cy.wait(2000)
     cy.get('.content__name').contains(titre1).should('be.visible')
-    cy.visit('/workspaces/1/contents')
+    cy.visit('/ui/workspaces/1/contents')
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     var titre1 = 'createhtml-document'
     cy.get('.content__name').each(($elm) => {

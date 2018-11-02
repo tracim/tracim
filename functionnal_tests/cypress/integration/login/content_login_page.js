@@ -7,7 +7,7 @@ describe('content :: login_page', function () {
   })
 
   beforeEach(function () {
-    cy.visit('/login')
+    cy.visit('/ui/login')
   })
   it('check all content', function () {
     cy.url().should('include', '/login')

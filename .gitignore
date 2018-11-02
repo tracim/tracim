@@ -14,4 +14,5 @@ functionnal_tests/package.json
 functionnal_tests/cypress.json
 functionnal_tests/node_modules/
 functionnal_tests/cypress/videos
+functionnal_tests/cypress/screenshots
 

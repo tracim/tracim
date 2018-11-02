@@ -11,7 +11,7 @@ describe('content :: home_page', function () {
   })
   it('', function () {
     cy.get('.sidebar__content .fa-chevron-up').should('be.visible')
-    cy.get('li').contains('Threads').should('have.attr', 'href', '/workspaces/1/contents?type=thread')
+    cy.get('li').contains('Threads').should('have.attr', 'href', '/ui/workspaces/1/contents?type=thread')
     cy.get('.fa-comments-o').should('be.visible')
     cy.get('.fa-comments-o').click()
     cy.url().should('include', '/workspaces/1/contents?type=thread')

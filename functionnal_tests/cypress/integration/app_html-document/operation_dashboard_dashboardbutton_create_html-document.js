@@ -8,7 +8,7 @@ describe('operation :: workspace > create_new > html-document', function () {
     cy.login('administrators')
   })
   it('dashborad > button', function () {
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
     cy.get('.dashboard__workspace__detail').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
     cy.get('.dashboard__calltoaction .fa-file-text-o').click()

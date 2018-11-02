@@ -6,7 +6,7 @@ describe('content :: workspace > dashbord', function () {
 
   beforeEach(function () {
     cy.login('administrators')
-    cy.visit('/workspaces/1/dashboard')
+    cy.visit('/ui/workspaces/1/dashboard')
   })
   it('dashboard__workspaceInfo > memberlist', function () {
     cy.get('.memberlist .memberlist__list').should('be.visible')
