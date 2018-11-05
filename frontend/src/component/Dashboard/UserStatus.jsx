@@ -1,5 +1,5 @@
 import React from 'react'
-import {ROLE} from '../../helper.js'
+import { ROLE } from '../../helper.js'
 
 require('./UserStatus.styl')
 

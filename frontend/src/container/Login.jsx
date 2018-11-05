@@ -14,7 +14,6 @@ import {
   newFlashMessage,
   setUserConnected,
   setWorkspaceList,
-  setWorkspaceListIsOpenInSidebar,
   setContentTypeList,
   setAppList,
   setConfig
@@ -120,23 +119,10 @@ class Login extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
-  loadWorkspaceList = async user => {
+  loadWorkspaceList = async () => {
     const { props } = this
-
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
-
-    if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-
-      const idWorkspaceToOpen = (() =>
-        props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
-          ? parseInt(props.match.params.idws)
-          : fetchGetWorkspaceList.json[0].workspace_id
-      )()
-
-      props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
-    }
+    if (fetchGetWorkspaceList.status === 200) props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
   }
 
   handleClickForgotPassword = async () => this.props.history.push(PAGE.FORGOT_PASSWORD)

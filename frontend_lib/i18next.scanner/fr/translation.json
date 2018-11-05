@@ -7,12 +7,10 @@
   "Rich text": "Texte riche",
   "Send": "Envoyer",
   "Your message...": "Votre message ...",
-  "Edit": "Modifier",
   "validate the title": "valider le titre",
   "edit title": "modifier le titre",
   "Archive": "archiver",
   "Delete": "supprimer",
-  "Create an account": "Créer un compte",
   "Choose the role of the member": "Choissir le role du membre",
   "Validate": "Valider",
   "Status": "Statut ",
@@ -32,5 +30,7 @@
   "Email notifications are disabled, you can't create new users from here": "Les notifications par email sont désactivées, vous ne pouvez pas créer d'utilisateur à partir d'ici",
   "Send an invitational email to this user": "Envoyer un email d'invitation à cet utilisateur",
   "I know this user exist": "Je sais que cet utilisateur existe",
-  "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur"
+  "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
+  "Cancel": "Annuler",
+  "Name or email": "Nom ou email"
 }

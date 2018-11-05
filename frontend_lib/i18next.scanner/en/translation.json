@@ -7,12 +7,10 @@
   "Rich text": "Rich text",
   "Send": "Send",
   "Your message...": "Your message...",
-  "Edit": "Edit",
   "validate the title": "validate the title",
   "edit title": "edit title",
   "Archive": "Archive",
   "Delete": "Delete",
-  "Create an account": "Create an account",
   "Choose the role of the member": "Choose the role of the member",
   "Validate": "Validate",
   "Status": "Status",
@@ -32,5 +30,7 @@
   "Email notifications are disabled, you can't create new users from here": "Email notifications are disabled, you can't create new users from here",
   "Send an invitational email to this user": "Send an invitational email to this user",
   "I know this user exist": "I know this user exist",
-  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator"
+  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
+  "Cancel": "Cancel",
+  "Name or email": "Name or email"
 }
