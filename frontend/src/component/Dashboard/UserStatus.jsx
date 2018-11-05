@@ -3,7 +3,6 @@ import { ROLE } from '../../helper.js'
 
 require('./UserStatus.styl')
 
-// @TODO Côme - 2018/08/07 - since api yet doesn't handle notification subscriptions, this file is WIP
 export const UserStatus = props => {
   const mySelf = props.curWs.memberList.find(m => m.id === props.user.user_id) || {role: ''}
   const myRole = ROLE.find(r => r.slug === mySelf.role) || {faIcon: '', hexcolor: '', label: ''}
