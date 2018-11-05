@@ -17,6 +17,7 @@ pyramid.debug_routematch = false
 pyramid.default_locale_name = en
 #pyramid.includes =
 #    pyramid_debugtoolbar
+retry.attempts = 3
 
 [pipeline:webdav]
 pipeline = tracim_webdav
@@ -25,8 +26,6 @@ use = egg:tracim_backend#webdav
 
 [DEFAULT]
 sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
-
-retry.attempts = 3
 
 # By default, the toolbar only appears for clients from IP addresses
 # '127.0.0.1' and '::1'.
