@@ -88,22 +88,27 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | ldap_* | disabled | feature not added yet in tracim_v2 |
 |-------------------|-------|---- |
 | pyramid.*         | new   | in tracim_web app section (`[app:tracim_web]` ), see pyramid doc for more information.
-| app.enabled       | new   | |
+| app.enabled       | new   | if provided, should be a list of app slug separated by `,` char, this allow you to activate beta app or disable some unwanted app.|
 | api.key           | new   |  :warning: Required ! API key, should be secret.|
 | user.reset_password.validity | new | |
 |  api.base_url      | new   | |
-| cors.access-control-allowed-origin | new ||
+| cors.access-control-allowed-origin | new | if provided, should be a list of `protocol://hostname:port` separated by `,` char.|
 | color.config_file_path | new ||
+| backend.18n_folder_path | new ||
+| invitation.new_user.minimal_profile | new | default = trusted_user
 | frontend.serve | new |  :warning: Probably Required if you want to enabled frontend of tracim_v2, default value to `False`|
 | frontend.dist_folder_path | new ||
 | preview.jpg.allowed_dims | new ||
 | preview.jpg.restricted_dims | new ||
 | session.* | new |  :warning: parameters required to allow cookie auth, see  [developement.ini.sample](../development.ini.sample) and/or [pyramid_beaker doc](https://docs.pylonsproject.org/projects/pyramid_beaker/en/latest/) for configuration   |
-| pipeline | new | :warning: metaconfig (PasteDeploy) :  used to ordonnate properly config file with multiple app. you should probably leave this as default like in [developement.ini.sample](../development.ini.sample)
-| retry.attemps | new | pyramid specific parameter link to [pyramid_retry](https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/), number of try per request.
+| pipeline | new | :warning: metaconfig (PasteDeploy) :  used to ordonnate properly config file with multiple app. you should probably leave this as default like in [developement.ini.sample](../development.ini.sample) |
+| retry.attemps | new | pyramid specific parameter link to [pyramid_retry](https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/), number of try per request. |
+| script_location | new | :warning: required for database migration, in `[alembic]` section, alembic specific param. you probably should use default value: `tracim_backend/migration`|
 --------------------------------
 
 Others modifications in config file includes :
 * reordering file with `pipeline` and `app`
 * added `[alembic]` section for migration
 * new logger for `alembic` and `hapic` (`auth` logger has been removed)
+* old personnalization file from tracim_v1 like  `assets/img/home_illustration.jpg`
+ or `/assets/img/bg.jpg` are not anymore used.

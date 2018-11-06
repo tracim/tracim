@@ -17,7 +17,22 @@ pyramid.debug_routematch = false
 pyramid.default_locale_name = en
 #pyramid.includes =
 #    pyramid_debugtoolbar
+
+# pyramid_retry parameters
 retry.attempts = 3
+
+# pyramid_beaker parameters
+session.type = file
+session.data_dir = %(here)s/sessions_data
+session.lock_dir = %(here)s/sessions_lock
+session.key = session_key
+session.secret = change_this_value_please!
+session.save_accessed_time = True
+session.cookie_expires = 604800
+session.timeout = 604800
+session.cookie_on_exception = true
+# custom tracim pyramid_beaker parameter
+# session.reissue_time = 120
 
 [pipeline:webdav]
 pipeline = tracim_webdav
@@ -94,15 +109,6 @@ user.auth_token.validity = 604800
 user.reset_password.validity = 900
 
 
-session.type = file
-session.data_dir = %(here)s/sessions_data
-session.lock_dir = %(here)s/sessions_lock
-session.key = session_key
-session.secret = change_this_value_please!
-session.save_accessed_time = True
-session.cookie_expires = 604800
-session.timeout = 604800
-session.cookie_on_exception = true
 ### Mail
 
 email.notification.activated = False
