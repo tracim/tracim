@@ -78,8 +78,6 @@ jobs:
 
     script:
       - $(npm bin)/cypress run
-    after_success:
-      - echo "override"
 
 stages:
   - quick-tests
