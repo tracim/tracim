@@ -17,7 +17,7 @@ defusedxml==0.5.0         # via wsgidav
 email-reply-parser==0.5.9
 filedepot==0.5.2
 filelock==3.0.10
-hapic==0.57
+hapic==0.59
 hapic_apispec==0.37.0     # via hapic
 hupper==1.4               # via pyramid
 imapclient==2.1.0
@@ -26,13 +26,13 @@ jsmin==2.2.2              # via wsgidav
 lxml==4.2.5
 mako==1.0.7
 markdown==3.0.1
-markupsafe==1.0           # via jinja2, mako, pyramid-jinja2
+markupsafe==1.1.0         # via jinja2, mako, pyramid-jinja2
 marshmallow==2.16.3
 multidict==4.4.2          # via hapic
 packaging==18.0           # via preview-generator
 pastedeploy==1.5.2        # via plaster-pastedeploy
 pathlib==1.0.1            # via preview-generator
-pbr==5.1.0                # via cliff, stevedore
+pbr==5.1.1                # via cliff, stevedore
 pdf2image==1.0.0          # via preview-generator
 pillow==5.3.0             # via pdf2image, preview-generator
 plaster-pastedeploy==0.6
