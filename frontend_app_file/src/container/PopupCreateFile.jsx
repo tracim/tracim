@@ -60,7 +60,7 @@ class PopupCreateFile extends React.Component {
     this.setState({uploadFile: fileToSave})
 
     var reader = new FileReader()
-    reader.onload = e => this.setState({uploadFilePreview: e.target.result})
+    reader.onload = e => this.setState({uploadFilePreview: e.total > 0 ? e.target.result : false})
     reader.readAsDataURL(fileToSave)
   }
 
