@@ -8,6 +8,7 @@ alembic==1.0.2
 attrs==18.2.0             # via cmd2
 babel==2.6.0
 beaker==1.10.0
+beautifulsoup4==4.6.3
 click==7.0                # via rq
 cliff==2.14.0
 cmd2==0.9.6               # via cliff

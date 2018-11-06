@@ -47,6 +47,7 @@ requires = [
     'email_reply_parser',
     'filelock',
     'imapclient',
+    'beautifulsoup4',
     # auth
     'pyramid_multiauth',
     'beaker',
