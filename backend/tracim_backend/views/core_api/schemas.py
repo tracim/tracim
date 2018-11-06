@@ -1057,6 +1057,10 @@ class FileInfoAbstractSchema(marshmallow.Schema):
         description="Is pdf version of file available ?",
         example=True,
     )
+    jpeg_available = marshmallow.fields.Bool(
+        description="Is jpeg version of file available ?",
+        example=True,
+    )
 
 
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
