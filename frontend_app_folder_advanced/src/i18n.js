@@ -1,13 +1,10 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import { langFr, langEn } from 'tracim_lib'
-import fr from './translate/fr.js'
-import en from './translate/en.js'
 
 i18n
   .use(reactI18nextModule)
   .init({
-    fallbackLng: 'fr',
+    fallbackLng: 'en',
     // have a common namespace used around the full app
     ns: ['translation'], // namespace
     defaultNS: 'translation',
@@ -18,14 +15,9 @@ i18n
     react: {
       wait: true
     },
-    resources: {
-      en: {
-        translation: {...langEn.translation, ...en.translation}
-      },
-      fr: {
-        translation: {...langFr.translation, ...fr.translation}
-      }
-    }
+    resources: {} // init with empty resources, they will come from frontend in app constructor
   })
+
+i18n.idTracim = 'frontend_app_folder'
 
 export default i18n

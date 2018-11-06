@@ -73,15 +73,15 @@ module.exports = {
   plugins: [
     ...[], // generic plugins always present
     ...(isProduction
-      ? [ // production specific plugins
-        new webpack.DefinePlugin({
-          'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
-        })
-      ]
-      : [] // development specific plugins
+        ? [ // production specific plugins
+          new webpack.DefinePlugin({
+            'process.env': { 'NODE_ENV': JSON.stringify('production') }
+          }),
+          new webpack.optimize.UglifyJsPlugin({
+            compress: { warnings: false }
+          })
+        ]
+        : [] // development specific plugins
     )
   ]
 }

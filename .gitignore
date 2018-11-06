@@ -2,7 +2,6 @@
 frontend/dist/app/
 frontend/dist/tracim.app.entry.js
 frontend/dist/asset/tracim/tracim.vendor.bundle.js
-frontend_app_html-document/dist/html-document.app.js
 frontend_lib/dist/tracim_frontend_lib.js
 frontend_lib/dist/tracim_frontend_lib.style.js
 npm-debug.log

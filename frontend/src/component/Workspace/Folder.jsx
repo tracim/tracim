@@ -6,7 +6,6 @@ import classnames from 'classnames'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
-import i18n from '../../i18n.js'
 
 class Folder extends React.Component {
   constructor (props) {
@@ -14,11 +13,11 @@ class Folder extends React.Component {
     this.state = {
       open: false
     }
-    console.log(i18n)
   }
 
   handleClickToggleFolder = () => {
-    !this.state.open && this.props.folderData.content.length === 0 && this.props.onClickFolder(this.props.folderData.id)
+    // const { props, state } = this
+    if (!state.open && props.folderData.content.length === 0) props.onClickFolder(props.folderData.id)
     this.setState({open: !this.state.open})
   }
 
@@ -28,36 +27,29 @@ class Folder extends React.Component {
   }
 
   render () {
-    const {
-      availableApp,
-      folderData,
-      // onClickItem,
-      idRoleUserWorkspace,
-      onClickExtendedAction,
-      onClickCreateContent,
-      // onClickFolder,
-      isLast,
-      t
-    } = this.props
+    const { props, state } = this
 
     return (
-      <div className={classnames('folder', {'active': this.state.open && folderData.content.length > 0, 'item-last': isLast})}>
-        <div className='folder__header align-items-center primaryColorBgLightenHover' onClick={this.handleClickToggleFolder}>
+      <div className={classnames('folder', {'active': state.open && props.folderData.content.length > 0, 'item-last': props.isLast})}>
+        <div
+          className='folder__header align-items-center primaryColorBgLightenHover'
+          onClick={this.handleClickToggleFolder}
+        >
 
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
           <div className='folder__header__icon'>
-            <i className={classnames('fa fa-fw', {'fa-folder-open-o': this.state.open, 'fa-folder-o': !this.state.open})} />
+            <i className={classnames('fa fa-fw', {'fa-folder-open-o': state.open, 'fa-folder-o': !state.open})} />
           </div>
 
           <div className='folder__header__name'>
-            { folderData.label }
+            { props.folderData.label }
           </div>
 
           <div className='folder__header__button'>
-            {idRoleUserWorkspace >= 2 &&
+            {props.idRoleUserWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 <button
                   className='folder__header__button__addbtn__text btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
@@ -68,26 +60,26 @@ class Folder extends React.Component {
                   aria-expanded='false'
                   onClick={e => e.stopPropagation()}
                 >
-                  {`${t('Create in folder')}...`}
+                  {`${props.t('Create in folder')}...`}
                 </button>
 
                 <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                   <SubDropdownCreateButton
                     idFolder={null}
-                    availableApp={availableApp}
-                    onClickCreateContent={onClickCreateContent}
+                    availableApp={props.availableApp}
+                    onClickCreateContent={props.onClickCreateContent}
                   />
                 </div>
 
                 <div className='d-none d-md-flex'>
                   <BtnExtandedAction
-                    idRoleUserWorkspace={idRoleUserWorkspace}
+                    idRoleUserWorkspace={props.idRoleUserWorkspace}
                     onClickExtendedAction={{
-                      edit: e => onClickExtendedAction.edit(e, folderData),
-                      move: e => onClickExtendedAction.move(e, folderData),
-                      download: e => onClickExtendedAction.download(e, folderData),
-                      archive: e => onClickExtendedAction.archive(e, folderData),
-                      delete: e => onClickExtendedAction.delete(e, folderData)
+                      edit: e => props.onClickExtendedAction.edit(e, props.folderData),
+                      move: e => props.onClickExtendedAction.move(e, props.folderData),
+                      download: e => props.onClickExtendedAction.download(e, props.folderData),
+                      archive: e => props.onClickExtendedAction.archive(e, props.folderData),
+                      delete: e => props.onClickExtendedAction.delete(e, props.folderData)
                     }}
                   />
                 </div>
