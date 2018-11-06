@@ -43,7 +43,7 @@ and verify which tracim_v1 parameter already exist and add them to your config f
 ## 5. More infos about new config in Tracim_v2
 
 Big change in config ini in tracim_v2 was to move most of the config (mostly from `[app:main]`) in `[DEFAULT]` section and 
-separated more properly global config from app specific param like p`yramid.*` param in tracim_web app section , `[app:tracim_web]`  .
+separated more properly global config from app specific param like `pyramid.*` param in tracim_web app section , `[app:tracim_web]`  .
 In order to have something working easily, best solution is using  [developement.ini.sample](../development.ini.sample) and
 modify parameters, which are mostly in `[DEFAULT]` section.
 
