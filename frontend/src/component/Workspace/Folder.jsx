@@ -6,34 +6,24 @@ import classnames from 'classnames'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
+import ContentItem from './ContentItem.jsx'
 
 class Folder extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      open: false
-    }
-  }
-
-  handleClickToggleFolder = () => {
-    // const { props, state } = this
-    if (!state.open && props.folderData.content.length === 0) props.onClickFolder(props.folderData.id)
-    this.setState({open: !this.state.open})
-  }
-
   handleClickCreateContent = (e, folder, type) => {
     e.stopPropagation() // because we have a link inside a link (togler and newFile)
     this.props.onClickCreateContent(folder, type)
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
     return (
-      <div className={classnames('folder', {'active': state.open && props.folderData.content.length > 0, 'item-last': props.isLast})}>
+      <div className={classnames('folder', {'active': props.folderData.isOpen && props.folderData.content.length > 0, 'item-last': props.isLast})}>
         <div
-          className='folder__header align-items-center primaryColorBgLightenHover'
-          onClick={this.handleClickToggleFolder}
+          // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
+          // since they have the border-top-color: inherit on hover
+          className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
+          onClick={() => props.onClickFolder(props.folderData.id)}
         >
 
           <div className='folder__header__triangleborder'>
@@ -41,7 +31,7 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__icon'>
-            <i className={classnames('fa fa-fw', {'fa-folder-open-o': state.open, 'fa-folder-o': !state.open})} />
+            <i className={classnames('fa fa-fw', {'fa-folder-open-o': props.folderData.isOpen, 'fa-folder-o': !props.folderData.isOpen})} />
           </div>
 
           <div className='folder__header__name'>
@@ -65,7 +55,7 @@ class Folder extends React.Component {
 
                 <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                   <SubDropdownCreateButton
-                    idFolder={null}
+                    idFolder={props.folderData.id}
                     availableApp={props.availableApp}
                     onClickCreateContent={props.onClickCreateContent}
                   />
@@ -92,37 +82,39 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {
-          //   folderData.map((c, i) => c.type === 'folder'
-          //   ? <Folder
-          //     app={app}
-          //     folderData={c}
-          //     onClickItem={onClickItem}
-          //     onClickExtendedAction={onClickExtendedAction}
-          //     onClickFolder={onClickFolder}
-          //     isLast={isLast}
-          //     t={t}
-          //     key={c.id}
-          //   />
-          //   : <FileItem
-          //     icon={(app[c.type] || {icon: ''}).icon}
-          //     name={c.title}
-          //     type={c.type}
-          //     status={c.status}
-          //     onClickItem={() => onClickItem(c)}
-          //     onClickExtendedAction={{
-          //       // we have to use the event here because it is the only place where we also have the content (c)
-          //       edit: e => onClickExtendedAction.edit(e, c),
-          //       move: e => onClickExtendedAction.move(e, c),
-          //       download: e => onClickExtendedAction.download(e, c),
-          //       archive: e => onClickExtendedAction.archive(e, c),
-          //       delete: e => onClickExtendedAction.delete(e, c)
-          //     }}
-          //     isLast={isLast && i === folderData.content.length - 1}
-          //     key={c.id}
-          //   />
-          // )
-          }
+          {props.folderData.content.map((c, i) => c.type === 'folder'
+            ? (
+              <Folder
+                availableApp={props.availableApp}
+                folderData={{
+                  ...c,
+                  content: [] // @TODO
+                }}
+                onClickItem={props.onClickItem}
+                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                onClickExtendedAction={props.onClickExtendedAction}
+                onClickFolder={props.onClickFolder}
+                onClickCreateContent={props.onClickCreateContent}
+                isLast={i === props.folderData.content.length - 1}
+                key={c.id}
+              />
+            )
+            : (
+              <ContentItem
+                label={c.label}
+                type={c.type}
+                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === c.type).faIcon : ''}
+                statusSlug={c.statusSlug}
+                read={false} // @TODO
+                contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === c.type) : null}
+                onClickItem={() => props.onClickItem(c)}
+                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                onClickExtendedAction={props.onClickExtendedAction}
+                isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
+                key={c.id}
+              />
+            )
+          )}
         </div>
       </div>
     )
