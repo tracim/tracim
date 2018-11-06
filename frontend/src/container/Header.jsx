@@ -26,6 +26,14 @@ import {
 import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
+  componentDidMount () {
+    i18n.changeLanguage(this.props.user.lang)
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.user.lang !== this.props.user.lang) i18n.changeLanguage(this.props.user.lang)
+  }
+
   handleClickLogo = () => {
     const { props } = this
 
@@ -114,7 +122,7 @@ class Header extends React.Component {
 
               <MenuActionListItemDropdownLang
                 langList={props.lang}
-                idLangActive={props.user.lang ? props.user.lang : 'en'}
+                idLangActive={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 

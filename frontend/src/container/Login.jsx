@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -13,7 +14,6 @@ import {
   newFlashMessage,
   setUserConnected,
   setWorkspaceList,
-  setWorkspaceListIsOpenInSidebar,
   setContentTypeList,
   setAppList,
   setConfig
@@ -82,6 +82,7 @@ class Login extends React.Component {
 
         Cookies.set('lastConnection', '1', {expires: 180})
         props.dispatch(setUserConnected(loggedUser))
+        i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppConfig()
         this.loadWorkspaceList()
@@ -118,23 +119,10 @@ class Login extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
-  loadWorkspaceList = async user => {
+  loadWorkspaceList = async () => {
     const { props } = this
-
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
-
-    if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-
-      const idWorkspaceToOpen = (() =>
-        props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
-          ? parseInt(props.match.params.idws)
-          : fetchGetWorkspaceList.json[0].workspace_id
-      )()
-
-      props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
-    }
+    if (fetchGetWorkspaceList.status === 200) props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
   }
 
   handleClickForgotPassword = async () => this.props.history.push(PAGE.FORGOT_PASSWORD)

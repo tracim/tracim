@@ -294,6 +294,9 @@ class Dashboard extends React.Component {
             )
             props.dispatch(newFlashMessage(<ErrorMsg />))
             return false
+          case 3008:
+            props.dispatch(newFlashMessage(props.t('This user already is in the workspace'), 'warning'))
+            return false
           default:
             props.dispatch(newFlashMessage(props.t('Error while adding the member to the shared space'), 'warning'))
             return false

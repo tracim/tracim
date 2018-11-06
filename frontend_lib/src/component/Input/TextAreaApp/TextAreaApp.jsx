@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 
 require('./TextAreaApp.styl')
@@ -29,7 +30,7 @@ export const TextAreaApp = props =>
         }}
         key='TextAreaApp__cancel'
       >
-        Annuler
+        {props.t('Cancel')}
       </button>
 
       <button
@@ -47,12 +48,12 @@ export const TextAreaApp = props =>
         }}
         key='TextAreaApp__validate'
       >
-        Valider
+        {props.t('Validate')}
       </button>
     </div>
   </form>
 
-export default Radium(TextAreaApp)
+export default translate()(Radium(TextAreaApp))
 
 TextAreaApp.propTypes = {
   text: PropTypes.string.isRequired,

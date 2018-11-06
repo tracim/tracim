@@ -265,6 +265,12 @@ class File extends React.Component {
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
+      case 400:
+        switch (fetchResultSaveFile.body.code) {
+          case 2041: break // same description sent, no need for error msg
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+        }
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
     }
   }
@@ -321,6 +327,7 @@ class File extends React.Component {
     switch (fetchResultArchive.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
@@ -334,6 +341,7 @@ class File extends React.Component {
     switch (fetchResultArchive.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
@@ -347,6 +355,7 @@ class File extends React.Component {
     switch (fetchResultRestore.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
@@ -360,6 +369,7 @@ class File extends React.Component {
     switch (fetchResultRestore.status) {
       case 204:
         this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadContent()
         this.loadTimeline()
         break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
@@ -499,7 +509,7 @@ class File extends React.Component {
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={state.content.is_archived || state.content.is_deleted}
+          disableChangeTitle={!state.content.is_editable}
         />
 
         <PopinFixedOption
@@ -513,7 +523,7 @@ class File extends React.Component {
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== MODE.VIEW || state.content.is_archived || state.content.is_deleted}
+                  disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
                   label={props.t('Update')}
                 />
               }
@@ -572,6 +582,7 @@ class File extends React.Component {
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
+            isEditable={state.content.is_editable}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
@@ -601,7 +612,7 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
             newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
+            disableComment={state.mode === MODE.REVISION || !state.content.is_editable}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

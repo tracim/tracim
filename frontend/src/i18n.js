@@ -19,10 +19,19 @@ const wsAdvancedFrTranslation = require('../dist/app/workspace_advanced_fr_trans
 const wsEnTranslation = require('../dist/app/workspace_en_translation.json')
 const wsFrTranslation = require('../dist/app/workspace_fr_translation.json')
 
+export const getBrowserLang = () => {
+  const browserLang = navigator.language
+
+  if (['en', 'fr'].includes(browserLang)) return browserLang
+  if (browserLang.includes('fr')) return 'fr' // for fr-XX
+
+  return 'en'
+}
+
 i18n
   .use(reactI18nextModule)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: getBrowserLang(),
     // have a common namespace used around the full app
     ns: ['translation'], // namespace
     defaultNS: 'translation',
