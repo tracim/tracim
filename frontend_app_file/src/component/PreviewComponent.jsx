@@ -2,8 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import Lightbox from 'react-image-lightbox'
-import 'react-image-lightbox/style.css'
+import Lightbox from 'react-images'
 
 require('./PreviewComponent.styl')
 
@@ -99,12 +98,23 @@ export class PreviewComponent extends React.Component {
           >
             <img src={props.previewUrl} className='img-thumbnail mx-auto' />
 
-            {state.displayLightbox && props.contentFullScreenUrl !== null && props.contentFullScreenUrl !== undefined &&
-              <Lightbox
-                mainSrc={props.contentFullScreenUrl}
-                onCloseRequest={() => this.setState({displayLightbox: false})}
-              />
-            }
+            <Lightbox
+              // mainSrc={props.lightboxUrlBuilder(props.fileCurrentPage)}
+              // nextSrc={props.lightboxUrlBuilder((props.fileCurrentPage + 1) % props.filePageNb)}
+              // prevSrc={props.lightboxUrlBuilder((props.fileCurrentPage + props.filePageNb - 1) % props.filePageNb)}
+              // onMovePrevRequest={props.onClickPreviousPage}
+              // onMoveNextRequest={props.onClickNextPage}
+              // onCloseRequest={() => this.setState({displayLightbox: false})}
+              // enableZoom={false}
+              isOpen={state.displayLightbox}
+              images={(props.lightboxUrlList || []).map(url => ({src: url}))}
+              currentImage={props.fileCurrentPage - 1}
+              onClose={() => this.setState({displayLightbox: false})}
+              onClickPrev={props.onClickPreviousPage}
+              onClickNext={props.onClickNextPage}
+              showImageCount
+              imageCountSeparator={props.t(' of ')}
+            />
           </div>
 
           <button

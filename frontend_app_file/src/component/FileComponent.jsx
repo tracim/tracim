@@ -49,7 +49,7 @@ export const FileComponent = props =>
         fileSize={props.fileSize}
         filePageNb={props.filePageNb}
         fileCurrentPage={props.fileCurrentPage}
-        contentFullScreenUrl={props.contentFullScreenUrl}
+        lightboxUrlList={props.lightboxUrlList}
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
