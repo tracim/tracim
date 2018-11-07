@@ -421,7 +421,7 @@ class File extends React.Component {
     this.setState({newFile: fileToSave})
 
     var reader = new FileReader()
-    reader.onload = e => this.setState({newFilePreview: e.target.result})
+    reader.onload = e => this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
     reader.readAsDataURL(fileToSave)
   }
 
