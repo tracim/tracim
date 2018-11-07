@@ -214,17 +214,20 @@ class WorkspaceContent extends React.Component {
   handleClickFolder = async idFolder => {
     const { props, state } = this
 
-    props.dispatch(toggleFolderOpen(idFolder))
+    // props.dispatch(toggleFolderOpen(idFolder))
 
-    const folderData = props.workspaceContentList.find(c => c.id === idFolder)
-    if (folderData.isOpen) return
+    const folderListInUrl = (qs.parse(props.location.search).folder_open || '').split(',').filter(str => str !== '')
 
-    const fetchGetFolderContent = await props.dispatch(getFolderContent(state.workspaceIdInUrl, idFolder))
+    const newFolderOpenList = props.workspaceContentList.find(c => c.id === idFolder).isOpen
+      ? folderListInUrl.filter(id => id !== idFolder)
+      : [...folderListInUrl, idFolder]
 
-    switch (fetchGetFolderContent.status) {
-      case 200: props.dispatch(setFolderData(idFolder, fetchGetFolderContent.json)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading folder data', 'warning'))); break
+    const newUrlSearch = {
+      ...qs.parse(props.location.search),
+      folder_open: newFolderOpenList.join(',')
     }
+
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
   }
 
   handleClickCreateContent = (e, idFolder, contentType) => {
