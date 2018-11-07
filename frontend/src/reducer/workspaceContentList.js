@@ -1,6 +1,5 @@
 import {
   SET,
-  UPDATE,
   TOGGLE,
   WORKSPACE,
   WORKSPACE_CONTENT,
@@ -27,25 +26,33 @@ const serializeContent = c => ({
   isOpen: c.isOpen ? c.isOpen : false // only useful for folder
 })
 
+const getOpenedIdFolderList = contentList => contentList.filter(c => c.isOpen).map(c => c.id)
+
 export default function workspaceContentList (state = [], action) {
   switch (action.type) {
-    case `${SET}/${WORKSPACE_CONTENT}`:
-      return action.workspaceContentList.map(c => serializeContent(c))
+    case `${SET}/${WORKSPACE_CONTENT}`: {
+      if (state.length === 0) return action.workspaceContentList.map(c => serializeContent(c))
 
-    case `${SET}/${WORKSPACE_CONTENT_PATH}`:
-      const openedIdFolderList = state.filter(c => c.isOpen).map(c => c.id) // already opened folder
-      const folderPathList = action.contentPath.map(c => c.parent_id) // folder to open because in path
-      const mergedOpenedFolderList = uniq([...openedIdFolderList, ...folderPathList])
+      const openedIdFolderList = getOpenedIdFolderList(state)
+      return action.workspaceContentList.map(c => ({
+        ...serializeContent(c),
+        isOpen: openedIdFolderList.includes(c.content_id)
+      }))
+    }
+
+    case `${SET}/${WORKSPACE_CONTENT_PATH}`: {
+      const openedIdFolderList = getOpenedIdFolderList(state)
+      const pathIdFolderList = action.contentPath.map(c => c.parent_id) // folder to open because in path
+      const mergedOpenedFolderList = uniq([...openedIdFolderList, ...pathIdFolderList])
+
       return [
         ...action.contentList.map(c => ({...serializeContent(c), isOpen: mergedOpenedFolderList.includes(c.content_id)})),
         ...action.contentPath.map(c => ({...serializeContent(c), isOpen: c.type === 'folder'}))
       ]
-
-    case `${UPDATE}/${WORKSPACE}/Filter`: // not used anymore ?
-      return {...state, filter: action.filterList}
+    }
 
     case `${SET}/${WORKSPACE}/${FOLDER}/Content`:
-      const listFolder = action.content.map(c => c.parent_id)
+      const listFolder = action.content.map(c => c.parent_id) // is all of this really useful ?
 
       const mergedArray = [ // cast back from Set into array
         ...state.map(c => c.type === 'folder'

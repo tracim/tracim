@@ -126,25 +126,21 @@ class WorkspaceContent extends React.Component {
     switch (wsContent.status) {
       case 200:
         if (
-          props.match.params.idcts &&
-          props.match.params.type && // idcts + type means there is a content to open
-          !wsContent.json.find(c => c.content_id === parseInt(props.match.params.idcts)) // means content to open is not in workspace's root folder
+          !props.match.params.idcts ||
+          !props.match.params.type || // exists idcts + type exists, it means there is a content to open
+          wsContent.json.find(c => c.content_id === parseInt(props.match.params.idcts)) // means content to open is in workspace's root folder, so need additional fetch
         ) {
-          const contentData = await props.dispatch(getContent(idWorkspace, props.match.params.idcts, props.match.params.type))
-
-          switch (contentData.status) {
-            case 200:
-              const contentPathList = await props.dispatch(getWorkspaceContentList(idWorkspace, contentData.json.parent_id))
-              switch (contentPathList.status) {
-                case 200:
-                  props.dispatch(setWorkspaceContentListPath(wsContent.json, contentPathList.json))
-                  // props.dispatch(setFolderData(contentData.json.parent_id, contentPathList.json))
-                  break
-              }
-          }
-        } else {
           props.dispatch(setWorkspaceContentList(wsContent.json))
+          break
         }
+
+        const contentData = await props.dispatch(getContent(idWorkspace, props.match.params.idcts, props.match.params.type))
+        if (contentData.status !== 200) break
+
+        const contentPathList = await props.dispatch(getWorkspaceContentList(idWorkspace, contentData.json.parent_id))
+        if (contentPathList.status !== 200) break
+
+        props.dispatch(setWorkspaceContentListPath(wsContent.json, contentPathList.json))
         break
       case 401: break
       default: props.dispatch(newFlashMessage(props.t('Error while loading workspace', 'danger')))
