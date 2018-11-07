@@ -40,9 +40,9 @@ export const FileDropzone = props => {
             case false:
               return (
                 <div className='filecontent__preview' drop='true'>
-                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{color: props.hexcolor}} />
+                  <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{color: props.hexcolor}} />
                   <div className='filecontent__preview__nopreview-msg'>
-                    {props.t('No preview available')}
+                    {props.filename}
                   </div>
                 </div>
               )
