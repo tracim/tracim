@@ -1053,12 +1053,12 @@ class FileInfoAbstractSchema(marshmallow.Schema):
         example=1024,
         allow_none=True,
     )
-    pdf_available = marshmallow.fields.Bool(
-        description="Is pdf version of file available ?",
+    has_pdf_preview = marshmallow.fields.Bool(
+        description="true if a pdf preview is available or false",
         example=True,
     )
-    jpeg_available = marshmallow.fields.Bool(
-        description="Is jpeg version of file available ?",
+    has_jpeg_preview = marshmallow.fields.Bool(
+        description="true if a JPEG preview is available or false",
         example=True,
     )
 

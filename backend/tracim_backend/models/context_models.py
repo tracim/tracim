@@ -909,7 +909,7 @@ class ContentInContext(object):
             return None
 
     @property
-    def pdf_available(self) -> bool:
+    def has_pdf_preview(self) -> bool:
         """
         :return: bool about if pdf version of content is available
         """
@@ -932,7 +932,7 @@ class ContentInContext(object):
             return False
 
     @property
-    def jpeg_available(self) -> bool:
+    def has_jpeg_preview(self) -> bool:
         """
         :return: bool about if jpeg version of content is available
         """
@@ -1190,7 +1190,7 @@ class RevisionInContext(object):
             return None
 
     @property
-    def pdf_available(self) -> bool:
+    def has_pdf_preview(self) -> bool:
         """
         :return: bool about if pdf version of content is available
         """
@@ -1213,7 +1213,7 @@ class RevisionInContext(object):
             return False
 
     @property
-    def jpeg_available(self) -> bool:
+    def has_jpeg_preview(self) -> bool:
         """
         :return: bool about if jpeg version of content is available
         """
