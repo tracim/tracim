@@ -36,7 +36,7 @@
     "react-dom": "^16.0.0",
     "react-dropzone": "^5.0.1",
     "react-i18next": "^7.5.0",
-    "react-image-lightbox": "^5.0.0",
+    "react-images": "^0.5.19",
     "standard": "^11.0.0",
     "standard-loader": "^6.0.1",
     "style-loader": "^0.19.0",
@@ -61,6 +61,7 @@
       "FormData",
       "XMLHttpRequest",
       "FileReader",
+      "Image",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"
