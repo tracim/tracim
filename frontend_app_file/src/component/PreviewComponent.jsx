@@ -98,7 +98,19 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__slider__fileimg'
             onClick={this.handleClickShowImageRaw}
           >
-            <img src={props.previewUrl} className='img-thumbnail mx-auto' />
+            {props.isJpegAvailable
+              ? (
+                <img src={props.previewUrl} className='img-thumbnail mx-auto' />
+              )
+              : (
+                <div className='filecontent__preview' drop='true'>
+                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{color: props.color}} />
+                  <div className='filecontent__preview__nopreview-msg'>
+                    {props.t('No preview available')}
+                  </div>
+                </div>
+              )
+            }
 
             <Lightbox
               isOpen={state.displayLightbox}

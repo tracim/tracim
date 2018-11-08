@@ -909,27 +909,51 @@ class ContentInContext(object):
             return None
 
     @property
-    def pdf_available(self) -> bool:
+    def has_pdf_preview(self) -> bool:
         """
         :return: bool about if pdf version of content is available
         """
-        if self.content.depot_file:
-            from tracim_backend.lib.core.content import ContentApi
-            content_api = ContentApi(
-                current_user=self._user,
-                session=self.dbsession,
-                config=self.config,
-                show_deleted=True,
-                show_archived=True,
-                show_active=True,
-                show_temporary=True,
-            )
-            return content_api.has_pdf_preview(
-                self.content.revision_id,
-                file_extension=self.content.file_extension
-            )
-        else:
+        if not self.content.depot_file:
             return False
+
+        from tracim_backend.lib.core.content import ContentApi
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.has_pdf_preview(
+            self.content.revision_id,
+            file_extension=self.content.file_extension
+            )
+
+    @property
+    def has_jpeg_preview(self) -> bool:
+        """
+        :return: bool about if jpeg version of content is available
+        """
+        if not self.content.depot_file:
+            return False
+
+        from tracim_backend.lib.core.content import ContentApi
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.has_jpeg_preview(
+            self.content.revision_id,
+            file_extension=self.content.file_extension
+        )
+
 
     @property
     def file_extension(self) -> str:
@@ -1167,27 +1191,50 @@ class RevisionInContext(object):
             return None
 
     @property
-    def pdf_available(self) -> bool:
+    def has_pdf_preview(self) -> bool:
         """
         :return: bool about if pdf version of content is available
         """
-        if self.revision.depot_file:
-            from tracim_backend.lib.core.content import ContentApi
-            content_api = ContentApi(
-                current_user=self._user,
-                session=self.dbsession,
-                config=self.config,
-                show_deleted=True,
-                show_archived=True,
-                show_active=True,
-                show_temporary=True,
-            )
-            return content_api.has_pdf_preview(
-                self.revision.revision_id,
-                file_extension=self.revision.file_extension,
-            )
-        else:
+        if not self.revision.depot_file:
             return False
+
+        from tracim_backend.lib.core.content import ContentApi
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.has_pdf_preview(
+            self.revision.revision_id,
+            file_extension=self.revision.file_extension,
+        )
+
+    @property
+    def has_jpeg_preview(self) -> bool:
+        """
+        :return: bool about if jpeg version of content is available
+        """
+        if not self.revision.depot_file:
+            return False
+
+        from tracim_backend.lib.core.content import ContentApi
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.has_jpeg_preview(
+            self.revision.revision_id,
+            file_extension=self.revision.file_extension
+        )
 
     @property
     def file_extension(self) -> str:

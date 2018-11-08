@@ -61,6 +61,7 @@
       "FormData",
       "XMLHttpRequest",
       "FileReader",
+      "Image",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"

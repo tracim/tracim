@@ -1590,13 +1590,24 @@ class ContentApi(object):
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            has_pdf_preview = self.preview_manager.has_pdf_preview(
+            has_preview = self.preview_manager.has_pdf_preview(
                 file_path,
                 file_ext=file_extension
             )
         except UnsupportedMimeType:
-            has_pdf_preview = False
-        return has_pdf_preview
+            has_preview = False
+        return has_preview
+
+    def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
+        file_path = self.get_one_revision_filepath(revision_id)
+        try:
+            has_preview = self.preview_manager.has_jpeg_preview(
+                file_path,
+                file_ext=file_extension
+            )
+        except UnsupportedMimeType:
+            has_preview = False
+        return has_preview
 
     def mark_read__all(
             self,
