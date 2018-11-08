@@ -52,6 +52,7 @@ requires = [
     'pyramid_multiauth',
     'beaker',
     'pyramid_beaker',
+    'pyramid_ldap',
     # frontend file serve
     'pyramid_mako',
     # i18n

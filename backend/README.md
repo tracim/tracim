@@ -18,6 +18,7 @@ on Debian Stretch (9) with sudo:
     sudo apt install redis-server
     sudo apt install zlib1g-dev libjpeg-dev
     sudo apt install imagemagick libmagickwand-dev ghostscript poppler-utils libfile-mimeinfo-perl
+    sudo apt install libldap2-dev libsasl2-dev
 
 for better preview support:
 

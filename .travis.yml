@@ -75,6 +75,8 @@ addons:
     - ghostscript
     - libfile-mimeinfo-perl
     - poppler-utils
+    - libldap2-dev
+    - libsasl2-dev
 services:
   - docker
   - redis-server
