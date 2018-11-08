@@ -575,7 +575,7 @@ class File extends React.Component {
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
-            isJpegAvaiable={state.content.has_jpeg_preview}
+            isJpegAvailable={state.content.has_jpeg_preview}
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}

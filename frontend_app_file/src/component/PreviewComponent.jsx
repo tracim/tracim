@@ -98,7 +98,7 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__slider__fileimg'
             onClick={this.handleClickShowImageRaw}
           >
-            {props.isJpegAvaiable
+            {props.isJpegAvailable
               ? (
                 <img src={props.previewUrl} className='img-thumbnail mx-auto' />
               )
