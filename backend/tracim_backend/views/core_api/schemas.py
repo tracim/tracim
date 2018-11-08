@@ -1058,7 +1058,7 @@ class FileInfoAbstractSchema(marshmallow.Schema):
         example=True,
     )
     has_jpeg_preview = marshmallow.fields.Bool(
-        description="true if a JPEG preview is available or false",
+        description="true if a jpeg preview is available or false",
         example=True,
     )
 
