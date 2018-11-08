@@ -84,6 +84,7 @@
       font-size 20px
       cursor pointer
   &__slider
+    position relative
     display flex
     align-items center
     width calc(100% - 50px) // 50px => width of property
@@ -102,6 +103,11 @@
       margin 0 5px
       font-size 20px
       cursor pointer
+    &__pagecount
+      position absolute
+      right 5px
+      bottom 5px
+      font-size 13px
 
 .closedproperty
   .previewcomponent

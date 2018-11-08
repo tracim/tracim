@@ -1696,7 +1696,8 @@ class TestFiles(FunctionalTest):
         assert content['file_extension'] == '.txt'
         assert content['filename'] == 'Test_file.txt'
         assert content['page_nb'] == 1
-        assert content['pdf_available'] is True
+        assert content['has_pdf_preview'] is True
+        assert content['has_jpeg_preview'] is True
 
     def test_api__get_file__ok_200__no_file_add(self) -> None:
         """
@@ -1768,7 +1769,8 @@ class TestFiles(FunctionalTest):
         assert content['filename'] == 'Test file'
         assert content['size'] is None
         assert content['page_nb'] is None
-        assert content['pdf_available'] is False
+        assert content['has_pdf_preview'] is False
+        assert content['has_jpeg_preview'] is False
 
     def test_api__get_file__ok_200__binary_file(self) -> None:
         """
@@ -1854,7 +1856,8 @@ class TestFiles(FunctionalTest):
         assert content['file_extension'] == '.bin'
         assert content['filename'] == 'Test_file.bin'
         assert content['page_nb'] is None
-        assert content['pdf_available'] is False
+        assert content['has_pdf_preview'] is False
+        assert content['has_jpeg_preview'] is False
 
     def test_api__get_files__err_400__wrong_content_type(self) -> None:
         """
@@ -2125,7 +2128,8 @@ class TestFiles(FunctionalTest):
         assert content['mimetype'] == 'plain/text'
         assert content['size'] == len(b'Test file')
         assert content['page_nb'] == 1
-        assert content['pdf_available'] is True
+        assert content['has_pdf_preview'] is True
+        assert content['has_jpeg_preview'] is True
 
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
@@ -2157,7 +2161,8 @@ class TestFiles(FunctionalTest):
         assert content['mimetype'] == 'plain/text'
         assert content['size'] == len(b'Test file')
         assert content['page_nb'] == 1
-        assert content['pdf_available'] is True
+        assert content['has_pdf_preview'] is True
+        assert content['has_jpeg_preview'] is True
 
     def test_api__update_file_info__err_400__content_status_closed(self) -> None:
         """
@@ -2449,7 +2454,8 @@ class TestFiles(FunctionalTest):
         assert content['mimetype'] == 'plain/text'
         assert content['size'] == len(b'Test file')
         assert content['page_nb'] == 1
-        assert content['pdf_available'] is True
+        assert content['has_pdf_preview'] is True
+        assert content['has_jpeg_preview'] is True
 
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
@@ -2481,7 +2487,8 @@ class TestFiles(FunctionalTest):
         assert content['mimetype'] == 'plain/text'
         assert content['size'] == len(b'Test file')
         assert content['page_nb'] == 1
-        assert content['pdf_available'] is True
+        assert content['has_pdf_preview'] is True
+        assert content['has_jpeg_preview'] is True
 
         res = self.testapp.put_json(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
@@ -2675,7 +2682,7 @@ class TestFiles(FunctionalTest):
         assert revision['mimetype'] == 'plain/text'
         assert revision['size'] == len(b'Test file')
         assert revision['page_nb'] == 1
-        assert revision['pdf_available'] is True
+        assert revision['has_pdf_preview'] is True
 
     def test_api__set_file_status__ok_200__nominal_case(self) -> None:
         """

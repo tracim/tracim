@@ -422,7 +422,12 @@ class File extends React.Component {
     this.setState({newFile: fileToSave})
 
     var reader = new FileReader()
-    reader.onload = e => this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
+    reader.onload = e => {
+      this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
+      const img = new Image()
+      img.src = e.target.result
+      img.onerror = () => this.setState({newFilePreview: false})
+    }
     reader.readAsDataURL(fileToSave)
   }
 
@@ -442,7 +447,6 @@ class File extends React.Component {
     xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
-    // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
 
@@ -571,6 +575,7 @@ class File extends React.Component {
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
+            isJpegAvailable={state.content.has_jpeg_preview}
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
@@ -588,7 +593,7 @@ class File extends React.Component {
             downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
               `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1`
             )(state)}
-            isPdfAvailable={state.content.pdf_available}
+            isPdfAvailable={state.content.has_pdf_preview}
             downloadPdfPageUrl={(({config: {apiUrl}, content, mode, fileCurrentPage}) =>
               `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1`
             )(state)}
