@@ -39,5 +39,6 @@
   "Update": "Update",
   "A content with the same name already exists": "A content with the same name already exists",
   "Error while saving new comment": "Error while saving new comment",
-  "No preview available": "No preview available"
+  "No preview available": "No preview available",
+  " of ": " of "
 }

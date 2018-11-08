@@ -2,8 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import Lightbox from 'react-image-lightbox'
-import 'react-image-lightbox/style.css'
+import Lightbox from 'react-images'
 
 require('./PreviewComponent.styl')
 
@@ -81,17 +80,19 @@ export class PreviewComponent extends React.Component {
         </div>
 
         <div className='previewcomponent__slider'>
-          <button
-            type='button'
-            className='previewcomponent__slider__icon btn iconBtn'
-            onClick={props.onClickPreviousPage}
-            style={{':hover': {color: props.color}}}
-            title={'Previous page'}
-            disabled={props.fileCurrentPage === 1}
-            key={'file_btn_previouspage'}
-          >
-            <i className='fa fa-chevron-left' />
-          </button>
+          {props.filePageNb > 1 && (
+            <button
+              type='button'
+              className='previewcomponent__slider__icon btn iconBtn'
+              onClick={props.onClickPreviousPage}
+              style={{':hover': {color: props.color}}}
+              title={'Previous page'}
+              disabled={props.fileCurrentPage === 1}
+              key={'file_btn_previouspage'}
+            >
+              <i className='fa fa-chevron-left' />
+            </button>
+          )}
 
           <div
             className='previewcomponent__slider__fileimg'
@@ -111,25 +112,37 @@ export class PreviewComponent extends React.Component {
               )
             }
 
-            {props.isJpegAvaiable && state.displayLightbox && props.contentFullScreenUrl !== null && props.contentFullScreenUrl !== undefined &&
-              <Lightbox
-                mainSrc={props.contentFullScreenUrl}
-                onCloseRequest={() => this.setState({displayLightbox: false})}
-              />
-            }
+            <Lightbox
+              isOpen={state.displayLightbox}
+              images={(props.lightboxUrlList || []).map(url => ({src: url}))}
+              currentImage={props.fileCurrentPage - 1}
+              onClose={() => this.setState({displayLightbox: false})}
+              onClickPrev={props.onClickPreviousPage}
+              onClickNext={props.onClickNextPage}
+              showImageCount
+              imageCountSeparator={props.t(' of ')}
+            />
           </div>
 
-          <button
-            type='button'
-            className='previewcomponent__slider__icon btn iconBtn'
-            onClick={props.onClickNextPage}
-            style={{':hover': {color: props.color}}}
-            title={'Next page'}
-            disabled={props.fileCurrentPage === props.filePageNb}
-            key={'file_btn_nextpage'}
-          >
-            <i className='fa fa-chevron-right' />
-          </button>
+          {props.filePageNb > 1 && (
+            <button
+              type='button'
+              className='previewcomponent__slider__icon btn iconBtn'
+              onClick={props.onClickNextPage}
+              style={{':hover': {color: props.color}}}
+              title={'Next page'}
+              disabled={props.fileCurrentPage === props.filePageNb}
+              key={'file_btn_nextpage'}
+            >
+              <i className='fa fa-chevron-right' />
+            </button>
+          )}
+
+          {props.filePageNb > 1 && (
+            <div className='previewcomponent__slider__pagecount'>
+              {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
+            </div>
+          )}
         </div>
 
         <div className='previewcomponent__property'>

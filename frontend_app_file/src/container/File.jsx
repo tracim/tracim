@@ -161,7 +161,9 @@ class File extends React.Component {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
             previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
-            contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`
+            lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
+            )
           }
         })
         break
@@ -400,8 +402,7 @@ class File extends React.Component {
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`,
-        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`
       },
       mode: MODE.REVISION
     }))
@@ -489,8 +490,7 @@ class File extends React.Component {
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`,
-        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`
       }
     }))
   }
@@ -600,7 +600,7 @@ class File extends React.Component {
             downloadPdfFullUrl={(({config: {apiUrl}, content, mode}) =>
               `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1`
             )(state)}
-            contentFullScreenUrl={state.content.contentFullScreenUrl}
+            lightboxUrlList={state.content.lightboxUrlList}
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}
             onClickDropzoneValidate={this.handleClickDropzoneValidate}
