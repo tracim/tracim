@@ -426,6 +426,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 status=401,
             )
             assert 'Set-Cookie' in res.headers
+
     def test_api__test_cookie_auth_token__ok__revocation_case(self):
         with freeze_time("1999-12-31 23:59:59"):
             params = {

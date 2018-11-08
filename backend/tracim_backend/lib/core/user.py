@@ -12,10 +12,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import UserAuthenticatedIsDeleted
+from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
-from tracim_backend.exceptions import \
-    NotificationDisabledCantCreateUserWithInvitation
+from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation  # nopep8
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
@@ -214,24 +215,80 @@ class UserApi(object):
         except:
             return False
 
-    def authenticate_user(self, email: str, password: str) -> User:
+    def _ldap_authenticate(self, email: str, password: str, ldap_connector: 'Connector'):
+        data = ldap_connector.authenticate(
+            email,
+            password
+        )
+        if not data:
+            raise WrongLDAPCredentials('LDAP credentials are not correct')
+
+        ldap_data = data[1]
+        try:
+            user = self.get_one_by_email(email)
+        except UserDoesNotExist:
+            # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
+            self.create_user(
+                email=ldap_data['mail'][0],
+                password=ldap_data['userpassword'][0],
+                name=ldap_data['givenname'][0],
+                do_save=True,
+                do_notify=False
+            )
+            transaction.commit()
+            # INFO - G.M - 2018-11-08 - get new created user
+            user = self.get_one_by_email(email)
+
+        if user.is_deleted:
+            raise UserDoesNotExist('This user has been deleted')  # nopep8
+
+        if not user.is_active:
+            raise UserAuthenticatedIsNotActive('This user is not activated')  # nopep8
+
+        return user.user_id
+
+    def _internal_db_authenticate(self, email: str, password: str) -> User:
+        user = self.get_one_by_email(email)
+        if not user.validate_password(password):
+            raise WrongUserPassword('User "{}" password is incorrect'.format(email))  # nopep8
+
+        if user.is_deleted:
+            raise UserDoesNotExist('This user has been deleted')  # nopep8
+
+        if not user.is_active:
+            raise UserAuthenticatedIsNotActive('This user is not activated')  # nopep8
+
+        return user
+
+    def authenticate(
+            self,
+            email: str,
+            password: str,
+            ldap_connector: 'Connector' = None
+    ) -> User:
         """
         Authenticate user with email and password, raise AuthenticationFailed
         if uncorrect.
         :param email: email of the user
         :param password: cleartext password of the user
+        :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
         try:
-            user = self.get_one_by_email(email)
-            if not user.is_active:
-                raise UserAuthenticatedIsNotActive('User "{}" is not active'.format(email))
-            if user.validate_password(password):
-                return user
+            if ldap_connector:
+                user = self._ldap_authenticate(email, password, ldap_connector)
             else:
-                raise WrongUserPassword('User "{}" password is incorrect'.format(email))  # nopep8
-        except (WrongUserPassword, UserDoesNotExist) as exc:
+                user = self._internal_db_authenticate(email, password)
+        except (
+            WrongUserPassword,
+            WrongLDAPCredentials,
+            UserDoesNotExist,
+            UserAuthenticatedIsDeleted,
+            UserAuthenticatedIsNotActive,
+        ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
+
+        return user
 
     # Actions
     def set_password(

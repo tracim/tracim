@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
+from collections import namedtuple
 from urllib.parse import urlparse
 
 import os
@@ -587,7 +588,6 @@ class CFG(object):
             )
         self.load_ldap_settings(settings)
 
-
     def load_ldap_settings(self, settings):
         """
         Will parse config file to setup new matching attribute in the instance
@@ -603,7 +603,7 @@ class CFG(object):
             param('ldap_bind_pass',             'LDAP_BIND_PASS',     'default value', None),
             param('ldap_ldap_naming_attribute', 'LDAP_NAMING_ATTR',   'default value', None),
             param('ldap_user_attributes',       'LDAP_USER_ATTR',     'default value', None),
-            param('ldap_tls',                   'LDAP_TLS',           'default value', asbool),
+            param('ldap_tls',                   'LDAP_TLS',           False, asbool),
             param('ldap_group_enabled',         'LDAP_GROUP_ENABLED', 'default value', None),
             param('ldap_user_base_dn',          'LDAP_USER_BASE_DN',  'default value', None),
             param('ldap_user_filter',           'LDAP_USER_FILTER',   'default value', None),
@@ -616,7 +616,7 @@ class CFG(object):
                 # Apply given function as a data modifier before setting value
                 setattr(self,
                         prm.cfg_name,
-                        prm.adapter( settings.get( prm.ini_name, prm.default_value) )
+                        prm.adapter(settings.get( prm.ini_name, prm.default_value) )
                         )
             else:
                 setattr(self,
