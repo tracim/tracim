@@ -18,22 +18,25 @@ TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_EMAIL_LOGIN_HEADER = "Tracim-Api-Login"
 
 
-def _get_auth_unsafe_user(
-    request: Request,
-    email: str=None,
-    user_id: int=None,
-) -> typing.Optional[User]:
-    """
-    :param request: pyramid request
-    :return: User or None
-    """
-    app_config = request.registry.settings['CFG']
-    uapi = UserApi(None, session=request.dbsession, config=app_config)
-    try:
-        _, user = uapi.find(user_id=user_id, email=email)
-        return user
-    except UserDoesNotExist:
-        return None
+class TracimAuthenticationPolicy(object):
+
+    def _get_auth_unsafe_user(
+        self,
+        request: Request,
+        email: str=None,
+        user_id: int=None,
+    ) -> typing.Optional[User]:
+        """
+        :param request: pyramid request
+        :return: User or None
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(None, session=request.dbsession, config=app_config)
+        try:
+            _, user = uapi.find(user_id=user_id, email=email)
+            return user
+        except UserDoesNotExist:
+            return None
 
 ###
 # Pyramid HTTP Basic Auth
@@ -41,7 +44,10 @@ def _get_auth_unsafe_user(
 
 
 @implementer(IAuthenticationPolicy)
-class TracimBasicAuthAuthenticationPolicy(BasicAuthAuthenticationPolicy):
+class TracimBasicAuthAuthenticationPolicy(
+    BasicAuthAuthenticationPolicy,
+    TracimAuthenticationPolicy
+):
 
     def __init__(self, realm):
         BasicAuthAuthenticationPolicy.__init__(self, check=None, realm=realm)
@@ -54,7 +60,7 @@ class TracimBasicAuthAuthenticationPolicy(BasicAuthAuthenticationPolicy):
     def authenticated_userid(self, request):
         # check if user is correct
         credentials = extract_http_basic_credentials(request)
-        user = _get_auth_unsafe_user(
+        user = self._get_auth_unsafe_user(
             request,
             email=request.unauthenticated_userid
         )
@@ -74,7 +80,10 @@ class TracimBasicAuthAuthenticationPolicy(BasicAuthAuthenticationPolicy):
 
 
 @implementer(IAuthenticationPolicy)
-class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy):
+class CookieSessionAuthentificationPolicy(
+    SessionAuthenticationPolicy,
+    TracimAuthenticationPolicy
+):
 
     def __init__(self, reissue_time: int, debug: bool = False):
         SessionAuthenticationPolicy.__init__(self, debug=debug, callback=None)
@@ -90,7 +99,7 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy):
         if not isinstance(request.unauthenticated_userid, int):
             request.session.delete()
             return None
-        user = _get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)  # nopep8
+        user = self._get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)  # nopep8
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:
             request.session.delete()
@@ -117,7 +126,10 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy):
 
 
 @implementer(IAuthenticationPolicy)
-class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy):
+class ApiTokenAuthentificationPolicy(
+    CallbackAuthenticationPolicy,
+    TracimAuthenticationPolicy,
+):
 
     def __init__(self, api_key_header: str, api_user_email_login_header: str):
         self.api_key_header = api_key_header
@@ -133,7 +145,7 @@ class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy):
         if valid_api_key != api_key:
             return None
         # check if user is correct
-        user = _get_auth_unsafe_user(request, email=request.unauthenticated_userid)
+        user = self._get_auth_unsafe_user(request, email=request.unauthenticated_userid)
         if not user or not user.is_active or user.is_deleted:
             return None
         return user.user_id
