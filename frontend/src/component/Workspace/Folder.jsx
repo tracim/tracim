@@ -1,19 +1,11 @@
 import React from 'react'
-import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-// import FileItem from './ContentItem.jsx'
-// import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 
 class Folder extends React.Component {
-  handleClickCreateContent = (e, folder, type) => {
-    e.stopPropagation() // because we have a link inside a link (togler and newFile)
-    this.props.onClickCreateContent(folder, type)
-  }
-
   render () {
     const { props } = this
 
@@ -97,8 +89,11 @@ class Folder extends React.Component {
                   onClickExtendedAction={props.onClickExtendedAction}
                   onClickFolder={props.onClickFolder}
                   onClickCreateContent={props.onClickCreateContent}
+                  contentType={props.contentType}
+                  readStatusList={props.readStatusList}
                   isLast={i === props.folderData.content.length - 1}
                   key={content.id}
+                  t={props.t}
                 />
               )
               : (
@@ -107,7 +102,7 @@ class Folder extends React.Component {
                   type={content.type}
                   faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                   statusSlug={content.statusSlug}
-                  read={false} // @TODO
+                  read={props.readStatusList.includes(content.id)}
                   contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
                   onClickItem={() => props.onClickItem(content)}
                   idRoleUserWorkspace={props.idRoleUserWorkspace}
@@ -124,7 +119,7 @@ class Folder extends React.Component {
   }
 }
 
-export default translate()(Folder)
+export default Folder
 
 Folder.propTypes = {
   folderData: PropTypes.object,

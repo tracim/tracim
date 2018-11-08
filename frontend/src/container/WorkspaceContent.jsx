@@ -329,8 +329,10 @@ class WorkspaceContent extends React.Component {
                         onClickFolder={this.handleClickFolder}
                         onClickCreateContent={this.handleClickCreateContent}
                         contentType={contentType}
+                        readStatusList={currentWorkspace.contentReadStatusList}
                         isLast={i === rootContentList.length - 1}
                         key={content.id}
+                        t={t}
                       />
                     )
                     : (

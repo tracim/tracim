@@ -106,10 +106,10 @@ class PopupCreateFolder extends React.Component {
         break
       case 400:
         switch (fetchSaveNewFolder.body.code) {
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space')); break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
     }
   }
 
