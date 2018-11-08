@@ -596,7 +596,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        user = api.authenticate_user('admin@admin.admin', 'admin@admin.admin')
+        user = api.authenticate('admin@admin.admin', 'admin@admin.admin')
         assert isinstance(user, User)
         assert user.email == 'admin@admin.admin'
 
@@ -623,7 +623,7 @@ class TestUserApi(DefaultTest):
         )
         api.disable(user)
         with pytest.raises(UserAuthenticatedIsNotActive):
-            api.authenticate_user('test@test.test', 'test@test.test')
+            api.authenticate('test@test.test', 'test@test.test')
 
     def test_unit__authenticate_user___err__wrong_password(self):
         api = UserApi(
@@ -632,7 +632,7 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('admin@admin.admin', 'wrong_password')
+            api.authenticate('admin@admin.admin', 'wrong_password')
 
     def test_unit__authenticate_user___err__wrong_user(self):
         api = UserApi(
@@ -641,7 +641,7 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('admin@admin.admin', 'wrong_password')
+            api.authenticate('admin@admin.admin', 'wrong_password')
 
     def test_unit__disable_user___ok__nominal_case(self):
         api = UserApi(
