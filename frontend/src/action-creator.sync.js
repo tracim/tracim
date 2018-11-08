@@ -39,12 +39,9 @@ export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, n
 export const USER_PASSWORD = `${USER}/Password`
 
 export const CONTENT = 'Content'
-export const CONTENT_PATH = `${CONTENT}/Path` // returns the list of content of all folders from one content path
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
-export const WORKSPACE_CONTENT_PATH = `${WORKSPACE}/${CONTENT_PATH}`
-export const setWorkspaceContentList = workspaceContentList => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList })
-export const setWorkspaceContentListPath = (contentList, contentPath) => ({ type: `${SET}/${WORKSPACE_CONTENT_PATH}`, contentList, contentPath })
+export const setWorkspaceContentList = (workspaceContentList, idFolderToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, idFolderToOpenList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
@@ -86,7 +83,6 @@ export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
 
 export const FOLDER = 'Folder'
-export const setFolderData = (idFolder, content) => ({ type: `${SET}/${WORKSPACE}/${FOLDER}/Content`, idFolder, content })
 export const toggleFolderOpen = idFolder => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, idFolder })
 
 export const APP = 'App'

@@ -22,11 +22,9 @@ import {
 import {
   getWorkspaceContentList,
   getWorkspaceMemberList,
-  getFolderContent,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
-  getMyselfWorkspaceReadStatusList,
-  getContent
+  getMyselfWorkspaceReadStatusList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -35,8 +33,6 @@ import {
   setWorkspaceContentDeleted,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
-  setFolderData,
-  setWorkspaceContentListPath,
   toggleFolderOpen
 } from '../action-creator.sync.js'
 
@@ -106,8 +102,6 @@ class WorkspaceContent extends React.Component {
       this.setState({workspaceIdInUrl: idWorkspace})
       this.loadContentList(idWorkspace)
     }
-
-    // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getMyselfWorkspaceList(user.user_id, idWorkspace))
   }
 
   componentWillUnmount () {
@@ -115,36 +109,30 @@ class WorkspaceContent extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  getIdFolderToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
+
   loadContentList = async idWorkspace => {
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
-    const wsContent = await props.dispatch(getWorkspaceContentList(idWorkspace, 0))
+    const idFolderInUrl = [0, ...this.getIdFolderToOpenInUrl(props.location.search)] // add 0 to get workspace's root
+
+    const fetchContentList = await Promise.all(
+      idFolderInUrl.map(id => props.dispatch(getWorkspaceContentList(idWorkspace, id)))
+    )
+
+    const fullContentList = fetchContentList.reduce((acc, fetchFolder) => {
+      if (fetchFolder.status !== 200) {
+        console.log(`Failed to load folder content. Requested: ${fetchFolder.url}`)
+        return acc
+      }
+      return [...acc, ...fetchFolder.json]
+    }, [])
+
+    props.dispatch(setWorkspaceContentList(fullContentList, idFolderInUrl))
+
     const wsMember = await props.dispatch(getWorkspaceMemberList(idWorkspace))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(idWorkspace))
-
-    switch (wsContent.status) {
-      case 200:
-        if (
-          !props.match.params.idcts ||
-          !props.match.params.type || // exists idcts + type exists, it means there is a content to open
-          wsContent.json.find(c => c.content_id === parseInt(props.match.params.idcts)) // means content to open is in workspace's root folder, so need additional fetch
-        ) {
-          props.dispatch(setWorkspaceContentList(wsContent.json))
-          break
-        }
-
-        const contentData = await props.dispatch(getContent(idWorkspace, props.match.params.idcts, props.match.params.type))
-        if (contentData.status !== 200) break
-
-        const contentPathList = await props.dispatch(getWorkspaceContentList(idWorkspace, contentData.json.parent_id))
-        if (contentPathList.status !== 200) break
-
-        props.dispatch(setWorkspaceContentListPath(wsContent.json, contentPathList.json))
-        break
-      case 401: break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading workspace', 'danger')))
-    }
 
     switch (wsMember.status) {
       case 200: props.dispatch(setWorkspaceMemberList(wsMember.json)); break
@@ -214,9 +202,7 @@ class WorkspaceContent extends React.Component {
   handleClickFolder = async idFolder => {
     const { props, state } = this
 
-    // props.dispatch(toggleFolderOpen(idFolder))
-
-    const folderListInUrl = (qs.parse(props.location.search).folder_open || '').split(',').filter(str => str !== '')
+    const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
 
     const newFolderOpenList = props.workspaceContentList.find(c => c.id === idFolder).isOpen
       ? folderListInUrl.filter(id => id !== idFolder)
@@ -227,6 +213,7 @@ class WorkspaceContent extends React.Component {
       folder_open: newFolderOpenList.join(',')
     }
 
+    props.dispatch(toggleFolderOpen(idFolder))
     props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
   }
 
@@ -268,6 +255,8 @@ class WorkspaceContent extends React.Component {
     const filteredWorkspaceContentList = workspaceContentList.length > 0
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
+
+    const rootContentList = filteredWorkspaceContentList.filter(c => c.idParent === null)
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
@@ -320,13 +309,13 @@ class WorkspaceContent extends React.Component {
                       {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
                     </div>
                   )
-                  : filteredWorkspaceContentList.map((content, i) => content.type === 'folder'
+                  : rootContentList.map((content, i) => content.type === 'folder'
                     ? (
                       <Folder
                         availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
                         folderData={{
                           ...content,
-                          content: workspaceContentList.filter(cc => cc.idParent === content.id)
+                          content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
                         }}
                         onClickItem={this.handleClickContentItem}
                         idRoleUserWorkspace={idRoleUserWorkspace}
@@ -340,7 +329,7 @@ class WorkspaceContent extends React.Component {
                         onClickFolder={this.handleClickFolder}
                         onClickCreateContent={this.handleClickCreateContent}
                         contentType={contentType}
-                        isLast={i === filteredWorkspaceContentList.length - 1}
+                        isLast={i === rootContentList.length - 1}
                         key={content.id}
                       />
                     )
@@ -361,7 +350,7 @@ class WorkspaceContent extends React.Component {
                           archive: e => this.handleClickArchiveContentItem(e, content),
                           delete: e => this.handleClickDeleteContentItem(e, content)
                         }}
-                        isLast={i === filteredWorkspaceContentList.length - 1}
+                        isLast={i === rootContentList.length - 1}
                         key={content.id}
                       />
                     )

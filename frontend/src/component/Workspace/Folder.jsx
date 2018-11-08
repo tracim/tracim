@@ -82,39 +82,42 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {props.folderData.content.map((c, i) => c.type === 'folder'
-            ? (
-              <Folder
-                availableApp={props.availableApp}
-                folderData={{
-                  ...c,
-                  content: [] // @TODO
-                }}
-                onClickItem={props.onClickItem}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
-                onClickExtendedAction={props.onClickExtendedAction}
-                onClickFolder={props.onClickFolder}
-                onClickCreateContent={props.onClickCreateContent}
-                isLast={i === props.folderData.content.length - 1}
-                key={c.id}
-              />
+          {props.folderData.content
+            .filter(c => c.idParent === props.folderData.id)
+            .map((content, i) => content.type === 'folder'
+              ? (
+                <Folder
+                  availableApp={props.availableApp}
+                  folderData={{
+                    ...content,
+                    content: props.folderData.content.filter(c => c.idParent !== props.folderData.id)
+                  }}
+                  onClickItem={props.onClickItem}
+                  idRoleUserWorkspace={props.idRoleUserWorkspace}
+                  onClickExtendedAction={props.onClickExtendedAction}
+                  onClickFolder={props.onClickFolder}
+                  onClickCreateContent={props.onClickCreateContent}
+                  isLast={i === props.folderData.content.length - 1}
+                  key={content.id}
+                />
+              )
+              : (
+                <ContentItem
+                  label={content.label}
+                  type={content.type}
+                  faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                  statusSlug={content.statusSlug}
+                  read={false} // @TODO
+                  contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
+                  onClickItem={() => props.onClickItem(content)}
+                  idRoleUserWorkspace={props.idRoleUserWorkspace}
+                  onClickExtendedAction={props.onClickExtendedAction}
+                  isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
+                  key={content.id}
+                />
+              )
             )
-            : (
-              <ContentItem
-                label={c.label}
-                type={c.type}
-                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === c.type).faIcon : ''}
-                statusSlug={c.statusSlug}
-                read={false} // @TODO
-                contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === c.type) : null}
-                onClickItem={() => props.onClickItem(c)}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
-                onClickExtendedAction={props.onClickExtendedAction}
-                isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
-                key={c.id}
-              />
-            )
-          )}
+          }
         </div>
       </div>
     )
