@@ -622,7 +622,7 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
         api.disable(user)
-        with pytest.raises(UserAuthenticatedIsNotActive):
+        with pytest.raises(AuthenticationFailed):
             api.authenticate('test@test.test', 'test@test.test')
 
     def test_unit__authenticate_user___err__wrong_password(self):
