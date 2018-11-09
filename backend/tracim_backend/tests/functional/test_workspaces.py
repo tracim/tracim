@@ -3715,7 +3715,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'parent_ids': None,
+            'parent_id': None,
             'label': 'GenericCreatedContent',
             'content_type': 'html-document',
         }
@@ -3820,7 +3820,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'parent_ids': 0,
+            'parent_id': 0,
             'label': 'GenericCreatedContent',
             'content_type': content_type_list.Page.slug
         }
@@ -3846,7 +3846,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'parent_ids': 1000,
+            'parent_id': 1000,
             'label': 'GenericCreatedContent',
             'content_type': content_type_list.Page.slug,
         }
@@ -3996,7 +3996,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'label': 'GenericCreatedContent',
             'content_type': content_type_list.Page.slug,
-            'parent_ids': folder.content_id
+            'parent_id': folder.content_id
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
