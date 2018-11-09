@@ -222,15 +222,14 @@ class UserApi(object):
         )
         if not data:
             raise WrongLDAPCredentials('LDAP credentials are not correct')
-
         ldap_data = data[1]
         try:
             user = self.get_one_by_email(email)
         except UserDoesNotExist:
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
             self.create_user(
-                email=ldap_data['mail'][0],
-                password=ldap_data['userpassword'][0],
+                email=email,
+                password=password,
                 name=ldap_data['givenname'][0],
                 do_save=True,
                 do_notify=False
@@ -245,7 +244,7 @@ class UserApi(object):
         if not user.is_active:
             raise UserAuthenticatedIsNotActive('This user is not activated')  # nopep8
 
-        return user.user_id
+        return user
 
     def _internal_db_authenticate(self, email: str, password: str) -> User:
         user = self.get_one_by_email(email)
