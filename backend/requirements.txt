@@ -39,7 +39,7 @@ pillow==5.3.0             # via pdf2image, preview-generator
 plaster-pastedeploy==0.6
 plaster==1.0              # via plaster-pastedeploy, pyramid
 prettytable==0.7.2        # via cliff
-preview-generator==0.7
+preview-generator==0.8
 pyexifinfo==0.4.0         # via preview-generator
 pygments==2.2.0           # via pyramid-debugtoolbar
 pyparsing==2.3.0          # via cliff, packaging
