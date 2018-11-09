@@ -1,5 +1,6 @@
 import {
   SET,
+  ADD,
   TOGGLE,
   WORKSPACE,
   WORKSPACE_CONTENT,
@@ -30,6 +31,15 @@ export default function workspaceContentList (state = [], action) {
         ...serializeContent(c),
         isOpen: action.idFolderToOpenList.includes(c.content_id)
       }))
+
+    case `${ADD}/${WORKSPACE_CONTENT}`:
+      return [
+        ...state,
+        ...action.workspaceContentList.map(c => ({
+          ...serializeContent(c),
+          isOpen: true
+        }))
+      ]
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
       return state.map(c => c.id === action.idFolder ? {...c, isOpen: !c.isOpen} : c)

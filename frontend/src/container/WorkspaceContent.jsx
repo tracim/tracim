@@ -29,12 +29,14 @@ import {
 import {
   newFlashMessage,
   setWorkspaceContentList,
+  addWorkspaceContentList,
   setWorkspaceContentArchived,
   setWorkspaceContentDeleted,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen
 } from '../action-creator.sync.js'
+import uniq from 'lodash/uniq'
 
 const qs = require('query-string')
 
@@ -42,7 +44,7 @@ class WorkspaceContent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
+      idWorkspaceInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       appOpenedType: false,
       contentLoaded: false
     }
@@ -55,7 +57,7 @@ class WorkspaceContent extends React.Component {
     switch (type) {
       case 'refreshContentList':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        this.loadContentList(state.workspaceIdInUrl)
+        this.loadContentList(state.idWorkspaceInUrl)
         break
 
       case 'openContentUrl':
@@ -65,8 +67,8 @@ class WorkspaceContent extends React.Component {
 
       case 'appClosed':
       case 'hide_popupCreateContent':
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
-        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + props.location.search)
+        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.idWorkspaceInUrl)
+        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + props.location.search)
         this.setState({appOpenedType: false})
         break
     }
@@ -90,7 +92,7 @@ class WorkspaceContent extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838')
 
-    if (this.state.workspaceIdInUrl === null) return
+    if (this.state.idWorkspaceInUrl === null) return
 
     const idWorkspace = parseInt(this.props.match.params.idws)
     if (isNaN(idWorkspace)) return
@@ -98,8 +100,8 @@ class WorkspaceContent extends React.Component {
     const prevFilter = qs.parse(prevProps.location.search).type
     const currentFilter = qs.parse(this.props.location.search).type
 
-    if (prevState.workspaceIdInUrl !== idWorkspace || prevFilter !== currentFilter) {
-      this.setState({workspaceIdInUrl: idWorkspace})
+    if (prevState.idWorkspaceInUrl !== idWorkspace || prevFilter !== currentFilter) {
+      this.setState({idWorkspaceInUrl: idWorkspace})
       this.loadContentList(idWorkspace)
     }
   }
@@ -178,7 +180,7 @@ class WorkspaceContent extends React.Component {
     switch (fetchPutContentArchived.status) {
       case 204:
         props.dispatch(setWorkspaceContentArchived(content.idWorkspace, content.id))
-        this.loadContentList(state.workspaceIdInUrl)
+        this.loadContentList(state.idWorkspaceInUrl)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while archiving document')))
     }
@@ -193,7 +195,7 @@ class WorkspaceContent extends React.Component {
     switch (fetchPutContentDeleted.status) {
       case 204:
         props.dispatch(setWorkspaceContentDeleted(content.idWorkspace, content.id))
-        this.loadContentList(state.workspaceIdInUrl)
+        this.loadContentList(state.idWorkspaceInUrl)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while deleting document')))
     }
@@ -206,7 +208,7 @@ class WorkspaceContent extends React.Component {
 
     const newFolderOpenList = props.workspaceContentList.find(c => c.id === idFolder).isOpen
       ? folderListInUrl.filter(id => id !== idFolder)
-      : [...folderListInUrl, idFolder]
+      : uniq([...folderListInUrl, idFolder])
 
     const newUrlSearch = {
       ...qs.parse(props.location.search),
@@ -214,12 +216,17 @@ class WorkspaceContent extends React.Component {
     }
 
     props.dispatch(toggleFolderOpen(idFolder))
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
+
+    if (!props.workspaceContentList.some(c => c.idParent === idFolder)) {
+      const fetchContentList = await props.dispatch(getWorkspaceContentList(state.idWorkspaceInUrl, idFolder))
+      if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
+    }
   }
 
   handleClickCreateContent = (e, idFolder, contentType) => {
     e.stopPropagation()
-    this.props.history.push(`${PAGE.WORKSPACE.NEW(this.state.workspaceIdInUrl, contentType)}?parent_id=${idFolder}`)
+    this.props.history.push(`${PAGE.WORKSPACE.NEW(this.state.idWorkspaceInUrl, contentType)}?parent_id=${idFolder}`)
   }
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
@@ -266,7 +273,7 @@ class WorkspaceContent extends React.Component {
           {state.contentLoaded &&
             <OpenContentApp
               // automatically open the app for the idContent in url
-              idWorkspace={state.workspaceIdInUrl}
+              idWorkspace={state.idWorkspaceInUrl}
               appOpenedType={state.appOpenedType}
               updateAppOpenedType={this.handleUpdateAppOpenedType}
             />
@@ -276,7 +283,7 @@ class WorkspaceContent extends React.Component {
             <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
               <OpenCreateContentApp
                 // automatically open the popup create content of the app in url
-                idWorkspace={state.workspaceIdInUrl}
+                idWorkspace={state.idWorkspaceInUrl}
                 appOpenedType={state.appOpenedType}
               />
             } />
