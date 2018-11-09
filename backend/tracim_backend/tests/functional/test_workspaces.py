@@ -2893,6 +2893,90 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['modified']
         assert content['created']
 
+    def test_api__get_workspace_content__ok_200__get_all_root_and_folder_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        params = {
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/contents?parent_id=0&parent_id=3',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/contents?parent_id=0&parent_id=3',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 7
+        assert [content for content in res if content['label'] == 'Desserts'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] is None
+                and content['content_id'] == 3
+                ]
+        assert [content for content in res if content['label'] == 'Fruits Desserts'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 3
+                ]
+
+    def test_api__get_workspace_content__ok_200__get_multiple_folder_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        content_id = res.json_body['content_id']
+        params = {
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents?parent_id=1&parent_id=2',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 2
+        assert [content for content in res if content['label'] == 'Current Menu'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 2
+                and content['content_id'] == 11
+                ]
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == content_id
+                ]
+
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
         Check obtain workspace all root contents

@@ -496,15 +496,17 @@ class PageQuerySchema(FileQuerySchema):
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-    parent_id = marshmallow.fields.Int(
-        example=2,
-        default=0,
-        description='allow to filter items in a folder.'
-                    ' If not set, then return all contents.'
-                    ' If set to 0, then return root contents.'
-                    ' If set to another value, return all contents'
-                    ' directly included in the folder parent_id',
-        validate=Range(min=0, error="Value must be positive or 0"),
+    parent_id = marshmallow.fields.List(
+        marshmallow.fields.Int(
+            example=2,
+            default=0,
+            description='allow to filter items in a folder.'
+                        ' If not set, then return all contents.'
+                        ' If set to 0, then return root contents.'
+                        ' If set to another value, return all contents'
+                        ' directly included in the folder parent_id',
+            validate=Range(min=0, error="Value must be positive or 0"),
+        )
     )
     show_archived = marshmallow.fields.Int(
         example=0,

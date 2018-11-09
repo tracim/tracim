@@ -1053,7 +1053,7 @@ class ContentApi(object):
 
     def _get_all_query(
         self,
-        parent_id: int = None,
+        parent_ids: typing.List[int] = None,
         content_type_slug: str = content_type_list.Any_SLUG,
         workspace: Workspace = None,
         label:str = None,
@@ -1061,7 +1061,7 @@ class ContentApi(object):
     ) -> Query:
         """
         Extended filter for better "get all data" query
-        :param parent_id: filter by parent_id
+        :param parent_ids: filter by parent_ids
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of
@@ -1070,7 +1070,7 @@ class ContentApi(object):
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
-        assert parent_id is None or isinstance(parent_id, int)
+        assert not parent_ids or isinstance(parent_ids, list)
         assert content_type_slug is not None
         resultset = self._base_query(workspace)
 
@@ -1083,10 +1083,23 @@ class ContentApi(object):
                 all_slug_alias.extend(content_type_object.slug_alias)
             resultset = resultset.filter(Content.type.in_(all_slug_alias))
 
-        if parent_id:
-            resultset = resultset.filter(Content.parent_id==parent_id)
-        if parent_id == 0 or parent_id is False:
+        if parent_ids is False:
             resultset = resultset.filter(Content.parent_id == None)
+
+        if parent_ids:
+            # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
+            # case properly
+            allowed_parent_id = []
+            allow_root = False
+            for parent_id in parent_ids:
+                if parent_id == 0:
+                    allow_root = True
+                else:
+                    allowed_parent_id.append(parent_id)
+            if allow_root:
+                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_id), Content.parent_id == None))  # nopep8
+            else:
+                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_id))  # nopep8
         if label:
             resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
 
@@ -1097,7 +1110,7 @@ class ContentApi(object):
 
     def get_all(
             self,
-            parent_id: int=None,
+            parent_ids: typing.List[int]=None,
             content_type: str=content_type_list.Any_SLUG,
             workspace: Workspace=None,
             label: str=None,
@@ -1105,7 +1118,7 @@ class ContentApi(object):
     ) -> typing.List[Content]:
         """
         Return all content using some filters
-        :param parent_id: filter by parent_id
+        :param parent_ids: filter by parent_id
         :param content_type: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of
@@ -1114,7 +1127,7 @@ class ContentApi(object):
         :return: List of contents
         """
         order_by_properties = order_by_properties or []  # FDV
-        return self._get_all_query(parent_id, content_type, workspace, label, order_by_properties).all()
+        return self._get_all_query(parent_ids, content_type, workspace, label, order_by_properties).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:

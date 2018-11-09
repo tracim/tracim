@@ -449,7 +449,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.input_query(FilterContentQuerySchema())
+    @hapic.input_query(FilterContentQuerySchema(), as_list=['parent_id'])
     @hapic.output_body(ContentDigestSchema(many=True))
     def workspace_content(
             self,
@@ -474,7 +474,7 @@ class WorkspaceController(Controller):
             show_active=content_filter.show_active,
         )
         contents = api.get_all(
-            parent_id=content_filter.parent_id,
+            parent_ids=content_filter.parent_id,
             workspace=request.current_workspace,
             content_type=content_filter.content_type or content_type_list.Any_SLUG,
             label=content_filter.label,
