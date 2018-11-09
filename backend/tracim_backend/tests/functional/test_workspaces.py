@@ -2898,6 +2898,7 @@ class TestWorkspaceContents(FunctionalTest):
         Check obtain workspace all root contents and all subcontent content
         """
         params = {
+            'parent_ids': '0,3',
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
@@ -2910,12 +2911,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/2/contents?parent_id=0&parent_id=3',
-            status=200,
-            params=params,
-        ).json_body  # nopep8
-        res = self.testapp.get(
-            '/api/v2/workspaces/2/contents?parent_id=0&parent_id=3',
+            '/api/v2/workspaces/2/contents',
             status=200,
             params=params,
         ).json_body  # nopep8
@@ -2954,12 +2950,13 @@ class TestWorkspaceContents(FunctionalTest):
         )
         content_id = res.json_body['content_id']
         params = {
+            'parent_ids': '1,2',
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
         }
         res = self.testapp.get(
-            '/api/v2/workspaces/1/contents?parent_id=1&parent_id=2',
+            '/api/v2/workspaces/1/contents',
             status=200,
             params=params,
         ).json_body  # nopep8
@@ -3343,7 +3340,7 @@ class TestWorkspaceContents(FunctionalTest):
         transaction.commit()
         # test-itself
         params = {
-            'parent_id': 1,
+            'parent_ids': 1,
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
@@ -3397,7 +3394,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder all contents
          """
         params = {
-            'parent_id': 10,  # TODO - G.M - 30-05-2018 - Find a real id
+            'parent_ids': 10,  # TODO - G.M - 30-05-2018 - Find a real id
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
@@ -3464,7 +3461,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder active contents
          """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3502,7 +3499,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder archived contents
          """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 1,
             'show_deleted': 0,
             'show_active': 0,
@@ -3540,7 +3537,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder deleted contents
          """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 1,
             'show_active': 0,
@@ -3580,7 +3577,7 @@ class TestWorkspaceContents(FunctionalTest):
         (archived, deleted, active) result should be empty list.
         """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 0,
@@ -3696,7 +3693,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['file_extension'] == '.document.html'
         assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         params_active = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3718,7 +3715,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'parent_id': None,
+            'parent_ids': None,
             'label': 'GenericCreatedContent',
             'content_type': 'html-document',
         }
@@ -3744,7 +3741,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3801,7 +3798,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3823,7 +3820,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'label': 'GenericCreatedContent',
             'content_type': content_type_list.Page.slug
         }
@@ -3849,7 +3846,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'parent_id': 1000,
+            'parent_ids': 1000,
             'label': 'GenericCreatedContent',
             'content_type': content_type_list.Page.slug,
         }
@@ -3900,7 +3897,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3999,7 +3996,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'label': 'GenericCreatedContent',
             'content_type': content_type_list.Page.slug,
-            'parent_id': folder.content_id
+            'parent_ids': folder.content_id
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
@@ -4013,7 +4010,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'label': 'GenericCreatedContent',
             'content_type': 'folder',
-            'parent_id': folder.content_id
+            'parent_ids': folder.content_id
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
@@ -4040,13 +4037,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '2',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 4,
+            'parent_ids': 4,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4089,13 +4086,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': 2,
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4138,13 +4135,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '2',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 4,
+            'parent_ids': 4,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4187,13 +4184,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '1',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 2,
+            'parent_ids': 2,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4236,13 +4233,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '1',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4286,13 +4283,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '1',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 4,
+            'parent_ids': 4,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4317,13 +4314,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_deleted = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 1,
             'show_active': 0,
@@ -4356,13 +4353,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_archived = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 1,
             'show_deleted': 0,
             'show_active': 0,
@@ -4393,13 +4390,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_deleted = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 1,
             'show_active': 0,
@@ -4430,13 +4427,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_archived = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 1,
             'show_deleted': 0,
             'show_active': 0,

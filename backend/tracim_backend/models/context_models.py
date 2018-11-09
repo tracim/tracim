@@ -14,6 +14,7 @@ from tracim_backend.config import PreviewDim
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import password_generator
@@ -306,13 +307,12 @@ class KnownMemberQuery(object):
     def __init__(
             self,
             acp: str,
-            exclude_user_ids: typing.List[int] = None,
-            exclude_workspace_ids: typing.List[int] = None
+            exclude_user_ids: str = None,
+            exclude_workspace_ids: str = None
     ) -> None:
         self.acp = acp
-        self.exclude_user_ids = exclude_user_ids or []  # DFV
-        self.exclude_workspace_ids = exclude_workspace_ids or []  # DFV
-
+        self.exclude_user_ids = string_to_list(exclude_user_ids, ',', int)
+        self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ',', int)  # nopep8
 
 
 class FileQuery(object):
@@ -346,7 +346,7 @@ class ContentFilter(object):
     def __init__(
             self,
             workspace_id: int = None,
-            parent_id: int = None,
+            parent_ids: str = None,
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
@@ -355,7 +355,7 @@ class ContentFilter(object):
             offset: int = None,
             limit: int = None,
     ) -> None:
-        self.parent_id = parent_id
+        self.parent_ids = string_to_list(parent_ids, ',', int)
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
@@ -379,9 +379,9 @@ class ActiveContentFilter(object):
 class ContentIdsQuery(object):
     def __init__(
             self,
-            contents_ids: typing.List[int] = None,
+            content_ids: str = None,
     ) -> None:
-        self.contents_ids = contents_ids
+        self.content_ids = string_to_list(content_ids, ',', int)
 
 
 class RoleUpdate(object):

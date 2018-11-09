@@ -96,7 +96,7 @@ class AccountController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
     @require_profile(Group.TIM_USER)
-    @hapic.input_query(KnownMemberQuerySchema(), as_list=['exclude_user_ids', 'exclude_workspace_ids'])  # nopep8
+    @hapic.input_query(KnownMemberQuerySchema())
     @hapic.output_body(UserDigestSchema(many=True))
     def account_known_members(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -232,7 +232,7 @@ class AccountController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_CONTENT_ENDPOINTS])
     @require_profile(Group.TIM_USER)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.input_query(ContentIdsQuerySchema(), as_list=['contents_ids'])
+    @hapic.input_query(ContentIdsQuerySchema())
     @hapic.output_body(ReadStatusSchema(many=True))  # nopep8
     def account_contents_read_status(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -257,7 +257,7 @@ class AccountController(Controller):
             workspace=workspace,
             limit=None,
             before_content=None,
-            content_ids=hapic_data.query.contents_ids or None
+            content_ids=hapic_data.query.content_ids or None
         )
         return [
             api.get_content_in_context(content)
