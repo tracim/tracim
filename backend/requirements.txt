@@ -24,7 +24,7 @@ hupper==1.4               # via pyramid
 imapclient==2.1.0
 jinja2==2.10              # via pyramid-jinja2
 jsmin==2.2.2              # via wsgidav
-ldappool==2.3.1           # via pyramid-ldap
+ldap3==2.5.1              # via pyramid-ldap3
 lxml==4.2.5
 mako==1.0.7
 markdown==3.0.1
@@ -41,8 +41,7 @@ plaster-pastedeploy==0.6
 plaster==1.0              # via plaster-pastedeploy, pyramid
 prettytable==0.7.2        # via cliff
 preview-generator==0.7
-pyasn1-modules==0.2.2     # via python-ldap
-pyasn1==0.4.4             # via pyasn1-modules, python-ldap
+pyasn1==0.4.4             # via ldap3
 pyexifinfo==0.4.0         # via preview-generator
 pygments==2.2.0           # via pyramid-debugtoolbar
 pyparsing==2.3.0          # via cliff, packaging
@@ -51,7 +50,7 @@ pyperclip==1.7.0          # via cmd2
 pyramid-beaker==0.8
 pyramid-debugtoolbar==4.5
 pyramid-jinja2==2.7
-pyramid-ldap==0.3.1.post1
+pyramid-ldap3==0.4
 pyramid-mako==1.0.2
 pyramid-multiauth==0.9.0
 pyramid-retry==1.0
@@ -59,7 +58,6 @@ pyramid-tm==2.2.1
 pyramid==1.10.1
 python-dateutil==2.7.5    # via alembic
 python-editor==1.0.3      # via alembic
-python-ldap==3.1.0        # via ldappool, pyramid-ldap
 python-magic==0.4.15      # via preview-generator
 python-slugify==1.2.6
 pytz==2018.7              # via babel
@@ -67,7 +65,7 @@ pyyaml==3.13
 redis==2.10.6
 repoze.lru==0.7           # via pyramid-debugtoolbar
 rq==0.12.0
-six==1.11.0               # via cliff, imapclient, packaging, pyramid-ldap, python-dateutil, stevedore
+six==1.11.0               # via cliff, imapclient, packaging, python-dateutil, stevedore
 sqlalchemy==1.2.13
 stevedore==1.30.0         # via cliff
 transaction==2.4.0

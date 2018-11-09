@@ -1,7 +1,7 @@
 import datetime
 import typing
 
-from pyramid_ldap import get_ldap_connector
+from pyramid_ldap3 import get_ldap_connector
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationPolicy

@@ -82,24 +82,27 @@ def web(global_config, **local_settings):
 
     # Hack for ldap
     if app_config.AUTH_TYPE == 'ldap':
-        import ldap
-        configurator.include('pyramid_ldap')
+        import ldap3
+        configurator.include('pyramid_ldap3')
+        #from ldap3.utils.log import set_library_log_detail_level,set_library_log_activation_level, BASIC, EXTENDED
+        #set_library_log_detail_level(BASIC)
         configurator.ldap_setup(
             app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN,
-            passwd=app_config.LDAP_BIND_PASS
+            passwd=app_config.LDAP_BIND_PASS,
+            use_tls=app_config.LDAP_TLS,
         )
         configurator.ldap_set_login_query(
             base_dn=app_config.LDAP_USER_BASE_DN,
             filter_tmpl='(mail=%(login)s)',
-            scope=ldap.SCOPE_ONELEVEL,
+            scope=ldap3.LEVEL,
+            attributes=ldap3.ALL_ATTRIBUTES
         )
-        configurator.ldap_set_groups_query(
-            base_dn=app_config.LDAP_GROUP_BASE_DN,
-            filter_tmpl=app_config.LDAP_GROUP_FILTER,
-            scope=ldap.SCOPE_SUBTREE,
-            cache_period=600,
-        )
+    #        configurator.ldap_set_groups_query(
+    #            base_dn=app_config.LDAP_GROUP_BASE_DN,
+    #            filter_tmpl=app_config.LDAP_GROUP_FILTER,
+    #            scope=ldap3.SCOPE_SUBTREE,
+    #            cache_period=600,
 
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
