@@ -96,7 +96,7 @@ export class PreviewComponent extends React.Component {
 
           <div
             className='previewcomponent__slider__fileimg'
-            onClick={this.handleClickShowImageRaw}
+            onClick={props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
             {props.isJpegAvailable
               ? (
@@ -112,16 +112,18 @@ export class PreviewComponent extends React.Component {
               )
             }
 
-            <Lightbox
-              isOpen={state.displayLightbox}
-              images={(props.lightboxUrlList || []).map(url => ({src: url}))}
-              currentImage={props.fileCurrentPage - 1}
-              onClose={() => this.setState({displayLightbox: false})}
-              onClickPrev={props.onClickPreviousPage}
-              onClickNext={props.onClickNextPage}
-              showImageCount
-              imageCountSeparator={props.t(' of ')}
-            />
+            {props.isJpegAvailable && (
+              <Lightbox
+                isOpen={state.displayLightbox}
+                images={(props.lightboxUrlList || []).map(url => ({src: url}))}
+                currentImage={props.fileCurrentPage - 1}
+                onClose={() => this.setState({displayLightbox: false})}
+                onClickPrev={props.onClickPreviousPage}
+                onClickNext={props.onClickNextPage}
+                showImageCount
+                imageCountSeparator={props.t(' of ')}
+              />
+            )}
           </div>
 
           {props.filePageNb > 1 && (
