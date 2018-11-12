@@ -346,6 +346,7 @@ class ContentFilter(object):
     def __init__(
             self,
             workspace_id: int = None,
+            complete_path_to_id: int = None,
             parent_ids: str = None,
             show_archived: int = 0,
             show_deleted: int = 0,
@@ -356,6 +357,7 @@ class ContentFilter(object):
             limit: int = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ',', int)
+        self.complete_path_to_id = complete_path_to_id
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)

@@ -507,7 +507,12 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     'return mix of all content of all theses parent_ids',
         default='0',
     )
-
+    complete_path_to_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+        default=None,
+        allow_none=True,
+    )
     show_archived = marshmallow.fields.Int(
         example=0,
         default=0,
