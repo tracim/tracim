@@ -148,7 +148,7 @@ class File extends React.Component {
     }
   })
 
-  loadContent = async () => {
+  loadContent = async (pageToLoad = null) => {
     const { content, config, fileCurrentPage } = this.state
 
     const fetchResultFile = await handleFetchResult(await getFileContent(config.apiUrl, content.workspace_id, content.content_id))
@@ -156,11 +156,12 @@ class File extends React.Component {
     switch (fetchResultFile.apiResponse.status) {
       case 200:
         const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
+        const pageForPreview = pageToLoad ? pageToLoad : fileCurrentPage
         this.setState({
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}`,
             lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
@@ -413,11 +414,11 @@ class File extends React.Component {
   }
 
   handleClickLastVersion = () => {
-    this.loadContent()
     this.setState({
       fileCurrentPage: 1,
       mode: MODE.VIEW
     })
+    this.loadContent(1)
   }
 
   handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
@@ -466,7 +467,7 @@ class File extends React.Component {
               newFilePreview: null,
               fileCurrentPage: 1
             })
-            this.loadContent()
+            this.loadContent(1)
             this.loadTimeline()
             break
           case 400:
