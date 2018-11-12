@@ -95,7 +95,7 @@ export class PreviewComponent extends React.Component {
           )}
 
           <div
-            className='previewcomponent__slider__fileimg'
+            className={classnames('previewcomponent__slider__fileimg', {'previewAvailable': props.isJpegAvailable})}
             onClick={props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
             {props.isJpegAvailable
