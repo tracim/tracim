@@ -1583,7 +1583,7 @@ class ContentApi(object):
                 file_path,
                 file_ext=file_extension
             )
-        except UnsupportedMimeType:
+        except Exception:
             return None
         return nb_pages
 
@@ -1594,7 +1594,7 @@ class ContentApi(object):
                 file_path,
                 file_ext=file_extension
             )
-        except UnsupportedMimeType:
+        except Exception:
             has_preview = False
         return has_preview
 
@@ -1605,7 +1605,7 @@ class ContentApi(object):
                 file_path,
                 file_ext=file_extension
             )
-        except UnsupportedMimeType:
+        except Exception:
             has_preview = False
         return has_preview
 
