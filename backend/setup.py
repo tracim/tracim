@@ -35,7 +35,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator>=0.6',
+    'preview-generator>=0.7',
     'colour',
     # mail-notifier
     'mako',
@@ -47,6 +47,7 @@ requires = [
     'email_reply_parser',
     'filelock',
     'imapclient',
+    'beautifulsoup4',
     # auth
     'pyramid_multiauth',
     'beaker',

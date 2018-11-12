@@ -1053,15 +1053,16 @@ class ContentApi(object):
 
     def _get_all_query(
         self,
-        parent_id: int = None,
+        parent_ids: typing.List[int] = None,
         content_type_slug: str = content_type_list.Any_SLUG,
         workspace: Workspace = None,
-        label:str = None,
+        label: str = None,
         order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
+        complete_path_to_id: int = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
-        :param parent_id: filter by parent_id
+        :param parent_ids: filter by parent_ids
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of
@@ -1070,9 +1071,23 @@ class ContentApi(object):
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
-        assert parent_id is None or isinstance(parent_id, int)
+        assert not parent_ids or isinstance(parent_ids, list)
         assert content_type_slug is not None
+        assert not complete_path_to_id or isinstance(complete_path_to_id, int)
         resultset = self._base_query(workspace)
+
+        # INFO - G.M - 2018-11-12 - Get list of all ancestror
+        #  of content, workspace root included
+        if complete_path_to_id:
+            content = self.get_one(complete_path_to_id, content_type_list.Any_SLUG)
+            if content.parent_id:
+                content = content.parent
+                while content.parent_id:
+                    parent_ids.append(content.content_id)
+                    content = content.parent
+                parent_ids.append(content.content_id)
+                # TODO - G.M - 2018-11-12 - add workspace root to parent_id list
+                parent_ids.append(0)
 
         if content_type_slug != content_type_list.Any_SLUG:
             # INFO - G.M - 2018-07-05 - convert with
@@ -1083,10 +1098,23 @@ class ContentApi(object):
                 all_slug_alias.extend(content_type_object.slug_alias)
             resultset = resultset.filter(Content.type.in_(all_slug_alias))
 
-        if parent_id:
-            resultset = resultset.filter(Content.parent_id==parent_id)
-        if parent_id == 0 or parent_id is False:
+        if parent_ids is False:
             resultset = resultset.filter(Content.parent_id == None)
+
+        if parent_ids:
+            # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
+            # case properly
+            allowed_parent_id = []
+            allow_root = False
+            for parent_id in parent_ids:
+                if parent_id == 0:
+                    allow_root = True
+                else:
+                    allowed_parent_id.append(parent_id)
+            if allow_root:
+                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_id), Content.parent_id == None))  # nopep8
+            else:
+                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_id))  # nopep8
         if label:
             resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
 
@@ -1097,15 +1125,17 @@ class ContentApi(object):
 
     def get_all(
             self,
-            parent_id: int=None,
+            parent_ids: typing.List[int]=None,
             content_type: str=content_type_list.Any_SLUG,
             workspace: Workspace=None,
             label: str=None,
             order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
+            complete_path_to_id: int = None,
     ) -> typing.List[Content]:
         """
         Return all content using some filters
-        :param parent_id: filter by parent_id
+        :param parent_ids: filter by parent_id
+        :param complete_path_to_id: filter by path of content_id
         :param content_type: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of
@@ -1114,7 +1144,7 @@ class ContentApi(object):
         :return: List of contents
         """
         order_by_properties = order_by_properties or []  # FDV
-        return self._get_all_query(parent_id, content_type, workspace, label, order_by_properties).all()
+        return self._get_all_query(parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
@@ -1590,13 +1620,24 @@ class ContentApi(object):
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            has_pdf_preview = self.preview_manager.has_pdf_preview(
+            has_preview = self.preview_manager.has_pdf_preview(
                 file_path,
                 file_ext=file_extension
             )
         except UnsupportedMimeType:
-            has_pdf_preview = False
-        return has_pdf_preview
+            has_preview = False
+        return has_preview
+
+    def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
+        file_path = self.get_one_revision_filepath(revision_id)
+        try:
+            has_preview = self.preview_manager.has_jpeg_preview(
+                file_path,
+                file_ext=file_extension
+            )
+        except UnsupportedMimeType:
+            has_preview = False
+        return has_preview
 
     def mark_read__all(
             self,

@@ -43,13 +43,14 @@ export const FileComponent = props =>
         color={props.customColor}
         downloadRawUrl={props.downloadRawUrl}
         isPdfAvailable={props.isPdfAvailable}
+        isJpegAvailable={props.isJpegAvailable}
         downloadPdfPageUrl={props.downloadPdfPageUrl}
         downloadPdfFullUrl={props.downloadPdfFullUrl}
         previewUrl={props.previewUrl}
         fileSize={props.fileSize}
         filePageNb={props.filePageNb}
         fileCurrentPage={props.fileCurrentPage}
-        contentFullScreenUrl={props.contentFullScreenUrl}
+        lightboxUrlList={props.lightboxUrlList}
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
@@ -76,6 +77,7 @@ export const FileComponent = props =>
           onClick={props.onChangeFile}
           hexcolor={props.customColor}
           preview={props.newFilePreview}
+          filename={props.newFile ? props.newFile.name : ''}
         />
 
         <div className='file__contentpage__dropzone__btn'>

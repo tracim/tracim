@@ -994,7 +994,7 @@ class TestContentApi(DefaultTest):
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(3, len(items))
 
-        items2 = api.get_all(parent_id, content_type_list.File.slug, workspace)
+        items2 = api.get_all([parent_id], content_type_list.File.slug, workspace)
         eq_(1, len(items2))
         eq_(child_id, items2[0].content_id)
 

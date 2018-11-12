@@ -38,5 +38,7 @@
   "Error while loading file": "Erreur lors du chargement du fichier",
   "Update": "Mettre à jour",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
-  "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire"
+  "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire",
+  "No preview available": "Prévisualisation indisponible",
+  " of ": " sur "
 }

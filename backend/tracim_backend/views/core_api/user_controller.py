@@ -135,7 +135,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_MANAGER)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(KnownMemberQuerySchema(), as_list=['exclude_user_ids', 'exclude_workspace_ids'])  # nopep8
+    @hapic.input_query(KnownMemberQuerySchema())  # nopep8
     @hapic.output_body(UserDigestSchema(many=True))
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -410,7 +410,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.input_query(ContentIdsQuerySchema(), as_list=['contents_ids'])
+    @hapic.input_query(ContentIdsQuerySchema())
     @hapic.output_body(ReadStatusSchema(many=True))  # nopep8
     def contents_read_status(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -435,7 +435,7 @@ class UserController(Controller):
             workspace=workspace,
             limit=None,
             before_content=None,
-            content_ids=hapic_data.query.contents_ids or None
+            content_ids=hapic_data.query.content_ids or None
         )
         return [
             api.get_content_in_context(content)

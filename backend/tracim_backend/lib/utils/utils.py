@@ -213,3 +213,14 @@ class ExtendedColor(Color):
         new_color = ExtendedColor(self)
         new_color.luminance = clamp(COLOR_LIGHTEN_SCALE_FACTOR*self.luminance)
         return new_color
+
+
+def string_to_list(
+        base_string: str,
+        separator: str,
+        cast_func: typing.Callable
+) -> typing.List[typing.Any]:
+    if not base_string:
+        return []
+    string_list = base_string.split(separator)
+    return [cast_func(item) for item in string_list]
