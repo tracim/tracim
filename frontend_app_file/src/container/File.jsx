@@ -463,7 +463,8 @@ class File extends React.Component {
           case 204:
             this.setState({
               newFile: '',
-              newFilePreview: null
+              newFilePreview: null,
+              fileCurrentPage: 1
             })
             this.loadContent()
             this.loadTimeline()
