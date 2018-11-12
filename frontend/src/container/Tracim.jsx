@@ -164,7 +164,7 @@ class Tracim extends React.Component {
             path='/ui/:first?/:idws?/*' render={() => <Sidebar />}
             // @FIXME - Côme - 2018/11/02 - upgrade ReactRouter and refactor the route path='/ui' with array of string in this route path
           />
-          <Route exact path='/ui' render={() => <Sidebar />} />
+          <Route exact strict path='/ui' render={() => <Sidebar />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
