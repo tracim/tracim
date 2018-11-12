@@ -414,7 +414,10 @@ class File extends React.Component {
 
   handleClickLastVersion = () => {
     this.loadContent()
-    this.setState({mode: MODE.VIEW})
+    this.setState({
+      fileCurrentPage: 1,
+      mode: MODE.VIEW
+    })
   }
 
   handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
@@ -487,7 +490,7 @@ class File extends React.Component {
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
     if (previousNext === 'next' && state.fileCurrentPage > state.content.page_nb) return
 
-    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}` : ''
+    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}/` : ''
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
     this.setState(prev => ({
