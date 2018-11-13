@@ -1065,6 +1065,8 @@ class ContentApi(object):
         :param parent_ids: filter by parent_ids
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
+        :param complete_path_to_id: add all parent(root included) of content_id
+        given there to parent_ids filter.
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
@@ -1086,8 +1088,9 @@ class ContentApi(object):
                     parent_ids.append(content.content_id)
                     content = content.parent
                 parent_ids.append(content.content_id)
-                # TODO - G.M - 2018-11-12 - add workspace root to parent_id list
-                parent_ids.append(0)
+            # TODO - G.M - 2018-11-12 - add workspace root to
+            # parent_ids list when complete_path_to_id is set
+            parent_ids.append(0)
 
         if content_type_slug != content_type_list.Any_SLUG:
             # INFO - G.M - 2018-07-05 - convert with
@@ -1104,17 +1107,17 @@ class ContentApi(object):
         if parent_ids:
             # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
             # case properly
-            allowed_parent_id = []
+            allowed_parent_ids = []
             allow_root = False
             for parent_id in parent_ids:
                 if parent_id == 0:
                     allow_root = True
                 else:
-                    allowed_parent_id.append(parent_id)
+                    allowed_parent_ids.append(parent_id)
             if allow_root:
-                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_id), Content.parent_id == None))  # nopep8
+                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None))  # nopep8
             else:
-                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_id))  # nopep8
+                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))  # nopep8
         if label:
             resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
 
@@ -1136,6 +1139,7 @@ class ContentApi(object):
         Return all content using some filters
         :param parent_ids: filter by parent_id
         :param complete_path_to_id: filter by path of content_id
+        (add all parent, root included to parent_ids filter)
         :param content_type: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of
