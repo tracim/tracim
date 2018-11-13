@@ -20,7 +20,7 @@ filedepot==0.5.2
 filelock==3.0.10
 hapic==0.59
 hapic_apispec==0.37.0     # via hapic
-hupper==1.4               # via pyramid
+hupper==1.4.1             # via pyramid
 imapclient==2.1.0
 jinja2==2.10              # via pyramid-jinja2
 jsmin==2.2.2              # via wsgidav
@@ -39,7 +39,7 @@ pillow==5.3.0             # via pdf2image, preview-generator
 plaster-pastedeploy==0.6
 plaster==1.0              # via plaster-pastedeploy, pyramid
 prettytable==0.7.2        # via cliff
-preview-generator==0.7
+preview-generator==0.9
 pyexifinfo==0.4.0         # via preview-generator
 pygments==2.2.0           # via pyramid-debugtoolbar
 pyparsing==2.3.0          # via cliff, packaging
@@ -63,16 +63,16 @@ redis==2.10.6
 repoze.lru==0.7           # via pyramid-debugtoolbar
 rq==0.12.0
 six==1.11.0               # via cliff, imapclient, packaging, python-dateutil, stevedore
-sqlalchemy==1.2.13
+sqlalchemy==1.2.14
 stevedore==1.30.0         # via cliff
 transaction==2.4.0
 translationstring==1.3    # via pyramid
 unidecode==1.0.22         # via filedepot, python-slugify
 venusian==1.1.0           # via pyramid
 waitress==1.1.0
-wand==0.4.4               # via preview-generator
+wand==0.4.5               # via preview-generator
 wcwidth==0.1.7            # via cmd2
-webob==1.8.3              # via pyramid
+webob==1.8.4              # via pyramid
 wsgidav==2.4.1
 xvfbwrapper==0.2.9        # via preview-generator
 zope.deprecation==4.3.0   # via pyramid, pyramid-jinja2
