@@ -209,7 +209,12 @@ class AdminWorkspaceUser extends React.Component {
   handleClickAddUser = async (name, email, profile, password) => {
     const { props, state } = this
 
-    if (password !== '') {
+    if (!state.config.system.config.email_notification_activated) {
+      if (password === '') {
+        this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
+        return
+      }
+
       if (password.length < 6) {
         this.sendGlobalFlashMsg(props.t('New password is too short (minimum 6 characters)'), 'warning')
         return
