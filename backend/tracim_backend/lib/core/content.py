@@ -10,7 +10,6 @@ import transaction
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
-from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
 from sqlalchemy import func
@@ -957,7 +956,7 @@ class ContentApi(object):
             )
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
-        except UnsupportedMimeType as exc:
+        except Exception as exc:
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
@@ -975,7 +974,7 @@ class ContentApi(object):
             pdf_preview_path = self.preview_manager.get_pdf_preview(file_path, file_ext=file_extension)  # nopep8
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
-        except UnsupportedMimeType as exc:
+        except Exception as exc:
             raise UnavailablePreview(
                 'No preview available for revision {}'.format(revision_id)
             ) from exc
@@ -1045,7 +1044,7 @@ class ContentApi(object):
                 height=height,
                 file_ext=file_extension,
             )
-        except UnsupportedMimeType as exc:
+        except Exception as exc:
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
