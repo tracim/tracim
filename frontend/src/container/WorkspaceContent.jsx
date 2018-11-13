@@ -217,7 +217,7 @@ class WorkspaceContent extends React.Component {
     const newUrlSearch = this.buildFolderOpenUrlSearchList(idFolder)
     delete newUrlSearch.parent_id
 
-    if (!props.workspaceContentList.find(c => c.id === idFolder).isOpen) this.handleClickFolder(idFolder)
+    if (!(props.workspaceContentList.find(c => c.id === idFolder) || {isOpen: false}).isOpen) this.handleClickFolder(idFolder)
     props.history.push(`${PAGE.WORKSPACE.NEW(state.idWorkspaceInUrl, contentType)}?${qs.stringify(newUrlSearch, {encode: false})}&parent_id=${idFolder}`)
   }
 
@@ -229,7 +229,7 @@ class WorkspaceContent extends React.Component {
     const { props } = this
     const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
 
-    const newFolderOpenList = props.workspaceContentList.find(c => c.id === idFolder).isOpen
+    const newFolderOpenList = (props.workspaceContentList.find(c => c.id === idFolder) || {isOpen: false}).isOpen
       ? folderListInUrl.filter(id => id !== idFolder)
       : uniq([...folderListInUrl, idFolder])
 

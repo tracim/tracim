@@ -106,7 +106,13 @@ class Folder extends React.Component {
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
                 onClickItem={() => props.onClickItem(content)}
                 idRoleUserWorkspace={props.idRoleUserWorkspace}
-                onClickExtendedAction={props.onClickExtendedAction}
+                onClickExtendedAction={{
+                  edit: e => props.onClickExtendedAction.edit(e, content),
+                  move: e => props.onClickExtendedAction.move(e, content),
+                  download: e => props.onClickExtendedAction.download(e, content),
+                  archive: e => props.onClickExtendedAction.archive(e, content),
+                  delete: e => props.onClickExtendedAction.delete(e, content)
+                }}
                 isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
                 key={content.id}
               />
