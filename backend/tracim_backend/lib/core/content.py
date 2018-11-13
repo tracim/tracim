@@ -1088,9 +1088,9 @@ class ContentApi(object):
                     parent_ids.append(content.content_id)
                     content = content.parent
                 parent_ids.append(content.content_id)
-                # TODO - G.M - 2018-11-12 - add workspace root to
-                # parent_ids list
-                parent_ids.append(0)
+            # TODO - G.M - 2018-11-12 - add workspace root to
+            # parent_ids list when complete_path_to_id is set
+            parent_ids.append(0)
 
         if content_type_slug != content_type_list.Any_SLUG:
             # INFO - G.M - 2018-07-05 - convert with
