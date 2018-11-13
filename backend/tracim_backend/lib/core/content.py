@@ -1065,6 +1065,8 @@ class ContentApi(object):
         :param parent_ids: filter by parent_ids
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
+        :param complete_path_to_id: add all parent(root included) of content_id
+        given there to parent_ids filter.
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
@@ -1086,7 +1088,8 @@ class ContentApi(object):
                     parent_ids.append(content.content_id)
                     content = content.parent
                 parent_ids.append(content.content_id)
-                # TODO - G.M - 2018-11-12 - add workspace root to parent_id list
+                # TODO - G.M - 2018-11-12 - add workspace root to
+                # parent_ids list
                 parent_ids.append(0)
 
         if content_type_slug != content_type_list.Any_SLUG:
@@ -1136,6 +1139,7 @@ class ContentApi(object):
         Return all content using some filters
         :param parent_ids: filter by parent_id
         :param complete_path_to_id: filter by path of content_id
+        (add all parent, root included to parent_ids filter)
         :param content_type: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of

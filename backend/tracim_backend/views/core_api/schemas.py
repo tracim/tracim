@@ -499,17 +499,23 @@ class FilterContentQuerySchema(marshmallow.Schema):
         validate=REGEX_STRING_AS_LIST_OF_INT,
         example='0,4,5',
         description='comma separated list of parent ids,'
-                    'parent_id allow to filter items in a folder.'
+                    ' parent_id allow to filter items in a folder.'
                     ' If not parent_ids at all, then return all contents.'
                     ' If one parent_id to 0, then return root contents.'
-                    ' If set to another value, return all content of this folder'
-                    ' If multiple value of parent_ids separated by comma, '
-                    'return mix of all content of all theses parent_ids',
+                    ' If set to another value, return all direct subcontents'
+                    ' content of this folder'
+                    ' If multiple value of parent_ids separated by comma,'
+                    ' return mix of all content of all theses parent_ids',
         default='0',
     )
     complete_path_to_id = marshmallow.fields.Int(
         example=6,
         validate=Range(min=1, error="Value must be greater than 0"),
+        description='If setted with a correct content_id, this will'
+                    ' add to parent_ids filter, all parent of given content_id,'
+                    ' workspace root included. This param help to get '
+                    ' content needed to show a complete folder tree '
+                    ' from root to content.',
         default=None,
         allow_none=True,
     )
