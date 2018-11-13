@@ -60,7 +60,12 @@ class PopupCreateFile extends React.Component {
     this.setState({uploadFile: fileToSave})
 
     var reader = new FileReader()
-    reader.onload = e => this.setState({uploadFilePreview: e.total > 0 ? e.target.result : false})
+    reader.onload = e => {
+      this.setState({uploadFilePreview: e.total > 0 ? e.target.result : false})
+      const img = new Image()
+      img.src = e.target.result
+      img.onerror = () => this.setState({uploadFilePreview: false})
+    }
     reader.readAsDataURL(fileToSave)
   }
 
@@ -183,6 +188,7 @@ class PopupCreateFile extends React.Component {
             onClick={this.handleChangeFile}
             hexcolor={state.config.hexcolor}
             preview={state.uploadFilePreview}
+            filename={state.uploadFile ? state.uploadFile.name : ''}
           />
         </div>
       </CardPopupCreateContent>

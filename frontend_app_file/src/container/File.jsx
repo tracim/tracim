@@ -148,7 +148,7 @@ class File extends React.Component {
     }
   })
 
-  loadContent = async () => {
+  loadContent = async (pageToLoad = null) => {
     const { content, config, fileCurrentPage } = this.state
 
     const fetchResultFile = await handleFetchResult(await getFileContent(config.apiUrl, content.workspace_id, content.content_id))
@@ -156,11 +156,12 @@ class File extends React.Component {
     switch (fetchResultFile.apiResponse.status) {
       case 200:
         const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
+        const pageForPreview = pageToLoad ? pageToLoad : fileCurrentPage
         this.setState({
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${fileCurrentPage}`,
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}`,
             lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
@@ -402,15 +403,22 @@ class File extends React.Component {
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${state.fileCurrentPage}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
+        lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+          `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
+        )
       },
+      fileCurrentPage: 1, // always set to first page on revision switch
       mode: MODE.REVISION
     }))
   }
 
   handleClickLastVersion = () => {
-    this.loadContent()
-    this.setState({mode: MODE.VIEW})
+    this.setState({
+      fileCurrentPage: 1,
+      mode: MODE.VIEW
+    })
+    this.loadContent(1)
   }
 
   handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
@@ -456,9 +464,10 @@ class File extends React.Component {
           case 204:
             this.setState({
               newFile: '',
-              newFilePreview: null
+              newFilePreview: null,
+              fileCurrentPage: 1
             })
-            this.loadContent()
+            this.loadContent(1)
             this.loadTimeline()
             break
           case 400:
@@ -483,7 +492,7 @@ class File extends React.Component {
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
     if (previousNext === 'next' && state.fileCurrentPage > state.content.page_nb) return
 
-    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}` : ''
+    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}/` : ''
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
     this.setState(prev => ({
