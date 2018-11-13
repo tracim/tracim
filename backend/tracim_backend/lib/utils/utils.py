@@ -220,6 +220,17 @@ def string_to_list(
         separator: str,
         cast_func: typing.Callable
 ) -> typing.List[typing.Any]:
+    """
+    Convert a string to a list of separated item of one type according
+    to a string separator and to a cast_func
+    >>> string_to_list('1,2,3', ',', int)
+    [1, 2, 3]
+    :param base_string: entry string which should be converted.
+    :param separator: string separator,
+    :param cast_func: all item should be casted to this function, this help
+    to convert to type like int, str ...
+    :return: list of content of type returned by the cast_func.
+    """
     if not base_string:
         return []
     string_list = base_string.split(separator)
