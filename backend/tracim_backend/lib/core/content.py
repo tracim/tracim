@@ -971,7 +971,7 @@ class ContentApi(object):
                 self,
                 "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
             )
-            logger.debug(self, traceback.format_exc())
+            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
@@ -998,7 +998,7 @@ class ContentApi(object):
                 self,
                 "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
             )
-            logger.debug(self, traceback.format_exc())
+            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 'No preview available for revision {}'.format(revision_id)
             ) from exc
@@ -1081,7 +1081,7 @@ class ContentApi(object):
                 self,
                 "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
             )
-            logger.debug(self, traceback.format_exc())
+            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
@@ -1626,7 +1626,7 @@ class ContentApi(object):
                 self,
                 "Unknown Preview_Generator Exception Occured : {}".format(str(e))
             )
-            logger.debug(self, traceback.format_exc())
+            logger.warning(self, traceback.format_exc())
             return None
         return nb_pages
 
@@ -1644,7 +1644,7 @@ class ContentApi(object):
                 self,
                 "Unknown Preview_Generator Exception Occured : {}".format(str(e))
             )
-            logger.debug(self, traceback.format_exc())
+            logger.warning(self, traceback.format_exc())
             return False
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
@@ -1661,7 +1661,7 @@ class ContentApi(object):
                 self,
                 "Unknown Preview_Generator Exception Occured : {}".format(str(e))
             )
-            logger.debug(self, traceback.format_exc())
+            logger.warning(self, traceback.format_exc())
             return False
 
     def mark_read__all(
