@@ -41,6 +41,8 @@ export const USER_PASSWORD = `${USER}/Password`
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
+export const PATH = 'Path'
+export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
 export const setWorkspaceContentList = (workspaceContentList, idFolderToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, idFolderToOpenList })
 export const addWorkspaceContentList = workspaceContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })

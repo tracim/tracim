@@ -1,5 +1,5 @@
 module.exports = {
-  debug: true,
+  debug: false,
   removeUnusedKeys: true,
   func: {
     list: ['t', 'props.t', 'this.props.t', 'i18n.t'],

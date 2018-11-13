@@ -35,6 +35,7 @@ import {
   USER,
   USER_WORKSPACE_LIST,
   CONTENT,
+  WORKSPACE_CONTENT_PATH,
   newFlashMessage
 } from './action-creator.sync.js'
 import { history } from './index.js'
@@ -489,9 +490,9 @@ export const getContent = (idWorkspace, idContent, typeContent) => dispatch => {
   })
 }
 
-export const getWorkspaceContentList = (idWorkspace, idParent) => dispatch => {
+export const getFolderContentList = (idWorkspace, idFolderList) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idParent}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_ids=${idFolderList.join(',')}`,
     param: {
       credentials: 'include',
       headers: {
@@ -500,6 +501,21 @@ export const getWorkspaceContentList = (idWorkspace, idParent) => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getContentPathList = (idWorkspace, idContent, idFolderList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?complete_path_to_id=${idContent}&parent_ids=${idFolderList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_CONTENT_PATH,
     dispatch
   })
 }

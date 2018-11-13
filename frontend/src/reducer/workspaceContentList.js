@@ -33,11 +33,15 @@ export default function workspaceContentList (state = [], action) {
       }))
 
     case `${ADD}/${WORKSPACE_CONTENT}`:
+      const idParentList = [
+        ...state.filter(c => c.idParent),
+        ...action.workspaceContentList.filter(c => c.idParent)
+      ]
       return [
         ...state,
         ...action.workspaceContentList.map(c => ({
           ...serializeContent(c),
-          isOpen: true
+          isOpen: idParentList.includes(c.content_id)
         }))
       ]
 

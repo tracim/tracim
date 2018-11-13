@@ -161,5 +161,8 @@
   "text documents": "text documents",
   "threads": "threads",
   "files": "files",
-  "Note, only administrators can send invitational email": "Note, only administrators can send invitational email"
+  "Note, only administrators can send invitational email": "Note, only administrators can send invitational email",
+  "This user already is in the workspace": "This user already is in the workspace",
+  "Error while loading content list": "Error while loading content list",
+  "Error while loading members list": "Error while loading members list"
 }

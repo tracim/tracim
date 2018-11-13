@@ -161,5 +161,8 @@
   "text documents": "documents texte",
   "threads": "discussions",
   "files": "fichiers",
-  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail"
+  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail",
+  "This user already is in the workspace": "__NOT_TRANSLATED__",
+  "Error while loading content list": "__NOT_TRANSLATED__",
+  "Error while loading members list": "__NOT_TRANSLATED__"
 }

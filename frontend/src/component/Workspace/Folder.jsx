@@ -9,8 +9,10 @@ class Folder extends React.Component {
   render () {
     const { props } = this
 
+    const folderContentList = props.folderData.content.filter(c => c.idParent === props.folderData.id)
+
     return (
-      <div className={classnames('folder', {'active': props.folderData.isOpen && props.folderData.content.length > 0, 'item-last': props.isLast})}>
+      <div className={classnames('folder', {'active': props.folderData.isOpen && folderContentList.length > 0, 'item-last': props.isLast})}>
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
@@ -74,45 +76,42 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {props.folderData.content
-            .filter(c => c.idParent === props.folderData.id)
-            .map((content, i) => content.type === 'folder'
-              ? (
-                <Folder
-                  availableApp={props.availableApp}
-                  folderData={{
-                    ...content,
-                    content: props.folderData.content.filter(c => c.idParent !== props.folderData.id)
-                  }}
-                  onClickItem={props.onClickItem}
-                  idRoleUserWorkspace={props.idRoleUserWorkspace}
-                  onClickExtendedAction={props.onClickExtendedAction}
-                  onClickFolder={props.onClickFolder}
-                  onClickCreateContent={props.onClickCreateContent}
-                  contentType={props.contentType}
-                  readStatusList={props.readStatusList}
-                  isLast={i === props.folderData.content.length - 1}
-                  key={content.id}
-                  t={props.t}
-                />
-              )
-              : (
-                <ContentItem
-                  label={content.label}
-                  type={content.type}
-                  faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
-                  statusSlug={content.statusSlug}
-                  read={props.readStatusList.includes(content.id)}
-                  contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                  onClickItem={() => props.onClickItem(content)}
-                  idRoleUserWorkspace={props.idRoleUserWorkspace}
-                  onClickExtendedAction={props.onClickExtendedAction}
-                  isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
-                  key={content.id}
-                />
-              )
+          {folderContentList.map((content, i) => content.type === 'folder'
+            ? (
+              <Folder
+                availableApp={props.availableApp}
+                folderData={{
+                  ...content,
+                  content: props.folderData.content.filter(c => c.idParent !== props.folderData.id)
+                }}
+                onClickItem={props.onClickItem}
+                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                onClickExtendedAction={props.onClickExtendedAction}
+                onClickFolder={props.onClickFolder}
+                onClickCreateContent={props.onClickCreateContent}
+                contentType={props.contentType}
+                readStatusList={props.readStatusList}
+                isLast={i === props.folderData.content.length - 1}
+                key={content.id}
+                t={props.t}
+              />
             )
-          }
+            : (
+              <ContentItem
+                label={content.label}
+                type={content.type}
+                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                statusSlug={content.statusSlug}
+                read={props.readStatusList.includes(content.id)}
+                contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
+                onClickItem={() => props.onClickItem(content)}
+                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                onClickExtendedAction={props.onClickExtendedAction}
+                isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
+                key={content.id}
+              />
+            )
+          )}
         </div>
       </div>
     )

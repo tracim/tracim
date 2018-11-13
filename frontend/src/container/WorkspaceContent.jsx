@@ -20,7 +20,8 @@ import {
   PageContent
 } from 'tracim_frontend_lib'
 import {
-  getWorkspaceContentList,
+  getFolderContentList,
+  getContentPathList,
   getWorkspaceMemberList,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
@@ -62,7 +63,7 @@ class WorkspaceContent extends React.Component {
 
       case 'openContentUrl':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent))
+        props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent) + props.location.search)
         break
 
       case 'appClosed':
@@ -111,35 +112,29 @@ class WorkspaceContent extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  getIdFolderToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
-
   loadContentList = async idWorkspace => {
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
     const idFolderInUrl = [0, ...this.getIdFolderToOpenInUrl(props.location.search)] // add 0 to get workspace's root
 
-    const fetchContentList = await Promise.all(
-      idFolderInUrl.map(id => props.dispatch(getWorkspaceContentList(idWorkspace, id)))
-    )
-
-    const fullContentList = fetchContentList.reduce((acc, fetchFolder) => {
-      if (fetchFolder.status !== 200) {
-        console.log(`Failed to load folder content. Requested: ${fetchFolder.url}`)
-        return acc
-      }
-      return [...acc, ...fetchFolder.json]
-    }, [])
-
-    props.dispatch(setWorkspaceContentList(fullContentList, idFolderInUrl))
+    let fetchContentList
+    if (props.match.params.idcts && !isNaN(props.match.params.idcts)) fetchContentList = await props.dispatch(getContentPathList(idWorkspace, props.match.params.idcts, idFolderInUrl))
+    else fetchContentList = await props.dispatch(getFolderContentList(idWorkspace, idFolderInUrl))
 
     const wsMember = await props.dispatch(getWorkspaceMemberList(idWorkspace))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(idWorkspace))
 
+    switch (fetchContentList.status) {
+      case 200: props.dispatch(setWorkspaceContentList(fetchContentList.json, idFolderInUrl)); break
+      case 401: break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading content list'), 'warning'))
+    }
+
     switch (wsMember.status) {
       case 200: props.dispatch(setWorkspaceMemberList(wsMember.json)); break
       case 401: break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading members list', 'warning')))
+      default: props.dispatch(newFlashMessage(props.t('Error while loading members list'), 'warning'))
     }
 
     switch (wsReadStatus.status) {
@@ -204,32 +199,45 @@ class WorkspaceContent extends React.Component {
   handleClickFolder = async idFolder => {
     const { props, state } = this
 
-    const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
-
-    const newFolderOpenList = props.workspaceContentList.find(c => c.id === idFolder).isOpen
-      ? folderListInUrl.filter(id => id !== idFolder)
-      : uniq([...folderListInUrl, idFolder])
-
-    const newUrlSearch = {
-      ...qs.parse(props.location.search),
-      folder_open: newFolderOpenList.join(',')
-    }
+    const newUrlSearch = this.buildFolderOpenUrlSearchList(idFolder)
 
     props.dispatch(toggleFolderOpen(idFolder))
     props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
 
     if (!props.workspaceContentList.some(c => c.idParent === idFolder)) {
-      const fetchContentList = await props.dispatch(getWorkspaceContentList(state.idWorkspaceInUrl, idFolder))
+      const fetchContentList = await props.dispatch(getFolderContentList(state.idWorkspaceInUrl, [idFolder]))
       if (fetchContentList.status === 200) props.dispatch(addWorkspaceContentList(fetchContentList.json))
     }
   }
 
   handleClickCreateContent = (e, idFolder, contentType) => {
     e.stopPropagation()
-    this.props.history.push(`${PAGE.WORKSPACE.NEW(this.state.idWorkspaceInUrl, contentType)}?parent_id=${idFolder}`)
+    const { props, state } = this
+
+    const newUrlSearch = this.buildFolderOpenUrlSearchList(idFolder)
+    delete newUrlSearch.parent_id
+
+    if (!props.workspaceContentList.find(c => c.id === idFolder).isOpen) this.handleClickFolder(idFolder)
+    props.history.push(`${PAGE.WORKSPACE.NEW(state.idWorkspaceInUrl, contentType)}?${qs.stringify(newUrlSearch, {encode: false})}&parent_id=${idFolder}`)
   }
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
+
+  getIdFolderToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
+
+  buildFolderOpenUrlSearchList = idFolder => {
+    const { props } = this
+    const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
+
+    const newFolderOpenList = props.workspaceContentList.find(c => c.id === idFolder).isOpen
+      ? folderListInUrl.filter(id => id !== idFolder)
+      : uniq([...folderListInUrl, idFolder])
+
+    return {
+      ...qs.parse(props.location.search),
+      folder_open: newFolderOpenList.join(',')
+    }
+  }
 
   getTitle = urlFilter => {
     const { props } = this
@@ -249,9 +257,6 @@ class WorkspaceContent extends React.Component {
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
     ? contentList
     : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
-    // @FIXME we need to filter subfolder too, but right now, we dont handle subfolder
-    // .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
-    // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty
 
   render () {
     const { user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
