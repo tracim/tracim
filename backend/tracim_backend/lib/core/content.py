@@ -1107,17 +1107,17 @@ class ContentApi(object):
         if parent_ids:
             # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
             # case properly
-            allowed_parent_id = []
+            allowed_parent_ids = []
             allow_root = False
             for parent_id in parent_ids:
                 if parent_id == 0:
                     allow_root = True
                 else:
-                    allowed_parent_id.append(parent_id)
+                    allowed_parent_ids.append(parent_id)
             if allow_root:
-                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_id), Content.parent_id == None))  # nopep8
+                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None))  # nopep8
             else:
-                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_id))  # nopep8
+                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))  # nopep8
         if label:
             resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
 
