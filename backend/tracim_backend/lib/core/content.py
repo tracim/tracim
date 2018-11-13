@@ -954,6 +954,8 @@ class ContentApi(object):
                 page=page_number,
                 file_ext=file_extension,
             )
+        except PageOfPreviewNotFound as exc:
+            raise exc
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except Exception as exc:
@@ -1044,6 +1046,8 @@ class ContentApi(object):
                 height=height,
                 file_ext=file_extension,
             )
+        except (PreviewDimNotAllowed, PageOfPreviewNotFound) as exc:
+            raise exc
         except Exception as exc:
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
