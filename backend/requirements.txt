@@ -24,6 +24,7 @@ hupper==1.4.1             # via pyramid
 imapclient==2.1.0
 jinja2==2.10              # via pyramid-jinja2
 jsmin==2.2.2              # via wsgidav
+ldap3==2.5.1              # via pyramid-ldap3
 lxml==4.2.5
 mako==1.0.7
 markdown==3.0.1
@@ -40,6 +41,7 @@ plaster-pastedeploy==0.6
 plaster==1.0              # via plaster-pastedeploy, pyramid
 prettytable==0.7.2        # via cliff
 preview-generator==0.9
+pyasn1==0.4.4             # via ldap3
 pyexifinfo==0.4.0         # via preview-generator
 pygments==2.2.0           # via pyramid-debugtoolbar
 pyparsing==2.3.0          # via cliff, packaging
@@ -48,6 +50,7 @@ pyperclip==1.7.0          # via cmd2
 pyramid-beaker==0.8
 pyramid-debugtoolbar==4.5
 pyramid-jinja2==2.7
+pyramid-ldap3==0.4
 pyramid-mako==1.0.2
 pyramid-multiauth==0.9.0
 pyramid-retry==1.0

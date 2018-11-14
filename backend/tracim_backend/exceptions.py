@@ -227,6 +227,14 @@ class BadStatusCode(TracimException):
     pass
 
 
+class WrongLDAPCredentials(TracimException):
+    pass
+
+
+class UserAuthenticatedIsDeleted(TracimException):
+    error_code = error.AUTHENTICATION_FAILED
+
+
 class UserAuthenticatedIsNotActive(TracimException):
     error_code = error.AUTHENTICATION_FAILED
 

@@ -1,6 +1,8 @@
 # coding=utf-8
 from pyramid.config import Configurator
 from pyramid.security import remember
+from pyramid_ldap3 import get_ldap_connector
+from tracim_backend.config import CFG
 
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
@@ -34,13 +36,16 @@ class SessionController(Controller):
         """
 
         login = hapic_data.body
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             None,
             session=request.dbsession,
             config=app_config,
         )
-        user = uapi.authenticate_user(login.email, login.password)
+        ldap_connector = None
+        if app_config.AUTH_TYPE == 'ldap':
+            ldap_connector = get_ldap_connector(request)
+        user = uapi.authenticate(login.email, login.password, ldap_connector)
         remember(request, user.user_id)
         return uapi.get_user_with_context(user)
 

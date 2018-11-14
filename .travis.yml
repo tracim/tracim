@@ -98,6 +98,8 @@ addons:
     - ghostscript
     - libfile-mimeinfo-perl
     - poppler-utils
+    - libldap2-dev
+    - libsasl2-dev
 services:
   - docker
   - redis-server
@@ -108,6 +110,8 @@ before_install:
   - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
   - docker pull mailhog/mailhog
   - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+  - docker pull rroemhild/test-openldap
+  - docker run -d -p 3890:389 rroemhild/test-openldap
   - cd backend
 install:
   - pip install --upgrade pip setuptools
