@@ -3,6 +3,7 @@ import typing as typing
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 
+import datetime
 import transaction
 from sqlalchemy import func
 from sqlalchemy import or_
@@ -523,7 +524,7 @@ class UserApi(object):
         user = User()
         user.email = email
         user.display_name = email.split('@')[0]
-
+        user.created = datetime.datetime.utcnow()
         if not groups:
             gapi = GroupApi(
                 current_user=self._user,  # User
