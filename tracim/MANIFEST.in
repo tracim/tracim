@@ -1,4 +1,0 @@
-recursive-include tracim/public *
-include tracim/public/favicon.ico
-recursive-include tracim/i18n *
-recursive-include tracim/templates *
