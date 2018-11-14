@@ -246,6 +246,14 @@ You can run it this way with docker :
     docker pull mailhog/mailhog
     docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
+You need also a test ldap server on port 3890, for ldap related test
+see here : https://github.com/rroemhild/docker-test-openldap
+
+You can run it this way with docker :
+
+    docker pull rroemhild/test-openldap
+    docker run -d -p 3890:389 rroemhild/test-openldap
+
 Run your project's tests:
 
     pytest
