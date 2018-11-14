@@ -1,0 +1,59 @@
+.loginpage
+  .connection__form
+    &__rememberme
+      margin-bottom 10px
+      font-size 14px
+      line-height 23px
+      cursor pointer
+      label
+        margin-right 8px
+        top 4px
+    &__pwforgot
+      cursor pointer
+      font-size 13px
+  &__footer
+    position fixed
+    bottom 2%
+    left calc(50% - 155px) // 155px => width of the text / 2
+    &__text
+      width 310px
+      font-size 17px
+      color offWhite
+      & > a
+        color offWhite
+        font-size 18px
+        &:hover
+          text-decoration underline
+
+// MEDIAQUERIES
+
+@media (min-width: min-lg) and (max-width: max-lg)
+  .loginpage
+    .connection__form
+      width 100%
+
+@media (min-width: min-md) and (max-width: max-md)
+  .loginpage
+    .connection__form
+      width 95%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .loginpage
+    padding-top 69px
+    display block
+    .connection__form
+      width 90%
+
+@media (max-width: max-xs)
+  .loginpage
+    padding-top 0
+    background-size cover
+    display block
+    &__connection
+      margin-top 90px
+    &__logo
+      display none
+    .connection__form
+      width 95%
+    .connection__form__pwforgot:hover::after
+      content normal

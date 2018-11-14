@@ -1,0 +1,100 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.dashboard
+  .pageContentGeneric
+    margin 0
+    min-height 100%
+  .pageTitleGeneric
+    margin 45px 0 15px 0
+
+.dashboard
+  width 100%
+  min-height 100%
+  &__header
+    display flex
+    flex-wrap wrap
+    align-items center
+    &__title
+      width auto
+      &__text
+        margin 0
+  &__workspace
+    display flex
+    flex-wrap wrap
+    align-items flex-start
+    &__detail
+      margin-right 20px
+      width calc(70% - 20px) //20px => margin-right
+      &__title
+        margin 0 0 20px 30px
+        font-size 70px
+        font-weight 500
+      &__description
+        margin-left 30px
+        font-size 18px
+  &__calltoaction
+    display flex
+    flex-wrap wrap
+    margin 40px 30px
+    &__button
+      &:active
+        box-shadow inset 0px 0px 5px 2px #656565
+      &__text
+        color white
+        &__icon
+          font-size 40px
+        &__title
+          font-size 18px
+  &__workspaceInfo
+    display flex
+    flex-wrap wrap
+    padding 30px
+    min-height 100%
+    background-color lightGrey
+
+@media (min-width: min-md) and (max-width: max-md)
+  .dashboard
+    &__workspace
+      width 100%
+      &__detail
+        order 2
+    .memberlist
+      margin-left 0
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .dashboard
+    &__header
+      &__advancedmode
+        display none
+    &__workspace
+      width 100%
+      &__detail
+        order 2
+
+@media (max-width: max-xs)
+  .dashboard .pageContentGeneric
+    margin 10px 0 0 0
+
+  .dashboard
+    &__header
+      &__advancedmode
+        display none
+    &__workspace-wrapper
+      margin 0 15px
+    &__workspace
+      width 100%
+      &__detail
+        order 2
+        width 100%
+    &__calltoaction
+      flex-direction column
+      align-items center
+      justify-content center
+      &__button
+        margin 20px 0
+    .memberlist
+      &__list__item__delete
+        display none
+      &__btnadd
+        display none
+

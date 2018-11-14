@@ -1,0 +1,66 @@
+.currentColor
+  color currentColor
+
+.validateColor
+  color validateColor
+
+.cancelColor
+  color cancelColor
+
+.outdateColor
+  color outdateColor
+
+.content
+  display flex
+  align-items center
+  padding 10px 0
+  border-bottom 0
+  cursor pointer
+  font-weight bold
+  &.read
+    font-weight normal
+  &:hover > .content__name
+    color offWhite
+  &:hover > .content__status
+    color offWhite
+  &__type
+    padding 0 25px
+    font-size 30px
+    text-align center
+  &__name
+    flex 1
+    width 0 // keep me ! without it, it breaks the design
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    margin-right 10px
+    font-size 17px
+  &__status
+    width 180px
+    padding 0 15px
+    text-align center
+    font-weight normal
+    &__text
+      margin-left 15px
+      font-size 18px
+    &__icon
+      font-size 20px
+
+//MEDIAQUERIES
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .content
+    border-right 1px solid grey
+    &__name__icons
+        margin-top 5px
+
+@media (max-width: max-xs)
+
+  .content
+    &__name__text
+      width 200px
+    &__status
+      width 70px
+      &__icon
+        display flex
+        justify-content flex-end

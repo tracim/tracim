@@ -1,0 +1,85 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.adminWorkspace
+  &__createworkspace
+    &__btncreate
+      margin 25px 15px
+  &__description
+    margin 25px 0
+    font-size 20px
+  &__delimiter
+    margin 65px auto
+  &__table
+    margin 25px 15px
+    &__delete
+      display flex
+      align-items center
+      flex-wrap wrap
+  &__workspaceTable__tr
+    &:hover, &:nth-child(even):hover
+      background-color grey-hover
+    &__td-link
+      cursor pointer
+      &:not(:hover)
+        color inherit
+
+.adminUser
+  &__description
+    margin-bottom 40px
+  &__adduser
+    display flex
+    align-items center
+    margin 25px 0
+    &__emailstate
+      margin-left 15px
+      color fontColor
+    &__form
+      border 1px solid grey
+      border-radius 5px
+      padding 20px
+      &__username
+        .username
+          &__text
+            font-weight bold
+          &__input
+            margin-bottom 10px
+      &__profile
+        .profile
+          &__text
+            margin 20px 0
+            font-weight bold
+          &__list
+            margin 25px 0
+            &__item
+              display flex
+              align-items center
+              margin-top 10px
+              cursor pointer
+              & > input
+                cursor pointer
+  &__delimiter
+    margin 50px auto
+  &__table
+    margin-bottom 100px
+    &__tr
+      &:hover, &:nth-child(even):hover
+        background-color grey-hover
+      &.user-deactivated
+        color #bbb
+      &__td-link
+        cursor pointer
+        &:not(:hover)
+          color inherit
+        & > i
+          margin-right 5px
+
+.adminworkspaceuser__popup
+  .cardPopup__container
+    width 400px
+  &__body
+    width 100%
+    &__btn
+      display flex
+      justify-content flex-end
+      .btn:first-child
+        margin-right 15px

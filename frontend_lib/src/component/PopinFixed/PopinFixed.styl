@@ -1,0 +1,183 @@
+@import '../../css/Variable.styl'
+
+.wsContentGeneric
+  position fixed
+  top 88px
+  right 0
+  width 70%
+  max-width calc(100% - 345px) // 300px sidebar with + 45px btn toggle sidebar
+  height 100%
+  border 1px solid grey
+  background-color lightGrey
+  box-shadow shadow-right
+  z-index 20
+  &.visible
+    visibility visible
+  &__header
+    display flex
+    align-items center
+    padding 15px 10px
+    height 62px
+    &__icon
+      margin-right 15px
+      font-size 22px
+      color white
+    &__title
+      margin-right 15px
+      border-radius 5px
+      width 100%
+      color white
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
+      & > input
+        padding-left 5px
+    &__edittitle
+      border 1px solid transparent
+      border-radius 5px
+      padding 2px 8px
+      color white
+      font-size 17px
+      .fa-pencil
+        color offWhite
+    &__close
+      border 1px solid white
+      border-radius 5px
+      padding 3px 7px
+      & > i
+        color white
+        font-size 20px
+  &__option
+    border-bottom 1px solid grey
+    padding 6px 10px
+    height 58px
+    background-color offWhite
+    &__menu
+      & > div
+        display flex
+        flex-flow row
+        justify-content space-between
+        align-items center
+      &__addversion
+        display flex
+        align-items center
+        cursor pointer
+      &__lastversion
+        display flex
+        align-items center
+        margin-left 15px
+        border-width 1px
+        border-style solid
+        & > i
+          margin-right 10px
+          color darkGrey
+          font-size 22px
+      &__action
+        font-size 18px
+        background-color transparent
+        border none
+        cursor pointer
+        &:hover , &:focus
+          color blue
+  &__content
+    display flex
+    flex-wrap wrap
+    // 209 = wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height
+    width 200% // to allow transform translateX of right part
+    height calc(100% - 209px)
+    &__state
+      width 100%
+      padding 5px 15px
+      border-radius 10px
+      background-color #fbe294
+    &__left
+      transition width 0.4s ease
+      width 25%
+      height 100%
+    &__right
+      transition width 0.4s ease
+      width calc(25% - 10px)
+      height 100%
+
+.rightPartClose
+  .wsContentGeneric__content__left
+    width calc(50% - 50px)
+  //.wsContentGeneric__content__right
+  //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
+
+
+// MEDIAQUERIES
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .wsContentGeneric
+    &__content
+      overflow-Y auto
+      width 100%
+      &__left
+        margin-bottom 20px
+        width calc(100% - 20px) // 20px => margin
+        height auto
+      &__right
+        width calc(100% - 20px) // 20px => margin
+        height auto
+
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .wsContentGeneric
+    &__content
+      overflow-Y auto
+      width 100%
+      &__left
+        margin-bottom 20px
+        width calc(100% - 20px) // 20px => margin
+        height auto
+        &__textnote
+          height auto
+          overflow-y hidden
+      &__right
+        width calc(100% - 20px) // 20px => margin
+        height auto
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .wsContentGeneric
+    width 100%
+    max-width 100%
+    top 68px
+    &__content
+      overflow-Y auto
+      width 100%
+      &__left
+        margin-bottom 20px
+        width calc(100% - 20px) // 20px => margin
+        height auto
+        &__textnote
+          height auto
+          overflow-y hidden
+      &__right
+        width calc(100% - 20px) // 20px => margin
+        height auto
+
+@media (max-width: max-xs)
+
+  .wsContentGeneric
+    width 100%
+    max-width 100%
+    top 68px
+    &__option
+      display none
+    &__content
+      overflow-Y auto
+      width 100%
+      &__left
+        margin-bottom 20px
+        width calc(100% - 20px) // 20px => margin
+        height auto
+        &__textnote
+          height auto
+          overflow-y hidden
+      &__right
+        width calc(100% - 20px) // 20px => margin
+        height auto

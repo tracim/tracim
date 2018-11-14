@@ -1,0 +1,136 @@
+env:
+  global:
+    - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
+
+sudo: false
+language: python
+python:
+  - "3.6"
+
+jobs:
+  include:
+# TODO BS 2018-10-12: Re-enable this test when setup.py list deps as strict
+#  - stage: quick-tests
+#    name: Check requirement.txt
+#    python:
+#    - "3.5"
+#    addons:
+#    services:
+#    before_install:
+#      # TODO - GM - 2018-10-12  find a better way to install exiftool
+#      # download exiftool and compile it to have a working exiftool command (used by preview_generator)
+#      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
+#      - cd backend
+#    install:
+#      - pip install --upgrade pip setuptools
+#      - pip install pip-tools
+#    before_script:
+#      - mv requirements.txt requirements_from_source.txt
+#    script:
+#      - pip-compile
+#      - diff -u requirements.txt requirements_from_source.txt
+#    after_success: true
+  - stage: quick-tests
+    name : Quick Unit-Test for Backend
+    env:
+    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+    python:
+      - "3.5"
+      - "3.6"
+      - "3.7"
+    script:
+    - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
+  - stage: backend-sqlite
+    name: Test Backend with sqlite
+    env:
+    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+    script:
+    - pytest --cov tracim_backend
+  - stage: backend-postgresql
+    name: Test Backend with postgresql
+    env:
+    - DB=postgres
+    script:
+    - pytest tracim_backend
+  - stage: backend-mysql
+    name: Test Backend with mysql
+    env:
+    - DB=mysql
+    script:
+    - pytest tracim_backend
+  - stage: functional
+    name: Functional tests using Cypress
+    env:
+      - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      - TRAVIS_NODE_VERSION="10"
+    before_install:
+      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
+    install:
+      - pip install --upgrade pip setuptools
+      - ./setup_default_backend.sh root
+      - ./install_frontend_dependencies.sh root
+      - ./build_full_frontend.sh root
+      - ./setup_functionnal_tests.sh root
+    before_script:
+      - cd backend
+      - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+      - nohup pserve development.ini&
+      - cd ../functionnal_tests
+
+    script:
+      - $(npm bin)/cypress run
+
+stages:
+  - quick-tests
+  - backend-sqlite
+  - backend-postgresql
+  - backend-mysql
+  - functional
+
+
+addons:
+  postgresql: "9.3"
+  apt:
+    packages:
+    - libreoffice
+    - imagemagick
+    - libmagickwand-dev
+    - ghostscript
+    - libfile-mimeinfo-perl
+    - poppler-utils
+services:
+  - docker
+  - redis-server
+  - mysql
+before_install:
+  # TODO - GM - 2018-10-12  find a better way to install exiftool
+  # download exiftool and compile it to have a working exiftool command (used by preview_generator)
+  - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
+  - docker pull mailhog/mailhog
+  - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+  - cd backend
+install:
+  - pip install --upgrade pip setuptools
+  # using old version of pytest-cov to avoid
+  # version conflict with python-coveralls
+  # see https://github.com/z4r/python-coveralls/issues/66
+  - pip install 'pytest-cov<2.6'
+  - pip install python-coveralls
+  - pip install -r "requirements.txt"
+  # postgresql
+  - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
+  # mysql
+  - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
+  # sqlite
+  - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+before_script:
+  # postgresql
+  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+  # mysql
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+  # sqlite : do nothing, default config is sqlite based.
+  - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+after_success:
+  - coveralls

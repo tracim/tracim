@@ -1,0 +1,173 @@
+sidebar-width = 300px
+sidebar-animate-speed = 0.5s
+
+.sidebarSticky
+  position sticky
+  top 87px
+  display flex
+  flex-direction column
+  justify-content space-between
+  height 100%
+
+leftside()
+  height 100%
+  font-size 18px
+  background-color rgba(253, 253, 253, 0.3)
+
+.sidebar
+  display flex
+  flex-direction column
+  justify-content space-between
+  position relative
+  transition all sidebar-animate-speed
+  width sidebar-width
+  min-height 100%
+  background-image url('../img/applat.png')
+  background-repeat repeat
+  z-index 10
+  box-shadow 0 0 2px 1px #333
+  &.sidebarclose
+    width 0
+  &__expand
+    position absolute
+    right -43px
+    display flex
+    justify-content center
+    align-items center
+    border 1px solid #333
+    border-bottom-right-radius 15px
+    padding 8px 15px
+    cursor pointer
+    color white
+    transition all sidebar-animate-speed
+  &__content
+    height 100%
+    &__btnnewworkspace
+      margin 50px 0
+      overflow hidden
+      color fontColor
+      &__btn
+        display block
+        margin 0 auto
+        padding 10px 20px
+        &:hover
+          color offWhite
+    &__navigation
+      padding 0
+      width sidebar-width
+      transition all sidebar-animate-speed
+      overflow hidden
+      &.sidebarclose
+        width 0
+      &__workspace
+        padding-left 0
+        list-style none
+        &__item
+          &__wrapper
+            display flex
+            align-items center
+            border-bottom 1px solid
+            width 100%
+            height 100%
+            cursor pointer
+          &__number
+            display flex
+            leftside()
+            padding 12px
+            width 50px
+            letter-spacing 2px
+          &__name
+            padding 10px
+            width 224px
+            font-size 20px
+            color offWhite
+            white-space nowrap
+            overflow hidden
+            text-overflow ellipsis
+          &__icon
+            display flex
+            align-items center
+            width 26px
+            height 50px
+            color white
+          &__submenu
+            margin 0
+            padding 0
+            width 100%
+            overflow hidden
+            & > li
+              display block
+            &__dropdown
+              display flex
+              align-items center
+              border-bottom 1px solid
+              cursor pointer
+              &__showdropdown
+                display flex
+                justify-content space-between
+                align-items center
+                padding 0 10px
+                width 100%
+              .dropdown__icon
+                padding 10px 15px
+                min-width 50px
+                leftside()
+              .dropdown__title
+                white-space nowrap
+                overflow hidden
+                text-overflow ellipsis
+                // color offWhite
+              &.activeFilter
+                .dropdown__icon
+                  background-color rgba(253, 253, 253, 0.8)
+  &__footer
+    &__text
+      color offWhite
+      font-size 14px
+      &__link
+        & > a
+          color offWhite
+          font-size 14px
+          &:hover
+            text-decoration underline
+            color fourthColor
+
+// MEDIAQUERIES
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .sidebarpagecontainer
+    position relative
+
+  .sidebar
+    position absolute
+    min-height calc(100% - 88px)
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .sidebarpagecontainer
+    position relative
+
+  .sidebar
+    position absolute
+    min-height calc(100% - 88px)
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .sidebarpagecontainer
+    position relative
+    padding-top 69px
+
+  .sidebar
+    position absolute
+    min-height calc(100% - 69px)
+
+@media (max-width: 575px)
+
+  .sidebarpagecontainer
+    position relative
+    padding-top 69px
+
+  .sidebar
+    position absolute
+    min-height calc(100% - 69px)

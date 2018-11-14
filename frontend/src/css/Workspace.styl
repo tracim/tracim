@@ -1,0 +1,49 @@
+.workspace
+  &__header
+    display flex
+    flex-wrap wrap
+    margin-right 30px
+  &__content
+    &__button
+      display flex
+      justify-content flex-end
+      margin 45px 0
+      &__btnaddworkspace
+        margin-bottom 50px
+        padding 10px 55px
+    &__fileandfolder
+      &__empty
+        margin-top 50px
+        font-weight bold
+
+// MEDIAQUERIES
+
+@media (min-width: min-md) and (max-width: max-md)
+  .workspace
+    &__content
+      margin 0
+      &__button
+        margin-right 30px
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .workspace
+    &__content
+      margin 0
+      &__button
+        margin-right 30px
+    &__header
+      &__btnaddworkspace
+        display inline-block
+        margin-right 0
+
+@media (max-width: max-xs)
+  .workspace
+    &__header
+      display block
+      &__title
+        margin 25px 0 20px 10px
+    &__content
+      margin 0
+      &__button
+        justify-content flex-start
+        margin-left 10px

@@ -1,0 +1,19 @@
+{
+  "Last version": "Dernière version",
+  "Validate and create": "Valider et créer",
+  "Document's title": "Titre du document",
+  "New Document": "Nouveau document",
+  "Error while archiving document": "Erreur lors de l'archivage d'un document",
+  "Error while deleting document": "Erreur lors de la suppression d'un document",
+  "Error while restoring document": "Erreur lors de la restauration du document",
+  "This content is archived.": "Ce contenu est archivé.",
+  "Restore": "Restaurer",
+  "This content is deleted.": "Ce contenu est supprimé.",
+  "latest version :": "Dernière version",
+  "Write a document": "Rédiger un document",
+  "Text Documents": "Documents texte",
+  "Edit": "Modifier",
+  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
+  "Error while creating document": "Erreur lors de la création du document",
+  "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire"
+}
