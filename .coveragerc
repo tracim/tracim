@@ -1,5 +1,0 @@
-[report]
-omit =
-tests/*
-*/python?.?/*
-*/site-packages/nose/*
