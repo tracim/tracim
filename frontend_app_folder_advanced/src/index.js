@@ -1,20 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import AppFolder from './container/AppFolder.jsx'
+import PopupCreateFolder from './container/PopupCreateFolder.jsx'
 
 require('./css/index.styl')
 
 const appInterface = {
-  name: 'AppFolder',
+  name: 'folder',
   isRendered: false,
-  renderApp: data => {
+  // renderAppFeature: data => {
+  //   return ReactDOM.render(
+  //     null // <Workspace data={data} />
+  //     , document.getElementById(data.config.domContainer)
+  //   )
+  // },
+  unmountApp: domId => {
+    return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
+  },
+  renderAppPopupCreation: data => {
     return ReactDOM.render(
-      <AppFolder data={data} />
+      <PopupCreateFolder data={data} />
       , document.getElementById(data.config.domContainer)
     )
-  },
-  hideApp: domId => {
-    return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   }
 }
 

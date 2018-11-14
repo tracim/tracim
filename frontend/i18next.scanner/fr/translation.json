@@ -72,7 +72,7 @@
   "Email Address:": "Adresse email",
   "An error has happened while getting": "Une erreur s'est produite lors de l'obtention de ",
   "An error has happened while setting \"mark all as read\"": "Une erreur s'est produite lors du réglage de \"Tout marquer comme lu\".",
-  "Create in folder": "Créer dans ce dossier ...",
+  "Create in folder": "Créer dans ce dossier ",
   "Open advanced Dashboard": "Ouvrir le tableau de bord avancé",
   "Error while loading user": "Erreur lors du chargement de l'utilisateur",
   "Name has been changed": "Le nom a été changé",
@@ -161,5 +161,8 @@
   "text documents": "documents texte",
   "threads": "discussions",
   "files": "fichiers",
-  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail"
+  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail",
+  "This user already is in the workspace": "__NOT_TRANSLATED__",
+  "Error while loading content list": "__NOT_TRANSLATED__",
+  "Error while loading members list": "__NOT_TRANSLATED__"
 }

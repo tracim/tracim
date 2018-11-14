@@ -32,6 +32,7 @@
     "file-loader": "^1.1.5",
     "i18next": "^10.5.0",
     "js-cookie": "^2.2.0",
+    "lodash": "^4.17.11",
     "prop-types": "^15.6.0",
     "query-string": "^6.1.0",
     "radium": "^0.24.1",

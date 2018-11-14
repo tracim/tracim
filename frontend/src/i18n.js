@@ -12,6 +12,8 @@ const threadEnTranslation = require('../dist/app/thread_en_translation.json') ||
 const threadFrTranslation = require('../dist/app/thread_fr_translation.json') || {}
 const fileEnTranslation = require('../dist/app/file_en_translation.json') || {}
 const fileFrTranslation = require('../dist/app/file_fr_translation.json') || {}
+const folderEnTranslation = require('../dist/app/folder_en_translation.json') || {}
+const folderFrTranslation = require('../dist/app/folder_fr_translation.json') || {}
 const adminWsUserEnTranslation = require('../dist/app/admin_workspace_user_en_translation.json') || {}
 const adminWsUserFrTranslation = require('../dist/app/admin_workspace_user_fr_translation.json') || {}
 const wsAdvancedEnTranslation = require('../dist/app/workspace_advanced_en_translation.json') || {}
@@ -47,6 +49,7 @@ i18n
           ...htmlDocEnTranslation, // html-document
           ...threadEnTranslation, // thread
           ...fileEnTranslation, // file
+          ...folderEnTranslation, // folder
           ...wsAdvancedEnTranslation, // advanced workspace
           ...adminWsUserEnTranslation, // admin workspace user
           ...wsEnTranslation // workspace
@@ -59,6 +62,7 @@ i18n
           ...htmlDocFrTranslation, // html-document
           ...threadFrTranslation, // thread
           ...fileFrTranslation, // file
+          ...folderFrTranslation, // folder
           ...wsAdvancedFrTranslation, // advanced workspace
           ...adminWsUserFrTranslation, // admin workspace user
           ...wsFrTranslation // workspace

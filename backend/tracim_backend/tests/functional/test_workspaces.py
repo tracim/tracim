@@ -2893,6 +2893,279 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['modified']
         assert content['created']
 
+    def test_api__get_workspace_content__ok_200__get_all_root_and_folder_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        params = {
+            'parent_ids': '0,3',
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 7
+        assert [content for content in res if content['label'] == 'Desserts'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] is None
+                and content['content_id'] == 3
+                ]
+        assert [content for content in res if content['label'] == 'Fruits Desserts'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 3
+                ]
+
+    def test_api__get_workspace_content__ok_200__get_multiple_folder_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        content_id = res.json_body['content_id']
+        params = {
+            'parent_ids': '1,2',
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 2
+        assert [content for content in res if content['label'] == 'Current Menu'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 2
+                and content['content_id'] == 11
+                ]
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == content_id
+                ]
+
+    def test_api__get_workspace_content__ok_200__get_folder_content_with_path_of_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'subfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subfolder_content_id,
+            'label': 'subsubfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subsubfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subsubfolder_content_id,
+            'label': 'InfolderContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        infolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        generic_content_content_id = res.json_body['content_id']
+        params = {
+            'parent_ids': '2',
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 7
+        assert [content for content in res if content['label'] == 'Current Menu'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 2
+                and content['content_id'] == 11
+                ]
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'InfolderContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+    def test_api__get_workspace_content__ok_200__get_path_of_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'subfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subfolder_content_id,
+            'label': 'subsubfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subsubfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subsubfolder_content_id,
+            'label': 'InfolderContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        infolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        generic_content_content_id = res.json_body['content_id']
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 6
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'InfolderContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
         Check obtain workspace all root contents
@@ -3259,7 +3532,7 @@ class TestWorkspaceContents(FunctionalTest):
         transaction.commit()
         # test-itself
         params = {
-            'parent_id': 1,
+            'parent_ids': 1,
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
@@ -3313,7 +3586,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder all contents
          """
         params = {
-            'parent_id': 10,  # TODO - G.M - 30-05-2018 - Find a real id
+            'parent_ids': 10,  # TODO - G.M - 30-05-2018 - Find a real id
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
@@ -3380,7 +3653,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder active contents
          """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3418,7 +3691,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder archived contents
          """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 1,
             'show_deleted': 0,
             'show_active': 0,
@@ -3456,7 +3729,7 @@ class TestWorkspaceContents(FunctionalTest):
          Check obtain workspace folder deleted contents
          """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 1,
             'show_active': 0,
@@ -3496,7 +3769,7 @@ class TestWorkspaceContents(FunctionalTest):
         (archived, deleted, active) result should be empty list.
         """
         params = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 0,
@@ -3612,7 +3885,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['file_extension'] == '.document.html'
         assert res.json_body['filename'] == 'GenericCreatedContent.document.html'   # nopep8
         params_active = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3660,7 +3933,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3717,7 +3990,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3816,7 +4089,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['modified']
         assert res.json_body['created']
         params_active = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -3929,7 +4202,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'label': 'GenericCreatedContent',
             'content_type': 'folder',
-            'parent_id': folder.content_id
+            'parent_ids': folder.content_id
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
@@ -3956,13 +4229,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '2',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 4,
+            'parent_ids': 4,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4005,13 +4278,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': 2,
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4054,13 +4327,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '2',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 4,
+            'parent_ids': 4,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4103,13 +4376,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '1',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 2,
+            'parent_ids': 2,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4152,13 +4425,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '1',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 0,
+            'parent_ids': 0,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4202,13 +4475,13 @@ class TestWorkspaceContents(FunctionalTest):
             'new_workspace_id': '1',
         }
         params_folder1 = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_folder2 = {
-            'parent_id': 4,
+            'parent_ids': 4,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -4233,13 +4506,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_deleted = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 1,
             'show_active': 0,
@@ -4272,13 +4545,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_archived = {
-            'parent_id': 3,
+            'parent_ids': 3,
             'show_archived': 1,
             'show_deleted': 0,
             'show_active': 0,
@@ -4309,13 +4582,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_deleted = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 1,
             'show_active': 0,
@@ -4346,13 +4619,13 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params_active = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
         }
         params_archived = {
-            'parent_id': 10,
+            'parent_ids': 10,
             'show_archived': 1,
             'show_deleted': 0,
             'show_active': 0,
