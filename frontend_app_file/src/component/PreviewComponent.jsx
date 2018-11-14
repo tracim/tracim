@@ -12,7 +12,19 @@ export class PreviewComponent extends React.Component {
     this.state = {
       displayFormNewDescription: false,
       newDescription: '',
-      displayLightbox: false
+      displayLightbox: false,
+      isPreviewDisplayable: true
+    }
+  }
+
+  componentDidMount () {
+    this.isPreviewDisplayable()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.previewUrl !== this.props.previewUrl) {
+      this.setState({isPreviewDisplayable: true})
+      this.isPreviewDisplayable()
     }
   }
 
@@ -30,6 +42,16 @@ export class PreviewComponent extends React.Component {
 
   handleClickShowImageRaw = async () => {
     this.setState({displayLightbox: true})
+  }
+
+  isPreviewDisplayable = () => {
+    const { props } = this
+
+    if (props.isJpegAvailable) {
+      const img = new Image()
+      img.src = props.previewUrl
+      img.onerror = () => this.setState({isPreviewDisplayable: false})
+    }
   }
 
   render () {
@@ -80,7 +102,7 @@ export class PreviewComponent extends React.Component {
         </div>
 
         <div className='previewcomponent__slider'>
-          {props.filePageNb > 1 && (
+          {state.isPreviewDisplayable && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__slider__icon btn iconBtn'
@@ -95,10 +117,12 @@ export class PreviewComponent extends React.Component {
           )}
 
           <div
-            className={classnames('previewcomponent__slider__fileimg', {'previewAvailable': props.isJpegAvailable})}
-            onClick={props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
+            className={
+              classnames('previewcomponent__slider__fileimg', {'previewAvailable': state.isPreviewDisplayable && props.isJpegAvailable})
+            }
+            onClick={state.isPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
-            {props.isJpegAvailable
+            {state.isPreviewDisplayable && props.isJpegAvailable
               ? (
                 <img src={props.previewUrl} className='img-thumbnail mx-auto' />
               )
@@ -112,7 +136,7 @@ export class PreviewComponent extends React.Component {
               )
             }
 
-            {props.isJpegAvailable && (
+            {state.isPreviewDisplayable && props.isJpegAvailable && (
               <Lightbox
                 isOpen={state.displayLightbox}
                 images={(props.lightboxUrlList || []).map(url => ({src: url}))}
@@ -126,7 +150,7 @@ export class PreviewComponent extends React.Component {
             )}
           </div>
 
-          {props.filePageNb > 1 && (
+          {state.isPreviewDisplayable && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__slider__icon btn iconBtn'
@@ -140,7 +164,7 @@ export class PreviewComponent extends React.Component {
             </button>
           )}
 
-          {props.filePageNb > 1 && (
+          {state.isPreviewDisplayable && props.filePageNb > 1 && (
             <div className='previewcomponent__slider__pagecount'>
               {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
             </div>

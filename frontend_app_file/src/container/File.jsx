@@ -156,7 +156,7 @@ class File extends React.Component {
     switch (fetchResultFile.apiResponse.status) {
       case 200:
         const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
-        const pageForPreview = pageToLoad ? pageToLoad : fileCurrentPage
+        const pageForPreview = pageToLoad || fileCurrentPage
         this.setState({
           content: {
             ...fetchResultFile.body,
