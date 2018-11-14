@@ -13,19 +13,33 @@ export class PreviewComponent extends React.Component {
       displayFormNewDescription: false,
       newDescription: '',
       displayLightbox: false,
-      isPreviewDisplayable: true
+      isJpegPreviewDisplayable: true
+      // isPdfPageDisplayable: true,
+      // isPdfFullDisplayable: true
     }
   }
 
   componentDidMount () {
-    this.isPreviewDisplayable()
+    this.isJpegPreviewDisplayable()
+    // this.isPdfPageDisplayable()
+    // this.isPdfFullDisplayable()
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.previewUrl !== this.props.previewUrl) {
-      this.setState({isPreviewDisplayable: true})
-      this.isPreviewDisplayable()
+    const { props } = this
+
+    if (prevProps.previewUrl !== props.previewUrl) {
+      this.setState({isJpegPreviewDisplayable: true})
+      this.isJpegPreviewDisplayable()
     }
+    // if (prevProps.downloadPdfPageUrl !== props.downloadPdfPageUrl) {
+    //   this.setState({isPdfPageDisplayable: true})
+    //   this.isPdfPageDisplayable()
+    // }
+    // if (prevProps.downloadPdfFullUrl !== props.downloadPdfFullUrl) {
+    //   this.setState({isPdfFullDisplayable: true})
+    //   this.isPdfFullDisplayable()
+    // }
   }
 
   handleToggleFormNewDescription = () => this.setState(prev => ({
@@ -44,15 +58,35 @@ export class PreviewComponent extends React.Component {
     this.setState({displayLightbox: true})
   }
 
-  isPreviewDisplayable = () => {
+  isJpegPreviewDisplayable = () => {
     const { props } = this
 
     if (props.isJpegAvailable) {
-      const img = new Image()
+      const img = document.createElement('img')
       img.src = props.previewUrl
-      img.onerror = () => this.setState({isPreviewDisplayable: false})
+      img.onerror = () => this.setState({isJpegPreviewDisplayable: false})
     }
   }
+
+  // Côme - 2018/11/14 - As long as we don't have a complete knowledge of what works and what don't about preview generator
+  // we assume that if jpeg fails, pdf will too
+  // isPdfPageDisplayable = async () => {
+  //   const { props } = this
+  //
+  //   if (props.isPdfAvailable) {
+  //     const fetchPdfPage = await handleFetchResult(await getFilePdf(props.downloadPdfPageUrl))
+  //     if (fetchPdfPage.status !== 200) this.setState({isPdfPageDisplayable: false})
+  //   }
+  // }
+  //
+  // isPdfFullDisplayable = async () => {
+  //   const { props } = this
+  //
+  //   if (props.isPdfAvailable) {
+  //     const fetchPdfFull = await handleFetchResult(await getFilePdf(props.downloadPdfFullUrl))
+  //     if (fetchPdfFull.status !== 200) this.setState({isPdfFullDisplayable: false})
+  //   }
+  // }
 
   render () {
     const { props, state } = this
@@ -60,7 +94,7 @@ export class PreviewComponent extends React.Component {
     return (
       <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
         <div className='previewcomponent__dloption'>
-          {props.isPdfAvailable && (
+          {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
             <a
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfPageUrl}
@@ -74,7 +108,7 @@ export class PreviewComponent extends React.Component {
             </a>
           )}
 
-          {props.isPdfAvailable && (
+          {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
             <a
               className='previewcomponent__dloption__icon btn iconBtn'
               href={props.downloadPdfFullUrl}
@@ -102,7 +136,7 @@ export class PreviewComponent extends React.Component {
         </div>
 
         <div className='previewcomponent__slider'>
-          {state.isPreviewDisplayable && props.filePageNb > 1 && (
+          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__slider__icon btn iconBtn'
@@ -118,11 +152,11 @@ export class PreviewComponent extends React.Component {
 
           <div
             className={
-              classnames('previewcomponent__slider__fileimg', {'previewAvailable': state.isPreviewDisplayable && props.isJpegAvailable})
+              classnames('previewcomponent__slider__fileimg', {'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable})
             }
-            onClick={state.isPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
+            onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
-            {state.isPreviewDisplayable && props.isJpegAvailable
+            {state.isJpegPreviewDisplayable && props.isJpegAvailable
               ? (
                 <img src={props.previewUrl} className='img-thumbnail mx-auto' />
               )
@@ -136,7 +170,7 @@ export class PreviewComponent extends React.Component {
               )
             }
 
-            {state.isPreviewDisplayable && props.isJpegAvailable && (
+            {state.isJpegPreviewDisplayable && props.isJpegAvailable && (
               <Lightbox
                 isOpen={state.displayLightbox}
                 images={(props.lightboxUrlList || []).map(url => ({src: url}))}
@@ -150,7 +184,7 @@ export class PreviewComponent extends React.Component {
             )}
           </div>
 
-          {state.isPreviewDisplayable && props.filePageNb > 1 && (
+          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__slider__icon btn iconBtn'
@@ -164,7 +198,7 @@ export class PreviewComponent extends React.Component {
             </button>
           )}
 
-          {state.isPreviewDisplayable && props.filePageNb > 1 && (
+          {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
             <div className='previewcomponent__slider__pagecount'>
               {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
             </div>
