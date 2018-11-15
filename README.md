@@ -1,7 +1,7 @@
 develop branch status:
-[![Build Status](https://travis-ci.org/tracim/tracim_v2.svg?branch=develop)](https://travis-ci.org/tracim/tracim_v2)
-[![Coverage Status](https://coveralls.io/repos/github/tracim/tracim_v2/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim_v2?branch=develop)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim_v2/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim_v2/?branch=develop)
+[![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=develop)](https://travis-ci.org/tracim/tracim)
+[![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
 
 ## Install Tracim on your server ##
@@ -16,8 +16,8 @@ Following the installation documentation below, you'll be able to run your own i
 
 Get the sources from GitHub (you need git):
 
-    git clone https://github.com/tracim/tracim_v2.git
-    cd tracim_v2/
+    git clone https://github.com/tracim/tracim.git
+    cd tracim/
 
 ## Install backend
 ### Option 1: Install backend manually ###
