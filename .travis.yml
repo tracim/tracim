@@ -100,8 +100,8 @@ addons:
     - poppler-utils
     - libldap2-dev
     - libsasl2-dev
+    - docker-ce
 services:
-  - docker
   - redis-server
   - mysql
 before_install:
