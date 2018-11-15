@@ -98,11 +98,6 @@ def web(global_config, **local_settings):
             scope=ldap3.LEVEL,
             attributes=ldap3.ALL_ATTRIBUTES
         )
-    #        configurator.ldap_set_groups_query(
-    #            base_dn=app_config.LDAP_GROUP_BASE_DN,
-    #            filter_tmpl=app_config.LDAP_GROUP_FILTER,
-    #            scope=ldap3.SCOPE_SUBTREE,
-    #            cache_period=600,
 
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS

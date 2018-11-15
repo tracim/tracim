@@ -5,16 +5,19 @@ import time
 from datetime import datetime
 from xml.etree import ElementTree
 
+import ldap3
 import transaction
 import yaml
 from pyramid.paster import get_appsettings
+from pyramid.registry import Registry
 from wsgidav import util, compat
 from wsgidav.middleware import BaseMiddleware
 
 from tracim_backend import CFG
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import get_engine, get_session_factory, get_tm_session
-
+from pyramid_ldap3 import ConnectionManager, Connector, _LDAPQuery
+from pyramid.threadlocal import get_current_registry
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):
     """
@@ -274,9 +277,40 @@ class TracimEnv(BaseMiddleware):
         environ['tracim_tm'] = tm
         environ['tracim_dbsession'] = dbsession
         environ['tracim_cfg'] = self.app_config
+        registry = get_current_registry()
+        registry.ldap_connector = None
+        if self.app_config.AUTH_TYPE == 'ldap':
+            registry = self.setup_ldap(registry, self.app_config)
+        environ['tracim_registry'] =  registry
+
         app = self._application(environ, start_response)
         dbsession.close()
         return app
+
+    def setup_ldap(self, registry: Registry, app_config: CFG):
+        use_pool = True
+        pool_size = 10 if use_pool else None
+        pool_lifetime = 3600 if use_pool else None
+        get_info = None
+        manager = ConnectionManager(
+            uri=app_config.LDAP_URL,
+            bind=app_config.LDAP_BIND_DN,
+            passwd=app_config.LDAP_BIND_PASS,
+            tls=app_config.LDAP_TLS,
+            use_pool=True,
+            pool_size=pool_size,
+            pool_lifetime=pool_lifetime,
+            get_info=get_info
+        )
+        registry.ldap_login_query = _LDAPQuery(
+            base_dn=app_config.LDAP_USER_BASE_DN,
+            filter_tmpl='(mail=%(login)s)',
+            scope=ldap3.LEVEL,
+            attributes=ldap3.ALL_ATTRIBUTES,
+            cache_period=0
+        )
+        registry.ldap_connector = Connector(registry, manager)
+        return registry
 
 
 class TracimUserSession(BaseMiddleware):
