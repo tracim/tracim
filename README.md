@@ -98,6 +98,6 @@ Open Cypress with graphical interface. You can show test running directly in web
     cd functionnal_tests/
     ./node_modules/.bin/cypress open
 
-# CONTRIBUTE
+# Contribute
 
 in order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
