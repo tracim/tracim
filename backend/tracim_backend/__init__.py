@@ -84,8 +84,6 @@ def web(global_config, **local_settings):
     if app_config.AUTH_TYPE == 'ldap':
         import ldap3
         configurator.include('pyramid_ldap3')
-        #from ldap3.utils.log import set_library_log_detail_level,set_library_log_activation_level, BASIC, EXTENDED
-        #set_library_log_detail_level(BASIC)
         configurator.ldap_setup(
             app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN,
