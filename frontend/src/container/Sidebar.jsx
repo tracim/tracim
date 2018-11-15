@@ -88,7 +88,7 @@ class Sidebar extends React.Component {
   shouldDisplaySidebar = props => { // pass props to allow to pass nextProps in shouldComponentUpdate
     return ![
       ...unLoggedAllowedPageList,
-      ...props.workspaceList.length > 0 ? [] : [PAGE.HOME]
+      ...props.workspaceList.length > 0 ? [] : [PAGE.HOME, '/ui/'] // @fixme - Côme - 2018/11/13 - have a better way than hardcoding '/ui/'
     ]
       .includes(props.location.pathname)
   }

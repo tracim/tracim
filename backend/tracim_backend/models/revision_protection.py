@@ -86,10 +86,12 @@ def new_revision(
                 content.new_revision()
             RevisionsIntegrity.add_to_updatable(content.revision)
             yield content
-        except SameValueError or ValueError as e:
-            # INFO - 20-03-2018 - renew transaction when error happened
+        except Exception as e:
+            # INFO - GM - 14-11-2018 - rollback session and renew
+            # transaction when error happened
             # This avoid bad _session data like new "temporary" revision
             # to be add when problem happen.
+            session.rollback()
             tm.abort()
             tm.begin()
             raise e
