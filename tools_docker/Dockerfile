@@ -45,7 +45,7 @@ RUN apt update && apt upgrade -qy \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/* \
 # Get the source from GitHub
-    && git clone https://github.com/tracim/tracim_v2.git tracim \
+    && git clone https://github.com/tracim/tracim.git tracim \
     && cd /tracim/ \
     && git checkout -- \
     && git pull origin develop \
