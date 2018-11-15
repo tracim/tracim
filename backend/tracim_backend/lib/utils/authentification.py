@@ -1,16 +1,17 @@
 import datetime
 import typing
 
-from pyramid_ldap3 import get_ldap_connector
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
+from pyramid_ldap3 import get_ldap_connector
 from zope.interface import implementer
-from tracim_backend.exceptions import UserDoesNotExist
+
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import User
 

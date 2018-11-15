@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+import datetime
 import typing as typing
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 
-import datetime
 import transaction
 from sqlalchemy import func
 from sqlalchemy import or_
@@ -13,8 +13,6 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import UserAuthenticatedIsDeleted
-from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation  # nopep8
@@ -24,11 +22,13 @@ from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnvalidResetPasswordToken
+from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager

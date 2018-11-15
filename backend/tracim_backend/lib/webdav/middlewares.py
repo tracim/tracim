@@ -10,14 +10,20 @@ import transaction
 import yaml
 from pyramid.paster import get_appsettings
 from pyramid.registry import Registry
-from wsgidav import util, compat
+from pyramid.threadlocal import get_current_registry
+from pyramid_ldap3 import ConnectionManager
+from pyramid_ldap3 import Connector
+from pyramid_ldap3 import _LDAPQuery
+from wsgidav import compat
+from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
 
 from tracim_backend import CFG
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import get_engine, get_session_factory, get_tm_session
-from pyramid_ldap3 import ConnectionManager, Connector, _LDAPQuery
-from pyramid.threadlocal import get_current_registry
+from tracim_backend.models import get_engine
+from tracim_backend.models import get_session_factory
+from tracim_backend.models import get_tm_session
+
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):
     """

@@ -4,8 +4,8 @@ import typing
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import DigestAuthNotImplemented
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import DigestAuthNotImplemented
 from tracim_backend.lib.core.user import UserApi
 
 DEFAULT_TRACIM_WEBDAV_REALM = '/'
