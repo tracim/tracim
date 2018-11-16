@@ -69,8 +69,9 @@ website.base_url = http://localhost:6543
 # base_url, by default only website.base_url and api.base_url are allowed
 # cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
-# Auth type (internal or ldap)
-auth_type = internal
+# Auth type list (internal or ldap), can be a list of item separated by ','
+# and ordered by priority
+auth_types = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
 # LDAP server address
 # ldap_url = ldap://localhost:389

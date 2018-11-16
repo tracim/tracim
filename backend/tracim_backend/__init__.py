@@ -81,7 +81,7 @@ def web(global_config, **local_settings):
     ]
 
     # Hack for ldap
-    if app_config.AUTH_TYPE == 'ldap':
+    if 'ldap' in app_config.AUTH_TYPES:
         import ldap3
         configurator.include('pyramid_ldap3')
         configurator.ldap_setup(

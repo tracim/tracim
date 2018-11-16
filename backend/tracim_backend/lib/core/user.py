@@ -16,6 +16,7 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import GroupDoesNotExist
+from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import \
     NotificationDisabledCantCreateUserWithInvitation  # nopep8
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
@@ -23,6 +24,7 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
+from tracim_backend.exceptions import UnknownAuthType
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
@@ -283,25 +285,61 @@ class UserApi(object):
 
         return user
 
+
     def authenticate(
             self,
             email: str,
             password: str,
-            ldap_connector: 'Connector' = None
+            ldap_connector: 'Connector' = None,
     ) -> User:
         """
         Authenticate user with email and password, raise AuthenticationFailed
-        if uncorrect.
+        if uncorrect. try all auth available in order and raise issue of
+        last auth if all auth failed.
         :param email: email of the user
         :param password: cleartext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
+        last_exception = None
+        for auth_type in self._config.AUTH_TYPES:
+            try:
+                return self._authenticate(
+                    email,
+                    password,
+                    ldap_connector,
+                    auth_type=auth_type
+                )
+            except AuthenticationFailed as exc:
+                last_exception = exc
+        raise last_exception
+
+
+    def _authenticate(
+            self,
+            email: str,
+            password: str,
+            ldap_connector: 'Connector' = None,
+            auth_type: str = 'internal',
+    ) -> User:
+        """
+        Authenticate user with email and password, raise AuthenticationFailed
+        if uncorrect. check only one auth
+        :param email: email of the user
+        :param password: cleartext password of the user
+        :param ldap_connector: ldap connector, enable ldap auth if provided
+        :param auth_type: auth type to test.
+        :return: User who was authenticated.
+        """
         try:
-            if ldap_connector:
-                user = self._ldap_authenticate(email, password, ldap_connector)
+            if auth_type == 'ldap':
+                if ldap_connector:
+                    return self._ldap_authenticate(email, password, ldap_connector)
+                raise MissingLDAPConnector()
+            elif auth_type == 'internal':
+                return self._internal_db_authenticate(email, password)
             else:
-                user = self._internal_db_authenticate(email, password)
+                raise UnknownAuthType()
         except (
             WrongUserPassword,
             WrongLDAPCredentials,
@@ -310,8 +348,6 @@ class UserApi(object):
             UserAuthenticatedIsNotActive,
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
-
-        return user
 
     # Actions
     def set_password(

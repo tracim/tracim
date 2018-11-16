@@ -43,7 +43,7 @@ class SessionController(Controller):
             config=app_config,
         )
         ldap_connector = None
-        if app_config.AUTH_TYPE == 'ldap':
+        if 'ldap' in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         user = uapi.authenticate(login.email, login.password, ldap_connector)
         remember(request, user.user_id)

@@ -118,9 +118,10 @@ class CFG(object):
                 'ERROR: preview_cache_dir configuration is mandatory. '
                 'Set it before continuing.'
             )
-        self.AUTH_TYPE = settings.get(
-            'auth_type', 'internal'
+        auth_type_str = settings.get(
+            'auth_types', 'internal'
         )
+        self.AUTH_TYPES = [auth.strip() for auth in auth_type_str.split(',')]
 
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(

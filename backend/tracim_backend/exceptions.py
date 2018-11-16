@@ -338,3 +338,8 @@ class EmptyNotificationError(TracimException):
 class ContentInNotEditableState(TracimException):
     error_code = error.CONTENT_IN_NOT_EDITABLE_STATE
 
+class UnknownAuthType(TracimException):
+    pass
+
+class MissingLDAPConnector(TracimException):
+    pass

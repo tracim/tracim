@@ -285,7 +285,7 @@ class TracimEnv(BaseMiddleware):
         environ['tracim_cfg'] = self.app_config
         registry = get_current_registry()
         registry.ldap_connector = None
-        if self.app_config.AUTH_TYPE == 'ldap':
+        if 'ldap' in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ['tracim_registry'] =  registry
 

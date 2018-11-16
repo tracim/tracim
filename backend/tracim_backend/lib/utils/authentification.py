@@ -49,7 +49,7 @@ class TracimAuthenticationPolicy(object):
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         ldap_connector = None
-        if app_config.AUTH_TYPE == 'ldap':
+        if 'ldap' in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
             user = uapi.authenticate(
