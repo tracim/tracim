@@ -92,7 +92,7 @@ def web(global_config, **local_settings):
         )
         configurator.ldap_set_login_query(
             base_dn=app_config.LDAP_USER_BASE_DN,
-            filter_tmpl='(mail=%(login)s)',
+            filter_tmpl=app_config.LDAP_USER_FILTER,
             scope=ldap3.LEVEL,
             attributes=ldap3.ALL_ATTRIBUTES
         )

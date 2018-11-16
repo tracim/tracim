@@ -310,7 +310,7 @@ class TracimEnv(BaseMiddleware):
         )
         registry.ldap_login_query = _LDAPQuery(
             base_dn=app_config.LDAP_USER_BASE_DN,
-            filter_tmpl='(mail=%(login)s)',
+            filter_tmpl=app_config.LDAP_USER_FILTER,
             scope=ldap3.LEVEL,
             attributes=ldap3.ALL_ATTRIBUTES,
             cache_period=0

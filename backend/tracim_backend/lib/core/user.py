@@ -15,7 +15,9 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
-from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation  # nopep8
+from tracim_backend.exceptions import GroupDoesNotExist
+from tracim_backend.exceptions import \
+    NotificationDisabledCantCreateUserWithInvitation  # nopep8
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
@@ -227,11 +229,32 @@ class UserApi(object):
         try:
             user = self.get_one_by_email(email)
         except UserDoesNotExist:
+            groups = None
+            if self._config.LDAP_PROFILE_ATTR:
+                ldap_profile = ldap_data[self._config.LDAP_PROFILE_ATTR][0]
+                try:
+                    gapi = GroupApi(
+                        current_user=self._user,  # User
+                        session=self._session,
+                        config=self._config,
+                    )
+                    groups = [gapi.get_one_with_name(ldap_profile)] # nopep8
+                except GroupDoesNotExist:
+                    logger.warning(self,
+                        'Profile {} does not exist, create ldap user'
+                        'with default profile.'.format(
+                            ldap_profile
+                        )
+                    )
+            name = None
+            if self._config.LDAP_NAME_ATTR:
+                name = ldap_data[self._config.LDAP_NAME_ATTR][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
             self.create_user(
                 email=email,
                 password=password,
-                name=ldap_data['givenname'][0],
+                name=name,
+                groups=groups,
                 do_save=True,
                 do_notify=False
             )

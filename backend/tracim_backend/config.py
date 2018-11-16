@@ -596,18 +596,16 @@ class CFG(object):
         param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
 
         ldap_parameters = [
-            param('ldap_url',                   'LDAP_URL',           'dc=directory,dc=fsf,dc=org', None),
-            param('ldap_base_dn',               'LDAP_BASE_DN',       'dc=directory,dc=fsf,dc=org', None),
-            param('ldap_bind_dn',               'LDAP_BIND_DN',       'cn = admin, dc = directory,dc=fsf,dc=org', None),
-            param('ldap_bind_pass',             'LDAP_BIND_PASS',     'default value', None),
-            param('ldap_ldap_naming_attribute', 'LDAP_NAMING_ATTR',   'default value', None),
-            param('ldap_user_attributes',       'LDAP_USER_ATTR',     'default value', None),
-            param('ldap_tls',                   'LDAP_TLS',           False, asbool),
-            param('ldap_group_enabled',         'LDAP_GROUP_ENABLED', 'default value', None),
-            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN',  'default value', None),
-            param('ldap_user_filter',           'LDAP_USER_FILTER',   'default value', None),
-            param('ldap_group_base_dn',         'LDAP_GROUP_BASE_DN', 'default value', None),
-            param('ldap_group_filter',          'LDAP_GROUP_FILTER',  'default value', None),
+            param('ldap_url',                   'LDAP_URL',          'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_base_dn',               'LDAP_BASE_DN',      'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_dn',               'LDAP_BIND_DN',      'cn=admin, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_pass',             'LDAP_BIND_PASS',    '', None),
+            param('ldap_tls',                   'LDAP_TLS',          False, asbool),
+            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN', 'ou=people, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
+            # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
+            param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
+            param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
         ]
 
         for prm in ldap_parameters:
@@ -622,6 +620,8 @@ class CFG(object):
                         prm.cfg_name,
                         settings.get( prm.ini_name, prm.default_value )
                         )
+
+        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
 
 
     def configure_filedepot(self):
