@@ -909,6 +909,12 @@ class ContentInContext(object):
             return None
         try:
             return self.content.depot_file.file.content_length
+        except IOError as e:
+            logger.warning(
+                self,
+                "IO Exception Occured when trying to get content size  : {}".format(str(e))
+            )
+            logger.warning(self, traceback.format_exc())
         except Exception as e:
             logger.warning(
                 self,
