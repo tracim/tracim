@@ -140,7 +140,7 @@ fi
 
 DEFAULTDIR=$(pwd)
 export DEFAULTDIR
-echo "This is DEFAULTDIR of tracim_v2 => \"$DEFAULTDIR\""
+echo "This is DEFAULTDIR of tracim => \"$DEFAULTDIR\""
 
 install_npm_and_nodejs
 log "go to backend subdir.."
