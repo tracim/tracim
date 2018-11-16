@@ -941,8 +941,8 @@ class ContentApi(object):
         :param file_extension: file extension of the file
         :return: preview_path as string
         """
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
             if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
@@ -984,8 +984,8 @@ class ContentApi(object):
                 :param file_extension: file extension of the file
         :return: path of the full pdf preview of this revision
         """
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             pdf_preview_path = self.preview_manager.get_pdf_preview(file_path, file_ext=file_extension)  # nopep8
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
@@ -1033,8 +1033,8 @@ class ContentApi(object):
         :param height: height in pixel
         :return: preview_path as string
         """
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
             if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
@@ -1613,8 +1613,8 @@ class ContentApi(object):
         content.revision_type = ActionDescription.UNDELETION
 
     def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:  # nopep8
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             nb_pages = self.preview_manager.get_page_nb(
                 file_path,
                 file_ext=file_extension
@@ -1631,8 +1631,8 @@ class ContentApi(object):
         return nb_pages
 
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             return self.preview_manager.has_pdf_preview(
                 file_path,
                 file_ext=file_extension
@@ -1648,8 +1648,8 @@ class ContentApi(object):
             return False
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             return self.preview_manager.has_jpeg_preview(
                 file_path,
                 file_ext=file_extension
