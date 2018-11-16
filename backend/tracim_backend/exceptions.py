@@ -330,3 +330,9 @@ class EmptyNotificationError(TracimException):
 class ContentInNotEditableState(TracimException):
     error_code = error.CONTENT_IN_NOT_EDITABLE_STATE
 
+
+class NewRevisionAbortedDepotCorrupted(TracimException):
+    pass
+
+class TracimFileNotFound(FileNotFoundError, TracimException):
+    pass
