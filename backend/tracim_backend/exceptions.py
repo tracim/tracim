@@ -334,5 +334,8 @@ class ContentInNotEditableState(TracimException):
 class NewRevisionAbortedDepotCorrupted(TracimException):
     pass
 
+class CopyRevisionAbortedDepotCorrupted(TracimException):
+    pass
+
 class TracimFileNotFound(FileNotFoundError, TracimException):
     pass
