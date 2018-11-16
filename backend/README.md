@@ -212,7 +212,7 @@ example of supervisord.conf file
     ; email notifier (if async email notification is enabled)
     [program:tracim_mail_notifier]
     directory=<PATH>/tracim/backend/
-    command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim_v2/backend/daemons/mail_notifier.py
+    command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim/backend/daemons/mail_notifier.py
     stdout_logfile =/tmp/mail_notifier.log
     redirect_stderr=true
     autostart=true

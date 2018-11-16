@@ -195,15 +195,15 @@ wsgidav.config_path = %(here)s/wsgidav.conf
 ### Frontend
 frontend.serve = True
 # You can set dist folder of tracim frontend. by default, system
-# will try to get it automatically according to tracim_v2 repository
+# will try to get it automatically according to tracim repository
 # organisation.
-# frontend.dist_folder_path = /home/user/tracim_v2/frontend/dist
+# frontend.dist_folder_path = /home/user/tracim/frontend/dist
 
 ### Color
-# check for color.json file in tracim_v2, check by default in tracim_v2 parent
+# check for color.json file in tracim, check by default in tracim parent
 # dir of backend.
 # you can set a specific file path here
-# color.config_file_path = /home/user/tracim_v2/color.json
+# color.config_file_path = /home/user/tracim/color.json
 
 
 ###
