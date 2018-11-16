@@ -71,8 +71,12 @@ class Sidebar extends React.Component {
     // check if pathname has changed
     if (props.location.pathname !== nextProps.location.pathname) return true
 
+    const propsUrlSearch = qs.parse(props.location.search)
+    const nextPropsUrlSearch = qs.parse(nextProps.location.search)
     // check if url filter of workspace content has changed
-    if (qs.parse(props.location.search).type !== qs.parse(nextProps.location.search).type) return true
+    if (propsUrlSearch.type !== nextPropsUrlSearch.type) return true
+    // check if opened folder list of workspace content has changed
+    if (propsUrlSearch.folder_open !== nextPropsUrlSearch.folder_open) return true
 
     const oldOpenedList = props.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
     const newOpenedList = nextProps.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)

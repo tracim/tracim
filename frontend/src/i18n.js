@@ -37,7 +37,7 @@ i18n
     // have a common namespace used around the full app
     ns: ['translation'], // namespace
     defaultNS: 'translation',
-    debug: true,
+    debug: false,
     react: {
       wait: true
     },

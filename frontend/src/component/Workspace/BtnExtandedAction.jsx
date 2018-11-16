@@ -18,7 +18,7 @@ const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        {props.idRoleUserWorkspace >= 2 &&
+        {props.idRoleUserWorkspace >= 2 && props.onClickExtendedAction.edit &&
           <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-pencil' />

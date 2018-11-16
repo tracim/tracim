@@ -51,7 +51,7 @@ class Folder extends React.Component {
                   <SubDropdownCreateButton
                     idFolder={props.folderData.id}
                     availableApp={props.availableApp}
-                    onClickCreateContent={props.onClickCreateContent}
+                    onClickCreateContent={(e, idFolder, slug) => props.onClickCreateContent(e, idFolder, slug)}
                   />
                 </div>
 
@@ -59,7 +59,7 @@ class Folder extends React.Component {
                   <BtnExtandedAction
                     idRoleUserWorkspace={props.idRoleUserWorkspace}
                     onClickExtendedAction={{
-                      edit: e => props.onClickExtendedAction.edit(e, props.folderData),
+                      edit: null, // e => props.onClickExtendedAction.edit(e, props.folderData),
                       move: e => props.onClickExtendedAction.move(e, props.folderData),
                       download: e => props.onClickExtendedAction.download(e, props.folderData),
                       archive: e => props.onClickExtendedAction.archive(e, props.folderData),
@@ -91,7 +91,7 @@ class Folder extends React.Component {
                 onClickCreateContent={props.onClickCreateContent}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
-                isLast={i === props.folderData.content.length - 1}
+                isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}
               />
@@ -113,7 +113,7 @@ class Folder extends React.Component {
                   archive: e => props.onClickExtendedAction.archive(e, content),
                   delete: e => props.onClickExtendedAction.delete(e, content)
                 }}
-                isLast={props.isLast} // isLast means among the entire contents of folder, not "is last of the current folder"
+                isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
               />
             )

@@ -20,13 +20,15 @@ const shouldDisplayAsActive = (location, idWorkspace, activeIdWorkspace, app) =>
 const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
   if (idWorkspace !== activeIdWorkspace) return route
 
+  if (search === '') return route
+
   // to keep query param (like opened folder) we need to copy theses param.
   // But "type" already is in allowedApp.route, so we need to remove it before passing props.location.search
   let urlSearch = qs.parse(search)
   delete urlSearch.type
   urlSearch = qs.stringify(urlSearch, {encode: false})
 
-  return `${route}${urlSearch.includes('?') ? '&' : '?'}${urlSearch}`
+  return `${route}${route.includes('?') ? '&' : '?'}${urlSearch}`
 }
 
 const WorkspaceListItem = props => {

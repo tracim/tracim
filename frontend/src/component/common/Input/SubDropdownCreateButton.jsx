@@ -8,7 +8,15 @@ const SubDropdownCreateButton = props => {
   return (
     <div>
       {props.availableApp.map(app =>
-        <div className='subdropdown__link primaryColorBgLightenHover dropdown-item' onClick={e => props.onClickCreateContent(e, props.idFolder, app.slug)} key={app.slug}>
+        <div
+          className='subdropdown__link primaryColorBgLightenHover dropdown-item'
+          onClick={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            props.onClickCreateContent(e, props.idFolder, app.slug)
+          }}
+          key={app.slug}
+        >
           <div className={`subdropdown__link__${app.slug} d-flex align-items-center`}>
             <div className={`subdropdown__link__${app.slug}__icon mr-3`}>
               <i
@@ -16,6 +24,7 @@ const SubDropdownCreateButton = props => {
                 style={{color: app.hexcolor}}
               />
             </div>
+
             <div className={`subdropdown__link__${app.slug}__text`}>
               {props.t(app.creationLabel) /* these keys come from each apps that have in state a property externalTradList */}
             </div>
