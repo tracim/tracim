@@ -696,7 +696,7 @@ class ContentRevisionRO(DeclarativeBase):
             except IOError as exc:
                 raise NewRevisionAbortedDepotCorrupted(
                     "Can't create new revision of content"
-                    " of last revision file is not accessible."
+                    " if last revision file is not accessible."
                 ) from exc
 
         return new_rev
