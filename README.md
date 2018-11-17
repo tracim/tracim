@@ -3,6 +3,9 @@ develop branch status:
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
+## Use tracim with docker
+
+You can find docker documentation [here](tools_docker/README.md). 
 
 ## Install Tracim on your server ##
 
