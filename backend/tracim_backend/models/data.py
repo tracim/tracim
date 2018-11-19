@@ -32,6 +32,8 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.exceptions import ContentStatusNotExist
+from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
+from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
@@ -686,11 +688,19 @@ class ContentRevisionRO(DeclarativeBase):
 
         new_rev.updated = datetime.utcnow()
         if revision.depot_file:
-            new_rev.depot_file = FileIntent(
-                revision.depot_file.file.read(),
-                revision.file_name,
-                revision.file_mimetype,
-            )
+            try:
+                new_rev.depot_file = FileIntent(
+                    revision.depot_file.file.read(),
+                    revision.file_name,
+                    revision.file_mimetype,
+                )
+            except IOError as exc:
+                raise NewRevisionAbortedDepotCorrupted(
+                    "IOError. Can't create new revision by copying another one "
+                    " during new revision creation process."
+                    " May be related to original revision"
+                    " file not being available."
+                ) from exc
 
         return new_rev
 
@@ -716,11 +726,19 @@ class ContentRevisionRO(DeclarativeBase):
 
         # copy attached_file
         if revision.depot_file:
-            copy_rev.depot_file = FileIntent(
-                revision.depot_file.file.read(),
-                revision.file_name,
-                revision.file_mimetype,
-            )
+            try:
+                copy_rev.depot_file = FileIntent(
+                    revision.depot_file.file.read(),
+                    revision.file_name,
+                    revision.file_mimetype,
+                )
+            except IOError as exc:
+                raise CopyRevisionAbortedDepotCorrupted(
+                    "IOError. Can't create new revision by copying another one"
+                    " during content copy process."
+                    " May be related to original revision "
+                    " file not being available."
+                ) from exc
         return copy_rev
 
     def __setattr__(self, key: str, value: 'mixed'):
