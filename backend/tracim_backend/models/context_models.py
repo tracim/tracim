@@ -1,5 +1,6 @@
 # coding=utf-8
 import cgi
+import traceback
 import typing
 from datetime import datetime
 from enum import Enum
@@ -13,6 +14,7 @@ from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
@@ -903,10 +905,24 @@ class ContentInContext(object):
         """
         :return: size of content if available, None if unavailable
         """
-        if self.content.depot_file:
-            return self.content.depot_file.file.content_length
-        else:
+        if not self.content.depot_file:
             return None
+        try:
+            return self.content.depot_file.file.content_length
+        except IOError as e:
+            logger.warning(
+                self,
+                "IO Exception Occured when trying to get content size  : {}".format(str(e))
+            )
+            logger.warning(self, traceback.format_exc())
+        except Exception as e:
+            logger.warning(
+                self,
+                "Unknown Exception Occured when trying to get content size  : {}".format(str(e))
+            )
+            logger.warning(self, traceback.format_exc())
+        return None
+
 
     @property
     def has_pdf_preview(self) -> bool:
@@ -1185,10 +1201,23 @@ class RevisionInContext(object):
         """
         :return: size of content if available, None if unavailable
         """
-        if self.revision.depot_file:
-            return self.revision.depot_file.file.content_length
-        else:
+        if not self.revision.depot_file:
             return None
+        try:
+            return self.revision.depot_file.file.content_length
+        except IOError as e:
+            logger.warning(
+                self,
+                "IO Exception Occured when trying to get content size  : {}".format(str(e))
+            )
+            logger.warning(self, traceback.format_exc())
+        except Exception as e:
+            logger.warning(
+                self,
+                "Unknown Exception Occured when trying to get content size  : {}".format(str(e))
+            )
+            logger.warning(self, traceback.format_exc())
+        return None
 
     @property
     def has_pdf_preview(self) -> bool:

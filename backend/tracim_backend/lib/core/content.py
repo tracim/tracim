@@ -25,14 +25,14 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
 
-from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import GlobalStatus
-from tracim_backend.exceptions import ContentInNotEditableState
+from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
+from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
@@ -40,6 +40,8 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
+from tracim_backend.exceptions import \
+    RevisionFilePathSearchFailedDepotCorrupted
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
@@ -724,11 +726,18 @@ class ContentApi(object):
         :param revision_id: The revision id of the filepath we want to return
         :return: The corresponding filepath
         """
-        revision = self.get_one_revision(revision_id)
-        depot = DepotManager.get()
-        depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
-        depot_file_path = depot_stored_file._file_path  # type: str
-        return depot_file_path
+        try:
+            revision = self.get_one_revision(revision_id)
+            depot = DepotManager.get()
+            depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
+            depot_file_path = depot_stored_file._file_path  # type: str
+            return depot_file_path
+        except IOError as exc:
+            raise RevisionFilePathSearchFailedDepotCorrupted(
+                'IOError Unable to find Revision filepath.'
+                'File may be not available.'
+            ) from exc
+
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent(
@@ -941,8 +950,8 @@ class ContentApi(object):
         :param file_extension: file extension of the file
         :return: preview_path as string
         """
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
             if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
@@ -966,6 +975,15 @@ class ContentApi(object):
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
+        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+            logger.warning(
+                self,
+                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+            )
+            logger.warning(self, traceback.format_exc())
+            raise UnavailablePreview(
+                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+            ) from exc
         except Exception as exc:
             logger.warning(
                 self,
@@ -984,14 +1002,23 @@ class ContentApi(object):
                 :param file_extension: file extension of the file
         :return: path of the full pdf preview of this revision
         """
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             pdf_preview_path = self.preview_manager.get_pdf_preview(file_path, file_ext=file_extension)  # nopep8
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
                 'No preview available for revision {}'.format(revision_id)
+            ) from exc
+        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+            logger.warning(
+                self,
+                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+            )
+            logger.warning(self, traceback.format_exc())
+            raise UnavailablePreview(
+                'No preview available for revision {}'.format(revision_id)  # nopep8
             ) from exc
         except Exception as exc:
             logger.warning(
@@ -1033,8 +1060,8 @@ class ContentApi(object):
         :param height: height in pixel
         :return: preview_path as string
         """
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
             if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
@@ -1073,6 +1100,15 @@ class ContentApi(object):
             # specific error code.
             raise exc
         except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+            ) from exc
+        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+            logger.warning(
+                self,
+                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+            )
+            logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
@@ -1613,13 +1649,20 @@ class ContentApi(object):
         content.revision_type = ActionDescription.UNDELETION
 
     def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:  # nopep8
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             nb_pages = self.preview_manager.get_page_nb(
                 file_path,
                 file_ext=file_extension
             )
         except UnsupportedMimeType:
+            return None
+        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+            logger.warning(
+                self,
+                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+            )
+            logger.warning(self, traceback.format_exc())
             return None
         except Exception as e:
             logger.warning(
@@ -1631,13 +1674,20 @@ class ContentApi(object):
         return nb_pages
 
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             return self.preview_manager.has_pdf_preview(
                 file_path,
                 file_ext=file_extension
             )
         except UnsupportedMimeType:
+            return False
+        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+            logger.warning(
+                self,
+                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+            )
+            logger.warning(self, traceback.format_exc())
             return False
         except Exception as e:
             logger.warning(
@@ -1648,13 +1698,20 @@ class ContentApi(object):
             return False
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
-        file_path = self.get_one_revision_filepath(revision_id)
         try:
+            file_path = self.get_one_revision_filepath(revision_id)
             return self.preview_manager.has_jpeg_preview(
                 file_path,
                 file_ext=file_extension
             )
         except UnsupportedMimeType:
+            return False
+        except RevisionFilePathSearchFailedDepotCorrupted as exc:
+            logger.warning(
+                self,
+                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+            )
+            logger.warning(self, traceback.format_exc())
             return False
         except Exception as e:
             logger.warning(
