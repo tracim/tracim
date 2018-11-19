@@ -345,7 +345,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u3,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name', exclude_workspace_ids=[workspace.workspace_id], exclude_user_ids=[u4.user_id])
         assert len(users) == 1
@@ -358,7 +358,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -406,7 +406,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u3,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name')
         assert len(users) == 2
@@ -459,7 +459,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name', exclude_user_ids=[u1.user_id])
         assert len(users) == 1
@@ -522,7 +522,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -555,7 +555,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         new_user = api.get_user_with_context(user)
         assert isinstance(new_user, UserInContext)
@@ -575,7 +575,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=user,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         new_user = api.get_current_user()
         assert isinstance(new_user, User)
@@ -585,7 +585,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(UserDoesNotExist):
             api.get_current_user()
@@ -594,7 +594,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         user = api.authenticate('admin@admin.admin', 'admin@admin.admin')
         assert isinstance(user, User)
@@ -604,12 +604,12 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         gapi = GroupApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
@@ -629,7 +629,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(AuthenticationFailed):
             api.authenticate('admin@admin.admin', 'wrong_password')
@@ -638,7 +638,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(AuthenticationFailed):
             api.authenticate('admin@admin.admin', 'wrong_password')
@@ -647,12 +647,12 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         gapi = GroupApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
