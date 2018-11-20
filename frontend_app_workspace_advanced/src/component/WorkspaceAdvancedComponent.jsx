@@ -12,13 +12,14 @@ import { translate } from 'react-i18next'
 const WorkspaceAdvancedComponent = props => {
   return (
     <div className='workspace_advanced-content'>
-      <div className='workspace_advanced__description'>
-        <div className='workspace_advanced__description__title'>
+      <div className='workspace_advanced__description formBlock'>
+        <div className='formBlock__title workspace_advanced__description__title '>
           {props.t('Description')}
         </div>
 
-        <div className='workspace_advanced__description__text'>
+        <div className='formBlock__field workspace_advanced__description__text '>
           <textarea
+            className='workspace_advanced__description__text__textarea'
             placeholder={props.t("Shared space's description")}
             value={props.description}
             onChange={props.onChangeDescription}
@@ -26,10 +27,10 @@ const WorkspaceAdvancedComponent = props => {
           />
         </div>
 
-        <div className='workspace_advanced__description__btn d-flex justify-content-end'>
+        <div className='formBlock__bottom  workspace_advanced__description__bottom d-flex justify-content-end'>
           <button
             type='button'
-            className='btn highlightBtn'
+            className='workspace_advanced__description__bottom__btn btn highlightBtn'
             onClick={props.onClickValidateNewDescription}
             style={{backgroundColor: props.customColor}}
           >
@@ -38,14 +39,14 @@ const WorkspaceAdvancedComponent = props => {
         </div>
       </div>
 
-      <div className='workspace_advanced__userlist'>
+      <div className='formBlock workspace_advanced__userlist'>
         {props.displayFormNewMember === false &&
           <div>
-            <div className='workspace_advanced__userlist__title'>
+            <div className='formBlock__title workspace_advanced__userlist__title'>
               {props.t('Members list')}
             </div>
 
-            <ul className='workspace_advanced__userlist__list'>
+            <ul className='formBlock__field workspace_advanced__userlist__list'>
               {props.memberList && props.memberList.filter(m => m.user).map(m =>
                 <li className='workspace_advanced__userlist__list__item' key={`member_${m.user_id}`}>
                   <div className='workspace_advanced__userlist__list__item__avatar mr-3'>
@@ -112,8 +113,9 @@ const WorkspaceAdvancedComponent = props => {
                 </li>
               )}
             </ul>
+
             <div
-              className='workspace_advanced__userlist__adduser'
+              className='formBlock__bottom workspace_advanced__userlist__adduser'
               onClick={props.onClickToggleFormNewMember}
             >
               <div className='workspace_advanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
@@ -153,12 +155,12 @@ const WorkspaceAdvancedComponent = props => {
         )}
       </div>
 
-      <div className='workspace_advanced__delete'>
-        <div className='workspace_advanced__delete__title'>
+      <div className='formBlock workspace_advanced__delete'>
+        <div className='formBlock__title workspace_advanced__delete__title'>
           {props.t('Delete shared space')}
         </div>
 
-        <div className='workspace_advanced__delete__content'>
+        <div className='formBlock__field workspace_advanced__delete__content'>
           <button
             className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
             onClick={props.onClickDelteWorkspaceBtn}

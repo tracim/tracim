@@ -1,19 +1,18 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-backgroundrules()
+.formBlock
   margin-bottom 15px
   border-radius 10px
   background-color offWhite
-
-title()
-  padding 10px 0 25px 10px
-  border-bottom 1px solid grey
-  font-size 20px
-  font-weight 400
-
-label()
-  font-weight 500
-  font-size 18px
+  &__title
+    padding 10px 0 25px 10px
+    border-bottom 1px solid grey
+    font-size 20px
+    font-weight 400
+  &__field
+    padding 10px
+  &__bottom
+    padding 10px
 
 .workspace_advanced
   width 1000px
@@ -27,27 +26,15 @@ label()
     height calc(100% - 134px) !important
     overflow-y auto
   &__description
-    backgroundrules()
-    &__title
-      title()
     &__text
       padding 10px
-      & > textarea
+      &__textarea
         width 100%
-    &__btn
-      padding 10px
-  &__delete
-    backgroundrules()
-    &__title
-      title()
-    &__content
+    &__bottom
       display flex
-      padding 10px
+      justify-content end
   &__userlist
-    backgroundrules()
     position relative
-    &__title
-      title()
     &__list
       margin 0
       padding 0

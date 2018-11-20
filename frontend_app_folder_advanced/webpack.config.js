@@ -10,9 +10,9 @@ module.exports = {
     : ['babel-polyfill', './src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'folder.app.js' : 'folder.app.dev.js',
+    filename: isProduction ? 'folder_advanced.app.js' : 'folder_advanced.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appFolder' : undefined,
+    library: isProduction ? 'appFolderAdvanced' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
@@ -26,7 +26,8 @@ module.exports = {
   // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
-    port: 8074,
+    host: '0.0.0.0',
+    port: 8077,
     hot: true,
     noInfo: true,
     overlay: {
