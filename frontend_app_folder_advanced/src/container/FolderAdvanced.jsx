@@ -7,7 +7,8 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
-  handleFetchResult
+  handleFetchResult,
+  addAllResourceI18n
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -20,13 +21,21 @@ class FolderAdvanced extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'appFolder',
+      appName: 'folder',
       isVisible: true,
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
+      externalTradList: [
+        props.t('Create a folder'),
+        props.t('Folder')
+      ],
       tracimAppList: []
     }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, this.state.config.translation)
+    i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }

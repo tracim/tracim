@@ -7,5 +7,7 @@
   "Error while loading folder details": "Erreur lors du chargement du dossier",
   "Error while loading tracim's app list": "Erreur lors du chargement de la liste des apps",
   "Error while saving new available apps list": "Erreur lors de la sauvegarde de la liste des apps",
-  "Error while saving new folder label": "Erreur lors de la sauvegarde du nom du dossier"
+  "Error while saving new folder label": "Erreur lors de la sauvegarde du nom du dossier",
+  "Create a folder": "Créer un dossier",
+  "Folder": "Dossier"
 }

@@ -7,5 +7,7 @@
   "Error while loading folder details": "Error while loading folder details",
   "Error while loading tracim's app list": "Error while loading tracim's app list",
   "Error while saving new available apps list": "Error while saving new available apps list",
-  "Error while saving new folder label": "Error while saving new folder label"
+  "Error while saving new folder label": "Error while saving new folder label",
+  "Create a folder": "Create a folder",
+  "Folder": "Folder"
 }

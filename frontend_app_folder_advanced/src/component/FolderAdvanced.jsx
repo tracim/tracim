@@ -31,7 +31,7 @@ const FolderAdvanced = props => {
               />
 
               <div className='folder_advanced__content__form__type__label'>
-                {app.label}
+                {props.t(app.label)}
               </div>
             </div>
           )}
