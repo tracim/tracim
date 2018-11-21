@@ -20,7 +20,7 @@ const serializeContent = c => ({
   isDeleted: c.is_deleted,
   showInUi: c.show_in_ui,
   statusSlug: c.status,
-  subContentTypeSlug: c.sub_content_type_slug,
+  subContentTypeList: c.sub_content_types,
   isOpen: c.isOpen ? c.isOpen : false // only useful for folder
 })
 

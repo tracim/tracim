@@ -13,7 +13,7 @@
       case 'file':
         return appFile
       case 'folder':
-        return appFolder
+        return appFolderAdvanced
       case 'admin_workspace_user':
         return appAdminWorkspaceUser
       case 'workspace_advanced':

@@ -86,12 +86,12 @@ class FolderAdvanced extends React.Component {
 
     switch (fetchFolder.apiResponse.status) {
       case 200: this.setState({content: fetchFolder.body}); break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'))
+      default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
 
     switch (fetchAppList.apiResponse.status) {
       case 200: this.setState({tracimAppList: fetchAppList.body}); break
-      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's app list"))
+      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's app list"), 'warning')
     }
   }
 
@@ -108,9 +108,9 @@ class FolderAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
     }
   }
 
@@ -134,7 +134,7 @@ class FolderAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200: break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while saving new available apps list', 'warning'))
+        this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')
         this.setState(prev => ({content: {...prev.content, sub_content_types: oldAvailableAppList}}))
         break
     }
@@ -149,7 +149,7 @@ class FolderAdvanced extends React.Component {
           // customClass='appFolder'
           // icon='fa fa-fw fa-folder-o'
           // name='title of the header'
-          customClass={`${state.config.slug}`}
+          customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           title={state.content.label}

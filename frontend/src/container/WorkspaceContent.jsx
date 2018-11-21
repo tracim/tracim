@@ -336,7 +336,7 @@ class WorkspaceContent extends React.Component {
                   : rootContentList.map((content, i) => content.type === 'folder'
                     ? (
                       <Folder
-                        availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                        availableApp={contentType.filter(ct => ct.slug !== 'comment')}
                         folderData={{
                           ...content,
                           content: filteredWorkspaceContentList.filter(c => c.idParent !== null)

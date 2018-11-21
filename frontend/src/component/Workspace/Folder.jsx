@@ -19,7 +19,6 @@ class Folder extends React.Component {
           className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
           onClick={() => props.onClickFolder(props.folderData.id)}
         >
-
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
           </div>
@@ -50,7 +49,7 @@ class Folder extends React.Component {
                 <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                   <SubDropdownCreateButton
                     idFolder={props.folderData.id}
-                    availableApp={props.availableApp}
+                    availableApp={props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))}
                     onClickCreateContent={(e, idFolder, slug) => props.onClickCreateContent(e, idFolder, slug)}
                   />
                 </div>
@@ -59,8 +58,8 @@ class Folder extends React.Component {
                   <BtnExtandedAction
                     idRoleUserWorkspace={props.idRoleUserWorkspace}
                     onClickExtendedAction={{
-                      edit: null, // e => props.onClickExtendedAction.edit(e, props.folderData),
-                      move: e => props.onClickExtendedAction.move(e, props.folderData),
+                      edit: e => props.onClickExtendedAction.edit(e, props.folderData),
+                      move: null, // e => props.onClickExtendedAction.move(e, props.folderData),
                       download: e => props.onClickExtendedAction.download(e, props.folderData),
                       archive: e => props.onClickExtendedAction.archive(e, props.folderData),
                       delete: e => props.onClickExtendedAction.delete(e, props.folderData)
