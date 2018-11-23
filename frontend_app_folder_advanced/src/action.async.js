@@ -46,3 +46,55 @@ export const putFolder = (apiUrl, idWorkspace, idFolder, newLabel, description, 
       sub_content_types: availableAppList
     })
   })
+
+export const putFolderStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/folders/${idContent}/status`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT',
+    body: JSON.stringify({
+      status: newStatus
+    })
+  })
+
+export const putFolderIsArchived = (apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putFolderIsDeleted = (apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putFolderRestoreArchived = (apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putFolderRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}

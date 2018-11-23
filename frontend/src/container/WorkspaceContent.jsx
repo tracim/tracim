@@ -69,7 +69,16 @@ class WorkspaceContent extends React.Component {
       case 'appClosed':
       case 'hide_popupCreateContent':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.idWorkspaceInUrl)
-        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + props.location.search)
+
+        const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
+        const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
+
+        const newUrlSearch = {
+          ...qs.parse(props.location.search),
+          folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
+        }
+
+        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
         this.setState({appOpenedType: false})
         break
     }
@@ -118,15 +127,25 @@ class WorkspaceContent extends React.Component {
 
     const idFolderInUrl = [0, ...this.getIdFolderToOpenInUrl(props.location.search)] // add 0 to get workspace's root
 
+    const idContentInUrl = props.match && props.match.params.idcts || null
+
+    if (idContentInUrl && idContentInUrl !== 'new' && props.match && props.match.params.type === 'folder') idFolderInUrl.push(idContentInUrl)
+
     let fetchContentList
-    if (props.match.params.idcts && !isNaN(props.match.params.idcts)) fetchContentList = await props.dispatch(getContentPathList(idWorkspace, props.match.params.idcts, idFolderInUrl))
+    if (idContentInUrl && !isNaN(idContentInUrl)) fetchContentList = await props.dispatch(getContentPathList(idWorkspace, idContentInUrl, idFolderInUrl))
     else fetchContentList = await props.dispatch(getFolderContentList(idWorkspace, idFolderInUrl))
 
     const wsMember = await props.dispatch(getWorkspaceMemberList(idWorkspace))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(idWorkspace))
 
     switch (fetchContentList.status) {
-      case 200: props.dispatch(setWorkspaceContentList(fetchContentList.json, idFolderInUrl)); break
+      case 200:
+        const folderToOpen = [
+          ...idFolderInUrl,
+          ...fetchContentList.json.filter(c => c.parent_id !== null).map(c => c.parent_id)
+        ]
+        props.dispatch(setWorkspaceContentList(fetchContentList.json, folderToOpen))
+        break
       case 401: break
       default: props.dispatch(newFlashMessage(props.t('Error while loading content list'), 'warning'))
     }
@@ -280,7 +299,7 @@ class WorkspaceContent extends React.Component {
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
-    const rootContentList = filteredWorkspaceContentList.filter(c => c.idParent === null)
+    const rootContentList = filteredWorkspaceContentList.filter(c => c.idParent === null) // .sort((a, b) => a.type !== 'folder' && b.type === 'folder')
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
@@ -345,7 +364,7 @@ class WorkspaceContent extends React.Component {
                         idRoleUserWorkspace={idRoleUserWorkspace}
                         onClickExtendedAction={{
                           edit: this.handleClickEditContentItem,
-                          move: this.handleClickMoveContentItem,
+                          move: null, // this.handleClickMoveContentItem,
                           download: this.handleClickDownloadContentItem,
                           archive: this.handleClickArchiveContentItem,
                           delete: this.handleClickDeleteContentItem
@@ -371,7 +390,7 @@ class WorkspaceContent extends React.Component {
                         idRoleUserWorkspace={idRoleUserWorkspace}
                         onClickExtendedAction={{
                           edit: e => this.handleClickEditContentItem(e, content),
-                          move: e => this.handleClickMoveContentItem(e, content),
+                          move: null, // e => this.handleClickMoveContentItem(e, content),
                           download: e => this.handleClickDownloadContentItem(e, content),
                           archive: e => this.handleClickArchiveContentItem(e, content),
                           delete: e => this.handleClickDeleteContentItem(e, content)

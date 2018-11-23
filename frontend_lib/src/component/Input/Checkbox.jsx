@@ -25,7 +25,10 @@ const style = {
     visibility: 'hidden'
   },
   disabled: {
-    cursor: 'default'
+    cursor: 'default',
+    backgroundColor: '#f5f5f5',
+    borderColor: '#eee',
+    color: '#999'
   }
 }
 
@@ -40,6 +43,7 @@ export const Checkbox = props =>
     onClick={e => {
       e.preventDefault()
       e.stopPropagation()
+      if (props.disabled) return
       props.onClickCheckbox()
     }}
     htmlFor={`checkbox-${props.name}`}
@@ -49,6 +53,7 @@ export const Checkbox = props =>
         className='checboxCustom__checked'
         style={{
           ...style.checked,
+          ...(props.disabled ? style.disabled : {}),
           ...props.styleCheck
         }}
       >✔</div>

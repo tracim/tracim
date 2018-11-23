@@ -2,5 +2,6 @@
   "primary": "#7d4e24",
   "contents/html-document": "#00CC00",
   "contents/thread": "#428BCA",
-  "contents/file": "#ffa500"
+  "contents/file": "#ffa500",
+  "contents/folder": "#414548"
 }

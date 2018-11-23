@@ -8,13 +8,20 @@ import {
   PopinFixedOption,
   PopinFixedContent,
   handleFetchResult,
-  addAllResourceI18n
+  addAllResourceI18n,
+  // SelectStatus,
+  ArchiveDeleteContent
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
   getFolder,
   getAppList,
-  putFolder
+  putFolder,
+  // putFolderStatus,
+  putFolderIsArchived,
+  putFolderIsDeleted,
+  putFolderRestoreArchived,
+  putFolderRestoreDeleted
 } from '../action.async.js'
 
 class FolderAdvanced extends React.Component {
@@ -149,15 +156,77 @@ class FolderAdvanced extends React.Component {
     }
   }
 
+  // Côme - 2018/11/23 - status not used for folders yet
+  // handleChangeStatus = async newStatus => {
+  //   const { state } = this
+  //
+  //   const fetchResultSaveEditStatus = putFolderStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+  //
+  //   const fetchResultStatus = await handleFetchResult(await fetchResultSaveEditStatus)
+  //   switch (fetchResultStatus.status) { // 204 no content so dont take status from resSave.apiResponse.status
+  //     case 204: this.loadContent(); break
+  //     default: this.sendGlobalFlashMessage(this.props.t("Error saving folder's status. Result:"), 'warning')
+  //   }
+  // }
+
+  handleClickArchive = async () => {
+    const { config, content } = this.state
+
+    const fetchResultArchive = await putFolderIsArchived(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadContent()
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving folder'), 'warning')
+    }
+  }
+
+  handleClickDelete = async () => {
+    const { config, content } = this.state
+
+    const fetchResultArchive = await putFolderIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadContent()
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting folder'), 'warning')
+    }
+  }
+
+  handleClickRestoreArchived = async () => {
+    const { config, content } = this.state
+
+    const fetchResultRestore = await putFolderRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadContent()
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')
+    }
+  }
+
+  handleClickRestoreDeleted = async () => {
+    const { config, content } = this.state
+
+    const fetchResultRestore = await putFolderRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadContent()
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring folder'), 'warning')
+    }
+  }
+
   render () {
     const { state } = this
 
     return (
       <PopinFixed customClass='folder_advanced'>
         <PopinFixedHeader
-          // customClass='appFolder'
-          // icon='fa fa-fw fa-folder-o'
-          // name='title of the header'
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
@@ -167,13 +236,39 @@ class FolderAdvanced extends React.Component {
           onValidateChangeTitle={this.handleSaveEditLabel}
         />
 
-        <PopinFixedOption display={false} />
+        <PopinFixedOption>
+          <div className='justify-content-end'>
+            <div className='d-flex'>
+              {/* state.loggedUser.idRoleUserWorkspace >= 2 &&
+                <SelectStatus
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
+                  onChangeStatus={this.handleChangeStatus}
+                  disabled={state.content.is_archived || state.content.is_deleted}
+                />
+              */}
+
+              {state.loggedUser.idRoleUserWorkspace >= 4 &&
+                <ArchiveDeleteContent
+                  customColor={state.config.hexcolor}
+                  onClickArchiveBtn={this.handleClickArchive}
+                  onClickDeleteBtn={this.handleClickDelete}
+                  disabled={state.content.is_archived || state.content.is_deleted}
+                />
+              }
+            </div>
+          </div>
+        </PopinFixedOption>
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <FolderAdvancedComponent
             folderSubContentType={(state.content.sub_content_types || []).map(c => `contents/${c}`)}
             tracimAppList={state.tracimAppList}
             onClickApp={this.handleClickCheckbox}
+            isArchived={state.content.is_archived}
+            isDeleted={state.content.is_deleted}
+            onClickRestoreArchived={this.handleClickRestoreArchived}
+            onClickRestoreDeleted={this.handleClickRestoreDeleted}
           />
         </PopinFixedContent>
       </PopinFixed>

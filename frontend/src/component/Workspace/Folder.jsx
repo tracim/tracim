@@ -23,7 +23,7 @@ class Folder extends React.Component {
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          <div className='folder__header__icon'>
+          <div className='folder__header__icon' style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}>
             <i className={classnames('fa fa-fw', {'fa-folder-open-o': props.folderData.isOpen, 'fa-folder-o': !props.folderData.isOpen})} />
           </div>
 
@@ -32,7 +32,7 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.idRoleUserWorkspace >= 2 &&
+            {props.idRoleUserWorkspace >= 4 &&
               <div className='folder__header__button__addbtn'>
                 <button
                   className='folder__header__button__addbtn__text btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
@@ -107,7 +107,7 @@ class Folder extends React.Component {
                 idRoleUserWorkspace={props.idRoleUserWorkspace}
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
-                  move: e => props.onClickExtendedAction.move(e, content),
+                  move: null, // e => props.onClickExtendedAction.move(e, content),
                   download: e => props.onClickExtendedAction.download(e, content),
                   archive: e => props.onClickExtendedAction.archive(e, content),
                   delete: e => props.onClickExtendedAction.delete(e, content)
