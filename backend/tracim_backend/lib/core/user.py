@@ -525,11 +525,15 @@ class UserApi(object):
             password: str=None,
             timezone: str=None,
             lang: str=None,
+            auth_type: AuthType= AuthType.INTERNAL,
             groups: typing.Optional[typing.List[Group]]=None,
             do_save=True,
     ) -> User:
         if name is not None:
             user.display_name = name
+
+        if auth_type is not None:
+            user.auth_type = auth_type
 
         if email is not None and email != user.email:
             self._check_email(email)
@@ -570,6 +574,7 @@ class UserApi(object):
         name: str = None,
         timezone: str = '',
         lang: str= None,
+        auth_type: AuthType = AuthType.INTERNAL,
         groups=[],
         do_save: bool=True,
         do_notify: bool=True,
@@ -584,6 +589,7 @@ class UserApi(object):
             user=new_user,
             name=name,
             email=email,
+            auth_type=auth_type,
             password=password,
             timezone=timezone,
             lang=lang,
