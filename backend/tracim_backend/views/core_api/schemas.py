@@ -13,6 +13,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import ActiveContentFilter
@@ -154,6 +155,11 @@ class UserSchema(UserDigestSchema):
         validate=Length(min=2, max=3),
         allow_none=True,
         default=None,
+    )
+    auth_type = marshmallow.fields.String(
+        validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
+        example=AuthType.INTERNAL.value,
+        description="authentication system of the user"
     )
 
     class Meta:

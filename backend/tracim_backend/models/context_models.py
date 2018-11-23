@@ -566,6 +566,10 @@ class UserInContext(object):
         # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
         return None
 
+    @property
+    def auth_type(self) -> str:
+        return self.user.auth_type.value
+
 
 class WorkspaceInContext(object):
     """

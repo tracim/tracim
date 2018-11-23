@@ -62,6 +62,7 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_login_enpoint__err_401__user_not_activated(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -175,6 +176,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
         with freeze_time("2002-01-01 12:00:00"):
             # normal login
@@ -199,6 +201,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
     def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self):  # nopep8
         params = {
@@ -261,6 +264,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
         with freeze_time("2002-01-01 12:00:00"):
             # normal login
@@ -284,6 +288,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(self):   # nopep8
         self.testapp.authorization = (
@@ -339,6 +344,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
         with freeze_time("2002-01-01 12:00:00"):
             # normal login
@@ -363,6 +369,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
     def test_api__try_login_enpoint_ldap_internal_auth__ok__200__valid_internal_db_user(self):  # nopep8
         params = {
@@ -386,6 +393,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(self):  # nopep8
         params = {
@@ -431,6 +439,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
         with freeze_time("2002-01-01 12:00:00"):
             # normal login
@@ -454,6 +463,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['profile'] == 'users'
             assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_internal_db_user(self):   # nopep8
         self.testapp.authorization = (
@@ -473,6 +483,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__err__403__unvalid_user(self):   # nopep8
         self.testapp.authorization = (
@@ -507,6 +518,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -589,6 +601,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
