@@ -15,6 +15,10 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
+from tracim_backend.exceptions import \
+    ExternalAuthUserEmailModificationDisallowed
+from tracim_backend.exceptions import \
+    ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import \
@@ -412,8 +416,11 @@ class UserApi(object):
         :param do_save: should we save new user password ?
         :return:
         """
+
         if not self._user:
             raise NoUserSetted('Current User should be set in UserApi to use this method')  # nopep8
+
+        self._check_password_modification_allowed(self._user)
         if not self._user.validate_password(loggedin_user_password):  # nopep8
             raise WrongUserPassword(
                 'Wrong password for authenticated user {}'. format(self._user.user_id)  # nopep8
@@ -449,6 +456,9 @@ class UserApi(object):
         """
         if not self._user:
             raise NoUserSetted('Current User should be set in UserApi to use this method')  # nopep8
+
+        self._check_email_modification_allowed(self._user)
+
         if not self._user.validate_password(loggedin_user_password):  # nopep8
             raise WrongUserPassword(
                 'Wrong password for authenticated user {}'. format(self._user.user_id)  # nopep8
@@ -468,6 +478,8 @@ class UserApi(object):
             reset_token: str,
             do_save: bool = False,
     ):
+        self._check_user_auth_validity(user)
+        self._check_password_modification_allowed(user)
         self.validate_reset_password_token(user, reset_token)
         if new_password != new_password2:
             raise PasswordDoNotMatch('Passwords given are different')
@@ -535,11 +547,13 @@ class UserApi(object):
         if auth_type is not None:
             user.auth_type = auth_type
 
-        if email is not None and email != user.email:
+        if email is not None:
+            self._check_email_modification_allowed(user)
             self._check_email(email)
             user.email = email
 
         if password is not None:
+            self._check_password_modification_allowed(user)
             user.password = password
 
         if timezone is not None:
@@ -566,6 +580,28 @@ class UserApi(object):
             self.save(user)
 
         return user
+
+    def _check_password_modification_allowed(self, user: User) -> bool:
+        if user.auth_type != AuthType.INTERNAL:
+            raise ExternalAuthUserPasswordModificationDisallowed(
+                'user {} is link to external auth {},'
+                'password modification disallowed'.format(
+                    user.email,
+                    user.auth_type,
+                )
+            )
+        return True
+
+    def _check_email_modification_allowed(self, user: User) -> bool:
+        if user.auth_type != AuthType.INTERNAL:
+            raise ExternalAuthUserEmailModificationDisallowed(
+                'user {} is link to external auth {},'
+                'email modification disallowed'.format(
+                    user.email,
+                    user.auth_type,
+                )
+            )
+        return True
 
     def create_user(
         self,
@@ -657,6 +693,8 @@ class UserApi(object):
         :param do_save: save update ?
         :return: reset_password_token
         """
+        self._check_user_auth_validity(user)
+        self._check_password_modification_allowed(user)
         if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
             raise NotificationDisabledCantResetPassword("cant reset password with notification disabled")  # nopep8
         token = user.generate_reset_password_token()
@@ -670,6 +708,8 @@ class UserApi(object):
         return token
 
     def validate_reset_password_token(self, user: User, token: str) -> bool:
+        self._check_user_auth_validity(user)
+        self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
             token=token,
             validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_VALIDITY,
@@ -734,6 +774,13 @@ class UserApi(object):
         #     calendar_class=UserCalendar,
         #     related_object_id=created_user.user_id,
         # )
+
+    def _check_user_auth_validity(self, user:User) -> None:
+        if not self._user_can_authenticate(user):
+            raise UserAuthTypeDisabled('user {} auth type {} is disabled'.format(user.email, user.auth_type.value))
+
+    def _user_can_authenticate(self, user: User) -> bool:
+        return user.auth_type and user.auth_type.value in self._config.AUTH_TYPES
 
     def allowed_to_invite_new_user(self, email: str) -> bool:
         # INFO - G.M - 2018-10-25 - disallow account creation if no

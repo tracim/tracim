@@ -154,6 +154,7 @@ class UserCommand(AppContextCommand):
 
     def _update_password_for_login(self, login: str, password: str) -> None:
         user = self._user_api.get_one_by_email(login)
+        self._user_api._check_password_modification_allowed(user)
         user.password = password
         self._session.flush()
         transaction.commit()

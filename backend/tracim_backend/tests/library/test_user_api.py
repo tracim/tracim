@@ -4,6 +4,9 @@ import transaction
 from tracim_backend import models
 
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
+from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
@@ -12,6 +15,7 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import User
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import DefaultTest
@@ -30,6 +34,7 @@ class TestUserApi(DefaultTest):
         assert u.email == 'bob@bob'
         assert u.display_name == 'bob'
 
+    @pytest.mark.internal_auth
     def test_unit__create_minimal_user_and_update__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
@@ -44,6 +49,45 @@ class TestUserApi(DefaultTest):
         assert nu.display_name == 'bob'
         assert nu.validate_password('pass')
 
+    @pytest.mark.internal_auth
+    def test_unit__create_minimal_user_and_set_password__ok__nominal_case(self):
+        u = User()
+        u.email = 'bob@bob'
+        u.password = 'pass'
+        u.auth_type = AuthType.INTERNAL
+        u.display_name = 'bob'
+        api = UserApi(
+            current_user=u,
+            session=self.session,
+            config=self.config,
+        )
+        assert u.validate_password('pass')
+        api.set_password(u,'pass','newpass','newpass')
+        assert u is not None
+        assert u.email == 'bob@bob'
+        assert u.display_name == 'bob'
+        assert u.validate_password('newpass')
+        assert not u.validate_password('pass')
+
+    @pytest.mark.internal_auth
+    def test_unit__create_minimal_user_and_set_password__ok__nominal_case(self):
+        u = User()
+        u.email = 'bob@bob'
+        u.password = 'pass'
+        u.auth_type = AuthType.INTERNAL
+        u.display_name = 'bob'
+        api = UserApi(
+            current_user=u,
+            session=self.session,
+            config=self.config,
+        )
+        assert u.email == 'bob@bob'
+        api.set_email(u,'pass','newbobemail@bob')
+        assert u is not None
+        assert u.email == 'newbobemail@bob'
+
+
+    @pytest.mark.internal_auth
     def test__unit__create__user__ok_nominal_case(self):
         api = UserApi(
             current_user=None,
@@ -590,6 +634,7 @@ class TestUserApi(DefaultTest):
         with pytest.raises(UserDoesNotExist):
             api.get_current_user()
 
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___ok__nominal_case(self):
         api = UserApi(
             current_user=None,
@@ -599,7 +644,10 @@ class TestUserApi(DefaultTest):
         user = api.authenticate('admin@admin.admin', 'admin@admin.admin')
         assert isinstance(user, User)
         assert user.email == 'admin@admin.admin'
+        assert user.auth_type == AuthType.INTERNAL
 
+
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__user_not_active(self):
         api = UserApi(
             current_user=None,
@@ -625,6 +673,7 @@ class TestUserApi(DefaultTest):
         with pytest.raises(AuthenticationFailed):
             api.authenticate('test@test.test', 'test@test.test')
 
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_password(self):
         api = UserApi(
             current_user=None,
@@ -634,6 +683,7 @@ class TestUserApi(DefaultTest):
         with pytest.raises(AuthenticationFailed):
             api.authenticate('admin@admin.admin', 'wrong_password')
 
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_user(self):
         api = UserApi(
             current_user=None,
@@ -708,4 +758,262 @@ class TestUserApi(DefaultTest):
         from tracim_backend.exceptions import UserCantDisableHimself
         with pytest.raises(UserCantDisableHimself):
             api2.disable(user)
+
+class TestFakeLDAPUserApi(DefaultTest):
+    config_section = 'base_test_ldap'
+
+    @pytest.mark.ldap
+    def test_unit__authenticate_user___err__no_ldap_connector(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(MissingLDAPConnector):
+            user = api.authenticate('hubert@planetexpress.com', 'professor')
+
+    @pytest.mark.ldap
+    def test_unit__authenticate_user___ok__new_user_ldap_auth(self):
+        class fake_ldap_connector(object):
+
+            def authenticate(self, email: str, password: str):
+                if not email == 'hubert@planetexpress.com' \
+                        and password == 'professor':
+                    return None
+                return [None, {'mail': ['huber@planetepress.com'],
+                               'givenName': ['Hubert'],
+                               'profile': ['trusted-users'],
+                               }]
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.authenticate('hubert@planetexpress.com', 'professor', fake_ldap_connector())  # nopep8
+        assert isinstance(user, User)
+        assert user.email == 'hubert@planetexpress.com'
+        assert user.auth_type == AuthType.LDAP
+        assert user.display_name == 'Hubert'
+        assert user.profile.name == 'trusted-users'
+
+    @pytest.mark.ldap
+    def test__unit__create_user__err__external_auth_ldap_with_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            u = api.create_user(
+                email='bob@bob',
+                password='pass',
+                name='bob',
+                auth_type=AuthType.LDAP,
+                timezone='+2',
+                lang='en',
+                do_save=True,
+                do_notify=False,
+            )
+
+    @pytest.mark.ldap
+    def test__unit__create__user__ok__external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        assert u is not None
+        assert u.email == "bob@bob"
+        assert u.validate_password(None) is False
+        assert u.display_name == 'bob'
+        assert u.timezone == '+2'
+        assert u.lang == 'en'
+
+    @pytest.mark.ldap
+    def test_unit_update__ok_external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        api.update(
+            email='bob@bob',
+            user = u,
+            name='bobi',
+            password=None,
+            auth_type=AuthType.LDAP,
+            timezone='-1',
+            lang='fr',
+            do_save=True,
+        )
+        assert u.display_name == 'bobi'
+
+    @pytest.mark.ldap
+    def test_unit_update__err__external_auth_ldap_set_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            api.update(
+                email='bob@bob',
+                user = u,
+                name='bobi',
+                password='new_password',
+                auth_type=AuthType.LDAP,
+                timezone='-1',
+                lang='fr',
+                do_save=True,
+            )
+
+    @pytest.mark.ldap
+    def test_unit_update__err__external_auth_ldap_set_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
+            api.update(
+                email='bob@bob1',
+                user = u,
+                name='bobi',
+                password=None,
+                auth_type=AuthType.LDAP,
+                timezone='-1',
+                lang='fr',
+                do_save=True,
+            )
+
+    @pytest.mark.ldap
+    def test_unit__check_email_modification_allowed__err_external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
+            api._check_email_modification_allowed(u)
+
+    @pytest.mark.ldap
+    def test_unit__check_password_modification_allowed__err_external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            api._check_password_modification_allowed(u)
+
+    @pytest.mark.ldap
+    def test_unit_set_password__err__external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        api._user = u
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            api.set_password(
+                u,
+                'pass',
+                'pass',
+                'pass',
+            )
+
+    @pytest.mark.ldap
+    def test_unit_set_email__err__external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        api._user = u
+        with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
+            api.set_email(
+                u,
+                'pass',
+                'bob@bobi',
+            )
 
