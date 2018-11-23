@@ -5877,3 +5877,64 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         res = res.json_body
         assert res['user_id'] == user_id
         assert res['is_active'] is True
+
+
+class TestUserEnpointsLDAPAuth(FunctionalTest):
+    config_section = 'functional_ldap_test'
+
+    @pytest.mark.ldap
+    def test_api_set_user_password__err__400__setting_password_unallowed_for_ldap_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        user_id = res.json_body['user_id']
+        # Set password
+        params = {
+            'new_password': 'mynewpassword',
+            'new_password2': 'mynewpassword',
+            'loggedin_user_password': 'professor',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/password'.format(user_id),
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+
+    @pytest.mark.ldap
+    def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        user_id = res.json_body['user_id']
+        # Set password
+        params = {
+            'email': 'hubertnewemail@planetexpress.com',
+            'loggedin_user_password': 'professor',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/email'.format(user_id),
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
