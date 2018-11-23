@@ -343,3 +343,18 @@ class UnknownAuthType(TracimException):
 
 class MissingLDAPConnector(TracimException):
     pass
+
+class WrongAuthTypeForUser(TracimException):
+    pass
+
+class UserAuthTypeDisabled(TracimException):
+    error_code = error.USER_AUTH_TYPE_DISABLED
+
+class DisabledFeatureForExternalAuth(TracimException):
+    pass
+
+class ExternalAuthUserEmailModificationDisallowed(DisabledFeatureForExternalAuth):
+    error_code = error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+
+class ExternalAuthUserPasswordModificationDisallowed(DisabledFeatureForExternalAuth):
+    error_code = error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
