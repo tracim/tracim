@@ -12,6 +12,7 @@ import time
 import uuid
 
 from datetime import datetime
+import enum
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
@@ -29,6 +30,7 @@ from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
+from sqlalchemy.types import Enum
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 
@@ -57,6 +59,9 @@ user_group_table = Table('user_group', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
+class AuthType(enum.Enum):
+    INTERNAL = 'internal'
+    LDAP = 'ldap'
 
 class Group(DeclarativeBase):
 
@@ -76,7 +81,6 @@ class Group(DeclarativeBase):
     group_name = Column(Unicode(16), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     created = Column(DateTime, default=datetime.utcnow)
-
     users = relationship('User', secondary=user_group_table, backref='groups')
 
     def __repr__(self):
@@ -153,6 +157,7 @@ class User(DeclarativeBase):
     # timezone as tz database format
     timezone = Column(Unicode(255), nullable=False, server_default='')
     # lang in iso639 format
+    auth_type = Column(Enum(AuthType), nullable=False, server_default=AuthType.INTERNAL.name)
     lang = Column(Unicode(3), nullable=True, default=None)
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
