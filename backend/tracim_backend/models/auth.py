@@ -149,7 +149,7 @@ class User(DeclarativeBase):
     user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
     email = Column(Unicode(255), unique=True, nullable=False)
     display_name = Column(Unicode(255))
-    _password = Column('password', Unicode(128))
+    _password = Column('password', Unicode(128), nullable=True)
     created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
     is_deleted = Column(Boolean, default=False, nullable=False, server_default=sqlalchemy.sql.expression.literal(False))
@@ -213,14 +213,18 @@ class User(DeclarativeBase):
         """Return the user object whose user name is ``username``."""
         return dbsession.query(cls).filter_by(email=username).first()
 
-    def _set_password(self, cleartext_password: str) -> None:
+    def _set_password(self, cleartext_password: typing.Optional[str]) -> None:
         """
         Set ciphertext password from cleartext password.
 
         Hash cleartext password on the fly,
         Store its ciphertext version,
         """
-        self._password = self._hash(cleartext_password)
+        if cleartext_password is None:
+            self._password = None
+        else:
+            self._password = self._hash(cleartext_password)
+
 
     def _get_password(self) -> str:
         """Return the hashed version of the password."""
@@ -229,7 +233,7 @@ class User(DeclarativeBase):
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
 
-    def validate_password(self, cleartext_password: str) -> bool:
+    def validate_password(self, cleartext_password: typing.Optional[str]) -> bool:
         """
         Check the password against existing credentials.
 
@@ -239,8 +243,11 @@ class User(DeclarativeBase):
         :type cleartext_password: unicode object.
         :return: Whether the password is valid.
         :rtype: bool
-
         """
+
+
+        if not self.password:
+            return False
         return self._validate_hash(self.password, cleartext_password)
 
     def get_display_name(self, remove_email_part: bool=False) -> str:
