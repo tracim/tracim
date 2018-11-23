@@ -26,23 +26,25 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UnknownAuthType
 from tracim_backend.exceptions import UnvalidResetPasswordToken
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
-
 
 class UserApi(object):
 
@@ -220,7 +222,27 @@ class UserApi(object):
         except:
             return False
 
-    def _ldap_authenticate(self, email: str, password: str, ldap_connector: 'Connector'):
+    def _ldap_authenticate(
+            self,
+            user: typing.Optional[User],
+            email: str,
+            password: str,
+            ldap_connector: 'Connector'
+    ):
+        auth_type = AuthType.LDAP
+
+        # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type
+        # different from LDAP
+        if user and user.auth_type != auth_type:
+                raise WrongAuthTypeForUser(
+                    'User "{}" auth_type is {} not {}'.format(
+                        email,
+                        user.auth_type.value,
+                        auth_type.value
+                    )
+                )
+
+        # INFO - G.M - 2018-11-22 - LDAP Auth
         data = ldap_connector.authenticate(
             email,
             password
@@ -228,9 +250,9 @@ class UserApi(object):
         if not data:
             raise WrongLDAPCredentials('LDAP credentials are not correct')
         ldap_data = data[1]
-        try:
-            user = self.get_one_by_email(email)
-        except UserDoesNotExist:
+
+        # INFO - G.M - 2018-11-22 - Create new user
+        if not user:
             groups = None
             if self._config.LDAP_PROFILE_ATTR:
                 ldap_profile = ldap_data[self._config.LDAP_PROFILE_ATTR][0]
@@ -254,9 +276,9 @@ class UserApi(object):
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
             self.create_user(
                 email=email,
-                password=password,
                 name=name,
                 groups=groups,
+                auth_type=AuthType.LDAP,
                 do_save=True,
                 do_notify=False
             )
@@ -272,8 +294,20 @@ class UserApi(object):
 
         return user
 
-    def _internal_db_authenticate(self, email: str, password: str) -> User:
-        user = self.get_one_by_email(email)
+    def _internal_db_authenticate(self, user: typing.Optional[User], email: str, password: str) -> User:
+        auth_type = AuthType.INTERNAL
+
+        if not user:
+            raise UserDoesNotExist('User {} not found in database'.format(email)) # nopep8
+
+        if user.auth_type != auth_type:
+            raise WrongAuthTypeForUser(
+                'User "{}" auth_type is {} not {}'.format(
+                    email,
+                    user.auth_type.value,
+                    auth_type.value
+                )
+            )
         if not user.validate_password(password):
             raise WrongUserPassword('User "{}" password is incorrect'.format(email))  # nopep8
 
@@ -301,7 +335,7 @@ class UserApi(object):
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
-        last_exception = None
+        user_auth_type_not_available = AuthenticationFailed('Auth mecanism for this user is not activated')
         for auth_type in self._config.AUTH_TYPES:
             try:
                 return self._authenticate(
@@ -311,8 +345,11 @@ class UserApi(object):
                     auth_type=auth_type
                 )
             except AuthenticationFailed as exc:
-                last_exception = exc
-        raise last_exception
+                raise exc
+            except WrongAuthTypeForUser:
+                pass
+
+        raise user_auth_type_not_available
 
 
     def _authenticate(
@@ -331,13 +368,19 @@ class UserApi(object):
         :param auth_type: auth type to test.
         :return: User who was authenticated.
         """
+        # get existing user
+        try:
+            user = self.get_one_by_email(email)
+        except UserDoesNotExist:
+            user = None
+        # try auth
         try:
             if auth_type == 'ldap':
                 if ldap_connector:
-                    return self._ldap_authenticate(email, password, ldap_connector)
+                    return self._ldap_authenticate(user, email, password, ldap_connector)
                 raise MissingLDAPConnector()
             elif auth_type == 'internal':
-                return self._internal_db_authenticate(email, password)
+                return self._internal_db_authenticate(user, email, password)
             else:
                 raise UnknownAuthType()
         except (
