@@ -547,7 +547,7 @@ class UserApi(object):
         if auth_type is not None:
             user.auth_type = auth_type
 
-        if email is not None:
+        if email is not None and email != user.email:
             self._check_email_modification_allowed(user)
             self._check_email(email)
             user.email = email
