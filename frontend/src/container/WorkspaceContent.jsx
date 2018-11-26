@@ -25,7 +25,8 @@ import {
   getWorkspaceMemberList,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
-  getMyselfWorkspaceReadStatusList
+  getMyselfWorkspaceReadStatusList,
+  putFolderRead
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -35,7 +36,8 @@ import {
   setWorkspaceContentDeleted,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
-  toggleFolderOpen
+  toggleFolderOpen,
+  setWorkspaceContentRead
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -99,6 +101,8 @@ class WorkspaceContent extends React.Component {
     this.loadContentList(wsToLoad)
   }
 
+  // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
+  // and add process that always keep url and folders open sync
   async componentDidUpdate (prevProps, prevState) {
     console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838')
 
@@ -127,7 +131,7 @@ class WorkspaceContent extends React.Component {
 
     const idFolderInUrl = [0, ...this.getIdFolderToOpenInUrl(props.location.search)] // add 0 to get workspace's root
 
-    const idContentInUrl = props.match && props.match.params.idcts || null
+    const idContentInUrl = (props.match && props.match.params.idcts) || null
 
     if (idContentInUrl && idContentInUrl !== 'new' && props.match && props.match.params.type === 'folder') idFolderInUrl.push(idContentInUrl)
 
@@ -218,10 +222,18 @@ class WorkspaceContent extends React.Component {
   handleClickFolder = async idFolder => {
     const { props, state } = this
 
-    const newUrlSearch = this.buildFolderOpenUrlSearchList(idFolder)
+    const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
+    const newUrlSearchList = (props.workspaceContentList.find(c => c.id === idFolder) || {isOpen: false}).isOpen
+      ? folderListInUrl.filter(id => id !== idFolder)
+      : uniq([...folderListInUrl, idFolder])
+
+    const newUrlSearchObject = {
+      ...qs.parse(props.location.search),
+      folder_open: newUrlSearchList.join(',')
+    }
 
     props.dispatch(toggleFolderOpen(idFolder))
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearchObject, {encode: false}))
 
     if (!props.workspaceContentList.some(c => c.idParent === idFolder)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.idWorkspaceInUrl, [idFolder]))
@@ -254,21 +266,16 @@ class WorkspaceContent extends React.Component {
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
-  getIdFolderToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
-
-  buildFolderOpenUrlSearchList = idFolder => {
-    const { props } = this
-    const folderListInUrl = this.getIdFolderToOpenInUrl(props.location.search)
-
-    const newFolderOpenList = (props.workspaceContentList.find(c => c.id === idFolder) || {isOpen: false}).isOpen
-      ? folderListInUrl.filter(id => id !== idFolder)
-      : uniq([...folderListInUrl, idFolder])
-
-    return {
-      ...qs.parse(props.location.search),
-      folder_open: newFolderOpenList.join(',')
+  handleSetFolderRead = async idFolder => {
+    const { props, state } = this
+    const fetchSetFolderRead = await props.dispatch(putFolderRead(props.user.user_id, state.idWorkspaceInUrl, idFolder))
+    switch (fetchSetFolderRead.status) {
+      case 204: props.dispatch(setWorkspaceContentRead(idFolder)); break
+      default: console.log(`Error while setting folder ${idFolder} read status. fetchSetFolderRead: `, fetchSetFolderRead)
     }
   }
+
+  getIdFolderToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
 
   getTitle = urlFilter => {
     const { props } = this
@@ -373,6 +380,7 @@ class WorkspaceContent extends React.Component {
                         onClickCreateContent={this.handleClickCreateContent}
                         contentType={contentType}
                         readStatusList={currentWorkspace.contentReadStatusList}
+                        setFolderRead={this.handleSetFolderRead}
                         isLast={i === rootContentList.length - 1}
                         key={content.id}
                         t={t}

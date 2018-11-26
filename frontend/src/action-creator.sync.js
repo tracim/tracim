@@ -86,7 +86,10 @@ export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
 
 export const FOLDER = 'Folder'
+export const READ = 'Read'
 export const toggleFolderOpen = idFolder => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, idFolder })
+export const FOLDER_READ = `${FOLDER}/${READ}`
+export const setWorkspaceContentRead = idFolder => ({ type: `${SET}/${FOLDER_READ}`, idFolder })
 
 export const APP = 'App'
 export const APP_LIST = `${APP}/List`

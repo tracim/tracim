@@ -5,14 +5,30 @@ import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 
+require('./Folder.styl')
+
 class Folder extends React.Component {
+  // componentDidMount () {
+  //   const { props } = this
+  //   if (props.folderData.isOpen) props.setFolderRead(props.folderData.id)
+  // }
+  //
+  // componentDidUpdate (prevProps) {
+  //   const { props } = this
+  //   if (!prevProps.folderData.isOpen && props.folderData.isOpen) props.setFolderRead(props.folderData.id)
+  // }
+
   render () {
     const { props } = this
 
     const folderContentList = props.folderData.content.filter(c => c.idParent === props.folderData.id)
 
     return (
-      <div className={classnames('folder', {'active': props.folderData.isOpen && folderContentList.length > 0, 'item-last': props.isLast})}>
+      <div className={classnames('folder', {
+        'active': props.folderData.isOpen && folderContentList.length > 0,
+        'item-last': props.isLast
+        // 'read': props.readStatusList.includes(props.folderData.id)
+      })}>
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
@@ -90,6 +106,7 @@ class Folder extends React.Component {
                 onClickCreateContent={props.onClickCreateContent}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
+                setFolderRead={props.setFolderRead}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}

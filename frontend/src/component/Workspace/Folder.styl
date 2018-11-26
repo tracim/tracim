@@ -1,3 +1,5 @@
+@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 // -----------------------------------------------------
 // border management for Workspace container
 border-style = 1px solid grey
@@ -94,6 +96,9 @@ folderopen()
       overflow hidden
       font-size 17px
       color darkGrey
+      font-weight bold
+      ^[0].read > ^[1] > & // renders .folder.read > .folder__header > .folder__header__name
+        font-weight normal
     &__button
       flex-grow 0
       &__advancedbtn

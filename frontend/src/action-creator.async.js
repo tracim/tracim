@@ -24,6 +24,7 @@ import {
   WORKSPACE_MEMBER_ADD,
   WORKSPACE_MEMBER_REMOVE,
   FOLDER,
+  FOLDER_READ,
   CONFIG,
   APP_LIST,
   CONTENT_TYPE_LIST,
@@ -668,6 +669,21 @@ export const putWorkspaceContentDeleted = (idWorkspace, idContent) => dispatch =
       method: 'PUT'
     },
     actionName: WORKSPACE_CONTENT_DELETED,
+    dispatch
+  })
+}
+
+export const putFolderRead = (idUser, idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces/${idWorkspace}/contents/${idContent}/read`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT'
+    },
+    actionName: FOLDER_READ,
     dispatch
   })
 }
