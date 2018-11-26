@@ -10,6 +10,7 @@ from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
 from zope.interface import implementer
 
+from tracim_backend import AuthType
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
@@ -49,7 +50,7 @@ class TracimAuthenticationPolicy(object):
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         ldap_connector = None
-        if 'ldap' in app_config.AUTH_TYPES:
+        if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
             user = uapi.authenticate(

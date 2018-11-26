@@ -16,6 +16,7 @@ from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models import Group
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.data import ActionDescription
 
 
@@ -121,7 +122,7 @@ class CFG(object):
         auth_type_str = settings.get(
             'auth_types', 'internal'
         )
-        self.AUTH_TYPES = [auth.strip() for auth in auth_type_str.split(',')]
+        self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
 
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(

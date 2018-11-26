@@ -361,7 +361,7 @@ class UserApi(object):
             email: str,
             password: str,
             ldap_connector: 'Connector' = None,
-            auth_type: str = 'internal',
+            auth_type: AuthType = AuthType.INTERNAL,
     ) -> User:
         """
         Authenticate user with email and password, raise AuthenticationFailed
@@ -379,11 +379,11 @@ class UserApi(object):
             user = None
         # try auth
         try:
-            if auth_type == 'ldap':
+            if auth_type == AuthType.LDAP:
                 if ldap_connector:
                     return self._ldap_authenticate(user, email, password, ldap_connector)
                 raise MissingLDAPConnector()
-            elif auth_type == 'internal':
+            elif auth_type == AuthType.INTERNAL:
                 return self._internal_db_authenticate(user, email, password)
             else:
                 raise UnknownAuthType()
@@ -780,7 +780,7 @@ class UserApi(object):
             raise UserAuthTypeDisabled('user {} auth type {} is disabled'.format(user.email, user.auth_type.value))
 
     def _user_can_authenticate(self, user: User) -> bool:
-        return user.auth_type and user.auth_type.value in self._config.AUTH_TYPES
+        return user.auth_type and user.auth_type in self._config.AUTH_TYPES
 
     def allowed_to_invite_new_user(self, email: str) -> bool:
         # INFO - G.M - 2018-10-25 - disallow account creation if no

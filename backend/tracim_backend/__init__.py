@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid_multiauth import MultiAuthenticationPolicy
+
+from tracim_backend.models.auth import AuthType
 from tracim_backend.views.core_api.account_controller import AccountController
 
 try:  # Python 3.5+
@@ -81,7 +83,7 @@ def web(global_config, **local_settings):
     ]
 
     # Hack for ldap
-    if 'ldap' in app_config.AUTH_TYPES:
+    if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3
         configurator.include('pyramid_ldap3')
         configurator.ldap_setup(
