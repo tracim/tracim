@@ -28,7 +28,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bob@bob')
         assert u.email == 'bob@bob'
@@ -39,7 +39,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bob@bob')
         api.update(u, 'bob', 'bob@bob', 'pass', do_save=True)
@@ -59,7 +59,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=u,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         assert u.validate_password('pass')
         api.set_password(u,'pass','newpass','newpass')
@@ -79,7 +79,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=u,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         assert u.email == 'bob@bob'
         api.set_email(u,'pass','newbobemail@bob')
@@ -92,7 +92,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -114,7 +114,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bibi@bibi')
         api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
@@ -127,7 +127,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bibi@bibi')
         self.session.flush()
@@ -141,7 +141,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('unknown')
@@ -150,7 +150,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_minimal_user('bibi@bibi')
 
@@ -162,7 +162,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -177,7 +177,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -197,7 +197,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=admin,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -208,7 +208,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('email')
         assert len(users) == 0
@@ -220,7 +220,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -259,7 +259,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name')
         assert len(users) == 2
@@ -273,7 +273,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -321,7 +321,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u3,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name', exclude_workspace_ids=[workspace.workspace_id])
         assert len(users) == 1
@@ -334,7 +334,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -464,7 +464,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -516,7 +516,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -555,7 +555,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('email')
         assert len(users) == 2
@@ -583,7 +583,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('titi@titi')
         api.update(u, 'titi', 'titi@titi', 'pass', do_save=True)
@@ -724,7 +724,7 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
 
-        api2 = UserApi(current_user=user,session=self.session, config=self.config)
+        api2 = UserApi(current_user=user,session=self.session, config=self.app_config)
         from tracim_backend.exceptions import UserCantDisableHimself
         api2.disable(user2)
         updated_user2 = api.get_one(user2.user_id)
@@ -736,12 +736,12 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         gapi = GroupApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
@@ -754,7 +754,7 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
 
-        api2 = UserApi(current_user=user,session=self.session, config=self.config)
+        api2 = UserApi(current_user=user,session=self.session, config=self.app_config)
         from tracim_backend.exceptions import UserCantDisableHimself
         with pytest.raises(UserCantDisableHimself):
             api2.disable(user)
@@ -801,7 +801,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
             u = api.create_user(
@@ -820,7 +820,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -844,7 +844,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -873,7 +873,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -902,7 +902,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -931,7 +931,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -951,7 +951,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -971,7 +971,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
@@ -997,7 +997,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
