@@ -53,7 +53,8 @@ depot_storage_name = tracim
 depot_storage_dir = %(here)s/depot/
 
 # Backend API config
-api.key = changethisnow!
+# This is needed for some feature like reply by email
+api.key =
 # base url of the backend API, default to same as website.base_url
 # api.base_url = http://localhost:6543
 # title of website, used in email
@@ -139,6 +140,7 @@ email.processing_mode = sync
 # email.async.redis.db = 0
 
 # Email reply configuration
+# This need api.key with non-empty value
 email.reply.activated = False
 email.reply.imap.server = your_imap_server
 email.reply.imap.port = 993

@@ -68,17 +68,23 @@ def web(global_config, **local_settings):
     # Add AuthPolicy
     configurator.include("pyramid_beaker")
     configurator.include("pyramid_multiauth")
-    policies = [
+    policies = []
+    policies.append(
         CookieSessionAuthentificationPolicy(
             reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
-        ApiTokenAuthentificationPolicy(
-            api_key_header=TRACIM_API_KEY_HEADER,
-            api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
-        ),
+    )
+    if app_config.API_KEY:
+        policies.append(
+            ApiTokenAuthentificationPolicy(
+                api_key_header=TRACIM_API_KEY_HEADER,
+                api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
+            ),
+        )
+    policies.append(
         TracimBasicAuthAuthenticationPolicy(
             realm=BASIC_AUTH_WEBUI_REALM
         ),
-    ]
+    )
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
