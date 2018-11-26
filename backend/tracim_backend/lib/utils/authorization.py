@@ -19,7 +19,7 @@ except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
 if TYPE_CHECKING:
-    from tracim_backend import TracimRequest
+    from tracim_backend.lib.utils.request import TracimRequest
 ###
 # Pyramid default permission/authorization mecanism
 

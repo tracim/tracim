@@ -4,7 +4,7 @@ import transaction
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
-from tracim_backend import BASE_API_V2
+from tracim_backend.views import BASE_API_V2
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound

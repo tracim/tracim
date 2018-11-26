@@ -1,6 +1,6 @@
 import datetime
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 

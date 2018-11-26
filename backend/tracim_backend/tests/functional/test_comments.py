@@ -6,7 +6,8 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
-from tracim_backend import error, models
+from tracim_backend import error
+from tracim_backend import models
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 

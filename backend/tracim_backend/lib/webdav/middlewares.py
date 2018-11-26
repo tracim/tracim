@@ -18,7 +18,8 @@ from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
 
-from tracim_backend import CFG
+from tracim_backend.models.auth import AuthType
+from tracim_backend.config import CFG
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import get_engine
 from tracim_backend.models import get_session_factory

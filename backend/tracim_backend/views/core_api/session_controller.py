@@ -3,6 +3,7 @@ from pyramid.config import Configurator
 from pyramid.security import remember
 from pyramid_ldap3 import get_ldap_connector
 
+from tracim_backend.models.auth import AuthType
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
@@ -43,7 +44,7 @@ class SessionController(Controller):
             config=app_config,
         )
         ldap_connector = None
-        if 'ldap' in app_config.AUTH_TYPES:
+        if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         user = uapi.authenticate(login.email, login.password, ldap_connector)
         remember(request, user.user_id)

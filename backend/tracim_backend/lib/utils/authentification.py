@@ -10,7 +10,7 @@ from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
 from zope.interface import implementer
 
-from tracim_backend import AuthType
+from tracim_backend.models.auth import AuthType
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
