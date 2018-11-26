@@ -218,6 +218,7 @@ class TestConfigEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/system/config', status=200)
         assert res.json_body['email_notification_activated'] is False
+        assert res.json_body['auth_types'] == ['internal']
 
     def test_api__get_config__err_401__unregistered_user(self):
         """

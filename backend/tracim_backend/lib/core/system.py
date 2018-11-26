@@ -24,5 +24,6 @@ class SystemApi(object):
 
     def get_config(self) -> ConfigModel:
         return ConfigModel(
-            email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED  # nopep8
+            email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED,  # nopep8
+            auth_types=self._config.AUTH_TYPES,
         )

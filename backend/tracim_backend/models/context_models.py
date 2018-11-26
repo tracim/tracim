@@ -18,6 +18,7 @@ from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models import User
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
@@ -46,9 +47,11 @@ class ConfigModel(object):
 
     def __init__(
         self,
-        email_notification_activated: bool
+        email_notification_activated: bool,
+        auth_types: typing.List[AuthType]
     ) -> None:
         self.email_notification_activated = email_notification_activated
+        self.auth_types = [auth_type.value for auth_type in auth_types]
 
 
 class PreviewAllowedDim(object):
