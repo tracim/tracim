@@ -5938,3 +5938,48 @@ class TestUserEnpointsLDAPAuth(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+
+    @pytest.mark.ldap
+    def test_api__create_user__ok_200__full_admin(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('hubert@planetexpress.com')
+        gapi =GroupApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=user
+        )
+        api.update(user, auth_type=user.auth_type, groups=[gapi.get_one_with_name('administrators')])
+        api.save(user)
+        transaction.commit()
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'lang': 'fr',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED

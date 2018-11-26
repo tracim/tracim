@@ -2,13 +2,15 @@
 """
 Tests for /api/v2/workspaces subpath endpoints.
 """
+import pytest
 import requests
 import transaction
 from depot.io.utils import FileIntent
 
+from tracim_backend import error
 from tracim_backend import models
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend import error
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -2623,6 +2625,72 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
 
+class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
+
+    fixtures = [BaseFixture, ContentFixtures]
+    config_section = 'functional_test_with_mail_test_sync_ldap_auth_only'
+
+    def test_api__create_workspace_member_role__err_400__new_user_but_internal_auth_disabled(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = uapi.get_one_by_email('hubert@planetexpress.com')
+        gapi =GroupApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=user
+        )
+        uapi.update(user, auth_type=user.auth_type, groups=[gapi.get_one_with_name('administrators')])
+        uapi.save(user)
+        transaction.commit()
+        gapi = GroupApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        transaction.commit()
+
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
 
 class TestUserInvitationWithMailActivatedASync(FunctionalTest):
 

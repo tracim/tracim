@@ -4,7 +4,6 @@ import transaction
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
-from tracim_backend.views import BASE_API_V2
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
@@ -13,6 +12,7 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
@@ -42,6 +42,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -376,6 +377,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserAuthTypeDisabled, HTTPStatus.BAD_REQUEST)
     @require_profile_and_workspace_role(
         minimal_profile=Group.TIM_USER,
         minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,

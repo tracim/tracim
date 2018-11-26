@@ -4,6 +4,7 @@ import transaction
 from tracim_backend import models
 
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import MissingLDAPConnector
@@ -48,6 +49,18 @@ class TestUserApi(DefaultTest):
         assert nu.email == 'bob@bob'
         assert nu.display_name == 'bob'
         assert nu.validate_password('pass')
+
+    @pytest.mark.ldap
+    def test_unit__create_minimal_user_and_update__err__set_unaivalable_auth_type(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(UserAuthTypeDisabled):
+            api.update(u, name='bob', email='bob@bob', auth_type=AuthType.LDAP, do_save=True)
+
 
     @pytest.mark.internal_auth
     def test_unit__create_minimal_user_and_set_password__ok__nominal_case(self):

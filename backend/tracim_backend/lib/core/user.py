@@ -545,6 +545,14 @@ class UserApi(object):
             user.display_name = name
 
         if auth_type is not None:
+            if not auth_type  in self._config.AUTH_TYPES:
+                raise UserAuthTypeDisabled(
+                    'Can modify user {} auth_type to'
+                    ' a disabled auth type like {}'.format(
+                        user.email,
+                        auth_type
+                    )
+                )
             user.auth_type = auth_type
 
         if email is not None and email != user.email:
