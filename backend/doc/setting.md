@@ -33,10 +33,10 @@ If the `website.base_url` trick is not enough for your own configuration, you ca
 - Explicitly set backend base url different from frontend url with `api.base_url`
 - Override allowed access control allowed origin for cors.
 
+with this configuration, i allowed cors to work with 2 different server with 2 different port
+that may be needed if frontend is in another computer distinct from backend.
+you can add how many server you want separated by ','
 
-     # with this configuration, i allowed cors to work with 2 different server with 2 different port
-     # that may be needed if frontend is in another computer distinct from backend.
-     # you can add how many server you want separated by ','
      cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
 
 ## Activating API key authentification
@@ -78,7 +78,7 @@ link to frontend in email.
 ## Activating reply by email feature ##
 
 to activate reply by email feature,
-you first need to [setting#Activating API key authentification] activate api key auth mecansim,
+you first need to activate api key auth mecansim (see Activating API key authentification section),
 without this, email_reply feature can't work correctly.
 
 to activate reply by email, smallest config is this:
