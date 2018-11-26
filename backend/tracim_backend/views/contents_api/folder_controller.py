@@ -96,15 +96,11 @@ class FolderController(Controller):
                 tm=transaction.manager,
                 content=content
         ):
-            api.update_content(
+            api.update_container_content(
                 item=content,
                 new_label=hapic_data.body.label,
                 new_content=hapic_data.body.raw_content,
-
-            )
-            api.set_allowed_content(
-                content=content,
-                allowed_content_type_slug_list=hapic_data.body.sub_content_types  # nopep8
+                allowed_content_type_slug_list=hapic_data.body.sub_content_types
             )
             api.save(content)
         return api.get_content_in_context(content)

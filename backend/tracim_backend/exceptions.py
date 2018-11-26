@@ -338,6 +338,7 @@ class EmptyNotificationError(TracimException):
 class ContentInNotEditableState(TracimException):
     error_code = error.CONTENT_IN_NOT_EDITABLE_STATE
 
+
 class UnknownAuthType(TracimException):
     pass
 
@@ -358,3 +359,20 @@ class ExternalAuthUserEmailModificationDisallowed(DisabledFeatureForExternalAuth
 
 class ExternalAuthUserPasswordModificationDisallowed(DisabledFeatureForExternalAuth):
     error_code = error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+
+class DepotCorrupted(TracimException):
+    pass
+
+class RevisionFilePathSearchFailedDepotCorrupted(DepotCorrupted):
+    pass
+
+class NewRevisionAbortedDepotCorrupted(DepotCorrupted):
+    pass
+
+class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
+    pass
+
+
+class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
+    pass
+

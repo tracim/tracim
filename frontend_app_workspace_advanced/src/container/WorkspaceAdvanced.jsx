@@ -42,7 +42,6 @@ class WorkspaceAdvanced extends React.Component {
         avatarUrl: '',
         isEmail: false
       },
-      firstLoadKnownMemberCompleted: false,
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
@@ -202,18 +201,20 @@ class WorkspaceAdvanced extends React.Component {
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
-  handleChangeNewMemberName = newNameOrEmail => {
-    if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
-
+  handleChangeNewMemberName = async newNameOrEmail => {
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
         nameOrEmail: newNameOrEmail,
         isEmail: this.isEmail(newNameOrEmail)
       },
-      autoCompleteFormNewMemberActive: this.state.firstLoadKnownMemberCompleted && newNameOrEmail.length >= 2,
       autoCompleteClicked: false
     }))
+
+    if (newNameOrEmail.length >= 2) {
+      await this.handleSearchUser(newNameOrEmail)
+      this.setState({autoCompleteFormNewMemberActive: true})
+    }
   }
 
   handleClickKnownMember = knownMember => {
@@ -239,12 +240,7 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, state.content.workspace_id))
     switch (fetchUserKnownMemberList.apiResponse.status) {
-      case 200:
-        this.setState({
-          searchedKnownMemberList: fetchUserKnownMemberList.body,
-          firstLoadKnownMemberCompleted: true
-        })
-        break
+      case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.body}); break
       default: this.sendGlobalFlashMessage(props.t('Error while fetching known members list', 'warning'))
     }
   }

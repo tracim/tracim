@@ -83,7 +83,7 @@ export const FileComponent = props =>
         <div className='file__contentpage__dropzone__btn'>
           <button
             type='button'
-            className='file__contentpage__dropzone__btn__cancel btn outlineTextBtn'
+            className='file__contentpage__dropzone__btn__cancel btn outlineTextBtn nohover'
             style={{borderColor: props.customColor}}
             onClick={props.onClickDropzoneCancel}
           >

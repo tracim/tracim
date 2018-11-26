@@ -175,7 +175,7 @@ to have more/less log about something.
 # Color File #
 
 You can change default color of apps by setting color.json file, by default,
-placed at root of tracim_v2 dir, see [color.json.sample](../../color.json.sample)
+placed at root of tracim dir, see [color.json.sample](../../color.json.sample)
 for default config file.
 
 # Wsgidav File

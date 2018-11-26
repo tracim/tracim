@@ -1043,6 +1043,7 @@ class ContentSchema(ContentDigestSchema):
 
 class TextBasedDataAbstractSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
+        required=True,
         description='Content of the object, may be raw text or <b>html</b> for example'  # nopep8
     )
 
@@ -1173,7 +1174,8 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
-                    'set it to empty list in other cases'
+                    'set it to empty list in other cases',
+        required = True,
     )
 
     @post_load
