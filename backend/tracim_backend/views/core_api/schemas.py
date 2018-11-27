@@ -170,7 +170,8 @@ class LoggedInUserPasswordSchema(marshmallow.Schema):
 class SetEmailSchema(LoggedInUserPasswordSchema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate=Length(min=3, max=255),
     )
 
     @post_load
@@ -244,7 +245,8 @@ class SetUserProfileSchema(marshmallow.Schema):
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate = Length(min=3, max=255),
     )
     password = marshmallow.fields.String(
         example='8QLa$<w',
@@ -617,6 +619,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         example='suri@cate.fr',
         default=None,
         allow_none=True,
+        validate=Length(min=3, max=255),
     )
     user_public_name = marshmallow.fields.String(
         example='John',
@@ -633,7 +636,8 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate = Length(min=3, max=255),
     )
 
     @post_load
@@ -644,7 +648,8 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate = Length(min=3, max=255),
     )
     reset_password_token = marshmallow.fields.String(
         description="token to reset password of given user",
@@ -659,7 +664,8 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
 class ResetPasswordModifySchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate = Length(min=3, max=255),
     )
     reset_password_token = marshmallow.fields.String(
         description="token to reset password of given user",
@@ -685,7 +691,8 @@ class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(
         example='hello@tracim.fr',
-        required=True
+        required=True,
+        validate=Length(min=3, max=255)
     )
     password = marshmallow.fields.String(
         example='8QLa$<w',
