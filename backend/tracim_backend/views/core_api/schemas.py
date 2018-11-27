@@ -163,6 +163,7 @@ class UserSchema(UserDigestSchema):
 class LoggedInUserPasswordSchema(marshmallow.Schema):
     loggedin_user_password = marshmallow.fields.String(
         required=True,
+        validate=Length(min=6, max=512),
     )
 
 
@@ -180,11 +181,13 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
 class SetPasswordSchema(LoggedInUserPasswordSchema):
     new_password = marshmallow.fields.String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate=Length(min=6, max=512),
     )
     new_password2 = marshmallow.fields.String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate = Length(min=6, max=512),
     )
 
     @post_load
@@ -246,6 +249,7 @@ class UserCreationSchema(marshmallow.Schema):
     password = marshmallow.fields.String(
         example='8QLa$<w',
         required=False,
+        validate=Length(min=6, max=512),
     )
     profile = marshmallow.fields.String(
         attribute='profile',
@@ -663,11 +667,13 @@ class ResetPasswordModifySchema(marshmallow.Schema):
     )
     new_password = marshmallow.fields.String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate = Length(min=6, max=512),
     )
     new_password2 = marshmallow.fields.String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate=Length(min=6, max=512),
     )
 
     @post_load
@@ -685,6 +691,7 @@ class BasicAuthSchema(marshmallow.Schema):
         example='8QLa$<w',
         required=True,
         load_only=True,
+        validate=Length(min=6, max=512),
     )
 
     class Meta:
