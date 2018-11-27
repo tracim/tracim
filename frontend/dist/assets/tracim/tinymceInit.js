@@ -40,7 +40,7 @@
       plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | fullscreen'
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
       ],
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
@@ -68,6 +68,20 @@
             })
 
             $('#hidden_tinymce_fileinput').click()
+          }
+        })
+
+        $editor.addButton('customFullscreen', {
+          icon: 'mce-ico mce-i-fullscreen',
+          title: 'Fullscreen',
+          onclick: function () {
+            $editor.execCommand('mceFullScreen')
+            var iframeElement = $editor.getWin()
+            var oldHeight = iframeElement.frameElement.style.height
+            var oldHeightInt = parseInt(
+              oldHeight.substr(0, oldHeight.length - 2) // remove the last 'px' to cast into int
+            ) - 88 // 88px is Tracim's header height
+            iframeElement.frameElement.style.height = oldHeightInt + 'px'
           }
         })
 
