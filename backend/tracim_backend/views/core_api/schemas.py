@@ -206,6 +206,7 @@ class SetUserInfoSchema(marshmallow.Schema):
     public_name = marshmallow.fields.String(
         example='John Doe',
         required=True,
+        validate=Length(min=3, max=255)
     )
     lang = marshmallow.fields.String(
         description=FIELD_LANG_DESC,
@@ -264,6 +265,7 @@ class UserCreationSchema(marshmallow.Schema):
         example='John Doe',
         required=False,
         default=None,
+        validate=Length(min=3, max=255)
     )
     lang = marshmallow.fields.String(
         description=FIELD_LANG_DESC,
@@ -616,6 +618,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         example='John',
         default=None,
         allow_none=True,
+        validate=Length(min=3, max=255)
     )
 
     @post_load
