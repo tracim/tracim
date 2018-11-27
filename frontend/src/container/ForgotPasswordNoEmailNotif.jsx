@@ -30,19 +30,19 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
                     </div>
 
                     <div className='forgotpassword__card__body__submsg'>
-                      {props.t("Unfortunately, email aren't activated so we can't send you a reset password email")}
+                      {props.t("Unfortunately, email notifications aren't activated, we can't send you a reset password email")}.
                     </div>
 
                     <div className='forgotpassword__card__body__submsg'>
-                      {props.t('To change your password, please refer to an administrator')}
+                      {props.t('To change your password, please refer to an administrator')}.
                     </div>
 
-                    <div className='forgotpassword__card__body__btn'>
+                    <div className='forgotpassword__card__body__btn-no-email'>
                       <Button
                         htmlType='button'
                         bootstrapType=''
-                        customClass='outlineTextBtn nohover forgotpassword__card__body__btncancel btn primaryColorFont primaryColorBorder'
-                        label={props.t('Back')}
+                        customClass='btnSubmit forgotpassword__card__body__btnsubmit'
+                        label={props.t('Go back to previous page')}
                         onClick={this.handleClickBack}
                       />
                     </div>

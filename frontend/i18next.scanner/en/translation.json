@@ -165,6 +165,6 @@
   "Error while loading members list": "Error while loading members list",
   "My profile": "My profile",
   "To change your password, please refer to an administrator": "To change your password, please refer to an administrator",
-  "Back": "Back",
-  "Unfortunately, email aren't activated so we can't send you a reset password email": "Unfortunately, email aren't activated so we can't send you a reset password email"
+  "Unfortunately, email notifications aren't activated, we can't send you a reset password email": "Unfortunately, email notifications aren't activated, we can't send you a reset password email",
+  "Go back to previous page": "Go back to previous page"
 }
