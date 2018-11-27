@@ -71,17 +71,32 @@
           }
         })
 
+        var customFullscreen = {
+          active: false,
+          originalHeight: null,
+          newHeight: 0
+        }
+
         $editor.addButton('customFullscreen', {
           icon: 'mce-ico mce-i-fullscreen',
           title: 'Fullscreen',
           onclick: function () {
-            $editor.execCommand('mceFullScreen')
             var iframeElement = $editor.getWin()
-            var oldHeight = iframeElement.frameElement.style.height
-            var oldHeightInt = parseInt(
-              oldHeight.substr(0, oldHeight.length - 2) // remove the last 'px' to cast into int
-            ) - 88 // 88px is Tracim's header height
-            iframeElement.frameElement.style.height = oldHeightInt + 'px'
+
+            if (customFullscreen.originalHeight === null) customFullscreen.originalHeight = iframeElement.frameElement.style.height
+
+            $editor.execCommand('mceFullScreen')
+
+            var currentHeight = iframeElement.frameElement.style.height
+            var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
+
+            customFullscreen = {
+              active: !customFullscreen.active,
+              originalHeight: customFullscreen.originalHeight,
+              newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - 88 // 88px is Tracim's header height
+            }
+
+            iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
           }
         })
 
