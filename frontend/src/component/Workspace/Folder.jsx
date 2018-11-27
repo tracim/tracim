@@ -27,7 +27,7 @@ class Folder extends React.Component {
       <div className={classnames('folder', {
         'active': props.folderData.isOpen && folderContentList.length > 0,
         'item-last': props.isLast
-        // 'read': props.readStatusList.includes(props.folderData.id)
+        'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
       })}>
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
