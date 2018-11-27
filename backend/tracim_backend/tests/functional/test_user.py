@@ -3,26 +3,28 @@
 Tests for /api/v2/users subpath endpoints.
 """
 from time import sleep
+
 import pytest
 import requests
 import transaction
 
-from tracim_backend import models
+from tracim_backend import AuthType
 from tracim_backend import error
+from tracim_backend import models
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
+from tracim_backend.fixtures.content import Content as ContentFixtures
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
