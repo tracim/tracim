@@ -50,11 +50,10 @@ class ConfigModel(object):
     def __init__(
         self,
         email_notification_activated: bool,
-        new_user_invitation_email_notif: bool,
+        new_user_invitation_do_notify: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
-        self.new_user_invitation_email_notif = new_user_invitation_email_notif
-
+        self.new_user_invitation_do_notify = new_user_invitation_do_notify
 
 class PreviewAllowedDim(object):
 

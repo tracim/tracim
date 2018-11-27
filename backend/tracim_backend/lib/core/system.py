@@ -25,5 +25,5 @@ class SystemApi(object):
     def get_config(self) -> ConfigModel:
         return ConfigModel(
             email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED,  # nopep8
-            new_user_invitation_email_notif=self._config.INVTATION_NEW_USER_EMAIL_NOTIF,  # nopep8
+            new_user_invitation_do_notify=self._config.NEW_USER_INVITATION_DO_NOTIFY,  # nopep8
         )

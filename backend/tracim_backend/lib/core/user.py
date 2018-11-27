@@ -798,11 +798,11 @@ class UserApi(object):
         # email provided or email_notification disabled.
         if not email:
             return False
-        if not self._config.EMAIL_NOTIFICATION_ACTIVATED and self._config.INVTATION_NEW_USER_EMAIL_NOTIF:
+        if not self._config.EMAIL_NOTIFICATION_ACTIVATED and self._config.NEW_USER_INVITATION_DO_NOTIFY:
             return False
         # INFO - G.M - 2018-10-25 - do not allow all profile to invite new user
         gapi = GroupApi(self._session, self._user, self._config)
-        invite_minimal_profile = gapi.get_one_with_name(group_name=self._config.INVITE_NEW_USER_MINIMAL_PROFILE)  # nopep8
+        invite_minimal_profile = gapi.get_one_with_name(group_name=self._config.NEW_USER_INVITATION_MINIMAL_PROFILE)  # nopep8
 
         if not self._user.profile.id >= invite_minimal_profile.group_id:
             return False

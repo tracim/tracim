@@ -169,10 +169,10 @@ email.reply.lockfile_path = %(here)s/email_fetcher.lock
 # password,
 # it means that only external auth user will be able to connect to tracim with
 # account created this way until internal auth password is set by admin.
-# invitation.new_user.email_notif = True
+# new_user.invitation.do_notify = True
 
 # minimal profile to allow new_user invitation
-# invitation.new_user.minimal_profile = 'trusted-users'
+# new_user.invitation.minimal_profile = 'trusted-users'
 
 
 ### Radical (CalDav server) configuration

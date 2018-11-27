@@ -308,7 +308,6 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
             'email.notification.processing_mode',
         )
-
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
@@ -420,13 +419,13 @@ class CFG(object):
             'email.async.redis.db',
             0,
         ))
-        self.INVTATION_NEW_USER_EMAIL_NOTIF = asbool(settings.get(
-            'invitation.new_user.email_notif',
+        self.NEW_USER_INVITATION_DO_NOTIFY = asbool(settings.get(
+            'new_user.invitation.do_notify',
             'True'
         ))
 
-        self.INVITE_NEW_USER_MINIMAL_PROFILE = settings.get(
-            'invitation.new_user.minimal_profile',
+        self.NEW_USER_INVITATION_MINIMAL_PROFILE = settings.get(
+            'new_user.invitation.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME
         )
         ###
