@@ -398,7 +398,7 @@ class WorkspaceController(Controller):
         """
         newly_created = False
         email_sent = False
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG'] # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -425,15 +425,24 @@ class WorkspaceController(Controller):
             if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
                 raise exc
 
-            user = uapi.create_user(
-                email=hapic_data.body.user_email,
-                password=password_generator(),
-                do_notify=True
-            )
+            if app_config.INVTATION_NEW_USER_EMAIL_NOTIF:
+                user = uapi.create_user(
+                    email=hapic_data.body.user_email,
+                    password=password_generator(),
+                    do_notify=True
+                )
+                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                    app_config._config.INVTATION_NEW_USER_EMAIL_NOTIF and \
+                    app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    email_sent = True
+            else:
+                user = uapi.create_user(
+                    email=hapic_data.body.user_email,
+                    password=None,
+                    do_notify=False
+                )
+
             newly_created = True
-            if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
-                email_sent = True
 
         role = rapi.create_one(
             user=user,

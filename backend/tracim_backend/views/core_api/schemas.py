@@ -837,13 +837,7 @@ class AboutSchema(marshmallow.Schema):
 
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
-    auth_types = marshmallow.fields.List(
-        marshmallow.fields.String(
-            validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
-            example=AuthType.INTERNAL.value,
-            description="authentication system"
-        )
-    )
+    new_user_invitation_email_notif = marshmallow.fields.Bool()
 
 
 class ApplicationSchema(marshmallow.Schema):

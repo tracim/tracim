@@ -795,7 +795,7 @@ class UserApi(object):
         # email provided or email_notification disabled.
         if not email:
             return False
-        if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
+        if not self._config.EMAIL_NOTIFICATION_ACTIVATED and self._config.INVTATION_NEW_USER_EMAIL_NOTIF:
             return False
         # INFO - G.M - 2018-10-25 - do not allow all profile to invite new user
         gapi = GroupApi(self._session, self._user, self._config)

@@ -420,6 +420,11 @@ class CFG(object):
             'email.async.redis.db',
             0,
         ))
+        self.INVTATION_NEW_USER_EMAIL_NOTIF = asbool(settings.get(
+            'invitation.new_user.email_notif',
+            'True'
+        ))
+
         self.INVITE_NEW_USER_MINIMAL_PROFILE = settings.get(
             'invitation.new_user.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME

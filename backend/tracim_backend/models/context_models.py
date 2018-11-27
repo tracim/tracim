@@ -50,10 +50,10 @@ class ConfigModel(object):
     def __init__(
         self,
         email_notification_activated: bool,
-        auth_types: typing.List[AuthType]
+        new_user_invitation_email_notif: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
-        self.auth_types = [auth_type.value for auth_type in auth_types]
+        self.new_user_inivitation_email_notif = new_user_invitation_email_notif
 
 
 class PreviewAllowedDim(object):
