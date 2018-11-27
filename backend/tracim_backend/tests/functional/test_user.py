@@ -3363,6 +3363,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['public_name'] == 'test'
         assert res['timezone'] == ''
         assert res['lang'] is None
+        assert res['auth_type'] == 'unknown'
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -3375,7 +3376,7 @@ class TestUserEndpoint(FunctionalTest):
         )
         user = uapi.get_one(user_id)
         assert user.email == 'test@test.test'
-        assert user.password
+        assert user.password is None
 
     def test_api__create_user__err_400__email_already_in_db(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3590,6 +3591,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         user = uapi.get_one(user_id)
         assert user.email == 'test@test.test'
         assert user.password
+        assert user.auth_type == AuthType.UNKNOWN
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
@@ -5977,9 +5979,11 @@ class TestUserEnpointsLDAPAuth(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/users',
-            status=400,
+            status=200,
             params=params,
         )
-        assert isinstance(res.json, dict)
-        assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
+        res = res.json_body
+        assert res['auth_type'] == 'unknown'
+        assert res['email'] == 'test@test.test'
+        assert res['public_name'] == 'test user'
+        assert res['profile'] == 'users'

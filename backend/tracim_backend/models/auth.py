@@ -62,6 +62,7 @@ user_group_table = Table('user_group', metadata,
 class AuthType(enum.Enum):
     INTERNAL = 'internal'
     LDAP = 'ldap'
+    UNKNOWN = 'unknown'
 
 class Group(DeclarativeBase):
 

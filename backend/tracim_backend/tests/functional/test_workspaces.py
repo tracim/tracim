@@ -2631,7 +2631,7 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
     fixtures = [BaseFixture, ContentFixtures]
     config_section = 'functional_test_with_mail_test_sync_ldap_auth_only'
 
-    def test_api__create_workspace_member_role__err_400__new_user_but_internal_auth_disabled(self):  # nopep8
+    def test_api__create_workspace_member_role__ok_200__new_user_but_internal_auth_disabled(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -2686,12 +2686,17 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
-            status=400,
+            status=200,
             params=params,
         )
-        assert isinstance(res.json, dict)
-        assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
+        uapi = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = uapi.get_one_by_email('bob@bob.bob')
+        assert user.auth_type == AuthType.UNKNOWN
+
 
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmailEnabled(FunctionalTest):
 
@@ -2800,7 +2805,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         )
         user = uapi.get_one_by_email('bob@bob.bob')
         assert user.password is None
-        assert user.auth_type == AuthType.INTERNAL
+        assert user.auth_type == AuthType.UNKNOWN
 
 class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisabled(FunctionalTest):
 
@@ -2857,7 +2862,7 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         )
         user = uapi.get_one_by_email('bob@bob.bob')
         assert user.password is None
-        assert user.auth_type == AuthType.INTERNAL
+        assert user.auth_type == AuthType.UNKNOWN
 
 class TestUserInvitationWithMailActivatedASync(FunctionalTest):
 

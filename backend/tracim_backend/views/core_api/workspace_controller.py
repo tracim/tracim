@@ -4,6 +4,7 @@ import transaction
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
+from tracim_backend import AuthType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
@@ -427,16 +428,18 @@ class WorkspaceController(Controller):
 
             if app_config.INVTATION_NEW_USER_EMAIL_NOTIF:
                 user = uapi.create_user(
+                    auth_type=AuthType.UNKNOWN,
                     email=hapic_data.body.user_email,
                     password=password_generator(),
                     do_notify=True
                 )
                 if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                    app_config._config.INVTATION_NEW_USER_EMAIL_NOTIF and \
+                    app_config.INVTATION_NEW_USER_EMAIL_NOTIF and \
                     app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
                     email_sent = True
             else:
                 user = uapi.create_user(
+                    auth_type=AuthType.UNKNOWN,
                     email=hapic_data.body.user_email,
                     password=None,
                     do_notify=False

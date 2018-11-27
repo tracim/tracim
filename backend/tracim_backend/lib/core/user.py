@@ -237,7 +237,7 @@ class UserApi(object):
 
         # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type
         # different from LDAP
-        if user and user.auth_type != auth_type:
+        if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
                 raise WrongAuthTypeForUser(
                     'User "{}" auth_type is {} not {}'.format(
                         email,
@@ -296,6 +296,8 @@ class UserApi(object):
         if not user.is_active:
             raise UserAuthenticatedIsNotActive('This user is not activated')  # nopep8
 
+        if user.auth_type == AuthType.UNKNOWN :
+            user.auth_type = auth_type
         return user
 
     def _internal_db_authenticate(self, user: typing.Optional[User], email: str, password: str) -> User:
@@ -304,7 +306,7 @@ class UserApi(object):
         if not user:
             raise UserDoesNotExist('User {} not found in database'.format(email)) # nopep8
 
-        if user.auth_type != auth_type:
+        if user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
                     email,
@@ -321,8 +323,9 @@ class UserApi(object):
         if not user.is_active:
             raise UserAuthenticatedIsNotActive('This user is not activated')  # nopep8
 
+        if user.auth_type == AuthType.UNKNOWN :
+            user.auth_type = auth_type
         return user
-
 
     def authenticate(
             self,
@@ -545,7 +548,7 @@ class UserApi(object):
             user.display_name = name
 
         if auth_type is not None:
-            if not auth_type  in self._config.AUTH_TYPES:
+            if auth_type != AuthType.UNKNOWN and not auth_type in self._config.AUTH_TYPES:
                 raise UserAuthTypeDisabled(
                     'Can modify user {} auth_type to'
                     ' a disabled auth type like {}'.format(
@@ -590,7 +593,7 @@ class UserApi(object):
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type != AuthType.INTERNAL:
+        if user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 'user {} is link to external auth {},'
                 'password modification disallowed'.format(
@@ -601,7 +604,7 @@ class UserApi(object):
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type != AuthType.INTERNAL:
+        if user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 'user {} is link to external auth {},'
                 'email modification disallowed'.format(
@@ -618,7 +621,7 @@ class UserApi(object):
         name: str = None,
         timezone: str = '',
         lang: str= None,
-        auth_type: AuthType = AuthType.INTERNAL,
+        auth_type: AuthType = AuthType.UNKNOWN,
         groups=[],
         do_save: bool=True,
         do_notify: bool=True,

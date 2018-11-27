@@ -1,5 +1,6 @@
 from pyramid.config import Configurator
 
+from tracim_backend import AuthType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import \
@@ -263,9 +264,16 @@ class UserController(Controller):
             config=app_config,
         )
         groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        # FIXME - G.M - 2018-11-27 - do not allow send email
+        # notification without valid password
+        password = hapic_data.body.password
+        if not password and hapic_data.body.email_notification:
+            password = password_generator()
+
         user = uapi.create_user(
+            auth_type=AuthType.UNKNOWN,
             email=hapic_data.body.email,
-            password=hapic_data.body.password,
+            password=password,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
