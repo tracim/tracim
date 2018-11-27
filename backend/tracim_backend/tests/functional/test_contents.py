@@ -607,6 +607,240 @@ class TestFolder(FunctionalTest):
         assert 'code' in res.json_body
         assert res.json_body['code'] == error.SAME_VALUE_ERROR
 
+    def test_api__update_folder__err_400__allowed_content_changed_only(self) -> None:
+        """
+        Update(put) one folder but change only allowed content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [content_type_list.Folder.slug]
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['is_editable'] is True
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['sub_content_types'] == [content_type_list.Folder.slug]
+
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [
+                content_type_list.Folder.slug,
+                content_type_list.Thread.slug
+            ]
+        }
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['is_editable'] is True
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert set(content['sub_content_types']) == set([
+            content_type_list.Folder.slug,
+            content_type_list.Thread.slug
+        ])
+
+    def test_api__update_folder__err_400__label_changed_only(self) -> None:
+        """
+        Update(put) one folder but change only allowed content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [content_type_list.Folder.slug]
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['is_editable'] is True
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['sub_content_types'] == [content_type_list.Folder.slug]
+
+        params = {
+            'label': 'My New label 2',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [content_type_list.Folder.slug]
+        }
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['is_editable'] is True
+        assert content['label'] == 'My New label 2'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label-2'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert set(content['sub_content_types']) == set([content_type_list.Folder.slug])  # nopep8
+
     def test_api__update_folder__err_400__label_already_used(self) -> None:
         """
         Update(put) one html document of a content

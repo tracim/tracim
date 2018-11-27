@@ -1425,7 +1425,7 @@ class ContentApi(object):
     #
     #     return result
 
-    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> None:  # nopep8
+    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:  # nopep8
         """
         :param content: the given content instance
         :param allowed_content_dict: must be something like this:
@@ -1435,13 +1435,16 @@ class ContentApi(object):
                 file = False,
                 page = True
             )
-        :return: nothing
+        :return: content
         """
         properties = content.properties.copy()
+        if set(properties['allowed_content']) == set(allowed_content_dict) :
+            raise SameValueError('Content allowed content did not change')
         properties['allowed_content'] = allowed_content_dict
         content.properties = properties
+        return content
 
-    def set_allowed_content(self, content: Content, allowed_content_type_slug_list: typing.List[str]) -> None:  # nopep8
+    def set_allowed_content(self, content: Content, allowed_content_type_slug_list: typing.List[str]) -> Content:  # nopep8
         """
         :param content: the given content instance
         :param allowed_content_type_slug_list: list of content_type_slug to
@@ -1454,7 +1457,7 @@ class ContentApi(object):
                 raise ContentTypeNotExist('Content_type {} does not exist'.format(allowed_content_type_slug))  # nopep8
             allowed_content_dict[allowed_content_type_slug] = True
 
-        self._set_allowed_content(content, allowed_content_dict)
+        return self._set_allowed_content(content, allowed_content_dict)
 
     def restore_content_default_allowed_content(self, content: Content) -> None:
         """
@@ -1576,13 +1579,48 @@ class ContentApi(object):
                and item.is_active \
                and item.get_status().is_editable()
 
-    def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
+    def update_container_content(
+            self,
+            item: Content,
+            allowed_content_type_slug_list: typing.List[str],
+            new_label: str,
+            new_content: str=None,
+    ):
+        """
+        Update a container content like folder
+        :param item: content
+        :param item: content
+        :param new_label: new label of content
+        :param new_content: new raw text content/description of content
+        :param allowed_content_type_slug_list: list of allowed subcontent type
+         of content.
+        :return:
+        """
+        try:
+            item = self.set_allowed_content(item, allowed_content_type_slug_list)
+            content_has_changed = True
+        except SameValueError:
+            content_has_changed = False
+        item = self.update_content(item, new_label, new_content, force_update=content_has_changed)
+
+        return item
+
+    def update_content(self, item: Content, new_label: str, new_content: str=None, force_update=False) -> Content:
+        """
+        Update a content
+        :param item: content
+        :param new_label: new label of content
+        :param new_content: new raw text content/description of content
+        :param force_update: don't raise SameValueError if value does not change
+        :return: updated content
+        """
         if not self.is_editable(item):
             raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
-        if item.label == new_label and item.description == new_content:
-            # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
-            # Internatization disabled in libcontent for now.
-            raise SameValueError('The content did not changed')
+        if not force_update:
+            if item.label == new_label and item.description == new_content:
+                # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
+                # Internatization disabled in libcontent for now.
+                raise SameValueError('The content did not changed')
         if not new_label:
             raise EmptyLabelNotAllowed()
 
