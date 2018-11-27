@@ -170,7 +170,7 @@ class Timeline extends React.Component {
                     type='button'
                     className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__body__texteditor__submit__btn btn highlightBtn')}
                     onClick={props.onClickValidateNewCommentBtn}
-                    disabled={props.disableComment}
+                    disabled={props.disableComment || props.newComment === ''}
                     style={{
                       backgroundColor: props.customColor,
                       color: '#fdfdfd',
