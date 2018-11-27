@@ -89,7 +89,10 @@ class Dashboard extends React.Component {
 
     if (prevProps.match.params.idws !== props.match.params.idws) {
       this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
-      this.setState({workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null})
+      this.setState({
+        workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
+        advancedDashboardOpenedId: null
+      })
     }
 
     if (prevState.workspaceIdInUrl !== state.workspaceIdInUrl) {
