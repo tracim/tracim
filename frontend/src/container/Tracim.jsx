@@ -7,6 +7,7 @@ import i18n from '../i18n.js'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
+import ForgotPasswordNoEmailNotif from './ForgotPasswordNoEmailNotif.jsx'
 import ResetPassword from './ResetPassword.jsx'
 import Account from './Account.jsx'
 import AdminAccount from './AdminAccount.jsx'
@@ -169,6 +170,8 @@ class Tracim extends React.Component {
           <Route path={PAGE.LOGIN} component={Login} />
 
           <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
+
+          <Route path={PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF} component={ForgotPasswordNoEmailNotif} />
 
           <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 

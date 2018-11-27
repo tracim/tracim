@@ -33,28 +33,33 @@ class Account extends React.Component {
   constructor (props) {
     super(props)
 
+    const builtSubComponentMenu = [{
+      name: 'personalData',
+      active: true,
+      label: props.t('My profile')
+    }, {
+      name: 'notification',
+      active: false,
+      label: props.t('Shared spaces and notifications')
+    }, {
+      name: 'password',
+      active: false,
+      label: props.t('Password')
+      // }, {
+      //   name: 'timezone',
+      //   active: false,
+      //   label: 'Timezone'
+      // }, {
+      //   name: 'calendar',
+      //   label: 'Calendrier personnel',
+      //   active: false
+    }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
+
     this.state = {
       idUserToEdit: props.match.params.iduser,
       userToEdit: {},
       userToEditWorkspaceList: [],
-      subComponentMenu: [{
-        name: 'personalData',
-        active: true
-      }, {
-        name: 'notification',
-        active: false
-      }, {
-        name: 'password',
-        active: false
-      }]
-      // {
-      //   name: 'timezone',
-      //   active: false
-      // }, {
-      //   name: 'calendar',
-      //   menuLabel: 'Calendrier personnel',
-      //   active: false
-      // }]
+      subComponentMenu: builtSubComponentMenu
     }
   }
 
@@ -225,7 +230,7 @@ class Account extends React.Component {
 
             <div className='account__userpreference'>
               <MenuSubComponent
-                activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
+                menu={state.subComponentMenu}
                 onClickMenuItem={this.handleClickSubComponentMenuItem}
               />
 

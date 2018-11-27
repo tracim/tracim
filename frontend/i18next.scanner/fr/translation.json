@@ -54,8 +54,6 @@
   "Edit": "Editer",
   "Information": "Information",
   "Warning": "Attention",
-  "My profil": "mon profil",
-  "Timezone": "Fuseau horaire",
   "Your name has been changed": "Votre nom a été changé",
   "Error while changing name": "Erreur lors du changement de nom",
   "Your name and email has been changed": "Votre nom et votre email ont été changés",
@@ -162,7 +160,11 @@
   "threads": "discussions",
   "files": "fichiers",
   "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail",
-  "This user already is in the workspace": "__NOT_TRANSLATED__",
-  "Error while loading content list": "__NOT_TRANSLATED__",
-  "Error while loading members list": "__NOT_TRANSLATED__"
+  "This user already is in the workspace": "Cet utilisateur est déjà dans l'espace partagé",
+  "Error while loading content list": "Erreur lors du chargement de la liste des contenus",
+  "Error while loading members list": "Erreur lors du chargement de la liste des membres",
+  "My profile": "Mon profil",
+  "To change your password, please refer to an administrator": "Pour changer votre mot de passe, veuillez en parler à un administrateur",
+  "Back": "Retour",
+  "Unfortunately, email aren't activated so we can't send you a reset password email": "Malheureusement, les emails ne sont pas activé, nous ne pouvons pas vous envoyer une demande de réinitialisation de mot de passe"
 }

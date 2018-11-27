@@ -423,7 +423,7 @@ class Dashboard extends React.Component {
                 <UserStatus
                   user={props.user}
                   curWs={props.curWs}
-                  displayNotifBtn={state.displayNotifBtn}
+                  displayNotifBtn={props.system.config.email_notification_activated}
                   onClickToggleNotifBtn={this.handleToggleNotifBtn}
                   onClickAddNotify={this.handleClickAddNotification}
                   onClickRemoveNotify={this.handleClickRemoveNotification}
