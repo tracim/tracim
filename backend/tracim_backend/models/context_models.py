@@ -53,7 +53,7 @@ class ConfigModel(object):
         new_user_invitation_email_notif: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
-        self.new_user_inivitation_email_notif = new_user_invitation_email_notif
+        self.new_user_invitation_email_notif = new_user_invitation_email_notif
 
 
 class PreviewAllowedDim(object):
