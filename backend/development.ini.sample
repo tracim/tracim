@@ -6,19 +6,40 @@
 ## GENERAL TRACIM config
 ## These config are common for all app : REST API, Webdav, etc...
 [DEFAULT]
+####
+### easy setup (shortcut) for setting most common config
+# search for "%(param)s" to check where those param are used and why
+####
+
+## global info (need for email and links)
+basic_setup.website_title = TRACIM
+basic_setup.website_base_url =  http://localhost:6543
+## storage path/connection
+basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
+basic_setup.depot_storage_dir = %(here)s/depot/
+basic_setup.preview_cache_dir = /tmp/tracim/preview/
+basic_setup.sessions_data_root_dir = %(here)s
+## secret
+basic_setup.api_key = changethisnow!
+basic_setup.session_secret = change_this_value_please!
+
+###
+# Detailed config
+###
+
 
 ## Database connection setting
 # to set database you need a proper sqlalchemy url, some example with supported
 # database (sqlite, postgresql, mysql/mariadb)
 # sqlite :
-sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
+# sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 # mysql/mariadb :
 # sqlalchemy.url = mysql+pymysql://user:password@dbhost:dbport/dbname
 # postgresql :
 # sqlalchemy.url = postgresql://user:paswword@dbhost:dbport/dbname?client_encoding=utf8
 # see also for more info :
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine
-
+sqlalchemy.url = %(basic_setup.sqlalchemy_url)s
 
 ### Global
 
@@ -41,25 +62,25 @@ sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 # file depot name
 depot_storage_name = tracim
 # This is where none database file will be stored.
-depot_storage_dir = %(here)s/depot/
+depot_storage_dir = %(basic_setup.depot_storage_dir)s
 
 ## Preview
 # preview cache directory
-preview_cache_dir = /tmp/tracim/preview/
+preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
 # Backend API config
 # Api key auth is disabled by default, you should set a not-null value
 # to api.key to active it
-api.key = changethisnow!
+api.key = %(basic_setup.api_key)s
 # base url of the backend API, default to same as website.base_url
 # api.base_url = http://localhost:6543
 
 ## Website config
 # title of website, used in email
-website.title = TRACIM
+website.title = %(basic_setup.website_title)s
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
-website.base_url = http://localhost:6543
+website.base_url = %(basic_setup.website_base_url)s
 # If config not provided, it will be extracted from website.base_url
 # website.server_name = localhost
 
@@ -69,7 +90,7 @@ website.base_url = http://localhost:6543
 # cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
 # Auth type (internal or ldap)
-auth_type = internal
+auth_type = %(basic_setup.auth_type)s
 # If auth_type is ldap, uncomment following ldap_* parameters
 # LDAP server address
 # ldap_url = ldap://localhost:389
@@ -96,7 +117,7 @@ user.reset_password.validity = 900
 ### Mail
 email.notification.activated = False
 # shortcut for template_dir path
-var_email_template_dir = %(here)s/tracim_backend/templates/mail
+email.template_dir = %(here)s/tracim_backend/templates/mail
 # email.notification.log_file_path = /tmp/mail-notifications.log
 # email notifications can be sent with the user_id added as an identifier
 # this way email clients like Thunderbird will be able to distinguish
@@ -105,12 +126,12 @@ email.notification.from.email = noreply+{user_id}@trac.im
 email.notification.from.default_label = Tracim Notifications
 email.notification.reply_to.email = reply+{content_id}@trac.im
 email.notification.references.email = thread+{content_id}@trac.im
-email.notification.content_update.template.html = %(var_email_template_dir)s/content_update_body_html.mak
-email.notification.content_update.template.text = %(var_email_template_dir)s/content_update_body_text.mak
-email.notification.created_account.template.html = %(var_email_template_dir)s/created_account_body_html.mak
-email.notification.created_account.template.text = %(var_email_template_dir)s/created_account_body_text.mak
-email.notification.reset_password_request.template.html = %(var_email_template_dir)s/reset_password_body_html.mak
-email.notification.reset_password_request.template.text = %(var_email_template_dir)s/reset_password_body_text.mak
+email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
+email.notification.content_update.template.text = %(email.template_dir)s/content_update_body_text.mak
+email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
+email.notification.created_account.template.text = %(email.template_dir)s/created_account_body_text.mak
+email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
+email.notification.reset_password_request.template.text = %(email.template_dir)s/reset_password_body_text.mak
 # Note: items between { and } are variable names. Do not remove / rename them
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Created account
@@ -172,7 +193,7 @@ wsgidav.config_path = %(here)s/wsgidav.conf
 ## Preview dimensions can be set as restricted, if set as restricted, access
 ## endpoint to  to get any other preview dimensions than allowed_dims will
 ## return error
-# preview.jpg.restricted_dims = True
+; preview.jpg.restricted_dims = True
 
 ### Frontend
 frontend.serve = True
@@ -197,7 +218,7 @@ pipeline = tracim_web
 use = egg:tracim_backend
 
 # hapic debug mode: return python traceback of error
-debug = True
+debug = %(basic_setup.debug)s
 
 # pyramid config
 pyramid.reload_templates = true
@@ -208,10 +229,10 @@ pyramid.default_locale_name = en
 
 # pyramid_beaker parameters
 session.type = file
-session.data_dir = %(here)s/sessions_data
-session.lock_dir = %(here)s/sessions_lock
+session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 session.key = session_key
-session.secret = change_this_value_please!
+session.secret = %(basic_setup.session_secret)s
 session.save_accessed_time = True
 session.cookie_expires = 604800
 session.timeout = 604800
