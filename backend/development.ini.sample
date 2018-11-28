@@ -3,49 +3,6 @@
 ######################
 
 ###
-## WEB REST API specific config ##
-## Rest API running pyramid framework
-[pipeline:main]
-pipeline = tracim_web
-
-[app:tracim_web]
-use = egg:tracim_backend
-
-# hapic debug mode: return python traceback of error
-debug = True
-
-# pyramid config
-pyramid.reload_templates = true
-pyramid.debug_authorization = false
-pyramid.debug_notfound = false
-pyramid.debug_routematch = false
-pyramid.default_locale_name = en
-
-# pyramid_beaker parameters
-session.type = file
-session.data_dir = %(here)s/sessions_data
-session.lock_dir = %(here)s/sessions_lock
-session.key = session_key
-session.secret = change_this_value_please!
-session.save_accessed_time = True
-session.cookie_expires = 604800
-session.timeout = 604800
-session.cookie_on_exception = true
-# custom tracim pyramid_beaker parameter
-# session.reissue_time = 120
-
-# pyramid.includes =
-#    pyramid_debugtoolbar
-
-###
-## WEBDAV server specific config ##
-## webdav server (tweaked wsigdav)
-[pipeline:webdav]
-pipeline = tracim_webdav
-[app:tracim_webdav]
-use = egg:tracim_backend#webdav
-
-###
 ## GENERAL TRACIM config
 ## These config are common for all app : REST API, Webdav, etc...
 [DEFAULT]
@@ -230,6 +187,48 @@ frontend.serve = True
 # you can set a specific file path here
 # color.config_file_path = /home/user/tracim/color.json
 
+###
+## WEB REST API specific config ##
+## Rest API running pyramid framework
+[pipeline:main]
+pipeline = tracim_web
+
+[app:tracim_web]
+use = egg:tracim_backend
+
+# hapic debug mode: return python traceback of error
+debug = True
+
+# pyramid config
+pyramid.reload_templates = true
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
+pyramid.default_locale_name = en
+
+# pyramid_beaker parameters
+session.type = file
+session.data_dir = %(here)s/sessions_data
+session.lock_dir = %(here)s/sessions_lock
+session.key = session_key
+session.secret = change_this_value_please!
+session.save_accessed_time = True
+session.cookie_expires = 604800
+session.timeout = 604800
+session.cookie_on_exception = true
+# custom tracim pyramid_beaker parameter
+# session.reissue_time = 120
+
+# pyramid.includes =
+#    pyramid_debugtoolbar
+
+###
+## WEBDAV server specific config ##
+## webdav server (tweaked wsigdav)
+[pipeline:webdav]
+pipeline = tracim_webdav
+[app:tracim_webdav]
+use = egg:tracim_backend#webdav
 
 [server:main]
 use = egg:waitress#main
