@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import Avatar from '../Avatar/Avatar.jsx'
 
 require('./Comment.styl')
 
@@ -38,7 +39,7 @@ const Comment = props => {
           </div>
 
           <div className={classnames(`${props.customClass}__header__avatar`, 'comment__header__avatar')}>
-            <img src={props.avatar} />
+            <Avatar width={'44px'} publicName={props.author} />
           </div>
         </div>
 

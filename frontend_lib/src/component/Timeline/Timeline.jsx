@@ -104,7 +104,6 @@ class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     author={content.author.public_name}
-                    avatar={content.author.avatar_url}
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
@@ -228,7 +227,6 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    avatar: '',
     idRoleUserWorkspace: 1
   },
   timelineData: [],

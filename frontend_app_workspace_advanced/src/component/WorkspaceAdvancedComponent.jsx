@@ -5,7 +5,8 @@ import {
   BtnSwitch,
   generateAvatarFromPublicName,
   NewMemberForm,
-  CardPopup
+  CardPopup,
+  Avatar
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -50,7 +51,7 @@ const WorkspaceAdvancedComponent = props => {
               {props.memberList && props.memberList.filter(m => m.user).map(m =>
                 <li className='workspace_advanced__userlist__list__item' key={`member_${m.user_id}`}>
                   <div className='workspace_advanced__userlist__list__item__avatar mr-3'>
-                    <img src={generateAvatarFromPublicName(m.user.public_name)} />
+                    <Avatar width={'50px'} publicName={m.user.public_name} />
                   </div>
 
                   <div className='workspace_advanced__userlist__list__item__name mr-5'>

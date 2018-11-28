@@ -21,7 +21,7 @@ export const debug = {
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:6543/api/v2',
+    apiUrl: 'http://192.168.1.153:6543/api/v2',
     availableStatuses: [{
       label: 'Open',
       slug: 'open',
