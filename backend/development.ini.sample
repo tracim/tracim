@@ -49,9 +49,18 @@ use = egg:tracim_backend#webdav
 ## GENERAL TRACIM config
 ## These config are common for all app : REST API, Webdav, etc...
 [DEFAULT]
-sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 
-retry.attempts = 3
+## Database connection setting
+# to set database you need a proper sqlalchemy url, some example with supported
+# database (sqlite, postgresql, mysql/mariadb)
+# sqlite :
+sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
+# mysql/mariadb :
+# sqlalchemy.url = mysql+pymysql://user:password@dbhost:dbport/dbname
+# postgresql :
+# sqlalchemy.url = postgresql://user:paswword@dbhost:dbport/dbname?client_encoding=utf8
+# see also for more info :
+# https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine
 
 
 ### Global
