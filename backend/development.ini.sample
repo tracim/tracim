@@ -347,14 +347,12 @@ script_location = tracim_backend/migration
 # are written from script.py.mako
 ; output_encoding = utf-8
 
-###
-# logging configuration
-# https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
-###
-
 #####################
 ##### LOGGERS
 #####################
+## more info here :
+## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
+
 [loggers]
 keys = root, tracim, sqlalchemy, alembic, hapic
 
