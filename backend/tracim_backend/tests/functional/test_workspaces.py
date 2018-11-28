@@ -2689,13 +2689,16 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
             status=200,
             params=params,
         )
-        uapi = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
+        user_id = res.json_body['user_id']
+        assert res.json_body['role'] == 'content-manager'
+        assert res.json_body['user']['public_name'] == 'bob'
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+            params=params,
         )
-        user = uapi.get_one_by_email('bob@bob.bob')
-        assert user.auth_type == AuthType.UNKNOWN
+        assert res.json_body['auth_type'] == 'unknown'
+        assert res.json_body['email'] == 'bob@bob.bob'
 
 
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmailEnabled(FunctionalTest):
@@ -2798,14 +2801,17 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
             status=200,
             params=params,
         )
-        uapi = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
+        user_id = res.json_body['user_id']
+        assert res.json_body['role'] == 'content-manager'
+        assert res.json_body['user']['public_name'] == 'bob'
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+            params=params,
         )
-        user = uapi.get_one_by_email('bob@bob.bob')
-        assert user.password is None
-        assert user.auth_type == AuthType.UNKNOWN
+        assert res.json_body['auth_type'] == 'unknown'
+        assert res.json_body['email'] == 'bob@bob.bob'
+
 
 class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisabled(FunctionalTest):
 
@@ -2855,14 +2861,17 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
             status=200,
             params=params,
         )
-        uapi = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
+        user_id = res.json_body['user_id']
+        assert res.json_body['role'] == 'content-manager'
+        assert res.json_body['user']['public_name'] == 'bob'
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+            params=params,
         )
-        user = uapi.get_one_by_email('bob@bob.bob')
-        assert user.password is None
-        assert user.auth_type == AuthType.UNKNOWN
+        assert res.json_body['auth_type'] == 'unknown'
+        assert res.json_body['email'] == 'bob@bob.bob'
+
 
 class TestUserInvitationWithMailActivatedASync(FunctionalTest):
 
