@@ -662,12 +662,25 @@ class ContentApi(object):
 
         return content
 
-    def get_one(self, content_id: int, content_type: str, workspace: Workspace=None, parent: Content=None) -> Content:
+    def get_one(
+            self,
+            content_id: int,
+            content_type: str,
+            workspace: Workspace=None,
+            parent: Content=None,
+            ignore_content_state_filter: bool=False
+    ) -> typing.Optional[Content]:
 
         if not content_id:
             return None
 
-        base_request = self._base_query(workspace).filter(Content.content_id==content_id)
+        if ignore_content_state_filter:
+            base_request = self.__real_base_query(workspace)
+        else:
+            base_request = self._base_query(workspace)
+
+
+        base_request = base_request.filter(Content.content_id==content_id)
 
         if content_type!=content_type_list.Any_SLUG:
             base_request = base_request.filter(Content.type==content_type)
@@ -1153,7 +1166,11 @@ class ContentApi(object):
         # INFO - G.M - 2018-11-12 - Get list of all ancestror
         #  of content, workspace root included
         if complete_path_to_id:
-            content = self.get_one(complete_path_to_id, content_type_list.Any_SLUG)
+            content = self.get_one(
+                complete_path_to_id,
+                content_type_list.Any_SLUG,
+                ignore_content_state_filter=True
+            )
             if content.parent_id:
                 content = content.parent
                 while content.parent_id:

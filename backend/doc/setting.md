@@ -29,15 +29,28 @@ you also need to NOT set website.server_name and api.base_url
 
 ## Fix URL for access to tracim from network (complex) ##
 
-If the website.base_url trick is not enough for your own configuration, you can:
-- Explicitly set backend base url different from frontend url with api.base_url
+If the `website.base_url` trick is not enough for your own configuration, you can:
+- Explicitly set backend base url different from frontend url with `api.base_url`
 - Override allowed access control allowed origin for cors.
 
+with this configuration, i allowed cors to work with 2 different server with 2 different port
+that may be needed if frontend is in another computer distinct from backend.
+you can add how many server you want separated by ','
 
-     # with this configuration, i allowed cors to work with 2 different server with 2 different port
-     # that may be needed if frontend is in another computer distinct from backend.
-     # you can add how many server you want separated by ','
      cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
+
+## Activating API key authentification
+
+API key is a auth mecanism of tracim which allow user with the key to have
+a superadmin right on tracim api, this allow user with the key to act as anyone
+and to do anything possible with the right of theses persons.
+
+It rely on 2 HTTP headers:
+
+- `Tracim-Api-Key` : Tracim api key, as marked in config in `api.key`
+- `Tracim-Api-Login` : User email login, in order to act as the user given
+
+If you let `api.key` with empty value, API key auth will be disabled.
 
 ## Activating Mail Notification feature ##
 
@@ -62,7 +75,11 @@ to activate mail notification, smallest config is this:
 don't forgot to set website.base_url and website.title for frontend, as some feature use this to return
 link to frontend in email.
 
-## Activating Email reply feature ##
+## Activating reply by email feature ##
+
+to activate reply by email feature,
+you first need to activate api key auth mecansim (see Activating API key authentification section),
+without this, email_reply feature can't work correctly.
 
 to activate reply by email, smallest config is this:
 
