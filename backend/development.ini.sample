@@ -70,9 +70,6 @@ sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 # already added to default list
 # app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
 
-# Enable debug mode
-# debug = True
-cache_dir = %(here)s/data
 # preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/
 # file depot storage
