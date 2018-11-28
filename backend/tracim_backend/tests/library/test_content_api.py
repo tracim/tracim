@@ -2086,17 +2086,21 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(
-                session=self.session,
-                tm=transaction.manager,
-                content=content2,
-        ):
-            with pytest.raises(ContentInNotEditableState):
-                api2.update_content(
-                    content2,
-                    'this is an updated page',
-                    'new content'
-                )
+        content2_nb_rev = len(content2.revisions)
+        with pytest.raises(ContentInNotEditableState):
+            with new_revision(
+                    session=self.session,
+                    tm=transaction.manager,
+                    content=content2,
+            ):
+                    api2.update_content(
+                        content2,
+                        'this is an updated page',
+                        'new content'
+                    )
+        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        assert content3.label == 'this_is_a_page'
+        assert content2_nb_rev == len(content3.revisions)
 
     def test_unit__update__err__label_already_used(self):
         uapi = UserApi(
@@ -2203,6 +2207,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             with new_revision(
                     session=self.session,
@@ -2215,8 +2220,9 @@ class TestContentApi(DefaultTest):
                     'new content'
                 )
             api2.save(content2)
-            content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-            assert content3.label == 'this_is_a_page'
+        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        assert content3.label == 'this_is_a_page'
+        assert content2_nb_rev == len(content3.revisions)
 
     def test_unit__update__err__label_dont_change(self):
         uapi = UserApi(
@@ -2323,19 +2329,23 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(
-                session=self.session,
-                tm=transaction.manager,
-                content=content2,
-        ):
-            api2.update_content(
-                content2,
-                'this_is_a_page',
-                'new content'
-            )
+        content2_nb_rev = len(content2.revisions)
+        with pytest.raises(SameValueError):
+            with new_revision(
+                    session=self.session,
+                    tm=transaction.manager,
+                    content=content2,
+            ):
+                api2.update_content(
+                    content2,
+                    'this_is_a_page',
+                    ''
+                )
         api2.save(content2)
         content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         assert content3.label == 'this_is_a_page'
+        assert content2_nb_rev == len(content3.revisions)
+
 
     def test_update_no_change(self):
         uapi = UserApi(
@@ -2403,6 +2413,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        content2_nb_rev = len(content2.revisions)
         with new_revision(
            session=self.session,
            tm=transaction.manager,
@@ -2418,6 +2429,7 @@ class TestContentApi(DefaultTest):
         transaction.commit()
         content3 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
         assert content3.label == 'same_content'
+        assert content2_nb_rev == len(content3.revisions)
 
     def test_update_file_data__ok_nominal(self):
         uapi = UserApi(
@@ -2648,18 +2660,22 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=content2,
-        ):
-            with pytest.raises(ContentInNotEditableState):
-                api2.update_file_data(
-                    content2,
-                    'index.html',
-                    'text/html',
-                    b'<html>hello world</html>'
-                )
+        content2_nb_rev = len(content2.revisions)
+        with pytest.raises(ContentInNotEditableState):
+            with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=content2,
+            ):
+                    api2.update_file_data(
+                        content2,
+                        'index.html',
+                        'text/html',
+                        b'<html>hello world</html>'
+                    )
+        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        assert content3.label == 'this_is_a_page'
+        assert content2_nb_rev == len(content3.revisions)
 
     def test_update_file_data__err__content_archived(self):
         uapi = UserApi(
@@ -2764,18 +2780,22 @@ class TestContentApi(DefaultTest):
             show_archived=True,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=content2,
-        ):
-            with pytest.raises(ContentInNotEditableState):
-                api2.update_file_data(
-                    content2,
-                    'index.html',
-                    'text/html',
-                    b'<html>hello world</html>'
-                )
+        content2_nb_rev = len(content2.revisions)
+        with pytest.raises(ContentInNotEditableState):
+            with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=content2,
+            ):
+                    api2.update_file_data(
+                        content2,
+                        'index.html',
+                        'text/html',
+                        b'<html>hello world</html>'
+                    )
+        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        assert content3.label == 'this_is_a_page'
+        assert content2_nb_rev == len(content3.revisions)
 
     def test_update_file_data__err__content_deleted(self):
         uapi = UserApi(
@@ -2880,18 +2900,22 @@ class TestContentApi(DefaultTest):
             show_deleted=True,
         )
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=content2,
-        ):
-            with pytest.raises(ContentInNotEditableState):
-                api2.update_file_data(
-                    content2,
-                    'index.html',
-                    'text/html',
-                    b'<html>hello world</html>'
-                )
+        content2_nb_rev = len(content2.revisions)
+        with pytest.raises(ContentInNotEditableState):
+            with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=content2,
+            ):
+                    api2.update_file_data(
+                        content2,
+                        'index.html',
+                        'text/html',
+                        b'<html>hello world</html>'
+                    )
+        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        assert content3.label == 'this_is_a_page'
+        assert content2_nb_rev == len(content3.revisions)
 
     @pytest.mark.xfail(reason='Broken feature dues to pyramid behaviour')
     def test_update_no_change(self):
@@ -2966,6 +2990,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         content2 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        content2_nb_rev = len(content2.revisions)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2980,6 +3005,9 @@ class TestContentApi(DefaultTest):
                 )
         api2.save(content2)
         transaction.commit()
+        content3 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        assert content3.label == 'index'
+        assert content2_nb_rev == len(content3.revisions)
 
     def test_archive_unarchive(self):
         uapi = UserApi(

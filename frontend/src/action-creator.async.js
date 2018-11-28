@@ -24,7 +24,7 @@ import {
   WORKSPACE_MEMBER_ADD,
   WORKSPACE_MEMBER_REMOVE,
   FOLDER,
-  setFolderData,
+  FOLDER_READ,
   CONFIG,
   APP_LIST,
   CONTENT_TYPE_LIST,
@@ -35,6 +35,8 @@ import {
   USER_WORKSPACE_DO_NOTIFY,
   USER,
   USER_WORKSPACE_LIST,
+  CONTENT,
+  WORKSPACE_CONTENT_PATH,
   newFlashMessage
 } from './action-creator.sync.js'
 import { history } from './index.js'
@@ -473,9 +475,25 @@ export const getWorkspaceMemberList = idWorkspace => dispatch => {
   })
 }
 
-export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch => {
+export const getContent = (idWorkspace, idContent, typeContent) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idParent}`,
+    // @FIXME - Côme - 2018/11/06 - find better solution for the -s in string bellow
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/${typeContent}s/${idContent}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: CONTENT,
+    dispatch
+  })
+}
+
+export const getFolderContentList = (idWorkspace, idFolderList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_ids=${idFolderList.join(',')}`,
     param: {
       credentials: 'include',
       headers: {
@@ -484,6 +502,21 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
       method: 'GET'
     },
     actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getContentPathList = (idWorkspace, idContent, idFolderList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?complete_path_to_id=${idContent}&parent_ids=${idFolderList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_CONTENT_PATH,
     dispatch
   })
 }
@@ -552,9 +585,9 @@ export const deleteWorkspaceMember = (user, idWorkspace, idMember) => dispatch =
   })
 }
 
-export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
-  const fetchGetFolderContent = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/?parent_id=${idFolder}`,
+export const getFolderContent = (idWorkspace, idFolder) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idFolder}`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -563,7 +596,6 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
     actionName: `${WORKSPACE}/${FOLDER}`,
     dispatch
   })
-  if (fetchGetFolderContent.status === 200) dispatch(setFolderData(idFolder, fetchGetFolderContent.json))
 }
 
 export const getConfig = () => dispatch => {
@@ -611,7 +643,7 @@ export const getContentTypeList = () => dispatch => {
   })
 }
 
-export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dispatch => {
+export const putWorkspaceContentArchived = (idWorkspace, idContent) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`,
     param: {
@@ -626,7 +658,7 @@ export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dis
   })
 }
 
-export const putWorkspaceContentDeleted = (user, idWorkspace, idContent) => dispatch => {
+export const putWorkspaceContentDeleted = (idWorkspace, idContent) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`,
     param: {
@@ -637,6 +669,21 @@ export const putWorkspaceContentDeleted = (user, idWorkspace, idContent) => disp
       method: 'PUT'
     },
     actionName: WORKSPACE_CONTENT_DELETED,
+    dispatch
+  })
+}
+
+export const putFolderRead = (idUser, idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces/${idWorkspace}/contents/${idContent}/read`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT'
+    },
+    actionName: FOLDER_READ,
     dispatch
   })
 }

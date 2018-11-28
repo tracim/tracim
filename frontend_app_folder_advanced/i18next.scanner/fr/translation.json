@@ -1,0 +1,13 @@
+{
+  "New folder": "Nouveau dossier",
+  "Validate and create": "Valider et créer",
+  "Folder's name": "Nom du dossier",
+  "Error while saving new folder": "Erreur lors de la sauvegarde du dossier",
+  "Allowed content type for this folder": "Types de contenus autorisés pour ce dossier",
+  "Error while loading folder details": "Erreur lors du chargement du dossier",
+  "Error while loading tracim's app list": "Erreur lors du chargement de la liste des apps",
+  "Error while saving new available apps list": "Erreur lors de la sauvegarde de la liste des apps",
+  "Error while saving new folder label": "Erreur lors de la sauvegarde du nom du dossier",
+  "Create a folder": "Créer un dossier",
+  "Folder": "Dossier"
+}

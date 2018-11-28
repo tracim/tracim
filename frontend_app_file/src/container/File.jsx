@@ -156,7 +156,7 @@ class File extends React.Component {
     switch (fetchResultFile.apiResponse.status) {
       case 200:
         const filenameNoExtension = removeExtensionOfFilename(fetchResultFile.body.filename)
-        const pageForPreview = pageToLoad ? pageToLoad : fileCurrentPage
+        const pageForPreview = pageToLoad || fileCurrentPage
         this.setState({
           content: {
             ...fetchResultFile.body,
@@ -626,7 +626,7 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
             newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION || !state.content.is_editable}
+            disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

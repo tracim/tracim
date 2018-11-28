@@ -4,9 +4,9 @@ import typing
 import transaction
 from depot.manager import DepotManager
 from hapic.data import HapicFile
+from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 
-from preview_generator.exception import UnavailablePreviewType
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -15,6 +15,7 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
@@ -196,7 +197,15 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=content_type_list.Any_SLUG
         )
-        file = DepotManager.get().get(content.depot_file)
+        try:
+            file = DepotManager.get().get(content.depot_file)
+        except IOError as exc:
+            raise TracimFileNotFound(
+                'file related to revision {} of content {} not found in depot.'.format(
+                    content.revision_id,
+                    content.content_id
+                )
+            ) from exc
         filename = hapic_data.path.filename
         if not filename or filename == 'raw':
             filename = content.file_name
@@ -235,7 +244,16 @@ class FileController(Controller):
             revision_id=hapic_data.path.revision_id,
             content=content
         )
-        file = DepotManager.get().get(revision.depot_file)
+        try:
+            file = DepotManager.get().get(revision.depot_file)
+        except IOError as exc:
+            raise TracimFileNotFound(
+                'file related to revision {} of content {} not found in depot.'.format(
+                    revision.revision_id,
+                    revision.content_id
+                )
+            ) from exc
+
         filename = hapic_data.path.filename
         if not filename or filename == 'raw':
             filename = "{label}_r{revision_id}{file_extension}".format(

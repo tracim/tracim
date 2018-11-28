@@ -54,8 +54,6 @@
   "Edit": "Editer",
   "Information": "Information",
   "Warning": "Attention",
-  "My profil": "mon profil",
-  "Timezone": "Fuseau horaire",
   "Your name has been changed": "Votre nom a été changé",
   "Error while changing name": "Erreur lors du changement de nom",
   "Your name and email has been changed": "Votre nom et votre email ont été changés",
@@ -72,7 +70,7 @@
   "Email Address:": "Adresse email",
   "An error has happened while getting": "Une erreur s'est produite lors de l'obtention de ",
   "An error has happened while setting \"mark all as read\"": "Une erreur s'est produite lors du réglage de \"Tout marquer comme lu\".",
-  "Create in folder": "Créer dans ce dossier ...",
+  "Create in folder": "Créer dans ce dossier ",
   "Open advanced Dashboard": "Ouvrir le tableau de bord avancé",
   "Error while loading user": "Erreur lors du chargement de l'utilisateur",
   "Name has been changed": "Le nom a été changé",
@@ -161,5 +159,12 @@
   "text documents": "documents texte",
   "threads": "discussions",
   "files": "fichiers",
-  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail"
+  "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par mail",
+  "This user already is in the workspace": "Cet utilisateur est déjà dans l'espace partagé",
+  "Error while loading content list": "Erreur lors du chargement de la liste des contenus",
+  "Error while loading members list": "Erreur lors du chargement de la liste des membres",
+  "My profile": "Mon profil",
+  "To change your password, please refer to an administrator": "Pour changer votre mot de passe, merci de contacter un administrateur",
+  "Unfortunately, email notifications aren't activated, we can't send you a reset password email": "Malheureusement, les notifications par emails ne sont pas activés, nous ne pouvons pas vous envoyer une demande de réinitialisation de mot de passe",
+  "Go back to previous page": "Retourner à la page précédente"
 }

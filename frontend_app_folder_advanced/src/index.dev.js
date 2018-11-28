@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import AppFolder from './container/AppFolder.jsx'
+import FolderAdvanced from './container/FolderAdvanced.jsx'
 
 require('./css/index.styl')
 
 ReactDOM.render(
-  <AppFolder />
+  <FolderAdvanced data={undefined} />
   , document.getElementById('content')
 )

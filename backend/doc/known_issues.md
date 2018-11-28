@@ -16,8 +16,8 @@ be careful for uwsgi ini file :
 
 
     # incorrect
-    env = TRACIM_CONF_PATH="/home/me/tracim_v2/backend/development.ini"
+    env = TRACIM_CONF_PATH="/home/me/tracim/backend/development.ini"
 
     # correct
-    env = TRACIM_CONF_PATH=/home/me/tracim_v2/backend/development.ini
+    env = TRACIM_CONF_PATH=/home/me/tracim/backend/development.ini
 

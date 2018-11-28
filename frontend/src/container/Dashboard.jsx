@@ -55,7 +55,6 @@ class Dashboard extends React.Component {
         role: '',
         isEmail: false
       },
-      firstLoadKnownMemberCompleted: false,
       displayNewMemberForm: false,
       autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
@@ -89,7 +88,11 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     if (prevProps.match.params.idws !== props.match.params.idws) {
-      this.setState({workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null})
+      this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
+      this.setState({
+        workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
+        advancedDashboardOpenedId: null
+      })
     }
 
     if (prevState.workspaceIdInUrl !== state.workspaceIdInUrl) {
@@ -186,30 +189,27 @@ class Dashboard extends React.Component {
     const { props } = this
     const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(userNameToSearch, props.curWs.id))
     switch (fetchUserKnownMemberList.status) {
-      case 200:
-        this.setState({
-          searchedKnownMemberList: fetchUserKnownMemberList.json,
-          firstLoadKnownMemberCompleted: true
-        })
-        break
+      case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
     }
   }
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
-  handleChangeNewMemberNameOrEmail = newNameOrEmail => {
-    if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
-
+  handleChangeNewMemberNameOrEmail = async newNameOrEmail => {
     this.setState(prev => ({
       newMember: {
         ...prev.newMember,
         nameOrEmail: newNameOrEmail,
         isEmail: this.isEmail(newNameOrEmail)
       },
-      autoCompleteFormNewMemberActive: this.state.firstLoadKnownMemberCompleted && newNameOrEmail.length >= 2,
       autoCompleteClicked: false
     }))
+
+    if (newNameOrEmail.length >= 2) {
+      await this.handleSearchUser(newNameOrEmail)
+      this.setState({autoCompleteFormNewMemberActive: true})
+    }
   }
 
   handleClickKnownMember = knownMember => {
@@ -426,7 +426,7 @@ class Dashboard extends React.Component {
                 <UserStatus
                   user={props.user}
                   curWs={props.curWs}
-                  displayNotifBtn={state.displayNotifBtn}
+                  displayNotifBtn={props.system.config.email_notification_activated}
                   onClickToggleNotifBtn={this.handleToggleNotifBtn}
                   onClickAddNotify={this.handleClickAddNotification}
                   onClickRemoveNotify={this.handleClickRemoveNotification}

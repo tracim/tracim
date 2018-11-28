@@ -136,3 +136,11 @@ export const putMyselfFileRead = (apiUrl, idWorkspace, idContent) => {
     method: 'PUT'
   })
 }
+
+// export const getFilePdf = pdfUrl => {
+//   return fetch(`${pdfUrl}`, {
+//     credentials: 'include',
+//     headers: {},
+//     method: 'GET'
+//   })
+// }

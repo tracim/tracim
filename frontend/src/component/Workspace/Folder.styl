@@ -1,3 +1,5 @@
+@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 // -----------------------------------------------------
 // border management for Workspace container
 border-style = 1px solid grey
@@ -58,9 +60,10 @@ folderopen()
     background-color lightGrey
     cursor pointer
     &:hover
-      // background-color hover-theme
-      .folder__header__triangleborder__triangle
-        border-color hover-theme transparent transparent transparent
+      .folder__header__triangleborder
+        border-top-color inherit
+        &__triangle
+          border-top-color inherit
     &__triangleborder
       display none
       position absolute
@@ -68,7 +71,7 @@ folderopen()
       left -1px
       border-style solid
       border-width 25px 30px 0 30px
-      border-color secondColor transparent transparent transparent
+      border-color grey transparent transparent transparent
       z-index 1
       &__triangle
         display none
@@ -85,14 +88,17 @@ folderopen()
       color darkGrey
       text-align center
     &__name
-      flex-grow 2
-      flex-shrink 2
+      flex 1
+      width 0
       margin 0 15px 0 0
       white-space nowrap
       text-overflow ellipsis
       overflow hidden
       font-size 17px
       color darkGrey
+      font-weight bold
+      ^[0].read > ^[1] > & // renders .folder.read > .folder__header > .folder__header__name
+        font-weight normal
     &__button
       flex-grow 0
       &__advancedbtn

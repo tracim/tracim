@@ -7,6 +7,7 @@ import i18n from '../i18n.js'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
+import ForgotPasswordNoEmailNotif from './ForgotPasswordNoEmailNotif.jsx'
 import ResetPassword from './ResetPassword.jsx'
 import Account from './Account.jsx'
 import AdminAccount from './AdminAccount.jsx'
@@ -161,13 +162,16 @@ class Tracim extends React.Component {
             // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
             // able to access props.match.params.idws
             // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
-            path='/ui(/:first?/:idws?/*)?' render={() => <Sidebar />}
+            path='/ui/:first?/:idws?/*' render={() => <Sidebar />}
             // @FIXME - Côme - 2018/11/02 - upgrade ReactRouter and refactor the route path='/ui' with array of string in this route path
           />
+          <Route exact strict path='/ui' render={() => <Sidebar />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
           <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
+
+          <Route path={PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF} component={ForgotPasswordNoEmailNotif} />
 
           <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 

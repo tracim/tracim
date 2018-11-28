@@ -95,10 +95,9 @@ class PopupCreateFile extends React.Component {
   handleValidate = async () => {
     const { state } = this
 
-    // const fetchPostContent = await handleFetchResult(await postFileContent(state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
-
     const formData = new FormData()
     formData.append('files', state.uploadFile)
+    formData.append('parent_id', state.idFolder)
 
     // fetch still doesn't handle event progress. So we need to use old school xhr object
     const xhr = new XMLHttpRequest()

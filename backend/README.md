@@ -28,7 +28,7 @@ for better preview support:
 
 get source from github:
 
-    git clone https://github.com/tracim/tracim_v2.git
+    git clone https://github.com/tracim/tracim.git
 
 go to *backend* subdirectory:
 
@@ -95,7 +95,7 @@ create wsgidav configuration file for webdav:
 
 ## Run Tracim_backend web services With Uwsgi : great for production ##
 
-if not did before, you need to create a color.json file at root of tracim_v2 :
+if not did before, you need to create a color.json file at root of tracim :
    
     cp ../color.json.sample ../color.json
 
@@ -140,21 +140,21 @@ You can also preset uwsgi config for tracim, this way, creating this kind of .in
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
     plugins = python3
-    chdir = <PATH>/tracim_v2/backend/
+    chdir = <PATH>/tracim/backend/
     module = wsgi.web:application
-    home = <PATH>/tracim_v2/backend/env/
-    env = TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
+    home = <PATH>/tracim/backend/env/
+    env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
 and :
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
     plugins = python3
-    chdir = <PATH>/tracim_v2/backend/
+    chdir = <PATH>/tracim/backend/
     module = wsgi.webdav:application
-    home = <PATH>/tracim_v2/backend/env/
-    env = TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
-    env = TRACIM_WEBDAV_CONF_PATH=<PATH>/tracim_v2/backend/wsgidav.conf
+    home = <PATH>/tracim/backend/env/
+    env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+    env = TRACIM_WEBDAV_CONF_PATH=<PATH>/tracim/backend/wsgidav.conf
 
 You can then run the process this way :
 
@@ -211,23 +211,23 @@ example of supervisord.conf file
 
     ; email notifier (if async email notification is enabled)
     [program:tracim_mail_notifier]
-    directory=<PATH>/tracim_v2/backend/
-    command=<PATH>/tracim_v2/backend/env/bin/python <PATH>/tracim_v2/backend/daemons/mail_notifier.py
+    directory=<PATH>/tracim/backend/
+    command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim/backend/daemons/mail_notifier.py
     stdout_logfile =/tmp/mail_notifier.log
     redirect_stderr=true
     autostart=true
     autorestart=true
-    environment=TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
+    environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
     ; email fetcher (if email reply is enabled)
     [program:tracim_mail_fetcher]
-    directory=<PATH>/tracim_v2/backend/
-    command=<PATH>/tracim_v2/backend/env/bin/python <PATH>/tracim_v2/backend/daemons/mail_fetcher.py
+    directory=<PATH>/tracim/backend/
+    command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim/backend/daemons/mail_fetcher.py
     stdout_logfile =/tmp/mail_fetcher.log
     redirect_stderr=true
     autostart=true
     autorestart=true
-    environment=TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
+    environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
 run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
 

@@ -74,19 +74,10 @@ export const debug = {
     },
     system: {
       config: {
-        email_notification_activated: true
+        email_notification_activated: false
       }
-    }
-  },
-  loggedUser: {
-    user_id: 1,
-    public_name: 'Global Manager',
-    email: 'osef@algoo.fr',
-    lang: 'en',
-    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
-  },
-  content: {
-    profile: {
+    },
+    profileObject: {
       ADMINISTRATOR: {
         id: 1,
         slug: 'administrators',
@@ -108,7 +99,16 @@ export const debug = {
         hexcolor: '#3145f7',
         label: i18n.t('User')
       }
-    },
+    }
+  },
+  loggedUser: {
+    user_id: 1,
+    public_name: 'Global Manager',
+    email: 'osef@algoo.fr',
+    lang: 'en',
+    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+  },
+  content: {
     workspaceList: [],
     userList: []
   }

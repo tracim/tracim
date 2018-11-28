@@ -101,7 +101,7 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
- 
+
 
 
 # install app workspace advanced
@@ -125,6 +125,15 @@ npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 # install app Admin Workspace User
 log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
 cd $DEFAULTDIR/frontend_app_admin_workspace_user  || exit 1
+log "npm i"
+npm i && loggood "success" || logerror "some error"
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+
+
+# install app Folder Advanced
+log "cd $DEFAULTDIR/frontend_app_folder_advanced"
+cd $DEFAULTDIR/frontend_app_folder_advanced  || exit 1
 log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"

@@ -40,13 +40,13 @@
       plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | fullscreen'
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
       ],
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
       content_style: 'div {height: 100%;}',
       setup: function ($editor) {
-        $editor.on('change', function (e) {
+        $editor.on('change keyup', function (e) {
           handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
         })
 
@@ -68,6 +68,35 @@
             })
 
             $('#hidden_tinymce_fileinput').click()
+          }
+        })
+
+        var customFullscreen = {
+          active: false,
+          originalHeight: null,
+          newHeight: 0
+        }
+
+        $editor.addButton('customFullscreen', {
+          icon: 'mce-ico mce-i-fullscreen',
+          title: 'Fullscreen',
+          onclick: function () {
+            var iframeElement = $editor.getWin()
+
+            if (customFullscreen.originalHeight === null) customFullscreen.originalHeight = iframeElement.frameElement.style.height
+
+            $editor.execCommand('mceFullScreen')
+
+            var currentHeight = iframeElement.frameElement.style.height
+            var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
+
+            customFullscreen = {
+              active: !customFullscreen.active,
+              originalHeight: customFullscreen.originalHeight,
+              newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - 88 // 88px is Tracim's header height
+            }
+
+            iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
           }
         })
 

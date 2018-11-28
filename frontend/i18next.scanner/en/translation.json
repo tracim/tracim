@@ -66,9 +66,7 @@
   "This shared space has no content yet, create the first content by clicking on the button 'Create'": "This shared space has no content yet, create the first content by clicking on the button 'Create'",
   "Calendar": "Calendar",
   "Access your personal calendar": "Access your personal calendar",
-  "My profil": "My profil",
   "Shared spaces and notifications": "Shared spaces and notifications",
-  "Timezone": "Timezone",
   "Shared space": "Shared space",
   "Shared spaces": "Shared spaces",
   "Role": "Role",
@@ -161,5 +159,12 @@
   "text documents": "text documents",
   "threads": "threads",
   "files": "files",
-  "Note, only administrators can send invitational email": "Note, only administrators can send invitational email"
+  "Note, only administrators can send invitational email": "Note, only administrators can send invitational email",
+  "This user already is in the workspace": "This user already is in the workspace",
+  "Error while loading content list": "Error while loading content list",
+  "Error while loading members list": "Error while loading members list",
+  "My profile": "My profile",
+  "To change your password, please refer to an administrator": "To change your password, please refer to an administrator",
+  "Unfortunately, email notifications aren't activated, we can't send you a reset password email": "Unfortunately, email notifications aren't activated, we can't send you a reset password email",
+  "Go back to previous page": "Go back to previous page"
 }
