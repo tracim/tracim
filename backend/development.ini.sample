@@ -65,25 +65,43 @@ sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 
 ### Global
 
+## APP
 # app enabled explicit list
 # this allow you to explictly disable default app or enabled beta app now
 # already added to default list
+# This parameter is a list of app slug separated by ',' char.
+# Not exhaustive list of available apps:
+# - content/thread -> thread/topic/discussion : allow to discuss about one
+#   subject.
+# - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
+# - content/html-document -> allow to work on a standard html-based document
+#   which is editable through tracim.
+# - content/folder -> allow to put content into folder.
+# example of app.enabled config explicit list config:
 # app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
 
-# preview generator cache directory
-preview_cache_dir = /tmp/tracim/preview/
-# file depot storage
+## File Depot
+# file depot name
 depot_storage_name = tracim
+# This is where none database file will be stored.
 depot_storage_dir = %(here)s/depot/
 
+## Preview
+# preview cache directory
+preview_cache_dir = /tmp/tracim/preview/
+
 # Backend API config
+# Api key auth is disabled by default, you should set a not-null value
+# to api.key to active it
 api.key = changethisnow!
 # base url of the backend API, default to same as website.base_url
 # api.base_url = http://localhost:6543
+
+## Website config
 # title of website, used in email
 website.title = TRACIM
 # The following base_url is used for links and icons
-# integrated in the email notifcations
+# integrated in the email notifcations, it's the frontend config.
 website.base_url = http://localhost:6543
 # If config not provided, it will be extracted from website.base_url
 # website.server_name = localhost
@@ -146,13 +164,17 @@ email.notification.smtp.password = your_smtp_password
 
 ## Email sending configuration
 # processing_mode may be sync or async,
-# with async, please configure redis below
+# if async is choosen, you need also to run mail_notifier daemon
+# see README for more info.
 email.processing_mode = sync
+# with async, please also configure redis below.
 # email.async.redis.host = localhost
 # email.async.redis.port = 6379
 # email.async.redis.db = 0
 
 # Email reply configuration
+# Reply by email feature: allow user to answer directly to tracim in reply
+# to notification.
 email.reply.activated = False
 email.reply.imap.server = your_imap_server
 email.reply.imap.port = 993
@@ -173,21 +195,8 @@ email.reply.use_txt_parsing = true
 # it's just an empty file use to prevent concurrent access to imap unseen mail
 email.reply.lockfile_path = %(here)s/email_fetcher.lock
 
-### Radical (CalDav server) configuration
 
-# radicale.server.host = 0.0.0.0
-# radicale.server.port = 5232
-# radicale.server.ssl = false
-radicale.server.filesystem.folder = %(here)s/radicale/collections/
-# radicale.server.allow_origin = *
-# radicale.server.realm_message = Tracim Calendar - Password Required
-## url can be extended like http://localhost:5232/calendar
-## in this case, you have to create your own proxy behind this url.
-## and update following parameters
-# radicale.client.base_url.host = http://localhost:5232
-# radicale.client.base_url.prefix = /
-
-### WSGIDAV
+### Webdav
 
 wsgidav.config_path = %(here)s/wsgidav.conf
 ## url can be extended like localhost/webdav
