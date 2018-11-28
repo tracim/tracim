@@ -37,12 +37,12 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         u = api.create_minimal_user('bob@bob')
-        api.update(u, 'bob', 'bob@bob', 'pass', do_save=True)
+        api.update(u, 'bob', 'bob@bob', 'password', do_save=True)
         nu = api.get_one_by_email('bob@bob')
         assert nu is not None
         assert nu.email == 'bob@bob'
         assert nu.display_name == 'bob'
-        assert nu.validate_password('pass')
+        assert nu.validate_password('password')
 
     def test__unit__create__user__ok_nominal_case(self):
         api = UserApi(
@@ -52,7 +52,7 @@ class TestUserApi(DefaultTest):
         )
         u = api.create_user(
             email='bob@bob',
-            password='pass',
+            password='password',
             name='bob',
             timezone='+2',
             lang='en',
@@ -61,7 +61,7 @@ class TestUserApi(DefaultTest):
         )
         assert u is not None
         assert u.email == "bob@bob"
-        assert u.validate_password('pass')
+        assert u.validate_password('password')
         assert u.display_name == 'bob'
         assert u.timezone == '+2'
         assert u.lang == 'en'
@@ -73,7 +73,7 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         u = api.create_minimal_user('bibi@bibi')
-        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
+        api.update(u, 'bibi', 'bibi@bibi', 'password', do_save=True)
         transaction.commit()
 
         eq_(True, api.user_with_email_exists('bibi@bibi'))
@@ -87,7 +87,7 @@ class TestUserApi(DefaultTest):
         )
         u = api.create_minimal_user('bibi@bibi')
         self.session.flush()
-        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
+        api.update(u, 'bibi', 'bibi@bibi', 'password', do_save=True)
         uid = u.user_id
         transaction.commit()
 
@@ -542,7 +542,7 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         u = api.create_minimal_user('titi@titi')
-        api.update(u, 'titi', 'titi@titi', 'pass', do_save=True)
+        api.update(u, 'titi', 'titi@titi', 'password', do_save=True)
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)
 
@@ -614,7 +614,7 @@ class TestUserApi(DefaultTest):
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -657,7 +657,7 @@ class TestUserApi(DefaultTest):
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -666,7 +666,7 @@ class TestUserApi(DefaultTest):
         )
         user2 = api.create_user(
             email='test2@test.test',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -696,7 +696,7 @@ class TestUserApi(DefaultTest):
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
