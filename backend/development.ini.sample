@@ -353,24 +353,17 @@ script_location = tracim_backend/migration
 ## more info here :
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
 
+### LOGGERS
 [loggers]
 keys = root, tracim, sqlalchemy, alembic, hapic
-
-[handlers]
-keys = console
-
-[formatters]
-keys = generic
 
 [logger_root]
 level = INFO
 handlers = console
-
 [logger_tracim]
 level = DEBUG
 handlers =
 qualname = tracim
-
 [logger_sqlalchemy]
 level = INFO
 handlers =
@@ -378,23 +371,54 @@ qualname = sqlalchemy.engine
 # "level = INFO" logs SQL queries.
 # "level = DEBUG" logs SQL queries and results.
 # "level = WARN" logs neither.  (Recommended for production systems.)
-
 [logger_alembic]
 level = INFO
 handlers =
 qualname = alembic
-
 [logger_hapic]
 level = DEBUG
 handlers =
 qualname = hapic
 
+### FORMATTER
+[formatters]
+keys = generic
+# colored log format (need colorlog python package)
+; keys = color
+
+# colored log formatter for console (do not work properly with file)
+# this need coloredlog python package, you can install it in venv
+# with 'pip install colorlog'
+[formatter_color]
+class=colorlog.ColoredFormatter
+format = %(asctime)s %(log_color)s%(levelname)-5.5s %(reset)s[%(name)s:%(lineno)s][%(threadName)s] %(log_color)s%(message)s
+datefmt = %H:%M:%S
+
+[formatter_generic]
+format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
+datefmt = %H:%M:%S
+
+### HANDLERS
+[handlers]
+keys = console
+# use file log instead
+; keys = logfile
+
+### Console log
 [handler_console]
 class = StreamHandler
 args = (sys.stderr,)
 level = NOTSET
 formatter = generic
+# colored console log (need colorlog python package)
+; formatter = color
 
-[formatter_generic]
-format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
-datefmt = %H:%M:%S
+### Rotated file log
+[handler_logfile]
+class=handlers.RotatingFileHandler
+level=NOTSET
+# file name = tracim.log (created in current dir)
+# max log size = 10Mo
+# number of max log file = 5
+args=('tracim.log','a',10*1024*1024,5)
+formatter=generic
