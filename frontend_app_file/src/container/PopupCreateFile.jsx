@@ -97,7 +97,7 @@ class PopupCreateFile extends React.Component {
 
     const formData = new FormData()
     formData.append('files', state.uploadFile)
-    formData.append('parent_id', state.idFolder)
+    formData.append('parent_id', state.idFolder || 0)
 
     // fetch still doesn't handle event progress. So we need to use old school xhr object
     const xhr = new XMLHttpRequest()
