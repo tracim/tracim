@@ -9,7 +9,6 @@ package-lock.json
 color.json
 
 #ignore file or folder about cypress tests
-functionnal_tests/package.json
 functionnal_tests/cypress.json
 functionnal_tests/node_modules/
 functionnal_tests/cypress/videos
