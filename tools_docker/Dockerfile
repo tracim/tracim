@@ -1,6 +1,8 @@
 FROM debian:stretch
 MAINTAINER contact@tracim.fr
 
+ARG GITTAG="git clone https://github.com/tracim/tracim.git tracim"
+
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -45,10 +47,8 @@ RUN apt update && apt upgrade -qy \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/* \
 # Get the source from GitHub
-    && git clone https://github.com/tracim/tracim.git tracim \
+    && $GITTAG \
     && cd /tracim/ \
-    && git checkout -- \
-    && git pull origin develop \
 # Go in repo folder
     && cd /tracim \
 # install frontend
