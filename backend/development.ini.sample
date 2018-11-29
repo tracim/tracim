@@ -263,11 +263,10 @@ wsgidav.config_path = %(here)s/wsgidav.conf
 ##### SPECIFIC CONFIG FOR WEBAPP
 #####################
 
-## WEB REST API specific config ##
-## Rest API running pyramid framework
+### WEB REST API specific config
+# Rest API running pyramid framework
 [pipeline:main]
 pipeline = tracim_web
-
 [app:tracim_web]
 use = egg:tracim_backend
 
@@ -294,11 +293,12 @@ session.cookie_on_exception = true
 # custom tracim pyramid_beaker parameter
 ; session.reissue_time = 120
 
+# pyramid optionals plugins (required plugin are imported
+# directly in tracim source code)
 ; pyramid.includes =
 ;    pyramid_debugtoolbar
 
-###
-## WEBDAV server specific config ##
+### WEBDAV server specific config
 ## webdav server (tweaked wsigdav)
 [pipeline:webdav]
 pipeline = tracim_webdav
