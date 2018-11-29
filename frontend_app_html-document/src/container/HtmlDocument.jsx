@@ -66,14 +66,29 @@ class HtmlDocument extends React.Component {
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         break
+
       case 'html-document_hideApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        tinymce.remove('#wysiwygNewVersion')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
+
       case 'html-document_reloadContent':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        tinymce.remove('#wysiwygTimelineComment')
+        tinymce.remove('#wysiwygNewVersion')
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: false,
+          newComment: prev.content.content_id === data.content_id ? prev.newComment : ''
+        }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
 
@@ -124,6 +139,8 @@ class HtmlDocument extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygNewVersion')
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 

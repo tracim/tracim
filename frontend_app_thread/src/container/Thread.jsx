@@ -63,11 +63,20 @@ class Thread extends React.Component {
         break
       case 'thread_hideApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: false
+        }))
         break
       case 'allApp_changeLang':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
@@ -109,6 +118,7 @@ class Thread extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 

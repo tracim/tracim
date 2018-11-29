@@ -79,11 +79,20 @@ class File extends React.Component {
         break
       case 'file_hideApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: false
+        }))
         break
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
@@ -124,17 +133,13 @@ class File extends React.Component {
       this.loadTimeline()
     }
 
-    if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
-      tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', this.handleChangeDescription)
-    }
-
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
