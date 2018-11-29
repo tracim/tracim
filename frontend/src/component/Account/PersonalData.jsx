@@ -52,14 +52,10 @@ export class PersonalData extends React.Component {
             <input
               className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='text'
-              placeholder={props.t('Change your name')}
+              placeholder={props.t('Change your full name')}
               value={state.newName}
               onChange={this.handleChangeName}
             />
-          </div>
-
-          <div className='personaldata__form__title'>
-            {props.t('Email Address:')}
           </div>
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
