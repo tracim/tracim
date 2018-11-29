@@ -220,7 +220,6 @@ email.notification.reset_password_request.template.text = %(email.template_dir)s
 # Email reply configuration
 # Reply by email feature: allow user to answer directly to tracim in reply
 # to notification.
-
 email.reply.activated = False
 
 ### IMAP

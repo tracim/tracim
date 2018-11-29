@@ -14,13 +14,14 @@ const Revision = props => {
         onClick={props.allowClickOnRevision ? props.onClickRevision : () => {}}
         style={{
           cursor: props.allowClickOnRevision ? 'pointer' : 'auto',
-          ...props.allowClickOnRevision
+          ...(props.allowClickOnRevision
             ? {
               ':hover': {
                 backgroundColor: color(props.customColor).lighten(0.60).hexString()
               }
             }
             : {}
+          )
         }}
       >
         <div className={classnames(`${props.customClass}__messagelist__version__data`, 'revision__data')}>

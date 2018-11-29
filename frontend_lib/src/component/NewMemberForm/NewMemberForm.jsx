@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { generateAvatarFromPublicName } from '../../index.js'
+import Avatar from '../Avatar/Avatar.jsx'
 
 require('./NewMemberForm.styl')
 
@@ -41,7 +41,7 @@ export const NewMemberForm = props => {
                     key={u.user_id}
                   >
                     <div className='autocomplete__item__avatar'>
-                      <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
+                      <Avatar publicName={u.public_name} width={'44px'} />
                     </div>
 
                     <div className='autocomplete__item__name'>

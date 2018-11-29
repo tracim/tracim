@@ -43,6 +43,7 @@ export const addAllResourceI18n = (i18n, translation) => {
   )
 }
 
+// @deprecated Côme - 2018/28/11 - this function is deprecated, you must use the component Avatar from tracim_frotnend_lib
 export const generateAvatarFromPublicName = publicName => {
   // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
   const stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
