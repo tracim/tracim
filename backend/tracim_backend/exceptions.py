@@ -267,8 +267,11 @@ class UserRoleNotFound(TracimException):
     error_code = error.USER_ROLE_NOT_FOUND
 
 
-class EmailValidationFailed(TracimException):
-    error_code = error.EMAIL_VALIDATION_FAILED
+class TracimValidationFailed(TracimException):
+    error_code = error.INTERNAL_TRACIM_VALIDATION_ERROR
+
+class EmailValidationFailed(TracimValidationFailed):
+    error_code = error.INTERNAL_TRACIM_VALIDATION_ERROR
 
 
 class InconsistentDatabase(TracimException):
