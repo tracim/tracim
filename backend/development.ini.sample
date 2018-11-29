@@ -82,8 +82,8 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ### Session ###
 # shortcut for pyramid_beaker specific config
 # see tracim_web app section to see where those shortcut are used
-advanced_setup.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
-advanced_setuo.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
+advanced_setup.session_data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
+advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 
 
 #####
@@ -98,7 +98,7 @@ api.key = %(basic_setup.api_key)s
 ; api.base_url = http://localhost:6543
 
 # Auth type (internal or ldap)
-auth_type = %(basic_setup.auth_type)s
+auth_type = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
 # LDAP server address
 ; ldap_url = ldap://localhost:389
@@ -271,7 +271,7 @@ pipeline = tracim_web
 use = egg:tracim_backend
 
 # hapic debug mode: return python traceback of error
-debug = %(basic_setup.debug)s
+debug = False
 
 # pyramid config
 pyramid.reload_templates = true
