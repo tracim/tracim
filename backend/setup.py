@@ -40,7 +40,7 @@ requires = [
     # mail-notifier
     'mako',
     'lxml',
-    'redis',
+    'redis<3.0.0',
     'rq',
     # mail-fetcher
     'markdown',
