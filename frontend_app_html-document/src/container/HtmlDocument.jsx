@@ -79,12 +79,18 @@ class HtmlDocument extends React.Component {
 
       case 'html-document_reloadContent':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        tinymce.remove('#wysiwygNewVersion')
+
+        const timelineRevisionNumber = state.timeline.filter(r => r.timelineType === 'revision').length || 0
+
+        if (timelineRevisionNumber > 1) {
+          tinymce.remove('#wysiwygTimelineComment')
+          tinymce.remove('#wysiwygNewVersion')
+        }
+
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false,
+          timelineWysiwyg: timelineRevisionNumber > 1,
           newComment: prev.content.content_id === data.content_id ? prev.newComment : ''
         }))
         break
@@ -161,7 +167,10 @@ class HtmlDocument extends React.Component {
     const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     handleFetchResult(await fetchResultHtmlDocument)
-      .then(resHtmlDocument => this.setState({content: resHtmlDocument.body}))
+      .then(resHtmlDocument => this.setState({
+        content: resHtmlDocument.body,
+        rawContentBeforeEdit: resHtmlDocument.body.raw_content
+      }))
       .catch(e => console.log('Error loading content.', e))
 
     Promise.all([
@@ -425,7 +434,7 @@ class HtmlDocument extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode } = this.state
+    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, rawContentBeforeEdit } = this.state
     const { t } = this.props
 
     if (!isVisible) return null
@@ -505,6 +514,7 @@ class HtmlDocument extends React.Component {
             customColor={config.hexcolor}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
+            disableValidateBtn={rawContentBeforeEdit === content.raw_content}
             onClickValidateBtn={this.handleSaveHtmlDocument}
             version={content.number}
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}

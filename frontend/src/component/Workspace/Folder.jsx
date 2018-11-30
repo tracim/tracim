@@ -23,6 +23,8 @@ class Folder extends React.Component {
 
     const folderContentList = props.folderData.content.filter(c => c.idParent === props.folderData.id)
 
+    const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
+
     return (
       <div className={classnames('folder', {
         'active': props.folderData.isOpen && folderContentList.length > 0,
@@ -50,25 +52,29 @@ class Folder extends React.Component {
           <div className='folder__header__button'>
             {props.idRoleUserWorkspace >= 4 &&
               <div className='folder__header__button__addbtn'>
-                <button
-                  className='folder__header__button__addbtn__text btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
-                  type='button'
-                  id='dropdownMenuButton'
-                  data-toggle='dropdown'
-                  aria-haspopup='true'
-                  aria-expanded='false'
-                  onClick={e => e.stopPropagation()}
-                >
-                  {`${props.t('Create in folder')}...`}
-                </button>
+                {folderAvailableApp.length > 0 && (
+                  <div>
+                    <button
+                      className='folder__header__button__addbtn__text btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
+                      type='button'
+                      id='dropdownMenuButton'
+                      data-toggle='dropdown'
+                      aria-haspopup='true'
+                      aria-expanded='false'
+                      onClick={e => e.stopPropagation()}
+                    >
+                      {`${props.t('Create in folder')}...`}
+                    </button>
 
-                <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                  <SubDropdownCreateButton
-                    idFolder={props.folderData.id}
-                    availableApp={props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))}
-                    onClickCreateContent={(e, idFolder, slug) => props.onClickCreateContent(e, idFolder, slug)}
-                  />
-                </div>
+                    <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                      <SubDropdownCreateButton
+                        idFolder={props.folderData.id}
+                        availableApp={folderAvailableApp}
+                        onClickCreateContent={(e, idFolder, slug) => props.onClickCreateContent(e, idFolder, slug)}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className='d-none d-md-flex'>
                   <BtnExtandedAction
