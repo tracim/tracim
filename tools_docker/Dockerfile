@@ -1,7 +1,7 @@
 FROM debian:stretch
 MAINTAINER contact@tracim.fr
 
-ARG GITTAG="git clone https://github.com/tracim/tracim.git tracim"
+ARG GITTAG=""
 
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
@@ -47,7 +47,7 @@ RUN apt update && apt upgrade -qy \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/* \
 # Get the source from GitHub
-    && $GITTAG \
+    && git clone $GITTAG https://github.com/tracim/tracim.git tracim \
     && cd /tracim/ \
 # Go in repo folder
     && cd /tracim \
@@ -55,14 +55,15 @@ RUN apt update && apt upgrade -qy \
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh \
 # Clean frontend installation
-    && rm -r frontend/node_modules \
-    && rm -r frontend_app_admin_workspace_user/node_modules \
-    && rm -r frontend_app_file/node_modules \
-    && rm -r frontend_app_html-document/node_modules \
-    && rm -r frontend_app_thread/node_modules \
-    && rm -r frontend_app_workspace/node_modules \
-    && rm -r frontend_app_workspace_advanced/node_modules \
-    && rm -r frontend_lib/node_modules \
+    && rm -rf frontend/node_modules \
+    && rm -rf frontend_app_admin_workspace_user/node_modules \
+    && rm -rf frontend_app_file/node_modules \
+    && rm -rf frontend_app_folder_advanced/node_modules \
+    && rm -rf frontend_app_html-document/node_modules \
+    && rm -rf frontend_app_thread/node_modules \
+    && rm -rf frontend_app_workspace/node_modules \
+    && rm -rf frontend_app_workspace_advanced/node_modules \
+    && rm -rf frontend_lib/node_modules \
 # Go in backend folder
     && cd backend \
 # install backend
