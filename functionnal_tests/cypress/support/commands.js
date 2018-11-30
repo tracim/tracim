@@ -89,25 +89,55 @@ Cypress.Commands.add('delete_htmldocument', () => {
   })
 })
 
-Cypress.Commands.add('login', (role = 'administrators') => {
-  const userFixtures = {
-    'administrators': 'defaultAdmin',
-    'trusted-users': '',
-    'users': 'baseUser'
-  }
-
-  return cy
-    .fixture(userFixtures[role])
-    .then(userJSON => cy.request({
+Cypress.Commands.add('loginAs', (role = 'administrators') => {
+  cy.getUserByRole(role)
+    .then(user => cy.request({
       method: 'POST',
       url: LOGIN_URL,
       body: {
-        'email': userJSON.email,
-        'password': userJSON.password
+        'email': user.email,
+        'password': user.password
       }
     }))
+    .then(response => response.body)
 })
 
 Cypress.Commands.add('logout', () => {
   cy.request('POST', 'api/v2/auth/logout')
+})
+
+Cypress.Commands.add('typeInTinyMCE', (content) => {
+  cy.window()
+    .its('tinyMCE')
+    .its('activeEditor')
+    .then(activeEditor => {
+      activeEditor.setContent(content)
+      activeEditor.save()
+    })
+})
+
+Cypress.Commands.add('assertTinyMCEContent', (content) => {
+  cy.window({ timeout: 5000 })
+    .its('tinyMCE')
+    .its('activeEditor')
+    .then(activeEditor => {
+      activeEditor.getContent(), content
+    })
+})
+
+Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
+  const assertion = (isActive ? assert.isNotNull : assert.isNull)
+  const message = (isActive ? 'tinyMCE is active' : 'tinyMCE is not active')
+  cy.window().then(window => assertion(window.tinyMCE.activeEditor, message))
+})
+
+Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector) => {
+  const dropEvent = { dataTransfer: { files: [] } }
+  cy.fixture(fixturePath, 'base64').then(fixture => {
+    return Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
+      dropEvent.dataTransfer.files.push(blob)
+    })
+  })
+
+  cy.get(dropZoneSelector).trigger('drop', dropEvent)
 })

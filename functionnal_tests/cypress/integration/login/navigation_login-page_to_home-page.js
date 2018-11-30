@@ -1,3 +1,5 @@
+let GREETING_MSG = 'Welcome to Tracim'
+
 describe('logging in tracim', function () {
   before(() => {
     cy.resetDB()
@@ -5,14 +7,14 @@ describe('logging in tracim', function () {
   })
 
   beforeEach(function () {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit('/ui')
   })
 
-  it('', function () {
-    cy.get('.profilgroup__name__imgprofil').should('have.attr', 'src')
+  it('Checks information in home page', function () {
+    cy.get('.homepagecard__title')
+    cy.get('[data-cy=avatar]')
+    cy.contains(GREETING_MSG)
     cy.get('.homepagecard.card').should('be.visible')
-    // for the moment we don't have name by default (26/07/2018)
-    cy.get('.profilgroup__name__imgprofil').invoke('text').should('be.equal', '')
   })
 })

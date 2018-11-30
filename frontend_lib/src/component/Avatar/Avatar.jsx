@@ -41,6 +41,7 @@ export class Avatar extends React.Component {
       <div className='avatar-wrapper' style={{...props.style}}>
         <div
           className='avatar'
+          data-cy='avatar'
           style={{
             width: props.width,
             height: props.width,

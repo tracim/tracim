@@ -5,7 +5,7 @@ describe('navigate :: create_new > workspace', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
     cy.visit('/ui/workspaces/1/dashboard')
   })
   it('', function () {

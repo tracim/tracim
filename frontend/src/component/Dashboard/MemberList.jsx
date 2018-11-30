@@ -12,7 +12,7 @@ export class MemberList extends React.Component {
     const { props } = this
 
     return (
-      <div className='memberlist'>
+      <div className='memberlist' data-cy='memberlist'>
 
         <div className='memberlist__header subTitle'>
           {props.t('Member List')}
@@ -72,7 +72,7 @@ export class MemberList extends React.Component {
                 </ul>
 
                 {props.idRoleUserWorkspace >= 8 && (
-                  <div className='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
+                  <div className='memberlist__btnadd' data-cy='memberlist__btnadd' onClick={props.onClickAddMemberBtn}>
                     <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                       <div className='memberlist__btnadd__button__avatar'>
                         <div className='memberlist__btnadd__button__avatar__icon'>

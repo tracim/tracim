@@ -7,7 +7,7 @@ describe('navigate :: workspace > create_new > thread', function () {
   })
 
   beforeEach(function () {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit('/ui/workspaces/1/contents')
   })
   it('allcontent > button', function () {

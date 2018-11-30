@@ -5,34 +5,34 @@ describe('content :: account', () => {
   })
 
   beforeEach(() => {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit('/ui/account')
   })
 
   it('content :: account exist', () => {
     cy.get('.account__title').should('be.visible')
-    cy.get('.userinfo').should('be.visible')
+    cy.get('[data-cy=userinfo]').should('be.visible')
     cy.get('.account__userpreference').should('be.visible')
   })
-  it('content :: account > resume', () => {
+  it('Checks if user info are visible', () => {
     //        account__userinformation
-    cy.get('.userinfo').should('be.visible')
-    cy.get('.userinfo__name').should('be.visible')
-    cy.get('.userinfo__email').should('be.visible')
-    cy.get('.userinfo__avatar > img').should('be.visible')
+    cy.get('[data-cy=userinfo]').should('be.visible')
+    cy.get('[data-cy=userinfo__name').should('be.visible')
+    cy.get('[data-cy=userinfo__email').should('be.visible')
+    cy.get('[data-cy=avatar]').should('be.visible')
   })
-  it('content :: account > menu', () => {
+  it('Checks if menu if visible', () => {
     //        account userpreference menu
     cy.get('.menusubcomponent__list').should('be.visible')
-    cy.get(':nth-child(1) > .menusubcomponent__list__item__link').should('be.visible')
-    cy.get(':nth-child(2) > .menusubcomponent__list__item__link').should('be.visible')
-    cy.get(':nth-child(3) > .menusubcomponent__list__item__link').should('be.visible')
+    cy.get('[data-cy=menusubcomponent__list__personalData]').should('be.visible')
+    cy.get('[data-cy=menusubcomponent__list__password]').should('be.visible')
+    cy.get(':nth-child(3) > .menusubcomponent__list__item__link').should('not.exist')
     //        @philippe 26/09/2018 timezone deactivated
     //        cy.get(':nth-child(4) > .menusubcomponent__list__item__link').should('be.visible')
   })
   it('content :: account > profile ', () => {
     //        account userpreference profile
-    cy.get(':nth-child(1) > .menusubcomponent__list__item__link').click()
+    cy.get('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link').click()
     cy.get('.personaldata__sectiontitle').should('be.visible')
     cy.get('.personaldata__form div:nth-child(1) > .personaldata__form__txtinput').should('be.visible')
     cy.get('.personaldata__form div:nth-child(1) > .personaldata__form__txtinput').should('have.attr', 'placeholder')
@@ -45,7 +45,7 @@ describe('content :: account', () => {
   })
   it('content :: account > password ', () => {
     //        account userpreference password
-    cy.get(':nth-child(3) > .menusubcomponent__list__item__link').click()
+    cy.get('[data-cy=menusubcomponent__list__password] > .menusubcomponent__list__item__link').click()
     cy.get('.personaldata__sectiontitle').should('be.visible')
     cy.get('.mr-5 div:nth-child(1) > .personaldata__form__txtinput').should('be.visible')
     cy.get('.mr-5 div:nth-child(1) > .personaldata__form__txtinput').should('have.attr', 'placeholder')

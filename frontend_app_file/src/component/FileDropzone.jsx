@@ -11,6 +11,7 @@ export const FileDropzone = props => {
       onClick={props.onClick}
       multiple={false}
       style={{}} // to reset default style
+      inputProps={{'data-cy': 'filecontent__form_input_file'}}
     >
       <div className='filecontent__form mb-4' drop='true'>
         {(() => {

@@ -5,7 +5,7 @@ describe('account :: main_page', function () {
   })
 
   beforeEach(function () {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit('/')
   })
   it('', function () {

@@ -25,6 +25,7 @@ export const NewMemberForm = props => {
             className='name__input form-control'
             id='addmember'
             placeholder={props.t('Full name or email')}
+            data-cy='addmember'
             value={props.nameOrEmail}
             onChange={e => props.onChangeNameOrEmail(e.target.value)}
             autoComplete='off'
@@ -44,7 +45,7 @@ export const NewMemberForm = props => {
                       <Avatar publicName={u.public_name} width={'44px'} />
                     </div>
 
-                    <div className='autocomplete__item__name'>
+                    <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                       {u.public_name}
                     </div>
                   </div>
@@ -59,7 +60,7 @@ export const NewMemberForm = props => {
                         <i className='fa fa-fw fa-user-plus' />
                       </div>
 
-                      <div className='autocomplete__item__name'>
+                      <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                         {props.t('Send an invitational email to this user')}
                       </div>
                     </div>
@@ -73,7 +74,7 @@ export const NewMemberForm = props => {
                         <i className='fa fa-fw fa-user-secret' />
                       </div>
 
-                      <div className='autocomplete__item__name'>
+                      <div className='autocomplete__item__name' data-cy='autocomplete__item__name'>
                         <div className='autocomplete__item__name__unknownuser'>
                           {props.nameOrEmail}
                           <div className='autocomplete__item__name__unknownuser__msg'>

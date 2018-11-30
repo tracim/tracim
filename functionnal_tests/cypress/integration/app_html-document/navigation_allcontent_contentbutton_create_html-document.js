@@ -7,7 +7,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
   })
 
   beforeEach(function () {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit(WORKSPACE_URL)
   })
   it('dashboard > button', function () {

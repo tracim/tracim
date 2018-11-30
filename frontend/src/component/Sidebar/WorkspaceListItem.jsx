@@ -33,7 +33,7 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
 
 const WorkspaceListItem = props => {
   return (
-    <li className='sidebar__content__navigation__workspace__item'>
+    <li className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'>
       <div
         className='sidebar__content__navigation__workspace__item__wrapper primaryColorBg primaryColorBgDarkenHover primaryColorBorder'
         onClick={props.onClickTitle}

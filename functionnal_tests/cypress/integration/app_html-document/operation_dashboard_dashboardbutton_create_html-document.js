@@ -5,7 +5,7 @@ describe('operation :: workspace > create_new > html-document', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
   })
   it('dashborad > button', function () {
     cy.visit('/ui/workspaces/1/dashboard')

@@ -5,7 +5,7 @@ describe('navigation :: admin > user', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
     cy.visit('/ui')
   })
   it('', function () {
