@@ -167,7 +167,10 @@ class HtmlDocument extends React.Component {
     const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     handleFetchResult(await fetchResultHtmlDocument)
-      .then(resHtmlDocument => this.setState({content: resHtmlDocument.body}))
+      .then(resHtmlDocument => this.setState({
+        content: resHtmlDocument.body,
+        rawContentBeforeEdit: resHtmlDocument.body.raw_content
+      }))
       .catch(e => console.log('Error loading content.', e))
 
     Promise.all([
@@ -431,7 +434,7 @@ class HtmlDocument extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode } = this.state
+    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, rawContentBeforeEdit } = this.state
     const { t } = this.props
 
     if (!isVisible) return null
@@ -511,6 +514,7 @@ class HtmlDocument extends React.Component {
             customColor={config.hexcolor}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
+            disableValidateBtn={rawContentBeforeEdit === content.raw_content}
             onClickValidateBtn={this.handleSaveHtmlDocument}
             version={content.number}
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
