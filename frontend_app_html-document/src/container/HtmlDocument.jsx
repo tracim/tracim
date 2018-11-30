@@ -79,12 +79,18 @@ class HtmlDocument extends React.Component {
 
       case 'html-document_reloadContent':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        tinymce.remove('#wysiwygTimelineComment')
-        tinymce.remove('#wysiwygNewVersion')
+
+        const timelineRevisionNumber = state.timeline.filter(r => r.timelineType === 'revision').length || 0
+
+        if (timelineRevisionNumber > 1) {
+          tinymce.remove('#wysiwygTimelineComment')
+          tinymce.remove('#wysiwygNewVersion')
+        }
+
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false,
+          timelineWysiwyg: timelineRevisionNumber > 1,
           newComment: prev.content.content_id === data.content_id ? prev.newComment : ''
         }))
         break
