@@ -5,12 +5,12 @@ const dashboardPlugin = require('webpack-dashboard/plugin')
 
 module.exports = {
   entry: {
-    app: ['babel-polyfill', 'whatwg-fetch', './src/index.js'],
+    app: ['@babel/polyfill', 'whatwg-fetch', './src/index.js'],
     vendor: [
-      'babel-plugin-transform-class-properties',
-      'babel-plugin-transform-object-assign',
-      'babel-plugin-transform-object-rest-spread',
-      'babel-polyfill',
+      '@babel/plugin-proposal-class-properties',
+      '@babel/plugin-transform-object-assign',
+      '@babel/plugin-proposal-object-rest-spread',
+      '@babel/polyfill',
       // 'lodash.pull',
       // 'lodash.reject',
       // 'lodash.uniqby',
@@ -49,6 +49,9 @@ module.exports = {
     // }
   },
   devtool: isProduction ? false : 'cheap-module-source-map',
+  node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
+    fs: "empty"
+  },
   module: {
     rules: [{
       test: /\.jsx?$/,
@@ -59,8 +62,15 @@ module.exports = {
       test: [/\.js$/, /\.jsx$/],
       loader: 'babel-loader',
       options: {
-        presets: ['env', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-class-properties', 'transform-object-assign']
+        presets: [
+          '@babel/preset-env',
+          '@babel/preset-react'
+        ],
+        plugins: [
+          '@babel/plugin-proposal-object-rest-spread',
+          '@babel/plugin-proposal-class-properties',
+          '@babel/plugin-transform-object-assign'
+        ]
       },
       exclude: [/node_modules/]
     }, {

@@ -3,7 +3,6 @@ import Radium from 'radium'
 import color from 'color'
 import {
   BtnSwitch,
-  generateAvatarFromPublicName,
   NewMemberForm,
   CardPopup,
   Avatar

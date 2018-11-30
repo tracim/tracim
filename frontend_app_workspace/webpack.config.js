@@ -7,7 +7,7 @@ console.log('isProduction : ', isProduction)
 module.exports = {
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
-    : ['babel-polyfill', './src/index.dev.js'],
+    : ['@babel/polyfill', './src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'workspace.app.js' : 'workspace.app.dev.js',
@@ -26,6 +26,7 @@ module.exports = {
   // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
+    host: '0.0.0.0',
     port: 8074,
     hot: true,
     noInfo: true,
@@ -49,8 +50,15 @@ module.exports = {
       test: [/\.js$/, /\.jsx$/],
       loader: 'babel-loader',
       options: {
-        presets: ['env', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-class-properties', 'transform-object-assign']
+        presets: [
+          '@babel/preset-env',
+          '@babel/preset-react'
+        ],
+        plugins: [
+          '@babel/plugin-proposal-object-rest-spread',
+          '@babel/plugin-proposal-class-properties',
+          '@babel/plugin-transform-object-assign'
+        ]
       },
       exclude: [/node_modules/]
     }, {

@@ -54,8 +54,15 @@ module.exports = {
       test: [/\.js$/, /\.jsx$/],
       loader: 'babel-loader',
       options: {
-        presets: ['env', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-class-properties', 'transform-object-assign']
+        presets: [
+          '@babel/preset-env',
+          '@babel/preset-react'
+        ],
+        plugins: [
+          '@babel/plugin-proposal-object-rest-spread',
+          '@babel/plugin-proposal-class-properties',
+          '@babel/plugin-transform-object-assign'
+        ]
       },
       exclude: [/node_modules/]
     }, {
