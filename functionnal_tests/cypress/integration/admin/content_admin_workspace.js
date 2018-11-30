@@ -12,6 +12,7 @@ describe('content :: admin > workspace', function () {
     cy.get('.adminWorkspace__description').should('be.visible')
     cy.get('.adminWorkspace__delimiter').should('be.visible')
     cy.get('.adminWorkspace__workspaceTable').should('be.visible')
+    cy.wait(2000)
   })
   it('content of workspaceTable', function () {
     cy.get('.adminWorkspace__workspaceTable th:nth-child(1)[scope="col"]').should('be.visible')
