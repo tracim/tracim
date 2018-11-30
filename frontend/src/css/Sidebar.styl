@@ -29,8 +29,8 @@ leftside()
   &.sidebarclose
     width 0
   &__expand
-    position absolute
-    right -43px
+    position fixed
+    left sidebar-width
     display flex
     justify-content center
     align-items center
@@ -40,6 +40,23 @@ leftside()
     cursor pointer
     color white
     transition all sidebar-animate-speed
+    ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__expand
+      left 0
+  &__scrollup
+    position fixed
+    bottom 0
+    left sidebar-width
+    display flex
+    justify-content center
+    align-items center
+    border 1px solid #333
+    border-top-right-radius 15px
+    padding 8px 12px
+    cursor pointer
+    color white
+    transition all sidebar-animate-speed
+    ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__scrollup
+      left 0
   &__content
     height 100%
     &__btnnewworkspace

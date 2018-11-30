@@ -103,6 +103,8 @@ class Sidebar extends React.Component {
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
 
+  handleClickScollUp = () => this.workspaceListTop.scrollIntoView({behavior: 'smooth'})
+
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
@@ -117,7 +119,13 @@ class Sidebar extends React.Component {
           <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
         </div>
 
+        <div className='sidebar__scrollup primaryColorBg' onClick={this.handleClickScollUp}>
+          <i className='fa fa-chevron-up' />
+        </div>
+
         <div className='sidebar__content'>
+          <div style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
+
           <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
             <ul className='sidebar__content__navigation__workspace'>
               { workspaceList.map(ws =>
