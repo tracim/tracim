@@ -15,6 +15,7 @@ from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.utils import deprecated
 from tracim_backend.models.auth import Group
+from tracim_backend.models.roles import WorkspaceRoles
 
 try:
     from json.decoder import JSONDecodeError
@@ -249,6 +250,46 @@ class AndAuthorizationChecker(AuthorizationChecker):
                 tracim_context=tracim_context,
             )
         return True
+
+# Useful Authorization Checker
+# profile
+is_administrator = ProfileChecker(Group.TIM_ADMIN)
+is_trusted_user = ProfileChecker(Group.TIM_MANAGER)
+is_user = ProfileChecker(Group.TIM_USER)
+# role
+is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
+is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
+is_reader = RoleChecker(WorkspaceRoles.READER.level)
+is_contributor = RoleChecker(WorkspaceRoles.READER.level)
+# personal_access
+has_personal_access = OrAuthorizationChecker(
+    SameUserChecker(),
+    is_administrator
+)
+# workspace
+can_see_workspace_information = OrAuthorizationChecker(
+    is_administrator,
+    AndAuthorizationChecker(is_reader, is_user)
+)
+can_modify_workspace = OrAuthorizationChecker(
+    is_administrator,
+    AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
+)
+can_delete_workspace = OrAuthorizationChecker(
+    is_administrator,
+    AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
+)
+# content
+can_move_content = AndAuthorizationChecker(
+    is_content_manager,
+    CandidateWorkspaceRoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
+)
+# comments
+is_comment_owner = CommentOwnerChecker()
+can_modify_comment = OrAuthorizationChecker(
+    AndAuthorizationChecker(is_contributor, is_comment_owner),
+    is_workspace_manager
+)
 
 ###
 # Authorization decorators for views
