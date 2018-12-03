@@ -21,6 +21,10 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.utils.authorization import ContentTypeChecker
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import require_content_types
 from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.lib.utils.request import TracimRequest
@@ -65,6 +69,7 @@ SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(  # nop
     SWAGGER_TAG__CONTENT_ENDPOINTS,
     SWAGGER_TAG__CONTENT_FILE_SECTION
 )
+is_file_content = ContentTypeChecker([FILE_TYPE])
 
 
 class FileController(Controller):
@@ -78,7 +83,7 @@ class FileController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @check_right(is_contributor)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
     @hapic.input_forms(FileCreationFormSchema())
@@ -133,8 +138,8 @@ class FileController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_file_content)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
@@ -174,8 +179,8 @@ class FileController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
@@ -217,8 +222,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])
@@ -271,8 +276,8 @@ class FileController(Controller):
     # preview
     # pdf
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
@@ -316,8 +321,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
@@ -355,8 +360,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FileRevisionPathSchema())
@@ -401,8 +406,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FileRevisionPathSchema())
@@ -450,8 +455,8 @@ class FileController(Controller):
 
     # jpg
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FilePathSchema())
@@ -497,8 +502,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -546,8 +551,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -600,8 +605,8 @@ class FileController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(AllowedJpgPreviewDimSchema())
     def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -621,8 +626,8 @@ class FileController(Controller):
 
     # File infos
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileContentSchema())
     def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
@@ -646,8 +651,8 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FileContentModifySchema())
     @hapic.output_body(FileContentSchema())
@@ -682,8 +687,8 @@ class FileController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_reader)
+    @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileRevisionSchema(many=True))
     def get_file_revisions(
@@ -715,8 +720,8 @@ class FileController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([FILE_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

@@ -13,6 +13,9 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import has_personal_access
+from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.request import TracimRequest
@@ -22,9 +25,9 @@ from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import \
     ActiveContentFilterQuerySchema
-from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
+from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
@@ -77,7 +80,7 @@ SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
 class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True),)
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
@@ -98,7 +101,7 @@ class UserController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserSchema())
     def user(self, context, request: TracimRequest, hapic_data=None):
@@ -114,7 +117,7 @@ class UserController(Controller):
         return uapi.get_user_with_context(request.candidate_user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.output_body(UserDigestSchema(many=True))
     def users(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -133,7 +136,7 @@ class UserController(Controller):
         return context_users
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_MANAGER)
+    @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(KnownMemberQuerySchema())  # nopep8
     @hapic.output_body(UserDigestSchema(many=True))
@@ -161,7 +164,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserSchema())
@@ -186,7 +189,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_body(SetPasswordSchema())
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -210,7 +213,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_body(SetUserInfoSchema())
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserSchema())
@@ -235,7 +238,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
     def create_user(self, context, request: TracimRequest, hapic_data=None):
@@ -267,7 +270,7 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def enable_user(self, context, request: TracimRequest, hapic_data=None):
@@ -285,7 +288,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(UserCantDeleteHimself, HTTPStatus.BAD_REQUEST)
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_user(self, context, request: TracimRequest, hapic_data=None):
@@ -302,7 +305,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS])
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def undelete_user(self, context, request: TracimRequest, hapic_data=None):
@@ -321,7 +324,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
     @hapic.handle_exception(UserCantDisableHimself, HTTPStatus.BAD_REQUEST)
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def disable_user(self, context, request: TracimRequest, hapic_data=None):
@@ -339,7 +342,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(UserCantChangeIsOwnProfile, HTTPStatus.BAD_REQUEST)
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetUserProfileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -367,7 +370,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ActiveContentFilterQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True))
@@ -408,7 +411,7 @@ class UserController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ContentIdsQuerySchema())
     @hapic.output_body(ReadStatusSchema(many=True))  # nopep8
@@ -443,7 +446,7 @@ class UserController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def set_content_as_read(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -462,7 +465,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def set_content_as_unread(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -481,7 +484,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def set_workspace_as_read(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -500,7 +503,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -530,7 +533,7 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
-    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):  # nopep8

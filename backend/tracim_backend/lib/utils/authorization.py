@@ -286,7 +286,7 @@ can_move_content = AndAuthorizationChecker(
 )
 # comments
 is_comment_owner = CommentOwnerChecker()
-can_modify_comment = OrAuthorizationChecker(
+can_delete_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner),
     is_workspace_manager
 )

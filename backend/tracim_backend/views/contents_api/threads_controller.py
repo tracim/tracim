@@ -10,6 +10,10 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.utils.authorization import ContentTypeChecker
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import require_content_types
 from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.lib.utils.request import TracimRequest
@@ -40,13 +44,13 @@ SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS,
     SWAGGER_TAG__CONTENT_THREAD_SECTION
 )
-
+is_thread_content = ContentTypeChecker([THREAD_TYPE])
 
 class ThreadController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([THREAD_TYPE])
+    @check_right(is_reader)
+    @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedContentSchema())
     def get_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
@@ -70,8 +74,8 @@ class ThreadController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([THREAD_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(TextBasedContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
@@ -106,8 +110,8 @@ class ThreadController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([THREAD_TYPE])
+    @check_right(is_reader)
+    @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedRevisionSchema(many=True))
     def get_thread_revisions(
@@ -138,8 +142,8 @@ class ThreadController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([THREAD_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
