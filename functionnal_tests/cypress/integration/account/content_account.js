@@ -19,16 +19,17 @@ describe('content :: account', () => {
     cy.get('.userinfo').should('be.visible')
     cy.get('.userinfo__name').should('be.visible')
     cy.get('.userinfo__email').should('be.visible')
-    cy.get('.userinfo__avatar > img').should('be.visible')
+    cy.get('.userinfo__avatar .avatar').should('be.visible')
   })
   it('content :: account > menu', () => {
     //        account userpreference menu
     cy.get('.menusubcomponent__list').should('be.visible')
     cy.get(':nth-child(1) > .menusubcomponent__list__item__link').should('be.visible')
     cy.get(':nth-child(2) > .menusubcomponent__list__item__link').should('be.visible')
-    cy.get(':nth-child(3) > .menusubcomponent__list__item__link').should('be.visible')
-    //        @philippe 26/09/2018 timezone deactivated
-    //        cy.get(':nth-child(4) > .menusubcomponent__list__item__link').should('be.visible')
+    // @philippe 03/12/2018 notification not visible if email not activated
+    // cy.get(':nth-child(3) > .menusubcomponent__list__item__link').should('be.visible')
+    // @philippe 26/09/2018 timezone deactivated
+    // cy.get(':nth-child(4) > .menusubcomponent__list__item__link').should('be.visible')
   })
   it('content :: account > profile ', () => {
     //        account userpreference profile
@@ -36,16 +37,16 @@ describe('content :: account', () => {
     cy.get('.personaldata__sectiontitle').should('be.visible')
     cy.get('.personaldata__form div:nth-child(1) > .personaldata__form__txtinput').should('be.visible')
     cy.get('.personaldata__form div:nth-child(1) > .personaldata__form__txtinput').should('have.attr', 'placeholder')
-    cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.withAdminMsg').should('be.visible')
-    cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.withAdminMsg').should('have.attr', 'placeholder')
-    cy.get('.personaldata__form div:nth-child(4) > .personaldata__form__txtinput.checkPassword').should('be.visible')
-    cy.get('.personaldata__form div:nth-child(4) > .personaldata__form__txtinput.checkPassword').should('have.attr', 'placeholder')
+    cy.get('.personaldata__form div:nth-child(2) > .personaldata__form__txtinput.withAdminMsg').should('be.visible')
+    cy.get('.personaldata__form div:nth-child(2) > .personaldata__form__txtinput.withAdminMsg').should('have.attr', 'placeholder')
+    cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.checkPassword').should('be.visible')
+    cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.checkPassword').should('have.attr', 'placeholder')
     cy.get('.personaldata__form .personaldata__form__button').should('be.visible')
     cy.get('.personaldata__form .personaldata__form__button').should('have.attr', 'type', 'button')
   })
   it('content :: account > password ', () => {
     //        account userpreference password
-    cy.get(':nth-child(3) > .menusubcomponent__list__item__link').click()
+    cy.get(':nth-child(2) > .menusubcomponent__list__item__link').click()
     cy.get('.personaldata__sectiontitle').should('be.visible')
     cy.get('.mr-5 div:nth-child(1) > .personaldata__form__txtinput').should('be.visible')
     cy.get('.mr-5 div:nth-child(1) > .personaldata__form__txtinput').should('have.attr', 'placeholder')
