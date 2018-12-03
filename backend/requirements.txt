@@ -60,7 +60,7 @@ python-magic==0.4.15      # via preview-generator
 python-slugify==1.2.6
 pytz==2018.7              # via babel
 pyyaml==3.13
-redis==3.0.1
+redis==2.10.6
 repoze.lru==0.7           # via pyramid-debugtoolbar
 rq==0.12.0
 six==1.11.0               # via cliff, imapclient, packaging, python-dateutil, stevedore
