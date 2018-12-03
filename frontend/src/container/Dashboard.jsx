@@ -67,15 +67,9 @@ class Dashboard extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case 'refreshWorkspaceList':
-        console.log('%c<Dashboard> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceDetail()
-        this.loadMemberList()
-        this.loadRecentActivity()
-        break
-    }
+  customEventReducer = ({ detail: { type, data } }) => {
+    // switch (type) {
+    // }
   }
 
   componentDidMount () {
