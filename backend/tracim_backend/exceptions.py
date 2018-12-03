@@ -255,6 +255,14 @@ class UserCantChangeIsOwnProfile(TracimException):
     error_code = error.USER_CANT_CHANGE_IS_OWN_PROFILE
 
 
+class UserIsNotContentOwner(TracimException):
+    pass
+
+
+class UserGivenIsNotTheSameAsAuthenticated(TracimException):
+    pass
+
+
 class NoUserSetted(TracimException):
     pass
 
@@ -334,11 +342,14 @@ class ContentInNotEditableState(TracimException):
 class DepotCorrupted(TracimException):
     pass
 
+
 class RevisionFilePathSearchFailedDepotCorrupted(DepotCorrupted):
     pass
 
+
 class NewRevisionAbortedDepotCorrupted(DepotCorrupted):
     pass
+
 
 class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
     pass

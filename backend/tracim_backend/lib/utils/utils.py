@@ -235,3 +235,6 @@ def string_to_list(
         return []
     string_list = base_string.split(separator)
     return [cast_func(item) for item in string_list]
+
+def deprecated(func: typing.Callable):
+    return func
