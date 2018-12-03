@@ -27,24 +27,26 @@ export const UserStatus = props => {
         </div>
       </div>
 
-      <div
-        className='userstatus__notification primaryColorFontHover'
-        onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-      >
-        <div className='userstatus__notification__icon'>
-          <i className={`fa fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}-o`} />
-        </div>
-
+      {props.displayNotifBtn && (
         <div
-          className='userstatus__notification__text'
-          title={props.t('you can change your notification status by clicking here')}
+          className='userstatus__notification primaryColorFontHover'
+          onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
         >
-          {mySelf.doNotify
-            ? props.t('Subscribed to notifications')
-            : props.t('Not subscribed to notifications')
-          }
+          <div className='userstatus__notification__icon'>
+            <i className={`fa fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}-o`} />
+          </div>
+
+          <div
+            className='userstatus__notification__text'
+            title={props.t('you can change your notification status by clicking here')}
+          >
+            {mySelf.doNotify
+              ? props.t('Subscribed to notifications')
+              : props.t('Not subscribed to notifications')
+            }
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

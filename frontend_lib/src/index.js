@@ -12,6 +12,8 @@ import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
+import Avatar from './component/Avatar/Avatar.jsx'
+
 import Timeline from './component/Timeline/Timeline.jsx'
 
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
@@ -47,6 +49,7 @@ export {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  Avatar,
   Timeline,
   TextAreaApp,
   BtnSwitch,

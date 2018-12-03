@@ -84,6 +84,7 @@ class CFG(object):
             'contents/thread',
             'contents/file',
             'contents/html-document',
+            'contents/folder',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
@@ -358,9 +359,6 @@ class CFG(object):
             'email.reply.check.heartbeat',
             60,
         ))
-        self.EMAIL_REPLY_TOKEN = settings.get(
-            'email.reply.token',
-        )
         self.EMAIL_REPLY_IMAP_USE_SSL = asbool(settings.get(
             'email.reply.imap.use_ssl',
         ))

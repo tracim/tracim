@@ -1,68 +1,51 @@
-@import "../../node_modules/tracim_lib/src/css/Variable.styl"
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-.appfolder
-  width 1155px
-  &__optionfolder
-    margin 10px
-    border-radius 10px
-    padding 25px
-    width calc(100% - 10px) /* 10px => margin */
-    height 100%
-    background-color off-white
-    .optionfolder
-      &__typecontent
-        &__title
-          font-size 20px
-          font-weight 600
-          color blue
-        &__desc
-          font-size 18px
-        &__form
-          .fa-file-text-o
-            color htmlColor
-          .fa-file-image-o
-            color fileColor
-          .fa-file-code-o
-            color markdownColor
-          .fa-comments-o
-            color threadColor
-          .fa-list-ul
-            color taskColor
-          .fa-ticket
-            color issueColor
-          &__apphtml
-            &__label
-              &__icon
-                font-size 20px
-              &__text
-                font-size 17px
-          &__appfile
-            &__label
-              &__icon
-                font-size 20px
-              &__text
-                font-size 17px
-          &__appthread
-            &__label
-              &__icon
-                font-size 20px
-              &__text
-                font-size 17px
-          &__appmarkdown
-            &__label
-              &__icon
-                font-size 20px
-              &__text
-                font-size 17px
-          &__apptask
-            &__label
-              &__icon
-                font-size 20px
-              &__text
-                font-size 17px
-          &__appissue
-            &__label
-              &__icon
-                font-size 20px
-              &__text
-                font-size 17px
+.formBlock
+  margin-bottom 15px
+  border-radius 10px
+  background-color offWhite
+  &__title
+    padding 10px 0 25px 10px
+    border-bottom 1px solid grey
+    font-size 20px
+    font-weight 400
+  &__field
+    padding 10px
+  &__bottom
+    padding 10px
+
+.folder_advanced
+  width 1000px
+  height 100%
+  overflow-y auto
+  overflow-x hidden
+  &-content
+    width 1000px
+    padding 10px 10px 0 10px
+  &__content
+    &__state
+      display flex
+      align-items center
+      justify-content space-between
+      margin-bottom 15px
+      padding 5px 15px
+      background-color #fee498
+      border-radius 10px
+      &__msg > i
+        margin-right 8px
+      &__btnrestore
+        cursor pointer
+        & > i
+          margin-right 8px
+    &__form
+      padding 10px 0
+      &__type
+        display flex
+        align-items center
+        padding 3px 13px
+        cursor pointer
+        font-size 16px
+        &:hover
+          background-color lightGrey
+        &__icon
+          margin 0 5px 0 0

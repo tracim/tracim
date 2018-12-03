@@ -3,52 +3,64 @@
 <head>
   <meta charset='utf-8' />
   <meta name="viewport" content="width=device-width, user-scalable=no" />
-  <title>Folder App Tracim</title>
+  <title>Folder advanced App Tracim</title>
   <link rel='shortcut icon' href='favicon.ico'>
 
-  <link rel="stylesheet" type="text/css" href="./font/font-awesome-4.7.0/css/font-awesome.css">
-  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="./dev/bootstrap-4.0.0-beta.css">
-</head>
-<body>
-  <script src="./dev/jquery-3.2.1.js"></script>
-  <script src="./dev/popper-1.12.3.js"></script>
-  <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
+  <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
+  <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
 
-  <div id='content'></div>
+  <style>
+    .primaryColorFont { color: #7d4e24; }
+    .primaryColorFontDarken { color: #522c00; }
+    .primaryColorFontLighten { color: #a37346; }
 
-  <script src='./folder.app.dev.js'></script>
+    .primaryColorFontHover:hover { color: #7d4e24; }
+    .primaryColorFontDarkenHover:hover { color: #522c00; }
+    .primaryColorFontLightenHover:hover { color: #a37346; }
+
+
+    .primaryColorBg { background-color: #7d4e24; }
+    .primaryColorBgDarken { background-color: #522c00; }
+    .primaryColorBgLighten { background-color: #a37346; }
+
+    .primaryColorBgHover:hover { background-color: #7d4e24; }
+    .primaryColorBgDarkenHover:hover { background-color: #522c00; }
+    .primaryColorBgLightenHover:hover { background-color: #a37346; }
+
+
+    .primaryColorBorder { border-color: #7d4e24; }
+    .primaryColorBorderDarken { border-color: #522c00; }
+    .primaryColorBorderLighten { border-color: #a37346; }
+
+    .primaryColorBorderHover:hover { border-color: #7d4e24; }
+    .primaryColorBorderDarkenHover:hover { border-color: #522c00; }
+    .primaryColorBorderLightenHover:hover { border-color: #a37346; }
+  </style>
+
+  <style>
+    @font-face {
+      font-family: 'Quicksand';
+      src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
+    }
+
+    body {
+      font-family: 'Quicksand';
+    }
+  </style>
 
   <script type='text/javascript'>
-    GLOBAL_renderApp = app => {
-      switch (app.appData.name) {
-        case 'PageHtml':
-          appPageHtml.renderApp('appContainer'); break
-        case 'Thread':
-          appThread.renderApp('appContainer'); break
-      }
-    }
-
-    GLOBAL_dispatchEvent = (data) => {
-      var event = new CustomEvent('appCustomEvent', {detail: data})
-      document.dispatchEvent(event)
-    }
-
-    GLOBAL_unmountApp = () => {
-      switch (appName) {
-        case 'PageHtml':
-          appPageHtml.hideApp('appContainer'); break
-        case 'Thread':
-          appThread.hideApp('appContainer'); break
-      }
-    }
-
-    // only usefull if app doesn't handle fileContent himself
-    GLOBAL_handleRequireRedraw = () => {
-      var rez = appA.destroyApp('app')
-      if (rez) GLOBAL_drawApp('redraw')
-      else console.log('Erreur, failed at destroying app')
-    }
+    GLOBAL_primaryColor = '#7d4e24'
   </script>
+</head>
+<body>
+<script src="./assets/bootstrap/jquery-3.2.1.js"></script>
+<script src="./assets/bootstrap/popper-1.12.3.js"></script>
+<script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+
+<div id='content'></div>
+
+<script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+
+<script src='./folder.app.dev.js'></script>
 </body>
 </html>

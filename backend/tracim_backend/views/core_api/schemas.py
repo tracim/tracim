@@ -2,8 +2,10 @@
 import typing
 
 import marshmallow
+import re
 from marshmallow import post_load
 from marshmallow.validate import Length
+from marshmallow.validate import Regexp
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 
@@ -61,6 +63,7 @@ FIELD_LANG_DESC = "User langage in ISO 639 format. " \
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 
+REGEX_STRING_AS_LIST_OF_INT = Regexp(regex=(re.compile('^(\d+(,\d+)*)?$')))
 
 class SimpleFileSchema(marshmallow.Schema):
     """
@@ -454,19 +457,15 @@ class KnownMemberQuerySchema(marshmallow.Schema):
         validate=Length(min=2),
         required=True,
     )
-    exclude_user_ids = marshmallow.fields.List(
-        marshmallow.fields.Integer(
-             example=6,
-             validate=Range(min=1, error="Value must be greater than 0"),
-        ),
-        description='list of excluded user',
+    exclude_user_ids = marshmallow.fields.String(
+        validate=REGEX_STRING_AS_LIST_OF_INT,
+        example="1,5",
+        description='comma separated list of excluded user',
     )
-    exclude_workspace_ids = marshmallow.fields.List(
-        marshmallow.fields.Integer(
-            example=3,
-            validate=Range(min=1, error="Value must be greater than 0"),
-        ),
-        description='list of excluded workspace: user of this workspace are excluded from result',  # nopep8
+    exclude_workspace_ids = marshmallow.fields.String(
+        validate=REGEX_STRING_AS_LIST_OF_INT,
+        example="3,4",
+        description='comma separated list of excluded workspace: user of this workspace are excluded from result',  # nopep8
     )
 
     @post_load
@@ -502,15 +501,29 @@ class PageQuerySchema(FileQuerySchema):
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-    parent_id = marshmallow.fields.Int(
-        example=2,
-        default=0,
-        description='allow to filter items in a folder.'
-                    ' If not set, then return all contents.'
-                    ' If set to 0, then return root contents.'
-                    ' If set to another value, return all contents'
-                    ' directly included in the folder parent_id',
-        validate=Range(min=0, error="Value must be positive or 0"),
+    parent_ids = marshmallow.fields.String(
+        validate=REGEX_STRING_AS_LIST_OF_INT,
+        example='0,4,5',
+        description='comma separated list of parent ids,'
+                    ' parent_id allow to filter items in a folder.'
+                    ' If not parent_ids at all, then return all contents.'
+                    ' If one parent_id to 0, then return root contents.'
+                    ' If set to another value, return all direct subcontents'
+                    ' content of this folder'
+                    ' If multiple value of parent_ids separated by comma,'
+                    ' return mix of all content of all theses parent_ids',
+        default='0',
+    )
+    complete_path_to_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+        description='If setted with a correct content_id, this will'
+                    ' add to parent_ids filter, all parent of given content_id,'
+                    ' workspace root included. This param help to get '
+                    ' content needed to show a complete folder tree '
+                    ' from root to content.',
+        default=None,
+        allow_none=True,
     )
     show_archived = marshmallow.fields.Int(
         example=0,
@@ -575,15 +588,14 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
-    contents_ids = marshmallow.fields.List(
-        marshmallow.fields.Int(
-            example=6,
-            validate=Range(min=1, error="Value must be greater than 0"),
-        )
+    content_ids = marshmallow.fields.String(
+        validate=REGEX_STRING_AS_LIST_OF_INT,
+        example="1,5",
+        description='comma separated list of contents ids',
     )
 
     @post_load
-    def make_contents_ids(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_ids(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentIdsQuery(**data)
 
 

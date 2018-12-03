@@ -1,5 +1,6 @@
 export const SET = 'Set' // save data from api
 export const UPDATE = 'Update' // edit data from api
+export const TOGGLE = 'Toggle'
 export const ADD = 'Add'
 export const REMOVE = 'Remove'
 export const APPEND = 'Append'
@@ -37,9 +38,13 @@ export const USER_EMAIL = `${USER}/Email`
 export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
 
+export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
-export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
-export const setWorkspaceContentList = workspaceContentList => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList })
+export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
+export const PATH = 'Path'
+export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
+export const setWorkspaceContentList = (workspaceContentList, idFolderToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, idFolderToOpenList })
+export const addWorkspaceContentList = workspaceContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
@@ -81,7 +86,10 @@ export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
 
 export const FOLDER = 'Folder'
-export const setFolderData = (folderId, content) => ({ type: `${SET}/${WORKSPACE}/${FOLDER}/Content`, folderId, content })
+export const READ = 'Read'
+export const toggleFolderOpen = idFolder => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, idFolder })
+export const FOLDER_READ = `${FOLDER}/${READ}`
+export const setWorkspaceContentRead = idFolder => ({ type: `${SET}/${FOLDER_READ}`, idFolder })
 
 export const APP = 'App'
 export const APP_LIST = `${APP}/List`

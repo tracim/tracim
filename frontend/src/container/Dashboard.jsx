@@ -88,7 +88,11 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     if (prevProps.match.params.idws !== props.match.params.idws) {
-      this.setState({workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null})
+      this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
+      this.setState({
+        workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
+        advancedDashboardOpenedId: null
+      })
     }
 
     if (prevState.workspaceIdInUrl !== state.workspaceIdInUrl) {
@@ -422,7 +426,7 @@ class Dashboard extends React.Component {
                 <UserStatus
                   user={props.user}
                   curWs={props.curWs}
-                  displayNotifBtn={state.displayNotifBtn}
+                  displayNotifBtn={props.system.config.email_notification_activated}
                   onClickToggleNotifBtn={this.handleToggleNotifBtn}
                   onClickAddNotify={this.handleClickAddNotification}
                   onClickRemoveNotify={this.handleClickRemoveNotification}

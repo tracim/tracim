@@ -1,14 +1,17 @@
 {
-  "name": "tracim_app_folder",
-  "version": "1.1.2",
+  "name": "tracim_app_folder_advanced",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
     "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
-    "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9872 -- webpack-dev-server --watch --colors --inline --hot --progress",
-    "buildwindoz": "set NODE_ENV=production&& webpack -p",
+    "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9877 -- webpack-dev-server --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack -p",
+    "build-dev": "NODE_ENV=production webpack",
+    "buildwindoz": "set NODE_ENV=production&& webpack -p",
+    "build-devwindoz": "set NODE_ENV=production&& webpack",
+    "build-translation": "node i18next.scanner.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -28,6 +31,7 @@
     "file-loader": "^1.1.5",
     "i18next": "^10.5.0",
     "prop-types": "^15.6.0",
+    "radium": "^0.24.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-i18next": "^7.5.0",
@@ -36,12 +40,12 @@
     "style-loader": "^0.19.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "tracim_lib": "git://github.com/tracim/tracim_lib.git",
     "url-loader": "^0.6.2",
     "webpack": "^3.8.1",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "i18next-scanner": "^2.6.1",
     "webpack-dashboard": "^1.1.1",
     "webpack-dev-server": "^2.9.2"
   },
@@ -49,8 +53,13 @@
     "globals": [
       "fetch",
       "history",
-      "GLOBAL_renderApp",
-      "GLOBAL_unmountApp"
+      "btoa",
+      "wysiwyg",
+      "tinymce",
+      "GLOBAL_renderAppFeature",
+      "GLOBAL_unmountApp",
+      "GLOBAL_dispatchEvent",
+      "GLOBAL_primaryColor"
     ],
     "parser": "babel-eslint",
     "ignore": []

@@ -70,18 +70,23 @@ def web(global_config, **local_settings):
     # Add AuthPolicy
     configurator.include("pyramid_beaker")
     configurator.include("pyramid_multiauth")
-    policies = [
+    policies = []
+    policies.append(
         CookieSessionAuthentificationPolicy(
             reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
-        ApiTokenAuthentificationPolicy(
-            api_key_header=TRACIM_API_KEY_HEADER,
-            api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
-        ),
+    )
+    if app_config.API_KEY:
+        policies.append(
+            ApiTokenAuthentificationPolicy(
+                api_key_header=TRACIM_API_KEY_HEADER,
+                api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
+            ),
+        )
+    policies.append(
         TracimBasicAuthAuthenticationPolicy(
             realm=BASIC_AUTH_WEBUI_REALM
         ),
-    ]
-
+    )
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3

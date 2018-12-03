@@ -17,6 +17,20 @@ const shouldDisplayAsActive = (location, idWorkspace, activeIdWorkspace, app) =>
     : location.pathname.includes(app.route)
 }
 
+const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
+  if (idWorkspace !== activeIdWorkspace) return route
+
+  if (search === '') return route
+
+  // to keep query param (like opened folder) we need to copy theses param.
+  // But "type" already is in allowedApp.route, so we need to remove it before passing props.location.search
+  let urlSearch = qs.parse(search)
+  delete urlSearch.type
+  urlSearch = qs.stringify(urlSearch, {encode: false})
+
+  return `${route}${route.includes('?') ? '&' : '?'}${urlSearch}`
+}
+
 const WorkspaceListItem = props => {
   return (
     <li className='sidebar__content__navigation__workspace__item'>
@@ -39,12 +53,9 @@ const WorkspaceListItem = props => {
 
       <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
         <ul className='sidebar__content__navigation__workspace__item__submenu'>
-          { props.allowedApp.map(aa =>
-            <li
-              // onClick={() => props.onClickContentFilter(props.idWs, aa.slug)}
-              key={aa.slug}
-            >
-              <Link to={aa.route}>
+          {props.allowedApp.map(aa =>
+            <li key={aa.slug}>
+              <Link to={buildLink(aa.route, props.location.search, props.idWs, props.activeIdWorkspace)}>
                 <div className={classnames(
                   'sidebar__content__navigation__workspace__item__submenu__dropdown primaryColorBgLighten primaryColorBgHover primaryColorBorderDarken',
                   {'activeFilter': shouldDisplayAsActive(props.location, props.idWs, props.activeIdWorkspace, aa)}

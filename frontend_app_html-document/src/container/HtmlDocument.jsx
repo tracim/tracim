@@ -5,7 +5,6 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -67,14 +66,35 @@ class HtmlDocument extends React.Component {
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         break
+
       case 'html-document_hideApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        tinymce.remove('#wysiwygNewVersion')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
+
       case 'html-document_reloadContent':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+
+        const timelineRevisionNumber = state.timeline.filter(r => r.timelineType === 'revision').length || 0
+
+        if (timelineRevisionNumber > 1) {
+          tinymce.remove('#wysiwygTimelineComment')
+          tinymce.remove('#wysiwygNewVersion')
+        }
+
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: timelineRevisionNumber > 1,
+          newComment: prev.content.content_id === data.content_id ? prev.newComment : ''
+        }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
 
@@ -125,6 +145,8 @@ class HtmlDocument extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygNewVersion')
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -145,7 +167,10 @@ class HtmlDocument extends React.Component {
     const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     handleFetchResult(await fetchResultHtmlDocument)
-      .then(resHtmlDocument => this.setState({content: resHtmlDocument.body}))
+      .then(resHtmlDocument => this.setState({
+        content: resHtmlDocument.body,
+        rawContentBeforeEdit: resHtmlDocument.body.raw_content
+      }))
       .catch(e => console.log('Error loading content.', e))
 
     Promise.all([
@@ -153,16 +178,10 @@ class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
       .then(([resComment, resRevision]) => {
-        const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+        const resCommentWithProperDate = resComment.body.map(c => ({
           ...c,
           created_raw: c.created,
-          created: displayDistanceDate(c.created, loggedUser.lang),
-          author: {
-            ...c.author,
-            avatar_url: c.author.avatar_url
-              ? c.author.avatar_url
-              : generateAvatarFromPublicName(c.author.public_name)
-          }
+          created: displayDistanceDate(c.created, loggedUser.lang)
         }))
 
         const revisionWithComment = resRevision.body
@@ -173,7 +192,7 @@ class HtmlDocument extends React.Component {
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
-              ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
+              ...resCommentWithProperDate.find(c => c.content_id === ci)
             })),
             number: i + 1
           }))
@@ -415,7 +434,7 @@ class HtmlDocument extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode } = this.state
+    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, rawContentBeforeEdit } = this.state
     const { t } = this.props
 
     if (!isVisible) return null
@@ -495,6 +514,7 @@ class HtmlDocument extends React.Component {
             customColor={config.hexcolor}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
+            disableValidateBtn={rawContentBeforeEdit === content.raw_content}
             onClickValidateBtn={this.handleSaveHtmlDocument}
             version={content.number}
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}

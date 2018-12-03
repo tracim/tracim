@@ -12,7 +12,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'folder.app.js' : 'folder.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appFolder' : undefined,
+    library: isProduction ? 'appFolderAdvanced' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
@@ -26,7 +26,8 @@ module.exports = {
   // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
-    port: 8074,
+    host: '0.0.0.0',
+    port: 8077,
     hot: true,
     noInfo: true,
     overlay: {
@@ -73,15 +74,15 @@ module.exports = {
   plugins: [
     ...[], // generic plugins always present
     ...(isProduction
-      ? [ // production specific plugins
-        new webpack.DefinePlugin({
-          'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
-        })
-      ]
-      : [] // development specific plugins
+        ? [ // production specific plugins
+          new webpack.DefinePlugin({
+            'process.env': { 'NODE_ENV': JSON.stringify('production') }
+          }),
+          new webpack.optimize.UglifyJsPlugin({
+            compress: { warnings: false }
+          })
+        ]
+        : [] // development specific plugins
     )
   ]
 }
