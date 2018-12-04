@@ -10,9 +10,8 @@ describe('logging in tracim', function () {
   })
 
   it('', function () {
-    cy.get('.profilgroup__name__imgprofil').should('have.attr', 'src')
+    cy.get('.profilgroup__name .avatar-wrapper').should('be.visible')
     cy.get('.homepagecard.card').should('be.visible')
-    // for the moment we don't have name by default (26/07/2018)
-    cy.get('.profilgroup__name__imgprofil').invoke('text').should('be.equal', '')
+    cy.get('.homepagecard__user__avatar .avatar').should('be.visible')
   })
 })
