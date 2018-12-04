@@ -11,7 +11,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import User
+from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import DefaultTest
@@ -147,8 +147,8 @@ class TestUserApi(DefaultTest):
         assert users[0] == u1
 
     def test_unit__get_known__user__user__no_workspace_empty_known_user(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=admin,
@@ -170,8 +170,8 @@ class TestUserApi(DefaultTest):
         assert len(users) == 0
 
     def test_unit__get_known__user__same_workspaces_users_by_name(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
@@ -223,8 +223,8 @@ class TestUserApi(DefaultTest):
         assert users[1] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
@@ -284,8 +284,8 @@ class TestUserApi(DefaultTest):
         assert users[0] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace_and_name(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
@@ -352,8 +352,8 @@ class TestUserApi(DefaultTest):
         assert users[0] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
@@ -414,8 +414,8 @@ class TestUserApi(DefaultTest):
         assert users[1] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_name__exclude_user(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
@@ -466,8 +466,8 @@ class TestUserApi(DefaultTest):
         assert users[0] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_email(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,

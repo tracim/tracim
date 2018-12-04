@@ -17,8 +17,8 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import Group
-from tracim_backend.models import User
+from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
 
 
 class UserCommand(AppContextCommand):

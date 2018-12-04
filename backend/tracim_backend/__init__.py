@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid_multiauth import MultiAuthenticationPolicy
-from tracim_backend.views.core_api.account_controller import AccountController
+
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -30,6 +30,7 @@ from tracim_backend.views.contents_api.threads_controller import ThreadControlle
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
 from tracim_backend.views.core_api.user_controller import UserController
+from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController  # nopep8
 from tracim_backend.views.contents_api.comment_controller import CommentController  # nopep8
 from tracim_backend.views.contents_api.file_controller import FileController
@@ -101,7 +102,7 @@ def web(global_config, **local_settings):
     # Pyramids "plugin" include.
     configurator.include('pyramid_jinja2')
     # Add SqlAlchemy DB
-    configurator.include('.models')
+    configurator.include('.models.setup_models')
     # set Hapic
     context = PyramidContext(
         configurator=configurator,

@@ -1,9 +1,9 @@
 import requests
 import transaction
 from freezegun import freeze_time
-from tracim_backend import models
+from tracim_backend.models.auth import User
 from tracim_backend import error
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.user import UserApi
@@ -76,8 +76,8 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
 
     def test_api__reset_password_check_token__ok_204__nominal_case(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -98,8 +98,8 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
 
     def test_api__reset_password_check_token__err_400__invalid_token(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -127,8 +127,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
 
     def test_api__reset_password_reset__ok_204__nominal_case(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -151,8 +151,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
 
     def test_api__reset_password_reset__err_400__invalid_token(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -177,8 +177,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
 
     def test_api__reset_password_reset__err_400__expired_token(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -209,8 +209,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
 
     def test_api__reset_password_reset__err_400__password_does_not_match(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,

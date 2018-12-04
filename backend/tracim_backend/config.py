@@ -15,8 +15,9 @@ from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.models import Group
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.roles import WorkspaceRoles
 
 
 class CFG(object):
