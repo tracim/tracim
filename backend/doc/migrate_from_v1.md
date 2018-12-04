@@ -1,9 +1,9 @@
-# Migration from Tracim v1 to Tracim v2
+# Migration from Tracim v1 to Tracim v2.1
 
-**Warning !** : 2.0 version of Tracim doesn't support yet folders correctly. If you want to migrate
-from tracim v1, you should use future 2.1 or latest.
+**Warning !** : 2.0 version of Tracim doesn't support folder and ldap. If you want to migrate
+from tracim v1, you should use 2.1 or latest.
 
-If you are using tracim v1 and want to use now tracim_v2 there is
+If you are using tracim v1 and want to use now tracim_v 2.1 there is
 few step to do.
 
 ## 1. Verify Tracim_v1 is up-to-date
@@ -51,6 +51,8 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 
 | parameters        | status in tracim v2 |complementary informations  | 
 |-------------------|--------------------|----------------------------|
+| auth_type         |  renamed           | only `auth_type=internal` is supported in tracim v2.0, tracim v2.1 use now `auth_types` a list of ',' separated auth type, valid value are `internal` and  `ldap`.
+|-------------------|-------------------|-----------------------------|
 | sqlalchemy.*    |    no change        |                            |
 | cache_dir         |    no change      |                            |
 | preview_cache_dir |    no change      |                            |
@@ -58,14 +60,18 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | depot_storage_dir |    no change      |                            |
 | website.title     |    no change      |                            |
 | website.server_name| no change        ||
-| wsgidav.* | no change | webdav support is still experimental in tracim v2.0|
-| auth_type         |    no change      | only `internal` is supported in tracim v2.0                      |
+| wsgidav.* | no change | official support in tracim v2.1+|
 | email.notification.* | no change      | |
 | email.processing_mode | no change ||
 | email.async.* | no change ||
 | email.reply.*     | no change ||
 | debug             | no change      | :warning: debug mode in tracim_v2 allow to have traceback in http api error response|
-|-------------------|-------------------|----------------------------|
+| ldap_url          | no change ||
+| ldap_base_dn      | no change ||
+| ldap_bind_dn      | no change ||
+| ldap_bind_pass    | no change ||
+| ldap_tls          | no change ||
+-------------------|-------------------|----------------------------|
 | resetpassword.*   | removed           | no specific smtp config for reset password, smtp config is actually in `email.notification.smtp` |
 | smtp_server       | removed           |                            |
 | error_email_from  | removed           |                            |
@@ -75,17 +81,19 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | beaker.session.*  | removed          | see new `session.*` parameters      | |
 | templating.*      | removed           | all parameters beginning with `templating.` are not used anymore. |
 | auto_reload_template | removed | see `pyramid.reload_templates` in `[app:tracim_web]` section
-|-------------------|-------------------|----------------------------|
+|| website.title.color| disabled         | not used in tracim_v2, will probably deleted soon|
+| website.home.subtitle | removed ||
+| website.home.tag_line | removed ||
+| website.home.below_login_form | removed ||
+| ldap_ldap_naming_attribute | removed | replaced by `ldap_name_attribute`
+| ldap_user_attribute | removed | partially replaced by `ldap_name_attribute`, `ldap_login_attribute` and `ldap_profile_attribute`
+| ldap_group_enabled | removed ||
+-------------------|-------------------|----------------------------|
 | user.auth_token.validity | disabled   | not really used in tracim_v2 |
 | tracim_instance.uuid | disabled       | not used yet in tracim_v2  |
-| website.title.color| disabled         | not used in tracim_v2, will probably deleted soon|
-| website.home.subtitle | disabled |not used in tracim_v2, will probably deleted soon|
-| website.home.tag_line | disabled |not used in tracim_v2, will probably deleted soon|
-| website.home.below_login_form | disabled | not used in tracim_v2, will probably deleted soon|
 | jitsi_meet.* | disabled | feature not added yet in tracim_v2|
 | content.update.allowed.duration | disabled | not used in tracim_v2|
 | radicale.* | disabled | feature not added yet in tracim_v2|
-| ldap_* | disabled | feature not added yet in tracim_v2 |
 |-------------------|-------|---- |
 | pyramid.*         | new   | in tracim_web app section (`[app:tracim_web]` ), see pyramid doc for more information.
 | app.enabled       | new   | if provided, should be a list of app slug separated by `,` char, this allow you to activate beta app or disable some unwanted app.|
@@ -104,6 +112,9 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | pipeline | new | :warning: metaconfig (PasteDeploy) :  used to ordonnate properly config file with multiple app. you should probably leave this as default like in [developement.ini.sample](../development.ini.sample) |
 | retry.attemps | new | pyramid specific parameter link to [pyramid_retry](https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/), number of try per request. |
 | script_location | new | :warning: required for database migration, in `[alembic]` section, alembic specific param. you probably should use default value: `tracim_backend/migration`|
+| ldap_login_attribute | new | attribute for email login (default:mail) in ldap
+| ldap_name_attribute | new | attribute for user name in ldap, used only for automatic new tracim user creation at first login
+| ldap_profile_attribute | new | attribute for user profile by default, used only for automatic new tracim user creation at first login, disabled if not provided
 --------------------------------
 
 Others modifications in config file includes :
