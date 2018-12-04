@@ -273,7 +273,7 @@ can_see_workspace_information = OrAuthorizationChecker(
 )
 can_modify_workspace = OrAuthorizationChecker(
     is_administrator,
-    AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
+    AndAuthorizationChecker(is_workspace_manager, is_user)
 )
 can_delete_workspace = OrAuthorizationChecker(
     is_administrator,
