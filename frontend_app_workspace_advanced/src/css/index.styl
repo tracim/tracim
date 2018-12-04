@@ -19,7 +19,7 @@
   height 100%
   overflow-y auto
   &-content
-    width 1000px
+    width 50%
     padding 10px 10px 0 10px
   &__contentpage__content
     // Côme - 2018/09/19 - the rule bellow get override by other apps including frontend_lib, so !important
@@ -43,40 +43,46 @@
       list-style none
       &__item
         display flex
+        justify-content space-between
         align-items center
         border-bottom 1px solid grey
         padding 10px 15px
         &:last-child
           border-bottom none
         &__avatar
-          & > img
-            width 50px
-            height 50px
-        &__role
-          margin 0 50px 0 auto
-          .btndropdown
-            display flex
-            align-items center
-            border none
-            padding 10px
-            width 250px
-            background-color transparent
-            cursor pointer
-            &::after
-              display flex
-              justify-content flex-end
-            &.bordered
-              border 1px solid grey
-              border-radius 10px
-          .subdropdown
-            width 250px
-            padding 0
-            &__item
+          margin-right 25px
+        &__namerole
+          display flex
+          justify-content space-between
+          align-items center
+          width 100%
+          &__name
+            margin-right 30px
+          &__role
+            margin-right 50px
+            .btndropdown
               display flex
               align-items center
+              border none
               padding 10px
-              &__icon
-                margin-right 15px
+              width 250px
+              background-color transparent
+              cursor pointer
+              &::after
+                display flex
+                justify-content flex-end
+              &.bordered
+                border 1px solid grey
+                border-radius 10px
+            .subdropdown
+              width 250px
+              padding 0
+              &__item
+                display flex
+                align-items center
+                padding 10px
+                &__icon
+                  margin-right 15px
         &__delete
           width 16px
           font-size 20px
@@ -117,37 +123,37 @@
       .btn:first-child
         margin-right 15px
 
-/**** MEDIA QUERIES ****/
+@media (min-width: min-lg) and (max-width: max-lg)
+  .workspace_advanced-content
+    width 100%
+
+@media (min-width: min-md) and (max-width: max-md)
+  .workspace_advanced-content
+    width 100%
+
+@media (min-width: min-md) and (max-width: max-md)
+  .workspace_advanced
+    width 100%
+    &-content
+      width 100%
+    &__userlist__list__item__namerole
+      flex-direction column
+      align-items flex-start
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
-  .appdashboard
+  .workspace_advanced
     width 100%
+    &-content
+      width 100%
+    &__userlist__list__item__namerole
+      flex-direction column
+      align-items flex-start
 
 @media (max-width: max-xs)
-
-  .appdashboard
+  .workspace_advanced
     width 100%
-    padding 10px 0
-    &__userlist
-      &__list
-        &__item
-          flex-wrap wrap
-          &__role
-            margin-left 7px
-            .btndropdown
-              &:focus
-                outline none
-          &__delete
-            display none
-      &__form
-        &__role
-          margin-bottom 0
-          &__list
-            display block
-    &__functionality__list
-      &__item
-        display block
-        .item__text
-          margin-bottom 15px
-
+    &-content
+      width 100%
+    &__userlist__list__item__namerole
+      flex-direction column
+      align-items flex-start
