@@ -224,8 +224,7 @@ class File extends React.Component {
       ], [])
 
     this.setState({
-      timeline: revisionWithComment,
-      mode: resRevision.body.length === 1 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
+      timeline: revisionWithComment
     })
   }
 
