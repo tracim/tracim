@@ -4,12 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "precypress-run": "cd ../backend/ && . env/bin/activate && cd -",
-    "cypress-run": "node_modules/cypress/bin/cypress run",
-    "postcypress-run": "deactivate",
-    "precypress-open": "cd ../backend/ && . env/bin/activate && cd -",
-    "cypress-open": "node_modules/cypress/bin/cypress open",
-    "postcypress-open": "deactivate",
+    "cypress-run": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress run",
+    "cypress-open": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
