@@ -2,81 +2,85 @@
 # Tracim Config File #
 ######################
 
-# GENERAL TRACIM config :
+## GENERAL TRACIM config:
 # These config are common for all app : REST API, Webdav, etc...
+
 [DEFAULT]
 
-#####################
-##### BASIC SETUP
-#####################
-## easy setup (shortcut) for setting most common config
-## search for "%(param)s" to check where those param are used and why
+###############
+# BASIC SETUP #
+###############
+
+# easy setup (shortcut) for setting most common config
+# search for "%(param)s" to check where those param are used and why
 
 ## global info (need for email and links)
 basic_setup.website_title = TRACIM
 basic_setup.website_base_url =  http://localhost:6543
+basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
 basic_setup.depot_storage_dir = %(here)s/depot/
 basic_setup.preview_cache_dir = /tmp/tracim/preview/
 basic_setup.sessions_data_root_dir = %(here)s
 ## secret
-basic_setup.api_key = changethisnow!
+# This is needed for some feature like reply by email
+api.key =
 basic_setup.session_secret = change_this_value_please!
 
-#####################
-##### ADVANCED SETUP
-#####################
+##################
+# ADVANCED SETUP #
+##################
 
-#####
-## CORE
+####
+# CORE
 ####
 
 ### Apps ###
-# app enabled explicit list
+## app enabled explicit list:
 # this allow you to explictly disable default app or enabled beta app now
-# already added to default list
+# already added to default list.
 # This parameter is a list of app slug separated by ',' char.
-# Not exhaustive list of available apps:
+## Not exhaustive list of available apps:
 # - content/thread -> thread/topic/discussion : allow to discuss about one
 #   subject.
 # - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
 # - content/html-document -> allow to work on a standard html-based document
 #   which is editable through tracim.
 # - content/folder -> allow to put content into folder.
-# example of app.enabled config explicit list config:
+## example of app.enabled config explicit list config
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
 
-# CORS Special config
+## CORS Special config
 # you can override access control allowed origin here with list of comma separated
 # base_url, by default only website.base_url and api.base_url are allowed
 ; cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
-#####
-## STORAGE
+####
+# STORAGE
 ####
 
 ### Database ###
 # to set database you need a proper sqlalchemy url, some example with supported
 # database (sqlite, postgresql, mysql/mariadb)
-# sqlite :
+## sqlite
 ; sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
-# mysql/mariadb :
+## mysql/mariadb
 ; sqlalchemy.url = mysql+pymysql://user:password@dbhost:dbport/dbname
-# postgresql :
+## postgresql
 ; sqlalchemy.url = postgresql://user:paswword@dbhost:dbport/dbname?client_encoding=utf8
-# see also for more info :
-# https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine
+# see also for more info:
+# https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine ##
 sqlalchemy.url = %(basic_setup.sqlalchemy_url)s
 
 ### File Depot ###
-# file depot name
+## file depot name
 depot_storage_name = tracim
-# This is where none database file will be stored.
+## This is where none database file will be stored
 depot_storage_dir = %(basic_setup.depot_storage_dir)s
 
 ### Preview ###
-# preview cache directory
+## preview cache directory
 preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
 ### Session ###
@@ -85,110 +89,112 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 advanced_setup.session_data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
 advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 
-
-#####
-## AUTH
+####
+# AUTH
 ####
 
-# Backend API config
-# Api key auth is disabled by default, you should set a not-null value
-# to api.key to active it
+## Backend API config:
+# Api key auth is disabled by default,
+# you should set a not-null value to api.key to active it:
 api.key = %(basic_setup.api_key)s
-# base url of the backend API, default to same as website.base_url
+## base url of the backend API, default to same as website.base_url
 ; api.base_url = http://localhost:6543
 
-# Auth type (internal or ldap)
+## Auth type (internal or ldap)
 auth_type = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
-# LDAP server address
+## LDAP server address
 ; ldap_url = ldap://localhost:389
-# Base dn to make queries
+## Base dn to make queries
 ; ldap_base_dn = dc=directory,dc=fsf,dc=org
-# Bind dn to identify the search
+## Bind dn to identify the search
 ; ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
-# The bind password
+## The bind password
 ; ldap_bind_pass = toor
-# Attribute name of user record who contain user login (email)
+## Attribute name of user record who contain user login (email)
 ; ldap_ldap_naming_attribute = uid
-# Matching between ldap attribute and ldap user field (ldap_attr1=user_field1,ldap_attr2=user_field2,...)
+## Matching between ldap attribute and ldap user field (ldap_attr1=user_field1,ldap_attr2=user_field2,...)
 ; ldap_user_attributes = mail=email
-# TLS usage to communicate with your LDAP server
+## TLS usage to communicate with your LDAP server
 ; ldap_tls = False
-# If True, LDAP own tracim group managment (not available for now!)
+## If True, LDAP own tracim group managment (not available for now!)
 ; ldap_group_enabled = False
-# User auth token validity in seconds (used to interfaces like web calendars)
+## User auth token validity in seconds (used to interfaces like web calendars)
 user.auth_token.validity = 604800
-# user reset_password token validity (default to 900s -> 15 minutes)
+## user reset_password token validity (default to 900s -> 15 minutes)
 user.reset_password.validity = 900
 
-#####
-## IHM
+####
+# IHM
 ####
 
-## Website config
-# title of website, used in email
+### Website config ###
+## title of website, used in email
 website.title = %(basic_setup.website_title)s
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
 website.base_url = %(basic_setup.website_base_url)s
-# If config not provided, it will be extracted from website.base_url
+## If config not provided, it will be extracted from website.base_url
 ; website.server_name = localhost
 
-### Frontend
+### Frontend ###
 frontend.serve = True
 # You can set dist folder of tracim frontend. by default, system
 # will try to get it automatically according to tracim repository
 # organisation.
 ; frontend.dist_folder_path = /home/user/tracim/frontend/dist
 
-### Color
+### Color ###
 # check for color.json file in tracim, check by default in tracim parent
 # dir of backend.
-# you can set a specific file path here
+## you can set a specific file path here
 ; color.config_file_path = /home/user/tracim/color.json
 
-### Webdav
-## webdav url for client
-## url can be extended like localhost/webdav
-## in this case, you have to create your own proxy behind this url.
-## Do not set http:// prefix.
+### Webdav ###
+# webdav url for client
+# url can be extended like localhost/webdav
+# in this case, you have to create your own proxy behind this url.
+# Do not set http:// prefix.
 ; wsgidav.client.base_url = localhost:<WSGIDAV_PORT>
 
-#####
-## EMAIL-COMMON
+####
+# EMAIL-COMMON
 ####
 
-# shortcut for template_dir path
+## shortcut for template_dir path
 email.template_dir = %(here)s/tracim_backend/templates/mail
 
-## Email sending configuration
+### Email sending configuration ###
 # processing_mode may be sync or async,
 # if async is choosen, you need also to run mail_notifier daemon
 # see README for more info.
 email.processing_mode = sync
-# with async, please also configure redis below.
+## with async, please also configure redis below
 ; email.async.redis.host = localhost
 ; email.async.redis.port = 6379
 ; email.async.redis.db = 0
 
-#####
-## EMAIL-NOTIFICATION
+####
+# EMAIL-NOTIFICATION
 ####
 
+## available choice: True or False
 email.notification.activated = False
+## You can change file_path for mail-notifications.log
 ; email.notification.log_file_path = /tmp/mail-notifications.log
 
-### SMTP
+### SMTP ###
 email.notification.smtp.server = your_smtp_server
 email.notification.smtp.port = 25
 email.notification.smtp.user = your_smtp_user
 email.notification.smtp.password = your_smtp_password
 
-### Processing
+### Processing ###
 # processing_mode may be sync or async
+# if you use async you need additional deamon, see README for more info.
 email.notification.processing_mode = sync
 
-### Headers
+### Headers ###
 # Note: items between { and } are variable names. Do not remove / rename them
 # email notifications can be sent with the user_id added as an identifier
 # this way email clients like Thunderbird will be able to distinguish
@@ -206,7 +212,7 @@ email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Created account
 
-### Templates
+### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
 email.notification.content_update.template.text = %(email.template_dir)s/content_update_body_text.mak
 email.notification.created_account.template.html = %(email.template_dir)s/created_account_body_html.mak
@@ -214,55 +220,56 @@ email.notification.created_account.template.text = %(email.template_dir)s/create
 email.notification.reset_password_request.template.html = %(email.template_dir)s/reset_password_body_html.mak
 email.notification.reset_password_request.template.text = %(email.template_dir)s/reset_password_body_text.mak
 
-#####
-## EMAIL-REPLY
 ####
-# Email reply configuration
+# EMAIL-REPLY
+####
+
+# Email reply configuration:
+# This need api.key with non-empty value
 # Reply by email feature: allow user to answer directly to tracim in reply
 # to notification.
+## available choice: True or False
 email.reply.activated = False
 
-### IMAP
+### IMAP ###
 email.reply.imap.server = your_imap_server
 email.reply.imap.port = 993
 email.reply.imap.user = your_imap_user
 email.reply.imap.password = your_imap_password
 email.reply.imap.folder = INBOX
-email.reply.imap.use_ssl = true
-email.reply.imap.use_idle = true
+email.reply.imap.use_ssl = True
+email.reply.imap.use_idle = True
 
-### Connection
-# Re-new connection each 10 minutes
+### Connection ###
+## Delay in seconds for re-new connection
 email.reply.connection.max_lifetime = 600
-# Delay in seconds between each check
+## Delay in seconds between each check
 email.reply.check.heartbeat = 60
 
-### Secret
-# Token for communication between mail fetcher and tracim controller
+### Secret ###
+## Token for communication between mail fetcher and tracim controller
 email.reply.token = mysecuretoken
 
-### Parsing
-email.reply.use_html_parsing = true
-email.reply.use_txt_parsing = true
+### Parsing ###
+email.reply.use_html_parsing = True
+email.reply.use_txt_parsing = True
 
-### Lock
+### Lock ###
 # Lockfile path is required for email_reply feature,
 # it's just an empty file use to prevent concurrent access to imap unseen mail
 email.reply.lockfile_path = %(here)s/email_fetcher.lock
 
-
-#####
-## WEBDAV
+####
+# WEBDAV
 ####
 
 wsgidav.config_path = %(here)s/wsgidav.conf
 
+##############################
+# SPECIFIC CONFIG FOR WEBAPP #
+##############################
 
-#####################
-##### SPECIFIC CONFIG FOR WEBAPP
-#####################
-
-### WEB REST API specific config
+### WEB REST API specific config ###
 # Rest API running pyramid framework
 [pipeline:main]
 pipeline = tracim_web
@@ -272,32 +279,35 @@ use = egg:tracim_backend
 # hapic debug mode: return python traceback of error
 debug = False
 
-# pyramid config
-pyramid.reload_templates = true
-pyramid.debug_authorization = false
-pyramid.debug_notfound = false
-pyramid.debug_routematch = false
+### pyramid config ###
+pyramid.reload_templates = True
+pyramid.debug_authorization = False
+pyramid.debug_notfound = False
+pyramid.debug_routematch = False
 pyramid.default_locale_name = en
+## More info here:
+## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#localization-deployment-settings
 
-# pyramid_beaker parameters
+### pyramid_beaker parameters ###
 session.type = file
 session.data_dir = %(advanced_setup.session_data_dir)s
 session.lock_dir = %(advanced_setup.session_lock_dir)s
 session.key = session_key
 session.secret = %(basic_setup.session_secret)s
 session.save_accessed_time = True
+## Delay in seconds
 session.cookie_expires = 604800
 session.timeout = 604800
-session.cookie_on_exception = true
-# custom tracim pyramid_beaker parameter
+session.cookie_on_exception = True
+## custom tracim pyramid_beaker parameter
 ; session.reissue_time = 120
 
-# pyramid optionals plugins (required plugin are imported
-# directly in tracim source code)
+### pyramid optionals plugins ###
+#required plugin are imported directly in tracim source code
 ; pyramid.includes =
 ;    pyramid_debugtoolbar
 
-### WEBDAV server specific config
+### WEBDAV server specific config ###
 ## webdav server (tweaked wsigdav)
 [pipeline:webdav]
 pipeline = tracim_webdav
@@ -306,88 +316,96 @@ use = egg:tracim_backend#webdav
 
 [server:main]
 use = egg:waitress#main
-listen = localhost:6543
+listen = %(basic_setup.listen)s
 
-#####################
-##### DATABASE MIGRATION
-#####################
+######################
+# DATABASE MIGRATION #
+######################
+
 [alembic]
-# path to migration scripts
+## path to migration scripts
 script_location = tracim_backend/migration
 
-# template used to generate migration files
+## template used to generate migration files
 ; file_template = %%(rev)s_%%(slug)s
 
 # timezone to use when rendering the date
 # within the migration file as well as the filename.
 # string value is passed to dateutil.tz.gettz()
-# leave blank for localtime
+## leave blank for localtime
 ; timezone =
 
-# max length of characters to apply to the
-# "slug" field
+## max length of characters to apply to the "slug" field
 ; truncate_slug_length = 40
 
 # set to 'true' to run the environment during
 # the 'revision' command, regardless of autogenerate
-; revision_environment = false
+; revision_environment = False
 
 # set to 'true' to allow .pyc and .pyo files without
 # a source .py file to be detected as revisions in the
 # versions/ directory
-; sourceless = false
+; sourceless = False
 
-# version location specification; this defaults
-# to migrate/versions.  When using multiple version
-# directories, initial revisions must be specified with --version-path
+# version location specification; this defaults to migrate/versions.
+# When using multiple version directories,
+# initial revisions must be specified with --version-path
 ; version_locations = %(here)s/bar %(here)s/bat migrate/versions
 
 # the output encoding used when revision files
 # are written from script.py.mako
 ; output_encoding = utf-8
 
-#####################
-##### LOGGERS
-#####################
+###########
+# LOGGERS #
+###########
+
 ## more info here :
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
 
-### LOGGERS
+## level possibilities
+# "level = INFO" logs SQL queries.
+# "level = DEBUG" logs SQL queries and results.
+# "level = WARN" logs neither.  (Recommended for production systems.)
+
+### LOGGERS ###
 [loggers]
 keys = root, tracim, sqlalchemy, alembic, hapic
 
 [logger_root]
 level = INFO
 handlers = console
+
 [logger_tracim]
 level = DEBUG
 handlers =
 qualname = tracim
+
 [logger_sqlalchemy]
 level = INFO
 handlers =
 qualname = sqlalchemy.engine
-# "level = INFO" logs SQL queries.
-# "level = DEBUG" logs SQL queries and results.
-# "level = WARN" logs neither.  (Recommended for production systems.)
+
 [logger_alembic]
 level = INFO
 handlers =
 qualname = alembic
+
 [logger_hapic]
 level = DEBUG
 handlers =
 qualname = hapic
 
-### FORMATTER
-[formatters]
-keys = generic
-# colored log format (need colorlog python package)
-; keys = color
-
+### FORMATTER ###
 # colored log formatter for console (do not work properly with file)
 # this need coloredlog python package, you can install it in venv
 # with 'pip install colorlog'
+
+[formatters]
+keys = generic
+## colored log format (need colorlog)
+; keys = color
+
 [formatter_color]
 class=colorlog.ColoredFormatter
 format = %(asctime)s %(log_color)s%(levelname)-5.5s %(reset)s[%(name)s:%(lineno)s][%(threadName)s] %(log_color)s%(message)s
@@ -397,13 +415,13 @@ datefmt = %H:%M:%S
 format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
 datefmt = %H:%M:%S
 
-### HANDLERS
+### HANDLERS ###
 [handlers]
 keys = console
 # use file log instead
 ; keys = logfile
 
-### Console log
+### Console log ###
 [handler_console]
 class = StreamHandler
 args = (sys.stderr,)
@@ -412,7 +430,7 @@ formatter = generic
 # colored console log (need colorlog python package)
 ; formatter = color
 
-### Rotated file log
+### Rotated file log ###
 [handler_logfile]
 class=handlers.RotatingFileHandler
 level=NOTSET
