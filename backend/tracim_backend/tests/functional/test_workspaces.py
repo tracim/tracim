@@ -3165,6 +3165,279 @@ class TestWorkspaceContents(FunctionalTest):
                 and content['parent_id'] == 1
                 and content['content_id'] == subfolder_content_id
                 ]
+    def test_api__get_workspace_content__ok_200__get_path_of_content_deleted_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'subfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subfolder_content_id,
+            'label': 'subsubfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subsubfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subsubfolder_content_id,
+            'label': 'InfolderContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        infolder_content_id = res.json_body['content_id']
+        # delete
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/contents/{}/trashed'.format(infolder_content_id),
+            status=204
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        generic_content_content_id = res.json_body['content_id']
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 6
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_deleted'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        assert len(res) == 5
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert not [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_deleted'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+    def test_api__get_workspace_content__ok_200__get_path_of_content_archived_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'subfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subfolder_content_id,
+            'label': 'subsubfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subsubfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subsubfolder_content_id,
+            'label': 'InfolderContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        infolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        generic_content_content_id = res.json_body['content_id']
+        # archive
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/contents/{}/archived'.format(infolder_content_id),
+            status=204
+        )
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 6
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_archived'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 0,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        assert len(res) == 5
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert not [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_archived'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
 
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
