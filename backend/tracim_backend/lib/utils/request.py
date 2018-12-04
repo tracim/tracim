@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
+from tracim_backend.exceptions import ContentTypeNotInTracimRequest
 from tracim_backend.exceptions import InvalidCommentId
 from tracim_backend.exceptions import InvalidContentId
 from tracim_backend.exceptions import InvalidUserId
@@ -41,6 +42,8 @@ class TracimContext(object):
         self._candidate_user = None  # type: User
         # Candidate workspace found in request body
         self._candidate_workspace = None  # type: Workspace
+        # Candidate content_type found in request body
+        self._candidate_content_type = None
 
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
 
@@ -119,6 +122,17 @@ class TracimContext(object):
             self._get_candidate_workspace_id
         )
 
+    @property
+    def candidate_content_type(self):
+        """
+        content_type given in entry
+        """
+        return self._generate_if_none(
+            self._candidate_content_type,
+            self._get_content_type,
+            self._get_candidate_content_type_slug,
+        )
+
     # INFO - G.M - 2018-12-03 - Internal utils method to simplfy source code
     # in access of public_parameters
 
@@ -174,6 +188,9 @@ class TracimContext(object):
             content_type=content_type_list.Any_SLUG
         )
 
+    def _get_content_type(self, content_type_slug_fetcher):
+        content_type_slug = content_type_slug_fetcher()
+        return content_type_list.get_one_by_slug(content_type_slug)
     # INFO - G.M - 2018-12-03 - Theses method need to be implemented
     # to support correctly Tracim Context
     # Method to Implements
@@ -210,6 +227,9 @@ class TracimContext(object):
         raise NotImplemented()
 
     def _get_candidate_workspace_id(self) -> int:
+        raise NotImplemented()
+
+    def _get_candidate_content_type_slug(self) -> str:
         raise NotImplemented()
 
 
@@ -310,6 +330,29 @@ class TracimRequest(TracimContext, Request):
             raise exception_if_invalid_id
         return id_param
 
+    def _get_body_str(
+            self,
+            name: str,
+            exception_if_none: Exception,
+    ) -> str:
+        """
+        Get string from pyramid json_body
+        :param name: name of the parameter
+        :param exception_if_none: exception if no param found
+        :return: string value of parameter
+        """
+        try:
+            body = self.json_body
+        except JSONDecodeError as exc:
+            raise exception_if_none from exc
+
+        if name not in body:
+            raise exception_if_none
+        str_value_param = body[name]
+        if not isinstance(str_value_param, str):
+            return str(str_value_param)
+        return str_value_param
+
     # ID fetchers
     def _get_current_user_id(self) -> int:
         try:
@@ -386,4 +429,13 @@ class TracimRequest(TracimContext, Request):
             'new_workspace_id',
             exception_if_none,
             exception_if_invalid_id
+        )
+
+    def _get_candidate_content_type_slug(self):
+        exception_if_none = ContentTypeNotInTracimRequest(
+            'No content_type property found in body'
+        )
+        return self._get_body_str(
+            'content_type',
+            exception_if_none,
         )

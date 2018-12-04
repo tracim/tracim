@@ -4142,8 +4142,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_EXIST  # nopep8
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
@@ -4206,6 +4205,141 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
+            params=params,
+            status=200,
+        )
+
+    def test_api__post_content_create_generic_content__err_403__try_creating_folder_as_simple_contributor(self) -> None:  # nopep8
+        """
+        Create generic content but content_type is not allowed in this folder
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            do_save=False,
+            do_notify=False
+        )
+        content_api.set_allowed_content(folder, [content_type_list.Folder.slug])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedFolder',
+            'content_type': content_type_list.Folder.slug,
+            'parent_id': folder.content_id
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=workspace.workspace_id),
+            params=params,
+            status=403,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+
+    def test_api__post_content_create_generic_content__ok_200__try_creating_folder_as_content_manager(self) -> None:  # nopep8
+        """
+        Create generic content but content_type is not allowed in this folder
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            do_save=False,
+            do_notify=False
+        )
+        content_api.set_allowed_content(folder, [content_type_list.Folder.slug])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedFolder',
+            'content_type': content_type_list.Folder.slug,
+            'parent_id': folder.content_id
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=workspace.workspace_id),
             params=params,
             status=200,
         )

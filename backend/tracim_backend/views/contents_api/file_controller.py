@@ -22,6 +22,7 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
+from tracim_backend.lib.utils.authorization import ContentTypeCreationChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -65,7 +66,7 @@ SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(  # nop
     SWAGGER_TAG__CONTENT_FILE_SECTION
 )
 is_file_content = ContentTypeChecker([FILE_TYPE])
-
+can_create_file = ContentTypeCreationChecker(content_type_list, FILE_TYPE)
 
 class FileController(Controller):
     """
@@ -78,7 +79,7 @@ class FileController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
-    @check_right(is_contributor)
+    @check_right(can_create_file)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
     @hapic.input_forms(FileCreationFormSchema())
