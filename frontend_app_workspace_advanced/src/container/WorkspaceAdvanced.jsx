@@ -187,12 +187,15 @@ class WorkspaceAdvanced extends React.Component {
     const fetchPutUserRole = await handleFetchResult(await putMemberRole(state.config.apiUrl, state.content.workspace_id, idMember, slugNewRole))
 
     switch (fetchPutUserRole.apiResponse.status) {
-      case 200: this.setState(prev => ({
-        content: {
-          ...prev.content,
-          memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
-        }
-      })); break
+      case 200:
+        this.setState(prev => ({
+          content: {
+            ...prev.content,
+            memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
+          }
+        }))
+        GLOBAL_dispatchEvent({ type: 'refreshDashboardMemberList', data: {} })
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
     }
   }
