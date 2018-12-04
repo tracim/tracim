@@ -698,7 +698,7 @@ class CFG(object):
         folder = Application(
             label='Folder',
             slug='contents/folder',
-            fa_icon='folder-open-o',
+            fa_icon='folder-o',
             is_active=True,
             config={},
             main_route='',

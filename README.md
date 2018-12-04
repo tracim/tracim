@@ -92,14 +92,14 @@ If you need to run cypress with external server of tracim, modify "baseurl" in c
 This command run all test present in 'cypress_test' folder.
 
     cd functionnal_tests/
-    ./node_modules/.bin/cypress run
+    npm run cypress-run
 
 ## Run tests with cypressgui ##
 
 Open Cypress with graphical interface. You can show test running directly in web interface.
 
     cd functionnal_tests/
-    ./node_modules/.bin/cypress open
+    npm run cypress-open
 
 # Contribute
 
