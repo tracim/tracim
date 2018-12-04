@@ -206,9 +206,18 @@ class HtmlDocument extends React.Component {
             }))
           ], [])
 
+        // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
+        // see https://github.com/tracim/tracim/issues/1206
+        // @fixme Côme - 2018/12/04 - this might not be a great idea
+        const modeToRender = (
+          resRevision.body.length === 1 && // if content has only one revision
+          loggedUser.idRoleUserWorkspace >= 2 && // if user has EDIT authorization
+          resRevision.body[0].raw_content === '' // if raw_content === '', content has neither been created through webdav nor imported from tracim v1
+        ) ? MODE.EDIT : MODE.VIEW
+
         this.setState({
           timeline: revisionWithComment,
-          mode: resRevision.body.length === 1 && loggedUser.idRoleUserWorkspace >= 2 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
+          mode: modeToRender
         })
       })
       .catch(e => {
