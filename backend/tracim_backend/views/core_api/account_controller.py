@@ -12,10 +12,8 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
-from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import \
     ActiveContentFilterQuerySchema

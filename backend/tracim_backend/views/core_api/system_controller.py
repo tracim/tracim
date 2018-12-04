@@ -10,12 +10,8 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.system import SystemApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
-from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import get_timezones_list
-from tracim_backend.models import Group
-from tracim_backend.models.context_models import AboutModel
-from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
