@@ -88,7 +88,14 @@ class Dashboard extends React.Component {
     this.setState({
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
       advancedDashboardOpenedId: null,
-      displayNewMemberForm: false
+      displayNewMemberForm: false,
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        nameOrEmail: '',
+        role: '',
+        isEmail: false
+      }
     })
     this.loadWorkspaceDetail()
     this.loadMemberList()
