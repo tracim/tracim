@@ -25,4 +25,4 @@ const appInterface = {
   }
 }
 
-module.exports = appInterface
+export default appInterface

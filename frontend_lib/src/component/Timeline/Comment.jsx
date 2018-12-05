@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import Avatar from '../Avatar/Avatar.jsx'
 
-require('./Comment.styl')
+// require('./Comment.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const Comment = props => {
   const styleSent = {

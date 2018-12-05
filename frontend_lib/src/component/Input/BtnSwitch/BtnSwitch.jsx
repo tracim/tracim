@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
-require('./BtnSwitch.styl')
+// require('./BtnSwitch.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const BtnSwitch = props =>
   <div className={classnames('btnswitch', {'disabled': props.disabled})}>

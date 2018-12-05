@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
 
-require('./NewMemberForm.styl')
+// require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const NewMemberForm = props => {
   const radioHash = Math.random().toString(36).substring(7)

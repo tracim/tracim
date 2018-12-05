@@ -2,6 +2,6 @@
 .git/
 node_modules/
 dist/assets/tracim.app.entry.js
-dist/assets/tracim.vendor.bundle.js
+dist/assets/tracim.vendor.entry.js
 dist/assets/images/
 configEnv.json

@@ -8,7 +8,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 
-require('./Timeline.styl')
+// require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
 class Timeline extends React.Component {
   constructor (props) {
