@@ -56,6 +56,7 @@ const HtmlDocument = props => {
           customClass={'html-document__editionmode'}
           customColor={props.customColor}
           onClickCancelBtn={props.onClickCloseEditMode}
+          disableValidateBtn={props.disableValidateBtn}
           onClickValidateBtn={props.onClickValidateBtn}
           text={props.text}
           onChangeText={props.onChangeText}

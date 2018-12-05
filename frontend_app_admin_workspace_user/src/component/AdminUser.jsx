@@ -119,7 +119,10 @@ export class AdminUser extends React.Component {
           </div>
 
           <div className='adminUser__adduser'>
-            <button className='adminUser__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover' onClick={this.handleToggleAddUser}>
+            <button
+              className='adminUser__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+              onClick={this.handleToggleAddUser}
+            >
               {props.t('Create a user')}
             </button>
 

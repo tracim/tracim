@@ -57,7 +57,9 @@ class Account extends React.Component {
 
     this.state = {
       idUserToEdit: props.match.params.iduser,
-      userToEdit: {},
+      userToEdit: {
+        public_name: ''
+      },
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
     }

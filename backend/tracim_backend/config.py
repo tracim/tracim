@@ -83,6 +83,7 @@ class CFG(object):
             'contents/thread',
             'contents/file',
             'contents/html-document',
+            'contents/folder',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
@@ -650,7 +651,7 @@ class CFG(object):
         folder = Application(
             label='Folder',
             slug='contents/folder',
-            fa_icon='folder-open-o',
+            fa_icon='folder-o',
             is_active=True,
             config={},
             main_route='',

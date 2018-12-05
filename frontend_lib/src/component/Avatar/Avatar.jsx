@@ -28,7 +28,7 @@ export class Avatar extends React.Component {
     const splitDot = name.split('.')
     if (name.split('.').length >= 2) return `${splitDot[0].substr(0, 1)}${splitDot[1].substr(0, 1)}`
 
-    return name.substr(0, 2).toUpperCase()
+    return name.substr(0, 2)
   }
 
   render () {
@@ -49,7 +49,7 @@ export class Avatar extends React.Component {
             fontSize: fontSize
           }}
         >
-          {this.getTwoLetter(props.publicName)}
+          {this.getTwoLetter(props.publicName.toUpperCase())}
         </div>
       </div>
     )

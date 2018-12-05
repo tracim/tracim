@@ -24,7 +24,7 @@ export const NewMemberForm = props => {
             type='text'
             className='name__input form-control'
             id='addmember'
-            placeholder={props.t('Name or email')}
+            placeholder={props.t('Full name or email')}
             value={props.nameOrEmail}
             onChange={e => props.onChangeNameOrEmail(e.target.value)}
             autoComplete='off'

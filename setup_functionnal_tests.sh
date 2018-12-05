@@ -67,18 +67,10 @@ log "Go to functionnal_tests subdir.."
 cd  functionnal_tests || exit 1
 CURRENTDIR=$(pwd)
 loggood "Your are now here: \"$CURRENTDIR\""
-log "Check if package.json exist."
-if [ ! -f package.json ]; then
-    log "package.json not exist => run npm init"
-    npm init -y && loggood "success" || logerror "some error"
-    loggood "npm init finished => package.json is now created."
-else
-    loggood "package.json exist."
-fi
 log "Install cypress."
 $SUDO apt update && loggood "success" || logerror "some error"
 $SUDO apt install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 && loggood "success" || logerror "some error"
-npm install cypress --save-dev && loggood "success" || logerror "some error"
+npm install && loggood "success" || logerror "some error"
 loggood "Cypress is now installed."
 
 
