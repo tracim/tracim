@@ -609,7 +609,10 @@ class CFG(object):
             param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
             # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
             param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
-            param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
+            # TODO - G.M - 2018-12-05 - [ldap_profile]
+            # support for profile attribute disabled
+            # Should be reenabled later probably with a better code
+            # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
         ]
 
         for prm in ldap_parameters:

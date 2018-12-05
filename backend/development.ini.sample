@@ -86,8 +86,6 @@ auth_types = internal
 # ldap_login_attribute = mail
 # Attribute for default name of new user from ldap
 # ldap_name_attributes = givenName
-# Attribute for default profile of new user from ldap
-# ldap_profile_attributes = TracimProfile
 # TLS usage to communicate with your LDAP server
 # ldap_tls = False
 

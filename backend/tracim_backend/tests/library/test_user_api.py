@@ -785,8 +785,14 @@ class TestFakeLDAPUserApi(DefaultTest):
         with pytest.raises(MissingLDAPConnector):
             user = api.authenticate('hubert@planetexpress.com', 'professor')
 
+    @pytest.mark.xfail(
+        reason='create account with specific profile ldap feature disabled'
+    )
     @pytest.mark.ldap
-    def test_unit__authenticate_user___ok__new_user_ldap_auth(self):
+    def test_unit__authenticate_user___ok__new_user_ldap_auth_custom_profile(self):
+        # TODO - G.M - 2018-12-05 - [ldap_profile]
+        # support for profile attribute disabled
+        # Should be reenabled later probably with a better code
         class fake_ldap_connector(object):
 
             def authenticate(self, email: str, password: str):
@@ -808,6 +814,30 @@ class TestFakeLDAPUserApi(DefaultTest):
         assert user.auth_type == AuthType.LDAP
         assert user.display_name == 'Hubert'
         assert user.profile.name == 'trusted-users'
+
+
+    @pytest.mark.ldap
+    def test_unit__authenticate_user___ok__new_user_ldap_auth(self):
+        class fake_ldap_connector(object):
+
+            def authenticate(self, email: str, password: str):
+                if not email == 'hubert@planetexpress.com' \
+                        and password == 'professor':
+                    return None
+                return [None, {'mail': ['huber@planetepress.com'],
+                               'givenName': ['Hubert'],
+                               }]
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.authenticate('hubert@planetexpress.com', 'professor', fake_ldap_connector())  # nopep8
+        assert isinstance(user, User)
+        assert user.email == 'hubert@planetexpress.com'
+        assert user.auth_type == AuthType.LDAP
+        assert user.display_name == 'Hubert'
+        assert user.profile.name == 'users'
 
     @pytest.mark.ldap
     def test__unit__create_user__err__external_auth_ldap_with_password(self):

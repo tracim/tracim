@@ -258,22 +258,25 @@ class UserApi(object):
         # INFO - G.M - 2018-11-22 - Create new user
         if not user:
             groups = None
-            if self._config.LDAP_PROFILE_ATTR:
-                ldap_profile = ldap_data[self._config.LDAP_PROFILE_ATTR][0]
-                try:
-                    gapi = GroupApi(
-                        current_user=self._user,  # User
-                        session=self._session,
-                        config=self._config,
-                    )
-                    groups = [gapi.get_one_with_name(ldap_profile)] # nopep8
-                except GroupDoesNotExist:
-                    logger.warning(self,
-                        'Profile {} does not exist, create ldap user'
-                        'with default profile.'.format(
-                            ldap_profile
-                        )
-                    )
+            # TODO - G.M - 2018-12-05 - [ldap_profile]
+            # support for profile attribute disabled
+            # Should be reenabled later probably with a better code
+            # if self._config.LDAP_PROFILE_ATTR:
+            #     ldap_profile = ldap_data[self._config.LDAP_PROFILE_ATTR][0]
+            #     try:
+            #         gapi = GroupApi(
+            #             current_user=self._user,  # User
+            #             session=self._session,
+            #             config=self._config,
+            #         )
+            #         groups = [gapi.get_one_with_name(ldap_profile)] # nopep8
+            #     except GroupDoesNotExist:
+            #         logger.warning(self,
+            #             'Profile {} does not exist, create ldap user'
+            #             'with default profile.'.format(
+            #                 ldap_profile
+            #             )
+            #         )
             name = None
             if self._config.LDAP_NAME_ATTR:
                 name = ldap_data[self._config.LDAP_NAME_ATTR][0]
