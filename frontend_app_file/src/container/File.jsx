@@ -464,7 +464,8 @@ class File extends React.Component {
             this.setState({
               newFile: '',
               newFilePreview: null,
-              fileCurrentPage: 1
+              fileCurrentPage: 1,
+              mode: MODE.VIEW
             })
             this.loadContent(1)
             this.loadTimeline()
