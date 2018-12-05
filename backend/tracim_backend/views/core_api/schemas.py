@@ -4,10 +4,6 @@ import typing
 import marshmallow
 import re
 from marshmallow import post_load
-from marshmallow.validate import Length
-from marshmallow.validate import Regexp
-from marshmallow.validate import OneOf
-from marshmallow.validate import Range
 
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
@@ -519,7 +515,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     )
     complete_path_to_id = marshmallow.fields.Int(
         example=6,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
         description='If setted with a correct content_id, this will'
                     ' add to parent_ids filter, all parent of given content_id,'
                     ' workspace root included. This param help to get '
