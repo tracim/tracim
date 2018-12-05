@@ -8,6 +8,7 @@ from zope.interface import implementer
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentTypeNotAllowed
+from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
@@ -57,15 +58,11 @@ class AuthorizationChecker(object):
     AndAuthorizationChecker and OrAuthorizationChecker for checker combination
     )
     """
-
-    def __init__(self):
-        pass
-
     def check(
         self,
         tracim_context: TracimContext
     ) -> bool:
-        """Return true or raise error if check doesnt pass"""
+        """Return true or raise TracimException error if check doesnt pass"""
         raise NotImplemented()
 
 
@@ -73,9 +70,6 @@ class SameUserChecker(AuthorizationChecker):
     """
     Check if candidate_user is same as current_user
     """
-    def __init__(self):
-        super().__init__()
-
     def check(
         self,
         tracim_context: TracimContext
@@ -93,7 +87,6 @@ class ProfileChecker(AuthorizationChecker):
     """
 
     def __init__(self, profile_level: int):
-        super().__init__()
         self.profile_level = profile_level
 
     def check(
@@ -112,7 +105,6 @@ class CandidateUserProfileChecker(AuthorizationChecker):
     """
 
     def __init__(self, profile_level: int):
-        super().__init__()
         self.profile_level = profile_level
 
     def check(
@@ -130,7 +122,6 @@ class RoleChecker(AuthorizationChecker):
     is as high as role level given
     """
     def __init__(self, role_level: int):
-        super().__init__()
         self.role_level = role_level
 
     def check(
@@ -149,7 +140,6 @@ class CandidateWorkspaceRoleChecker(AuthorizationChecker):
     is as high as role level given
     """
     def __init__(self, role_level: int):
-        super().__init__()
         self.role_level = role_level
 
     def check(
@@ -167,7 +157,6 @@ class ContentTypeChecker(AuthorizationChecker):
     Check if current_content match content_types given
     """
     def __init__(self, allowed_content_type_list: typing.List[str]):
-        super().__init__()
         self.allowed_content_type_list = allowed_content_type_list
 
     def check(
@@ -186,9 +175,6 @@ class CommentOwnerChecker(AuthorizationChecker):
     """
     Check if current_user is owner of current_comment
     """
-    def __init__(self):
-        super().__init__()
-
     def check(
         self,
         tracim_context: TracimContext
@@ -211,7 +197,6 @@ class OrAuthorizationChecker(AuthorizationChecker):
     return last exception found in list of checker
     """
     def __init__(self, *authorization_checkers):
-        super().__init__()
         self.authorization_checkers = authorization_checkers
 
     def check(
@@ -225,7 +210,7 @@ class OrAuthorizationChecker(AuthorizationChecker):
                     tracim_context=tracim_context,
                 )
                 return True
-            except Exception as e:
+            except TracimException as e:
                 exception_to_raise = e
 
         raise exception_to_raise
@@ -238,7 +223,6 @@ class AndAuthorizationChecker(AuthorizationChecker):
     """
 
     def __init__(self, *authorization_checkers):
-        super().__init__()
         self.authorization_checkers = authorization_checkers
 
     def check(

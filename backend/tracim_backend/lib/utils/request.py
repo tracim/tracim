@@ -269,7 +269,8 @@ class TracimRequest(TracimContext, Request):
         exception_if_invalid_id: Exception
     ) -> int:
         """
-        Get id from pyramid path
+        Get id from pyramid path or raise one of the Exception
+        given in params, this allow to have specific exception for each id.
         :param name: name of the parameter
         :param exception_if_none: exception if no param found
         :param exception_if_invalid_id: exception if id is not a correct integer
@@ -290,7 +291,8 @@ class TracimRequest(TracimContext, Request):
             exception_if_invalid_id: Exception
     ) -> int:
         """
-        Get id from pyramid json_body
+        Get id from pyramid json_body or raise one of the Exception
+        given in params, this allow to have specific exception for each id.
         :param name: name of the parameter
         :param exception_if_none: exception if no param found
         :param exception_if_invalid_id: exception if id is not a correct integer

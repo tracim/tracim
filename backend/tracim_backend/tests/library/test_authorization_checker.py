@@ -6,6 +6,7 @@ from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.lib.utils.authorization import AndAuthorizationChecker
@@ -363,7 +364,7 @@ class TestAuthorizationChecker(BaseTest):
 
     def test__unit__AndAuthorizationChecker__err__exception(self):
 
-        class CheckerFailed(Exception):
+        class CheckerFailed(TracimException):
             pass
 
         class OkChecker(AuthorizationChecker):
@@ -406,10 +407,10 @@ class TestAuthorizationChecker(BaseTest):
 
     def test__unit__AndAuthorizationChecker__err__exception_order(self):
 
-        class CheckerFailed(Exception):
+        class CheckerFailed(TracimException):
             pass
 
-        class CheckerFailed2(Exception):
+        class CheckerFailed2(TracimException):
             pass
 
         class OkChecker(AuthorizationChecker):
@@ -462,7 +463,7 @@ class TestAuthorizationChecker(BaseTest):
 
     def test__unit__OrAuthorizationChecker__ok__nominal_case(self):
 
-        class CheckerFailed(Exception):
+        class CheckerFailed(TracimException):
             pass
 
         class OkChecker(AuthorizationChecker):
@@ -497,10 +498,10 @@ class TestAuthorizationChecker(BaseTest):
 
     def test__unit__OrAuthorizationChecker__err__exception_order(self):
 
-        class CheckerFailed(Exception):
+        class CheckerFailed(TracimException):
             pass
 
-        class CheckerFailed2(Exception):
+        class CheckerFailed2(TracimException):
             pass
 
         class ExceptionChecker(AuthorizationChecker):
@@ -545,7 +546,7 @@ class TestAuthorizationChecker(BaseTest):
 
     def test__unit__OrAuthorizationChecker__err__exception(self):
 
-        class CheckerFailed(Exception):
+        class CheckerFailed(TracimException):
             pass
 
         class OkChecker(AuthorizationChecker):
