@@ -6,33 +6,18 @@ console.log('isPoduction: ', isProduction)
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    app: ['@babel/polyfill', 'whatwg-fetch', './src/index.js'],
-    vendor: [
-      '@babel/plugin-proposal-class-properties',
-      '@babel/plugin-transform-object-assign',
-      '@babel/plugin-proposal-object-rest-spread',
-      '@babel/polyfill',
-      // 'lodash.pull',
-      // 'lodash.reject',
-      // 'lodash.uniqby',
-      'react',
-      'react-dom',
-      'react-redux',
-      'react-router-dom',
-      // 'react-select',
-      'redux',
-      'redux-logger',
-      // 'redux-saga',
-      'redux-thunk',
-      'whatwg-fetch',
-      'classnames'
-    ]
+    app: ['@babel/polyfill', './src/index.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist/assets'),
-    filename: 'tracim.[name].entry.js',
+    filename: 'tracim.[name].js',
     pathinfo: !isProduction,
     publicPath: '/assets/'
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all'
+    }
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
