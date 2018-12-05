@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import { NewMemberForm } from 'tracim_frontend_lib'
+import { NewMemberForm, Avatar } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
 
@@ -46,7 +46,7 @@ export class MemberList extends React.Component {
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
-                        <img src={m.avatarUrl} />
+                        <Avatar publicName={m.publicName} />
                       </div>
 
                       <div className='memberlist__list__item__info'>

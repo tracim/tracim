@@ -6,7 +6,8 @@ import {
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
-  WORKSPACE_MEMBER, UPDATE, USER_WORKSPACE_DO_NOTIFY
+  WORKSPACE_MEMBER, UPDATE,
+  USER_WORKSPACE_DO_NOTIFY, FOLDER_READ
 } from '../action-creator.sync.js'
 import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
@@ -116,6 +117,14 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           )
         }
         : state
+
+    case `${SET}/${FOLDER_READ}`:
+      return state.contentReadStatusList.includes(action.idFolder)
+        ? state
+        : {
+          ...state,
+          contentReadStatusList: [...state.contentReadStatusList, action.idFolder]
+        }
 
     default:
       return state

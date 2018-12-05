@@ -5,6 +5,8 @@ import { translate } from 'react-i18next'
 require('./MenuSubComponent.styl')
 
 export const MenuSubComponent = props => {
+  const activeSubMenu = (props.menu.find(scm => scm.active) || {name: ''}).name
+
   return (
     <nav className='menusubcomponent navbar'>
 
@@ -19,39 +21,15 @@ export const MenuSubComponent = props => {
       </div>
 
       <ul className='menusubcomponent__list nav flex-column'>
-        <li
-          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'personalData'})}
-          onClick={() => props.onClickMenuItem('personalData')}
-          key={'personalData'}
-        >
-          <div className='menusubcomponent__list__item__link nav-link'>{props.t('My profil')}</div>
-        </li>
-
-        <li
-          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'notification'})}
-          onClick={() => props.onClickMenuItem('notification')}
-          key={'notification'}
-        >
-          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Shared spaces and notifications')}</div>
-        </li>
-
-        <li
-          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'password'})}
-          onClick={() => props.onClickMenuItem('password')}
-          key={'password'}
-        >
-          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Password')}</div>
-        </li>
-
-        {/*
-        <li
-          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'timezone'})}
-          onClick={() => props.onClickMenuItem('timezone')}
-          key={'timezone'}
-        >
-          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Timezone')}</div>
-        </li>
-        */}
+        {props.menu.map(menu =>
+          <li
+            className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': menu.name === activeSubMenu})}
+            onClick={() => props.onClickMenuItem(menu.name)}
+            key={menu.name}
+          >
+            <div className='menusubcomponent__list__item__link nav-link'>{menu.label}</div>
+          </li>
+        )}
       </ul>
     </nav>
   )

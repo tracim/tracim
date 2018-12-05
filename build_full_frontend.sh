@@ -83,6 +83,12 @@ cd $DEFAULTDIR/frontend_app_admin_workspace_user || exit 1
 ./build_admin_workspace_user.sh $dev
 
 
+# app Folder Advanced
+log "cd $DEFAULTDIR/frontend_app_folder_advanced"
+cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
+./build_folder.sh $dev
+
+
 # build Tracim
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend || exit 1

@@ -474,7 +474,8 @@ class WorkspaceController(Controller):
             show_active=content_filter.show_active,
         )
         contents = api.get_all(
-            parent_id=content_filter.parent_id,
+            parent_ids=content_filter.parent_ids,
+            complete_path_to_id=content_filter.complete_path_to_id,
             workspace=request.current_workspace,
             content_type=content_filter.content_type or content_type_list.Any_SLUG,
             label=content_filter.label,

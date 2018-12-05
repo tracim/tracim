@@ -34,10 +34,11 @@
   "User created and email sent": "User created and email sent",
   "User created": "User created",
   "Email already exists": "Email already exists",
-  "Name": "Name",
   "Password": "Password",
   "Create the user": "Create the user",
   "Create a user": "Create a user",
   "Email notification are disabled, please notify users of any change": "Email notification are disabled, please notify users of any change",
-  "Please type a name, an email, a password and select a profile": "Please type a name, an email, a password and select a profile"
+  "Please type a name, an email, a password and select a profile": "Please type a name, an email, a password and select a profile",
+  "Please set a password": "Please set a password",
+  "Full name": "Full name"
 }

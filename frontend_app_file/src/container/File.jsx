@@ -5,7 +5,6 @@ import FileComponent from '../component/FileComponent.jsx'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -80,11 +79,20 @@ class File extends React.Component {
         break
       case 'file_hideApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: false
+        }))
         break
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
@@ -125,17 +133,13 @@ class File extends React.Component {
       this.loadTimeline()
     }
 
-    if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
-      tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', this.handleChangeDescription)
-    }
-
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -191,14 +195,10 @@ class File extends React.Component {
       return
     }
 
-    const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+    const resCommentWithProperDate = resComment.body.map(c => ({
       ...c,
       created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang),
-      author: {
-        ...c.author,
-        avatar_url: c.author.avatar_url ? c.author.avatar_url : generateAvatarFromPublicName(c.author.public_name)
-      }
+      created: displayDistanceDate(c.created, loggedUser.lang)
     }))
 
     const revisionWithComment = resRevision.body
@@ -209,7 +209,7 @@ class File extends React.Component {
         timelineType: 'revision',
         commentList: r.comment_ids.map(ci => ({
           timelineType: 'comment',
-          ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
+          ...resCommentWithProperDate.find(c => c.content_id === ci)
         })),
         number: i + 1
       }))
@@ -224,8 +224,7 @@ class File extends React.Component {
       ], [])
 
     this.setState({
-      timeline: revisionWithComment,
-      mode: resRevision.body.length === 1 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
+      timeline: revisionWithComment
     })
   }
 
@@ -465,7 +464,8 @@ class File extends React.Component {
             this.setState({
               newFile: '',
               newFilePreview: null,
-              fileCurrentPage: 1
+              fileCurrentPage: 1,
+              mode: MODE.VIEW
             })
             this.loadContent(1)
             this.loadTimeline()

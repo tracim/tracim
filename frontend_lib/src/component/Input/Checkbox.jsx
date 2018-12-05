@@ -25,7 +25,10 @@ const style = {
     visibility: 'hidden'
   },
   disabled: {
-    cursor: 'default'
+    cursor: 'default',
+    backgroundColor: '#f5f5f5',
+    borderColor: '#eee',
+    color: '#999'
   }
 }
 
@@ -34,12 +37,29 @@ export const Checkbox = props =>
     className={classnames('checkboxCustom', {'checked': props.checked})}
     style={{
       ...style.label,
-      ...(props.disabled ? style.disabled : {})
+      ...(props.disabled ? style.disabled : {}),
+      ...props.styleLabel
     }}
-    onClick={props.onClickCheckbox}
+    onClick={e => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (props.disabled) return
+      props.onClickCheckbox()
+    }}
+    htmlFor={`checkbox-${props.name}`}
   >
-    { props.checked && <div className='checboxCustom__checked' style={style.checked}>✔</div> }
+    {props.checked && (
+      <div
+        className='checboxCustom__checked'
+        style={{
+          ...style.checked,
+          ...(props.disabled ? style.disabled : {}),
+          ...props.styleCheck
+        }}
+      >✔</div>
+    )}
     <input
+      id={`checkbox-${props.name}`}
       type='checkbox'
       name={`checkbox-${props.name}`}
       checked={props.checked}
@@ -55,12 +75,16 @@ Checkbox.propTypes = {
   onClickCheckbox: PropTypes.func.isRequired,
   checked: PropTypes.bool,
   defaultChecked: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  styleLabel: PropTypes.object,
+  styleCheck: PropTypes.object
 }
 
 Checkbox.defaultProps = {
   checked: false,
-  disabled: false
+  disabled: false,
+  styleLabel: {},
+  styleCheck: {}
 }
 
 export default Checkbox

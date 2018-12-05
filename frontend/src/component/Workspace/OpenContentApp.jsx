@@ -55,8 +55,11 @@ export class OpenContentApp extends React.Component {
     this.openContentApp()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prev) {
+    const { props } = this
     console.log('%c<OpenContentApp> did Update', 'color: #dcae84', this.props)
+
+    if (props.match && prev.match && props.match.params.idcts === prev.match.params.idcts) return
 
     this.openContentApp()
   }

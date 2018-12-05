@@ -231,7 +231,7 @@ class WorkspaceResource(DAVCollection):
         retlist = []
 
         children = self.content_api.get_all(
-            parent_id=self.content.id if self.content is not None else None,
+            parent_ids=[self.content.id] if self.content is not None else None,
             workspace=self.workspace
         )
 
@@ -545,7 +545,7 @@ class FolderResource(WorkspaceResource):
             session=self.session,
         )
         visible_children = content_api.get_all(
-            self.content.content_id,
+            [self.content.content_id],
             content_type_list.Any_SLUG,
             self.workspace,
         )
@@ -703,7 +703,7 @@ class HistoryFolderResource(FolderResource):
         ret = []
 
         content_id = None if self.content is None else self.content.id
-        for content in self.content_api.get_all(content_id, content_type_list.Any_SLUG, self.workspace):
+        for content in self.content_api.get_all([content_id], content_type_list.Any_SLUG, self.workspace):
             if (self._is_archived and content.is_archived or
                 self._is_deleted and content.is_deleted or
                 not (content.is_archived or self._is_archived or content.is_deleted or self._is_deleted))\
@@ -1426,7 +1426,7 @@ class OtherFileResource(FileResource):
             return designThread(
                 self.content,
                 self.content_revision,
-                self.content_api.get_all(self.content.content_id, content_type_list.Comment.slug)
+                self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug)
             )
 
 

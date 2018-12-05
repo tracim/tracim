@@ -1,7 +1,9 @@
+import re
 import typing
 
 from marshmallow import ValidationError
 from marshmallow.validate import Length
+from marshmallow.validate import Regexp
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 from marshmallow.validate import Validator
@@ -57,7 +59,9 @@ class TracimValidator(object):
 bool_as_int_validator = Range(min=0, max=1, error="Value must be 0 or 1")
 strictly_positive_int_validator = Range(min=1, error="Value must be positive")
 positive_int_validator = Range(min=0, error="Value must be positive or 0")
+
 # string
+regex_string_as_list_of_int = Regexp(regex=(re.compile('^(\d+(,\d+)*)?$')))
 acp_validator = Length(min=2)
 not_empty_string_validator = Length(min=1)
 action_description_validator = OneOf(ActionDescription.allowed_values())

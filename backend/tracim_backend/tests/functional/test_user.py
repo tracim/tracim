@@ -882,17 +882,22 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created.content_id,
             main_folder.content_id,
         ]
-        url = '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status?contents_ids={cid1}&contents_ids={cid2}&contents_ids={cid3}&contents_ids={cid4}'.format(  # nopep8
+        params = {
+            'content_ids': '{cid1},{cid2},{cid3},{cid4}'.format(
+                    cid1=selected_contents_id[0],
+                    cid2=selected_contents_id[1],
+                    cid3=selected_contents_id[2],
+                    cid4=selected_contents_id[3],
+            )
+        }
+        url = '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
               workspace_id=workspace.workspace_id,
-              cid1=selected_contents_id[0],
-              cid2=selected_contents_id[1],
-              cid3=selected_contents_id[2],
-              cid4=selected_contents_id[3],
               user_id=test_user.user_id,
         )
         res = self.testapp.get(
             url=url,
             status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 4
@@ -1006,12 +1011,16 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created.content_id,
             main_folder.content_id,
         ]
-        url = '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status?contents_ids={cid1}&contents_ids={cid2}&contents_ids={cid3}&contents_ids={cid4}'.format(  # nopep8
+        params = {
+            'content_ids': '{cid1},{cid2},{cid3},{cid4}'.format(
+                    cid1=selected_contents_id[0],
+                    cid2=selected_contents_id[1],
+                    cid3=selected_contents_id[2],
+                    cid4=selected_contents_id[3],
+            )
+        }
+        url = '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
               workspace_id=workspace.workspace_id,
-              cid1=selected_contents_id[0],
-              cid2=selected_contents_id[1],
-              cid3=selected_contents_id[2],
-              cid4=selected_contents_id[3],
               user_id=admin.user_id,
         )
         res = self.testapp.get(
@@ -3905,7 +3914,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         params = {
             'acp': 'bob',
-            'exclude_user_ids': [test_user2.user_id]
+            'exclude_user_ids': str(test_user2.user_id)
         }
         res = self.testapp.get(
             '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
@@ -3997,7 +4006,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         params = {
             'acp': 'bob',
-            'exclude_workspace_ids': [workspace2.workspace_id]
+            'exclude_workspace_ids': str(workspace2.workspace_id)
         }
         res = self.testapp.get(
             '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
@@ -4100,8 +4109,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         params = {
             'acp': 'bob',
-            'exclude_workspace_ids': [workspace2.workspace_id],
-            'exclude_user_ids': [test_user3.user_id]
+            'exclude_workspace_ids': str(workspace2.workspace_id),
+            'exclude_user_ids': str(test_user3.user_id)
         }
         res = self.testapp.get(
             '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),

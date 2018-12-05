@@ -1,13 +1,14 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { getUserProfile } from '../../helper.js'
+import { Avatar } from 'tracim_frontend_lib'
 
 require('./UserInfo.styl')
 
 export const UserInfo = props =>
   <div className='userinfo mr-5 ml-5 mb-5'>
     <div className='userinfo__avatar'>
-      <img src={props.user.avatar_url} />
+      <Avatar publicName={props.user.public_name} width={'100px'} />
     </div>
 
     <div className='userinfo__wrapper'>

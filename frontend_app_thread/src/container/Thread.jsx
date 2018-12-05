@@ -5,7 +5,6 @@ import { debug } from '../helper.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -64,11 +63,20 @@ class Thread extends React.Component {
         break
       case 'thread_hideApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: false
+        }))
         break
       case 'allApp_changeLang':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
@@ -110,6 +118,7 @@ class Thread extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -136,16 +145,10 @@ class Thread extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
 
-    const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+    const resCommentWithProperDate = resComment.body.map(c => ({
       ...c,
       created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang),
-      author: {
-        ...c.author,
-        avatar_url: c.author.avatar_url
-          ? c.author.avatar_url
-          : generateAvatarFromPublicName(c.author.public_name)
-      }
+      created: displayDistanceDate(c.created, loggedUser.lang)
     }))
 
     const revisionWithComment = resRevision.body
@@ -156,7 +159,7 @@ class Thread extends React.Component {
         timelineType: 'revision',
         commentList: r.comment_ids.map(ci => ({
           timelineType: 'comment',
-          ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
+          ...resCommentWithProperDate.find(c => c.content_id === ci)
         })),
         number: i + 1
       }))

@@ -125,7 +125,14 @@ class Login extends React.Component {
     if (fetchGetWorkspaceList.status === 200) props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
   }
 
-  handleClickForgotPassword = async () => this.props.history.push(PAGE.FORGOT_PASSWORD)
+  handleClickForgotPassword = () => {
+    const { props } = this
+    props.history.push(
+      props.system.config.email_notification_activated
+        ? PAGE.FORGOT_PASSWORD
+        : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF
+    )
+  }
 
   render () {
     const { props, state } = this

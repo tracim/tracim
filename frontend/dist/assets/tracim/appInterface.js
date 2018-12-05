@@ -12,6 +12,8 @@
         return appThread
       case 'file':
         return appFile
+      case 'folder':
+        return appFolderAdvanced
       case 'admin_workspace_user':
         return appAdminWorkspaceUser
       case 'workspace_advanced':

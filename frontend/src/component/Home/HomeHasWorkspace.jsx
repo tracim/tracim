@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { Avatar } from 'tracim_frontend_lib'
 
 require('./Home.styl')
 
@@ -11,7 +12,7 @@ export const HomeHasWorkspace = props =>
 
     <div className='homepagecard__user'>
       <div className='homepagecard__user__avatar'>
-        <img src={props.user.avatar_url} />
+        <Avatar publicName={props.user.public_name} width={'75px'} />
       </div>
 
       <div className='homepagecard__user__publicname'>

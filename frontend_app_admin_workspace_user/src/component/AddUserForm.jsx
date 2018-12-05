@@ -53,14 +53,14 @@ export class AddUserForm extends React.Component {
       <form className='adminUser__adduser__form'>
         <div className='adminUser__adduser__form__username'>
           <label className='username__text' htmlFor='adduser_name'>
-            {props.t('Name')}
+            {props.t('Full name')}
           </label>
 
           <input
             type='text'
             className='username__input form-control'
             id='adduser_name'
-            placeholder={props.t('Name')}
+            placeholder={props.t('Full name')}
             value={state.newUserName}
             onChange={this.handleChangeNewUserName}
           />

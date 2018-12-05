@@ -35,6 +35,7 @@ export const PAGE = {
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
+  FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
   RESET_PASSWORD: '/ui/reset-password',
   ACCOUNT: '/ui/account',
   ADMIN: {
@@ -45,7 +46,7 @@ export const PAGE = {
   }
 }
 
-export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD]
+export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
 
 export const ROLE = [{
   id: 8,

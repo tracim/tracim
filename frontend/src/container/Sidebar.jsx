@@ -71,8 +71,12 @@ class Sidebar extends React.Component {
     // check if pathname has changed
     if (props.location.pathname !== nextProps.location.pathname) return true
 
+    const propsUrlSearch = qs.parse(props.location.search)
+    const nextPropsUrlSearch = qs.parse(nextProps.location.search)
     // check if url filter of workspace content has changed
-    if (qs.parse(props.location.search).type !== qs.parse(nextProps.location.search).type) return true
+    if (propsUrlSearch.type !== nextPropsUrlSearch.type) return true
+    // check if opened folder list of workspace content has changed
+    if (propsUrlSearch.folder_open !== nextPropsUrlSearch.folder_open) return true
 
     const oldOpenedList = props.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
     const newOpenedList = nextProps.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
@@ -99,6 +103,8 @@ class Sidebar extends React.Component {
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
 
+  handleClickScollUp = () => this.workspaceListTop.scrollIntoView({behavior: 'smooth'})
+
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
@@ -113,7 +119,13 @@ class Sidebar extends React.Component {
           <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
         </div>
 
+        <div className='sidebar__scrollup primaryColorBg' onClick={this.handleClickScollUp}>
+          <i className='fa fa-chevron-up' />
+        </div>
+
         <div className='sidebar__content'>
+          <div style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
+
           <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
             <ul className='sidebar__content__navigation__workspace'>
               { workspaceList.map(ws =>
