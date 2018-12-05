@@ -191,7 +191,7 @@ email.notification.smtp.password = your_smtp_password
 
 ### Processing ###
 # processing_mode may be sync or async
-# if you use async you need additional deamon, see README for more info.
+# if you use async you need additional daemon, see README for more info.
 email.notification.processing_mode = sync
 
 ### Headers ###
@@ -225,9 +225,10 @@ email.notification.reset_password_request.template.text = %(email.template_dir)s
 ####
 
 # Email reply configuration:
-# This need api.key with non-empty value
 # Reply by email feature: allow user to answer directly to tracim in reply
 # to notification.
+# This need api.key with non-empty value
+# This feature need additional daemons: see README for more info
 ## available choice: True or False
 email.reply.activated = False
 
@@ -245,10 +246,6 @@ email.reply.imap.use_idle = True
 email.reply.connection.max_lifetime = 600
 ## Delay in seconds between each check
 email.reply.check.heartbeat = 60
-
-### Secret ###
-## Token for communication between mail fetcher and tracim controller
-email.reply.token = mysecuretoken
 
 ### Parsing ###
 email.reply.use_html_parsing = True
