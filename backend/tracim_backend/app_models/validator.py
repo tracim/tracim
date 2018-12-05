@@ -6,7 +6,6 @@ from marshmallow.validate import Length
 from marshmallow.validate import Regexp
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
-from marshmallow.validate import Validator
 
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
@@ -19,21 +18,43 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
 
+
 class TracimValidator(object):
+    """
+    Validate many fields with value and validator Callable.
+    """
 
     def __init__(self):
-        self.validators = {}
-        self.values = {}
+        self.validators = {}  # type: typing.Callable[[typing.Any], None]
+        self.values = {}  # type: typing.Dict[str, str]
 
-    def add_validator(self, field:str, value:str, validator:typing.Callable) -> bool:  # nopep8
-        if not value:
+    def add_validator(
+            self,
+            field: str,
+            value: typing.Optional[str],
+            validator: typing.Callable[[typing.Any], None]
+    ) -> bool:
+        """
+        Add validator, doesn't accept None as field value
+        :param field: name of the field
+        :param value: value of the field, to check with validator
+        :param validator: validator for the field
+        :return: True if validator correctly added, false if validator can not
+        be added.
+        """
+        if value is None:
             return False
 
         self.validators[field] = validator
         self.values[field] = value
         return True
 
-    def validate_all(self):
+    def validate_all(self) -> bool:
+        """
+        Validate all validators given
+        :return: true if success, TracimValidationFailed exception if validation
+        failed.
+        """
         errors = []
         for field, value in self.values.items():
 
@@ -51,16 +72,17 @@ class TracimValidator(object):
         return True
 
 
+# TODO - G.M - 2018-11-29 - Refactor validator system
 
+# Static Validators #
 
-## TODO - G.M - 2018-11-29 - Refactor validator system
-# static validator #
-# int
+# Int
 bool_as_int_validator = Range(min=0, max=1, error="Value must be 0 or 1")
 strictly_positive_int_validator = Range(min=1, error="Value must be positive")
 positive_int_validator = Range(min=0, error="Value must be positive or 0")
 
-# string
+# String
+# string matching list of int separated by ','
 regex_string_as_list_of_int = Regexp(regex=(re.compile('^(\d+(,\d+)*)?$')))
 acp_validator = Length(min=2)
 not_empty_string_validator = Length(min=1)
@@ -89,5 +111,7 @@ user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
 
 # Dynamic validator #
 all_content_types_validator = OneOf(choices=[])
+
+
 def update_validators():
     all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()  # nopep8
