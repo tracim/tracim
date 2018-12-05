@@ -1,7 +1,7 @@
 {
   "name": "tracim_frontend_lib",
   "version": "1.1.9",
-  "main": "dist/tracim_frontend_lib.js",
+  "main": "dist/tracim_frontend_lib.lib.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
@@ -9,10 +9,10 @@
     "buildwindoz": "echo 'Only use npm run buildtracimlibwindoz'",
     "build": "echo 'Only use npm run buildtracimlib'",
     "build-translation": "node i18next.scanner.js",
-    "buildtracimlib": "NODE_ENV=production webpack -p && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlib-dev": "NODE_ENV=production webpack && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
-    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
-    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
+    "buildtracimlib": "NODE_ENV=production webpack -p && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
+    "buildtracimlib-dev": "NODE_ENV=production webpack && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
+    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
+    "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -43,12 +43,13 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "url-loader": "^0.6.2",
-    "webpack": "^3.8.1",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "i18next-scanner": "^2.6.1",
-    "webpack-dev-server": "^2.9.2"
+    "webpack-dev-server": "^3.1.10"
   },
   "standard": {
     "globals": [],

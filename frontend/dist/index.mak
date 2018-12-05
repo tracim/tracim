@@ -78,7 +78,7 @@
     <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
     <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
 
-    <script type='text/javascript' src='/assets/tracim.vendor.bundle.js'></script>
+    <script type='text/javascript' src='/assets/tracim.vendor.entry.js'></script>
     <script type='text/javascript' src='/assets/tracim.app.entry.js'></script>
 
     <script type='text/javascript' src='/app/workspace.app.js'></script>

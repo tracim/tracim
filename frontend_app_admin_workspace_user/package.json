@@ -40,12 +40,13 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "url-loader": "^0.6.2",
-    "webpack": "^3.8.1",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "i18next-scanner": "^2.6.1",
-    "webpack-dev-server": "^2.9.2"
+    "webpack-dev-server": "^3.1.10"
   },
   "standard": {
     "globals": [

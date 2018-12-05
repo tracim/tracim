@@ -4,14 +4,14 @@
 
   getSelectedApp = name => {
     switch (name) {
-      case 'workspace':
-        return appWorkspace.default
       case 'html-document':
         return appHtmlDocument.default
       case 'thread':
         return appThread.default
       case 'file':
         return appFile.default
+      case 'workspace':
+        return appWorkspace.default
       case 'folder':
         return appFolderAdvanced.default
       case 'admin_workspace_user':

@@ -1,10 +1,10 @@
-const webpack = require('webpack')
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
 console.log('isProduction : ', isProduction)
 
 module.exports = {
+  mode: isProduction ? 'production' : 'development',
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
     : ['@babel/polyfill', './src/index.dev.js'],
@@ -21,7 +21,7 @@ module.exports = {
   //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
   //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
   //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
-  //   tracim_lib: {commonjs: 'tracim_lib', commonjs2: 'tracim_lib', amd: 'tracim_lib', root: '_'}
+  //   tracim_frontend_lib: {commonjs: 'tracim_frontend_lib', commonjs2: 'tracim_frontend_lib', amd: 'tracim_frontend_lib', root: '_'}
   // }
   // : {},
   devServer: {
@@ -40,6 +40,9 @@ module.exports = {
     // }
   },
   devtool: isProduction ? false : 'cheap-module-source-map',
+  performance: {
+    hints: false
+  },
   module: {
     rules: [{
       test: /\.jsx?$/,
@@ -81,14 +84,7 @@ module.exports = {
   plugins: [
     ...[], // generic plugins always present
     ...(isProduction
-      ? [ // production specific plugins
-        new webpack.DefinePlugin({
-          'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        })
-        // new webpack.optimize.UglifyJsPlugin({
-        //   compress: { warnings: false }
-        // })
-      ]
+      ? [] // production specific plugins
       : [ // development specific plugins
       ]
     )

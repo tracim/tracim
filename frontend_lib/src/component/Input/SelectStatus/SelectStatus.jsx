@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 
-require('./SelectStatus.styl')
+// require('./SelectStatus.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const SelectStatus = props => {
   return (

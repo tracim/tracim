@@ -1,9 +1,10 @@
-const webpack = require('webpack')
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
-const dashboardPlugin = require('webpack-dashboard/plugin')
+
+console.log('isPoduction: ', isProduction)
 
 module.exports = {
+  mode: isProduction ? 'production' : 'development',
   entry: {
     app: ['@babel/polyfill', 'whatwg-fetch', './src/index.js'],
     vendor: [
@@ -29,7 +30,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist/assets'),
-    filename: 'tracim.app.entry.js',
+    filename: 'tracim.[name].entry.js',
     pathinfo: !isProduction,
     publicPath: '/assets/'
   },
@@ -48,18 +49,22 @@ module.exports = {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'cheap-module-source-map',
+  devtool: isProduction ? false : 'cheap-eval-source-map ',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
     fs: "empty"
+  },
+  performance: {
+    hints: false
   },
   module: {
     rules: [{
       test: /\.jsx?$/,
       enforce: 'pre',
+      exclude: [/node_modules/],
       use: 'standard-loader',
-      exclude: [/node_modules/]
     }, {
       test: [/\.js$/, /\.jsx$/],
+      exclude: [/node_modules/],
       loader: 'babel-loader',
       options: {
         presets: [
@@ -71,8 +76,7 @@ module.exports = {
           '@babel/plugin-proposal-class-properties',
           '@babel/plugin-transform-object-assign'
         ]
-      },
-      exclude: [/node_modules/]
+      }
     }, {
       test: /\.css$/,
       use: ['style-loader', 'css-loader']
@@ -93,22 +97,9 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   plugins:[
-    ...[ // generic plugins always present
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        filename: 'tracim.vendor.bundle.js'
-      })
-      // new dashboardPlugin()
-    ],
+    ...[], // generic plugins always present
     ...(isProduction
-      ? [ // production specific plugins
-        new webpack.DefinePlugin({
-          'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
-        })
-      ]
+      ? [] // production specific plugins
       : [] // development specific plugins
     )
   ]
