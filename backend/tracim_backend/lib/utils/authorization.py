@@ -260,7 +260,7 @@ is_user = ProfileChecker(Group.TIM_USER)
 is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
 is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
 is_reader = RoleChecker(WorkspaceRoles.READER.level)
-is_contributor = RoleChecker(WorkspaceRoles.READER.level)
+is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
 has_personal_access = OrAuthorizationChecker(
     SameUserChecker(),

@@ -1,4 +1,5 @@
 # coding: utf8
+import functools
 import logging
 
 import os
@@ -12,13 +13,14 @@ from os.path import dirname, basename
 
 from sqlalchemy.orm import Session
 
-from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import ContentNotFound, TracimException
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.authorization import is_trusted_user, is_user, \
     can_see_workspace_information, is_contributor, can_modify_workspace, \
-    can_delete_workspace, is_reader, is_content_manager
+    can_delete_workspace, is_reader, is_content_manager, AuthorizationChecker, \
+    can_move_content
 from tracim_backend.lib.webdav.utils import transform_to_display, HistoryType, \
     FakeFileStream
 from tracim_backend.lib.webdav.utils import transform_to_bdd
@@ -43,8 +45,22 @@ from tracim_backend.models.revision_protection import new_revision
 logger = logging.getLogger()
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext, \
-    webdav_check_right
+    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
+
+def webdav_check_right(authorization_checker: AuthorizationChecker):
+    def decorator(func: typing.Callable) -> typing.Callable:
+        @functools.wraps(func)
+        def wrapper(self: '_DAVResource', *arg, **kwarg) -> typing.Callable:
+            tracim_context = self.tracim_context # type: WebdavTracimContext
+            try:
+                authorization_checker.check(
+                    tracim_context=self.tracim_context,
+                )
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN) from exc
+            return func(self, *arg, **kwarg)
+        return wrapper
+    return decorator
 
 
 class ManageActions(object):
@@ -225,23 +241,19 @@ class WorkspaceResource(DAVCollection):
     def __repr__(self) -> str:
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
-    @webdav_check_right(can_see_workspace_information)
+
     def getPreferredPath(self):
         return self.path
 
-    @webdav_check_right(can_see_workspace_information)
     def getCreationDate(self) -> float:
         return mktime(self.workspace.created.timetuple())
 
-    @webdav_check_right(can_see_workspace_information)
     def getDisplayName(self) -> str:
         return self.workspace.label
 
-    @webdav_check_right(can_see_workspace_information)
     def getLastModified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
 
-    @webdav_check_right(can_see_workspace_information)
     def getMemberNames(self) -> [str]:
         retlist = []
 
@@ -258,7 +270,6 @@ class WorkspaceResource(DAVCollection):
 
         return retlist
 
-    @webdav_check_right(can_see_workspace_information)
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
@@ -266,7 +277,7 @@ class WorkspaceResource(DAVCollection):
             self.environ
         )
 
-    # # TODO - G.M - 2018-12-06 - add right check
+    @webdav_check_right(is_contributor)
     def createEmptyResource(self, file_name: str):
         """
         [For now] we don't allow to create files right under workspaces.
@@ -340,7 +351,6 @@ class WorkspaceResource(DAVCollection):
         else:
             raise DAVError(HTTP_FORBIDDEN)
 
-    @webdav_check_right(can_see_workspace_information)
     def getMemberList(self) -> [_DAVResource]:
         members = []
 
@@ -419,7 +429,7 @@ class FolderResource(WorkspaceResource):
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
-    @webdav_check_right(is_contributor)
+    @webdav_check_right(is_content_manager)
     def delete(self):
         ManageActions(
             action_type=ActionDescription.DELETION,
@@ -431,13 +441,17 @@ class FolderResource(WorkspaceResource):
     def supportRecursiveMove(self, destpath: str):
         return True
 
-    @webdav_check_right(is_content_manager)
     def moveRecursive(self, destpath: str):
         """
         As we support recursive move, copymovesingle won't be called, though with copy it'll be called
         but i have to check if the client ever call that function...
         """
         destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        try:
+            can_move_content.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
         invalid_path = False
 
@@ -486,7 +500,6 @@ class FolderResource(WorkspaceResource):
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
-    @webdav_check_right(is_content_manager)
     def move_folder(self, destpath):
 
         workspace_api = WorkspaceApi(
@@ -494,8 +507,14 @@ class FolderResource(WorkspaceResource):
             session=self.session,
             config=self.provider.app_config,
         )
-
+        destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
+        try:
+            can_move_content.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
+
+
         destination_workspace = self.tracim_context.candidate_workspace
         try:
             destination_parent = self.tracim_context.candidate_parent_content
@@ -637,11 +656,16 @@ class FileResource(DAVNonCollection):
             session=self.session,
         )
 
-    @webdav_check_right(is_content_manager)
+
     def moveRecursive(self, destpath):
         """As we support recursive move, copymovesingle won't be called, though with copy it'll be called
             but i have to check if the client ever call that function..."""
         destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        try:
+            can_move_content.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
         invalid_path = False
 
@@ -690,7 +714,6 @@ class FileResource(DAVNonCollection):
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
-    @webdav_check_right(is_content_manager)
     def move_file(self, destpath: str) -> None:
         """
         Move file mean changing the path to access to a file. This can mean
@@ -707,7 +730,13 @@ class FileResource(DAVNonCollection):
 
         workspace = self.content.workspace
         parent = self.content.parent
+        destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
+        try:
+            can_move_content.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
+
 
         with new_revision(
             content=self.content,
@@ -751,7 +780,6 @@ class FileResource(DAVNonCollection):
 
         transaction.commit()
 
-    @webdav_check_right(is_content_manager)
     def copyMoveSingle(self, destpath, isMove):
         if isMove:
             # INFO - G.M - 12-03-2018 - This case should not happen
@@ -761,7 +789,14 @@ class FileResource(DAVNonCollection):
             # self.move_file(destpath)
             # return
             ####
-            raise NotImplemented
+            raise NotImplemented('Feature not available')
+
+        destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        try:
+            can_move_content.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
         new_filename = transform_to_bdd(basename(destpath))
         regex_file_extension = re.compile(
@@ -791,10 +826,10 @@ class FileResource(DAVNonCollection):
         self.content_api.copy_children(self.content, new_content)
         transaction.commit()
 
-    def supportRecursiveMove(self, destPath):
+    def supportRecursiveMove(self, destpath):
         return True
 
-    @webdav_check_right(is_contributor)
+    @webdav_check_right(is_content_manager)
     def delete(self):
         ManageActions(
             action_type=ActionDescription.DELETION,
