@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-import io
-import os
-
-import pytest
-from sqlalchemy.exc import InvalidRequestError
-from wsgidav.wsgidav_app import DEFAULT_CONFIG
 from tracim_backend import WebdavAppFactory
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.webdav import TracimDomainController
@@ -32,20 +26,9 @@ class TestWebdavFactory(StandardTest):
         :return:
         """
         tracim_settings = self.settings
-        wsgidav_setting = DEFAULT_CONFIG.copy()
-        wsgidav_setting.update(
-            {
-               'root_path':  '',
-               'acceptbasic': True,
-               'acceptdigest': False,
-               'defaultdigest': False,
-            }
-        )
         mock = MagicMock()
         mock._initConfig = WebdavAppFactory._initConfig
-        mock._readConfigFile.return_value = wsgidav_setting
-        mock._get_tracim_settings.return_value = tracim_settings
-        config = mock._initConfig(mock)
+        config = mock._initConfig(self, **tracim_settings)
         assert config
         assert config['acceptbasic'] is True
         assert config['acceptdigest'] is False
@@ -53,33 +36,11 @@ class TestWebdavFactory(StandardTest):
         # TODO - G.M - 25-05-2018 - Better check for middleware stack config
         assert 'middleware_stack' in config
         assert len(config['middleware_stack']) == 7
-        assert 'root_path' in config
         assert 'provider_mapping' in config
-        assert config['root_path'] in config['provider_mapping']
-        assert isinstance(config['provider_mapping'][config['root_path']], Provider)  # nopep8
+        assert '/' in config['provider_mapping']
+        assert isinstance(config['provider_mapping']['/'], Provider)  # nopep8
         assert 'domaincontroller' in config
         assert isinstance(config['domaincontroller'], TracimDomainController)
-
-    def test_unit__readConfigFile__ok__nominal_case(self):
-        tracim_settings = self.settings
-        default_config_file = os.path.abspath(tracim_settings['wsgidav.config_path'])  # nopep8
-        mock = MagicMock()
-        mock._readConfigFile = WebdavAppFactory._readConfigFile
-        webdav_config_file = mock._readConfigFile(
-            mock,
-            default_config_file,
-            verbose=1,
-        )
-        assert webdav_config_file['host'] == "0.0.0.0"
-        assert webdav_config_file['port'] == 3030
-        assert webdav_config_file['show_history'] is True
-        assert webdav_config_file['show_deleted'] is True
-        assert webdav_config_file['show_archived'] is True
-        assert webdav_config_file['manager_locks'] is True
-        assert webdav_config_file['root_path'] == ''
-        assert webdav_config_file['acceptbasic'] is True
-        assert webdav_config_file['acceptdigest'] is False
-        assert webdav_config_file['defaultdigest'] is False
 
 
 class TestWebDav(StandardTest):

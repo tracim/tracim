@@ -22,6 +22,20 @@ pyramid.default_locale_name = en
 pipeline = tracim_webdav
 [app:tracim_webdav]
 use = egg:tracim_backend#webdav
+host  = "0.0.0.0"
+port = 3030
+
+root_path = ''
+
+# Tracim doesn't support digest auth for webdav
+show_history = True
+show_deleted = True
+show_archived = True
+manager_locks = True
+acceptbasic = True
+acceptdigest = False
+defaultdigest = False
+
 
 [DEFAULT]
 sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
@@ -173,13 +187,6 @@ radicale.server.filesystem.folder = %(here)s/radicale/collections/
 # radicale.client.base_url.host = http://localhost:5232
 # radicale.client.base_url.prefix = /
 
-### WSGIDAV
-
-wsgidav.config_path = %(here)s/wsgidav.conf
-## url can be extended like localhost/webdav
-## in this case, you have to create your own proxy behind this url.
-## Do not set http:// prefix.
-# wsgidav.client.base_url = localhost:<WSGIDAV_PORT>
 
 ### Preview
 ## You can parametrized allowed jpg preview dimension list, if not set, default
@@ -204,11 +211,6 @@ frontend.serve = True
 # dir of backend.
 # you can set a specific file path here
 # color.config_file_path = /home/user/tracim/color.json
-
-
-###
-# wsgi server configuration
-###
 
 [server:main]
 use = egg:waitress#main

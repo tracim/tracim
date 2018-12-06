@@ -194,9 +194,3 @@ to have more/less log about something.
 You can change default color of apps by setting color.json file, by default,
 placed at root of tracim dir, see [color.json.sample](../../color.json.sample)
 for default config file.
-
-# Wsgidav File
-
-This file is by default placed in backend subdir,
-it by default called wsigdav.conf, for more information, see default
-conf file [wsigdav.conf.sample](../wsgidav.conf.sample).

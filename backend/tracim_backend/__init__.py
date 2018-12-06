@@ -174,6 +174,6 @@ def webdav(global_config, **local_settings):
     settings = global_config
     settings.update(local_settings)
     app_factory = WebdavAppFactory(
-        tracim_config_file_path=settings['__file__'],
+        **settings
     )
     return app_factory.get_wsgi_app()

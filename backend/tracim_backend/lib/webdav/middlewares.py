@@ -7,7 +7,6 @@ from xml.etree import ElementTree
 
 import transaction
 import yaml
-from pyramid.paster import get_appsettings
 from wsgidav import util, compat
 from wsgidav.middleware import BaseMiddleware
 
@@ -51,7 +50,6 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
     def __call__(self, environ, start_response):
         """"""
-        #        srvcfg = environ["wsgidav.config"]
         verbose = self._config.get("verbose", 2)
         self.last_request_time = '{0}_{1}'.format(
             datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
@@ -256,11 +254,7 @@ class TracimEnv(BaseMiddleware):
     def __init__(self, application, config):
         super().__init__(application, config)
         self._application = application
-        self._config = config
-        global_conf = get_appsettings(config['tracim_config']).global_conf
-        local_conf = get_appsettings(config['tracim_config'], 'tracim_web')
-        self.settings = global_conf
-        self.settings.update(local_conf)
+        self.settings = config['tracim_settings']
         self.engine = get_engine(self.settings)
         self.session_factory = get_session_factory(self.engine)
         self.app_config = CFG(self.settings)
