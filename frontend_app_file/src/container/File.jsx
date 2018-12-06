@@ -426,6 +426,18 @@ class File extends React.Component {
     if (!newFile || !newFile[0]) return
 
     const fileToSave = newFile[0]
+
+    if (
+      !fileToSave.type.includes('image') ||
+      fileToSave.size > 2000000
+    ) {
+      this.setState({
+        newFile: fileToSave,
+        newFilePreview: false
+      })
+      return
+    }
+
     this.setState({newFile: fileToSave})
 
     var reader = new FileReader()
