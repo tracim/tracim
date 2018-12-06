@@ -183,12 +183,14 @@ class TracimContext(object):
 
     # General context parameters
 
+    @property
     def dbsession(self) -> Session:
         """
         Current session available
         """
         raise NotImplemented()
 
+    @property
     def app_config(self) -> CFG:
         """
         Current config available

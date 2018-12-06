@@ -26,9 +26,142 @@ from tracim_backend.lib.core.content import ContentRevisionRO
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.utils import normpath
-from tracim_backend.models.data import Content
-from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import Content, Workspace
 
+
+class WebdavTracimContext(TracimContext):
+
+    def __init__(self, path: str, environ: typing.Dict[str, typing.Any], provider: 'Provider'):
+        super().__init__()
+        self.path = path
+        self.environ = environ
+        self.provider = provider
+
+    @property
+    def root_path(self) -> str:
+        return self.environ['http_authenticator.realm']
+
+    @property
+    def dbsession(self) -> Session:
+        return self.environ['tracim_dbsession']
+
+    @property
+    def app_config(self) -> CFG:
+       return self.environ['tracim_cfg']
+
+    @property
+    def current_user(self):
+        """
+        Current authenticated user if exist
+        """
+        return self._generate_if_none(
+            self._current_user,
+            self._get_user,
+            self._get_current_user_email
+        )
+
+    def _get_user(self, user_email: typing.Callable):
+        user_email = user_email()
+        uapi = UserApi(
+            None,
+            show_deleted=True,
+            session=self.dbsession,
+            config=self.app_config
+        )
+        return uapi.get_one_by_email(user_email)
+
+    def _get_current_user_email(self) -> str:
+        try:
+            if not self.environ['http_authenticator.username']:
+                raise UserNotFoundInTracimRequest(
+                    'You request a current user '
+                    'but the context not permit to found one'
+                )
+        except UserNotFoundInTracimRequest as exc:
+            raise NotAuthenticated('User not found') from exc
+        return self.environ['http_authenticator.username']
+
+
+    @property
+    def current_workspace(self):
+        """
+        Workspace of current ressources used if exist, for example,
+        if you are editing content 21 in workspace 3,
+        current_workspace will be 3.
+        """
+        return self._generate_if_none(
+            self._current_workspace,
+            self._get_workspace,
+            self._get_current_workspace_label
+        )
+
+    def _get_workspace(self, workspace_id_fetcher):
+        workspace_id = workspace_id_fetcher()
+        wapi = WorkspaceApi(
+            current_user=self.current_user,
+            session=self.dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        return wapi.get_one_by_label(workspace_id)
+
+    def _get_current_workspace_label(self) -> str:
+        return transform_to_bdd(self.path.split('/')[1])
+
+    @property
+    def current_content(self):
+        """
+        Current content if exist, if you are editing content 21, current content
+        will be content 21.
+        """
+        return self._generate_if_none(
+            self._current_content,
+            self._get_content,
+            self._get_content_path
+        )
+
+    def _get_content(self, content_path_fetcher):
+        path = content_path_fetcher()
+        content_path = self.provider.reduce_path(path)
+        parent_path = dirname(path)
+        workspace = self.current_workspace
+        relative_parents_path = parent_path[len(workspace.label)+1:]
+        parents = relative_parents_path.split('/')
+
+        try:
+            parents.remove('')
+        except ValueError:
+            pass
+        parents = [transform_to_bdd(x) for x in parents]
+
+        content_api = ContentApi(
+            config=self.app_config,
+            current_user=self.current_user,
+            session=self.dbsession
+        )
+        return content_api.get_one_by_filename_and_parent_labels(
+            content_label=transform_to_bdd(basename(path)),
+            content_parent_labels=parents,
+            workspace=workspace,
+        )
+
+    def _get_content_path(self):
+        return self.path
+
+
+def use_tracim_context():
+    def decorator(func: typing.Callable) -> typing.Callable:
+        @functools.wraps(func)
+        def wrapper(self: 'Provider',
+                    path:str,
+                    environ: typing.Dict[str, typing.Any]
+                    ) -> typing.Callable:
+            tracim_context = WebdavTracimContext(path, environ, self)
+            return func(self, path, environ, tracim_context)
+
+        return wrapper
+
+    return decorator
 
 class Provider(DAVProvider):
     """
@@ -65,16 +198,17 @@ class Provider(DAVProvider):
 
     #########################################################
     # Everything override from DAVProvider
-    def getResourceInst(self, path: str, environ: dict):
+    @use_tracim_context()
+    def getResourceInst(self, path: str, environ: dict, tracim_context: WebdavTracimContext):
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
-        user = environ['tracim_user']
-        session = environ['tracim_dbsession']
+        user = tracim_context.current_user
+        session = tracim_context.dbsession
         if not self.exists(path, environ):
             return None
         path = normpath(path)
-        root_path = environ['http_authenticator.realm']
+        root_path = tracim_context.root_path
 
         # If the requested path is the root, then we return a RootResource resource
         if path == root_path:
@@ -85,12 +219,10 @@ class Provider(DAVProvider):
                 session=session
             )
 
-        workspace_api = WorkspaceApi(
-            current_user=user,
-            session=session,
-            config=self.app_config,
-        )
-        workspace = self.get_workspace_from_path(path, workspace_api)
+        try:
+            workspace = tracim_context.current_workspace
+        except WorkspaceNotFound:
+            workspace = None
 
         # If the request path is in the form root/name, then we return a WorkspaceResource resource
         parent_path = dirname(path)
@@ -115,11 +247,10 @@ class Provider(DAVProvider):
             show_deleted=False,  # self._show_delete
         )
 
-        content = self.get_content_from_path(
-            path=path,
-            content_api=content_api,
-            workspace=workspace
-        )
+        try:
+            content = tracim_context.current_content
+        except ContentNotFound:
+            content = None
 
 
         # Easy cases : path either end with /.deleted, /.archived or /.history, then we return corresponding resources
@@ -232,7 +363,8 @@ class Provider(DAVProvider):
                 user=user,
             )
 
-    def exists(self, path, environ) -> bool:
+    @use_tracim_context()
+    def exists(self, path, environ, tracim_context: TracimContext) -> bool:
         """
         Called by wsgidav to check if a certain path is linked to a _DAVResource
         """
@@ -241,19 +373,15 @@ class Provider(DAVProvider):
         working_path = self.reduce_path(path)
         root_path = environ['http_authenticator.realm']
         parent_path = dirname(working_path)
-        user = environ['tracim_user']
-        session = environ['tracim_dbsession']
+        user = tracim_context.current_user
+        session = tracim_context.dbsession
         if path == root_path:
             return True
 
-        workspace = self.get_workspace_from_path(
-            path,
-            WorkspaceApi(
-                current_user=user,
-                session=session,
-                config=self.app_config,
-            )
-        )
+        try:
+            workspace = tracim_context.current_workspace
+        except WorkspaceNotFound:
+            workspace = None
 
         if parent_path == root_path or workspace is None:
             return workspace is not None
@@ -278,7 +406,10 @@ class Provider(DAVProvider):
             revision_id = revision_id.group(1)
             content = content_api.get_one_revision(revision_id)
         else:
-            content = self.get_content_from_path(working_path, content_api, workspace)
+            try:
+                content = tracim_context.current_content
+            except ContentNotFound:
+                content = None
 
         return content is not None \
             and content.is_deleted == is_deleted \

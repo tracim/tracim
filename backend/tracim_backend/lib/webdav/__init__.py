@@ -12,7 +12,6 @@ from tracim_backend.lib.webdav.dav_provider import Provider
 from tracim_backend.lib.webdav.middlewares import TracimEnforceHTTPS
 from tracim_backend.lib.webdav.middlewares import TracimEnv
 from tracim_backend.lib.webdav.middlewares import TracimWsgiDavDebugFilter
-from tracim_backend.lib.webdav.middlewares import TracimUserSession
 
 
 class WebdavAppFactory(object):
@@ -78,7 +77,6 @@ class WebdavAppFactory(object):
             ErrorPrinter,
             TracimWsgiDavDebugFilter,
             TracimEnv,
-            TracimUserSession
         ]
         return config
 

@@ -272,19 +272,3 @@ class TracimEnv(BaseMiddleware):
         app = self._application(environ, start_response)
         dbsession.close()
         return app
-
-
-class TracimUserSession(BaseMiddleware):
-
-    def __init__(self, application, config):
-        super().__init__(application, config)
-        self._application = application
-        self._config = config
-
-    def __call__(self, environ, start_response):
-        environ['tracim_user'] = UserApi(
-            None,
-            session=environ['tracim_dbsession'],
-            config=environ['tracim_cfg'],
-        ).get_one_by_email(environ['http_authenticator.username'])
-        return self._application(environ, start_response)
