@@ -25,21 +25,24 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.authorization import can_delete_workspace
+from tracim_backend.lib.utils.authorization import can_modify_workspace
+from tracim_backend.lib.utils.authorization import can_move_content
 from tracim_backend.lib.utils.authorization import \
-    require_candidate_workspace_role
-from tracim_backend.lib.utils.authorization import require_profile
-from tracim_backend.lib.utils.authorization import \
-    require_profile_and_workspace_role
-from tracim_backend.lib.utils.authorization import require_workspace_role
+    can_see_workspace_information
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_administrator
+from tracim_backend.lib.utils.authorization import is_content_manager
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
-from tracim_backend.models import Group
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views.controllers import Controller
@@ -100,11 +103,7 @@ SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = generate_documentation_
 class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.READER,
-        allow_superadmin=True
-    )
+    @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceSchema())
     def workspace(self, context, request: TracimRequest, hapic_data=None):
@@ -120,7 +119,7 @@ class WorkspaceController(Controller):
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
-    @require_profile(Group.TIM_ADMIN)
+    @check_right(is_administrator)
     @hapic.output_body(WorkspaceSchema(many=True), )
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -142,11 +141,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        allow_superadmin=True
-    )
+    @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
     @hapic.output_body(WorkspaceSchema())
@@ -172,7 +167,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
-    @require_profile(Group.TIM_MANAGER)
+    @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())
     @hapic.output_body(WorkspaceSchema())
     def create_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -194,11 +189,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_MANAGER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        allow_superadmin=True
-    )
+    @check_right(can_delete_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -217,11 +208,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_MANAGER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        allow_superadmin=True
-    )
+    @check_right(can_delete_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def undelete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -240,11 +227,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.READER,
-        allow_superadmin=True
-    )
+    @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
     def workspaces_members(
@@ -270,11 +253,7 @@ class WorkspaceController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.READER,
-        allow_superadmin=True
-    )
+    @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema())
     def workspaces_member_role(
@@ -301,11 +280,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        allow_superadmin=True
-    )
+    @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(WorkspaceMemberSchema())
@@ -338,11 +313,7 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        allow_superadmin=True
-    )
+    @check_right(can_modify_workspace)
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
@@ -376,11 +347,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
-    @require_profile_and_workspace_role(
-        minimal_profile=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        allow_superadmin=True
-    )
+    @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
     @hapic.output_body(WorkspaceMemberCreationSchema())
@@ -447,7 +414,7 @@ class WorkspaceController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @check_right(is_reader)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(FilterContentQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True))
@@ -487,7 +454,7 @@ class WorkspaceController(Controller):
         return contents
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @check_right(is_contributor)
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
@@ -533,7 +500,7 @@ class WorkspaceController(Controller):
         return content
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)  # nopep8
     def get_content_from_workspace(
@@ -596,8 +563,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
-    @require_candidate_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
+    @check_right(can_move_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
     @hapic.output_body(ContentDigestSchema())
@@ -650,7 +616,7 @@ class WorkspaceController(Controller):
         return api.get_content_in_context(updated_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])  # nopep8
-    @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
+    @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_content(
@@ -686,7 +652,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])  # nopep8
-    @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
+    @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def undelete_content(
@@ -720,7 +686,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])  # nopep8
-    @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
+    @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def archive_content(
@@ -755,7 +721,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])  # nopep8
-    @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
+    @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def unarchive_content(

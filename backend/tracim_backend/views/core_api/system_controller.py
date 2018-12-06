@@ -8,12 +8,10 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.system import SystemApi
-from tracim_backend.lib.utils.authorization import require_profile
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import get_timezones_list
-from tracim_backend.models import Group
-from tracim_backend.models.context_models import AboutModel
-from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
@@ -33,7 +31,7 @@ SWAGGER_TAG_SYSTEM_ENDPOINTS = 'System'
 class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @require_profile(Group.TIM_USER)
+    @check_right(is_user)
     @hapic.output_body(ApplicationSchema(many=True),)
     def applications(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -46,7 +44,7 @@ class SystemController(Controller):
         return app_api.get_all()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @require_profile(Group.TIM_USER)
+    @check_right(is_user)
     @hapic.output_body(ContentTypeSchema(many=True), )
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -57,7 +55,7 @@ class SystemController(Controller):
         return content_types
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @require_profile(Group.TIM_USER)
+    @check_right(is_user)
     @hapic.output_body(TimezoneSchema(many=True),)
     def timezones_list(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -66,7 +64,7 @@ class SystemController(Controller):
         return get_timezones_list()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @require_profile(Group.TIM_USER)
+    @check_right(is_user)
     @hapic.output_body(AboutSchema(),)
     def about(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -78,7 +76,7 @@ class SystemController(Controller):
         return system_api.get_about()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @require_profile(Group.TIM_USER)
+    @check_right(is_user)
     @hapic.output_body(ConfigSchema(),)
     def config(self, context, request: TracimRequest, hapic_data=None):
         """

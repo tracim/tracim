@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-require('./CardPopup.styl')
+// require('./CardPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const CardPopup = props => {
   return (

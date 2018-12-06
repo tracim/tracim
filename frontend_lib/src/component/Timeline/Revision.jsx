@@ -4,7 +4,7 @@ import Radium from 'radium'
 import color from 'color'
 import { revisionTypeList } from '../../helper.js'
 
-require('./Revision.styl')
+// require('./Revision.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const Revision = props => {
   const revisionType = revisionTypeList(props.lang).find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
