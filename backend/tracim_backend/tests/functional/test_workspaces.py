@@ -603,7 +603,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -927,7 +927,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
