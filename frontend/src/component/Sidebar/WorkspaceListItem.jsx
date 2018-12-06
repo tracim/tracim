@@ -35,7 +35,7 @@ const WorkspaceListItem = props => {
   return (
     <li className='sidebar__content__navigation__workspace__item'>
       <div
-        className='sidebar__content__navigation__workspace__item__wrapper primaryColorBg primaryColorBgDarkenHover primaryColorBorder'
+        className='sidebar__content__navigation__workspace__item__wrapper'
         onClick={props.onClickTitle}
       >
         <div className='sidebar__content__navigation__workspace__item__number'>
@@ -57,7 +57,7 @@ const WorkspaceListItem = props => {
             <li key={aa.slug}>
               <Link to={buildLink(aa.route, props.location.search, props.idWs, props.activeIdWorkspace)}>
                 <div className={classnames(
-                  'sidebar__content__navigation__workspace__item__submenu__dropdown primaryColorBgLighten primaryColorBgHover primaryColorBorderDarken',
+                  'sidebar__content__navigation__workspace__item__submenu__dropdown',
                   {'activeFilter': shouldDisplayAsActive(props.location, props.idWs, props.activeIdWorkspace, aa)}
                 )}>
                   <div className='dropdown__icon'>
