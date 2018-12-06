@@ -115,7 +115,6 @@ class Timeline extends React.Component {
                   return <Revision
                     customClass={props.customClass}
                     customColor={props.customColor}
-                    lang={props.loggedUser.lang}
                     revisionType={content.revision_type}
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}

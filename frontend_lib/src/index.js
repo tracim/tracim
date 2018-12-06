@@ -1,3 +1,4 @@
+import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
@@ -34,6 +35,15 @@ import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteConte
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
+
+const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  switch (type) {
+    case 'allApp_changeLang': i18n.changeLanguage(data); break
+    default: break
+  }
+}
+
+document.addEventListener('appCustomEvent', customEventReducer)
 
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
