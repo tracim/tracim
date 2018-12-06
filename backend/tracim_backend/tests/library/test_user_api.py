@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import pytest
 import transaction
-from tracim_backend import models
+from marshmallow import ValidationError
 
+from tracim_backend import models
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import TooShortAutocompleteString
-from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -37,12 +40,246 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         u = api.create_minimal_user('bob@bob')
-        api.update(u, 'bob', 'bob@bob', 'pass', do_save=True)
+        api.update(u, 'bob', 'bob@bob', 'password', do_save=True)
         nu = api.get_one_by_email('bob@bob')
         assert nu is not None
         assert nu.email == 'bob@bob'
         assert nu.display_name == 'bob'
-        assert nu.validate_password('pass')
+        assert nu.validate_password('password')
+
+    def test_unit__create_minimal_user__err__too_short_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        with pytest.raises(TracimValidationFailed):
+            u = api.create_minimal_user('b@')
+
+    def test_unit__create_minimal_user__err__too_long_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        with pytest.raises(TracimValidationFailed):
+            email = 'b{}b@bob'.format('o'*255)
+            u = api.create_minimal_user(email)
+
+    # email
+    def test_unit__update_user_email__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.email == 'bob@bob'
+        u = api.update(user=u, email='bib@bib')
+        assert u.email == 'bib@bib'
+
+    def test_unit__update_user_email__err__wrong_format(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+
+        # 2 char
+        with pytest.raises(EmailValidationFailed):
+            u = api.update(user=u, email='b+b')
+
+    def test_unit__update_user_email__err__too_short_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+
+        # 2 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, email='b@')
+
+        # 3 char
+        u = api.update(user=u, email='b@b')
+        assert u.email == 'b@b'
+
+    def test_unit__update_user_email__err__too_long_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 256 char
+        chars = 'o' * (256 - 6)
+        with pytest.raises(TracimValidationFailed):
+            email = 'b{}b@bob'.format(chars)
+            u = api.update(user=u, email=email)
+
+        # 255 char
+        chars = 'o' * (255 - 6)
+        email = 'b{}b@bob'.format(chars)
+        u = api.update(user=u, email=email)
+        assert u.email==email
+
+    # password
+    def test_unit__update_user_password__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.password is None
+        # 8 char
+        u = api.update(user=u, password='password')
+        assert u.password
+        assert u.validate_password('password')
+        # 16 char
+        u = api.update(user=u, password='password'*2)
+        assert u.password
+        assert u.validate_password('password'*2)
+
+    def test_unit__update_user_password__err__too_short_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 5 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, password='passw')
+        # 6 char
+        u = api.update(user=u, password='passwo')
+
+    def test_unit__update_user_password__err__too_long_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            password = 'p' * 513
+            u = api.update(user=u, password=password)
+        password = 'p' * 512
+        u = api.update(user=u, password=password)
+
+    # public_name
+    def test_unit__update_user_public_name__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.display_name == 'bob'
+        # 8 char
+        u = api.update(user=u, name='John Doe')
+        assert u.display_name == 'John Doe'
+        # 16 char
+        u = api.update(user=u, name='John Doe'*2)
+        assert u.display_name == 'John Doe'*2
+
+    def test_unit__update_user_public_name__err__too_short_public_name(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 2 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, name='nn')
+        # 3 char
+        u = api.update(user=u, name='nnn')
+        assert u.display_name == 'nnn'
+
+    def test_unit__update_user_public_name__err__too_long_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            name = 'n' * 256
+            u = api.update(user=u, name=name)
+        name = 'n' * 255
+        u = api.update(user=u, name=name)
+
+    # lang
+    def test_unit__update_user_lang_name__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.lang is None
+        # 2 char
+        u = api.update(user=u, lang='fr')
+        assert u.lang == 'fr'
+        # 3 char
+        u = api.update(user=u, lang='fre')
+        assert u.lang == 'fre'
+
+    def test_unit__update_user_lang__err__too_short_lang(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 1 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, lang='f')
+        # 2 char
+        u = api.update(user=u, lang='fr')
+        assert u.lang == 'fr'
+
+    def test_unit__update_user_lang__err__too_long_lang(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            lang = 'n' * 4
+            u = api.update(user=u, lang=lang)
+        lang = 'n' * 3
+        u = api.update(user=u, lang=lang)
+
+    # timezone
+    def test_unit__update_timezone__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.timezone is None
+        u = api.update(user=u, timezone='Europe/Paris')
+        assert u.timezone == 'Europe/Paris'
+
+
+    def test_unit__update_timezone__too_long_timezone(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            timezone = 't' * 33
+            u = api.update(user=u, timezone=timezone)
+        timezone = 't' * 32
+        u = api.update(user=u, timezone=timezone)
 
     def test__unit__create__user__ok_nominal_case(self):
         api = UserApi(
@@ -52,7 +289,7 @@ class TestUserApi(DefaultTest):
         )
         u = api.create_user(
             email='bob@bob',
-            password='pass',
+            password='password',
             name='bob',
             timezone='+2',
             lang='en',
@@ -61,7 +298,7 @@ class TestUserApi(DefaultTest):
         )
         assert u is not None
         assert u.email == "bob@bob"
-        assert u.validate_password('pass')
+        assert u.validate_password('password')
         assert u.display_name == 'bob'
         assert u.timezone == '+2'
         assert u.lang == 'en'
@@ -73,7 +310,7 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         u = api.create_minimal_user('bibi@bibi')
-        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
+        api.update(u, 'bibi', 'bibi@bibi', 'password', do_save=True)
         transaction.commit()
 
         eq_(True, api.user_with_email_exists('bibi@bibi'))
@@ -87,7 +324,7 @@ class TestUserApi(DefaultTest):
         )
         u = api.create_minimal_user('bibi@bibi')
         self.session.flush()
-        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
+        api.update(u, 'bibi', 'bibi@bibi', 'password', do_save=True)
         uid = u.user_id
         transaction.commit()
 
@@ -542,7 +779,7 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         u = api.create_minimal_user('titi@titi')
-        api.update(u, 'titi', 'titi@titi', 'pass', do_save=True)
+        api.update(u, 'titi', 'titi@titi', 'password', do_save=True)
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)
 
@@ -614,7 +851,7 @@ class TestUserApi(DefaultTest):
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -657,7 +894,7 @@ class TestUserApi(DefaultTest):
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -666,7 +903,7 @@ class TestUserApi(DefaultTest):
         )
         user2 = api.create_user(
             email='test2@test.test',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -696,7 +933,7 @@ class TestUserApi(DefaultTest):
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -708,4 +945,3 @@ class TestUserApi(DefaultTest):
         from tracim_backend.exceptions import UserCantDisableHimself
         with pytest.raises(UserCantDisableHimself):
             api2.disable(user)
-

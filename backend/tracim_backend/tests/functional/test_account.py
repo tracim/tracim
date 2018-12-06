@@ -75,7 +75,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -121,7 +121,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get('/api/v2/users/me/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
@@ -395,7 +395,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -441,7 +441,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         selected_contents_id = [
@@ -520,7 +520,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -556,7 +556,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # before
@@ -625,7 +625,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -661,7 +661,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # before
@@ -727,7 +727,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -765,7 +765,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
@@ -829,7 +829,7 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -850,7 +850,7 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
@@ -905,7 +905,7 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -926,7 +926,7 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         self.testapp.put_json('/api/v2/users/me/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
@@ -1018,7 +1018,7 @@ class TestAccountEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1034,7 +1034,7 @@ class TestAccountEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get(
@@ -1077,7 +1077,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1087,7 +1087,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1143,7 +1143,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1153,7 +1153,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1207,7 +1207,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1217,7 +1217,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1299,7 +1299,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1309,7 +1309,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1319,7 +1319,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user3 = uapi.create_user(
             email='test3@test3.test3',
-            password='pass',
+            password='password',
             name='bob3',
             groups=groups,
             timezone='Europe/Paris',
@@ -1403,7 +1403,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1413,7 +1413,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1466,7 +1466,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1476,7 +1476,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1532,7 +1532,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1542,7 +1542,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1591,7 +1591,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1601,7 +1601,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -1611,7 +1611,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         test_user3 = uapi.create_user(
             email='test3@test3.test3',
-            password='pass',
+            password='password',
             name='bob3',
             groups=groups,
             timezone='Europe/Paris',
@@ -1650,7 +1650,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         params = {
@@ -1697,7 +1697,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1713,7 +1713,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         # check before
@@ -1727,7 +1727,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         # Set password
         params = {
             'email': 'admin@admin.admin',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         res = self.testapp.put_json(
             '/api/v2/users/me/email',
@@ -1763,7 +1763,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1779,7 +1779,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # check before
@@ -1829,7 +1829,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1845,7 +1845,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # check before
@@ -1859,7 +1859,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         self.testapp.put_json(
             '/api/v2/users/me/email',
@@ -1870,7 +1870,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'mysuperemail@email.fr',
-                'pass'
+                'password'
             )
         )
         # Check After
@@ -1907,7 +1907,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1928,7 +1928,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         # Set password
         params = {
@@ -1952,7 +1952,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # Check After
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
 
     def test_api__set_account_password__err_400__admin_passwords_do_not_match(self):  # nopep8
@@ -1973,7 +1973,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1994,7 +1994,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         assert not user.validate_password('mynewpassword2')
         # Set password
@@ -2019,7 +2019,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             config=self.app_config,
         )
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         assert not user.validate_password('mynewpassword2')
 
@@ -2041,7 +2041,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2057,18 +2057,18 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         # Set password
         params = {
             'new_password': 'mynewpassword',
             'new_password2': 'mynewpassword',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         self.testapp.put_json(
             '/api/v2/users/me/password',
@@ -2083,7 +2083,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             config=self.app_config,
         )
         user = uapi.get_one(user_id)
-        assert not user.validate_password('pass')
+        assert not user.validate_password('password')
         assert user.validate_password('mynewpassword')
 
 
@@ -2113,7 +2113,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2129,7 +2129,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         # check before
