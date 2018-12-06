@@ -124,3 +124,5 @@ export const revisionTypeList = [{
   faIcon: 'files-o',
   label: i18n.t('Item copied')
 }]
+
+export const generateLocalStorageContentId = (idWorkspace, idContent, typeContent, dataType) => `${idWorkspace}/${idContent}/${typeContent}_${dataType}`

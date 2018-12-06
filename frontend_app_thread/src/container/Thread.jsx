@@ -13,7 +13,8 @@ import {
   SelectStatus,
   ArchiveDeleteContent,
   displayDistanceDate,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  generateLocalStorageContentId
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -100,6 +101,13 @@ class Thread extends React.Component {
 
   componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
+
+    const { appName, content } = this.state
+    const previouslyUnsavedComment = localStorage.getItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+    )
+    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
+
     this.loadContent()
   }
 
@@ -208,6 +216,12 @@ class Thread extends React.Component {
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({newComment})
+
+    const { appName, content } = this.state
+    localStorage.setItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
+      newComment
+    )
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -224,6 +238,9 @@ class Thread extends React.Component {
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
         this.setState({newComment: ''})
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
+        )
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         break

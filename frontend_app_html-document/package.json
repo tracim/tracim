@@ -55,6 +55,7 @@
       "btoa",
       "wysiwyg",
       "tinymce",
+      "localStorage",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"

@@ -6,6 +6,7 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
+  generateLocalStorageContentId
 } from './helper.js'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -55,6 +56,7 @@ export {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
+  generateLocalStorageContentId,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,

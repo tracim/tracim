@@ -14,7 +14,8 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  generateLocalStorageContentId
 } from 'tracim_frontend_lib'
 import { MODE, debug } from '../helper.js'
 import {
@@ -121,6 +122,12 @@ class HtmlDocument extends React.Component {
 
   componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
+
+    const { appName, content } = this.state
+    const previouslyUnsavedComment = localStorage.getItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+    )
+    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
     this.loadContent()
   }
@@ -251,13 +258,26 @@ class HtmlDocument extends React.Component {
       })
   }
 
-  handleClickNewVersion = () => this.setState(prev => ({
-    rawContentBeforeEdit: prev.content.raw_content,
-    mode: MODE.EDIT
-  }))
+  handleClickNewVersion = () => {
+    const { appName, content } = this.state
+
+    const previouslyUnsavedRawContent = localStorage.getItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
+    )
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        raw_content: previouslyUnsavedRawContent || prev.content.raw_content
+      },
+      rawContentBeforeEdit: prev.content.raw_content, // for cancel btn
+      mode: MODE.EDIT
+    }))
+  }
 
   handleCloseNewVersion = () => {
     tinymce.remove('#wysiwygNewVersion')
+
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -265,10 +285,15 @@ class HtmlDocument extends React.Component {
       },
       mode: MODE.VIEW
     }))
+
+    const { appName, content } = this.state
+    localStorage.removeItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
+    )
   }
 
   handleSaveHtmlDocument = async () => {
-    const { content, config } = this.state
+    const { appName, content, config } = this.state
 
     const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
 
@@ -277,6 +302,9 @@ class HtmlDocument extends React.Component {
         if (resSave.apiResponse.status === 200) {
           this.handleCloseNewVersion()
           this.loadContent()
+          localStorage.removeItem(
+            generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
+          )
         } else {
           console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
         }
@@ -286,11 +314,23 @@ class HtmlDocument extends React.Component {
   handleChangeText = e => {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({content: {...prev.content, raw_content: newText}}))
+
+    const { appName, content } = this.state
+    localStorage.setItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent'),
+      e.target.value
+    )
   }
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({newComment})
+
+    const { appName, content } = this.state
+    localStorage.setItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
+      newComment
+    )
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -306,6 +346,9 @@ class HtmlDocument extends React.Component {
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
         this.setState({newComment: ''})
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
+        )
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         break
