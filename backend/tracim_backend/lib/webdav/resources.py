@@ -305,7 +305,7 @@ class WorkspaceResource(DAVCollection):
             path=self.path + '/' + file_name
         )
 
-    @webdav_check_right(is_trusted_user)
+    @webdav_check_right(is_content_manager)
     def createCollection(self, label: str) -> 'FolderResource':
         """
         Create a new folder for the current workspace. As it's not possible for the user to choose
