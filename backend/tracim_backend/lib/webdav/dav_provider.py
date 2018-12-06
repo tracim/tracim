@@ -146,7 +146,7 @@ class WebdavTracimContext(TracimContext):
         )
 
     def _get_content_path(self):
-        return self.path
+        return normpath(self.path)
 
 
 def use_tracim_context():
@@ -364,7 +364,7 @@ class Provider(DAVProvider):
             )
 
     @use_tracim_context()
-    def exists(self, path, environ, tracim_context: TracimContext) -> bool:
+    def exists(self, path, environ, tracim_context: WebdavTracimContext) -> bool:
         """
         Called by wsgidav to check if a certain path is linked to a _DAVResource
         """
