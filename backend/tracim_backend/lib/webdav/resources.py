@@ -16,6 +16,9 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.authorization import is_trusted_user, is_user, \
+    can_see_workspace_information, is_contributor, can_modify_workspace, \
+    can_delete_workspace, is_reader, is_content_manager
 from tracim_backend.lib.webdav.utils import transform_to_display, HistoryType, \
     FakeFileStream
 from tracim_backend.lib.webdav.utils import transform_to_bdd
@@ -40,7 +43,9 @@ from tracim_backend.models.revision_protection import new_revision
 logger = logging.getLogger()
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
+    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext, \
+    webdav_check_right
+
 
 class ManageActions(object):
     """
@@ -101,6 +106,7 @@ class RootResource(DAVCollection):
     def __repr__(self) -> str:
         return '<DAVCollection: RootResource>'
 
+    @webdav_check_right(is_user)
     def getMemberNames(self) -> [str]:
         """
         This method returns the names (here workspace's labels) of all its children
@@ -109,6 +115,7 @@ class RootResource(DAVCollection):
         """
         return [workspace.label for workspace in self.workspace_api.get_all()]
 
+    @webdav_check_right(is_user)
     def getMember(self, label: str) -> DAVCollection:
         """
         This method returns the child Workspace that corresponds to a given name
@@ -128,6 +135,7 @@ class RootResource(DAVCollection):
         except AttributeError:
             return None
 
+    @webdav_check_right(is_trusted_user)
     def createEmptyResource(self, name: str):
         """
         This method is called whenever the user wants to create a DAVNonCollection resource (files in our case).
@@ -137,6 +145,7 @@ class RootResource(DAVCollection):
         """
         raise DAVError(HTTP_FORBIDDEN)
 
+    @webdav_check_right(is_trusted_user)
     def createCollection(self, name: str):
         """
         This method is called whenever the user wants to create a DAVCollection resource as a child (in our case,
@@ -163,6 +172,7 @@ class RootResource(DAVCollection):
             tracim_context=self.tracim_context
         )
 
+    @webdav_check_right(is_user)
     def getMemberList(self):
         """
         This method is called by wsgidav when requesting with a depth > 0, it will return a list of _DAVResource
@@ -215,18 +225,23 @@ class WorkspaceResource(DAVCollection):
     def __repr__(self) -> str:
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
+    @webdav_check_right(can_see_workspace_information)
     def getPreferredPath(self):
         return self.path
 
+    @webdav_check_right(can_see_workspace_information)
     def getCreationDate(self) -> float:
         return mktime(self.workspace.created.timetuple())
 
+    @webdav_check_right(can_see_workspace_information)
     def getDisplayName(self) -> str:
         return self.workspace.label
 
+    @webdav_check_right(can_see_workspace_information)
     def getLastModified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
 
+    @webdav_check_right(can_see_workspace_information)
     def getMemberNames(self) -> [str]:
         retlist = []
 
@@ -243,6 +258,7 @@ class WorkspaceResource(DAVCollection):
 
         return retlist
 
+    @webdav_check_right(can_see_workspace_information)
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
@@ -250,6 +266,7 @@ class WorkspaceResource(DAVCollection):
             self.environ
         )
 
+    # # TODO - G.M - 2018-12-06 - add right check
     def createEmptyResource(self, file_name: str):
         """
         [For now] we don't allow to create files right under workspaces.
@@ -277,6 +294,7 @@ class WorkspaceResource(DAVCollection):
             path=self.path + '/' + file_name
         )
 
+    @webdav_check_right(is_trusted_user)
     def createCollection(self, label: str) -> 'FolderResource':
         """
         Create a new folder for the current workspace. As it's not possible for the user to choose
@@ -306,6 +324,7 @@ class WorkspaceResource(DAVCollection):
                               workspace=self.workspace,
                               )
 
+    @webdav_check_right(can_delete_workspace)
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
         raise DAVError(HTTP_FORBIDDEN)
@@ -313,6 +332,7 @@ class WorkspaceResource(DAVCollection):
     def supportRecursiveMove(self, destpath):
         return True
 
+    @webdav_check_right(can_modify_workspace)
     def moveRecursive(self, destpath):
         if dirname(normpath(destpath)) == self.environ['http_authenticator.realm']:
             self.workspace.label = basename(normpath(destpath))
@@ -320,6 +340,7 @@ class WorkspaceResource(DAVCollection):
         else:
             raise DAVError(HTTP_FORBIDDEN)
 
+    @webdav_check_right(can_see_workspace_information)
     def getMemberList(self) -> [_DAVResource]:
         members = []
 
@@ -386,15 +407,19 @@ class FolderResource(WorkspaceResource):
     def __repr__(self) -> str:
         return "<DAVCollection: Folder (%s)>" % self.content.label
 
+    @webdav_check_right(is_reader)
     def getCreationDate(self) -> float:
         return mktime(self.content.created.timetuple())
 
+    @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
         return transform_to_display(self.content.file_name)
 
+    @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
+    @webdav_check_right(is_contributor)
     def delete(self):
         ManageActions(
             action_type=ActionDescription.DELETION,
@@ -406,6 +431,7 @@ class FolderResource(WorkspaceResource):
     def supportRecursiveMove(self, destpath: str):
         return True
 
+    @webdav_check_right(is_content_manager)
     def moveRecursive(self, destpath: str):
         """
         As we support recursive move, copymovesingle won't be called, though with copy it'll be called
@@ -460,6 +486,7 @@ class FolderResource(WorkspaceResource):
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
+    @webdav_check_right(is_content_manager)
     def move_folder(self, destpath):
 
         workspace_api = WorkspaceApi(
@@ -491,6 +518,7 @@ class FolderResource(WorkspaceResource):
 
         transaction.commit()
 
+    @webdav_check_right(is_reader)
     def getMemberList(self) -> [_DAVResource]:
         members = []
         content_api = ContentApi(
@@ -571,21 +599,27 @@ class FileResource(DAVNonCollection):
     def __repr__(self) -> str:
         return "<DAVNonCollection: FileResource (%d)>" % self.content.revision_id
 
+    @webdav_check_right(is_reader)
     def getContentLength(self) -> int:
         return self.content.depot_file.file.content_length
 
+    @webdav_check_right(is_reader)
     def getContentType(self) -> str:
         return self.content.file_mimetype
 
+    @webdav_check_right(is_reader)
     def getCreationDate(self) -> float:
         return mktime(self.content.created.timetuple())
 
+    @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
         return self.content.file_name
 
+    @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
+    @webdav_check_right(is_reader)
     def getContent(self) -> typing.BinaryIO:
         filestream = compat.BytesIO()
         filestream.write(self.content.depot_file.file.read())
@@ -603,6 +637,7 @@ class FileResource(DAVNonCollection):
             session=self.session,
         )
 
+    @webdav_check_right(is_content_manager)
     def moveRecursive(self, destpath):
         """As we support recursive move, copymovesingle won't be called, though with copy it'll be called
             but i have to check if the client ever call that function..."""
@@ -655,6 +690,7 @@ class FileResource(DAVNonCollection):
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
+    @webdav_check_right(is_content_manager)
     def move_file(self, destpath: str) -> None:
         """
         Move file mean changing the path to access to a file. This can mean
@@ -715,6 +751,7 @@ class FileResource(DAVNonCollection):
 
         transaction.commit()
 
+    @webdav_check_right(is_content_manager)
     def copyMoveSingle(self, destpath, isMove):
         if isMove:
             # INFO - G.M - 12-03-2018 - This case should not happen
@@ -757,6 +794,7 @@ class FileResource(DAVNonCollection):
     def supportRecursiveMove(self, destPath):
         return True
 
+    @webdav_check_right(is_contributor)
     def delete(self):
         ManageActions(
             action_type=ActionDescription.DELETION,
@@ -782,21 +820,26 @@ class OtherFileResource(FileResource):
         if not self.path.endswith('.html'):
             self.path += '.html'
 
+    @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
         return self.content.file_name
 
+    @webdav_check_right(is_reader)
     def getPreferredPath(self):
         return self.path
 
     def __repr__(self) -> str:
         return "<DAVNonCollection: OtherFileResource (%s)" % self.content.file_name
 
+    @webdav_check_right(is_reader)
     def getContentLength(self) -> int:
         return len(self.content_designed)
 
+    @webdav_check_right(is_reader)
     def getContentType(self) -> str:
         return 'text/html'
 
+    @webdav_check_right(is_reader)
     def getContent(self):
         filestream = compat.BytesIO()
 

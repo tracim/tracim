@@ -6,11 +6,14 @@ from os.path import basename, dirname
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound, \
-    UserNotFoundInTracimRequest, NotAuthenticated, WorkspaceNotFound
+    UserNotFoundInTracimRequest, NotAuthenticated, WorkspaceNotFound, \
+    TracimException
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
     SpecialFolderExtension
@@ -184,9 +187,26 @@ def use_tracim_context():
                     ) -> typing.Callable:
             tracim_context = WebdavTracimContext(path, environ, self)
             return func(self, path, environ, tracim_context)
-
         return wrapper
+    return decorator
 
+
+
+def webdav_check_right(authorization_checker: AuthorizationChecker):
+    def decorator(func: typing.Callable) -> typing.Callable:
+        @functools.wraps(func)
+        def wrapper(self: '_DAVResource', *arg, **kwarg) -> typing.Callable:
+            tracim_context = self.tracim_context # type: WebdavTracimContext
+            if 'destpath' in kwarg:
+                self.tracim_context.set_destpath(kwarg['destpath'])
+            try:
+                authorization_checker.check(
+                    tracim_context=self.tracim_context,
+                )
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN) from exc
+            return func(self, *arg, **kwarg)
+        return wrapper
     return decorator
 
 class Provider(DAVProvider):
