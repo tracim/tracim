@@ -36,6 +36,7 @@ class WebdavTracimContext(TracimContext):
         self.path = path
         self.environ = environ
         self.provider = provider
+        self._candidate_parent_content = None
 
     @property
     def root_path(self) -> str:
@@ -148,6 +149,31 @@ class WebdavTracimContext(TracimContext):
     def _get_content_path(self):
         return normpath(self.path)
 
+    def _get_candidate_parent_content_path(self):
+        return normpath(dirname(self._destpath))
+
+    def set_destpath(self, destpath: str):
+        self._destpath = destpath
+
+    def _get_candidate_workspace_path(self):
+        return transform_to_bdd(self._destpath.split('/')[1])
+
+    @property
+    def candidate_parent_content(self) -> Content:
+        return self._generate_if_none(
+            self._candidate_parent_content,
+            self._get_content,
+            self._get_candidate_parent_content_path
+        )
+
+    @property
+    def candidate_workspace(self) -> Workspace:
+        return self._generate_if_none(
+            self._candidate_workspace,
+            self._get_workspace,
+            self._get_candidate_workspace_path
+        )
+
 
 def use_tracim_context():
     def decorator(func: typing.Callable) -> typing.Callable:
@@ -215,8 +241,7 @@ class Provider(DAVProvider):
             return resources.RootResource(
                 path=path,
                 environ=environ,
-                user=user,
-                session=session
+                tracim_context=tracim_context
             )
 
         try:
@@ -233,8 +258,7 @@ class Provider(DAVProvider):
                 path=path,
                 environ=environ,
                 workspace=workspace,
-                user=user,
-                session=session,
+                tracim_context=tracim_context
             )
 
         # And now we'll work on the path to establish which type or resource is requested
@@ -259,9 +283,8 @@ class Provider(DAVProvider):
                 path=path,
                 environ=environ,
                 workspace=workspace,
-                user=user,
                 content=content,
-                session=session,
+                tracim_context=tracim_context
             )
 
         if path.endswith(SpecialFolderExtension.Deleted) and self._show_delete:
@@ -269,9 +292,8 @@ class Provider(DAVProvider):
                 path=path,
                 environ=environ,
                 workspace=workspace,
-                user=user,
                 content=content,
-                session=session,
+                tracim_context=tracim_context
             )
 
         if path.endswith(SpecialFolderExtension.History) and self._show_history:
@@ -286,10 +308,9 @@ class Provider(DAVProvider):
                 path=path,
                 environ=environ,
                 workspace=workspace,
-                user=user,
                 content=content,
-                session=session,
-                type=type
+                type=type,
+                tracim_context=tracim_context,
             )
 
         # Now that's more complicated, we're trying to find out if the path end with /.history/file_name
@@ -299,9 +320,8 @@ class Provider(DAVProvider):
             return resources.HistoryFileFolderResource(
                 path=path,
                 environ=environ,
-                user=user,
                 content=content,
-                session=session,
+                tracim_context=tracim_context,
             )
         # And here next step :
         is_history_file = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', path) is not None
@@ -317,19 +337,17 @@ class Provider(DAVProvider):
                 return resources.HistoryFileResource(
                     path=path,
                     environ=environ,
-                    user=user,
                     content=content,
                     content_revision=content_revision,
-                    session=session,
+                    tracim_context=tracim_context,
                 )
             else:
                 return resources.HistoryOtherFile(
                     path=path,
                     environ=environ,
-                    user=user,
                     content=content,
                     content_revision=content_revision,
-                    session=session,
+                    tracim_context=tracim_context,
                 )
 
         # And if we're still going, the client is asking for a standard Folder/File/Page/Thread so we check the type7
@@ -343,24 +361,21 @@ class Provider(DAVProvider):
                 environ=environ,
                 workspace=content.workspace,
                 content=content,
-                session=session,
-                user=user,
+                tracim_context=tracim_context,
             )
         elif content.type == content_type_list.File.slug:
             return resources.FileResource(
                 path=path,
                 environ=environ,
                 content=content,
-                session=session,
-                user=user
+                tracim_context=tracim_context,
             )
         else:
             return resources.OtherFileResource(
                 path=path,
                 environ=environ,
                 content=content,
-                session=session,
-                user=user,
+                tracim_context=tracim_context,
             )
 
     @use_tracim_context()
@@ -468,42 +483,8 @@ class Provider(DAVProvider):
 
         return path
 
-    def get_content_from_path(self, path, content_api: ContentApi, workspace: Workspace) -> Content:
-        """
-        Called whenever we want to get the Content item from the database for a given path
-        """
-        path = self.reduce_path(path)
-        parent_path = dirname(path)
-
-        relative_parents_path = parent_path[len(workspace.label)+1:]
-        parents = relative_parents_path.split('/')
-
-        try:
-            parents.remove('')
-        except ValueError:
-            pass
-        parents = [transform_to_bdd(x) for x in parents]
-
-        try:
-            return content_api.get_one_by_label_and_parent_labels(
-                content_label=transform_to_bdd(basename(path)),
-                content_parent_labels=parents,
-                workspace=workspace,
-            )
-        except NoResultFound:
-            return None
-
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:
             return api.get_one(revision.content_id, content_type_list.Any_SLUG)
-        except NoResultFound:
-            return None
-
-    def get_parent_from_path(self, path, api: ContentApi, workspace) -> Content:
-        return self.get_content_from_path(dirname(path), api, workspace)
-
-    def get_workspace_from_path(self, path: str, api: WorkspaceApi) -> Workspace:
-        try:
-            return api.get_one_by_label(transform_to_bdd(path.split('/')[1]))
         except NoResultFound:
             return None

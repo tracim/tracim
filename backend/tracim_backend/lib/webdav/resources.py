@@ -12,6 +12,7 @@ from os.path import dirname, basename
 
 from sqlalchemy.orm import Session
 
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
@@ -38,6 +39,8 @@ from tracim_backend.models.revision_protection import new_revision
 
 logger = logging.getLogger()
 
+if typing.TYPE_CHECKING:
+    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 
 class ManageActions(object):
     """
@@ -80,19 +83,19 @@ class RootResource(DAVCollection):
     RootResource ressource that represents tracim's home, which contains all workspaces
     """
 
-    def __init__(self, path: str, environ: dict, user: User, session: Session):
+    def __init__(self, path: str, environ: dict, tracim_context: 'WebdavTracimContext'):
         super(RootResource, self).__init__(path, environ)
-
-        self.user = user
-        self.session = session
+        self.tracim_context = tracim_context
+        self.user = tracim_context.current_user
+        self.session = tracim_context.dbsession
         # TODO BS 20170221: Web interface should list all workspace to. We
         # disable it here for moment. When web interface will be updated to
         # list all workspace, change this here to.
         self.workspace_api = WorkspaceApi(
             current_user=self.user,
-            session=session,
+            session=self.session,
             force_role=True,
-            config=self.provider.app_config
+            config=tracim_context.app_config
         )
 
     def __repr__(self) -> str:
@@ -120,8 +123,7 @@ class RootResource(DAVCollection):
                 workspace_path,
                 self.environ,
                 workspace,
-                session=self.session,
-                user=self.user,
+                tracim_context=self.tracim_context
             )
         except AttributeError:
             return None
@@ -158,8 +160,7 @@ class RootResource(DAVCollection):
             workspace_path,
             self.environ,
             new_workspace,
-            user=self.user,
-            session=self.session,
+            tracim_context=self.tracim_context
         )
 
     def getMemberList(self):
@@ -176,8 +177,7 @@ class RootResource(DAVCollection):
                     path=workspace_path,
                     environ=self.environ,
                     workspace=workspace,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -194,19 +194,19 @@ class WorkspaceResource(DAVCollection):
                  path: str,
                  environ: dict,
                  workspace: Workspace,
-                 user: User,
-                 session: Session
+                 tracim_context: 'WebdavTracimContext'
     ) -> None:
         super(WorkspaceResource, self).__init__(path, environ)
 
         self.workspace = workspace
         self.content = None
-        self.user = user
-        self.session = session
+        self.tracim_context = tracim_context
+        self.user = tracim_context.current_user
+        self.session = tracim_context.dbsession
         self.content_api = ContentApi(
             current_user=self.user,
-            session=session,
-            config=self.provider.app_config,
+            session=tracim_context.dbsession,
+            config=tracim_context.app_config,
             show_temporary=True
         )
 
@@ -302,8 +302,7 @@ class WorkspaceResource(DAVCollection):
         return FolderResource('%s/%s' % (self.path, transform_to_display(label)),
                               self.environ,
                               content=folder,
-                              session=self.session,
-                              user=self.user,
+                              tracim_context=self.tracim_context,
                               workspace=self.workspace,
                               )
 
@@ -335,9 +334,8 @@ class WorkspaceResource(DAVCollection):
                         path=content_path,
                         environ=self.environ,
                         workspace=self.workspace,
-                        user=self.user,
                         content=content,
-                        session=self.session,
+                        tracim_context=self.tracim_context
                     )
                 )
             elif content.type == content_type_list.File.slug:
@@ -347,8 +345,7 @@ class WorkspaceResource(DAVCollection):
                         path=content_path,
                         environ=self.environ,
                         content=content,
-                        user=self.user,
-                        session=self.session,
+                        tracim_context=self.tracim_context
                     )
                 )
             else:
@@ -358,8 +355,7 @@ class WorkspaceResource(DAVCollection):
                         content_path,
                         self.environ,
                         content,
-                        session=self.session,
-                        user=self.user,
+                        tracim_context=self.tracim_context
                     ))
 
         if self._file_count > 0 and self.provider.show_history():
@@ -370,8 +366,7 @@ class WorkspaceResource(DAVCollection):
                     content=self.content,
                     workspace=self.workspace,
                     type=HistoryType.Standard,
-                    session=self.session,
-                    user=self.user,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -382,8 +377,7 @@ class WorkspaceResource(DAVCollection):
                     environ=self.environ,
                     content=self.content,
                     workspace=self.workspace,
-                    session=self.session,
-                    user=self.user,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -394,8 +388,7 @@ class WorkspaceResource(DAVCollection):
                     environ=self.environ,
                     content=self.content,
                     workspace=self.workspace,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -415,15 +408,13 @@ class FolderResource(WorkspaceResource):
             environ: dict,
             workspace: Workspace,
             content: Content,
-            user: User,
-            session: Session
+            tracim_context: 'WebdavTracimContext'
     ):
         super(FolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
-            user=user,
-            session=session,
+            tracim_context=tracim_context
         )
         self.content = content
 
@@ -511,15 +502,13 @@ class FolderResource(WorkspaceResource):
             session=self.session,
             config=self.provider.app_config,
         )
-        workspace = self.provider.get_workspace_from_path(
-            normpath(destpath), workspace_api
-        )
 
-        parent = self.provider.get_parent_from_path(
-            normpath(destpath),
-            self.content_api,
-            workspace
-        )
+        self.tracim_context.set_destpath(destpath)
+        destination_workspace = self.tracim_context.candidate_workspace
+        try:
+            destination_parent = self.tracim_context.candidate_parent_content
+        except ContentNotFound as e:
+            destination_parent = None
 
         with new_revision(
             content=self.content,
@@ -530,10 +519,10 @@ class FolderResource(WorkspaceResource):
                 self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
                 self.content_api.save(self.content)
             else:
-                if workspace.workspace_id == self.content.workspace.workspace_id:
-                    self.content_api.move(self.content, parent)
+                if destination_workspace.workspace_id == self.content.workspace.workspace_id:
+                    self.content_api.move(self.content, destination_parent)
                 else:
-                    self.content_api.move_recursively(self.content, parent, workspace)
+                    self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
 
         transaction.commit()
 
@@ -561,8 +550,7 @@ class FolderResource(WorkspaceResource):
                             environ=self.environ,
                             workspace=self.workspace,
                             content=content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         )
                     )
                 elif content.type == content_type_list.File.slug:
@@ -572,8 +560,7 @@ class FolderResource(WorkspaceResource):
                             path=content_path,
                             environ=self.environ,
                             content=content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
                 else:
                     self._file_count += 1
@@ -582,8 +569,7 @@ class FolderResource(WorkspaceResource):
                             path=content_path,
                             environ=self.environ,
                             content=content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
             except NotImplementedError as exc:
                 pass
@@ -603,8 +589,7 @@ class FolderResource(WorkspaceResource):
                     content=self.content,
                     workspace=self.workspace,
                     type=HistoryType.Standard,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -615,8 +600,7 @@ class FolderResource(WorkspaceResource):
                     environ=self.environ,
                     content=self.content,
                     workspace=self.workspace,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -627,8 +611,7 @@ class FolderResource(WorkspaceResource):
                     environ=self.environ,
                     content=self.content,
                     workspace=self.workspace,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -648,8 +631,7 @@ class HistoryFolderResource(FolderResource):
                  path,
                  environ,
                  workspace: Workspace,
-                 user: User,
-                 session: Session,
+                 tracim_context: 'WebdavTracimContext',
                  content: Content=None,
                  type: str=HistoryType.Standard
     ) -> None:
@@ -658,8 +640,7 @@ class HistoryFolderResource(FolderResource):
             environ=environ,
             workspace=workspace,
             content=content,
-            user=user,
-            session=session,
+            tracim_context=tracim_context,
         )
 
         self._is_archived = type == HistoryType.Archived
@@ -695,8 +676,7 @@ class HistoryFolderResource(FolderResource):
             path='%s/%s' % (self.path, content.file_name),
             environ=self.environ,
             content=content,
-            session=self.session,
-            user=self.user,
+            tracim_context=self.tracim_context
         )
 
     def getMemberNames(self) -> [str]:
@@ -744,8 +724,7 @@ class HistoryFolderResource(FolderResource):
                     path='%s/%s' % (self.path, content.file_name),
                     environ=self.environ,
                     content=content,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 ))
 
         return members
@@ -761,18 +740,16 @@ class DeletedFolderResource(HistoryFolderResource):
             path: str,
             environ: dict,
             workspace: Workspace,
-            user: User,
-            session: Session,
+            tracim_context: 'WebdavTracimContext',
             content: Content=None
     ):
         super(DeletedFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
-            user=user,
             content=content,
-            session=session,
-            type=HistoryType.Deleted
+            tracim_context=tracim_context,
+            type=HistoryType.Deleted,
         )
 
         self._file_count = 0
@@ -837,8 +814,7 @@ class DeletedFolderResource(HistoryFolderResource):
                             self.environ,
                             self.workspace,
                             content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
                 elif content.type == content_type_list.File.slug:
                     self._file_count += 1
@@ -847,8 +823,7 @@ class DeletedFolderResource(HistoryFolderResource):
                             content_path,
                             self.environ,
                             content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         )
                     )
                 else:
@@ -858,8 +833,7 @@ class DeletedFolderResource(HistoryFolderResource):
                             content_path,
                             self.environ,
                             content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                     ))
 
         if self._file_count > 0 and self.provider.show_history():
@@ -887,17 +861,15 @@ class ArchivedFolderResource(HistoryFolderResource):
             path: str,
             environ: dict,
             workspace: Workspace,
-            user: User,
-            session: Session,
+            tracim_context: 'WebdavTracimContext',
             content: Content=None
     ):
         super(ArchivedFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
-            user=user,
             content=content,
-            session=session,
+            tracim_context=tracim_context,
             type=HistoryType.Archived
         )
 
@@ -968,8 +940,7 @@ class ArchivedFolderResource(HistoryFolderResource):
                             content_path,
                             self.environ,
                             content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
                 else:
                     self._file_count += 1
@@ -978,8 +949,7 @@ class ArchivedFolderResource(HistoryFolderResource):
                             content_path,
                             self.environ,
                             content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
 
         if self._file_count > 0 and self.provider.show_history():
@@ -1008,16 +978,14 @@ class HistoryFileFolderResource(HistoryFolderResource):
             path: str,
             environ: dict,
             content: Content,
-            user: User,
-            session: Session
+            tracim_context: 'WebdavTracimContext',
     ) -> None:
         super(HistoryFileFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=content.workspace,
             content=content,
-            user=user,
-            session=session,
+            tracim_context=tracim_context,
             type=HistoryType.All,
         )
 
@@ -1080,8 +1048,7 @@ class HistoryFileFolderResource(HistoryFolderResource):
                     environ=self.environ,
                     content=self.content,
                     content_revision=content,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                     )
                 )
             else:
@@ -1090,8 +1057,7 @@ class HistoryFileFolderResource(HistoryFolderResource):
                     environ=self.environ,
                     content=self.content,
                     content_revision=content,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                     )
                 )
 
@@ -1107,17 +1073,16 @@ class FileResource(DAVNonCollection):
             path: str,
             environ: dict,
             content: Content,
-            user: User,
-            session: Session,
+            tracim_context: 'WebdavTracimContext'
     ) -> None:
         super(FileResource, self).__init__(path, environ)
-
+        self.tracim_context = tracim_context
         self.content = content
-        self.user = user
-        self.session = session
+        self.user = tracim_context.current_user
+        self.session = tracim_context.dbsession
         self.content_api = ContentApi(
             current_user=self.user,
-            config=self.provider.app_config,
+            config=tracim_context.app_config,
             session=self.session,
         )
 
@@ -1228,6 +1193,7 @@ class FileResource(DAVNonCollection):
 
         workspace = self.content.workspace
         parent = self.content.parent
+        self.tracim_context.set_destpath(destpath)
 
         with new_revision(
             content=self.content,
@@ -1236,38 +1202,29 @@ class FileResource(DAVNonCollection):
         ):
             # INFO - G.M - 2018-03-09 - First, renaming file if needed
             if basename(destpath) != self.getDisplayName():
-                new_given_file_name = transform_to_bdd(basename(destpath))
-                new_file_name, new_file_extension = \
-                    os.path.splitext(new_given_file_name)
+
+                new_filename = transform_to_bdd(basename(destpath))
+                regex_file_extension = re.compile(
+                    '(?P<label>.*){}'.format(
+                        re.escape(self.content.file_extension)))
+                same_extension = regex_file_extension.match(new_filename)
+                if same_extension:
+                    new_label = same_extension.group('label')
+                    new_file_extension = self.content.file_extension
+                else:
+                    new_label, new_file_extension = os.path.splitext(
+                        new_filename)
 
                 self.content_api.update_content(
                     self.content,
-                    new_file_name,
+                    new_label=new_label,
                 )
                 self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
 
             # INFO - G.M - 2018-03-09 - Moving file if needed
-            workspace_api = WorkspaceApi(
-                current_user=self.user,
-                session=self.session,
-                config=self.provider.app_config,
-                )
-            content_api = ContentApi(
-                current_user=self.user,
-                session=self.session,
-                config=self.provider.app_config
-            )
-
-            destination_workspace = self.provider.get_workspace_from_path(
-                destpath,
-                workspace_api,
-            )
-            destination_parent = self.provider.get_parent_from_path(
-                destpath,
-                content_api,
-                destination_workspace,
-            )
+            destination_workspace = self.tracim_context.candidate_workspace
+            destination_parent = self.tracim_context.candidate_parent_content
             if destination_parent != parent or destination_workspace != workspace:  # nopep8
                 #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
                 #  if the request does not result in a real move.
@@ -1289,43 +1246,32 @@ class FileResource(DAVNonCollection):
             # self.move_file(destpath)
             # return
             ####
-
             raise NotImplemented
 
-        new_file_name = None
-        new_file_extension = None
+        new_filename = transform_to_bdd(basename(destpath))
+        regex_file_extension = re.compile(
+            '(?P<label>.*){}'.format(re.escape(self.content.file_extension)))
+        same_extension = regex_file_extension.match(new_filename)
+        if same_extension:
+            new_label = same_extension.group('label')
+            new_file_extension = self.content.file_extension
+        else:
+           new_label, new_file_extension = os.path.splitext(new_filename)
 
-        # Inspect destpath
-        if basename(destpath) != self.getDisplayName():
-            new_given_file_name = transform_to_bdd(basename(destpath))
-            new_file_name, new_file_extension = \
-                os.path.splitext(new_given_file_name)
-
-        workspace_api = WorkspaceApi(
-            current_user=self.user,
-            session=self.session,
-            config=self.provider.app_config,
-        )
-        content_api = ContentApi(
-            current_user=self.user,
-            session=self.session,
-            config=self.provider.app_config
-        )
-        destination_workspace = self.provider.get_workspace_from_path(
-            destpath,
-            workspace_api,
-        )
-        destination_parent = self.provider.get_parent_from_path(
-            destpath,
-            content_api,
-            destination_workspace,
-        )
+        self.tracim_context.set_destpath(destpath)
+        destination_workspace = self.tracim_context.candidate_workspace
+        try:
+            destination_parent = self.tracim_context.candidate_parent_content
+        except ContentNotFound as e:
+            destination_parent = None
         workspace = self.content.workspace
         parent = self.content.parent
         new_content = self.content_api.copy(
             item=self.content,
-            new_label=new_file_name,
+            new_label=new_label,
+            new_file_extension=new_file_extension,
             new_parent=destination_parent,
+            new_workspace=destination_workspace
         )
         self.content_api.copy_children(self.content, new_content)
         transaction.commit()
@@ -1346,8 +1292,8 @@ class HistoryFileResource(FileResource):
     """
     A virtual resource corresponding to a specific tracim's revision's file
     """
-    def __init__(self, path: str, environ: dict, content: Content, user: User, session: Session, content_revision: ContentRevisionRO):
-        super(HistoryFileResource, self).__init__(path, environ, content, user=user, session=session)
+    def __init__(self, path: str, environ: dict, content: Content, tracim_context: 'WebdavTracimContext', content_revision: ContentRevisionRO):
+        super(HistoryFileResource, self).__init__(path, environ, content, tracim_context=tracim_context)
         self.content_revision = content_revision
 
     def __repr__(self) -> str:
@@ -1384,8 +1330,8 @@ class OtherFileResource(FileResource):
     """
     FileResource resource corresponding to tracim's page and thread
     """
-    def __init__(self, path: str, environ: dict, content: Content, user:User, session: Session):
-        super(OtherFileResource, self).__init__(path, environ, content, user=user, session=session)
+    def __init__(self, path: str, environ: dict, content: Content, tracim_context: 'WebdavTracimContext'):
+        super(OtherFileResource, self).__init__(path, environ, content, tracim_context=tracim_context)
 
         self.content_revision = self.content.revision
 
@@ -1438,15 +1384,14 @@ class HistoryOtherFile(OtherFileResource):
                  path: str,
                  environ: dict,
                  content: Content,
-                 user:User,
                  content_revision: ContentRevisionRO,
-                 session: Session):
+                 tracim_context: 'WebdavTracimContext'
+    ):
         super(HistoryOtherFile, self).__init__(
-            path,
-            environ,
-            content,
-            user=user,
-            session=session
+            path=path,
+            environ=environ,
+            content=content,
+            tracim_context=tracim_context
         )
         self.content_revision = content_revision
         self.content_designed = self.design()

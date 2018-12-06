@@ -1509,6 +1509,7 @@ class ContentApi(object):
         item: Content,
         new_parent: Content=None,
         new_label: str=None,
+        new_workspace: Workspace=None,
         new_file_extension: str=None,
         do_save: bool=True,
         do_notify: bool=True,
@@ -1522,13 +1523,16 @@ class ContentApi(object):
         :param do_notify: notify copy or not
         :return: Newly copied item
         """
-        if (not new_parent and not new_label and not new_file_extension) or \
-                (new_parent == item.parent and new_label == item.label  and new_file_extension==item.file_extension):
+        if (not new_parent and not new_label and not new_file_extension and not new_workspace) or \
+                (new_parent == item.parent and new_label == item.label  and new_file_extension==item.file_extension and item.workspace == new_workspace):
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
         if new_parent:
             workspace = new_parent.workspace
             parent = new_parent
+        elif new_workspace:
+            workspace = new_workspace
+            parent = None
         else:
             workspace = item.workspace
             parent = item.parent
