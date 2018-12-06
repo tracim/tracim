@@ -211,3 +211,6 @@ class FakeFileStream(object):
             )
 
             self._api.save(self._content, ActionDescription.REVISION)
+
+    def supportEtag(self):
+        return False

@@ -1,11 +1,17 @@
 # coding: utf8
-
+import functools
 import re
+import typing
 from os.path import basename, dirname
 
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentNotFound, \
+    UserNotFoundInTracimRequest, NotAuthenticated, WorkspaceNotFound
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
     SpecialFolderExtension
 from tracim_backend.app_models.contents import content_type_list
