@@ -63,8 +63,8 @@ class PopupCreateFile extends React.Component {
       fileToSave.size > 2000000
     ) {
       this.setState({
-        newFile: fileToSave,
-        newFilePreview: false
+        uploadFile: fileToSave,
+        uploadFilePreview: false
       })
       return
     }
