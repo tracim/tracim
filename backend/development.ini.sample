@@ -25,7 +25,7 @@ basic_setup.preview_cache_dir = /tmp/tracim/preview/
 basic_setup.sessions_data_root_dir = %(here)s
 ## secret
 # This is needed for some feature like reply by email
-api.key =
+basic_setup.api_key =
 basic_setup.session_secret = change_this_value_please!
 
 ##################
