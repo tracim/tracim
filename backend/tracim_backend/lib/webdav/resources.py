@@ -1,45 +1,55 @@
 # coding: utf8
 import functools
 import logging
-
 import os
+import re
+import typing
+from datetime import datetime
+from os.path import basename
+from os.path import dirname
+from time import mktime
 
 import transaction
-import typing
-import re
-from datetime import datetime
-from time import mktime
-from os.path import dirname, basename
-
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import MultipleResultsFound
+from sqlalchemy.orm.exc import NoResultFound
+from wsgidav import compat
+from wsgidav.dav_error import HTTP_FORBIDDEN
+from wsgidav.dav_error import DAVError
+from wsgidav.dav_provider import DAVCollection
+from wsgidav.dav_provider import DAVNonCollection
+from wsgidav.dav_provider import _DAVResource
 
-from tracim_backend.exceptions import ContentNotFound, TracimException
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.utils.authorization import is_trusted_user, is_user, \
-    can_see_workspace_information, is_contributor, can_modify_workspace, \
-    can_delete_workspace, is_reader, is_content_manager, AuthorizationChecker, \
-    can_move_content
-from tracim_backend.lib.webdav.utils import transform_to_display, HistoryType, \
-    FakeFileStream
-from tracim_backend.lib.webdav.utils import transform_to_bdd
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.data import User, ContentRevisionRO
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import Content
-from tracim_backend.models.data import ActionDescription
-from tracim_backend.lib.webdav.design import designThread, designPage
-
-from wsgidav import compat
-from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
-from wsgidav.dav_provider import DAVCollection, DAVNonCollection
-from wsgidav.dav_provider import _DAVResource
+from tracim_backend.lib.utils.authorization import AuthorizationChecker
+from tracim_backend.lib.utils.authorization import can_delete_workspace
+from tracim_backend.lib.utils.authorization import can_modify_workspace
+from tracim_backend.lib.utils.authorization import can_move_content
+from tracim_backend.lib.utils.authorization import \
+    can_see_workspace_information
+from tracim_backend.lib.utils.authorization import is_content_manager
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_trusted_user
+from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.webdav.design import designPage
+from tracim_backend.lib.webdav.design import designThread
+from tracim_backend.lib.webdav.utils import FakeFileStream
+from tracim_backend.lib.webdav.utils import HistoryType
 from tracim_backend.lib.webdav.utils import normpath
-
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-
+from tracim_backend.lib.webdav.utils import transform_to_bdd
+from tracim_backend.lib.webdav.utils import transform_to_display
+from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import User
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
 logger = logging.getLogger()

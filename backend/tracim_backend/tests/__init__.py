@@ -24,7 +24,9 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
-from tracim_backend import web, webdav, WebdavAppFactory
+from tracim_backend import web
+from tracim_backend import webdav
+from tracim_backend import WebdavAppFactory
 from webtest import TestApp
 from io import BytesIO
 from PIL import Image

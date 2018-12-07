@@ -2,33 +2,36 @@
 import functools
 import re
 import typing
-from os.path import basename, dirname
+from os.path import basename
+from os.path import dirname
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
-from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
-
-from tracim_backend.config import CFG
-from tracim_backend.exceptions import ContentNotFound, \
-    UserNotFoundInTracimRequest, NotAuthenticated, WorkspaceNotFound, \
-    TracimException
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
-    SpecialFolderExtension
-from tracim_backend.app_models.contents import content_type_list
-
+from wsgidav.dav_error import HTTP_FORBIDDEN
+from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
 
-
-from tracim_backend.lib.webdav.lock_storage import LockStorage
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import NotAuthenticated
+from tracim_backend.exceptions import TracimException
+from tracim_backend.exceptions import UserNotFoundInTracimRequest
+from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import ContentRevisionRO
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.webdav import resources
+from tracim_backend.lib.webdav.lock_storage import LockStorage
+from tracim_backend.lib.webdav.utils import HistoryType
+from tracim_backend.lib.webdav.utils import SpecialFolderExtension
 from tracim_backend.lib.webdav.utils import normpath
-from tracim_backend.models.data import Content, Workspace
+from tracim_backend.lib.webdav.utils import transform_to_bdd
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import Workspace
 
 
 class WebdavTracimContext(TracimContext):
