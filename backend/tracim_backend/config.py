@@ -15,14 +15,16 @@ from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.models import Group
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.roles import WorkspaceRoles
 
+SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key: str, value: typing.Any):
         """
         Log-ready setter.
 
@@ -31,16 +33,15 @@ class CFG(object):
         :param value:
         :return:
         """
-        if 'PASSWORD' not in key and \
-                ('URL' not in key or type(value) == str) and \
-                'CONTENT' not in key:
-            # We do not show PASSWORD for security reason
-            # we do not show URL because At the time of configuration setup,
-            # it can't be evaluated
-            # We do not show CONTENT in order not to pollute log files
-            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
-        else:
+        is_value_secret = False
+        for secret in SECRET_ENDING_STR:
+            if key.endswith(secret):
+                is_value_secret = True
+
+        if is_value_secret:
             logger.info(self, 'CONFIG: [ {} | <value not shown> ]'.format(key))
+        else:
+            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
 
         self.__dict__[key] = value
 
@@ -663,6 +664,7 @@ class CFG(object):
             creation_label='Create a folder',
             available_statuses=content_status_list.get_all(),
             allow_sub_content=True,
+            minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER
         )
 
         markdownpluspage = Application(

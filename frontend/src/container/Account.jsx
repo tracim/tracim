@@ -36,15 +36,18 @@ class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: props.t('My profile')
+      label: 'My profile',
+      translationKey: props.t('My profile')
     }, {
       name: 'notification',
       active: false,
-      label: props.t('Shared spaces and notifications')
+      label: 'Shared spaces and notifications',
+      translationKey: props.t('Shared spaces and notifications')
     }, {
       name: 'password',
       active: false,
-      label: props.t('Password')
+      label: 'Password',
+      translationKey: props.t('Password')
     // }, {
     //   name: 'timezone',
     //   active: false,

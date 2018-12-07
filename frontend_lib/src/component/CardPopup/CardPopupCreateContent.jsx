@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Radium from 'radium'
 import CardPopup from './CardPopup.jsx'
 
-require('./CardPopupCreateContent.styl')
+// require('./CardPopupCreateContent.styl') // see https://github.com/tracim/tracim/issues/1156
 
 class PopupCreateContent extends React.Component {
   handleInputKeyDown = e => {

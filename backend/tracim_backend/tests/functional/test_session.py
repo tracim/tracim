@@ -2,11 +2,11 @@
 import datetime
 import transaction
 from freezegun import freeze_time
-from tracim_backend import models
+from tracim_backend.models.auth import User
 from tracim_backend import error
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import FunctionalTestNoDB
 
@@ -65,8 +65,8 @@ class TestLoginEndpoint(FunctionalTest):
 
     def test_api__try_login_enpoint__err_401__user_not_activated(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -81,7 +81,7 @@ class TestLoginEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -170,8 +170,8 @@ class TestWhoamiEndpoint(FunctionalTest):
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -186,7 +186,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -201,7 +201,7 @@ class TestWhoamiEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
 
@@ -252,8 +252,8 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -268,7 +268,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -375,8 +375,8 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         with freeze_time("1999-12-31 23:59:58"):
             params = {

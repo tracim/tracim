@@ -39,8 +39,9 @@ describe('content :: account', () => {
     cy.get('.personaldata__form div:nth-child(1) > .personaldata__form__txtinput').should('have.attr', 'placeholder')
     cy.get('.personaldata__form div:nth-child(2) > .personaldata__form__txtinput.withAdminMsg').should('be.visible')
     cy.get('.personaldata__form div:nth-child(2) > .personaldata__form__txtinput.withAdminMsg').should('have.attr', 'placeholder')
-    cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.checkPassword').should('be.visible')
-    cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.checkPassword').should('have.attr', 'placeholder')
+    // @philippe checkPassword is not visible by default. see issue #1077
+    // cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.checkPassword').should('be.visible')
+    // cy.get('.personaldata__form div:nth-child(3) > .personaldata__form__txtinput.checkPassword').should('have.attr', 'placeholder')
     cy.get('.personaldata__form .personaldata__form__button').should('be.visible')
     cy.get('.personaldata__form .personaldata__form__button').should('have.attr', 'type', 'button')
   })

@@ -10,6 +10,12 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
+from tracim_backend.app_models.validator import TracimValidator
+from tracim_backend.app_models.validator import user_email_validator
+from tracim_backend.app_models.validator import user_lang_validator
+from tracim_backend.app_models.validator import user_password_validator
+from tracim_backend.app_models.validator import user_public_name_validator
+from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
@@ -369,6 +375,14 @@ class UserApi(object):
             groups: typing.Optional[typing.List[Group]]=None,
             do_save=True,
     ) -> User:
+        validator = TracimValidator()
+        validator.add_validator('name', name, user_public_name_validator)
+        validator.add_validator('password', password, user_password_validator)
+        validator.add_validator('email', email, user_email_validator)
+        validator.add_validator('timezone', timezone, user_timezone_validator)
+        validator.add_validator('lang', lang, user_lang_validator)
+        validator.validate_all()
+
         if name is not None:
             user.display_name = name
 
@@ -463,9 +477,14 @@ class UserApi(object):
             save_now=False
     ) -> User:
         """Previous create_user method"""
+        validator = TracimValidator()
+        validator.add_validator('email', email, user_email_validator)
+        validator.validate_all()
         self._check_email(email)
         user = User()
         user.email = email
+        # TODO - G.M - 2018-11-29 - Check if this default_value can be
+        # incorrect according to user_public_name_validator
         user.display_name = email.split('@')[0]
 
         if not groups:
