@@ -45,7 +45,7 @@ class CFG(object):
 
         self.__dict__[key] = value
 
-    def __init__(self, settings):
+    def __init__(self, settings: typing.Dict[str, typing.Any]):
         """Parse configuration file."""
 
         ###
@@ -591,11 +591,10 @@ class CFG(object):
             )
         self.load_ldap_settings(settings)
 
-    def load_ldap_settings(self, settings):
+    def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
         """
         Will parse config file to setup new matching attribute in the instance
-        :param settings:
-        :return:
+        :param settings: dict of source settings (from ini file)
         """
         param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
 
@@ -615,20 +614,35 @@ class CFG(object):
             # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
         ]
 
-        for prm in ldap_parameters:
-            if prm.adapter:
+        for ldap_parameter in ldap_parameters:
+            if ldap_parameter.adapter:
                 # Apply given function as a data modifier before setting value
-                setattr(self,
-                        prm.cfg_name,
-                        prm.adapter(settings.get( prm.ini_name, prm.default_value) )
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    ldap_parameter.adapter(
+                        settings.get(
+                            ldap_parameter.ini_name,
+                            ldap_parameter.default_value
                         )
+                    )
+                )
             else:
-                setattr(self,
-                        prm.cfg_name,
-                        settings.get( prm.ini_name, prm.default_value )
-                        )
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    settings.get(
+                        ldap_parameter.ini_name,
+                        ldap_parameter.default_value
+                    )
+                )
 
         self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
+
+        self.LDAP_USE_POOL = True
+        self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
+        self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
+        self.LDAP_GET_INFO = None
 
 
     def configure_filedepot(self):

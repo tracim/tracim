@@ -96,6 +96,10 @@ def web(global_config, **local_settings):
             bind=app_config.LDAP_BIND_DN,
             passwd=app_config.LDAP_BIND_PASS,
             use_tls=app_config.LDAP_TLS,
+            use_pool=app_config.LDAP_USE_POOL,
+            pool_size=app_config.LDAP_POOL_SIZE,
+            pool_lifetime=app_config.LDAP_POOL_LIFETIME,
+            get_info=app_config.LDAP_GET_INFO
         )
         configurator.ldap_set_login_query(
             base_dn=app_config.LDAP_USER_BASE_DN,

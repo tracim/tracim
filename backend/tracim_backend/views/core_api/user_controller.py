@@ -264,8 +264,6 @@ class UserController(Controller):
             config=app_config,
         )
         groups = [gapi.get_one_with_name(hapic_data.body.profile)]
-        # FIXME - G.M - 2018-11-27 - do not allow send email
-        # notification without valid password
         password = hapic_data.body.password
         if not password and hapic_data.body.email_notification:
             password = password_generator()

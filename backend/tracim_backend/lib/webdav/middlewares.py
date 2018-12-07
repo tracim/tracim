@@ -295,19 +295,15 @@ class TracimEnv(BaseMiddleware):
         return app
 
     def setup_ldap(self, registry: Registry, app_config: CFG):
-        use_pool = True
-        pool_size = 10 if use_pool else None
-        pool_lifetime = 3600 if use_pool else None
-        get_info = None
         manager = ConnectionManager(
             uri=app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN,
             passwd=app_config.LDAP_BIND_PASS,
             tls=app_config.LDAP_TLS,
-            use_pool=True,
-            pool_size=pool_size,
-            pool_lifetime=pool_lifetime,
-            get_info=get_info
+            use_pool=app_config.LDAP_USE_POOL,
+            pool_size=app_config.LDAP_POOL_SIZE,
+            pool_lifetime=app_config.LDAP_POOL_LIFETIME,
+            get_info=app_config.LDAP_GET_INFO
         )
         registry.ldap_login_query = _LDAPQuery(
             base_dn=app_config.LDAP_USER_BASE_DN,

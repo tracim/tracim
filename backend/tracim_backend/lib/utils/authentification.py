@@ -22,15 +22,22 @@ TRACIM_API_USER_EMAIL_LOGIN_HEADER = "Tracim-Api-Login"
 
 
 class TracimAuthenticationPolicy(object):
+    """
+    Abstract class with some helper for Pyramid TracimAuthentificationPolicy
+    """
 
     def _get_auth_unsafe_user(
         self,
         request: Request,
-        email: str=None,
-        user_id: int=None,
+        email: typing.Optional[str]=None,
+        user_id: typing.Optional[int]=None,
     ) -> typing.Optional[User]:
         """
+        Helper to get user from email or user_id in pyramid request
+        (process check user_id first)
         :param request: pyramid request
+        :param email: email of the user, optional
+        :param user_id: user_id of the user, optional
         :return: User or None
         """
         app_config = request.registry.settings['CFG']
@@ -44,9 +51,15 @@ class TracimAuthenticationPolicy(object):
     def _authenticate_user(
         self,
         request: Request,
-        email: str,
-        password: str,
+        email: typing.Optional[str],
+        password: typing.Optional[str],
     ) -> typing.Optional[User]:
+        """
+        Helper to authenticate user in pyramid request
+        from user email and password
+        :param request: pyramid request
+        :return: User or None
+        """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         ldap_connector = None

@@ -232,7 +232,17 @@ class UserApi(object):
             email: str,
             password: str,
             ldap_connector: 'Connector'
-    ):
+    ) -> User:
+        """
+        Authenticate with ldap, return authenticated user or raise Exception
+        like WrongAuthTypeForUser, WrongLDAPCredentials, UserDoesNotExist
+        or UserAuthenticatedIsNotActive
+        :param user: user to check,, can be none if user not found, will try
+         to create new user if none but ldap auth succeed
+        :param email: email of the user
+        :param password: cleartext password of the user
+        :param ldap_connector: ldap connector, enable ldap auth if provided
+        """
         auth_type = AuthType.LDAP
 
         # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type
@@ -304,6 +314,15 @@ class UserApi(object):
         return user
 
     def _internal_db_authenticate(self, user: typing.Optional[User], email: str, password: str) -> User:
+        """
+        Authenticate with internal db, return authenticated user
+        or raise Exception like WrongAuthTypeForUser, UserDoesNotExist,
+        WrongUserPassword or UserAuthenticatedIsNotActive
+        :param user: user to check, can be none if user not found, will raise
+        UserDoesNotExist exception if none
+        :param password: cleartext password of the user
+        :param ldap_connector: ldap connector, enable ldap auth if provided
+        """
         auth_type = AuthType.INTERNAL
 
         if not user:
@@ -553,8 +572,7 @@ class UserApi(object):
         if auth_type is not None:
             if auth_type != AuthType.UNKNOWN and not auth_type in self._config.AUTH_TYPES:
                 raise UserAuthTypeDisabled(
-                    'Can modify user {} auth_type to'
-                    ' a disabled auth type like {}'.format(
+                    'Can\'t update user "{}" auth_type with unavailable value "{}".'.format(
                         user.email,
                         auth_type
                     )
