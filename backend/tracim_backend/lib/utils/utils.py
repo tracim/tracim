@@ -15,7 +15,6 @@ if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
 CONTENT_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}/contents/{content_type}/{content_id}'  # nopep8
 WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8

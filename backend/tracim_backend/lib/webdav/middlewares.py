@@ -60,7 +60,6 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
     def __call__(self, environ, start_response):
         """"""
-        #        srvcfg = environ["wsgidav.config"]
         verbose = self._config.get("verbose", 2)
         self.last_request_time = '{0}_{1}'.format(
             datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
@@ -265,11 +264,7 @@ class TracimEnv(BaseMiddleware):
     def __init__(self, application, config):
         super().__init__(application, config)
         self._application = application
-        self._config = config
-        global_conf = get_appsettings(config['tracim_config']).global_conf
-        local_conf = get_appsettings(config['tracim_config'], 'tracim_web')
-        self.settings = global_conf
-        self.settings.update(local_conf)
+        self.settings = config['tracim_settings']
         self.engine = get_engine(self.settings)
         self.session_factory = get_session_factory(self.engine)
         self.app_config = CFG(self.settings)
@@ -314,19 +309,3 @@ class TracimEnv(BaseMiddleware):
         )
         registry.ldap_connector = Connector(registry, manager)
         return registry
-
-
-class TracimUserSession(BaseMiddleware):
-
-    def __init__(self, application, config):
-        super().__init__(application, config)
-        self._application = application
-        self._config = config
-
-    def __call__(self, environ, start_response):
-        environ['tracim_user'] = UserApi(
-            None,
-            session=environ['tracim_dbsession'],
-            config=environ['tracim_cfg'],
-        ).get_one_by_email(environ['http_authenticator.username'])
-        return self._application(environ, start_response)

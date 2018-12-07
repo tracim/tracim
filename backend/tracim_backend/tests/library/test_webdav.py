@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-import io
-import os
-
-import pytest
-from sqlalchemy.exc import InvalidRequestError
-from wsgidav.wsgidav_app import DEFAULT_CONFIG
 from tracim_backend import WebdavAppFactory
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.webdav import TracimDomainController
@@ -32,54 +26,21 @@ class TestWebdavFactory(StandardTest):
         :return:
         """
         tracim_settings = self.settings
-        wsgidav_setting = DEFAULT_CONFIG.copy()
-        wsgidav_setting.update(
-            {
-               'root_path':  '',
-               'acceptbasic': True,
-               'acceptdigest': False,
-               'defaultdigest': False,
-            }
-        )
         mock = MagicMock()
         mock._initConfig = WebdavAppFactory._initConfig
-        mock._readConfigFile.return_value = wsgidav_setting
-        mock._get_tracim_settings.return_value = tracim_settings
-        config = mock._initConfig(mock)
+        config = mock._initConfig(self, **tracim_settings)
         assert config
         assert config['acceptbasic'] is True
         assert config['acceptdigest'] is False
         assert config['defaultdigest'] is False
         # TODO - G.M - 25-05-2018 - Better check for middleware stack config
         assert 'middleware_stack' in config
-        assert len(config['middleware_stack']) == 7
-        assert 'root_path' in config
+        assert len(config['middleware_stack']) == 6
         assert 'provider_mapping' in config
-        assert config['root_path'] in config['provider_mapping']
-        assert isinstance(config['provider_mapping'][config['root_path']], Provider)  # nopep8
+        assert '/' in config['provider_mapping']
+        assert isinstance(config['provider_mapping']['/'], Provider)  # nopep8
         assert 'domaincontroller' in config
         assert isinstance(config['domaincontroller'], TracimDomainController)
-
-    def test_unit__readConfigFile__ok__nominal_case(self):
-        tracim_settings = self.settings
-        default_config_file = os.path.abspath(tracim_settings['wsgidav.config_path'])  # nopep8
-        mock = MagicMock()
-        mock._readConfigFile = WebdavAppFactory._readConfigFile
-        webdav_config_file = mock._readConfigFile(
-            mock,
-            default_config_file,
-            verbose=1,
-        )
-        assert webdav_config_file['host'] == "0.0.0.0"
-        assert webdav_config_file['port'] == 3030
-        assert webdav_config_file['show_history'] is True
-        assert webdav_config_file['show_deleted'] is True
-        assert webdav_config_file['show_archived'] is True
-        assert webdav_config_file['manager_locks'] is True
-        assert webdav_config_file['root_path'] == ''
-        assert webdav_config_file['acceptbasic'] is True
-        assert webdav_config_file['acceptdigest'] is False
-        assert webdav_config_file['defaultdigest'] is False
 
 
 class TestWebDav(StandardTest):
@@ -104,6 +65,7 @@ class TestWebDav(StandardTest):
             'wsgidav.provider': provider,
             'tracim_user': self._get_user(username),
             'tracim_dbsession': self.session,
+            'tracim_cfg': self.app_config
         }
 
     def _get_user(self, email):
@@ -479,7 +441,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         pie = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -511,7 +473,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         pie = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -547,7 +509,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         pie = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -566,9 +528,7 @@ class TestWebDav(StandardTest):
             msg='field parent should be Desserts',
         )
 
-        pie.moveRecursive('/Others/Infos/Apple_Pie_RENAMED.txt')
-
-        # Database content is moved
+        pie.moveRecursive('/Business/Menus/Apple_Pie_RENAMED.txt')
         content_pie = self.session.query(ContentRevisionRO) \
             .filter(ContentRevisionRO.content_id == content_pie_id) \
             .order_by(ContentRevisionRO.revision_id.desc()) \
@@ -589,7 +549,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         content_to_move_res = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -608,7 +568,7 @@ class TestWebDav(StandardTest):
             msg='field parent should be Desserts',
         )
 
-        content_to_move_res.moveRecursive('/Others/Infos/Apple_Pie.txt')  # move in Business, f1
+        content_to_move_res.moveRecursive('/Business/Menus/Apple_Pie.txt')  # move in Business, f1
 
         # Database content is moved
         content_to_move = self.session.query(ContentRevisionRO) \
@@ -618,7 +578,7 @@ class TestWebDav(StandardTest):
 
         assert content_to_move.parent, 'Content should have a parent'
 
-        assert content_to_move.parent.label == 'Infos',\
+        assert content_to_move.parent.label == 'Menus',\
             'file should be moved in Infos but is in {0}'.format(
                 content_to_move.parent.label
         )

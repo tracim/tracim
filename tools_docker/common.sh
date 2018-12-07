@@ -43,14 +43,6 @@ if [ ! -L /etc/uwsgi/apps-enabled/tracim.ini ]; then
     ln -s /etc/uwsgi/apps-available/tracim.ini /etc/uwsgi/apps-enabled/tracim.ini
 fi
 
-# Create wsgidav.conf file if no exist
-if [ ! -f /etc/tracim/wsgidav.conf ]; then
-    cp /tracim/backend/wsgidav.conf.sample /etc/tracim/wsgidav.conf
-fi
-if [ ! -L /tracim/backend/wsgidav.conf ]; then
-    ln -s /etc/tracim/wsgidav.conf /tracim/backend/wsgidav.conf
-fi
-
 # Create color.json file if no exist
 if [ ! -f /etc/tracim/color.json ]; then
     cp /tracim/color.json.sample /etc/tracim/color.json

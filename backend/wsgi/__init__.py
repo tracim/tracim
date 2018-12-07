@@ -2,8 +2,6 @@
 import plaster
 import pyramid.paster
 
-from tracim_backend.lib.webdav import WebdavAppFactory
-
 
 def web_app(config_uri):
     pyramid.paster.setup_logging(config_uri)

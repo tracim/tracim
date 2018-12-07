@@ -267,7 +267,35 @@ email.reply.lockfile_path = %(here)s/email_fetcher.lock
 # WEBDAV
 ####
 
-wsgidav.config_path = %(here)s/wsgidav.conf
+### Main Webdav Config ###
+## webdav server hostname (default: localhost)
+; webdav.host  = 0.0.0.0
+## webdav server port (default: 3030)
+; webdav.port = 9090
+## default root of webdav service ( default : / )
+## this params need to be modified in case of using webdav with proxy
+## if you want for example that path /webdav give access to webdav
+;webdav.root_path = /
+
+### Technical Webdav configuration ###
+## wsgidav block size in bytes (default: 8192)
+; webdav.block_size = 8192
+## wsgidav verbose level (default: 1)
+## 0 - quiet
+## 1 - no output (excepting application exceptions)
+## 2 - warnings and errors only
+## 3 - show single line request summaries (HTTP logging)
+## 4 - show additional events
+## 5 - show full request/response header info (HTTP Logging)
+##     request body and GET response bodies not shown
+; webdav.verbose.level = 1
+
+### Webdav HTML dir browser ###
+## Render HTML listing for GET requests on collections (default: True)
+; webdav.dir_browser.enabled = True
+## Raw HTML code, appended as footer, if not set, let tracim created his own
+## footer.
+; webdav.dir_browser.footer = Just another footer
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
@@ -311,8 +339,6 @@ session.cookie_on_exception = True
 ; pyramid.includes =
 ;    pyramid_debugtoolbar
 
-### WEBDAV server specific config ###
-## webdav server (tweaked wsigdav)
 [pipeline:webdav]
 pipeline = tracim_webdav
 [app:tracim_webdav]

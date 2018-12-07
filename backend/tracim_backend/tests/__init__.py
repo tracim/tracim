@@ -25,6 +25,8 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend import web
+from tracim_backend import webdav
+from tracim_backend import WebdavAppFactory
 from webtest import TestApp
 from io import BytesIO
 from PIL import Image
@@ -146,6 +148,18 @@ class FunctionalTest(unittest.TestCase):
         self.disconnect_database(remove_tables=True)
         testing.tearDown()
 
+class WebdavFunctionalTest(FunctionalTest):
+    config_uri = 'tests_configs.ini'
+    config_section = 'functional_webdav_test'
+
+    def run_app(self) -> None:
+        settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        app_factory = WebdavAppFactory(**settings)
+        app = app_factory.get_wsgi_app()
+        self.testapp = TestApp(app)
 
 class FunctionalTestEmptyDB(FunctionalTest):
     fixtures = []
