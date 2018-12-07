@@ -58,8 +58,6 @@ FIELD_LANG_DESC = "User langage in ISO 639 format. " \
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 
-REGEX_STRING_AS_LIST_OF_INT = Regexp(regex=(re.compile('^(\d+(,\d+)*)?$')))
-
 
 class StrippedString(String):
 
