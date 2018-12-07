@@ -15,7 +15,8 @@ import {
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  Badge
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -542,7 +543,7 @@ class File extends React.Component {
           customClass={`${state.config.slug}`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          title={state.content.label}
+          title={(() => <span>{state.content.label} <Badge text={state.content.file_extension} /></span>)()}
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

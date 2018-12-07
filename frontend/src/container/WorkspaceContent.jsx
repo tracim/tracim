@@ -389,7 +389,8 @@ class WorkspaceContent extends React.Component {
                     : (
                       <ContentItem
                         label={content.label}
-                        type={content.type}
+                        fileName={content.fileName}
+                        fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
                         statusSlug={content.statusSlug}
                         read={currentWorkspace.contentReadStatusList.includes(content.id)}

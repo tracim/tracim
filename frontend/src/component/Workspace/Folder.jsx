@@ -122,6 +122,8 @@ class Folder extends React.Component {
               <ContentItem
                 label={content.label}
                 type={content.type}
+                fileName={content.fileName}
+                fileExtension={content.fileExtension}
                 faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                 statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
