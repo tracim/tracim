@@ -60,7 +60,6 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | depot_storage_dir |    no change      |                            |
 | website.title     |    no change      |                            |
 | website.server_name| no change        ||
-| wsgidav.* | no change | official support in tracim v2.1+|
 | email.notification.* | no change      | |
 | email.processing_mode | no change ||
 | email.async.* | no change ||
@@ -76,6 +75,7 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | smtp_server       | removed           |                            |
 | error_email_from  | removed           |                            |
 | full_stack        | removed           |                            |
+| wsgidav.*         | removed | official support in tracim v2.1+, use `webdav.*` params|
 | i18n.lang         | removed           | partially replaced by `pyramid.default_locale_name`  in tracim web app (`[app:tracim_web]` )section                        |
 | cookie_secret     | removed           | `[sa_auth]` section is not anymore used |
 | beaker.session.*  | removed          | see new `session.*` parameters      | |
@@ -100,6 +100,7 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | api.key           | new   |  :warning: Required ! API key, should be secret.|
 | user.reset_password.validity | new | |
 |  api.base_url      | new   | |
+| webdav.*         | new | official support in tracim v2.1+, webdav configuration params|
 | cors.access-control-allowed-origin | new | if provided, should be a list of `protocol://hostname:port` separated by `,` char.|
 | color.config_file_path | new ||
 | backend.18n_folder_path | new ||
