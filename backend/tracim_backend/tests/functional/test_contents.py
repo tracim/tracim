@@ -3,7 +3,7 @@ from urllib.parse import quote
 
 import transaction
 
-from tracim_backend import models
+
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.setup_models import get_tm_session

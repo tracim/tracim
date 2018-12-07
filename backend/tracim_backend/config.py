@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 import json
+import os
+import typing
 from collections import OrderedDict
+from collections import namedtuple
 from urllib.parse import urlparse
 
-import os
-
-import typing
-
+from depot.manager import DepotManager
 from paste.deploy.converters import asbool
+
+from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
-from depot.manager import DepotManager
-from tracim_backend.app_models.applications import Application
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
@@ -45,7 +46,7 @@ class CFG(object):
 
         self.__dict__[key] = value
 
-    def __init__(self, settings):
+    def __init__(self, settings: typing.Dict[str, typing.Any]):
         """Parse configuration file."""
 
         ###
@@ -120,6 +121,10 @@ class CFG(object):
                 'ERROR: preview_cache_dir configuration is mandatory. '
                 'Set it before continuing.'
             )
+        auth_type_str = settings.get(
+            'auth_types', 'internal'
+        )
+        self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
 
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
@@ -305,7 +310,6 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
             'email.notification.processing_mode',
         )
-
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
@@ -414,8 +418,13 @@ class CFG(object):
             'email.async.redis.db',
             0,
         ))
-        self.INVITE_NEW_USER_MINIMAL_PROFILE = settings.get(
-            'invitation.new_user.minimal_profile',
+        self.NEW_USER_INVITATION_DO_NOTIFY = asbool(settings.get(
+            'new_user.invitation.do_notify',
+            'True'
+        ))
+
+        self.NEW_USER_INVITATION_MINIMAL_PROFILE = settings.get(
+            'new_user.invitation.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME
         )
         ###
@@ -581,6 +590,61 @@ class CFG(object):
                 'please set frontend.dist_folder.path'
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
+        self.load_ldap_settings(settings)
+
+    def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
+        """
+        Will parse config file to setup new matching attribute in the instance
+        :param settings: dict of source settings (from ini file)
+        """
+        param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
+
+        ldap_parameters = [
+            param('ldap_url',                   'LDAP_URL',          'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_base_dn',               'LDAP_BASE_DN',      'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_dn',               'LDAP_BIND_DN',      'cn=admin, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_pass',             'LDAP_BIND_PASS',    '', None),
+            param('ldap_tls',                   'LDAP_TLS',          False, asbool),
+            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN', 'ou=people, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
+            # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
+            param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
+            # TODO - G.M - 2018-12-05 - [ldap_profile]
+            # support for profile attribute disabled
+            # Should be reenabled later probably with a better code
+            # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
+        ]
+
+        for ldap_parameter in ldap_parameters:
+            if ldap_parameter.adapter:
+                # Apply given function as a data modifier before setting value
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    ldap_parameter.adapter(
+                        settings.get(
+                            ldap_parameter.ini_name,
+                            ldap_parameter.default_value
+                        )
+                    )
+                )
+            else:
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    settings.get(
+                        ldap_parameter.ini_name,
+                        ldap_parameter.default_value
+                    )
+                )
+
+        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
+
+        self.LDAP_USE_POOL = True
+        self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
+        self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
+        self.LDAP_GET_INFO = None
+
 
     def configure_filedepot(self):
 

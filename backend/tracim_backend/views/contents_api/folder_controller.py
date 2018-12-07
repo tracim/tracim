@@ -4,7 +4,7 @@ import typing
 import transaction
 from pyramid.config import Configurator
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder

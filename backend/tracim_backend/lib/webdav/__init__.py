@@ -13,7 +13,7 @@ from wsgidav.wsgidav_app import DEFAULT_CONFIG
 from wsgidav.wsgidav_app import WsgiDAVApp
 from wsgidav.xml_tools import useLxml
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 from tracim_backend.lib.webdav.authentification import TracimDomainController
 from tracim_backend.lib.webdav.dav_provider import Provider
