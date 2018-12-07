@@ -60,8 +60,8 @@ const WorkspaceListItem = props => {
                   'sidebar__content__navigation__workspace__item__submenu__dropdown',
                   {'activeFilter': shouldDisplayAsActive(props.location, props.idWs, props.activeIdWorkspace, aa)}
                 )}>
-                  <div className='dropdown__icon'>
-                    <i className={classnames(`fa fa-${aa.faIcon}`)} style={{backgroudColor: aa.hexcolor}} />
+                  <div className='dropdown__icon' style={{backgroundColor: aa.hexcolor}}>
+                    <i className={classnames(`fa fa-${aa.faIcon}`)} />
                   </div>
 
                   <div className='sidebar__content__navigation__workspace__item__submenu__dropdown__showdropdown'>
