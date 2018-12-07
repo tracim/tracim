@@ -897,9 +897,12 @@ class ContentApi(object):
                     .filter(Content.parent_id == None)
 
             # Get thirst corresponding folder
-            folder = folder_query \
-                .order_by(Content.revision_id.desc()) \
-                .one()
+            try:
+                folder = folder_query \
+                    .order_by(Content.revision_id.desc()) \
+                    .one()
+            except NoResultFound as exc:
+                raise ContentNotFound('Folder not found')
 
         return folder
 

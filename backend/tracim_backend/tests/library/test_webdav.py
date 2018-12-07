@@ -35,7 +35,7 @@ class TestWebdavFactory(StandardTest):
         assert config['defaultdigest'] is False
         # TODO - G.M - 25-05-2018 - Better check for middleware stack config
         assert 'middleware_stack' in config
-        assert len(config['middleware_stack']) == 7
+        assert len(config['middleware_stack']) == 6
         assert 'provider_mapping' in config
         assert '/' in config['provider_mapping']
         assert isinstance(config['provider_mapping']['/'], Provider)  # nopep8
@@ -65,6 +65,7 @@ class TestWebDav(StandardTest):
             'wsgidav.provider': provider,
             'tracim_user': self._get_user(username),
             'tracim_dbsession': self.session,
+            'tracim_cfg': self.app_config
         }
 
     def _get_user(self, email):
@@ -440,7 +441,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         pie = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -472,7 +473,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         pie = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -508,7 +509,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         pie = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -527,9 +528,7 @@ class TestWebDav(StandardTest):
             msg='field parent should be Desserts',
         )
 
-        pie.moveRecursive('/Others/Infos/Apple_Pie_RENAMED.txt')
-
-        # Database content is moved
+        pie.moveRecursive('/Business/Menus/Apple_Pie_RENAMED.txt')
         content_pie = self.session.query(ContentRevisionRO) \
             .filter(ContentRevisionRO.content_id == content_pie_id) \
             .order_by(ContentRevisionRO.revision_id.desc()) \
@@ -550,7 +549,7 @@ class TestWebDav(StandardTest):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
             provider,
-            'bob@fsf.local',
+            'admin@admin.admin',
         )
         content_to_move_res = provider.getResourceInst(
             '/Recipes/Desserts/Apple_Pie.txt',
@@ -569,7 +568,7 @@ class TestWebDav(StandardTest):
             msg='field parent should be Desserts',
         )
 
-        content_to_move_res.moveRecursive('/Others/Infos/Apple_Pie.txt')  # move in Business, f1
+        content_to_move_res.moveRecursive('/Business/Menus/Apple_Pie.txt')  # move in Business, f1
 
         # Database content is moved
         content_to_move = self.session.query(ContentRevisionRO) \
@@ -579,7 +578,7 @@ class TestWebDav(StandardTest):
 
         assert content_to_move.parent, 'Content should have a parent'
 
-        assert content_to_move.parent.label == 'Infos',\
+        assert content_to_move.parent.label == 'Menus',\
             'file should be moved in Infos but is in {0}'.format(
                 content_to_move.parent.label
         )

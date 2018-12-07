@@ -126,16 +126,18 @@ class WebdavTracimContext(TracimContext):
     def _get_content(self, content_path_fetcher):
         path = content_path_fetcher()
         content_path = self.provider.reduce_path(path)
-        parent_path = dirname(path)
-        workspace = self.current_workspace
-        relative_parents_path = parent_path[len(workspace.label)+1:]
-        parents = relative_parents_path.split('/')
-
-        try:
-            parents.remove('')
-        except ValueError:
-            pass
-        parents = [transform_to_bdd(x) for x in parents]
+        splited_local_path = content_path.strip('/').split('/')
+        workspace_name = transform_to_bdd(splited_local_path[0])
+        wapi = WorkspaceApi(
+            current_user=self.current_user,
+            session=self.dbsession,
+            config=self.app_config,
+        )
+        workspace = wapi.get_one_by_label(workspace_name)
+        parents = []
+        if len(splited_local_path) > 2:
+            parent_string = splited_local_path[1:-1]
+            parents = [transform_to_bdd(x) for x in parent_string]
 
         content_api = ContentApi(
             config=self.app_config,

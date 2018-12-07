@@ -282,7 +282,7 @@ can_delete_workspace = OrAuthorizationChecker(
 # content
 can_move_content = AndAuthorizationChecker(
     is_content_manager,
-    CandidateWorkspaceRoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
+    CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
 )
 # comments
 is_comment_owner = CommentOwnerChecker()
