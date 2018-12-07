@@ -1,6 +1,10 @@
 sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
+sidebarColor = #333
+sidebarColorLighten = lighten(sidebarColor, 15%)
+sidebarColorDarken = darken(sidebarColor, 15%)
+
 .sidebarSticky
   position sticky
   top 87px
@@ -8,11 +12,6 @@ sidebar-animate-speed = 0.5s
   flex-direction column
   justify-content space-between
   height 100%
-
-leftside()
-  height 100%
-  font-size 18px
-  background-color rgba(253, 253, 253, 0.3)
 
 .sidebar
   display flex
@@ -26,6 +25,7 @@ leftside()
   background-repeat repeat
   z-index 10
   box-shadow 0 0 2px 1px #333
+  background-color sidebarColor // #1168
   &.sidebarclose
     width 0
   &__expand
@@ -40,6 +40,7 @@ leftside()
     cursor pointer
     color white
     transition all sidebar-animate-speed
+    background-color sidebarColor // #1168
     ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__expand
       left 0
   &__scrollup
@@ -55,6 +56,7 @@ leftside()
     cursor pointer
     color white
     transition all sidebar-animate-speed
+    background-color sidebarColor // #1168
     ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__scrollup
       left 0
   &__content
@@ -67,8 +69,11 @@ leftside()
         display block
         margin 0 auto
         padding 10px 20px
+        background-color sidebarColorLighten // #1168
+        border-color sidebarColorDarken // #1168
         &:hover
           color offWhite
+          background-color sidebarColorDarken // #1168
     &__navigation
       padding 0
       width sidebar-width
@@ -87,11 +92,17 @@ leftside()
             width 100%
             height 100%
             cursor pointer
+            background-color sidebarColor // #1168
+            border-color sidebarColor
+            &:hover
+              background-color sidebarColorDarken // #1168
           &__number
             display flex
-            leftside()
-            padding 12px
             width 50px
+            height 100%
+            font-size 18px
+            background-color rgba(253, 253, 253, 0.3)
+            padding 12px
             letter-spacing 2px
           &__name
             padding 10px
@@ -119,24 +130,28 @@ leftside()
               align-items center
               border-bottom 1px solid
               cursor pointer
+              background-color sidebarColorLighten // #1168
+              border-color sidebarColorDarken // #1168
+              transition background-color 150ms
+              &:hover
+                background-color sidebarColor // #1168
+                opacity 0.80
+              &.activeFilter
+                background-color #777
               &__showdropdown
-                display flex
-                justify-content space-between
-                align-items center
                 padding 0 10px
                 width 100%
               .dropdown__icon
                 padding 10px 15px
                 min-width 50px
-                leftside()
+                height 100%
+                font-size 18px
+                opacity 0.95
               .dropdown__title
                 white-space nowrap
                 overflow hidden
                 text-overflow ellipsis
-                // color offWhite
-              &.activeFilter
-                .dropdown__icon
-                  background-color rgba(253, 253, 253, 0.8)
+                color offWhite
   &__footer
     &__text
       color offWhite

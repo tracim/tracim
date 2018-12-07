@@ -410,7 +410,7 @@ class WorkspaceContent extends React.Component {
                   )
                 }
 
-                {idRoleUserWorkspace >= 2 &&
+                {idRoleUserWorkspace >= 2 && workspaceContentList.length >= 10 &&
                   <DropdownCreateButton
                     customClass='workspace__content__button'
                     idFolder={null}

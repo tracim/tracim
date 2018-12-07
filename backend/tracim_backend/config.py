@@ -644,7 +644,7 @@ class CFG(object):
         folder = Application(
             label='Folder',
             slug='contents/folder',
-            fa_icon='folder-open-o',
+            fa_icon='folder-o',
             is_active=True,
             config={},
             main_route='',
@@ -656,6 +656,7 @@ class CFG(object):
             creation_label='Create a folder',
             available_statuses=content_status_list.get_all(),
             allow_sub_content=True,
+            minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER
         )
 
         markdownpluspage = Application(

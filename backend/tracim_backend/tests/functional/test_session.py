@@ -81,7 +81,7 @@ class TestLoginEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -186,7 +186,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -201,7 +201,7 @@ class TestWhoamiEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
 
@@ -268,7 +268,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',

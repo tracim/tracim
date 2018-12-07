@@ -4,5 +4,3 @@
 node_modules/
 dist/folder.app.js
 dist/folder_advanced.app.dev.js
-dist/app
-dist/assets
