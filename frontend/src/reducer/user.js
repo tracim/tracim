@@ -12,7 +12,7 @@ import { getBrowserLang } from '../helper.js'
 const defaultUser = {
   user_id: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
-  auth: '',
+  auth_type: '',
   timezone: '',
   profile: {
     id: 1,
