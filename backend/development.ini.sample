@@ -138,6 +138,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ; website.server_name = localhost
 
 ### Frontend ###
+## if you want to use tracim API without frontend, change this parameter to False
 frontend.serve = True
 # You can set dist folder of tracim frontend. by default, system
 # will try to get it automatically according to tracim repository
@@ -191,7 +192,8 @@ email.notification.smtp.password = your_smtp_password
 
 ### Processing ###
 # processing_mode may be sync or async
-# if you use async you need additional daemon, see README for more info.
+# if async is choosen, you need also to run mail_notifier daemon.
+# more info in README (Run daemons according to your config)
 email.notification.processing_mode = sync
 
 ### Headers ###
@@ -228,18 +230,23 @@ email.notification.reset_password_request.template.text = %(email.template_dir)s
 # Reply by email feature: allow user to answer directly to tracim in reply
 # to notification.
 # This need api.key with non-empty value
-# This feature need additional daemons: see README for more info
+# This feature need to run mail_fetcher daemons.
+# more info in README (Run daemons according to your config)
 ## available choice: True or False
 email.reply.activated = False
 
 ### IMAP ###
+# Tracim email reply feature will read all mails in following IMAP,
+# to be able to transform email responses into Tracim app comments.
 email.reply.imap.server = your_imap_server
 email.reply.imap.port = 993
 email.reply.imap.user = your_imap_user
 email.reply.imap.password = your_imap_password
 email.reply.imap.folder = INBOX
 email.reply.imap.use_ssl = True
-email.reply.imap.use_idle = True
+# IMAP IDLE feature is for real-time notifications (its not necessary to use function send & receive)
+# if this option is available in your imap server, change this parameter to True
+email.reply.imap.use_idle = False
 
 ### Connection ###
 ## Delay in seconds for re-new connection
