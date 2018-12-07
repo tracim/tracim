@@ -2,6 +2,8 @@
 import typing
 
 from tracim_backend.app_models.contents import ContentType
+from tracim_backend.models.roles import WorkspaceRoles
+
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
     from tracim_backend.app_models.contents import ContentStatus
@@ -56,6 +58,7 @@ class Application(object):
             slug_alias: typing.List[str] = None,
             allow_sub_content: bool = False,
             file_extension: typing.Optional[str] = None,
+            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
     ):
         content_type = ContentType(
             slug=slug,
@@ -67,6 +70,7 @@ class Application(object):
             slug_alias=slug_alias,
             allow_sub_content=allow_sub_content,
             file_extension=file_extension,
+            minimal_role_content_creation=minimal_role_content_creation,
         )
         self.content_types.append(content_type)
 

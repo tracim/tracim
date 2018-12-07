@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
+from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimException
@@ -170,6 +171,42 @@ class ContentTypeChecker(AuthorizationChecker):
             return True
         raise ContentTypeNotAllowed()
 
+class ContentTypeCreationChecker(AuthorizationChecker):
+    """
+    Check if user can create content of this type
+    """
+    def __init__(
+            self,
+            content_type_list: ContentTypeList,
+            content_type_slug: typing.Optional[str] = None,
+    ):
+        """
+        :param content_type_slug: force to check a content_type, if not provided,
+        :param content_type_list: list of all content_type available in tracim
+        check if content type creation is allowed with
+        tracim_context.candidate_content_type
+        """
+        super().__init__()
+        self.content_type_slug = content_type_slug
+        self.content_type_list = content_type_list
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        user_role = tracim_context.current_workspace.get_user_role(
+            tracim_context.current_user
+        )
+        if self.content_type_slug:
+            content_type = self.content_type_list.get_one_by_slug(
+                self.content_type_slug
+            )
+        else:
+            content_type = tracim_context.candidate_content_type
+        if user_role >= content_type.minimal_role_content_creation.level:
+            return True
+        raise InsufficientUserRoleInWorkspace()
+
 
 class CommentOwnerChecker(AuthorizationChecker):
     """
@@ -268,6 +305,7 @@ can_move_content = AndAuthorizationChecker(
     is_content_manager,
     CandidateWorkspaceRoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
 )
+can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
 can_delete_comment = OrAuthorizationChecker(
