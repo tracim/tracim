@@ -50,7 +50,7 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.idRoleUserWorkspace >= 4 &&
+            {props.idRoleUserWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 {folderAvailableApp.length > 0 && (
                   <div>
@@ -76,18 +76,20 @@ class Folder extends React.Component {
                   </div>
                 )}
 
-                <div className='d-none d-md-flex'>
-                  <BtnExtandedAction
-                    idRoleUserWorkspace={props.idRoleUserWorkspace}
-                    onClickExtendedAction={{
-                      edit: e => props.onClickExtendedAction.edit(e, props.folderData),
-                      move: null, // e => props.onClickExtendedAction.move(e, props.folderData),
-                      download: e => props.onClickExtendedAction.download(e, props.folderData),
-                      archive: e => props.onClickExtendedAction.archive(e, props.folderData),
-                      delete: e => props.onClickExtendedAction.delete(e, props.folderData)
-                    }}
-                  />
-                </div>
+                {props.idRoleUserWorkspace >= 4 && (
+                  <div className='d-none d-md-flex'>
+                    <BtnExtandedAction
+                      idRoleUserWorkspace={props.idRoleUserWorkspace}
+                      onClickExtendedAction={{
+                        edit: e => props.onClickExtendedAction.edit(e, props.folderData),
+                        move: null, // e => props.onClickExtendedAction.move(e, props.folderData),
+                        download: e => props.onClickExtendedAction.download(e, props.folderData),
+                        archive: e => props.onClickExtendedAction.archive(e, props.folderData),
+                        delete: e => props.onClickExtendedAction.delete(e, props.folderData)
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             }
           </div>

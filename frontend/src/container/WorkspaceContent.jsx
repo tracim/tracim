@@ -310,6 +310,10 @@ class WorkspaceContent extends React.Component {
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
+    const createContentAvailableApp = contentType
+      .filter(ct => ct.slug !== 'comment')
+      .filter(ct => idRoleUserWorkspace === 2 ? ct.slug !== 'folder' : true)
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='WorkspaceContent' style={{width: '100%'}}>
@@ -344,7 +348,7 @@ class WorkspaceContent extends React.Component {
                   parentClass='workspace__header__btnaddcontent'
                   idFolder={null} // null because it is workspace root content
                   onClickCreateContent={this.handleClickCreateContent}
-                  availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                  availableApp={createContentAvailableApp}
                 />
               }
             </PageTitle>
@@ -362,7 +366,7 @@ class WorkspaceContent extends React.Component {
                   : rootContentList.map((content, i) => content.type === 'folder'
                     ? (
                       <Folder
-                        availableApp={contentType.filter(ct => ct.slug !== 'comment')}
+                        availableApp={createContentAvailableApp}
                         folderData={{
                           ...content,
                           content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
@@ -416,7 +420,7 @@ class WorkspaceContent extends React.Component {
                     customClass='workspace__content__button'
                     idFolder={null}
                     onClickCreateContent={this.handleClickCreateContent}
-                    availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                    availableApp={createContentAvailableApp}
                   />
                 }
               </div>
