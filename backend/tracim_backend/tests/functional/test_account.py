@@ -9,7 +9,6 @@ import requests
 import transaction
 
 from tracim_backend import error
-from tracim_backend import models
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -20,7 +19,8 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.auth import User
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -36,8 +36,8 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -163,8 +163,8 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -275,8 +275,8 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -357,8 +357,8 @@ class TestUserReadStatusEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -490,8 +490,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__nominal(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -595,8 +595,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__ok__200__nominal(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -697,8 +697,8 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__nominal(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -799,8 +799,8 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
     def test_api_enable_account_workspace_notification__ok__200__user_nominal(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -875,8 +875,8 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
     def test_api_enable_account_workspace_notification__ok__200__nominal(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -954,8 +954,8 @@ class TestAccountWorkspaceEndpoint(FunctionalTest):
         Check obtain all workspaces reachables for user with user auth.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         workspace_api = WorkspaceApi(
@@ -1002,8 +1002,8 @@ class TestAccountEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__nominal(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1061,8 +1061,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1127,8 +1127,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1191,8 +1191,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1283,8 +1283,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1387,8 +1387,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1450,8 +1450,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1516,8 +1516,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__err_403__admin__too_small_acp(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1575,8 +1575,8 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__normal_user_by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1681,8 +1681,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_account_email__err_400__admin_same_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1747,8 +1747,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_account_email__err_403__admin_wrong_password(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1813,8 +1813,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_account_email__ok_200__user_nominal(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1891,8 +1891,8 @@ class TestSetPasswordEndpoint(FunctionalTest):
 
     def test_api__set_account_password__err_403__admin_wrong_password(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1957,8 +1957,8 @@ class TestSetPasswordEndpoint(FunctionalTest):
 
     def test_api__set_account_password__err_400__admin_passwords_do_not_match(self):  # nopep8
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2025,8 +2025,8 @@ class TestSetPasswordEndpoint(FunctionalTest):
 
     def test_api__set_account_password__ok_200__nominal(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2097,8 +2097,8 @@ class TestSetUserInfoEndpoint(FunctionalTest):
 
     def test_api__set_account_info__ok_200__nominal(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,

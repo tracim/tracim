@@ -21,8 +21,8 @@ from tracim_backend.lib.utils.authorization import ProfileChecker
 from tracim_backend.lib.utils.authorization import RoleChecker
 from tracim_backend.lib.utils.authorization import SameUserChecker
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.models import Group
-from tracim_backend.models import User
+from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace

@@ -6,7 +6,7 @@ import requests
 import transaction
 from depot.io.utils import FileIntent
 
-from tracim_backend import models
+from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend import error
 from tracim_backend.extensions import app_list
@@ -18,7 +18,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -37,8 +37,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Check obtain workspace reachable for user.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -104,8 +104,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Check obtain workspace reachable for user.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -170,8 +170,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test update workspace
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         workspace_api = WorkspaceApi(
@@ -358,8 +358,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -434,8 +434,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -495,8 +495,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -559,8 +559,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -624,8 +624,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -677,8 +677,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -755,8 +755,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -817,8 +817,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -882,8 +882,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -948,8 +948,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1055,8 +1055,8 @@ class TestWorkspacesEndpoints(FunctionalTest):
         Check obtain all workspaces reachables for user with user auth.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         workspace_api = WorkspaceApi(
@@ -1094,8 +1094,8 @@ class TestWorkspacesEndpoints(FunctionalTest):
         with another non-admin user auth.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1187,8 +1187,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         have any right
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1307,8 +1307,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list with a reachable workspace for user
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1362,8 +1362,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list with a reachable workspace for user
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1534,8 +1534,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         have any right
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1603,8 +1603,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         have any right
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1722,8 +1722,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1764,8 +1764,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1965,8 +1965,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Update worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2047,8 +2047,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Update worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2105,8 +2105,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Update worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2187,8 +2187,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2241,8 +2241,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2297,8 +2297,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2351,8 +2351,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Unallow to delete himself as workspace_manager
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2407,8 +2407,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2478,8 +2478,8 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2569,8 +2569,8 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3626,8 +3626,8 @@ class TestWorkspaceContents(FunctionalTest):
     def test_api__get_workspace_content__ok_200__get_all_filter_content_thread(self):
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3733,8 +3733,8 @@ class TestWorkspaceContents(FunctionalTest):
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4423,8 +4423,8 @@ class TestWorkspaceContents(FunctionalTest):
         Create generic content but content_type is not allowed in this folder
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,

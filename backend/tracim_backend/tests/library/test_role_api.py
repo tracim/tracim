@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.exceptions import UserRoleNotFound
 
 from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.models import User
+from tracim_backend.models.auth import User
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests import DefaultTest
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
