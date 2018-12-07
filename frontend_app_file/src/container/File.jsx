@@ -90,10 +90,16 @@ class File extends React.Component {
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
+
+        const previouslyUnsavedComment = localStorage.getItem(
+          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
+        )
+
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false
+          timelineWysiwyg: false,
+          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
       case 'allApp_changeLang':
