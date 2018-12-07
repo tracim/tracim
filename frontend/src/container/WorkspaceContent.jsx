@@ -363,56 +363,62 @@ class WorkspaceContent extends React.Component {
                       {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
                     </div>
                   )
-                  : rootContentList.map((content, i) => content.type === 'folder'
+                  : rootContentList.length === 0
                     ? (
-                      <Folder
-                        availableApp={createContentAvailableApp}
-                        folderData={{
-                          ...content,
-                          content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
-                        }}
-                        onClickItem={this.handleClickContentItem}
-                        idRoleUserWorkspace={idRoleUserWorkspace}
-                        onClickExtendedAction={{
-                          edit: this.handleClickEditContentItem,
-                          move: null, // this.handleClickMoveContentItem,
-                          download: this.handleClickDownloadContentItem,
-                          archive: this.handleClickArchiveContentItem,
-                          delete: this.handleClickDeleteContentItem
-                        }}
-                        onClickFolder={this.handleClickFolder}
-                        onClickCreateContent={this.handleClickCreateContent}
-                        contentType={contentType}
-                        readStatusList={currentWorkspace.contentReadStatusList}
-                        setFolderRead={this.handleSetFolderRead}
-                        isLast={i === rootContentList.length - 1}
-                        key={content.id}
-                        t={t}
-                      />
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t("This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'")}
+                      </div>
                     )
-                    : (
-                      <ContentItem
-                        label={content.label}
-                        fileName={content.fileName}
-                        fileExtension={content.fileExtension}
-                        faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                        statusSlug={content.statusSlug}
-                        read={currentWorkspace.contentReadStatusList.includes(content.id)}
-                        contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                        onClickItem={() => this.handleClickContentItem(content)}
-                        idRoleUserWorkspace={idRoleUserWorkspace}
-                        onClickExtendedAction={{
-                          edit: e => this.handleClickEditContentItem(e, content),
-                          move: null, // e => this.handleClickMoveContentItem(e, content),
-                          download: e => this.handleClickDownloadContentItem(e, content),
-                          archive: e => this.handleClickArchiveContentItem(e, content),
-                          delete: e => this.handleClickDeleteContentItem(e, content)
-                        }}
-                        isLast={i === rootContentList.length - 1}
-                        key={content.id}
-                      />
+                    : rootContentList.map((content, i) => content.type === 'folder'
+                      ? (
+                        <Folder
+                          availableApp={createContentAvailableApp}
+                          folderData={{
+                            ...content,
+                            content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
+                          }}
+                          onClickItem={this.handleClickContentItem}
+                          idRoleUserWorkspace={idRoleUserWorkspace}
+                          onClickExtendedAction={{
+                            edit: this.handleClickEditContentItem,
+                            move: null, // this.handleClickMoveContentItem,
+                            download: this.handleClickDownloadContentItem,
+                            archive: this.handleClickArchiveContentItem,
+                            delete: this.handleClickDeleteContentItem
+                          }}
+                          onClickFolder={this.handleClickFolder}
+                          onClickCreateContent={this.handleClickCreateContent}
+                          contentType={contentType}
+                          readStatusList={currentWorkspace.contentReadStatusList}
+                          setFolderRead={this.handleSetFolderRead}
+                          isLast={i === rootContentList.length - 1}
+                          key={content.id}
+                          t={t}
+                        />
+                      )
+                      : (
+                        <ContentItem
+                          label={content.label}
+                          fileName={content.fileName}
+                          fileExtension={content.fileExtension}
+                          faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                          statusSlug={content.statusSlug}
+                          read={currentWorkspace.contentReadStatusList.includes(content.id)}
+                          contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
+                          onClickItem={() => this.handleClickContentItem(content)}
+                          idRoleUserWorkspace={idRoleUserWorkspace}
+                          onClickExtendedAction={{
+                            edit: e => this.handleClickEditContentItem(e, content),
+                            move: null, // e => this.handleClickMoveContentItem(e, content),
+                            download: e => this.handleClickDownloadContentItem(e, content),
+                            archive: e => this.handleClickArchiveContentItem(e, content),
+                            delete: e => this.handleClickDeleteContentItem(e, content)
+                          }}
+                          isLast={i === rootContentList.length - 1}
+                          key={content.id}
+                        />
+                      )
                     )
-                  )
                 }
 
                 {idRoleUserWorkspace >= 2 && workspaceContentList.length >= 10 &&
