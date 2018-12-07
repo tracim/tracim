@@ -249,6 +249,8 @@ class UserCreationSchema(marshmallow.Schema):
         example='8QLa$<w',
         required=False,
         validate=user_password_validator,
+        allow_none=True,
+        default=None,
     )
     profile = marshmallow.fields.String(
         attribute='profile',

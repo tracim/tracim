@@ -3356,6 +3356,7 @@ class TestUserEndpoint(FunctionalTest):
         params = {
             'email': 'test@test.test',
             'email_notification': False,
+            'password': None,
         }
         res = self.testapp.post_json(
             '/api/v2/users',
