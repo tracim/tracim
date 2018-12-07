@@ -130,6 +130,20 @@ class User(DeclarativeBase):
     least the ``email`` column.
     """
 
+    MIN_PASSWORD_LENGTH =  6
+    MAX_PASSWORD_LENGTH = 512
+    MAX_HASHED_PASSWORD_LENGTH = 128
+    MIN_PUBLIC_NAME_LENGTH = 3
+    MAX_PUBLIC_NAME_LENGTH = 255
+    MIN_EMAIL_LENGTH = 3
+    MAX_EMAIL_LENGTH = 255
+    MAX_IMPORTED_FROM_LENGTH = 32
+    MAX_TIMEZONE_LENGTH = 32
+    MIN_LANG_LENGTH = 2
+    MAX_LANG_LENGTH = 3
+    MAX_AUTH_TOKEN_LENGTH = 255
+    MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
+
     __tablename__ = 'users'
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
     # utf8bm4 for mysql only in order to avoid max length of key issue with
@@ -143,24 +157,23 @@ class User(DeclarativeBase):
     }
 
     user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
-    email = Column(Unicode(255), unique=True, nullable=False)
-    display_name = Column(Unicode(255))
-    _password = Column('password', Unicode(128))
+    email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=False)
+    display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
+    _password = Column('password', Unicode(MAX_HASHED_PASSWORD_LENGTH))
     created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
     is_deleted = Column(Boolean, default=False, nullable=False, server_default=sqlalchemy.sql.expression.literal(False))
-    imported_from = Column(Unicode(32), nullable=True)
+    imported_from = Column(Unicode(MAX_IMPORTED_FROM_LENGTH), nullable=True)
     # timezone as tz database format
-    timezone = Column(Unicode(255), nullable=False, server_default='')
+    timezone = Column(Unicode(MAX_TIMEZONE_LENGTH), nullable=False, server_default='')
     # lang in iso639 format
-    lang = Column(Unicode(3), nullable=True, default=None)
+    lang = Column(Unicode(MAX_LANG_LENGTH), nullable=True, default=None)
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
     # TODO - G.M - 2018-08-22 - Think about hash instead of direct token
-    auth_token = Column(Unicode(255))
+    auth_token = Column(Unicode(MAX_AUTH_TOKEN_LENGTH))
     auth_token_created = Column(DateTime)
-
-    reset_password_token_hash = Column(Unicode(255), nullable=True, default=None)  # nopep8
+    reset_password_token_hash = Column(Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None)  # nopep8
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
 
     @hybrid_property

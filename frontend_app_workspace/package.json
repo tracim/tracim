@@ -6,7 +6,6 @@
   "scripts": {
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
     "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
-    "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9874 -- webpack-dev-server --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack -p",
     "build-dev": "NODE_ENV=production webpack",
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
@@ -17,15 +16,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.1",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-assign": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.24.1",
+    "@babel/core": "^7.1.6",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-transform-object-assign": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^8.2.6",
+    "babel-loader": "^8.0.4",
     "classnames": "^2.2.5",
     "css-loader": "^0.28.7",
     "file-loader": "^1.1.5",
@@ -40,13 +39,13 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "url-loader": "^0.6.2",
-    "webpack": "^3.8.1",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "i18next-scanner": "^2.6.1",
-    "webpack-dashboard": "^1.1.1",
-    "webpack-dev-server": "^2.9.2"
+    "webpack-dev-server": "^3.1.10"
   },
   "standard": {
     "globals": [

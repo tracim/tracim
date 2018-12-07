@@ -1,7 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
+import Avatar from '../Avatar/Avatar.jsx'
 
-require('./Comment.styl')
+// require('./Comment.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const Comment = props => {
   const styleSent = {
@@ -38,7 +39,7 @@ const Comment = props => {
           </div>
 
           <div className={classnames(`${props.customClass}__header__avatar`, 'comment__header__avatar')}>
-            <img src={props.avatar} />
+            <Avatar width={'44px'} publicName={props.author} />
           </div>
         </div>
 

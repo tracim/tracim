@@ -5,7 +5,6 @@ import FileComponent from '../component/FileComponent.jsx'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -15,7 +14,8 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  generateLocalStorageContentId
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -80,11 +80,20 @@ class File extends React.Component {
         break
       case 'file_hideApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState({
+          isVisible: false,
+          timelineWysiwyg: false
+        })
         break
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        tinymce.remove('#wysiwygTimelineComment')
+        this.setState(prev => ({
+          content: {...prev.content, ...data},
+          isVisible: true,
+          timelineWysiwyg: false
+        }))
         break
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
@@ -109,6 +118,12 @@ class File extends React.Component {
   componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
+    const { appName, content } = this.state
+    const previouslyUnsavedComment = localStorage.getItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+    )
+    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
+
     this.loadContent()
     this.loadTimeline()
   }
@@ -125,17 +140,13 @@ class File extends React.Component {
       this.loadTimeline()
     }
 
-    if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
-      tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', this.handleChangeDescription)
-    }
-
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
+    tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -191,14 +202,10 @@ class File extends React.Component {
       return
     }
 
-    const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+    const resCommentWithProperDate = resComment.body.map(c => ({
       ...c,
       created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang),
-      author: {
-        ...c.author,
-        avatar_url: c.author.avatar_url ? c.author.avatar_url : generateAvatarFromPublicName(c.author.public_name)
-      }
+      created: displayDistanceDate(c.created, loggedUser.lang)
     }))
 
     const revisionWithComment = resRevision.body
@@ -209,7 +216,7 @@ class File extends React.Component {
         timelineType: 'revision',
         commentList: r.comment_ids.map(ci => ({
           timelineType: 'comment',
-          ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
+          ...resCommentWithProperDate.find(c => c.content_id === ci)
         })),
         number: i + 1
       }))
@@ -224,8 +231,7 @@ class File extends React.Component {
       ], [])
 
     this.setState({
-      timeline: revisionWithComment,
-      mode: resRevision.body.length === 1 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
+      timeline: revisionWithComment
     })
   }
 
@@ -281,6 +287,12 @@ class File extends React.Component {
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({newComment})
+
+    const { appName, content } = this.state
+    localStorage.setItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
+      newComment
+    )
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -297,6 +309,9 @@ class File extends React.Component {
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
         this.setState({newComment: ''})
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
+        )
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         this.loadTimeline()
@@ -427,16 +442,24 @@ class File extends React.Component {
     if (!newFile || !newFile[0]) return
 
     const fileToSave = newFile[0]
-    this.setState({newFile: fileToSave})
 
-    var reader = new FileReader()
-    reader.onload = e => {
-      this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
-      const img = new Image()
-      img.src = e.target.result
-      img.onerror = () => this.setState({newFilePreview: false})
+    if (fileToSave.type.includes('image') && fileToSave.size > 2000000) { // allow preview
+      this.setState({newFile: fileToSave})
+
+      var reader = new FileReader()
+      reader.onload = e => {
+        this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
+        const img = new Image()
+        img.src = e.target.result
+        img.onerror = () => this.setState({newFilePreview: false})
+      }
+      reader.readAsDataURL(fileToSave)
+    } else { // no preview
+      this.setState({
+        newFile: fileToSave,
+        newFilePreview: false
+      })
     }
-    reader.readAsDataURL(fileToSave)
   }
 
   handleClickDropzoneCancel = () => this.setState({mode: MODE.VIEW, newFile: '', newFilePreview: null})
@@ -465,7 +488,8 @@ class File extends React.Component {
             this.setState({
               newFile: '',
               newFilePreview: null,
-              fileCurrentPage: 1
+              fileCurrentPage: 1,
+              mode: MODE.VIEW
             })
             this.loadContent(1)
             this.loadTimeline()

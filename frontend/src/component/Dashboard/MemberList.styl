@@ -17,16 +17,11 @@
     margin 0
     padding 0
     list-style none
-    min-height 477px
-    &.withAddBtn
-      min-height 397px
     &__item
       display flex
       border-bottom 1px solid grey
       padding 10px 15px
-      &:last-child
-        box-shadow inset 0px -3px 5px -2px #333
-      &:hover > .memberlist__list__item__info
+      &:hover > .memberlist__list__item__info, &:hover .memberlist__list__item__info__role
         color offWhite
       &:hover > .memberlist__list__item__delete
         color offWhite
@@ -40,7 +35,8 @@
         &__name
           font-size 20px
         &__role
-          font-size 18px
+          font-size 14px
+          color #999
       &__delete
         font-size 20px
         color darkGrey

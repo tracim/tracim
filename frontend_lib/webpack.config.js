@@ -1,20 +1,37 @@
-const webpack = require('webpack')
 const path = require('path')
 const glob = require('glob')
 const isProduction = process.env.NODE_ENV === 'production'
 
+// const isStylusFileRegex = /.+\.styl$/gm
+
 module.exports = {
+  mode: isProduction ? 'production' : 'development',
   entry: {
-    libJs: isProduction ? './src/index.js' : './src/index.dev.js',
-    libStyle: glob.sync('./src/**/*.styl')
+    lib: isProduction ? './src/index.js' : './src/index.dev.js',
+    style: glob.sync('./src/**/*.styl')
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'tracim_frontend_lib.js' : 'tracim_frontend_lib.dev.js',
+    filename: isProduction ? 'tracim_frontend_lib.[name].js' : 'tracim_frontend_lib.[name].dev.js',
     pathinfo: !isProduction,
     library: isProduction ? 'tracim_frontend_lib' : undefined,
     libraryTarget: isProduction ? 'umd' : undefined,
     umdNamedDefine: isProduction ? true : undefined
+  },
+  optimization: {
+    namedModules: true
+    // splitChunks: {
+    //   chunks: 'all',
+    //   cacheGroups: {
+    //     default: false,
+    //     vendors: false,
+    //     style: {
+    //       test: isStylusFileRegex,
+    //       enforce: true,
+    //       filename: 'tracim_frontend_lib.style.js'
+    //     }
+    //   }
+    // }
   },
   externals: isProduction
     ? {
@@ -44,8 +61,8 @@ module.exports = {
   module: {
     rules: [
       isProduction
-      ? {}
-      : {
+        ? {}
+        : {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
@@ -54,8 +71,15 @@ module.exports = {
       test: [/\.js$/, /\.jsx$/],
       loader: 'babel-loader',
       options: {
-        presets: ['env', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-class-properties', 'transform-object-assign']
+        presets: [
+          '@babel/preset-env',
+          '@babel/preset-react'
+        ],
+        plugins: [
+          '@babel/plugin-proposal-object-rest-spread',
+          '@babel/plugin-proposal-class-properties',
+          '@babel/plugin-transform-object-assign'
+        ]
       },
       exclude: [/node_modules/]
     }, {
@@ -76,21 +100,9 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   plugins:[
-    ...[
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'libStyle',
-        filename: 'tracim_frontend_lib.style.js'
-      })
-    ], // generic plugins always present
+    ...[], // generic plugins always present
     ...(isProduction
-      ? [ // production specific plugins
-        new webpack.DefinePlugin({
-          'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
-        })
-      ]
+      ? [] // production specific plugins
       : [] // development specific plugins
     )
   ]

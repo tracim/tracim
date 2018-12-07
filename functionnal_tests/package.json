@@ -1,0 +1,17 @@
+{
+  "name": "functionnal_tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "cypress-run": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress run",
+    "cypress-open": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress open",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^3.1.2"
+  }
+}

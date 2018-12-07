@@ -67,14 +67,9 @@ class Dashboard extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = async ({ detail: { type, data } }) => {
+  customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'refreshWorkspaceList':
-        console.log('%c<Dashboard> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceDetail()
-        this.loadMemberList()
-        this.loadRecentActivity()
-        break
+      case 'refreshDashboardMemberList': this.loadMemberList(); break
     }
   }
 
@@ -85,22 +80,26 @@ class Dashboard extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { props, state } = this
+    const { props } = this
 
-    if (prevProps.match.params.idws !== props.match.params.idws) {
-      this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
-      this.setState({
-        workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
-        advancedDashboardOpenedId: null
-      })
-    }
+    if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
 
-    if (prevState.workspaceIdInUrl !== state.workspaceIdInUrl) {
-      this.setState({displayNewMemberForm: false})
-      this.loadWorkspaceDetail()
-      this.loadMemberList()
-      this.loadRecentActivity()
-    }
+    this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
+    this.setState({
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
+      advancedDashboardOpenedId: null,
+      displayNewMemberForm: false,
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        nameOrEmail: '',
+        role: '',
+        isEmail: false
+      }
+    })
+    this.loadWorkspaceDetail()
+    this.loadMemberList()
+    this.loadRecentActivity()
   }
 
   componentWillUnmount () {
@@ -109,9 +108,9 @@ class Dashboard extends React.Component {
   }
 
   loadWorkspaceDetail = async () => {
-    const { props, state } = this
+    const { props } = this
 
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
       case 400:
@@ -123,9 +122,9 @@ class Dashboard extends React.Component {
   }
 
   loadMemberList = async () => {
-    const { props, state } = this
+    const { props } = this
 
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(state.workspaceIdInUrl))
+    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
     switch (fetchWorkspaceMemberList.status) {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
       case 400: break
@@ -134,10 +133,10 @@ class Dashboard extends React.Component {
   }
 
   loadRecentActivity = async () => {
-    const { props, state } = this
+    const { props } = this
 
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl))
-    const fetchWorkspaceReadStatusList = await props.dispatch(getMyselfWorkspaceReadStatusList(state.workspaceIdInUrl))
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(props.match.params.idws))
+    const fetchWorkspaceReadStatusList = await props.dispatch(getMyselfWorkspaceReadStatusList(props.match.params.idws))
 
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break

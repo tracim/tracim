@@ -8,7 +8,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 
-require('./Timeline.styl')
+// require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
 class Timeline extends React.Component {
   constructor (props) {
@@ -104,7 +104,6 @@ class Timeline extends React.Component {
                     customClass={props.customClass}
                     customColor={props.customColor}
                     author={content.author.public_name}
-                    avatar={content.author.avatar_url}
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
                     text={content.raw_content}
@@ -116,7 +115,6 @@ class Timeline extends React.Component {
                   return <Revision
                     customClass={props.customClass}
                     customColor={props.customColor}
-                    lang={props.loggedUser.lang}
                     revisionType={content.revision_type}
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
@@ -228,7 +226,6 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    avatar: '',
     idRoleUserWorkspace: 1
   },
   timelineData: [],

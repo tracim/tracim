@@ -13,7 +13,8 @@ from wsgidav.middleware import BaseMiddleware
 
 from tracim_backend import CFG
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import get_engine, get_session_factory, get_tm_session
+from tracim_backend.models.setup_models import get_engine, get_session_factory, \
+    get_tm_session
 
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):

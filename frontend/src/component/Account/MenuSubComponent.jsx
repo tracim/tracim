@@ -27,7 +27,7 @@ export const MenuSubComponent = props => {
             onClick={() => props.onClickMenuItem(menu.name)}
             key={menu.name}
           >
-            <div className='menusubcomponent__list__item__link nav-link'>{menu.label}</div>
+            <div className='menusubcomponent__list__item__link nav-link'>{props.t(menu.label)}</div>
           </li>
         )}
       </ul>
