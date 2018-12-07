@@ -192,8 +192,10 @@ class ContentTypeCreationChecker(AuthorizationChecker):
             content_type_slug: typing.Optional[str] = None,
     ):
         """
-        :param content_type: force to check a content_type, if not provided,
-        check is done with tracim_context.candidate_content_type
+        :param content_type_slug: force to check a content_type, if not provided,
+        :param content_type_list: list of all content_type available in tracim
+        check if content type creation is allowed with
+        tracim_context.candidate_content_type
         """
         super().__init__()
         self.content_type_slug = content_type_slug
