@@ -443,27 +443,23 @@ class File extends React.Component {
 
     const fileToSave = newFile[0]
 
-    if (
-      !fileToSave.type.includes('image') ||
-      fileToSave.size > 2000000
-    ) {
+    if (fileToSave.type.includes('image') && fileToSave.size > 2000000) { // allow preview
+      this.setState({newFile: fileToSave})
+
+      var reader = new FileReader()
+      reader.onload = e => {
+        this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
+        const img = new Image()
+        img.src = e.target.result
+        img.onerror = () => this.setState({newFilePreview: false})
+      }
+      reader.readAsDataURL(fileToSave)
+    } else { // no preview
       this.setState({
         newFile: fileToSave,
         newFilePreview: false
       })
-      return
     }
-
-    this.setState({newFile: fileToSave})
-
-    var reader = new FileReader()
-    reader.onload = e => {
-      this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
-      const img = new Image()
-      img.src = e.target.result
-      img.onerror = () => this.setState({newFilePreview: false})
-    }
-    reader.readAsDataURL(fileToSave)
   }
 
   handleClickDropzoneCancel = () => this.setState({mode: MODE.VIEW, newFile: '', newFilePreview: null})
