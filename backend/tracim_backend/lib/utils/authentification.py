@@ -14,7 +14,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import User
+from tracim_backend.models.auth import User
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"

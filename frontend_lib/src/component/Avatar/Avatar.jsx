@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import color from 'color'
 
-require('./Avatar.styl')
+// require('./Avatar.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export class Avatar extends React.Component {
   stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)

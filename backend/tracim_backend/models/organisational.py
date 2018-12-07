@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tracim_backend.models import User
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 
 

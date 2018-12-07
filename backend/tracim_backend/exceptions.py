@@ -85,6 +85,8 @@ class WorkspaceNotFound(NotFound):
 class WorkspaceNotFoundInTracimRequest(NotFound):
     error_code = error.WORKSPACE_NOT_IN_TRACIM_REQUEST
 
+class ContentTypeNotInTracimRequest(NotFound):
+    error_code = error.CONTENT_TYPE_NOT_IN_TRACIM_REQUEST
 
 class InsufficientUserRoleInWorkspace(TracimException):
     error_code = error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
@@ -140,7 +142,7 @@ class ContentStatusNotExist(TracimError):
 
 
 class ContentTypeNotExist(TracimError):
-    pass
+    error_code = error.CONTENT_TYPE_NOT_EXIST
 
 
 class UserDoesNotExist(TracimException):
@@ -181,7 +183,6 @@ class ContentNotFound(TracimException):
 
 class ContentTypeNotAllowed(TracimException):
     error_code = error.CONTENT_TYPE_NOT_ALLOWED
-
 
 class WorkspacesDoNotMatch(TracimException):
     error_code = error.WORKSPACE_DO_NOT_MATCH
@@ -263,6 +264,14 @@ class UserCantChangeIsOwnProfile(TracimException):
     error_code = error.USER_CANT_CHANGE_IS_OWN_PROFILE
 
 
+class UserIsNotContentOwner(TracimException):
+    pass
+
+
+class UserGivenIsNotTheSameAsAuthenticated(TracimException):
+    pass
+
+
 class NoUserSetted(TracimException):
     pass
 
@@ -275,8 +284,11 @@ class UserRoleNotFound(TracimException):
     error_code = error.USER_ROLE_NOT_FOUND
 
 
-class EmailValidationFailed(TracimException):
-    error_code = error.EMAIL_VALIDATION_FAILED
+class TracimValidationFailed(TracimException):
+    error_code = error.INTERNAL_TRACIM_VALIDATION_ERROR
+
+class EmailValidationFailed(TracimValidationFailed):
+    error_code = error.INTERNAL_TRACIM_VALIDATION_ERROR
 
 
 class InconsistentDatabase(TracimException):
@@ -363,11 +375,14 @@ class ExternalAuthUserPasswordModificationDisallowed(DisabledFeatureForExternalA
 class DepotCorrupted(TracimException):
     pass
 
+
 class RevisionFilePathSearchFailedDepotCorrupted(DepotCorrupted):
     pass
 
+
 class NewRevisionAbortedDepotCorrupted(DepotCorrupted):
     pass
+
 
 class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
     pass

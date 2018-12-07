@@ -21,9 +21,9 @@ from wsgidav.middleware import BaseMiddleware
 from tracim_backend.models.auth import AuthType
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import get_engine
-from tracim_backend.models import get_session_factory
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import get_tm_session
 
 
 class TracimWsgiDavDebugFilter(BaseMiddleware):

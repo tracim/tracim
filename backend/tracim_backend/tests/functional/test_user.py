@@ -9,8 +9,8 @@ import requests
 import transaction
 
 from tracim_backend import AuthType
+from tracim_backend.models.auth import User
 from tracim_backend import error
-from tracim_backend import models
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -21,7 +21,8 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -37,8 +38,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -75,7 +76,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -162,8 +163,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -200,7 +201,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -256,8 +257,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -295,7 +296,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -341,7 +342,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
@@ -382,8 +383,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -421,7 +422,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -467,7 +468,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
@@ -484,8 +485,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -596,8 +597,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -678,8 +679,8 @@ class TestUserReadStatusEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -716,7 +717,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -791,8 +792,8 @@ class TestUserReadStatusEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -829,7 +830,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -875,7 +876,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         selected_contents_id = [
@@ -920,8 +921,8 @@ class TestUserReadStatusEndpoint(FunctionalTest):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -958,7 +959,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1004,7 +1005,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         selected_contents_id = [
@@ -1041,8 +1042,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1071,7 +1072,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1149,8 +1150,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__admin_workspace_do_not_exist(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1179,7 +1180,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1234,8 +1235,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__admin_content_do_not_exist(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1264,7 +1265,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1319,8 +1320,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__user_itself(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1349,7 +1350,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1385,7 +1386,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # before
@@ -1419,8 +1420,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__403__other_user(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1449,7 +1450,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1485,7 +1486,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # read
@@ -1504,8 +1505,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__admin_with_comments_read_content(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1534,7 +1535,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1613,8 +1614,8 @@ class TestUserSetContentAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__admin_with_comments_read_comment(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1643,7 +1644,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1727,8 +1728,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1757,7 +1758,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1837,8 +1838,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__err__400__admin_workspace_do_not_exist(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1867,7 +1868,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -1922,8 +1923,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__err__400__admin_content_do_not_exist(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1952,7 +1953,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2008,8 +2009,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__ok__200__user_itself(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2038,7 +2039,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2074,7 +2075,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # before
@@ -2104,8 +2105,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__err__403__other_user(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2134,7 +2135,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2170,7 +2171,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
 
@@ -2190,8 +2191,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__ok__200__with_comments_read_content(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2245,8 +2246,8 @@ class TestUserSetContentAsUnread(FunctionalTest):
     def test_api_set_content_as_unread__ok__200__with_comments_read_comment_only(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2305,8 +2306,8 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2335,7 +2336,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2403,8 +2404,8 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
     def test_api_set_content_as_read__ok__200__user_itself(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2433,7 +2434,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2471,7 +2472,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
@@ -2501,8 +2502,8 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
     def test_api_set_content_as_read__err__403__other_user(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2531,7 +2532,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2569,7 +2570,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.put(
@@ -2592,8 +2593,8 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
     def test_api_enable_user_workspace_notification__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2622,7 +2623,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2662,8 +2663,8 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
     def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2692,7 +2693,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2713,7 +2714,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
@@ -2733,8 +2734,8 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
     def test_api_enable_user_workspace_notification__err__403__other_user(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2763,7 +2764,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2773,7 +2774,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='boby',
             groups=groups,
             timezone='Europe/Paris',
@@ -2795,7 +2796,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass',
+                'password',
             )
         )
         res = self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
@@ -2814,8 +2815,8 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
     def test_api_disable_user_workspace_notification__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2844,7 +2845,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2885,8 +2886,8 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
     def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2915,7 +2916,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2936,7 +2937,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
@@ -2955,8 +2956,8 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
     def test_api_disable_user_workspace_notification__err__403__other_user(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2985,7 +2986,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -2995,7 +2996,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='boby',
             groups=groups,
             timezone='Europe/Paris',
@@ -3017,7 +3018,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass',
+                'password',
             )
         )
         res = self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
@@ -3040,8 +3041,8 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         Check obtain all workspaces reachables for user with user auth.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         workspace_api = WorkspaceApi(
@@ -3146,8 +3147,8 @@ class TestUserEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3162,7 +3163,7 @@ class TestUserEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3198,8 +3199,8 @@ class TestUserEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3214,7 +3215,7 @@ class TestUserEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3230,7 +3231,7 @@ class TestUserEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get(
@@ -3249,8 +3250,8 @@ class TestUserEndpoint(FunctionalTest):
 
     def test_api__get_user__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3265,7 +3266,7 @@ class TestUserEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3274,7 +3275,7 @@ class TestUserEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -3291,7 +3292,7 @@ class TestUserEndpoint(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get(
@@ -3335,8 +3336,8 @@ class TestUserEndpoint(FunctionalTest):
         assert res['timezone'] == 'Europe/Paris'
         assert res['lang'] == 'fr'
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3358,6 +3359,7 @@ class TestUserEndpoint(FunctionalTest):
         params = {
             'email': 'test@test.test',
             'email_notification': False,
+            'password': None,
         }
         res = self.testapp.post_json(
             '/api/v2/users',
@@ -3377,8 +3379,8 @@ class TestUserEndpoint(FunctionalTest):
         assert res['auth_type'] == 'unknown'
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3391,8 +3393,8 @@ class TestUserEndpoint(FunctionalTest):
 
     def test_api__create_user__err_400__email_already_in_db(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3407,7 +3409,7 @@ class TestUserEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3444,8 +3446,8 @@ class TestUserEndpoint(FunctionalTest):
 
     def test_api__create_user__err_403__other_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3460,7 +3462,7 @@ class TestUserEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3474,7 +3476,7 @@ class TestUserEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         params = {
@@ -3537,8 +3539,8 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert res['lang'] == 'fr'
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3591,8 +3593,8 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert res['lang'] == None
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3618,8 +3620,8 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
 
     def test_api_delete_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3634,7 +3636,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3665,8 +3667,8 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
 
     def test_api_delete_user__err_400__admin_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         self.testapp.authorization = (
@@ -3697,8 +3699,8 @@ class TestUsersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3713,7 +3715,7 @@ class TestUsersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3750,8 +3752,8 @@ class TestUsersEndpoint(FunctionalTest):
 
     def test_api__get_user__err_403__normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3766,7 +3768,7 @@ class TestUsersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3782,7 +3784,7 @@ class TestUsersEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.get(
@@ -3803,8 +3805,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3819,7 +3821,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3829,7 +3831,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -3869,8 +3871,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3885,7 +3887,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3895,7 +3897,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -3933,8 +3935,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -3949,7 +3951,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -3959,7 +3961,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4025,8 +4027,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4041,7 +4043,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4051,7 +4053,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4061,7 +4063,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user3 = uapi.create_user(
             email='test3@test3.test3',
-            password='pass',
+            password='password',
             name='bob3',
             groups=groups,
             timezone='Europe/Paris',
@@ -4129,8 +4131,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4145,7 +4147,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4155,7 +4157,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4192,8 +4194,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__admin__by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4208,7 +4210,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4218,7 +4220,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4258,8 +4260,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__err_403__admin__too_small_acp(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4274,7 +4276,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4284,7 +4286,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4317,8 +4319,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
 
     def test_api__get_user__ok_200__normal_user_by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4333,7 +4335,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4343,7 +4345,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4353,7 +4355,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         test_user3 = uapi.create_user(
             email='test3@test3.test3',
-            password='pass',
+            password='password',
             name='bob3',
             groups=groups,
             timezone='Europe/Paris',
@@ -4392,7 +4394,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         params = {
@@ -4423,8 +4425,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_user_email__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4439,7 +4441,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4486,8 +4488,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_user_email__err_400__admin_same_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4502,7 +4504,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4552,8 +4554,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_user_email__err_403__admin_wrong_password(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4568,7 +4570,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4618,8 +4620,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_user_email__err_400__admin_string_is_not_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4634,7 +4636,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4685,8 +4687,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_user_email__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4701,7 +4703,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4717,7 +4719,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # check before
@@ -4731,7 +4733,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
@@ -4742,7 +4744,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'mysuperemail@email.fr',
-                'pass'
+                'password'
             )
         )
         # Check After
@@ -4755,8 +4757,8 @@ class TestSetEmailEndpoint(FunctionalTest):
 
     def test_api__set_user_email__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4771,7 +4773,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4781,7 +4783,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -4798,13 +4800,13 @@ class TestSetEmailEndpoint(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass'
+                'password'
             )
         )
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
@@ -4825,8 +4827,8 @@ class TestSetPasswordEndpoint(FunctionalTest):
 
     def test_api__set_user_password__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4841,7 +4843,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4862,7 +4864,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         # Set password
         params = {
@@ -4883,13 +4885,13 @@ class TestSetPasswordEndpoint(FunctionalTest):
             config=self.app_config,
         )
         user = uapi.get_one(user_id)
-        assert not user.validate_password('pass')
+        assert not user.validate_password('password')
         assert user.validate_password('mynewpassword')
 
     def test_api__set_user_password__err_403__admin_wrong_password(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4904,7 +4906,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4925,7 +4927,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         # Set password
         params = {
@@ -4949,13 +4951,13 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # Check After
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
 
     def test_api__set_user_password__err_400__admin_passwords_do_not_match(self):  # nopep8
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -4970,7 +4972,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -4991,7 +4993,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         assert not user.validate_password('mynewpassword2')
         # Set password
@@ -5016,14 +5018,14 @@ class TestSetPasswordEndpoint(FunctionalTest):
             config=self.app_config,
         )
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         assert not user.validate_password('mynewpassword2')
 
     def test_api__set_user_password__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5038,7 +5040,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5054,18 +5056,18 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # check before
         user = uapi.get_one(user_id)
-        assert user.validate_password('pass')
+        assert user.validate_password('password')
         assert not user.validate_password('mynewpassword')
         # Set password
         params = {
             'new_password': 'mynewpassword',
             'new_password2': 'mynewpassword',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         self.testapp.put_json(
             '/api/v2/users/{}/password'.format(user_id),
@@ -5080,13 +5082,13 @@ class TestSetPasswordEndpoint(FunctionalTest):
             config=self.app_config,
         )
         user = uapi.get_one(user_id)
-        assert not user.validate_password('pass')
+        assert not user.validate_password('password')
         assert user.validate_password('mynewpassword')
 
     def test_api__set_user_email__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5101,7 +5103,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             lang='fr',
@@ -5111,7 +5113,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -5128,13 +5130,13 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass'
+                'password'
             )
         )
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'pass',
+            'loggedin_user_password': 'password',
         }
         res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
@@ -5155,8 +5157,8 @@ class TestSetUserInfoEndpoint(FunctionalTest):
 
     def test_api__set_user_info__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5171,7 +5173,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5224,8 +5226,8 @@ class TestSetUserInfoEndpoint(FunctionalTest):
 
     def test_api__set_user_info__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5240,7 +5242,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5256,7 +5258,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass',
+                'password',
             )
         )
         # check before
@@ -5293,8 +5295,8 @@ class TestSetUserInfoEndpoint(FunctionalTest):
 
     def test_api__set_user_info__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5309,7 +5311,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5319,7 +5321,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='test',
             groups=groups,
             timezone='Europe/Paris',
@@ -5336,7 +5338,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass',
+                'password',
             )
         )
         # Set params
@@ -5364,8 +5366,8 @@ class TestSetUserProfileEndpoint(FunctionalTest):
 
     def test_api__set_user_profile__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5380,7 +5382,7 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5431,8 +5433,8 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         Return 400 because of "not allow to set own profile check"
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         transaction.commit()
 
@@ -5476,8 +5478,8 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         Return 403 error because of no right to do this as simple user
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5492,7 +5494,7 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5502,7 +5504,7 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='test',
             groups=groups,
             timezone='Europe/Paris',
@@ -5519,7 +5521,7 @@ class TestSetUserProfileEndpoint(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass',
+                'password',
             )
         )
         # Set params
@@ -5546,8 +5548,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
 
     def test_api_enable_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5562,7 +5564,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5605,8 +5607,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
 
     def test_api_disable_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5621,7 +5623,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5664,8 +5666,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
 
     def test_api_disable_user__err_400__cant_disable_myself_admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5712,8 +5714,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
 
     def test_api_enable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5728,7 +5730,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5738,7 +5740,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='test2',
             groups=groups,
             timezone='Europe/Paris',
@@ -5756,7 +5758,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.put_json(
@@ -5769,8 +5771,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
 
     def test_api_disable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5785,7 +5787,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5795,7 +5797,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         )
         test_user2 = uapi.create_user(
             email='test2@test2.test2',
-            password='pass',
+            password='password',
             name='test2',
             groups=groups,
             timezone='Europe/Paris',
@@ -5813,7 +5815,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             'Basic',
             (
                 'test2@test2.test2',
-                'pass'
+                'password'
             )
         )
         res = self.testapp.put_json(
@@ -5831,8 +5833,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         self-disable not allowed_check).
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -5847,7 +5849,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         groups = [gapi.get_one_with_name('users')]
         test_user = uapi.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -5864,7 +5866,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             'Basic',
             (
                 'test@test.test',
-                'pass'
+                'password'
             )
         )
         # check before

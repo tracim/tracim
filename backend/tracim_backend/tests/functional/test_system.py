@@ -1,10 +1,9 @@
 # coding=utf-8
 import transaction
-from tracim_backend import error
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_timezones_list
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.tests import FunctionalTest
 

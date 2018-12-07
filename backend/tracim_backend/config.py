@@ -15,9 +15,10 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.models import Group
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.roles import WorkspaceRoles
 
 
 class CFG(object):
@@ -727,6 +728,7 @@ class CFG(object):
             creation_label='Create a folder',
             available_statuses=content_status_list.get_all(),
             allow_sub_content=True,
+            minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER
         )
 
         markdownpluspage = Application(

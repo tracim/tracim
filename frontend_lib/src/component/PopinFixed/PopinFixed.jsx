@@ -5,7 +5,7 @@ import PopinFixedHeader from './PopinFixedHeader.jsx'
 import PopinFixedOption from './PopinFixedOption.jsx'
 import PopinFixedContent from './PopinFixedContent.jsx'
 
-require('./PopinFixed.styl')
+// require('./PopinFixed.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const PopinFixed = props => {
   return (

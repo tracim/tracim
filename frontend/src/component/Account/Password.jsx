@@ -84,7 +84,10 @@ export class Password extends React.Component {
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
-          {props.t('Change your password')}
+          {props.displayAdminInfo
+            ? props.t('Change the password')
+            : props.t('Change my password')
+          }
         </div>
 
         <div className='personaldata__text ml-2 ml-sm-0' />
@@ -124,7 +127,7 @@ export class Password extends React.Component {
               maxLength={513}
             />
 
-            {props.displayAdminInfo && (
+            {props.displayAdminInfo && state.newPassword !== '' && (
               <input
                 className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
                 type='password'
@@ -134,7 +137,7 @@ export class Password extends React.Component {
                 disabled={state.newPassword === '' && state.newPassword2 === ''}
               />
             )}
-            {props.displayAdminInfo && (
+            {props.displayAdminInfo && state.newPassword !== '' && (
               <div className='personaldata__form__txtinput__info'>
                 <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
                 {props.t('This edition requires your administrator password')}
@@ -148,7 +151,7 @@ export class Password extends React.Component {
             onClick={this.handleClickSubmit}
             disabled={this.isSubmitDisabled()}
           >
-            {props.t('Send')}
+            {props.t('Validate')}
           </button>
         </form>
 

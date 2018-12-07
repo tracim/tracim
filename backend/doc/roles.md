@@ -50,14 +50,15 @@ The other is workspace related and is called "workspace role".
 |                              | Reader | Contributor | Content Manager | Workspace Manager |
 |------------------------------|--------|-------------|-----------------|-------------------|
 | read content                 |  yes   | yes         | yes             | yes               |
-| get workspace members list   |  yes    | yes         | yes             | yes               |
+| get workspace members list   |  yes    | yes         | yes             | yes              |
 |------------------------------|--------|-------------|-----------------|-------------------|
-| create content               |  no    | yes         | yes             | yes               |
+| create content*              |  no    | yes         | yes             | yes               |
 | edit content                 |  no    | yes         | yes             | yes               |
 | copy content                 |  no    | yes         | yes             | yes               |
 | comments content             |  no    | yes         | yes             | yes               |
 | update content status        |  no    | yes         | yes             | yes               |
 -------------------------------|--------|-------------|-----------------|-------------------|
+| create folder                |  no    | no          | yes             | yes               |
 | move content                 |  no    | no          | yes             | yes               |
 | archive content              |  no    | no          | yes             | yes               |
 | delete content               |  no    | no          | yes             | yes               |
@@ -70,4 +71,4 @@ The other is workspace related and is called "workspace role".
 | modify comments              |  no    | owner       | owner             | yes             |
 | delete comments              |  no    | owner       | owner             | yes             |
  
- 
+  *: folder content not included.

@@ -7,9 +7,10 @@ import requests
 import transaction
 from depot.io.utils import FileIntent
 
+
 from tracim_backend import AuthType
 from tracim_backend import error
-from tracim_backend import models
+from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.extensions import app_list
@@ -21,7 +22,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -40,8 +41,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Check obtain workspace reachable for user.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -107,8 +108,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Check obtain workspace reachable for user.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -173,8 +174,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test update workspace
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         workspace_api = WorkspaceApi(
@@ -361,8 +362,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -437,8 +438,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -498,8 +499,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -562,8 +563,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -606,7 +607,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -627,8 +628,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -680,8 +681,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -758,8 +759,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -820,8 +821,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -885,8 +886,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -930,7 +931,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -951,8 +952,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1058,8 +1059,8 @@ class TestWorkspacesEndpoints(FunctionalTest):
         Check obtain all workspaces reachables for user with user auth.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
 
         workspace_api = WorkspaceApi(
@@ -1097,8 +1098,8 @@ class TestWorkspacesEndpoints(FunctionalTest):
         with another non-admin user auth.
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1190,8 +1191,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         have any right
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1310,8 +1311,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list with a reachable workspace for user
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1365,8 +1366,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list with a reachable workspace for user
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1537,8 +1538,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         have any right
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1606,8 +1607,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         have any right
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1725,8 +1726,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1767,8 +1768,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -1968,8 +1969,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Update worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2050,8 +2051,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Update worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2108,8 +2109,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Update worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2190,8 +2191,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2244,8 +2245,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2300,8 +2301,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2354,8 +2355,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Unallow to delete himself as workspace_manager
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2410,8 +2411,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2481,8 +2482,8 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2572,8 +2573,8 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         :return:
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         uapi = UserApi(
             current_user=admin,
@@ -2719,8 +2720,8 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         gapi = GroupApi(
             current_user=admin,
@@ -2771,8 +2772,8 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         gapi = GroupApi(
             current_user=admin,
@@ -2831,8 +2832,8 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         gapi = GroupApi(
             current_user=admin,
@@ -3414,6 +3415,279 @@ class TestWorkspaceContents(FunctionalTest):
                 and content['parent_id'] == 1
                 and content['content_id'] == subfolder_content_id
                 ]
+    def test_api__get_workspace_content__ok_200__get_path_of_content_deleted_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'subfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subfolder_content_id,
+            'label': 'subsubfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subsubfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subsubfolder_content_id,
+            'label': 'InfolderContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        infolder_content_id = res.json_body['content_id']
+        # delete
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/contents/{}/trashed'.format(infolder_content_id),
+            status=204
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        generic_content_content_id = res.json_body['content_id']
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 6
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_deleted'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        assert len(res) == 5
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert not [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_deleted'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+    def test_api__get_workspace_content__ok_200__get_path_of_content_archived_content(self):  # nopep8
+        """
+        Check obtain workspace all root contents and all subcontent content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': 1,
+            'label': 'subfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subfolder_content_id,
+            'label': 'subsubfolder',
+            'content_type': 'folder',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        subsubfolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': subsubfolder_content_id,
+            'label': 'InfolderContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        infolder_content_id = res.json_body['content_id']
+        params = {
+            'parent_id': 1,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        generic_content_content_id = res.json_body['content_id']
+        # archive
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/contents/{}/archived'.format(infolder_content_id),
+            status=204
+        )
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 6
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_archived'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
+
+        params = {
+            'complete_path_to_id': infolder_content_id,
+            'show_archived': 0,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        assert len(res) == 5
+        assert [content for content in res if
+                content['label'] == 'GenericCreatedContent'
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == 1
+                and content['content_id'] == generic_content_content_id
+                ]
+        assert not [content for content in res if
+                content['label'].startswith('InfolderContent')
+                and content['content_type'] == 'html-document'
+                and content['parent_id'] == subsubfolder_content_id
+                and content['content_id'] == infolder_content_id
+                and content['is_archived'] is True
+                ]
+        assert [content for content in res if
+                content['label'] == 'subsubfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == subfolder_content_id
+                and content['content_id'] == subsubfolder_content_id
+                ]
+        assert [content for content in res if
+                content['label'] == 'subfolder'
+                and content['content_type'] == 'folder'
+                and content['parent_id'] == 1
+                and content['content_id'] == subfolder_content_id
+                ]
 
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
         """
@@ -3602,8 +3876,8 @@ class TestWorkspaceContents(FunctionalTest):
     def test_api__get_workspace_content__ok_200__get_all_filter_content_thread(self):
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3709,8 +3983,8 @@ class TestWorkspaceContents(FunctionalTest):
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4391,16 +4665,15 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_EXIST  # nopep8
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
         Create generic content but content_type is not allowed in this folder
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4455,6 +4728,141 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
+            params=params,
+            status=200,
+        )
+
+    def test_api__post_content_create_generic_content__err_403__try_creating_folder_as_simple_contributor(self) -> None:  # nopep8
+        """
+        Create generic content but content_type is not allowed in this folder
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            do_save=False,
+            do_notify=False
+        )
+        content_api.set_allowed_content(folder, [content_type_list.Folder.slug])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedFolder',
+            'content_type': content_type_list.Folder.slug,
+            'parent_id': folder.content_id
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=workspace.workspace_id),
+            params=params,
+            status=403,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+
+    def test_api__post_content_create_generic_content__ok_200__try_creating_folder_as_content_manager(self) -> None:  # nopep8
+        """
+        Create generic content but content_type is not allowed in this folder
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            do_save=False,
+            do_notify=False
+        )
+        content_api.set_allowed_content(folder, [content_type_list.Folder.slug])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedFolder',
+            'content_type': content_type_list.Folder.slug,
+            'parent_id': folder.content_id
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=workspace.workspace_id),
             params=params,
             status=200,
         )

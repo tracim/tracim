@@ -36,7 +36,7 @@ class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: props.t('My profile')
+      label: props.t('Profile')
     }, {
       name: 'notification',
       active: false,
@@ -221,7 +221,7 @@ class Account extends React.Component {
         <PageWrapper customClass='account'>
           <PageTitle
             parentClass={'account'}
-            title={props.t('Admin account page')}
+            title={props.t('{{userName}} account edition', {userName: state.userToEdit.public_name})}
             icon='user-o'
           />
 
