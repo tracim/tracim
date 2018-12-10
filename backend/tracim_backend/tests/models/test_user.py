@@ -96,6 +96,23 @@ class TestUserModel(BaseTest):
 
         assert user.validate_password('uncorrect_password') is False
 
+    def test_unit__validate_password__false__empty_password(self):
+        """
+        Check if validate_password failed if not password
+        """
+        name = 'Damien'
+        email = 'tracim@trac.im'
+        password = None
+
+        user = User()
+        user.display_name = name
+        user.email = email
+        user.password = password
+
+        assert user.validate_password(password) is False
+        assert user.validate_password('') is False
+
+
     def test_unit__repr__ok__nominal_case(self):
         name = 'Damien'
         email = 'tracim@trac.im'

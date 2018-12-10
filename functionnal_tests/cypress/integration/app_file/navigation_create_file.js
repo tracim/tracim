@@ -12,7 +12,7 @@ describe('navigate :: workspace > create_new > file', function () {
   it('dashboard > button', function () {
     cy.get('.sidebar__content__navigation__workspace__item__name').should('be.visible')
     cy.get('.rah-static--height-auto').should('have.attr', 'aria-hidden', 'false')
-    cy.get('.fa-signal').should('be.visible').click()
+    cy.get('.fa-home').should('be.visible').click()
     cy.get('.dashboard__calltoaction .fa-paperclip').should('be.visible').click()
     cy.get('.cardPopup__container').should('be.visible')
     cy.get('.cardPopup__container .cardPopup__header').should('be.visible')

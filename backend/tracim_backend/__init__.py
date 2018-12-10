@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from pyramid_multiauth import MultiAuthenticationPolicy
 
+from tracim_backend.models.auth import AuthType
+from tracim_backend.views.core_api.account_controller import AccountController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -87,6 +89,27 @@ def web(global_config, **local_settings):
             realm=BASIC_AUTH_WEBUI_REALM
         ),
     )
+    # Hack for ldap
+    if AuthType.LDAP in app_config.AUTH_TYPES:
+        import ldap3
+        configurator.include('pyramid_ldap3')
+        configurator.ldap_setup(
+            app_config.LDAP_URL,
+            bind=app_config.LDAP_BIND_DN,
+            passwd=app_config.LDAP_BIND_PASS,
+            use_tls=app_config.LDAP_TLS,
+            use_pool=app_config.LDAP_USE_POOL,
+            pool_size=app_config.LDAP_POOL_SIZE,
+            pool_lifetime=app_config.LDAP_POOL_LIFETIME,
+            get_info=app_config.LDAP_GET_INFO
+        )
+        configurator.ldap_set_login_query(
+            base_dn=app_config.LDAP_USER_BASE_DN,
+            filter_tmpl=app_config.LDAP_USER_FILTER,
+            scope=ldap3.LEVEL,
+            attributes=ldap3.ALL_ATTRIBUTES
+        )
+
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()

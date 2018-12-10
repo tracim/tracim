@@ -100,8 +100,9 @@ api.key = %(basic_setup.api_key)s
 ## base url of the backend API, default to same as website.base_url
 ; api.base_url = http://localhost:6543
 
-## Auth type (internal or ldap)
-auth_type = internal
+## Auth type list (internal or ldap), can be a list of item separated by ','
+## and ordered by priority
+auth_types = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
 ## LDAP server address
 ; ldap_url = ldap://localhost:389
@@ -112,13 +113,12 @@ auth_type = internal
 ## The bind password
 ; ldap_bind_pass = toor
 ## Attribute name of user record who contain user login (email)
-; ldap_ldap_naming_attribute = uid
-## Matching between ldap attribute and ldap user field (ldap_attr1=user_field1,ldap_attr2=user_field2,...)
-; ldap_user_attributes = mail=email
+; ldap_login_attribute = mail
+## Attribute for default name of new user from ldap
+; ldap_name_attributes = givenName
 ## TLS usage to communicate with your LDAP server
 ; ldap_tls = False
-## If True, LDAP own tracim group managment (not available for now!)
-; ldap_group_enabled = False
+
 ## User auth token validity in seconds (used to interfaces like web calendars)
 user.auth_token.validity = 604800
 ## user reset_password token validity (default to 900s -> 15 minutes)

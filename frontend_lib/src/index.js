@@ -15,6 +15,7 @@ import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
 import Avatar from './component/Avatar/Avatar.jsx'
+import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 
@@ -62,6 +63,7 @@ export {
   PopinFixedOption,
   PopinFixedContent,
   Avatar,
+  Badge,
   Timeline,
   TextAreaApp,
   BtnSwitch,

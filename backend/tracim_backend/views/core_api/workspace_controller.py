@@ -4,7 +4,8 @@ import transaction
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
-from tracim_backend import BASE_API_V2
+from tracim_backend.models.auth import AuthType
+from tracim_backend.config import CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
@@ -13,6 +14,7 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
@@ -46,6 +48,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
@@ -364,7 +367,7 @@ class WorkspaceController(Controller):
         """
         newly_created = False
         email_sent = False
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG'] # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -391,15 +394,26 @@ class WorkspaceController(Controller):
             if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
                 raise exc
 
-            user = uapi.create_user(
-                email=hapic_data.body.user_email,
-                password=password_generator(),
-                do_notify=True
-            )
+            if app_config.NEW_USER_INVITATION_DO_NOTIFY:
+                user = uapi.create_user(
+                    auth_type=AuthType.UNKNOWN,
+                    email=hapic_data.body.user_email,
+                    password=password_generator(),
+                    do_notify=True
+                )
+                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                    app_config.NEW_USER_INVITATION_DO_NOTIFY and \
+                    app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    email_sent = True
+            else:
+                user = uapi.create_user(
+                    auth_type=AuthType.UNKNOWN,
+                    email=hapic_data.body.user_email,
+                    password=None,
+                    do_notify=False
+                )
+
             newly_created = True
-            if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
-                email_sent = True
 
         role = rapi.create_one(
             user=user,

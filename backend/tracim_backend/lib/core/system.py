@@ -1,6 +1,6 @@
 import datetime
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 
@@ -24,5 +24,6 @@ class SystemApi(object):
 
     def get_config(self) -> ConfigModel:
         return ConfigModel(
-            email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED  # nopep8
+            email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED,  # nopep8
+            new_user_invitation_do_notify=self._config.NEW_USER_INVITATION_DO_NOTIFY,  # nopep8
         )

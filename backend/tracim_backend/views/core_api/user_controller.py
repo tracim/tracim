@@ -1,5 +1,9 @@
 from pyramid.config import Configurator
 
+from tracim_backend.models.auth import AuthType
+from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
+from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
@@ -18,6 +22,7 @@ from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import \
     ActiveContentFilterQuerySchema
@@ -160,6 +165,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -185,6 +191,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetPasswordSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -225,6 +232,7 @@ class UserController(Controller):
         )
         user = uapi.update(
             request.candidate_user,
+            auth_type=request.candidate_user.auth_type,
             name=hapic_data.body.public_name,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
@@ -253,9 +261,14 @@ class UserController(Controller):
             config=app_config,
         )
         groups = [gapi.get_one_with_name(hapic_data.body.profile)]
+        password = hapic_data.body.password
+        if not password and hapic_data.body.email_notification:
+            password = password_generator()
+
         user = uapi.create_user(
+            auth_type=AuthType.UNKNOWN,
             email=hapic_data.body.email,
-            password=hapic_data.body.password,
+            password=password,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
@@ -360,6 +373,7 @@ class UserController(Controller):
         groups = [gapi.get_one_with_name(hapic_data.body.profile)]
         uapi.update(
             user=request.candidate_user,
+            auth_type=request.candidate_user.auth_type,
             groups=groups,
             do_save=True,
         )
