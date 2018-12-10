@@ -18,6 +18,7 @@ from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
 
+from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.user import UserApi
@@ -284,7 +285,7 @@ class TracimEnv(BaseMiddleware):
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ['tracim_registry'] =  registry
-
+        environ['tracim_context'] = WebdavTracimContext(environ)
         app = self._application(environ, start_response)
         dbsession.close()
         return app

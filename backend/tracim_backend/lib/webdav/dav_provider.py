@@ -42,12 +42,13 @@ from tracim_backend.models.data import Workspace
 
 class WebdavTracimContext(TracimContext):
 
-    def __init__(self, path: str, environ: typing.Dict[str, typing.Any], provider: 'Provider'):
+    def __init__(self, environ: typing.Dict[str, typing.Any]):
         super().__init__()
-        self.path = path
         self.environ = environ
-        self.provider = provider
         self._candidate_parent_content = None
+
+    def set_path(self, path: str):
+        self.path = path
 
     @property
     def root_path(self) -> str:
@@ -134,7 +135,7 @@ class WebdavTracimContext(TracimContext):
 
     def _get_content(self, content_path_fetcher):
         path = content_path_fetcher()
-        content_path = self.provider.reduce_path(path)
+        content_path = self.reduce_path(path)
         splited_local_path = content_path.strip('/').split('/')
         workspace_name = transform_to_bdd(splited_local_path[0])
         wapi = WorkspaceApi(
@@ -187,18 +188,27 @@ class WebdavTracimContext(TracimContext):
             self._get_candidate_workspace_path
         )
 
+    def reduce_path(self, path: str) -> str:
+        """
+        As we use the given path to request the database
 
-def use_tracim_context():
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self: 'Provider',
-                    path:str,
-                    environ: typing.Dict[str, typing.Any]
-                    ) -> typing.Callable:
-            tracim_context = WebdavTracimContext(path, environ, self)
-            return func(self, path, environ, tracim_context)
-        return wrapper
-    return decorator
+        ex: if the path is /a/b/.deleted/c/.archived, we're trying to get the archived content of the 'c' resource,
+        we need to keep the path /a/b/c
+
+        ex: if the path is /a/b/.history/my_file, we're trying to get the history of the file my_file, thus we need
+        the path /a/b/my_file
+
+        ex: if the path is /a/b/.history/my_file/(1985 - edition) my_old_name, we're looking for,
+        thus we remove all useless information
+        """
+        path = re.sub(r'/\.archived', r'', path)
+        path = re.sub(r'/\.deleted', r'', path)
+        path = re.sub(r'/\.history/[^/]+/(\d+)-.+', r'/\1', path)
+        path = re.sub(r'/\.history/([^/]+)', r'/\1', path)
+        path = re.sub(r'/\.history', r'', path)
+
+        return path
+
 
 class Provider(DAVProvider):
     """
@@ -235,11 +245,12 @@ class Provider(DAVProvider):
 
     #########################################################
     # Everything override from DAVProvider
-    @use_tracim_context()
-    def getResourceInst(self, path: str, environ: dict, tracim_context: WebdavTracimContext):
+    def getResourceInst(self, path: str, environ: dict):
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
+        tracim_context = environ['tracim_context']
+        tracim_context.set_path(path)
         user = tracim_context.current_user
         session = tracim_context.dbsession
         if not self.exists(path, environ):
@@ -315,14 +326,15 @@ class Provider(DAVProvider):
                 tracim_context=tracim_context,
             )
 
-    @use_tracim_context()
-    def exists(self, path, environ, tracim_context: WebdavTracimContext) -> bool:
+    def exists(self, path, environ) -> bool:
         """
         Called by wsgidav to check if a certain path is linked to a _DAVResource
         """
 
+        tracim_context = environ['tracim_context']
+        tracim_context.set_path(path)
         path = normpath(path)
-        working_path = self.reduce_path(path)
+        working_path = tracim_context.reduce_path(path)
         root_path = environ['http_authenticator.realm']
         parent_path = dirname(working_path)
         user = tracim_context.current_user
@@ -398,27 +410,6 @@ class Provider(DAVProvider):
             r'/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$',
             path
         ) is not None
-
-    def reduce_path(self, path: str) -> str:
-        """
-        As we use the given path to request the database
-
-        ex: if the path is /a/b/.deleted/c/.archived, we're trying to get the archived content of the 'c' resource,
-        we need to keep the path /a/b/c
-
-        ex: if the path is /a/b/.history/my_file, we're trying to get the history of the file my_file, thus we need
-        the path /a/b/my_file
-
-        ex: if the path is /a/b/.history/my_file/(1985 - edition) my_old_name, we're looking for,
-        thus we remove all useless information
-        """
-        path = re.sub(r'/\.archived', r'', path)
-        path = re.sub(r'/\.deleted', r'', path)
-        path = re.sub(r'/\.history/[^/]+/(\d+)-.+', r'/\1', path)
-        path = re.sub(r'/\.history/([^/]+)', r'/\1', path)
-        path = re.sub(r'/\.history', r'', path)
-
-        return path
 
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:
