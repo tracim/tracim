@@ -1,6 +1,7 @@
 # coding: utf8
 import typing
 
+import transaction
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
@@ -59,6 +60,7 @@ class TracimDomainController(object):
                 password=password,
                 ldap_connector=environ['tracim_registry'].ldap_connector
             )
+            transaction.commit()
         except AuthenticationFailed:
             return False
         return True
