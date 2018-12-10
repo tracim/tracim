@@ -62,6 +62,7 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_login_enpoint__err_401__user_not_activated(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -147,6 +148,356 @@ class TestLoginEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
 
+class TestLDAPAuthOnlyEndpoint(FunctionalTest):
+    config_section = 'functional_ldap_test'
+
+    def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(self):
+        params = {
+            'email': 'hubert@planetexpress.com',
+            'password': 'professor',
+        }
+        # user creation
+        with freeze_time("1999-12-31 23:59:59"):
+            creation_date = datetime.datetime.utcnow()
+            res = self.testapp.post_json(
+                '/api/v2/auth/login',
+                params=params,
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+        with freeze_time("2002-01-01 12:00:00"):
+            # normal login
+            res = self.testapp.post_json(
+                '/api/v2/auth/login',
+                params=params,
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == creation_date
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) != datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self):  # nopep8
+        params = {
+            'email': 'admin@admin.admin',
+            'password': 'admin@admin.admin',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/auth/login',
+            params=params,
+            status=403,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
+        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__try_login_enpoint_ldap_auth__err_403__unvalid_user(self):  # nopep8
+        params = {
+            'email': 'unknown@unknown.unknown',
+            'password': 'unknown@unknown.unknown',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/auth/login',
+            params=params,
+            status=403,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
+        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__ok__200__valid_ldap_user(self):   # nopep8
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        # user creation
+        with freeze_time("1999-12-31 23:59:59"):
+            creation_date = datetime.datetime.utcnow()
+            res = self.testapp.get(
+                '/api/v2/auth/whoami',
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+        with freeze_time("2002-01-01 12:00:00"):
+            # normal login
+            res = self.testapp.get(
+                '/api/v2/auth/whoami',
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == creation_date
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) != datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(self):   # nopep8
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+        )
+
+    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__unvalid_user(self):   # nopep8
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'unknown@unknown.unknown',
+                'unknown@unknown.unknown'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+        )
+
+class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
+    config_section = 'functional_ldap_and_internal_test'
+
+    def test_api__try_login_enpoint_ldap_internal_auth__ok_200__valid_ldap_user(self):
+        params = {
+            'email': 'hubert@planetexpress.com',
+            'password': 'professor',
+        }
+        # user creation
+        with freeze_time("1999-12-31 23:59:59"):
+            creation_date = datetime.datetime.utcnow()
+            res = self.testapp.post_json(
+                '/api/v2/auth/login',
+                params=params,
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+        with freeze_time("2002-01-01 12:00:00"):
+            # normal login
+            res = self.testapp.post_json(
+                '/api/v2/auth/login',
+                params=params,
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == creation_date
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) != datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+    def test_api__try_login_enpoint_ldap_internal_auth__ok__200__valid_internal_db_user(self):  # nopep8
+        params = {
+            'email': 'admin@admin.admin',
+            'password': 'admin@admin.admin',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/auth/login',
+            params=params,
+            status=200,
+        )
+        assert res.json_body['created']
+        datetime.datetime.strptime(
+            res.json_body['created'],
+            '%Y-%m-%dT%H:%M:%SZ'
+        )
+        assert res.json_body['public_name'] == 'Global manager'
+        assert res.json_body['email'] == 'admin@admin.admin'
+        assert res.json_body['is_active']
+        assert res.json_body['profile']
+        assert res.json_body['profile'] == 'administrators'
+        assert res.json_body['caldav_url'] is None
+        assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'internal'
+
+    def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(self):  # nopep8
+        params = {
+            'email': 'unknown@unknown.unknown',
+            'password': 'unknown@unknown.unknown',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/auth/login',
+            params=params,
+            status=403,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
+        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_ldap_user(self):   # nopep8
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        # user creation
+        with freeze_time("1999-12-31 23:59:59"):
+            creation_date = datetime.datetime.utcnow()
+            res = self.testapp.get(
+                '/api/v2/auth/whoami',
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+        with freeze_time("2002-01-01 12:00:00"):
+            # normal login
+            res = self.testapp.get(
+                '/api/v2/auth/whoami',
+                status=200,
+            )
+            assert res.json_body['created']
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) == creation_date
+            assert datetime.datetime.strptime(
+                res.json_body['created'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ) != datetime.datetime.utcnow()
+            assert res.json_body['public_name'] == 'Hubert'
+            assert res.json_body['email'] == 'hubert@planetexpress.com'
+            assert res.json_body['is_active']
+            assert res.json_body['profile']
+            assert res.json_body['profile'] == 'users'
+            assert res.json_body['caldav_url'] is None
+            assert res.json_body['avatar_url'] is None
+            assert res.json_body['auth_type'] == 'ldap'
+
+    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_internal_db_user(self):   # nopep8
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/auth/whoami', status=200)
+        assert res.json_body['public_name'] == 'Global manager'
+        assert res.json_body['email'] == 'admin@admin.admin'
+        assert res.json_body['created']
+        assert res.json_body['is_active']
+        assert res.json_body['profile']
+        assert res.json_body['profile'] == 'administrators'
+        assert res.json_body['caldav_url'] is None
+        assert res.json_body['avatar_url'] is None
+        assert res.json_body['lang'] is None
+        assert res.json_body['auth_type'] == 'internal'
+
+    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__err__403__unvalid_user(self):   # nopep8
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'unknown@unknown.unknown',
+                'unknown@unknown.unknown'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+        )
+
 class TestWhoamiEndpoint(FunctionalTest):
 
     def test_api__try_whoami_enpoint__ok_200__nominal_case(self):
@@ -167,6 +518,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -249,6 +601,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'internal'
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -438,6 +791,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 status=401,
             )
             assert 'Set-Cookie' in res.headers
+
     def test_api__test_cookie_auth_token__ok__revocation_case(self):
         with freeze_time("1999-12-31 23:59:59"):
             params = {

@@ -3,17 +3,22 @@
 Tests for /api/v2/users subpath endpoints.
 """
 from time import sleep
+
 import pytest
 import requests
 import transaction
 
+from tracim_backend import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend import error
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
+from tracim_backend.fixtures.content import Content as ContentFixtures
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.setup_models import get_tm_session
@@ -21,8 +26,6 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
@@ -3373,6 +3376,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['public_name'] == 'test'
         assert res['timezone'] == ''
         assert res['lang'] is None
+        assert res['auth_type'] == 'unknown'
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User) \
@@ -3385,7 +3389,7 @@ class TestUserEndpoint(FunctionalTest):
         )
         user = uapi.get_one(user_id)
         assert user.email == 'test@test.test'
-        assert user.password
+        assert user.password is None
 
     def test_api__create_user__err_400__email_already_in_db(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3600,6 +3604,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         user = uapi.get_one(user_id)
         assert user.email == 'test@test.test'
         assert user.password
+        assert user.auth_type == AuthType.UNKNOWN
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
@@ -5887,3 +5892,111 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         res = res.json_body
         assert res['user_id'] == user_id
         assert res['is_active'] is True
+
+
+class TestUserEnpointsLDAPAuth(FunctionalTest):
+    config_section = 'functional_ldap_test'
+
+    @pytest.mark.ldap
+    def test_api_set_user_password__err__400__setting_password_unallowed_for_ldap_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        user_id = res.json_body['user_id']
+        # Set password
+        params = {
+            'new_password': 'mynewpassword',
+            'new_password2': 'mynewpassword',
+            'loggedin_user_password': 'professor',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/password'.format(user_id),
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+
+    @pytest.mark.ldap
+    def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        user_id = res.json_body['user_id']
+        # Set password
+        params = {
+            'email': 'hubertnewemail@planetexpress.com',
+            'loggedin_user_password': 'professor',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/email'.format(user_id),
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+
+    @pytest.mark.ldap
+    def test_api__create_user__ok_200__full_admin(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('hubert@planetexpress.com')
+        gapi =GroupApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=user
+        )
+        api.update(user, auth_type=user.auth_type, groups=[gapi.get_one_with_name('administrators')])
+        api.save(user)
+        transaction.commit()
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'lang': 'fr',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['auth_type'] == 'unknown'
+        assert res['email'] == 'test@test.test'
+        assert res['public_name'] == 'test user'
+        assert res['profile'] == 'users'

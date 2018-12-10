@@ -13,6 +13,7 @@ from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.validator import *
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
@@ -162,6 +163,11 @@ class UserSchema(UserDigestSchema):
         validate=user_lang_validator,
         allow_none=True,
         default=None,
+    )
+    auth_type = marshmallow.fields.String(
+        validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
+        example=AuthType.INTERNAL.value,
+        description="authentication system of the user"
     )
 
     class Meta:
@@ -871,6 +877,7 @@ class AboutSchema(marshmallow.Schema):
 
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
+    new_user_invitation_do_notify = marshmallow.fields.Bool()
 
 
 class ApplicationSchema(marshmallow.Schema):

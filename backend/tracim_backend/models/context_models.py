@@ -49,10 +49,11 @@ class ConfigModel(object):
 
     def __init__(
         self,
-        email_notification_activated: bool
+        email_notification_activated: bool,
+        new_user_invitation_do_notify: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
-
+        self.new_user_invitation_do_notify = new_user_invitation_do_notify
 
 class PreviewAllowedDim(object):
 
@@ -193,7 +194,7 @@ class UserCreation(object):
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
-        self.password = password or password_generator()
+        self.password = password or None
         self.public_name = public_name or None
         self.timezone = timezone or ''
         self.lang = lang or None
@@ -569,6 +570,10 @@ class UserInContext(object):
     def avatar_url(self) -> typing.Optional[str]:
         # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
         return None
+
+    @property
+    def auth_type(self) -> str:
+        return self.user.auth_type.value
 
 
 class WorkspaceInContext(object):

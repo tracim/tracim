@@ -126,7 +126,7 @@ export const debug = {
         route: '/#/workspaces/1/dashboard',
         slug: 'dashboard',
         label: 'Dashboard',
-        fa_icon: 'signal'
+        fa_icon: 'home'
       },
       {
         hexcolor: '#fdfdfd',

@@ -51,7 +51,7 @@ class TestThread(DefaultTest):
         uapi = UserApi(
             session=self.session,
             current_user=admin,
-            config=self.config
+            config=self.app_config
         )
         u = uapi.create_minimal_user(email='u.u@u.u', save_now=True)
         eq_([], wapi.get_notifiable_roles(workspace=w))
@@ -71,7 +71,7 @@ class TestThread(DefaultTest):
         uapi = UserApi(
             session=self.session,
             current_user=admin,
-            config=self.config,
+            config=self.app_config,
         )
         # Checks a case without workspaces.
         wapi = WorkspaceApi(

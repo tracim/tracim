@@ -1,6 +1,6 @@
 import typing
 
-from tracim_backend import BASE_API_V2
+from tracim_backend.views import BASE_API_V2
 from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 from tracim_backend.lib.utils.daemon import FakeDaemon
 from tracim_backend.lib.utils.logger import logger
