@@ -70,6 +70,7 @@ class Dashboard extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case 'refreshDashboardMemberList': this.loadMemberList(); break
+      case 'refreshWorkspaceList': this.loadWorkspaceDetail(); break
     }
   }
 
