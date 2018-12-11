@@ -83,15 +83,10 @@ class HtmlDocument extends React.Component {
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
 
-        const previouslyUnsavedComment = localStorage.getItem(
-          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
-        )
-
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false,
-          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
+          timelineWysiwyg: false
         }))
         break
 
@@ -122,25 +117,23 @@ class HtmlDocument extends React.Component {
   componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
-    const { appName, content } = this.state
-    const previouslyUnsavedComment = localStorage.getItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
-    )
-    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
-
     this.loadContent()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     console.log('%c<HtmlDocument> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      await this.loadContent()
+      tinymce.remove('#wysiwygNewVersion')
+      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+    }
 
-    if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
+    if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
       tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -165,73 +158,108 @@ class HtmlDocument extends React.Component {
     }
   })
 
+  isValidLocalStorageType = type => ['rawContent', 'comment'].includes(type)
+
+  getLocalStorageItem = type => {
+    if (!this.isValidLocalStorageType(type)) {
+      console.log('error in app htmldoc, wrong getLocalStorage type')
+      return
+    }
+
+    const { state } = this
+    return localStorage.getItem(
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type)
+    )
+  }
+
+  setLocalStorageItem = (type, value) => {
+    if (!this.isValidLocalStorageType(type)) {
+      console.log('error in app htmldoc, wrong setLocalStorage type')
+      return
+    }
+
+    const { state } = this
+    localStorage.setItem(
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
+      value
+    )
+  }
+
   loadContent = async () => {
-    const { loggedUser, content, config } = this.state
+    const { loggedUser, content, config, appName } = this.state
 
     const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
     const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
     const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    handleFetchResult(await fetchResultHtmlDocument)
-      .then(resHtmlDocument => this.setState({
-        content: resHtmlDocument.body,
-        rawContentBeforeEdit: resHtmlDocument.body.raw_content
-      }))
-      .catch(e => console.log('Error loading content.', e))
-
-    Promise.all([
+    const [resHtmlDocument, resComment, resRevision] = await Promise.all([
+      handleFetchResult(await fetchResultHtmlDocument),
       handleFetchResult(await fetchResultComment),
       handleFetchResult(await fetchResultRevision)
     ])
-      .then(([resComment, resRevision]) => {
-        const resCommentWithProperDate = resComment.body.map(c => ({
-          ...c,
-          created_raw: c.created,
-          created: displayDistanceDate(c.created, loggedUser.lang)
+
+    const resCommentWithProperDate = resComment.body.map(c => ({
+      ...c,
+      created_raw: c.created,
+      created: displayDistanceDate(c.created, loggedUser.lang)
+    }))
+
+    const revisionWithComment = resRevision.body
+      .map((r, i) => ({
+        ...r,
+        created_raw: r.created,
+        created: displayDistanceDate(r.created, loggedUser.lang),
+        timelineType: 'revision',
+        commentList: r.comment_ids.map(ci => ({
+          timelineType: 'comment',
+          ...resCommentWithProperDate.find(c => c.content_id === ci)
+        })),
+        number: i + 1
+      }))
+      .reduce((acc, rev) => [
+        ...acc,
+        rev,
+        ...rev.commentList.map(comment => ({
+          ...comment,
+          customClass: '',
+          loggedUser: this.state.config.loggedUser
         }))
+      ], [])
 
-        const revisionWithComment = resRevision.body
-          .map((r, i) => ({
-            ...r,
-            created_raw: r.created,
-            created: displayDistanceDate(r.created, loggedUser.lang),
-            timelineType: 'revision',
-            commentList: r.comment_ids.map(ci => ({
-              timelineType: 'comment',
-              ...resCommentWithProperDate.find(c => c.content_id === ci)
-            })),
-            number: i + 1
-          }))
-          .reduce((acc, rev) => [
-            ...acc,
-            rev,
-            ...rev.commentList.map(comment => ({
-              ...comment,
-              customClass: '',
-              loggedUser: this.state.config.loggedUser
-            }))
-          ], [])
+    const localStorageComment = localStorage.getItem(
+      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'comment')
+    )
 
-        // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
-        // see https://github.com/tracim/tracim/issues/1206
-        // @fixme Côme - 2018/12/04 - this might not be a great idea
-        const modeToRender = (
-          resRevision.body.length === 1 && // if content has only one revision
-          loggedUser.idRoleUserWorkspace >= 2 && // if user has EDIT authorization
-          resRevision.body[0].raw_content === '' // if raw_content === '', content has neither been created through webdav nor imported from tracim v1
-        ) ? MODE.EDIT : MODE.VIEW
+    // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
+    // see https://github.com/tracim/tracim/issues/1206
+    // @fixme Côme - 2018/12/04 - this might not be a great idea
+    const modeToRender = (
+      resRevision.body.length === 1 && // if content has only one revision
+      loggedUser.idRoleUserWorkspace >= 2 && // if user has EDIT authorization
+      resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
+    )
+      ? MODE.EDIT
+      : MODE.VIEW
 
-        this.setState({
-          timeline: revisionWithComment,
-          mode: modeToRender
-        })
-      })
-      .catch(e => {
-        console.log('Error loading Timeline.', e)
-        this.setState({timeline: []})
-      })
+    // can't use this.getLocalStorageItem because it uses state that isn't yet initialized
+    const localStorageRawContent = localStorage.getItem(
+      generateLocalStorageContentId(resHtmlDocument.body.workspace_id, resHtmlDocument.body.content_id, appName, 'rawContent')
+    )
+    const hasLocalStorageRawContent = !!localStorageRawContent
 
-    await Promise.all([fetchResultHtmlDocument, fetchResultComment, fetchResultRevision])
+    this.setState({
+      mode: modeToRender,
+      content: {
+        ...resHtmlDocument.body,
+        raw_content: modeToRender === MODE.EDIT && hasLocalStorageRawContent
+          ? localStorageRawContent
+          : resHtmlDocument.body.raw_content
+      },
+      newComment: localStorageComment || '',
+      rawContentBeforeEdit: resHtmlDocument.body.raw_content,
+      timeline: revisionWithComment
+    })
+
     await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
   }
@@ -258,11 +286,8 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const { appName, content } = this.state
-
-    const previouslyUnsavedRawContent = localStorage.getItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
-    )
+    const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
+    console.log('handleClickNewVersion(), previouslyUnsavedRawContent', previouslyUnsavedRawContent)
 
     this.setState(prev => ({
       content: {
@@ -314,22 +339,14 @@ class HtmlDocument extends React.Component {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({content: {...prev.content, raw_content: newText}}))
 
-    const { appName, content } = this.state
-    localStorage.setItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent'),
-      e.target.value
-    )
+    this.setLocalStorageItem('rawContent', newText)
   }
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({newComment})
 
-    const { appName, content } = this.state
-    localStorage.setItem(
-      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
-      newComment
-    )
+    this.setLocalStorageItem('comment', newComment)
   }
 
   handleClickValidateNewCommentBtn = async () => {
