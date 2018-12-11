@@ -542,33 +542,23 @@ class ContentApi(object):
         assert content_type_slug != content_type_list.Any_SLUG
         assert not (label and filename)
 
+        if (workspace and parent) and \
+            workspace.workspace_id != parent.workspace_id:
+            raise WorkspacesDoNotMatch(
+                'new parent workspace and new workspace should be the same.'
+            )
+
         if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
         # can call here with None. Must update create_comment tu require the
         # workspace.
-        if not workspace:
-            workspace = parent.workspace
-
-        content_type = content_type_list.get_one_by_slug(content_type_slug)
-        if parent and parent.properties and 'allowed_content' in parent.properties:
-            if content_type.slug not in parent.properties['allowed_content'] or not parent.properties['allowed_content'][content_type.slug]:
-                raise UnallowedSubContent(' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(  # nopep8
-                    subcontent_type=content_type.slug,
-                    content_id=parent.content_id,
-                ))
         if not workspace and parent:
             workspace = parent.workspace
+        content_type = content_type_list.get_one_by_slug(content_type_slug)
 
-        if workspace:
-            if content_type.slug not in workspace.get_allowed_content_types():
-                raise UnallowedSubContent(
-                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
-                        subcontent_type=content_type.slug,
-                        content_id=workspace.workspace_id,
-                    )
-                )
+        self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
         if label:
             file_extension = ''
@@ -1487,14 +1477,25 @@ class ContentApi(object):
             if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
 
+        if (new_workspace and new_parent) and \
+            new_parent.workspace_id != new_workspace.workspace_id:
+            raise WorkspacesDoNotMatch(
+                'new parent workspace and new workspace should be the same.'
+            )
+
+        # INFO - G.M - 2018-12-11 - We allow renaming existing wrong file
+        # but not adding new content of wrong type.
+        if new_parent and new_parent != item.parent:
+            content_type = content_type_list.get_one_by_slug(item.type)
+            self._check_valid_content_type_in_dir(
+                content_type,
+                new_parent,
+                new_workspace
+            )
+
         item.parent = new_parent
         if new_workspace:
             item.workspace = new_workspace
-            if new_parent and \
-                    new_parent.workspace_id != new_workspace.workspace_id:
-                raise WorkspacesDoNotMatch(
-                    'new parent workspace and new workspace should be the same.'
-                )
         else:
             if new_parent:
                 item.workspace = new_parent.workspace
@@ -1507,6 +1508,30 @@ class ContentApi(object):
         )
         item.revision_type = ActionDescription.MOVE
 
+    def _check_valid_content_type_in_dir(self,
+        content_type: ContentType,
+        parent: Content,
+        workspace: Workspace,
+    ) -> None:
+        if parent:
+            assert workspace == parent.workspace
+            if parent.properties and 'allowed_content' in parent.properties:
+                if content_type.slug not in parent.properties[ 'allowed_content'] \
+                    or not parent.properties['allowed_content'][content_type.slug]:
+                        raise UnallowedSubContent(
+                            ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
+                                # nopep8
+                                subcontent_type=content_type.slug,
+                                content_id=parent.content_id,
+                            ))
+        if workspace:
+            if content_type.slug not in workspace.get_allowed_content_types():
+                raise UnallowedSubContent(
+                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
+                        subcontent_type=content_type.slug,
+                        content_id=workspace.workspace_id,
+                    )
+                )
     def copy(
         self,
         item: Content,
@@ -1530,6 +1555,13 @@ class ContentApi(object):
                 (new_parent == item.parent and new_label == item.label  and new_file_extension==item.file_extension and item.workspace == new_workspace):
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
+
+        if (new_workspace and new_parent) and \
+            new_parent.workspace_id != new_workspace.workspace_id:
+            raise WorkspacesDoNotMatch(
+                'new parent workspace and new workspace should be the same.'
+            )
+
         if new_parent:
             workspace = new_parent.workspace
             parent = new_parent
@@ -1539,6 +1571,12 @@ class ContentApi(object):
         else:
             workspace = item.workspace
             parent = item.parent
+
+        # INFO - G.M - 2018-12-11 - Do not allow copy file in a dir where
+        # this kind of content is not allowed.
+        if parent:
+            content_type = content_type_list.get_one_by_slug(item.type)
+            self._check_valid_content_type_in_dir(content_type, parent, workspace)
         label = new_label or item.label
         if new_file_extension is not None:
             file_extension = new_file_extension
