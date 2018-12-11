@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import transaction
-from os.path import normpath as base_normpath
 
 from sqlalchemy.orm import Session
 from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
@@ -16,62 +15,6 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
-
-
-def transform_to_display(string: str) -> str:
-    """
-    As characters that Windows does not support may have been inserted
-    through Tracim in names, before displaying information we update path
-    so that all these forbidden characters are replaced with similar
-    shape character that are allowed so that the user isn't trouble and
-    isn't limited in his naming choice
-    """
-    _TO_DISPLAY = {
-        '/': '⧸',
-        '\\': '⧹',
-        ':': '∶',
-        '*': '∗',
-        '?': 'ʔ',
-        '"': 'ʺ',
-        '<': '❮',
-        '>': '❯',
-        '|': '∣'
-    }
-
-    for key, value in _TO_DISPLAY.items():
-        string = string.replace(key, value)
-
-    return string
-
-
-def transform_to_bdd(string: str) -> str:
-    """
-    Called before sending request to the database to recover the right names
-    """
-    _TO_BDD = {
-        '⧸': '/',
-        '⧹': '\\',
-        '∶': ':',
-        '∗': '*',
-        'ʔ': '?',
-        'ʺ': '"',
-        '❮': '<',
-        '❯': '>',
-        '∣': '|'
-    }
-
-    for key, value in _TO_BDD.items():
-        string = string.replace(key, value)
-
-    return string
-
-
-def normpath(path):
-    if path == b'':
-        path = b'/'
-    elif path == '':
-        path = '/'
-    return base_normpath(path)
 
 
 class HistoryType(object):

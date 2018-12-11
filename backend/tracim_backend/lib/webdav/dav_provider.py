@@ -24,12 +24,12 @@ from tracim_backend.lib.core.content import ContentRevisionRO
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.lib.utils.utils import normpath
+from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
 from tracim_backend.lib.webdav.utils import HistoryType
 from tracim_backend.lib.webdav.utils import SpecialFolderExtension
-from tracim_backend.lib.webdav.utils import normpath
-from tracim_backend.lib.webdav.utils import transform_to_bdd
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 
@@ -115,7 +115,7 @@ class WebdavTracimContext(TracimContext):
         return wapi.get_one_by_label(workspace_id)
 
     def _get_current_workspace_label(self) -> str:
-        return transform_to_bdd(self.path.split('/')[1])
+        return webdav_convert_file_name_to_bdd(self.path.split('/')[1])
 
     @property
     def current_content(self):
@@ -133,7 +133,7 @@ class WebdavTracimContext(TracimContext):
         path = content_path_fetcher()
         content_path = self.reduce_path(path)
         splited_local_path = content_path.strip('/').split('/')
-        workspace_name = transform_to_bdd(splited_local_path[0])
+        workspace_name = webdav_convert_file_name_to_bdd(splited_local_path[0])
         wapi = WorkspaceApi(
             current_user=self.current_user,
             session=self.dbsession,
@@ -143,7 +143,7 @@ class WebdavTracimContext(TracimContext):
         parents = []
         if len(splited_local_path) > 2:
             parent_string = splited_local_path[1:-1]
-            parents = [transform_to_bdd(x) for x in parent_string]
+            parents = [webdav_convert_file_name_to_bdd(x) for x in parent_string]
 
         content_api = ContentApi(
             config=self.app_config,
@@ -151,7 +151,7 @@ class WebdavTracimContext(TracimContext):
             session=self.dbsession
         )
         return content_api.get_one_by_filename_and_parent_labels(
-            content_label=transform_to_bdd(basename(path)),
+            content_label=webdav_convert_file_name_to_bdd(basename(path)),
             content_parent_labels=parents,
             workspace=workspace,
         )
@@ -166,7 +166,7 @@ class WebdavTracimContext(TracimContext):
         self._destpath = destpath
 
     def _get_candidate_workspace_path(self):
-        return transform_to_bdd(self._destpath.split('/')[1])
+        return webdav_convert_file_name_to_bdd(self._destpath.split('/')[1])
 
     @property
     def candidate_parent_content(self) -> Content:

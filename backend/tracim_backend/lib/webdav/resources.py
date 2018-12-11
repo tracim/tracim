@@ -38,13 +38,13 @@ from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.utils import normpath
+from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
+from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
 from tracim_backend.lib.webdav.design import designPage
 from tracim_backend.lib.webdav.design import designThread
 from tracim_backend.lib.webdav.utils import FakeFileStream
 from tracim_backend.lib.webdav.utils import HistoryType
-from tracim_backend.lib.webdav.utils import normpath
-from tracim_backend.lib.webdav.utils import transform_to_bdd
-from tracim_backend.lib.webdav.utils import transform_to_display
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
@@ -153,7 +153,7 @@ class RootResource(DAVCollection):
         """
         try:
             workspace = self.workspace_api.get_one_by_label(label)
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', transform_to_display(workspace.label))
+            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(workspace.label))
 
             return WorkspaceResource(
                 workspace_path,
@@ -191,7 +191,7 @@ class RootResource(DAVCollection):
         self.workspace_api.save(new_workspace)
 
         workspace_path = '%s%s%s' % (
-        self.path, '' if self.path == '/' else '/', transform_to_display(new_workspace.label))
+            self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(new_workspace.label))
 
         transaction.commit()
         return WorkspaceResource(
@@ -262,7 +262,7 @@ class WorkspaceResource(DAVCollection):
         return mktime(self.workspace.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return transform_to_display(self.workspace.label)
+        return webdav_convert_file_name_to_display(self.workspace.label)
 
     def getLastModified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
@@ -286,7 +286,7 @@ class WorkspaceResource(DAVCollection):
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
-            '%s/%s' % (self.path, transform_to_display(content_label)),
+            '%s/%s' % (self.path, webdav_convert_file_name_to_display(content_label)),
             self.environ
         )
 
@@ -344,7 +344,7 @@ class WorkspaceResource(DAVCollection):
 
         transaction.commit()
 
-        return FolderResource('%s/%s' % (self.path, transform_to_display(label)),
+        return FolderResource('%s/%s' % (self.path, webdav_convert_file_name_to_display(label)),
                               self.environ,
                               content=folder,
                               tracim_context=self.tracim_context,
@@ -375,7 +375,7 @@ class WorkspaceResource(DAVCollection):
         children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
+            content_path = '%s/%s' % (self.path, webdav_convert_file_name_to_display(content.file_name))
 
             if content.type == content_type_list.Folder.slug:
                 members.append(
@@ -441,7 +441,7 @@ class FolderResource(WorkspaceResource):
 
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return transform_to_display(self.content.file_name)
+        return webdav_convert_file_name_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
@@ -545,7 +545,7 @@ class FolderResource(WorkspaceResource):
                 session=self.session,
             ):
                 if basename(destpath) != self.getDisplayName():
-                    self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
+                    self.content_api.update_content(self.content, webdav_convert_file_name_to_bdd(basename(destpath)))
                     self.content_api.save(self.content)
                 else:
                     if destination_workspace.workspace_id == self.content.workspace.workspace_id:
@@ -572,7 +572,7 @@ class FolderResource(WorkspaceResource):
         )
 
         for content in visible_children:
-            content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
+            content_path = '%s/%s' % (self.path, webdav_convert_file_name_to_display(content.file_name))
 
             try:
                 if content.type == content_type_list.Folder.slug:
@@ -652,7 +652,7 @@ class FileResource(DAVNonCollection):
 
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return transform_to_display(self.content.file_name)
+        return webdav_convert_file_name_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
@@ -766,7 +766,7 @@ class FileResource(DAVNonCollection):
                 # INFO - G.M - 2018-03-09 - First, renaming file if needed
                 if basename(destpath) != self.getDisplayName():
 
-                    new_filename = transform_to_bdd(basename(destpath))
+                    new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
                     regex_file_extension = re.compile(
                         '(?P<label>.*){}'.format(
                             re.escape(self.content.file_extension)))
@@ -823,7 +823,7 @@ class FileResource(DAVNonCollection):
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN)
 
-        new_filename = transform_to_bdd(basename(destpath))
+        new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
         regex_file_extension = re.compile(
             '(?P<label>.*){}'.format(re.escape(self.content.file_extension)))
         same_extension = regex_file_extension.match(new_filename)
@@ -885,7 +885,7 @@ class OtherFileResource(FileResource):
 
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return transform_to_display(self.content.file_name)
+        return webdav_convert_file_name_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
     def getPreferredPath(self):

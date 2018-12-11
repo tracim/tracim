@@ -16,13 +16,14 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
-from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import password_generator
-from tracim_backend.models.auth import User
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -990,7 +991,7 @@ class ContentInContext(object):
         """
         :return: complete filename with both label and file extension part
         """
-        return self.content.file_name
+        return core_convert_file_name_to_display(self.content.file_name)
 
 
 class RevisionInContext(object):
@@ -1284,4 +1285,4 @@ class RevisionInContext(object):
         """
         :return: complete filename with both label and file extension part
         """
-        return self.revision.file_name
+        return core_convert_file_name_to_display(self.revision.file_name)
