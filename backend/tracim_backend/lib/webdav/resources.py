@@ -98,13 +98,16 @@ class ManageActions(object):
         self._type = action_type
 
     def action(self):
-        with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=self.content,
-        ):
-            self._actions[self._type](self.content)
-            self.content_api.save(self.content, self._type)
+        try:
+            with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=self.content,
+            ):
+                self._actions[self._type](self.content)
+                self.content_api.save(self.content, self._type)
+        except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN) from exc
 
         transaction.commit()
 
@@ -327,12 +330,15 @@ class WorkspaceResource(DAVCollection):
         if '/.deleted/' in self.path or '/.archived/' in self.path:
             raise DAVError(HTTP_FORBIDDEN)
 
-        folder = self.content_api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=self.workspace,
-            label=label,
-            parent=self.content
-        )
+        try:
+            folder = self.content_api.create(
+                content_type_slug=content_type_list.Folder.slug,
+                workspace=self.workspace,
+                label=label,
+                parent=self.content
+            )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
         self.content_api.save(folder)
 
@@ -530,20 +536,22 @@ class FolderResource(WorkspaceResource):
             destination_parent = self.tracim_context.candidate_parent_content
         except ContentNotFound as e:
             destination_parent = None
-
-        with new_revision(
-            content=self.content,
-            tm=transaction.manager,
-            session=self.session,
-        ):
-            if basename(destpath) != self.getDisplayName():
-                self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
-                self.content_api.save(self.content)
-            else:
-                if destination_workspace.workspace_id == self.content.workspace.workspace_id:
-                    self.content_api.move(self.content, destination_parent)
+        try:
+            with new_revision(
+                content=self.content,
+                tm=transaction.manager,
+                session=self.session,
+            ):
+                if basename(destpath) != self.getDisplayName():
+                    self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
+                    self.content_api.save(self.content)
                 else:
-                    self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
+                    if destination_workspace.workspace_id == self.content.workspace.workspace_id:
+                        self.content_api.move(self.content, destination_parent)
+                    else:
+                        self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
         transaction.commit()
 
@@ -747,49 +755,51 @@ class FileResource(DAVNonCollection):
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN)
 
+        try:
+            with new_revision(
+                content=self.content,
+                tm=transaction.manager,
+                session=self.session,
+            ):
+                # INFO - G.M - 2018-03-09 - First, renaming file if needed
+                if basename(destpath) != self.getDisplayName():
 
-        with new_revision(
-            content=self.content,
-            tm=transaction.manager,
-            session=self.session,
-        ):
-            # INFO - G.M - 2018-03-09 - First, renaming file if needed
-            if basename(destpath) != self.getDisplayName():
+                    new_filename = transform_to_bdd(basename(destpath))
+                    regex_file_extension = re.compile(
+                        '(?P<label>.*){}'.format(
+                            re.escape(self.content.file_extension)))
+                    same_extension = regex_file_extension.match(new_filename)
+                    if same_extension:
+                        new_label = same_extension.group('label')
+                        new_file_extension = self.content.file_extension
+                    else:
+                        new_label, new_file_extension = os.path.splitext(
+                            new_filename)
 
-                new_filename = transform_to_bdd(basename(destpath))
-                regex_file_extension = re.compile(
-                    '(?P<label>.*){}'.format(
-                        re.escape(self.content.file_extension)))
-                same_extension = regex_file_extension.match(new_filename)
-                if same_extension:
-                    new_label = same_extension.group('label')
-                    new_file_extension = self.content.file_extension
-                else:
-                    new_label, new_file_extension = os.path.splitext(
-                        new_filename)
+                    self.content_api.update_content(
+                        self.content,
+                        new_label=new_label,
+                    )
+                    self.content.file_extension = new_file_extension
+                    self.content_api.save(self.content)
 
-                self.content_api.update_content(
-                    self.content,
-                    new_label=new_label,
-                )
-                self.content.file_extension = new_file_extension
-                self.content_api.save(self.content)
-
-            # INFO - G.M - 2018-03-09 - Moving file if needed
-            destination_workspace = self.tracim_context.candidate_workspace
-            try:
-                destination_parent = self.tracim_context.candidate_parent_content
-            except ContentNotFound:
-                destination_parent = None
-            if destination_parent != parent or destination_workspace != workspace:  # nopep8
-                #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
-                #  if the request does not result in a real move.
-                self.content_api.move(
-                    item=self.content,
-                    new_parent=destination_parent,
-                    must_stay_in_same_workspace=False,
-                    new_workspace=destination_workspace
-                )
+                # INFO - G.M - 2018-03-09 - Moving file if needed
+                destination_workspace = self.tracim_context.candidate_workspace
+                try:
+                    destination_parent = self.tracim_context.candidate_parent_content
+                except ContentNotFound:
+                    destination_parent = None
+                if destination_parent != parent or destination_workspace != workspace:  # nopep8
+                    #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
+                    #  if the request does not result in a real move.
+                    self.content_api.move(
+                        item=self.content,
+                        new_parent=destination_parent,
+                        must_stay_in_same_workspace=False,
+                        new_workspace=destination_workspace
+                    )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
         transaction.commit()
 
@@ -829,14 +839,17 @@ class FileResource(DAVNonCollection):
             destination_parent = None
         workspace = self.content.workspace
         parent = self.content.parent
-        new_content = self.content_api.copy(
-            item=self.content,
-            new_label=new_label,
-            new_file_extension=new_file_extension,
-            new_parent=destination_parent,
-            new_workspace=destination_workspace
-        )
-        self.content_api.copy_children(self.content, new_content)
+        try:
+            new_content = self.content_api.copy(
+                item=self.content,
+                new_label=new_label,
+                new_file_extension=new_file_extension,
+                new_parent=destination_parent,
+                new_workspace=destination_workspace
+            )
+            self.content_api.copy_children(self.content, new_content)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
         transaction.commit()
 
     def supportRecursiveMove(self, destpath):
