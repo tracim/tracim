@@ -55,7 +55,16 @@ class Folder extends React.Component {
                 {folderAvailableApp.length > 0 && (
                   <div>
                     <button
-                      className='folder__header__button__addbtn__text btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
+                      className={`
+                        folder__header__button__addbtn__text
+                        btn
+                        outlineTextBtn
+                        primaryColorBorder
+                        primaryColorBgHover
+                        primaryColorBorderDarkenHover
+                        dropdown-toggle
+                        ${props.idRoleUserWorkspace === 2 ? 'no-margin-right' : ''}
+                      `}
                       type='button'
                       id='dropdownMenuButton'
                       data-toggle='dropdown'
@@ -76,8 +85,8 @@ class Folder extends React.Component {
                   </div>
                 )}
 
-                {props.idRoleUserWorkspace >= 4 && (
-                  <div className='d-none d-md-flex'>
+                <div className='d-none d-md-flex'>
+                  {props.idRoleUserWorkspace >= 4 && (
                     <BtnExtandedAction
                       idRoleUserWorkspace={props.idRoleUserWorkspace}
                       onClickExtendedAction={{
@@ -88,8 +97,8 @@ class Folder extends React.Component {
                         delete: e => props.onClickExtendedAction.delete(e, props.folderData)
                       }}
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             }
           </div>

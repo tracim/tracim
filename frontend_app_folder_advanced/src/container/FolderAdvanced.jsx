@@ -133,7 +133,7 @@ class FolderAdvanced extends React.Component {
   handleClickCheckbox = async appSlug => {
     const { props, state } = this
 
-    const simpleAppSlug = (appSlug.split('/') || ['', ''])[1]
+    const simpleAppSlug = (appSlug.split('/') || ['', ''])[1] // appSlug are like 'content/${slug}' and need to remove 'content/'
 
     const oldAvailableAppList = state.content.sub_content_types
 
