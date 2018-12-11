@@ -5,7 +5,6 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -134,13 +133,7 @@ class WorkspaceAdvanced extends React.Component {
     this.setState({
       content: {
         ...resDetail.body,
-        memberList: resMember.body.map(m => ({
-          ...m,
-          user: {
-            ...m.user,
-            avatar_url: m.user.avatar_url ? m.user.avatar_url : generateAvatarFromPublicName(m.user.public_name)
-          }
-        }))
+        memberList: resMember.body
       }
     })
   }

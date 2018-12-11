@@ -2,7 +2,6 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
@@ -53,7 +52,6 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
