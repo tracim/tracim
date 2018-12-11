@@ -175,7 +175,7 @@ class UserSchema(UserDigestSchema):
 
 
 class LoggedInUserPasswordSchema(marshmallow.Schema):
-    loggedin_user_password = StrippedString(
+    loggedin_user_password = String(
         required=True,
         validate=user_password_validator,
     )
@@ -194,12 +194,12 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
 
 
 class SetPasswordSchema(LoggedInUserPasswordSchema):
-    new_password = StrippedString(
+    new_password = String(
         example='8QLa$<w',
         required=True,
         validate=user_password_validator
     )
-    new_password2 = StrippedString(
+    new_password2 = String(
         example='8QLa$<w',
         required=True,
         validate =user_password_validator,
@@ -262,7 +262,7 @@ class UserCreationSchema(marshmallow.Schema):
         example='hello@tracim.fr',
         validate=user_email_validator,
     )
-    password = StrippedString(
+    password = String(
         example='8QLa$<w',
         required=False,
         validate=user_password_validator,
@@ -680,7 +680,7 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
         example='hello@tracim.fr',
         validate=user_email_validator,
     )
-    reset_password_token = StrippedString(
+    reset_password_token = String(
         description="token to reset password of given user",
         required=True,
     )
@@ -696,16 +696,16 @@ class ResetPasswordModifySchema(marshmallow.Schema):
         example='hello@tracim.fr',
         validate = user_email_validator
     )
-    reset_password_token = StrippedString(
+    reset_password_token = String(
         description="token to reset password of given user",
         required=True,
     )
-    new_password = StrippedString(
+    new_password = String(
         example='8QLa$<w',
         required=True,
         validate = user_password_validator,
     )
-    new_password2 = StrippedString(
+    new_password2 = String(
         example='8QLa$<w',
         required=True,
         validate = user_password_validator,
@@ -723,7 +723,7 @@ class BasicAuthSchema(marshmallow.Schema):
         required=True,
         validate= user_email_validator
     )
-    password = StrippedString(
+    password = String(
         example='8QLa$<w',
         required=True,
         load_only=True,
