@@ -540,6 +540,10 @@ class File extends React.Component {
 
     if (!state.isVisible) return null
 
+    const headerTitle = state.mode === MODE.EDIT
+      ? state.content.label
+      : <span>{state.content.label} <Badge text={state.content.file_extension} /></span>
+
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -549,7 +553,7 @@ class File extends React.Component {
           customClass={`${state.config.slug}`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          title={(() => <span>{state.content.label} <Badge text={state.content.file_extension} /></span>)()}
+          title={headerTitle}
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
