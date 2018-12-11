@@ -1,5 +1,4 @@
 import i18n from './i18n.js'
-import color from 'color'
 import { distanceInWords } from 'date-fns'
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -35,12 +34,13 @@ export const handleFetchResult = async fetchResult => {
   }
 }
 
-export const addAllResourceI18n = (i18n, translation) => {
+export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
   Object.keys(translation).forEach(lang =>
     Object.keys(translation[lang]).forEach(namespace =>
-      i18n.addResources(lang, namespace, translation[lang][namespace])
+      i18nFromApp.addResources(lang, namespace, translation[lang][namespace])
     )
   )
+  i18n.changeLanguage(activeLang) // set frontend_lib's i18n on app mount
 }
 
 export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
