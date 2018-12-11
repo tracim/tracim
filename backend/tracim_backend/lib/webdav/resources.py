@@ -363,6 +363,8 @@ class WorkspaceResource(DAVCollection):
     def moveRecursive(self, destpath):
         if dirname(normpath(destpath)) == self.environ['http_authenticator.realm']:
             self.workspace.label = basename(normpath(destpath))
+            self.session.add(self.workspace)
+            self.session.flush()
             transaction.commit()
         else:
             raise DAVError(HTTP_FORBIDDEN)
