@@ -467,7 +467,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
 
 
 class KnownMemberQuerySchema(marshmallow.Schema):
-    acp = marshmallow.fields.Str(
+    acp = StrippedString(
         example='test',
         description='search text to query',
         validate=acp_validator,
@@ -1000,7 +1000,7 @@ class ContentDigestSchema(marshmallow.Schema):
         example=6,
         validate=strictly_positive_int_validator,
     )
-    slug = marshmallow.fields.Str(example='intervention-report-12')
+    slug = StrippedString(example='intervention-report-12')
     parent_id = marshmallow.fields.Int(
         example=34,
         allow_none=True,
@@ -1011,8 +1011,8 @@ class ContentDigestSchema(marshmallow.Schema):
         example=19,
         validate=strictly_positive_int_validator,
     )
-    label = marshmallow.fields.Str(example='Intervention Report 12')
-    content_type = marshmallow.fields.Str(
+    label = StrippedString(example='Intervention Report 12')
+    content_type = StrippedString(
         example='html-document',
         validate=all_content_types_validator,
     )
@@ -1025,7 +1025,7 @@ class ContentDigestSchema(marshmallow.Schema):
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
     )
-    status = marshmallow.fields.Str(
+    status = StrippedString(
         example='closed-deprecated',
         validate=content_status_validator,
         description='this slug is found in content_type available statuses',
@@ -1222,7 +1222,7 @@ class FileContentModifySchema(TextBasedContentModifySchema):
 
 
 class SetContentStatusSchema(marshmallow.Schema):
-    status = marshmallow.fields.Str(
+    status = StrippedString(
         example='closed-deprecated',
         validate=content_status_validator,
         description='this slug is found in content_type available statuses',
