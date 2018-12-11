@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
+from unittest.mock import MagicMock
+
+from wsgidav import util
+
 from tracim_backend import WebdavAppFactory
+from tracim_backend.fixtures.content import Content as ContentFixtures
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.lib.core.notifications import DummyNotifier
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.webdav import TracimDomainController
-from tracim_backend.tests import eq_
-from tracim_backend.lib.core.notifications import DummyNotifier
 from tracim_backend.lib.webdav.dav_provider import Provider
+from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.lib.webdav.resources import RootResource
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests import StandardTest
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from wsgidav import util
-from unittest.mock import MagicMock
+from tracim_backend.tests import eq_
 
 
 class TestWebdavFactory(StandardTest):
@@ -59,14 +62,20 @@ class TestWebDav(StandardTest):
             provider: Provider,
             username: str,
     ) -> dict:
-        return {
+        environ = {
             'http_authenticator.username': username,
             'http_authenticator.realm': '/',
             'wsgidav.provider': provider,
             'tracim_user': self._get_user(username),
-            'tracim_dbsession': self.session,
-            'tracim_cfg': self.app_config
         }
+        tracim_context = WebdavTracimContext(
+            app_config=self.app_config,
+            session=self.session,
+            environ=environ,
+        )
+        environ['tracim_context'] = tracim_context
+        return environ
+
 
     def _get_user(self, email):
         return UserApi(None,
