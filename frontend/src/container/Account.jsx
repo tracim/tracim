@@ -57,7 +57,8 @@ class Account extends React.Component {
     //   label: 'Calendrier personnel',
     //   active: false
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
-      .filter(menu => props.user.auth_type === 'internal' ? true : menu.name !== 'password')
+      // allow pw change only for users in tracim's db (eg. not from ldap)
+      .filter(menu => ['internal', 'unknown'].includes(props.user.auth_type) ? true : menu.name !== 'password')
 
     this.state = {
       subComponentMenu: builtSubComponentMenu
