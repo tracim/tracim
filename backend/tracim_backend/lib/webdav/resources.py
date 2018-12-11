@@ -262,7 +262,7 @@ class WorkspaceResource(DAVCollection):
         return mktime(self.workspace.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return self.workspace.label
+        return transform_to_display(self.workspace.label)
 
     def getLastModified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
@@ -650,7 +650,7 @@ class FileResource(DAVNonCollection):
 
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return self.content.file_name
+        return transform_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
@@ -883,7 +883,7 @@ class OtherFileResource(FileResource):
 
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return self.content.file_name
+        return transform_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
     def getPreferredPath(self):
