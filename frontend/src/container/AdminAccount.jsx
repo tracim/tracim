@@ -133,6 +133,11 @@ class Account extends React.Component {
     const { props, state } = this
 
     if (newName !== '') {
+      if (newName.length < 3) {
+        props.dispatch(newFlashMessage(props.t('Full name must be at least 3 characters'), 'warning'))
+        return false
+      }
+
       const fetchPutUserName = await props.dispatch(putUserName(state.userToEdit, newName))
       switch (fetchPutUserName.status) {
         case 200:
@@ -193,29 +198,6 @@ class Account extends React.Component {
   render () {
     const { props, state } = this
 
-    const subComponent = (() => {
-      switch (state.subComponentMenu.find(({active}) => active).name) {
-        case 'personalData':
-          return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} displayAdminInfo />
-
-        // case 'calendar':
-        //   return <Calendar user={props.user} />
-
-        case 'notification':
-          return <Notification
-            idMyself={parseInt(state.idUserToEdit)}
-            workspaceList={state.userToEditWorkspaceList}
-            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-          />
-
-        case 'password':
-          return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
-
-        // case 'timezone':
-        //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
-      }
-    })()
-
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <PageWrapper customClass='account'>
@@ -237,7 +219,28 @@ class Account extends React.Component {
               />
 
               <div className='account__userpreference__setting'>
-                { subComponent }
+                {(() => {
+                  switch (state.subComponentMenu.find(({active}) => active).name) {
+                    case 'personalData':
+                      return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} displayAdminInfo />
+
+                    // case 'calendar':
+                    //   return <Calendar user={props.user} />
+
+                    case 'notification':
+                      return <Notification
+                        idMyself={parseInt(state.idUserToEdit)}
+                        workspaceList={state.userToEditWorkspaceList}
+                        onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                      />
+
+                    case 'password':
+                      return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
+
+                    // case 'timezone':
+                    //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
+                  }
+                })()}
               </div>
             </div>
 
