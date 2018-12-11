@@ -351,23 +351,38 @@ class WorkspaceResource(DAVCollection):
                               workspace=self.workspace,
                               )
 
-    @webdav_check_right(can_delete_workspace)
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
+        # FIXME - G.M - 2018-12-11 - For an unknown reason current_workspace
+        # of tracim_context is here invalid.
+        self.tracim_context._current_workspace = self.workspace
+        try:
+            can_delete_workspace.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
         raise DAVError(HTTP_FORBIDDEN)
 
     def supportRecursiveMove(self, destpath):
         return True
 
-    @webdav_check_right(can_modify_workspace)
     def moveRecursive(self, destpath):
+        # INFO - G.M - 2018-12-11 - We only allow renaming
         if dirname(normpath(destpath)) == self.environ['http_authenticator.realm']:
-            self.workspace.label = basename(normpath(destpath))
-            self.session.add(self.workspace)
-            self.session.flush()
-            transaction.commit()
-        else:
-            raise DAVError(HTTP_FORBIDDEN)
+            # FIXME - G.M - 2018-12-11 - For an unknown reason current_workspace
+            # of tracim_context is here invalid.
+            self.tracim_context._current_workspace = self.workspace
+            try:
+                can_modify_workspace.check(self.tracim_context)
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN)
+
+            try:
+                self.workspace.label = basename(normpath(destpath))
+                self.session.add(self.workspace)
+                self.session.flush()
+                transaction.commit()
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
         members = []
