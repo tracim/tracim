@@ -7,12 +7,6 @@ from os.path import dirname
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
-
-from tracim_backend.config import CFG
-from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
-    SpecialFolderExtension
-from tracim_backend.app_models.contents import content_type_list
-
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVProvider
@@ -42,10 +36,12 @@ from tracim_backend.models.data import Workspace
 
 class WebdavTracimContext(TracimContext):
 
-    def __init__(self, environ: typing.Dict[str, typing.Any]):
+    def __init__(self, environ: typing.Dict[str, typing.Any], app_config: CFG, session: Session):
         super().__init__()
         self.environ = environ
         self._candidate_parent_content = None
+        self._app_config = app_config
+        self._session  = session
 
     def set_path(self, path: str):
         self.path = path
@@ -56,11 +52,11 @@ class WebdavTracimContext(TracimContext):
 
     @property
     def dbsession(self) -> Session:
-        return self.environ['tracim_dbsession']
+        return self._session
 
     @property
     def app_config(self) -> CFG:
-       return self.environ['tracim_cfg']
+       return self._app_config
 
     @property
     def current_user(self):

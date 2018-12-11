@@ -18,11 +18,12 @@ from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
 
-from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
-from tracim_backend.models.auth import AuthType
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_scoped_session_factory
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 
@@ -267,7 +268,7 @@ class TracimEnv(BaseMiddleware):
         self._application = application
         self.settings = config['tracim_settings']
         self.engine = get_engine(self.settings)
-        self.session_factory = get_session_factory(self.engine)
+        self.session_factory = get_scoped_session_factory(self.engine)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
 
@@ -276,18 +277,21 @@ class TracimEnv(BaseMiddleware):
         # with thread and database, this should be verify.
         # see https://github.com/tracim/tracim_backend/issues/62
         tm = transaction.manager
-        dbsession = get_tm_session(self.session_factory, tm)
-        environ['tracim_tm'] = tm
-        environ['tracim_dbsession'] = dbsession
-        environ['tracim_cfg'] = self.app_config
+        session = get_tm_session(self.session_factory, tm)
         registry = get_current_registry()
         registry.ldap_connector = None
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ['tracim_registry'] =  registry
-        environ['tracim_context'] = WebdavTracimContext(environ)
-        app = self._application(environ, start_response)
-        dbsession.close()
+        environ['tracim_context'] = WebdavTracimContext(environ, self.app_config, session)
+        try:
+            app = self._application(environ, start_response)
+        except Exception as exc:
+            transaction.rollback()
+            raise exc
+        finally:
+            transaction.commit()
+            session.close()
         return app
 
     def setup_ldap(self, registry: Registry, app_config: CFG):
