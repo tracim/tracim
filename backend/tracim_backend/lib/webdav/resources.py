@@ -481,12 +481,17 @@ class FolderResource(WorkspaceResource):
         """
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
+
         try:
-            can_move_content.check(self.tracim_context)
+            checker.check(self.tracim_context)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN)
-
-        invalid_path = False
 
         # if content is either deleted or archived, we'll check that we try moving it to the parent
         # if yes, then we'll unarchive / undelete them, else the action's not allowed
@@ -542,11 +547,17 @@ class FolderResource(WorkspaceResource):
         )
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
+
         try:
-            can_move_content.check(self.tracim_context)
+            checker.check(self.tracim_context)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN)
-
 
         destination_workspace = self.tracim_context.candidate_workspace
         try:
@@ -697,8 +708,15 @@ class FileResource(DAVNonCollection):
             but i have to check if the client ever call that function..."""
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
+
         try:
-            can_move_content.check(self.tracim_context)
+            checker.check(self.tracim_context)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN)
 
@@ -767,8 +785,15 @@ class FileResource(DAVNonCollection):
         parent = self.content.parent
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
+
         try:
-            can_move_content.check(self.tracim_context)
+            checker.check(self.tracim_context)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN)
 
