@@ -580,7 +580,6 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-
 class TestWhoamiEndpointWithApiKey(FunctionalTest):
 
     def test_api__try_whoami_enpoint_with_api_key__ok_200__nominal_case(self):
@@ -672,6 +671,113 @@ class TestWhoamiEndpointWithApiKeyNoKey(FunctionalTest):
             status=401,
             headers=headers_auth
         )
+
+class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
+    config_section = 'functional_test_remote_auth'
+
+    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self):
+
+        headers_auth = {
+                'X-Remote-User': 'remoteuser@remoteuser.remoteuser',
+        }
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+            headers=headers_auth
+        )
+        assert res.json_body['public_name'] == 'remoteuser'
+        assert res.json_body['email'] == 'remoteuser@remoteuser.remoteuser'
+        assert res.json_body['created']
+        assert res.json_body['is_active']
+        assert res.json_body['profile']
+        assert res.json_body['profile'] == 'users'
+        assert res.json_body['caldav_url'] is None
+        assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'remote'
+        user_id = res.json_body['user_id']
+
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+            headers=headers_auth
+        )
+        assert res.json_body['public_name'] == 'remoteuser'
+        assert res.json_body['email'] == 'remoteuser@remoteuser.remoteuser'
+        assert res.json_body['created']
+        assert res.json_body['is_active']
+        assert res.json_body['profile']
+        assert res.json_body['profile'] == 'users'
+        assert res.json_body['caldav_url'] is None
+        assert res.json_body['avatar_url'] is None
+        assert res.json_body['auth_type'] == 'remote'
+        assert res.json_body['user_id'] == user_id
+
+
+    def test_api__try_whoami_enpoint__err_401__remote_user_is_not_active(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='password',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.disable(test_user)
+        transaction.commit()
+        headers_auth = {
+                'X-Remote-User': 'test@test.test',
+        }
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+            headers=headers_auth
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
+
+    def test_api__try_whoami_enpoint__err_401__remote_user_unauthenticated(self):
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__try_whoami_enpoint__err_401__remote_user_bad_email(self):
+        headers_auth = {
+                'X-Remote-User': '',
+        }
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+            headers=headers_auth
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] is None
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
 class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
     config_section = 'functional_test_with_cookie_auth'

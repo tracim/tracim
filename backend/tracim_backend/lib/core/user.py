@@ -33,12 +33,14 @@ from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import TooShortAutocompleteString
+from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
 from tracim_backend.exceptions import UnvalidResetPasswordToken
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
@@ -55,6 +57,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+
 
 class UserApi(object):
 
@@ -355,6 +358,104 @@ class UserApi(object):
             user.auth_type = auth_type
         return user
 
+    def _remote_user_authenticate(
+        self,
+        user: User,
+        email: str,
+    ) -> User:
+        """
+        Authenticate with remote_auth, return authenticated user
+        or raise Exception like WrongAuthTypeForUser,
+        UserDoesNotExist or UserAuthenticatedIsNotActive
+        :param user: user to check, can be none if user not found, will try
+         to create new user if none
+        :param email: email of the user
+        """
+        auth_type = AuthType.REMOTE
+
+        # INFO - G.M - 2018-12-12 - Do not authenticate user with auth_type
+        # different from REMOTE
+        if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
+                raise WrongAuthTypeForUser(
+                    'User "{}" auth_type is {} not {}'.format(
+                        email,
+                        user.auth_type.value,
+                        auth_type.value
+                    )
+                )
+
+        # INFO - G.M - 2018-12-12 - Create new user
+        if not user:
+            groups = None
+            self.create_user(
+                email=email,
+                groups=groups,
+                auth_type=AuthType.REMOTE,
+                do_save=True,
+                do_notify=False
+            )
+            transaction.commit()
+            # INFO - G.M - 2018-12-02 - get new created user
+            user = self.get_one_by_email(email)
+
+        if user.is_deleted:
+            raise UserDoesNotExist('This user has been deleted')  # nopep8
+
+        if not user.is_active:
+            raise UserAuthenticatedIsNotActive('This user is not activated')  # nopep8
+
+        if user.auth_type == AuthType.UNKNOWN :
+            user.auth_type = auth_type
+        return user
+
+    def remote_authenticate(
+            self,
+            email: str
+    ) -> User:
+        """
+        Remote Authenticate user with email (no password check),
+        raise AuthenticationFailed if uncorrect.
+        raise RemoteUserAuthDisabled if auth remote header is not set
+        """
+        try:
+            if not self._config.REMOTE_USER_HEADER:
+                raise RemoteUserAuthDisabled('Remote User Auth mecanism disabled')
+            return self._remote_authenticate(
+                email
+            )
+        except AuthenticationFailed as exc:
+            raise exc
+        except WrongAuthTypeForUser as exc:
+            raise AuthenticationFailed(
+                'Auth mecanism for this user is not activated'
+            ) from exc
+
+    def _remote_authenticate(
+        self,
+        email: str
+    ):
+        """
+        Authenticate user with email given using remote mecanism,
+        raise AuthenticationFailed if uncorrect.
+        :param email: email of the user
+        :return: User who was authenticated.
+        """
+        # get existing user
+        try:
+            user = self.get_one_by_email(email)
+        except UserDoesNotExist:
+            user = None
+        # try auth
+        try:
+            return self._remote_user_authenticate(user, email)
+        except (
+            UserDoesNotExist,
+            UserAuthenticatedIsDeleted,
+            UserAuthenticatedIsNotActive,
+            TracimValidationFailed,
+        ) as exc:
+            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
+
     def authenticate(
             self,
             email: str,
@@ -385,7 +486,6 @@ class UserApi(object):
                 pass
 
         raise user_auth_type_not_available
-
 
     def _authenticate(
             self,
@@ -424,6 +524,7 @@ class UserApi(object):
             UserDoesNotExist,
             UserAuthenticatedIsDeleted,
             UserAuthenticatedIsNotActive,
+            TracimValidationFailed,
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
 
@@ -584,7 +685,7 @@ class UserApi(object):
             user.display_name = name
 
         if auth_type is not None:
-            if auth_type != AuthType.UNKNOWN and not auth_type in self._config.AUTH_TYPES:
+            if auth_type not in [AuthType.UNKNOWN, AuthType.REMOTE] and not auth_type in self._config.AUTH_TYPES:
                 raise UserAuthTypeDisabled(
                     'Can\'t update user "{}" auth_type with unavailable value "{}".'.format(
                         user.email,

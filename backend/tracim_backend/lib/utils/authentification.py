@@ -15,6 +15,7 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
+from tracim_backend.config import CFG
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
@@ -75,6 +76,19 @@ class TracimAuthenticationPolicy(object):
         except AuthenticationFailed:
             return None
 
+    def _remote_authenticated_user(
+        self,
+        request: Request,
+        email: str
+    ):
+        app_config = request.registry.settings['CFG'] # type: 'CFG'
+        uapi = UserApi(None, session=request.dbsession, config=app_config)
+        if not app_config.REMOTE_USER_HEADER:
+            return None
+        try:
+            return uapi.remote_authenticate(email)
+        except AuthenticationFailed:
+            return None
 ###
 # Pyramid HTTP Basic Auth
 ###
@@ -154,6 +168,34 @@ class CookieSessionAuthentificationPolicy(
             request.session.delete()
         return []
 
+###
+# RemoteUser auth
+###
+
+@implementer(IAuthenticationPolicy)
+class RemoteAuthentificationPolicy(
+    CallbackAuthenticationPolicy,
+    TracimAuthenticationPolicy,
+):
+    def __init__(self, remote_user_email_login_header: str):
+        self.remote_user_email_login_header = remote_user_email_login_header
+        self.callback = None
+
+    def authenticated_userid(self, request):
+        user = self._remote_authenticated_user(
+            request=request,
+            email=request.unauthenticated_userid
+        )
+        if not user:
+            return None
+        return user.user_id
+
+    def unauthenticated_userid(self, request):
+        return request.headers.get(self.remote_user_email_login_header)
+    def remember(self, request, userid, **kw):
+        return []
+    def forget(self, request):
+        return []
 
 ###
 # Pyramid API key auth
