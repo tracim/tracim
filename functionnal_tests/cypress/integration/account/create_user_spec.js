@@ -1,11 +1,11 @@
-const username = 'Francky'
-const email = 'francky.vincent@cousine.com'
+const username = 'new_usersname'
+const email = 'new.username@tracim.fr'
 const correct_pwd = '123456'
 
 const errShortPwd = '123'
 const errLongPwd = '123'.repeat(200)
-const errUsername = 'Vincent'
-const errEmail = 'vincent.francky@sinecou.com'
+const errUsername = 'err_username'
+const errEmail = 'err.username@tracim.fr'
 
 describe('content :: account', () => {
   before(() => {
@@ -17,15 +17,6 @@ describe('content :: account', () => {
     cy.loginAs('administrators')
     cy.visit('/ui/admin/user')
   })
-
-  // it('Shows missing password error', () => {
-  //   cy.get('[data-cy=adminUser__adduser__button]').click()
-  //   cy.get('[data-cy=adduser_name').type(username)
-  //   cy.get('[data-cy=adduser_email').type(email)
-  //   cy.get('[data-cy=profile__list__item__administrators').click()
-  //   cy.get('[data-cy=adminUser__adduser__form__submit').click()
-  //   cy.get('[data-cy=flashmessage]').contains('Please type a name, an email, a password and select a profile')
-  // })
 
   it('Shows missing username error', () => {
     cy.get('[data-cy=adminUser__adduser__button]').click()
