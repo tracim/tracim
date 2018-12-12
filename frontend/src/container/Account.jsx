@@ -36,15 +36,18 @@ class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: props.t('My profile')
+      label: 'My profile',
+      translationKey: props.t('My profile')
     }, {
       name: 'notification',
       active: false,
-      label: props.t('Shared spaces and notifications')
+      label: 'Shared spaces and notifications',
+      translationKey: props.t('Shared spaces and notifications')
     }, {
       name: 'password',
       active: false,
-      label: props.t('Password')
+      label: 'Password',
+      translationKey: props.t('Password')
     // }, {
     //   name: 'timezone',
     //   active: false,
@@ -54,6 +57,8 @@ class Account extends React.Component {
     //   label: 'Calendrier personnel',
     //   active: false
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
+      // allow pw change only for users in tracim's db (eg. not from ldap)
+      .filter(menu => ['internal', 'unknown'].includes(props.user.auth_type) ? true : menu.name !== 'password')
 
     this.state = {
       subComponentMenu: builtSubComponentMenu
@@ -93,6 +98,11 @@ class Account extends React.Component {
     const { props } = this
 
     if (newName !== '') {
+      if (newName.length < 3) {
+        props.dispatch(newFlashMessage(props.t('Full name must be at least 3 characters'), 'warning'))
+        return false
+      }
+
       const fetchPutUserName = await props.dispatch(putMyselfName(props.user, newName))
       switch (fetchPutUserName.status) {
         case 200:
@@ -149,29 +159,6 @@ class Account extends React.Component {
   render () {
     const { props, state } = this
 
-    const subComponent = (() => {
-      switch (state.subComponentMenu.find(({active}) => active).name) {
-        case 'personalData':
-          return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} />
-
-        // case 'calendar':
-        //   return <Calendar user={props.user} />
-
-        case 'notification':
-          return <Notification
-            idMyself={props.user.user_id}
-            workspaceList={props.workspaceList}
-            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-          />
-
-        case 'password':
-          return <Password onClickSubmit={this.handleSubmitPassword} />
-
-        // case 'timezone':
-        //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
-      }
-    })()
-
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <PageWrapper customClass='account'>
@@ -193,7 +180,28 @@ class Account extends React.Component {
               />
 
               <div className='account__userpreference__setting'>
-                { subComponent }
+                {(() => {
+                  switch (state.subComponentMenu.find(({active}) => active).name) {
+                    case 'personalData':
+                      return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} />
+
+                    // case 'calendar':
+                    //   return <Calendar user={props.user} />
+
+                    case 'notification':
+                      return <Notification
+                        idMyself={props.user.user_id}
+                        workspaceList={props.workspaceList}
+                        onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                      />
+
+                    case 'password':
+                      return <Password onClickSubmit={this.handleSubmitPassword} />
+
+                    // case 'timezone':
+                    //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
+                  }
+                })()}
               </div>
             </div>
 

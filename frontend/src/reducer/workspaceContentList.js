@@ -14,6 +14,8 @@ const serializeContent = c => ({
   label: c.label,
   slug: c.slug,
   type: c.content_type,
+  fileName: c.filename,
+  fileExtension: c.file_extension,
   idWorkspace: c.workspace_id,
   isArchived: c.is_archived,
   idParent: c.parent_id,

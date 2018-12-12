@@ -91,9 +91,9 @@ Cypress.Commands.add('setupBaseDB', () => {
 
 Cypress.Commands.add('resetDB', () => {
   cy
-    .exec('tracimcli db delete --force -c ../backend/tracim_cypress.ini')
+    .exec('tracimcli db delete --force -c ../backend/cypress_test.ini')
     .then(cmd => cy.log(cmd.stdout))
-    .then(cmd => cy.exec('tracimcli db init -c ../backend/tracim_cypress.ini'))
+    .then(cmd => cy.exec('tracimcli db init -c ../backend/cypress_test.ini'))
     .then(cmd => cy.log(cmd.stdout))
 })
 

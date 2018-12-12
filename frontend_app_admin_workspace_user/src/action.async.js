@@ -106,7 +106,7 @@ export const postAddUser = (apiUrl, name, email, profile, emailNotif, password) 
       public_name: name,
       email,
       email_notification: emailNotif,
-      password: password || '', // '' will generate the password by backend
+      password: password || null, // '' will generate the password by backend
       profile
     }),
     method: 'POST'

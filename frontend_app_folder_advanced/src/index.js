@@ -10,7 +10,7 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     // if loggedUser isn't at least content manager, do not open the advanced folder app
-    if (data && data.loggedUser && data.loggedUser.idRoleUserWorkspace <= 4) return
+    if (data && data.loggedUser && data.loggedUser.idRoleUserWorkspace < 4) return
 
     return ReactDOM.render(
       <FolderAdvanced data={data} />
@@ -28,4 +28,4 @@ const appInterface = {
   }
 }
 
-module.exports = appInterface
+export default appInterface

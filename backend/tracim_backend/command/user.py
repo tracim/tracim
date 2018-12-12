@@ -6,7 +6,7 @@ from pyramid.scripting import AppEnvironment
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.command import Extender
 from tracim_backend.exceptions import BadCommandError
@@ -17,8 +17,8 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import Group
-from tracim_backend.models import User
+from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
 
 
 class UserCommand(AppContextCommand):
@@ -154,6 +154,7 @@ class UserCommand(AppContextCommand):
 
     def _update_password_for_login(self, login: str, password: str) -> None:
         user = self._user_api.get_one_by_email(login)
+        self._user_api._check_password_modification_allowed(user)
         user.password = password
         self._session.flush()
         transaction.commit()

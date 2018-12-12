@@ -40,5 +40,6 @@
   "Email notification are disabled, please notify users of any change": "Les notifications par email sont désactivées, pensez à notifier les utilisateurs de tout changement",
   "Please type a name, an email, a password and select a profile": "Veuillez entrer un nom, un email, un mot de passe et choisir un profil",
   "Please set a password": "Veuillez définir un mot de passe",
-  "Full name": "Nom complet"
+  "Full name": "Nom complet",
+  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères"
 }

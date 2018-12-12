@@ -1,5 +1,5 @@
 from hapic.error import DefaultErrorBuilder
-from hapic.processor import ProcessValidationError
+from hapic.processor.main import ProcessValidationError
 from tracim_backend.error import GENERIC_SCHEMA_VALIDATION_ERROR
 
 

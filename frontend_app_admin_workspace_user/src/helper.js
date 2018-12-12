@@ -74,7 +74,7 @@ export const debug = {
     },
     system: {
       config: {
-        email_notification_activated: false
+        email_notification_activated: true
       }
     },
     profileObject: {

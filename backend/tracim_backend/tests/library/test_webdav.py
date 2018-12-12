@@ -12,8 +12,8 @@ from tracim_backend.tests import eq_
 from tracim_backend.lib.core.notifications import DummyNotifier
 from tracim_backend.lib.webdav.dav_provider import Provider
 from tracim_backend.lib.webdav.resources import RootResource
-from tracim_backend.models import Content
-from tracim_backend.models import ContentRevisionRO
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests import StandardTest
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture

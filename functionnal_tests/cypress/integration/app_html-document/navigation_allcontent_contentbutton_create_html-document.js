@@ -12,7 +12,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
   })
   it('dashboard > button', function () {
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
-    cy.get('.workspace__content__button.dropdownCreateBtn .__label').should('be.visible').click()
+    cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
     cy.get('.show .subdropdown__link__html-document__icon').should('be.visible').click()
     const title = 'document1'
     cy.get('.cardPopup__container').should('be.visible')

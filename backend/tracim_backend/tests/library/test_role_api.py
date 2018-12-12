@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.exceptions import UserRoleNotFound
 
 from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.models import User
+from tracim_backend.models.auth import User
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests import DefaultTest
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -21,7 +21,7 @@ class TestRoleApi(DefaultTest):
         rapi = RoleApi(
             current_user=admin,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         rapi.get_one(admin.user_id, 1)
 
@@ -31,7 +31,7 @@ class TestRoleApi(DefaultTest):
         rapi = RoleApi(
             current_user=admin,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(UserRoleNotFound):
             rapi.get_one(admin.user_id, 100)  # workspace 100 does not exist
@@ -48,7 +48,7 @@ class TestRoleApi(DefaultTest):
         rapi = RoleApi(
             current_user=admin,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         created_role = rapi.create_one(
             user=bob,
@@ -65,7 +65,7 @@ class TestRoleApi(DefaultTest):
         rapi = RoleApi(
             current_user=admin,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         workspace = self._create_workspace_and_test(
             'workspace_1',

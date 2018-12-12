@@ -3,8 +3,8 @@ from collections import OrderedDict
 
 from sqlalchemy import inspect
 
-from tracim_backend.models import ContentRevisionRO
-from tracim_backend.models import User
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_

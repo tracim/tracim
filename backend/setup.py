@@ -24,7 +24,7 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic>=0.57',
+    'hapic[marshmallow]>=0.62',
     'marshmallow <3.0.0a1,>2.0.0',
     # CLI
     'cliff',
@@ -40,7 +40,7 @@ requires = [
     # mail-notifier
     'mako',
     'lxml',
-    'redis',
+    'redis<3.0.0',
     'rq',
     # mail-fetcher
     'markdown',
@@ -52,6 +52,7 @@ requires = [
     'pyramid_multiauth',
     'beaker',
     'pyramid_beaker',
+    'pyramid_ldap3',
     # frontend file serve
     'pyramid_mako',
     # i18n

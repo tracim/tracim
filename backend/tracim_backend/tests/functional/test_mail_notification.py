@@ -97,7 +97,7 @@ class TestNotificationsSync(MailHogTest):
         )
         u = api.create_user(
             email='bob@bob',
-            password='pass',
+            password='password',
             name='bob',
             timezone='+2',
             lang='fr',
@@ -106,7 +106,7 @@ class TestNotificationsSync(MailHogTest):
         )
         assert u is not None
         assert u.email == "bob@bob"
-        assert u.validate_password('pass')
+        assert u.validate_password('password')
         assert u.display_name == 'bob'
         assert u.timezone == '+2'
 
@@ -252,7 +252,7 @@ class TestNotificationsAsync(MailHogTest):
         )
         u = api.create_user(
             email='bob@bob',
-            password='pass',
+            password='password',
             name='bob',
             timezone='+2',
             do_save=True,
@@ -260,7 +260,7 @@ class TestNotificationsAsync(MailHogTest):
         )
         assert u is not None
         assert u.email == "bob@bob"
-        assert u.validate_password('pass')
+        assert u.validate_password('password')
         assert u.display_name == 'bob'
         assert u.timezone == '+2'
 

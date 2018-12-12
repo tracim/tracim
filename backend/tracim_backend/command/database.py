@@ -7,7 +7,7 @@ from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
 from sqlalchemy.exc import IntegrityError
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
@@ -15,10 +15,10 @@ from tracim_backend.exceptions import InvalidSettingFile
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.models import get_engine
-from tracim_backend.models import get_session_factory
-from tracim_backend.models import get_tm_session
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import get_tm_session
 
 
 class InitializeDBCommand(AppContextCommand):

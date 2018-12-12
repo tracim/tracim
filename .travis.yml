@@ -61,7 +61,8 @@ jobs:
   - stage: functional
     name: Functional tests using Cypress
     env:
-      - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
+      - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
       - TRAVIS_NODE_VERSION="10"
     before_install:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
@@ -73,8 +74,8 @@ jobs:
       - ./setup_functionnal_tests.sh root
     before_script:
       - cd backend
-      - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-      - nohup pserve development.ini&
+      - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+      - nohup pserve cypress_test.ini&
       - cd ../functionnal_tests
 
     script:
@@ -98,8 +99,10 @@ addons:
     - ghostscript
     - libfile-mimeinfo-perl
     - poppler-utils
+    - libldap2-dev
+    - libsasl2-dev
+    - docker-ce
 services:
-  - docker
   - redis-server
   - mysql
 before_install:
@@ -108,6 +111,8 @@ before_install:
   - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
   - docker pull mailhog/mailhog
   - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+  - docker pull rroemhild/test-openldap
+  - docker run -d -p 3890:389 rroemhild/test-openldap
   - cd backend
 install:
   - pip install --upgrade pip setuptools
@@ -126,11 +131,11 @@ install:
 before_script:
   # postgresql
   - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+  - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
   # mysql
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-  - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
   # sqlite : do nothing, default config is sqlite based.
-  - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(sqlalchemy.url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+  - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
 after_success:
   - coveralls

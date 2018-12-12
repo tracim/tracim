@@ -2,6 +2,8 @@
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
+from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UnvalidResetPasswordToken
@@ -33,8 +35,10 @@ SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_sw
 class ResetPasswordController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
-    @hapic.input_body(ResetPasswordRequestSchema())
     @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.input_body(ResetPasswordRequestSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_request(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -54,6 +58,8 @@ class ResetPasswordController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.input_body(ResetPasswordCheckTokenSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_check_token(self, context, request: TracimRequest, hapic_data=None):   # nopep8
@@ -74,7 +80,9 @@ class ResetPasswordController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])  # nopep8
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PasswordDoNotMatch, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.input_body(ResetPasswordModifySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_modify(self, context, request: TracimRequest, hapic_data=None):   # nopep8

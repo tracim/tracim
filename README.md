@@ -89,17 +89,21 @@ If you need to run cypress with external server of tracim, modify "baseurl" in c
 
 ## Run tests with command line ##
 
+Warning: cypress use the database that you have configure in development.ini and erase data in this database. Make a backup of your databse before starting test.
+
 This command run all test present in 'cypress_test' folder.
 
     cd functionnal_tests/
-    ./node_modules/.bin/cypress run
+    npm run cypress-run
 
 ## Run tests with cypressgui ##
+
+Warning: cypress use the database that you have configure in development.ini and erase data in this database. Make a backup of your databse before starting test.
 
 Open Cypress with graphical interface. You can show test running directly in web interface.
 
     cd functionnal_tests/
-    ./node_modules/.bin/cypress open
+    npm run cypress-open
 
 # Contribute
 

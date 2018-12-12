@@ -2,7 +2,7 @@
 from depot.io.utils import FileIntent
 import transaction
 
-from tracim_backend import models
+from tracim_backend.models.auth import User
 from tracim_backend.fixtures import Fixture
 from tracim_backend.fixtures.users_and_groups import Test
 from tracim_backend.lib.core.content import ContentApi
@@ -17,14 +17,14 @@ class Content(Fixture):
     require = [Test]
 
     def insert(self):
-        admin = self._session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self._session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
-        bob = self._session.query(models.User) \
-            .filter(models.User.email == 'bob@fsf.local') \
+        bob = self._session.query(User) \
+            .filter(User.email == 'bob@fsf.local') \
             .one()
-        john_the_reader = self._session.query(models.User) \
-            .filter(models.User.email == 'john-the-reader@reader.local') \
+        john_the_reader = self._session.query(User) \
+            .filter(User.email == 'john-the-reader@reader.local') \
             .one()
 
         admin_workspace_api = WorkspaceApi(

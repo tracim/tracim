@@ -51,7 +51,7 @@ class PopupCreateHtmlDocument extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)

@@ -2,16 +2,16 @@
 import typing
 from enum import Enum
 
-from tracim_backend.extensions import app_list
-from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import ContentStatusNotExist
-
+from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.extensions import app_list
 ####
 # Content Status
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.models.roles import WorkspaceRoles
+
 if typing.TYPE_CHECKING:
     from tracim_backend.app_models.applications import Application
-
 
 class GlobalStatus(Enum):
     OPEN = 'open'
@@ -125,6 +125,7 @@ class ContentType(object):
             slug_alias: typing.List[str] = None,
             allow_sub_content: bool = False,
             file_extension: typing.Optional[str] = None,
+            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -135,6 +136,7 @@ class ContentType(object):
         self.slug_alias = slug_alias
         self.allow_sub_content = allow_sub_content
         self.file_extension = file_extension
+        self.minimal_role_content_creation = minimal_role_content_creation
 
 
 THREAD_TYPE = 'thread'

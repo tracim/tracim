@@ -12,10 +12,9 @@ from sqlalchemy.exc import IntegrityError
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_engine
-from tracim_backend.models import DeclarativeBase
-from tracim_backend.models import get_session_factory
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_engine, get_session_factory, \
+    get_tm_session
+from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import ContentRevisionRO
@@ -225,14 +224,14 @@ class BaseTest(unittest.TestCase):
             self.config_section
         )
         self.config = testing.setUp(settings = self.settings)
-        self.config.include('tracim_backend.models')
+        self.config.include('tracim_backend.models.setup_models')
         DepotManager._clear()
         DepotManager.configure(
             'test', {'depot.backend': 'depot.io.memory.MemoryFileStorage'}
         )
         settings = self.config.get_settings()
         self.app_config = CFG(settings)
-        from tracim_backend.models import (
+        from tracim_backend.models.setup_models import (
             get_engine,
             get_session_factory,
             get_tm_session,
