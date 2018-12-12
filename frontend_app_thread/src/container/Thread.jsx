@@ -362,7 +362,8 @@ class Thread extends React.Component {
           customClass={`${config.slug}__contentpage`}
           customColor={config.hexcolor}
           faIcon={config.faIcon}
-          title={content.label}
+          rawTitle={content.label}
+          componentTitle={<div>{content.label}</div>}
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

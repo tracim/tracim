@@ -230,7 +230,8 @@ class FolderAdvanced extends React.Component {
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          title={state.content.label}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
