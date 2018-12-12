@@ -264,6 +264,11 @@ class WorkspaceResource(DAVCollection):
     def getDisplayName(self) -> str:
         return webdav_convert_file_name_to_display(self.workspace.label)
 
+    def getDisplayInfo(self):
+        return {
+            'type': "workspace".capitalize(),
+        }
+
     def getLastModified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
 
@@ -457,6 +462,12 @@ class FolderResource(WorkspaceResource):
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
         return webdav_convert_file_name_to_display(self.content.file_name)
+
+    @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {
+            'type': self.content.type.capitalize(),
+        }
 
     @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
@@ -679,6 +690,12 @@ class FileResource(DAVNonCollection):
     @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
         return webdav_convert_file_name_to_display(self.content.file_name)
+
+    @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {
+            'type': self.content.type.capitalize(),
+        }
 
     @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
@@ -949,6 +966,12 @@ class OtherFileResource(FileResource):
         filestream.write(bytes(self.content_designed, 'utf-8'))
         filestream.seek(0)
         return filestream
+
+    @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {
+            'type': self.content.type.capitalize(),
+        }
 
     def design(self):
         if self.content.type == content_type_list.Page.slug:
