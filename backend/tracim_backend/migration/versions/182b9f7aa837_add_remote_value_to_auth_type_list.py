@@ -1,20 +1,20 @@
-"""add unknown value to auth_type
+"""add remote value to auth_type list
 
-Revision ID: 1877d3571a8b
-Revises: ab7c7f4bcbc5
-Create Date: 2018-11-27 12:01:24.143020
+Revision ID: 182b9f7aa837
+Revises: 1877d3571a8b
+Create Date: 2018-12-12 16:36:32.887491
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '1877d3571a8b'
-down_revision = 'ab7c7f4bcbc5'
+revision = '182b9f7aa837'
+down_revision = '1877d3571a8b'
 
 from alembic import op
 import sqlalchemy as sa
 
-previous_auth_type_list = ['INTERNAL', 'LDAP']
-new_elements = ['UNKNOWN']
+previous_auth_type_list = ['INTERNAL', 'LDAP', 'UNKNOWN']
+new_elements = ['REMOTE']
 new_auth_type_list = previous_auth_type_list + new_elements
 default_type = 'INTERNAL'
 
@@ -24,8 +24,8 @@ users = sa.Table(
     sa.Column('auth_type')
 )
 
-def upgrade():
 
+def upgrade():
     if op.get_context().dialect.name == 'postgresql':
         # INFO - G.M - 2018-11-27 - TO modify type in postgresq, we should
         # create a new one set column type to this new one and remove old one
