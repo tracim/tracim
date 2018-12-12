@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 import argparse
-
-import plaster_pastedeploy
-from waitress import serve
-
+import plaster
 from tracim_backend.command import AppContextCommand
-from tracim_backend.lib.webdav import WebdavAppFactory
 from wsgi import webdav_app
+from wsgi import WEBDAV_APP_NAME
 
 
 class WebdavRunnerCommand(AppContextCommand):
@@ -24,4 +21,9 @@ class WebdavRunnerCommand(AppContextCommand):
         tracim_config = parsed_args.config_file
         # TODO - G.M - 16-04-2018 - Allow specific webdav config file
         app = webdav_app(tracim_config)
-        serve(app, port=app.config['port'], host=app.config['host'])
+        server = self._get_server(tracim_config)
+        server(app)
+
+    def _get_server(self, config_uri: str):
+        loader = plaster.get_loader(config_uri, protocols=['wsgi'])
+        return loader.get_wsgi_server(name=WEBDAV_APP_NAME)

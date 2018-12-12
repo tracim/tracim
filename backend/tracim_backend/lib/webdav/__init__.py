@@ -36,8 +36,6 @@ class WebdavAppFactory(object):
         app_config = CFG(settings)
 
         # use only basic_auth, disable digest auth
-        config['host'] = app_config.WEBDAV_HOST
-        config['port'] = app_config.WEBDAV_PORT
         config['acceptbasic'] = True
         config['acceptdigest'] = False
         config['defaultdigest'] = False

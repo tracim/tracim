@@ -268,10 +268,8 @@ email.reply.lockfile_path = %(here)s/email_fetcher.lock
 ####
 
 ### Main Webdav Config ###
-## webdav server hostname (default: localhost)
-; webdav.host  = 0.0.0.0
-## webdav server port (default: 3030)
-; webdav.port = 9090
+## webdav server hostname listen
+webdav.listen = localhost:3030
 ## default root of webdav service ( default : / )
 ## this params need to be modified in case of using webdav with proxy
 ## if you want for example that path /webdav give access to webdav
@@ -344,9 +342,14 @@ pipeline = tracim_webdav
 [app:tracim_webdav]
 use = egg:tracim_backend#webdav
 
+
 [server:main]
 use = egg:waitress#main
 listen = %(basic_setup.listen)s
+
+[server:webdav]
+use = egg:waitress#main
+listen = %(webdav.listen)s
 
 ######################
 # DATABASE MIGRATION #

@@ -435,8 +435,6 @@ class CFG(object):
         wsgidav_website = 'https://github.com/mar10/wsgidav/'
         wsgidav_name = 'WsgiDAV'
 
-        self.WEBDAV_HOST = settings.get('webdav.host', 'localhost')
-        self.WEBDAV_PORT = int(settings.get('webdav.port', 3030))
         self.WEBDAV_VERBOSE_LEVEL = int(settings.get('webdav.verbose.level', 1))
         self.WEBDAV_ROOT_PATH = settings.get('webdav.root_path', '/')
         self.WEBDAV_BLOCK_SIZE = int(settings.get('webdav.block_size', 8192))
