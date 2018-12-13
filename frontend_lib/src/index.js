@@ -2,7 +2,6 @@ import i18n from './i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
@@ -15,6 +14,7 @@ import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
 import Avatar from './component/Avatar/Avatar.jsx'
+import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 
@@ -52,7 +52,6 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
@@ -62,6 +61,7 @@ export {
   PopinFixedOption,
   PopinFixedContent,
   Avatar,
+  Badge,
   Timeline,
   TextAreaApp,
   BtnSwitch,

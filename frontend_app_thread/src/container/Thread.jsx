@@ -49,7 +49,7 @@ class Thread extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -73,10 +73,16 @@ class Thread extends React.Component {
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
+
+        const previouslyUnsavedComment = localStorage.getItem(
+          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
+        )
+
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false
+          timelineWysiwyg: false,
+          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
       case 'allApp_changeLang':
@@ -356,7 +362,8 @@ class Thread extends React.Component {
           customClass={`${config.slug}__contentpage`}
           customColor={config.hexcolor}
           faIcon={config.faIcon}
-          title={content.label}
+          rawTitle={content.label}
+          componentTitle={<div>{content.label}</div>}
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

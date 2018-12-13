@@ -167,5 +167,7 @@
   "New full name": "New full name",
   "New email": "New email",
   "Change my password": "Change my password",
-  "Change my profile": "Change my profile"
+  "Change my profile": "Change my profile",
+  "This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'": "This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'",
+  "Full name must be at least 3 characters": "Full name must be at least 3 characters"
 }

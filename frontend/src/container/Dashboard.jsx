@@ -70,6 +70,7 @@ class Dashboard extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case 'refreshDashboardMemberList': this.loadMemberList(); break
+      case 'refreshWorkspaceList': this.loadWorkspaceDetail(); break
     }
   }
 
@@ -373,7 +374,7 @@ class Dashboard extends React.Component {
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
               subtitle={''}
-              icon='signal'
+              icon='home'
             >
               <div className='dashboard__header__advancedmode ml-3'>
                 {idRoleUserWorkspace >= 8 &&

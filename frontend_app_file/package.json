@@ -61,6 +61,7 @@
       "XMLHttpRequest",
       "FileReader",
       "Image",
+      "localStorage",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"

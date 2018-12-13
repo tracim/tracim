@@ -22,7 +22,7 @@ dashboard_menu_entry = WorkspaceMenuEntry(
   label='Dashboard',
   route='/ui/workspaces/{workspace_id}/dashboard',
   hexcolor='#fdfdfd',
-  fa_icon="signal",
+  fa_icon="home",
 )
 all_content_menu_entry = WorkspaceMenuEntry(
   slug="contents/all",

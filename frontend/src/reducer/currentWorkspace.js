@@ -9,7 +9,6 @@ import {
   WORKSPACE_MEMBER, UPDATE,
   USER_WORKSPACE_DO_NOTIFY, FOLDER_READ
 } from '../action-creator.sync.js'
-import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
   id: 0,
@@ -47,9 +46,6 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         memberList: action.workspaceMemberList.map(m => ({
           id: m.user_id,
           publicName: m.user.public_name,
-          avatarUrl: m.user.avatar_url
-            ? m.user.avatar_url
-            : m.user.public_name ? generateAvatarFromPublicName(m.user.public_name) : '',
           role: m.role,
           isActive: m.is_active,
           doNotify: m.do_notify
@@ -64,6 +60,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           slug: ra.slug,
           label: ra.label,
           type: ra.content_type,
+          fileExtension: ra.file_extension,
           idParent: ra.parent_id,
           showInUi: ra.show_in_ui,
           isArchived: ra.is_archived,

@@ -8,12 +8,12 @@ class PopinFixedHeader extends React.Component {
     super(props)
     this.state = {
       editTitle: false,
-      editTitleValue: props.title
+      editTitleValue: props.rawTitle
     }
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.title !== this.props.title) this.setState({editTitleValue: this.props.title})
+    if (prevProps.rawTitle !== this.props.rawTitle) this.setState({editTitleValue: this.props.rawTitle})
   }
 
   onChangeTitle = e => {
@@ -30,12 +30,12 @@ class PopinFixedHeader extends React.Component {
   handleInputKeyPress = e => {
     switch (e.key) {
       case 'Enter': this.handleClickChangeTitleBtn(); break
-      case 'Escape': this.setState({editTitle: false, editTitleValue: this.props.title}); break
+      case 'Escape': this.setState({editTitle: false, editTitleValue: this.props.rawTitle}); break
     }
   }
 
   render () {
-    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
+    const { customClass, customColor, faIcon, rawTitle, componentTitle, idRoleUserWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
     const { state } = this
 
     return (
@@ -46,7 +46,7 @@ class PopinFixedHeader extends React.Component {
 
         <div
           className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
-          title={title}
+          title={rawTitle}
         >
           {state.editTitle
             ? <input
@@ -55,7 +55,7 @@ class PopinFixedHeader extends React.Component {
               onChange={this.onChangeTitle}
               onKeyDown={this.handleInputKeyPress}
             />
-            : title
+            : componentTitle
           }
         </div>
 
@@ -87,7 +87,8 @@ PopinFixedHeader.propTypes = {
   onClickCloseBtn: PropTypes.func.isRequired,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
-  title: PropTypes.string,
+  rawTitle: PropTypes.string,
+  componentTitle: PropTypes.element,
   idRoleUserWorkspace: PropTypes.number,
   onValidateChangeTitle: PropTypes.func,
   disableChangeTitle: PropTypes.bool
@@ -96,7 +97,8 @@ PopinFixedHeader.propTypes = {
 PopinFixedHeader.defaultProps = {
   customClass: '',
   customColor: '',
-  title: '',
+  rawTitle: '',
+  componentTitle: <div />,
   idRoleUserWorkspace: 1,
   onChangeTitle: () => {},
   disableChangeTitle: false

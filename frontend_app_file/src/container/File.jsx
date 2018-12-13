@@ -15,7 +15,8 @@ import {
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  Badge
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -65,7 +66,7 @@ class File extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -89,10 +90,16 @@ class File extends React.Component {
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
+
+        const previouslyUnsavedComment = localStorage.getItem(
+          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
+        )
+
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false
+          timelineWysiwyg: false,
+          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
       case 'allApp_changeLang':
@@ -542,7 +549,8 @@ class File extends React.Component {
           customClass={`${state.config.slug}`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          title={state.content.label}
+          rawTitle={state.content.label}
+          componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
