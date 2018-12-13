@@ -7,7 +7,7 @@ describe('navigate :: allcontent > headerbutton > create_new > html-document', f
   beforeEach(function () {
     cy.loginAs('users')
   })
-  it('allcontent > button', function () {
+  it('check id create button has a dropdown', function () {
     cy.visit('/ui/workspaces/1/contents')
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()

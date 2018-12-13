@@ -1,6 +1,6 @@
 const sharedSpaceManager = 'Shared space manager'
 
-describe('Member\s workspace', () => {
+describe("Member's workspace", () => {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()

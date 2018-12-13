@@ -121,7 +121,7 @@ Cypress.Commands.add('assertTinyMCEContent', (content) => {
     .its('tinyMCE')
     .its('activeEditor')
     .then(activeEditor => {
-      activeEditor.getContent(), content
+      activeEditor.getContent()
     })
 })
 

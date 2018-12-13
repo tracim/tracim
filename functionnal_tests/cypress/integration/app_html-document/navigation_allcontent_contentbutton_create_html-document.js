@@ -10,7 +10,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
     cy.loginAs('users')
     cy.visit(WORKSPACE_URL)
   })
-  it('dashboard > button', function () {
+  it('Checks if creation popup opens and closes', function () {
     cy.get('.pageTitleGeneric__title__icon').should('be.visible')
     cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
     cy.get('.show .subdropdown__link__html-document__icon').should('be.visible').click()

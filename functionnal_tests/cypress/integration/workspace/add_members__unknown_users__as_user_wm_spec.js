@@ -19,7 +19,8 @@ context('Unknown users', function () {
             cy.createRandomUser().as('userToAdd')
             cy.logout()
             cy.loginAs('users').as('currentUser')
-          }))
+          })
+      )
       .then(el => {
         cy.visit(`/ui/workspaces/${this.currentWorkspace.workspace_id}/dashboard`)
       })

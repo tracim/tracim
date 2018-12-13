@@ -106,5 +106,4 @@ Cypress.Commands.add('getUserByRole', (role) => {
 
   return cy
     .fixture(userFixtures[role])
-    .then(user => user)
 })

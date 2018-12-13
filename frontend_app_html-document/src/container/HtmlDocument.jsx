@@ -516,7 +516,8 @@ class HtmlDocument extends React.Component {
           customClass={`${config.slug}`}
           customColor={config.hexcolor}
           faIcon={config.faIcon}
-          title={content.label}
+          rawTitle={content.label}
+          componentTitle={<div>{content.label}</div>}
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
