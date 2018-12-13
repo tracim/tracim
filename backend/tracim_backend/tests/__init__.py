@@ -203,6 +203,7 @@ class BaseTest(unittest.TestCase):
         session = get_tm_session(self.session_factory, transaction.manager)
         with transaction.manager:
             try:
+                DeclarativeBase.metadata.drop_all(self.engine)
                 DeclarativeBase.metadata.create_all(self.engine)
                 fixtures_loader = FixturesLoader(session, self.app_config)
                 fixtures_loader.loads(self.fixtures)
