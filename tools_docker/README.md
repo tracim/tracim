@@ -57,4 +57,17 @@ To build image
 
     cd tools_docker/
     docker build -t algoo/tracim:latest .
+
+You can build with specific branch
+
+    cd tools_docker/
+    docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<branch_name> .
+
+Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:feature/new_app .`
     
+You can also build image with specific tag (This build is make just with necessary files:)
+
+    cd tools_docker/
+    docker build --build-arg TAG="-b <tag_name> --single-branch" -t algoo/tracim:<tag_name> .
+    
+Ex: `docker build --build-arg TAG="-b release_02.00.00 --single-branch" -t algoo/tracim:release_02.00.00 .`

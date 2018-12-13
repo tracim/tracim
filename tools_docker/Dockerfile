@@ -1,7 +1,8 @@
 FROM debian:stretch
 MAINTAINER contact@tracim.fr
 
-ARG GITTAG=""
+ARG TAG=""
+ARG BRANCH=""
 
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
@@ -47,7 +48,8 @@ RUN apt update && apt upgrade -qy \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/* \
 # Get the source from GitHub
-    && git clone $GITTAG https://github.com/tracim/tracim.git tracim \
+    && git clone $TAG https://github.com/tracim/tracim.git tracim \
+    && git checkout $BRANCH \
     && cd /tracim/ \
 # Go in repo folder
     && cd /tracim \
