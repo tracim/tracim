@@ -4591,7 +4591,7 @@ class TestWorkspaceContents(FunctionalTest):
             'parent_id': 10,
         }
         res = self.testapp.post_json(
-            '/api/v2/workspaces/1/contents',
+            '/api/v2/workspaces/2/contents',
             params=params,
             status=200
         )
@@ -4602,7 +4602,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['content_type'] == 'html-document'
         assert res.json_body['is_archived'] is False
         assert res.json_body['is_deleted'] is False
-        assert res.json_body['workspace_id'] == 1
+        assert res.json_body['workspace_id'] == 2
         assert res.json_body['slug'] == 'genericcreatedcontent'
         assert res.json_body['parent_id'] == 10
         assert res.json_body['show_in_ui'] is True
@@ -4618,7 +4618,7 @@ class TestWorkspaceContents(FunctionalTest):
             'show_active': 1,
         }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
-        active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
+        active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         content_ids = [content['content_id'] for content in active_contents]
         assert res.json_body['content_id'] in content_ids
 
@@ -4865,6 +4865,169 @@ class TestWorkspaceContents(FunctionalTest):
             '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=workspace.workspace_id),
             params=params,
             status=200,
+        )
+
+    def test_api_put_move_content__err_400__unallowed_sub_content(self):
+        """
+        move content to a dir where content_type is not allowed
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        thread = content_api.create(
+            label='test-thread',
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            do_save=True,
+            do_notify=False
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            do_save=False,
+            do_notify=False
+        )
+        content_api.set_allowed_content(folder, [])
+        content_api.save(folder)
+        workspace_id = workspace.workspace_id
+        thread_id = thread.content_id
+        folder_id = folder.content_id
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params =  {
+            'new_parent_id': '{}'.format(folder_id),
+            'new_workspace_id': '{}'.format(workspace_id),
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{}/contents/{}/move'.format(
+                workspace_id,
+                thread_id
+            ),
+            params=params,
+            status=400
+        )
+        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT
+
+    def test_api_put_move_content__ok_200__unallowed_sub_content_renaming(self):
+        """
+        move content to a dir where content_type is not allowed
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            do_save=True,
+            do_notify=False
+        )
+        thread = content_api.create(
+            label='test-thread',
+            content_type_slug=content_type_list.Thread.slug,
+            parent=folder,
+            workspace=workspace,
+            do_save=True,
+            do_notify=False
+        )
+        with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=folder,
+        ):
+            content_api.set_allowed_content(folder, [])
+            content_api.save(folder)
+        workspace_id = workspace.workspace_id
+        thread_id = thread.content_id
+        folder_id = folder.content_id
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params =  {
+            'new_parent_id': '{}'.format(folder_id),
+            'new_workspace_id': '{}'.format(workspace_id),
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{}/contents/{}/move'.format(
+                workspace_id,
+                thread_id
+            ),
+            params=params,
+            status=200
         )
 
     def test_api_put_move_content__ok_200__nominal_case(self):

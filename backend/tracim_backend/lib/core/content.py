@@ -542,33 +542,23 @@ class ContentApi(object):
         assert content_type_slug != content_type_list.Any_SLUG
         assert not (label and filename)
 
+        if (workspace and parent) and \
+            workspace.workspace_id != parent.workspace_id:
+            raise WorkspacesDoNotMatch(
+                'new parent workspace and new workspace should be the same.'
+            )
+
         if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
         # can call here with None. Must update create_comment tu require the
         # workspace.
-        if not workspace:
-            workspace = parent.workspace
-
-        content_type = content_type_list.get_one_by_slug(content_type_slug)
-        if parent and parent.properties and 'allowed_content' in parent.properties:
-            if content_type.slug not in parent.properties['allowed_content'] or not parent.properties['allowed_content'][content_type.slug]:
-                raise UnallowedSubContent(' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(  # nopep8
-                    subcontent_type=content_type.slug,
-                    content_id=parent.content_id,
-                ))
         if not workspace and parent:
             workspace = parent.workspace
+        content_type = content_type_list.get_one_by_slug(content_type_slug)
 
-        if workspace:
-            if content_type.slug not in workspace.get_allowed_content_types():
-                raise UnallowedSubContent(
-                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
-                        subcontent_type=content_type.slug,
-                        content_id=workspace.workspace_id,
-                    )
-                )
+        self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
         if label:
             file_extension = ''
@@ -774,30 +764,36 @@ class ContentApi(object):
 
         # TODO - G.M - 2018-09-04 - If this method is needed, it should be
         # rewritten in order to avoid content_type hardcoded code there
-        return query.filter(
-            or_(
-                and_(
-                    Content.type == content_type_list.File.slug,
-                    Content.label == file_name,
-                    Content.file_extension == file_extension,
-                ),
-                and_(
-                    Content.type == content_type_list.Thread.slug,
-                    Content.label == file_name,
-                ),
-                and_(
-                    Content.type == content_type_list.Page.slug,
-                    Content.label == file_name,
-                ),
-                and_(
-                    Content.type == content_type_list.Folder.slug,
-                    Content.label == content_label,
-                ),
-            )
-        ).one()
+        try:
+            return query.filter(
+                or_(
+                    and_(
+                        Content.type == content_type_list.File.slug,
+                        Content.label == file_name,
+                        Content.file_extension == file_extension,
+                    ),
+                    and_(
+                        Content.type == content_type_list.Thread.slug,
+                        Content.label == file_name,
+                    ),
+                    and_(
+                        Content.type == content_type_list.Page.slug,
+                        Content.label == file_name,
+                    ),
+                    and_(
+                        Content.type == content_type_list.Folder.slug,
+                        Content.label == content_label,
+                    ),
+                )
+            ).one()
+        except NoResultFound as exc:
+            raise ContentNotFound(
+                'Content "{}" not found in database'.format(content_label)
+            ) from exc  # nopep8
+
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
-    def get_one_by_label_and_parent_labels(
+    def get_one_by_filename_and_parent_labels(
             self,
             content_label: str,
             workspace: Workspace,
@@ -825,7 +821,7 @@ class ContentApi(object):
         # Build query for found content by label
         content_query = self.filter_query_for_content_label_as_path(
             query=query,
-            content_label_as_file=content_label,
+            filename=content_label,
         )
 
         # Modify query to apply parent folder filter if any
@@ -844,11 +840,14 @@ class ContentApi(object):
         )
 
         # Return the content
-        return content_query\
-            .order_by(
+        try:
+            return content_query.order_by(
                 Content.revision_id.desc(),
-            )\
-            .one()
+            ).one()
+        except NoResultFound as exc:
+            raise ContentNotFound('Content "{}" not found in database'.format(
+                content_label)) from exc  # nopep8
+
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
@@ -888,9 +887,12 @@ class ContentApi(object):
                     .filter(Content.parent_id == None)
 
             # Get thirst corresponding folder
-            folder = folder_query \
-                .order_by(Content.revision_id.desc()) \
-                .one()
+            try:
+                folder = folder_query \
+                    .order_by(Content.revision_id.desc()) \
+                    .one()
+            except NoResultFound as exc:
+                raise ContentNotFound('Folder not found')
 
         return folder
 
@@ -898,54 +900,25 @@ class ContentApi(object):
     def filter_query_for_content_label_as_path(
             self,
             query: Query,
-            content_label_as_file: str,
+            filename: str,
             is_case_sensitive: bool = False,
     ) -> Query:
         """
         Apply normalised filters to found Content corresponding as given label.
         :param query: query to modify
-        :param content_label_as_file: label in this
+        :param filename: label in this
         FILE version, use Content.file_name.
         :param is_case_sensitive: Take care about case or not
         :return: modified query
         """
-        file_name, file_extension = os.path.splitext(content_label_as_file)
 
-        label_filter = Content.label == content_label_as_file
-        file_name_filter = Content.label == file_name
-        file_extension_filter = Content.file_extension == file_extension
-
-        if not is_case_sensitive:
-            label_filter = func.lower(Content.label) == \
-                           func.lower(content_label_as_file)
-            file_name_filter = func.lower(Content.label) == \
-                               func.lower(file_name)
-            file_extension_filter = func.lower(Content.file_extension) == \
-                                    func.lower(file_extension)
-
-        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
-        # rewritten in order to avoid content_type hardcoded code there
-        return query.filter(or_(
-            and_(
-                Content.type == content_type_list.File.slug,
-                file_name_filter,
-                file_extension_filter,
-            ),
-            and_(
-                Content.type == content_type_list.Thread.slug,
-                file_name_filter,
-                file_extension_filter,
-            ),
-            and_(
-                Content.type == content_type_list.Page.slug,
-                file_name_filter,
-                file_extension_filter,
-            ),
-            and_(
-                Content.type == content_type_list.Folder.slug,
-                label_filter,
-            ),
-        ))
+        if is_case_sensitive:
+            return query.filter(
+                (Content.label + Content.file_extension) == filename
+            )
+        return query.filter(
+            func.lower(Content.label + Content.file_extension) == func.lower(filename)
+        )
 
     def get_pdf_preview_path(
         self,
@@ -1504,14 +1477,25 @@ class ContentApi(object):
             if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
 
+        if (new_workspace and new_parent) and \
+            new_parent.workspace_id != new_workspace.workspace_id:
+            raise WorkspacesDoNotMatch(
+                'new parent workspace and new workspace should be the same.'
+            )
+
+        # INFO - G.M - 2018-12-11 - We allow renaming existing wrong file
+        # but not adding new content of wrong type.
+        if new_parent and new_parent != item.parent:
+            content_type = content_type_list.get_one_by_slug(item.type)
+            self._check_valid_content_type_in_dir(
+                content_type,
+                new_parent,
+                new_workspace
+            )
+
         item.parent = new_parent
         if new_workspace:
             item.workspace = new_workspace
-            if new_parent and \
-                    new_parent.workspace_id != new_workspace.workspace_id:
-                raise WorkspacesDoNotMatch(
-                    'new parent workspace and new workspace should be the same.'
-                )
         else:
             if new_parent:
                 item.workspace = new_parent.workspace
@@ -1524,11 +1508,37 @@ class ContentApi(object):
         )
         item.revision_type = ActionDescription.MOVE
 
+    def _check_valid_content_type_in_dir(self,
+        content_type: ContentType,
+        parent: Content,
+        workspace: Workspace,
+    ) -> None:
+        if parent:
+            assert workspace == parent.workspace
+            if parent.properties and 'allowed_content' in parent.properties:
+                if content_type.slug not in parent.properties[ 'allowed_content'] \
+                    or not parent.properties['allowed_content'][content_type.slug]:
+                        raise UnallowedSubContent(
+                            ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
+                                # nopep8
+                                subcontent_type=content_type.slug,
+                                content_id=parent.content_id,
+                            ))
+        if workspace:
+            if content_type.slug not in workspace.get_allowed_content_types():
+                raise UnallowedSubContent(
+                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
+                        subcontent_type=content_type.slug,
+                        content_id=workspace.workspace_id,
+                    )
+                )
     def copy(
         self,
         item: Content,
         new_parent: Content=None,
         new_label: str=None,
+        new_workspace: Workspace=None,
+        new_file_extension: str=None,
         do_save: bool=True,
         do_notify: bool=True,
     ) -> Content:
@@ -1541,17 +1551,38 @@ class ContentApi(object):
         :param do_notify: notify copy or not
         :return: Newly copied item
         """
-        if (not new_parent and not new_label) or (new_parent == item.parent and new_label == item.label):  # nopep8
+        if (not new_parent and not new_label and not new_file_extension and not new_workspace) or \
+                (new_parent == item.parent and new_label == item.label  and new_file_extension==item.file_extension and item.workspace == new_workspace):
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
+
+        if (new_workspace and new_parent) and \
+            new_parent.workspace_id != new_workspace.workspace_id:
+            raise WorkspacesDoNotMatch(
+                'new parent workspace and new workspace should be the same.'
+            )
+
         if new_parent:
             workspace = new_parent.workspace
             parent = new_parent
+        elif new_workspace:
+            workspace = new_workspace
+            parent = None
         else:
             workspace = item.workspace
             parent = item.parent
+
+        # INFO - G.M - 2018-12-11 - Do not allow copy file in a dir where
+        # this kind of content is not allowed.
+        if parent:
+            content_type = content_type_list.get_one_by_slug(item.type)
+            self._check_valid_content_type_in_dir(content_type, parent, workspace)
         label = new_label or item.label
-        filename = self._prepare_filename(label, item.file_extension)
+        if new_file_extension is not None:
+            file_extension = new_file_extension
+        else:
+            file_extension = item.file_extension
+        filename = self._prepare_filename(label, file_extension)
         self._is_filename_available_or_raise(filename, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
@@ -1563,7 +1594,8 @@ class ContentApi(object):
         ) as rev:
             rev.parent = parent
             rev.workspace = workspace
-            rev.file_name = filename
+            rev.label = label
+            rev.file_extension = file_extension
             rev.revision_type = ActionDescription.COPY
             rev.properties['origin'] = {
                 'content': item.id,

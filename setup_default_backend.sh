@@ -58,11 +58,6 @@ function setup_config_file {
        cp development.ini.sample development.ini && loggood "success" || logerror "some error"
     fi
 
-    if [ ! -f wsgidav.conf ]; then
-       log "generate missing wsgidav.conf ..."
-       cp wsgidav.conf.sample wsgidav.conf && loggood "success" || logerror "some error"
-    fi
-
     if [ ! -f ../color.json ]; then
        log "generate missing color.json ..."
        cp ../color.json.sample ../color.json && loggood "success" || logerror "some error"

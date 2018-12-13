@@ -1,6 +1,7 @@
 # coding: utf8
 import typing
 
+import transaction
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
@@ -51,14 +52,15 @@ class TracimDomainController(object):
         If you ever feel the need to send a request al-mano with a curl, this is the function that'll be called by
         http_authenticator to validate the password sent
         """
-        session = environ['tracim_dbsession'] # type: Session
-        api = UserApi(None, environ['tracim_dbsession'], self.app_config)
+        session = environ['tracim_context'].dbsession
+        api = UserApi(None, session, self.app_config)
         try:
             api.authenticate(
                 email=username,
                 password=password,
                 ldap_connector=environ['tracim_registry'].ldap_connector
             )
+            transaction.commit()
         except AuthenticationFailed:
             return False
         return True

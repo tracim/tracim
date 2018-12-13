@@ -1,42 +1,76 @@
 # coding: utf8
+import functools
 import logging
-
 import os
+import re
+import typing
+from datetime import datetime
+from os.path import basename
+from os.path import dirname
+from time import mktime
 
 import transaction
-import typing
-import re
-from datetime import datetime
-from time import mktime
-from os.path import dirname, basename
-
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import MultipleResultsFound
+from sqlalchemy.orm.exc import NoResultFound
+from wsgidav import compat
+from wsgidav.dav_error import HTTP_FORBIDDEN
+from wsgidav.dav_error import DAVError
+from wsgidav.dav_provider import DAVCollection
+from wsgidav.dav_provider import DAVNonCollection
+from wsgidav.dav_provider import _DAVResource
 
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.webdav.utils import transform_to_display, HistoryType, \
-    FakeFileStream
-from tracim_backend.lib.webdav.utils import transform_to_bdd
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.data import User, ContentRevisionRO
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import Content
+from tracim_backend.lib.utils.authorization import AuthorizationChecker
+from tracim_backend.lib.utils.authorization import can_delete_workspace
+from tracim_backend.lib.utils.authorization import can_modify_workspace
+from tracim_backend.lib.utils.authorization import can_move_content
+from tracim_backend.lib.utils.authorization import \
+    can_see_workspace_information
+from tracim_backend.lib.utils.authorization import is_content_manager
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_trusted_user
+from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.utils import normpath
+from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
+from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
+from tracim_backend.lib.webdav.design import designPage
+from tracim_backend.lib.webdav.design import designThread
+from tracim_backend.lib.webdav.utils import FakeFileStream
+from tracim_backend.lib.webdav.utils import HistoryType
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.lib.webdav.design import designThread, designPage
-
-from wsgidav import compat
-from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
-from wsgidav.dav_provider import DAVCollection, DAVNonCollection
-from wsgidav.dav_provider import _DAVResource
-from tracim_backend.lib.webdav.utils import normpath
-
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import User
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
 logger = logging.getLogger()
+
+if typing.TYPE_CHECKING:
+    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
+
+def webdav_check_right(authorization_checker: AuthorizationChecker):
+    def decorator(func: typing.Callable) -> typing.Callable:
+        @functools.wraps(func)
+        def wrapper(self: '_DAVResource', *arg, **kwarg) -> typing.Callable:
+            tracim_context = self.tracim_context # type: WebdavTracimContext
+            try:
+                authorization_checker.check(
+                    tracim_context=self.tracim_context,
+                )
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN) from exc
+            return func(self, *arg, **kwarg)
+        return wrapper
+    return decorator
 
 
 class ManageActions(object):
@@ -64,13 +98,16 @@ class ManageActions(object):
         self._type = action_type
 
     def action(self):
-        with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=self.content,
-        ):
-            self._actions[self._type](self.content)
-            self.content_api.save(self.content, self._type)
+        try:
+            with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=self.content,
+            ):
+                self._actions[self._type](self.content)
+                self.content_api.save(self.content, self._type)
+        except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN) from exc
 
         transaction.commit()
 
@@ -80,24 +117,25 @@ class RootResource(DAVCollection):
     RootResource ressource that represents tracim's home, which contains all workspaces
     """
 
-    def __init__(self, path: str, environ: dict, user: User, session: Session):
+    def __init__(self, path: str, environ: dict, tracim_context: 'WebdavTracimContext'):
         super(RootResource, self).__init__(path, environ)
-
-        self.user = user
-        self.session = session
+        self.tracim_context = tracim_context
+        self.user = tracim_context.current_user
+        self.session = tracim_context.dbsession
         # TODO BS 20170221: Web interface should list all workspace to. We
         # disable it here for moment. When web interface will be updated to
         # list all workspace, change this here to.
         self.workspace_api = WorkspaceApi(
             current_user=self.user,
-            session=session,
+            session=self.session,
             force_role=True,
-            config=self.provider.app_config
+            config=tracim_context.app_config
         )
 
     def __repr__(self) -> str:
         return '<DAVCollection: RootResource>'
 
+    @webdav_check_right(is_user)
     def getMemberNames(self) -> [str]:
         """
         This method returns the names (here workspace's labels) of all its children
@@ -106,6 +144,7 @@ class RootResource(DAVCollection):
         """
         return [workspace.label for workspace in self.workspace_api.get_all()]
 
+    @webdav_check_right(is_user)
     def getMember(self, label: str) -> DAVCollection:
         """
         This method returns the child Workspace that corresponds to a given name
@@ -114,18 +153,18 @@ class RootResource(DAVCollection):
         """
         try:
             workspace = self.workspace_api.get_one_by_label(label)
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', transform_to_display(workspace.label))
+            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(workspace.label))
 
             return WorkspaceResource(
                 workspace_path,
                 self.environ,
                 workspace,
-                session=self.session,
-                user=self.user,
+                tracim_context=self.tracim_context
             )
         except AttributeError:
             return None
 
+    @webdav_check_right(is_trusted_user)
     def createEmptyResource(self, name: str):
         """
         This method is called whenever the user wants to create a DAVNonCollection resource (files in our case).
@@ -135,6 +174,7 @@ class RootResource(DAVCollection):
         """
         raise DAVError(HTTP_FORBIDDEN)
 
+    @webdav_check_right(is_trusted_user)
     def createCollection(self, name: str):
         """
         This method is called whenever the user wants to create a DAVCollection resource as a child (in our case,
@@ -151,17 +191,17 @@ class RootResource(DAVCollection):
         self.workspace_api.save(new_workspace)
 
         workspace_path = '%s%s%s' % (
-        self.path, '' if self.path == '/' else '/', transform_to_display(new_workspace.label))
+            self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(new_workspace.label))
 
         transaction.commit()
         return WorkspaceResource(
             workspace_path,
             self.environ,
             new_workspace,
-            user=self.user,
-            session=self.session,
+            tracim_context=self.tracim_context
         )
 
+    @webdav_check_right(is_user)
     def getMemberList(self):
         """
         This method is called by wsgidav when requesting with a depth > 0, it will return a list of _DAVResource
@@ -176,8 +216,7 @@ class RootResource(DAVCollection):
                     path=workspace_path,
                     environ=self.environ,
                     workspace=workspace,
-                    user=self.user,
-                    session=self.session,
+                    tracim_context=self.tracim_context
                 )
             )
 
@@ -194,19 +233,19 @@ class WorkspaceResource(DAVCollection):
                  path: str,
                  environ: dict,
                  workspace: Workspace,
-                 user: User,
-                 session: Session
+                 tracim_context: 'WebdavTracimContext'
     ) -> None:
         super(WorkspaceResource, self).__init__(path, environ)
 
         self.workspace = workspace
         self.content = None
-        self.user = user
-        self.session = session
+        self.tracim_context = tracim_context
+        self.user = tracim_context.current_user
+        self.session = tracim_context.dbsession
         self.content_api = ContentApi(
             current_user=self.user,
-            session=session,
-            config=self.provider.app_config,
+            session=tracim_context.dbsession,
+            config=tracim_context.app_config,
             show_temporary=True
         )
 
@@ -215,6 +254,7 @@ class WorkspaceResource(DAVCollection):
     def __repr__(self) -> str:
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
+
     def getPreferredPath(self):
         return self.path
 
@@ -222,7 +262,12 @@ class WorkspaceResource(DAVCollection):
         return mktime(self.workspace.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return self.workspace.label
+        return webdav_convert_file_name_to_display(self.workspace.label)
+
+    def getDisplayInfo(self):
+        return {
+            'type': "workspace".capitalize(),
+        }
 
     def getLastModified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
@@ -246,10 +291,11 @@ class WorkspaceResource(DAVCollection):
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
-            '%s/%s' % (self.path, transform_to_display(content_label)),
+            '%s/%s' % (self.path, webdav_convert_file_name_to_display(content_label)),
             self.environ
         )
 
+    @webdav_check_right(is_contributor)
     def createEmptyResource(self, file_name: str):
         """
         [For now] we don't allow to create files right under workspaces.
@@ -277,6 +323,7 @@ class WorkspaceResource(DAVCollection):
             path=self.path + '/' + file_name
         )
 
+    @webdav_check_right(is_content_manager)
     def createCollection(self, label: str) -> 'FolderResource':
         """
         Create a new folder for the current workspace. As it's not possible for the user to choose
@@ -288,38 +335,59 @@ class WorkspaceResource(DAVCollection):
         if '/.deleted/' in self.path or '/.archived/' in self.path:
             raise DAVError(HTTP_FORBIDDEN)
 
-        folder = self.content_api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=self.workspace,
-            label=label,
-            parent=self.content
-        )
+        try:
+            folder = self.content_api.create(
+                content_type_slug=content_type_list.Folder.slug,
+                workspace=self.workspace,
+                label=label,
+                parent=self.content
+            )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
         self.content_api.save(folder)
 
         transaction.commit()
 
-        return FolderResource('%s/%s' % (self.path, transform_to_display(label)),
+        return FolderResource('%s/%s' % (self.path, webdav_convert_file_name_to_display(label)),
                               self.environ,
                               content=folder,
-                              session=self.session,
-                              user=self.user,
+                              tracim_context=self.tracim_context,
                               workspace=self.workspace,
                               )
 
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
+        # FIXME - G.M - 2018-12-11 - For an unknown reason current_workspace
+        # of tracim_context is here invalid.
+        self.tracim_context._current_workspace = self.workspace
+        try:
+            can_delete_workspace.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
         raise DAVError(HTTP_FORBIDDEN)
 
     def supportRecursiveMove(self, destpath):
         return True
 
     def moveRecursive(self, destpath):
+        # INFO - G.M - 2018-12-11 - We only allow renaming
         if dirname(normpath(destpath)) == self.environ['http_authenticator.realm']:
-            self.workspace.label = basename(normpath(destpath))
-            transaction.commit()
-        else:
-            raise DAVError(HTTP_FORBIDDEN)
+            # FIXME - G.M - 2018-12-11 - For an unknown reason current_workspace
+            # of tracim_context is here invalid.
+            self.tracim_context._current_workspace = self.workspace
+            try:
+                can_modify_workspace.check(self.tracim_context)
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN)
+
+            try:
+                self.workspace.label = basename(normpath(destpath))
+                self.session.add(self.workspace)
+                self.session.flush()
+                transaction.commit()
+            except TracimException as exc:
+                raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
         members = []
@@ -327,7 +395,7 @@ class WorkspaceResource(DAVCollection):
         children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
+            content_path = '%s/%s' % (self.path, webdav_convert_file_name_to_display(content.file_name))
 
             if content.type == content_type_list.Folder.slug:
                 members.append(
@@ -335,9 +403,8 @@ class WorkspaceResource(DAVCollection):
                         path=content_path,
                         environ=self.environ,
                         workspace=self.workspace,
-                        user=self.user,
                         content=content,
-                        session=self.session,
+                        tracim_context=self.tracim_context
                     )
                 )
             elif content.type == content_type_list.File.slug:
@@ -347,8 +414,7 @@ class WorkspaceResource(DAVCollection):
                         path=content_path,
                         environ=self.environ,
                         content=content,
-                        user=self.user,
-                        session=self.session,
+                        tracim_context=self.tracim_context
                     )
                 )
             else:
@@ -358,47 +424,8 @@ class WorkspaceResource(DAVCollection):
                         content_path,
                         self.environ,
                         content,
-                        session=self.session,
-                        user=self.user,
+                        tracim_context=self.tracim_context
                     ))
-
-        if self._file_count > 0 and self.provider.show_history():
-            members.append(
-                HistoryFolderResource(
-                    path=self.path + '/' + ".history",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    type=HistoryType.Standard,
-                    session=self.session,
-                    user=self.user,
-                )
-            )
-
-        if self.provider.show_delete():
-            members.append(
-                DeletedFolderResource(
-                    path=self.path + '/' + ".deleted",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    session=self.session,
-                    user=self.user,
-                )
-            )
-
-        if self.provider.show_archive():
-            members.append(
-                ArchivedFolderResource(
-                    path=self.path + '/' + ".archived",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    user=self.user,
-                    session=self.session,
-                )
-            )
-
         return members
 
 
@@ -415,30 +442,38 @@ class FolderResource(WorkspaceResource):
             environ: dict,
             workspace: Workspace,
             content: Content,
-            user: User,
-            session: Session
+            tracim_context: 'WebdavTracimContext'
     ):
         super(FolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
-            user=user,
-            session=session,
+            tracim_context=tracim_context
         )
         self.content = content
 
     def __repr__(self) -> str:
         return "<DAVCollection: Folder (%s)>" % self.content.label
 
+    @webdav_check_right(is_reader)
     def getCreationDate(self) -> float:
         return mktime(self.content.created.timetuple())
 
+    @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return transform_to_display(self.content.file_name)
+        return webdav_convert_file_name_to_display(self.content.file_name)
 
+    @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {
+            'type': self.content.type.capitalize(),
+        }
+
+    @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
+    @webdav_check_right(is_content_manager)
     def delete(self):
         ManageActions(
             action_type=ActionDescription.DELETION,
@@ -456,8 +491,18 @@ class FolderResource(WorkspaceResource):
         but i have to check if the client ever call that function...
         """
         destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
 
-        invalid_path = False
+        try:
+            checker.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
         # if content is either deleted or archived, we'll check that we try moving it to the parent
         # if yes, then we'll unarchive / undelete them, else the action's not allowed
@@ -511,32 +556,45 @@ class FolderResource(WorkspaceResource):
             session=self.session,
             config=self.provider.app_config,
         )
-        workspace = self.provider.get_workspace_from_path(
-            normpath(destpath), workspace_api
-        )
+        destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
 
-        parent = self.provider.get_parent_from_path(
-            normpath(destpath),
-            self.content_api,
-            workspace
-        )
+        try:
+            checker.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
-        with new_revision(
-            content=self.content,
-            tm=transaction.manager,
-            session=self.session,
-        ):
-            if basename(destpath) != self.getDisplayName():
-                self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
-                self.content_api.save(self.content)
-            else:
-                if workspace.workspace_id == self.content.workspace.workspace_id:
-                    self.content_api.move(self.content, parent)
+        destination_workspace = self.tracim_context.candidate_workspace
+        try:
+            destination_parent = self.tracim_context.candidate_parent_content
+        except ContentNotFound as e:
+            destination_parent = None
+        try:
+            with new_revision(
+                content=self.content,
+                tm=transaction.manager,
+                session=self.session,
+            ):
+                if basename(destpath) != self.getDisplayName():
+                    self.content_api.update_content(self.content, webdav_convert_file_name_to_bdd(basename(destpath)))
+                    self.content_api.save(self.content)
                 else:
-                    self.content_api.move_recursively(self.content, parent, workspace)
+                    if destination_workspace.workspace_id == self.content.workspace.workspace_id:
+                        self.content_api.move(self.content, destination_parent)
+                    else:
+                        self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
         transaction.commit()
 
+    @webdav_check_right(is_reader)
     def getMemberList(self) -> [_DAVResource]:
         members = []
         content_api = ContentApi(
@@ -551,7 +609,7 @@ class FolderResource(WorkspaceResource):
         )
 
         for content in visible_children:
-            content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
+            content_path = '%s/%s' % (self.path, webdav_convert_file_name_to_display(content.file_name))
 
             try:
                 if content.type == content_type_list.Folder.slug:
@@ -561,8 +619,7 @@ class FolderResource(WorkspaceResource):
                             environ=self.environ,
                             workspace=self.workspace,
                             content=content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         )
                     )
                 elif content.type == content_type_list.File.slug:
@@ -572,8 +629,7 @@ class FolderResource(WorkspaceResource):
                             path=content_path,
                             environ=self.environ,
                             content=content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
                 else:
                     self._file_count += 1
@@ -582,518 +638,10 @@ class FolderResource(WorkspaceResource):
                             path=content_path,
                             environ=self.environ,
                             content=content,
-                            user=self.user,
-                            session=self.session,
+                            tracim_context=self.tracim_context
                         ))
             except NotImplementedError as exc:
                 pass
-            # except Exception as exc:
-            #     logger.exception(
-            #         'Unable to construct member {}'.format(
-            #             content_path,
-            #         ),
-            #         exc_info=True,
-            #     )
-
-        if self._file_count > 0 and self.provider.show_history():
-            members.append(
-                HistoryFolderResource(
-                    path=self.path + '/' + ".history",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    type=HistoryType.Standard,
-                    user=self.user,
-                    session=self.session,
-                )
-            )
-
-        if self.provider.show_delete():
-            members.append(
-                DeletedFolderResource(
-                    path=self.path + '/' + ".deleted",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    user=self.user,
-                    session=self.session,
-                )
-            )
-
-        if self.provider.show_archive():
-            members.append(
-                ArchivedFolderResource(
-                    path=self.path + '/' + ".archived",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    user=self.user,
-                    session=self.session,
-                )
-            )
-
-        return members
-
-# TODO - G.M - 02-05-2018 - Check these object (History/Deleted/Archived Folder)
-# Those object are now not in used by tracim and also not tested,
-
-
-class HistoryFolderResource(FolderResource):
-    """
-    A virtual resource which contains a sub-folder for every files (DAVNonCollection) contained in the parent
-    folder
-    """
-    
-    def __init__(self,
-                 path,
-                 environ,
-                 workspace: Workspace,
-                 user: User,
-                 session: Session,
-                 content: Content=None,
-                 type: str=HistoryType.Standard
-    ) -> None:
-        super(HistoryFolderResource, self).__init__(
-            path=path,
-            environ=environ,
-            workspace=workspace,
-            content=content,
-            user=user,
-            session=session,
-        )
-
-        self._is_archived = type == HistoryType.Archived
-        self._is_deleted = type == HistoryType.Deleted
-
-        self.content_api = ContentApi(
-            current_user=self.user,
-            show_archived=self._is_archived,
-            show_deleted=self._is_deleted,
-            session=self.session,
-            config=self.provider.app_config,
-        )
-
-    def __repr__(self) -> str:
-        return "<DAVCollection: HistoryFolderResource (%s)>" % self.content.file_name
-
-    def getCreationDate(self) -> float:
-        return mktime(datetime.now().timetuple())
-
-    def getDisplayName(self) -> str:
-        return '.history'
-
-    def getLastModified(self) -> float:
-        return mktime(datetime.now().timetuple())
-
-    def getMember(self, content_label: str) -> _DAVResource:
-        content = self.content_api.get_one_by_label_and_parent(
-            content_label=content_label,
-            content_parent=self.content
-        )
-
-        return HistoryFileFolderResource(
-            path='%s/%s' % (self.path, content.file_name),
-            environ=self.environ,
-            content=content,
-            session=self.session,
-            user=self.user,
-        )
-
-    def getMemberNames(self) -> [str]:
-        ret = []
-
-        content_id = None if self.content is None else self.content.id
-        for content in self.content_api.get_all([content_id], content_type_list.Any_SLUG, self.workspace):
-            if (self._is_archived and content.is_archived or
-                self._is_deleted and content.is_deleted or
-                not (content.is_archived or self._is_archived or content.is_deleted or self._is_deleted))\
-                    and content.type != content_type_list.Folder.slug:
-                ret.append(content.file_name)
-
-        return ret
-
-    def createEmptyResource(self, name: str):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def createCollection(self, name: str):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def delete(self):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def handleDelete(self):
-        return True
-
-    def handleCopy(self, destPath: str, depthInfinity):
-        return True
-
-    def handleMove(self, destPath: str):
-        return True
-
-    def getMemberList(self) -> [_DAVResource]:
-        members = []
-        
-        if self.content:
-            children = self.content.children
-        else:
-            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
-        
-        for content in children:
-            if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
-                members.append(HistoryFileFolderResource(
-                    path='%s/%s' % (self.path, content.file_name),
-                    environ=self.environ,
-                    content=content,
-                    user=self.user,
-                    session=self.session,
-                ))
-
-        return members
-
-
-class DeletedFolderResource(HistoryFolderResource):
-    """
-    A virtual resources which exists for every folder or workspaces which contains their deleted children
-    """
-
-    def __init__(
-            self,
-            path: str,
-            environ: dict,
-            workspace: Workspace,
-            user: User,
-            session: Session,
-            content: Content=None
-    ):
-        super(DeletedFolderResource, self).__init__(
-            path=path,
-            environ=environ,
-            workspace=workspace,
-            user=user,
-            content=content,
-            session=session,
-            type=HistoryType.Deleted
-        )
-
-        self._file_count = 0
-
-    def __repr__(self):
-        return "<DAVCollection: DeletedFolderResource (%s)" % self.content.file_name
-
-    def getCreationDate(self) -> float:
-        return mktime(datetime.now().timetuple())
-
-    def getDisplayName(self) -> str:
-        return '.deleted'
-
-    def getLastModified(self) -> float:
-        return mktime(datetime.now().timetuple())
-
-    def getMember(self, content_label) -> _DAVResource:
-
-        content = self.content_api.get_one_by_label_and_parent(
-            content_label=content_label,
-            content_parent=self.content
-        )
-
-        return self.provider.getResourceInst(
-            path='%s/%s' % (self.path, transform_to_display(content.file_name)),
-            environ=self.environ
-            )
-
-    def getMemberNames(self) -> [str]:
-        retlist = []
-
-        if self.content:
-            children = self.content.children
-        else:
-            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
-
-        for content in children:
-            if content.is_deleted:
-                retlist.append(content.file_name)
-
-                if content.type != content_type_list.Folder.slug:
-                    self._file_count += 1
-
-        return retlist
-
-    def getMemberList(self) -> [_DAVResource]:
-        members = []
-
-        if self.content:
-            children = self.content.children
-        else:
-            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
-
-        for content in children:
-            if content.is_deleted:
-                content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
-
-                if content.type == content_type_list.Folder.slug:
-                    members.append(
-                        FolderResource(
-                            content_path,
-                            self.environ,
-                            self.workspace,
-                            content,
-                            user=self.user,
-                            session=self.session,
-                        ))
-                elif content.type == content_type_list.File.slug:
-                    self._file_count += 1
-                    members.append(
-                        FileResource(
-                            content_path,
-                            self.environ,
-                            content,
-                            user=self.user,
-                            session=self.session,
-                        )
-                    )
-                else:
-                    self._file_count += 1
-                    members.append(
-                        OtherFileResource(
-                            content_path,
-                            self.environ,
-                            content,
-                            user=self.user,
-                            session=self.session,
-                    ))
-
-        if self._file_count > 0 and self.provider.show_history():
-            members.append(
-                HistoryFolderResource(
-                    path=self.path + '/' + ".history",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    user=self.user,
-                    type=HistoryType.Standard,
-                    session=self.session,
-                )
-            )
-
-        return members
-
-
-class ArchivedFolderResource(HistoryFolderResource):
-    """
-    A virtual resources which exists for every folder or workspaces which contains their archived children
-    """
-    def __init__(
-            self,
-            path: str,
-            environ: dict,
-            workspace: Workspace,
-            user: User,
-            session: Session,
-            content: Content=None
-    ):
-        super(ArchivedFolderResource, self).__init__(
-            path=path,
-            environ=environ,
-            workspace=workspace,
-            user=user,
-            content=content,
-            session=session,
-            type=HistoryType.Archived
-        )
-
-        self._file_count = 0
-
-    def __repr__(self) -> str:
-        return "<DAVCollection: ArchivedFolderResource (%s)" % self.content.file_name
-
-    def getCreationDate(self) -> float:
-        return mktime(datetime.now().timetuple())
-
-    def getDisplayName(self) -> str:
-        return '.archived'
-
-    def getLastModified(self) -> float:
-        return mktime(datetime.now().timetuple())
-
-    def getMember(self, content_label) -> _DAVResource:
-
-        content = self.content_api.get_one_by_label_and_parent(
-            content_label=content_label,
-            content_parent=self.content
-        )
-
-        return self.provider.getResourceInst(
-            path=self.path + '/' + transform_to_display(content.file_name),
-            environ=self.environ
-        )
-
-    def getMemberNames(self) -> [str]:
-        retlist = []
-
-        for content in self.content_api.get_all_with_filter(
-                self.content if self.content is None else self.content.id, content_type_list.Any_SLUG):
-            retlist.append(content.file_name)
-
-            if content.type != content_type_list.Folder.slug:
-                self._file_count += 1
-
-        return retlist
-
-    def getMemberList(self) -> [_DAVResource]:
-        members = []
-
-        if self.content:
-            children = self.content.children
-        else:
-            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
-
-        for content in children:
-            if content.is_archived:
-                content_path = '%s/%s' % (self.path, transform_to_display(content.file_name))
-
-                if content.type == content_type_list.Folder.slug:
-                    members.append(
-                        FolderResource(
-                            content_path,
-                            self.environ,
-                            self.workspace,
-                            content,
-                            user=self.user,
-                            session=self.session,
-                        ))
-                elif content.type == content_type_list.File.slug:
-                    self._file_count += 1
-                    members.append(
-                        FileResource(
-                            content_path,
-                            self.environ,
-                            content,
-                            user=self.user,
-                            session=self.session,
-                        ))
-                else:
-                    self._file_count += 1
-                    members.append(
-                        OtherFileResource(
-                            content_path,
-                            self.environ,
-                            content,
-                            user=self.user,
-                            session=self.session,
-                        ))
-
-        if self._file_count > 0 and self.provider.show_history():
-            members.append(
-                HistoryFolderResource(
-                    path=self.path + '/' + ".history",
-                    environ=self.environ,
-                    content=self.content,
-                    workspace=self.workspace,
-                    user=self.user,
-                    type=HistoryType.Standard,
-                    session=self.session,
-                )
-            )
-
-        return members
-
-
-class HistoryFileFolderResource(HistoryFolderResource):
-    """
-    A virtual resource that contains for a given content (file/page/thread) all its revisions
-    """
-
-    def __init__(
-            self,
-            path: str,
-            environ: dict,
-            content: Content,
-            user: User,
-            session: Session
-    ) -> None:
-        super(HistoryFileFolderResource, self).__init__(
-            path=path,
-            environ=environ,
-            workspace=content.workspace,
-            content=content,
-            user=user,
-            session=session,
-            type=HistoryType.All,
-        )
-
-    def __repr__(self) -> str:
-        return "<DAVCollection: HistoryFileFolderResource (%s)" % self.content.file_name
-
-    def getDisplayName(self) -> str:
-        return self.content.file_name
-
-    def createCollection(self, name):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def getMemberNames(self) -> [int]:
-        """
-        Usually we would return a string, but here as we're working with different
-        revisions of the same content, we'll work with revision_id
-        """
-        ret = []
-
-        for content in self.content.revisions:
-            ret.append(content.revision_id)
-
-        return ret
-
-    def getMember(self, item_id) -> DAVNonCollection:
-
-        revision = self.content_api.get_one_revision(item_id)
-
-        left_side = '%s/(%d - %s) ' % (self.path, revision.revision_id, revision.revision_type)
-
-        if self.content.type == content_type_list.File.slug:
-            return HistoryFileResource(
-                path='%s%s' % (left_side, transform_to_display(revision.file_name)),
-                environ=self.environ,
-                content=self.content,
-                content_revision=revision,
-                session=self.session,
-                user=self.user,
-            )
-        else:
-            return HistoryOtherFile(
-                path='%s%s' % (left_side, transform_to_display(revision.file_name)),
-                environ=self.environ,
-                content=self.content,
-                content_revision=revision,
-                session=self.session,
-                user=self.user,
-            )
-
-    def getMemberList(self) -> [_DAVResource]:
-        members = []
-
-        for content in self.content.revisions:
-
-            left_side = '%s/(%d - %s) ' % (self.path, content.revision_id, content.revision_type)
-
-            if self.content.type == content_type_list.File.slug:
-                members.append(HistoryFileResource(
-                    path='%s%s' % (left_side, transform_to_display(content.file_name)),
-                    environ=self.environ,
-                    content=self.content,
-                    content_revision=content,
-                    user=self.user,
-                    session=self.session,
-                    )
-                )
-            else:
-                members.append(HistoryOtherFile(
-                    path='%s%s' % (left_side, transform_to_display(content.file_name)),
-                    environ=self.environ,
-                    content=self.content,
-                    content_revision=content,
-                    user=self.user,
-                    session=self.session,
-                    )
-                )
 
         return members
 
@@ -1107,17 +655,16 @@ class FileResource(DAVNonCollection):
             path: str,
             environ: dict,
             content: Content,
-            user: User,
-            session: Session,
+            tracim_context: 'WebdavTracimContext'
     ) -> None:
         super(FileResource, self).__init__(path, environ)
-
+        self.tracim_context = tracim_context
         self.content = content
-        self.user = user
-        self.session = session
+        self.user = tracim_context.current_user
+        self.session = tracim_context.dbsession
         self.content_api = ContentApi(
             current_user=self.user,
-            config=self.provider.app_config,
+            config=tracim_context.app_config,
             session=self.session,
         )
 
@@ -1128,21 +675,33 @@ class FileResource(DAVNonCollection):
     def __repr__(self) -> str:
         return "<DAVNonCollection: FileResource (%d)>" % self.content.revision_id
 
+    @webdav_check_right(is_reader)
     def getContentLength(self) -> int:
         return self.content.depot_file.file.content_length
 
+    @webdav_check_right(is_reader)
     def getContentType(self) -> str:
         return self.content.file_mimetype
 
+    @webdav_check_right(is_reader)
     def getCreationDate(self) -> float:
         return mktime(self.content.created.timetuple())
 
+    @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return self.content.file_name
+        return webdav_convert_file_name_to_display(self.content.file_name)
 
+    @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {
+            'type': self.content.type.capitalize(),
+        }
+
+    @webdav_check_right(is_reader)
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
+    @webdav_check_right(is_reader)
     def getContent(self) -> typing.BinaryIO:
         filestream = compat.BytesIO()
         filestream.write(self.content.depot_file.file.read())
@@ -1160,10 +719,23 @@ class FileResource(DAVNonCollection):
             session=self.session,
         )
 
+
     def moveRecursive(self, destpath):
         """As we support recursive move, copymovesingle won't be called, though with copy it'll be called
             but i have to check if the client ever call that function..."""
         destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
+
+        try:
+            checker.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
         invalid_path = False
 
@@ -1228,55 +800,65 @@ class FileResource(DAVNonCollection):
 
         workspace = self.content.workspace
         parent = self.content.parent
+        destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+            # INFO - G.M - 2018-12-12 - renaming case
+            checker = is_contributor
+        else:
+            # INFO - G.M - 2018-12-12 - move case
+            checker = can_move_content
 
-        with new_revision(
-            content=self.content,
-            tm=transaction.manager,
-            session=self.session,
-        ):
-            # INFO - G.M - 2018-03-09 - First, renaming file if needed
-            if basename(destpath) != self.getDisplayName():
-                new_given_file_name = transform_to_bdd(basename(destpath))
-                new_file_name, new_file_extension = \
-                    os.path.splitext(new_given_file_name)
+        try:
+            checker.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
-                self.content_api.update_content(
-                    self.content,
-                    new_file_name,
-                )
-                self.content.file_extension = new_file_extension
-                self.content_api.save(self.content)
-
-            # INFO - G.M - 2018-03-09 - Moving file if needed
-            workspace_api = WorkspaceApi(
-                current_user=self.user,
+        try:
+            with new_revision(
+                content=self.content,
+                tm=transaction.manager,
                 session=self.session,
-                config=self.provider.app_config,
-                )
-            content_api = ContentApi(
-                current_user=self.user,
-                session=self.session,
-                config=self.provider.app_config
-            )
+            ):
+                # INFO - G.M - 2018-03-09 - First, renaming file if needed
+                if basename(destpath) != self.getDisplayName():
 
-            destination_workspace = self.provider.get_workspace_from_path(
-                destpath,
-                workspace_api,
-            )
-            destination_parent = self.provider.get_parent_from_path(
-                destpath,
-                content_api,
-                destination_workspace,
-            )
-            if destination_parent != parent or destination_workspace != workspace:  # nopep8
-                #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
-                #  if the request does not result in a real move.
-                self.content_api.move(
-                    item=self.content,
-                    new_parent=destination_parent,
-                    must_stay_in_same_workspace=False,
-                    new_workspace=destination_workspace
-                )
+                    new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
+                    regex_file_extension = re.compile(
+                        '(?P<label>.*){}'.format(
+                            re.escape(self.content.file_extension)))
+                    same_extension = regex_file_extension.match(new_filename)
+                    if same_extension:
+                        new_label = same_extension.group('label')
+                        new_file_extension = self.content.file_extension
+                    else:
+                        new_label, new_file_extension = os.path.splitext(
+                            new_filename)
+
+                    self.content_api.update_content(
+                        self.content,
+                        new_label=new_label,
+                    )
+                    self.content.file_extension = new_file_extension
+                    self.content_api.save(self.content)
+
+                # INFO - G.M - 2018-03-09 - Moving file if needed
+                destination_workspace = self.tracim_context.candidate_workspace
+                try:
+                    destination_parent = self.tracim_context.candidate_parent_content
+                except ContentNotFound:
+                    destination_parent = None
+                if destination_parent != parent or destination_workspace != workspace:  # nopep8
+                    #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
+                    #  if the request does not result in a real move.
+                    self.content_api.move(
+                        item=self.content,
+                        new_parent=destination_parent,
+                        must_stay_in_same_workspace=False,
+                        new_workspace=destination_workspace
+                    )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
         transaction.commit()
 
@@ -1289,50 +871,50 @@ class FileResource(DAVNonCollection):
             # self.move_file(destpath)
             # return
             ####
+            raise NotImplemented('Feature not available')
 
-            raise NotImplemented
+        destpath = normpath(destpath)
+        self.tracim_context.set_destpath(destpath)
+        try:
+            can_move_content.check(self.tracim_context)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN)
 
-        new_file_name = None
-        new_file_extension = None
+        new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
+        regex_file_extension = re.compile(
+            '(?P<label>.*){}'.format(re.escape(self.content.file_extension)))
+        same_extension = regex_file_extension.match(new_filename)
+        if same_extension:
+            new_label = same_extension.group('label')
+            new_file_extension = self.content.file_extension
+        else:
+           new_label, new_file_extension = os.path.splitext(new_filename)
 
-        # Inspect destpath
-        if basename(destpath) != self.getDisplayName():
-            new_given_file_name = transform_to_bdd(basename(destpath))
-            new_file_name, new_file_extension = \
-                os.path.splitext(new_given_file_name)
-
-        workspace_api = WorkspaceApi(
-            current_user=self.user,
-            session=self.session,
-            config=self.provider.app_config,
-        )
-        content_api = ContentApi(
-            current_user=self.user,
-            session=self.session,
-            config=self.provider.app_config
-        )
-        destination_workspace = self.provider.get_workspace_from_path(
-            destpath,
-            workspace_api,
-        )
-        destination_parent = self.provider.get_parent_from_path(
-            destpath,
-            content_api,
-            destination_workspace,
-        )
+        self.tracim_context.set_destpath(destpath)
+        destination_workspace = self.tracim_context.candidate_workspace
+        try:
+            destination_parent = self.tracim_context.candidate_parent_content
+        except ContentNotFound as e:
+            destination_parent = None
         workspace = self.content.workspace
         parent = self.content.parent
-        new_content = self.content_api.copy(
-            item=self.content,
-            new_label=new_file_name,
-            new_parent=destination_parent,
-        )
-        self.content_api.copy_children(self.content, new_content)
+        try:
+            new_content = self.content_api.copy(
+                item=self.content,
+                new_label=new_label,
+                new_file_extension=new_file_extension,
+                new_parent=destination_parent,
+                new_workspace=destination_workspace
+            )
+            self.content_api.copy_children(self.content, new_content)
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
         transaction.commit()
 
-    def supportRecursiveMove(self, destPath):
+    def supportRecursiveMove(self, destpath):
         return True
 
+    @webdav_check_right(is_content_manager)
     def delete(self):
         ManageActions(
             action_type=ActionDescription.DELETION,
@@ -1341,51 +923,12 @@ class FileResource(DAVNonCollection):
             session=self.session,
         ).action()
 
-
-class HistoryFileResource(FileResource):
-    """
-    A virtual resource corresponding to a specific tracim's revision's file
-    """
-    def __init__(self, path: str, environ: dict, content: Content, user: User, session: Session, content_revision: ContentRevisionRO):
-        super(HistoryFileResource, self).__init__(path, environ, content, user=user, session=session)
-        self.content_revision = content_revision
-
-    def __repr__(self) -> str:
-        return "<DAVNonCollection: HistoryFileResource (%s-%s)" % (self.content.content_id, self.content.file_name)
-
-    def getDisplayName(self) -> str:
-        left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, transform_to_display(self.content_revision.file_name))
-
-    def getContent(self):
-        filestream = compat.BytesIO()
-        filestream.write(self.content_revision.depot_file.file.read())
-        filestream.seek(0)
-
-        return filestream
-
-    def getContentLength(self):
-        return self.content_revision.depot_file.file.content_length
-
-    def getContentType(self) -> str:
-        return self.content_revision.file_mimetype
-
-    def beginWrite(self, contentType=None):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def delete(self):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def copyMoveSingle(self, destpath, ismove):
-        raise DAVError(HTTP_FORBIDDEN)
-
-
 class OtherFileResource(FileResource):
     """
     FileResource resource corresponding to tracim's page and thread
     """
-    def __init__(self, path: str, environ: dict, content: Content, user:User, session: Session):
-        super(OtherFileResource, self).__init__(path, environ, content, user=user, session=session)
+    def __init__(self, path: str, environ: dict, content: Content, tracim_context: 'WebdavTracimContext'):
+        super(OtherFileResource, self).__init__(path, environ, content, tracim_context=tracim_context)
 
         self.content_revision = self.content.revision
 
@@ -1397,27 +940,38 @@ class OtherFileResource(FileResource):
         if not self.path.endswith('.html'):
             self.path += '.html'
 
+    @webdav_check_right(is_reader)
     def getDisplayName(self) -> str:
-        return self.content.file_name
+        return webdav_convert_file_name_to_display(self.content.file_name)
 
+    @webdav_check_right(is_reader)
     def getPreferredPath(self):
         return self.path
 
     def __repr__(self) -> str:
         return "<DAVNonCollection: OtherFileResource (%s)" % self.content.file_name
 
+    @webdav_check_right(is_reader)
     def getContentLength(self) -> int:
         return len(self.content_designed)
 
+    @webdav_check_right(is_reader)
     def getContentType(self) -> str:
         return 'text/html'
 
+    @webdav_check_right(is_reader)
     def getContent(self):
         filestream = compat.BytesIO()
 
         filestream.write(bytes(self.content_designed, 'utf-8'))
         filestream.seek(0)
         return filestream
+
+    @webdav_check_right(is_reader)
+    def getDisplayInfo(self):
+        return {
+            'type': self.content.type.capitalize(),
+        }
 
     def design(self):
         if self.content.type == content_type_list.Page.slug:
@@ -1428,46 +982,3 @@ class OtherFileResource(FileResource):
                 self.content_revision,
                 self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug)
             )
-
-
-class HistoryOtherFile(OtherFileResource):
-    """
-    A virtual resource corresponding to a specific tracim's revision's page and thread
-    """
-    def __init__(self,
-                 path: str,
-                 environ: dict,
-                 content: Content,
-                 user:User,
-                 content_revision: ContentRevisionRO,
-                 session: Session):
-        super(HistoryOtherFile, self).__init__(
-            path,
-            environ,
-            content,
-            user=user,
-            session=session
-        )
-        self.content_revision = content_revision
-        self.content_designed = self.design()
-
-    def __repr__(self) -> str:
-        return "<DAVNonCollection: HistoryOtherFile (%s-%s)" % (self.content.file_name, self.content.id)
-
-    def getDisplayName(self) -> str:
-        left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, transform_to_display(self.content_revision.file_name))
-
-    def getContent(self):
-        filestream = compat.BytesIO()
-
-        filestream.write(bytes(self.content_designed, 'utf-8'))
-        filestream.seek(0)
-
-        return filestream
-
-    def delete(self):
-        raise DAVError(HTTP_FORBIDDEN)
-
-    def copyMoveSingle(self, destpath, ismove):
-        raise DAVError(HTTP_FORBIDDEN)
