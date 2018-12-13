@@ -3,10 +3,10 @@ from urllib.parse import quote
 
 import transaction
 
-from tracim_backend import models
+
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.revision_protection import new_revision
 import io
@@ -17,13 +17,13 @@ from depot.io.utils import FileIntent
 from PIL import Image
 
 from tracim_backend import error
-from tracim_backend import models
+from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import create_1000px_png_test_image
@@ -43,8 +43,8 @@ class TestFolder(FunctionalTest):
         Get one folder content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -121,8 +121,8 @@ class TestFolder(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -169,8 +169,8 @@ class TestFolder(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -207,8 +207,8 @@ class TestFolder(FunctionalTest):
             )
         )
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -259,8 +259,8 @@ class TestFolder(FunctionalTest):
         Get one folder content (Workspace 40 does not exist)
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -304,8 +304,8 @@ class TestFolder(FunctionalTest):
         Get one folder content, workspace id is not int
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -349,8 +349,8 @@ class TestFolder(FunctionalTest):
         Get one folder content, content_id is not int
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -395,8 +395,8 @@ class TestFolder(FunctionalTest):
         Update(put) one folder content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -450,8 +450,8 @@ class TestFolder(FunctionalTest):
         Update(put) one html document of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -525,8 +525,8 @@ class TestFolder(FunctionalTest):
         Update(put) one html document of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -612,8 +612,8 @@ class TestFolder(FunctionalTest):
         Update(put) one folder but change only allowed content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -732,8 +732,8 @@ class TestFolder(FunctionalTest):
         Update(put) one folder but change only allowed content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -846,8 +846,8 @@ class TestFolder(FunctionalTest):
         Update(put) one html document of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -909,8 +909,8 @@ class TestFolder(FunctionalTest):
         Get one html document of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1082,8 +1082,8 @@ class TestFolder(FunctionalTest):
         Get one folder content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1170,8 +1170,8 @@ class TestFolder(FunctionalTest):
             'status': 'unexistant-status',
         }
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1848,8 +1848,8 @@ class TestFiles(FunctionalTest):
         Get one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1938,8 +1938,8 @@ class TestFiles(FunctionalTest):
         Get one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2012,8 +2012,8 @@ class TestFiles(FunctionalTest):
         """
         dbsession = get_tm_session(self.session_factory,
                                    transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2212,8 +2212,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2281,8 +2281,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2403,8 +2403,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2469,8 +2469,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2536,8 +2536,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2603,8 +2603,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2738,8 +2738,8 @@ class TestFiles(FunctionalTest):
         Update(put) one file, failed because label already used
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2835,8 +2835,8 @@ class TestFiles(FunctionalTest):
         Get file revisions
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -2923,8 +2923,8 @@ class TestFiles(FunctionalTest):
         set file status
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3004,8 +3004,8 @@ class TestFiles(FunctionalTest):
         set file status
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3077,8 +3077,8 @@ class TestFiles(FunctionalTest):
         Get one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3136,8 +3136,8 @@ class TestFiles(FunctionalTest):
         Get one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3201,8 +3201,8 @@ class TestFiles(FunctionalTest):
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3274,8 +3274,8 @@ class TestFiles(FunctionalTest):
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3334,8 +3334,8 @@ class TestFiles(FunctionalTest):
         """
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3417,8 +3417,8 @@ class TestFiles(FunctionalTest):
         create one file of a content but subcontent of type file unallowed here
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3474,8 +3474,8 @@ class TestFiles(FunctionalTest):
         create one file of a content but parent_id is not valid
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3517,8 +3517,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3571,8 +3571,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3638,8 +3638,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3694,8 +3694,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3757,8 +3757,8 @@ class TestFiles(FunctionalTest):
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3812,8 +3812,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3871,8 +3871,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3936,8 +3936,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -3997,8 +3997,8 @@ class TestFiles(FunctionalTest):
         get 256x256 preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4052,8 +4052,8 @@ class TestFiles(FunctionalTest):
         Set one file of a content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4113,8 +4113,8 @@ class TestFiles(FunctionalTest):
         get 256x256 preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4174,8 +4174,8 @@ class TestFiles(FunctionalTest):
         get 256x256 preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4235,8 +4235,8 @@ class TestFiles(FunctionalTest):
         get 256x256 preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4296,8 +4296,8 @@ class TestFiles(FunctionalTest):
         get 256x256 preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4351,8 +4351,8 @@ class TestFiles(FunctionalTest):
         get 256x256 revision preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4428,8 +4428,8 @@ class TestFiles(FunctionalTest):
         get 256x256 revision preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4509,8 +4509,8 @@ class TestFiles(FunctionalTest):
         get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4573,8 +4573,8 @@ class TestFiles(FunctionalTest):
         get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4651,8 +4651,8 @@ class TestFiles(FunctionalTest):
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4705,8 +4705,8 @@ class TestFiles(FunctionalTest):
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4763,8 +4763,8 @@ class TestFiles(FunctionalTest):
         get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4829,8 +4829,8 @@ class TestFiles(FunctionalTest):
         get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4888,8 +4888,8 @@ class TestFiles(FunctionalTest):
         get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -4956,8 +4956,8 @@ class TestFiles(FunctionalTest):
         get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -5023,8 +5023,8 @@ class TestFiles(FunctionalTest):
         get pdf revision preview of content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -5099,8 +5099,8 @@ class TestFiles(FunctionalTest):
         get pdf revision preview of content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -5169,8 +5169,8 @@ class TestFiles(FunctionalTest):
         get pdf revision preview of content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -5246,8 +5246,8 @@ class TestFiles(FunctionalTest):
         get pdf revision preview of content
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -5739,8 +5739,8 @@ class TestThreads(FunctionalTest):
         get threads revisions
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         workspace_api = WorkspaceApi(
             current_user=admin,

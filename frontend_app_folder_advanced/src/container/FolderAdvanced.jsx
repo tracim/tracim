@@ -41,7 +41,7 @@ class FolderAdvanced extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -133,7 +133,7 @@ class FolderAdvanced extends React.Component {
   handleClickCheckbox = async appSlug => {
     const { props, state } = this
 
-    const simpleAppSlug = (appSlug.split('/') || ['', ''])[1]
+    const simpleAppSlug = (appSlug.split('/') || ['', ''])[1] // appSlug are like 'content/${slug}' and need to remove 'content/'
 
     const oldAvailableAppList = state.content.sub_content_types
 
@@ -230,7 +230,8 @@ class FolderAdvanced extends React.Component {
           customClass={'folderAdvanced'}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          title={state.content.label}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}

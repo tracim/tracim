@@ -2,8 +2,10 @@
 
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-from tracim_backend import models
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+from tracim_backend.models.setup_models import *
+from tracim_backend.models.meta import metadata
 # from logging.config import fileConfig
 
 # this is the Alembic Config object, which provides
@@ -18,7 +20,7 @@ config = context.config
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-target_metadata = models.meta.metadata
+target_metadata = metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -43,7 +43,7 @@ class AdminWorkspaceUser extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -208,6 +208,11 @@ class AdminWorkspaceUser extends React.Component {
 
   handleClickAddUser = async (name, email, profile, password) => {
     const { props, state } = this
+
+    if (name.length < 3) {
+      this.sendGlobalFlashMsg(props.t('Full name must be at least 3 characters'), 'warning')
+      return
+    }
 
     if (!state.config.system.config.email_notification_activated) {
       if (password === '') {

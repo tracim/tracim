@@ -16,13 +16,14 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
-from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import password_generator
-from tracim_backend.models import User
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -49,10 +50,11 @@ class ConfigModel(object):
 
     def __init__(
         self,
-        email_notification_activated: bool
+        email_notification_activated: bool,
+        new_user_invitation_do_notify: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
-
+        self.new_user_invitation_do_notify = new_user_invitation_do_notify
 
 class PreviewAllowedDim(object):
 
@@ -193,7 +195,7 @@ class UserCreation(object):
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
-        self.password = password or password_generator()
+        self.password = password or None
         self.public_name = public_name or None
         self.timezone = timezone or ''
         self.lang = lang or None
@@ -569,6 +571,10 @@ class UserInContext(object):
     def avatar_url(self) -> typing.Optional[str]:
         # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
         return None
+
+    @property
+    def auth_type(self) -> str:
+        return self.user.auth_type.value
 
 
 class WorkspaceInContext(object):
@@ -985,7 +991,7 @@ class ContentInContext(object):
         """
         :return: complete filename with both label and file extension part
         """
-        return self.content.file_name
+        return core_convert_file_name_to_display(self.content.file_name)
 
 
 class RevisionInContext(object):
@@ -1279,4 +1285,4 @@ class RevisionInContext(object):
         """
         :return: complete filename with both label and file extension part
         """
-        return self.revision.file_name
+        return core_convert_file_name_to_display(self.revision.file_name)

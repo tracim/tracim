@@ -4,19 +4,17 @@ import typing
 import marshmallow
 import re
 from marshmallow import post_load
-from marshmallow.validate import Length
-from marshmallow.validate import Regexp
-from marshmallow.validate import OneOf
-from marshmallow.validate import Range
 
+from marshmallow.fields import String
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
-from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.app_models.validator import *
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
-from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
@@ -55,14 +53,21 @@ from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import UserRoleInWorkspace
 
 FIELD_LANG_DESC = "User langage in ISO 639 format. " \
                   "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
 
-REGEX_STRING_AS_LIST_OF_INT = Regexp(regex=(re.compile('^(\d+(,\d+)*)?$')))
+
+class StrippedString(String):
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        if value:
+            value = value.strip()
+        return value.strip()
+
 
 class SimpleFileSchema(marshmallow.Schema):
     """
@@ -81,7 +86,7 @@ class FileCreationFormSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
         example=2,
         default=0,
-        validate=Range(min=0, error="Value must be positive or 0"),
+        validate=positive_int_validator,
         allow_none=True
     )
 
@@ -103,7 +108,7 @@ class UserDigestSchema(marshmallow.Schema):
                     "(frontend should interpret "
                     "an empty url as default avatar)",
     )
-    public_name = marshmallow.fields.String(
+    public_name = StrippedString(
         example='John Doe',
     )
 
@@ -132,9 +137,10 @@ class UserSchema(UserDigestSchema):
                     'Default is false'
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
-    timezone = marshmallow.fields.String(
+    timezone = StrippedString(
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
+        validate=user_timezone_validator,
     )
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
     caldav_url = marshmallow.fields.Url(
@@ -144,19 +150,24 @@ class UserSchema(UserDigestSchema):
         example="/api/v2/calendar/user/3.ics/",
         description="CalDAV url of the user dedicated calendar",
     )
-    profile = marshmallow.fields.String(
+    profile = StrippedString(
         attribute='profile',
-        validate=OneOf(Profile._NAME),
+        validate=user_profile_validator,
         example='trusted-users',
         description=FIELD_PROFILE_DESC,
     )
-    lang = marshmallow.fields.String(
+    lang = StrippedString(
         description=FIELD_LANG_DESC,
         example='en',
         required=False,
-        validate=Length(min=2, max=3),
+        validate=user_lang_validator,
         allow_none=True,
         default=None,
+    )
+    auth_type = marshmallow.fields.String(
+        validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
+        example=AuthType.INTERNAL.value,
+        description="authentication system of the user"
     )
 
     class Meta:
@@ -164,15 +175,17 @@ class UserSchema(UserDigestSchema):
 
 
 class LoggedInUserPasswordSchema(marshmallow.Schema):
-    loggedin_user_password = marshmallow.fields.String(
+    loggedin_user_password = String(
         required=True,
+        validate=user_password_validator,
     )
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate=user_email_validator
     )
 
     @post_load
@@ -181,13 +194,15 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
 
 
 class SetPasswordSchema(LoggedInUserPasswordSchema):
-    new_password = marshmallow.fields.String(
+    new_password = String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate=user_password_validator
     )
-    new_password2 = marshmallow.fields.String(
+    new_password2 = String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate =user_password_validator,
     )
 
     @post_load
@@ -201,20 +216,21 @@ class SetUserInfoSchema(marshmallow.Schema):
     This schema is for write access only
     """
 
-    timezone = marshmallow.fields.String(
+    timezone = StrippedString(
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         required=True,
     )
-    public_name = marshmallow.fields.String(
+    public_name = StrippedString(
         example='John Doe',
         required=True,
+        validate=user_public_name_validator
     )
-    lang = marshmallow.fields.String(
+    lang = StrippedString(
         description=FIELD_LANG_DESC,
         example='en',
         required=True,
-        validate=Length(min=2, max=3),
+        validate=user_lang_validator,
         allow_none=True,
         default=None,
     )
@@ -228,9 +244,9 @@ class SetUserProfileSchema(marshmallow.Schema):
     """
     Schema used for setting user profile. This schema is for write access only
     """
-    profile = marshmallow.fields.String(
+    profile = StrippedString(
         attribute='profile',
-        validate=OneOf(Profile._NAME),
+        validate=user_profile_validator,
         example='trusted-users',
         description=FIELD_PROFILE_DESC,
     )
@@ -243,36 +259,42 @@ class SetUserProfileSchema(marshmallow.Schema):
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate=user_email_validator,
     )
-    password = marshmallow.fields.String(
+    password = String(
         example='8QLa$<w',
         required=False,
+        validate=user_password_validator,
+        allow_none=True,
+        default=None,
     )
-    profile = marshmallow.fields.String(
+    profile = StrippedString(
         attribute='profile',
-        validate=OneOf(Profile._NAME),
+        validate=user_profile_validator,
         example='trusted-users',
         required=False,
         default=Group.TIM_USER_GROUPNAME,
         description=FIELD_PROFILE_DESC,
     )
-    timezone = marshmallow.fields.String(
+    timezone = StrippedString(
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         required=False,
-        default=''
+        default='',
+        validate=user_timezone_validator,
     )
-    public_name = marshmallow.fields.String(
+    public_name = StrippedString(
         example='John Doe',
         required=False,
         default=None,
+        #validate=user_public_name_validator
     )
-    lang = marshmallow.fields.String(
+    lang = StrippedString(
         description=FIELD_LANG_DESC,
         example='en',
         required=False,
-        validate=Length(min=2, max=3),
+        validate=user_lang_validator,
         allow_none=True,
         default=None,
     )
@@ -294,7 +316,7 @@ class UserIdPathSchema(marshmallow.Schema):
         example=3,
         required=True,
         description='id of a valid user',
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
 
 
@@ -303,7 +325,7 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
         example=4,
         required=True,
         description='id of a valid workspace',
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
@@ -316,7 +338,7 @@ class ContentIdPathSchema(marshmallow.Schema):
         example=6,
         required=True,
         description='id of a valid content',
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
 
 
@@ -343,7 +365,7 @@ class WorkspaceAndContentIdPathSchema(
 
 
 class FilenamePathSchema(marshmallow.Schema):
-    filename = marshmallow.fields.String('filename.ext')
+    filename = StrippedString('filename.ext')
 
 
 class WidthAndHeightPathSchema(marshmallow.Schema):
@@ -436,7 +458,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         example=6,
         description='id of a valid comment related to content content_id',
         required=True,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
@@ -445,19 +467,20 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
 
 
 class KnownMemberQuerySchema(marshmallow.Schema):
-    acp = marshmallow.fields.Str(
+    acp = StrippedString(
         example='test',
         description='search text to query',
-        validate=Length(min=2),
+        validate=acp_validator,
         required=True,
     )
-    exclude_user_ids = marshmallow.fields.String(
-        validate=REGEX_STRING_AS_LIST_OF_INT,
+
+    exclude_user_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
         example="1,5",
         description='comma separated list of excluded user',
     )
-    exclude_workspace_ids = marshmallow.fields.String(
-        validate=REGEX_STRING_AS_LIST_OF_INT,
+    exclude_workspace_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
         example="3,4",
         description='comma separated list of excluded workspace: user of this workspace are excluded from result',  # nopep8
     )
@@ -473,7 +496,7 @@ class FileQuerySchema(marshmallow.Schema):
         default=0,
         description='force download of file or let browser decide if'
                     'file can be read directly from browser',
-        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
+        validate=bool_as_int_validator,
     )
 
     @post_load
@@ -486,7 +509,7 @@ class PageQuerySchema(FileQuerySchema):
         example=2,
         default=1,
         description='allow to show a specific page of a pdf file',
-        validate=Range(min=1, error="Value must be positive"),
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
@@ -495,8 +518,9 @@ class PageQuerySchema(FileQuerySchema):
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-    parent_ids = marshmallow.fields.String(
-        validate=REGEX_STRING_AS_LIST_OF_INT,
+
+    parent_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
         example='0,4,5',
         description='comma separated list of parent ids,'
                     ' parent_id allow to filter items in a folder.'
@@ -510,7 +534,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     )
     complete_path_to_id = marshmallow.fields.Int(
         example=6,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
         description='If setted with a correct content_id, this will'
                     ' add to parent_ids filter, all parent of given content_id,'
                     ' workspace root included. This param help to get '
@@ -524,14 +548,14 @@ class FilterContentQuerySchema(marshmallow.Schema):
         default=0,
         description='if set to 1, then show archived contents.'
                     ' Default is 0 - hide archived content',
-        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
+        validate=bool_as_int_validator,
     )
     show_deleted = marshmallow.fields.Int(
         example=0,
         default=0,
         description='if set to 1, then show deleted contents.'
                     ' Default is 0 - hide deleted content',
-        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
+        validate=bool_as_int_validator,
     )
     show_active = marshmallow.fields.Int(
         example=1,
@@ -542,14 +566,14 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     'that is neither archived nor deleted. '
                     'The reason for this parameter to exist is for example '
                     'to allow to show only archived documents',
-        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
+        validate=bool_as_int_validator
     )
-    content_type = marshmallow.fields.String(
+    content_type = StrippedString(
         example=content_type_list.Any_SLUG,
         default=content_type_list.Any_SLUG,
         validate=all_content_types_validator
     )
-    label = marshmallow.fields.String(
+    label = StrippedString(
         example='myfilename',
         default=None,
         allow_none=True,
@@ -567,7 +591,7 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
         default=0,
         description='if 0 or not set, return all elements, else return only '
                     'the first limit elem (according to offset)',
-        validate=Range(min=0, error="Value must be positive or 0"),
+        validate=strictly_positive_int_validator,
     )
     before_content_id = marshmallow.fields.Int(
         example=41,
@@ -582,8 +606,9 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
-    content_ids = marshmallow.fields.String(
-        validate=REGEX_STRING_AS_LIST_OF_INT,
+
+    content_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
         example="1,5",
         description='comma separated list of contents ids',
     )
@@ -597,10 +622,10 @@ class ContentIdsQuerySchema(marshmallow.Schema):
 
 
 class RoleUpdateSchema(marshmallow.Schema):
-    role = marshmallow.fields.String(
+    role = StrippedString(
         required=True,
         example='contributor',
-        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+        validate=user_role_validator
     )
 
     @post_load
@@ -609,9 +634,9 @@ class RoleUpdateSchema(marshmallow.Schema):
 
 
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
-    role = marshmallow.fields.String(
+    role = StrippedString(
         example='contributor',
-        validate=OneOf(UserRoleInWorkspace.get_all_role_slug()),
+        validate=user_role_validator,
         required=True
     )
     user_id = marshmallow.fields.Int(
@@ -623,11 +648,13 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
         example='suri@cate.fr',
         default=None,
         allow_none=True,
+        validate=user_email_validator,
     )
-    user_public_name = marshmallow.fields.String(
+    user_public_name = StrippedString(
         example='John',
         default=None,
         allow_none=True,
+        validate=user_public_name_validator
     )
 
     @post_load
@@ -638,7 +665,8 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate=user_email_validator,
     )
 
     @post_load
@@ -649,9 +677,10 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate=user_email_validator,
     )
-    reset_password_token = marshmallow.fields.String(
+    reset_password_token = String(
         description="token to reset password of given user",
         required=True,
     )
@@ -664,19 +693,22 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
 class ResetPasswordModifySchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='hello@tracim.fr'
+        example='hello@tracim.fr',
+        validate = user_email_validator
     )
-    reset_password_token = marshmallow.fields.String(
+    reset_password_token = String(
         description="token to reset password of given user",
         required=True,
     )
-    new_password = marshmallow.fields.String(
+    new_password = String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate = user_password_validator,
     )
-    new_password2 = marshmallow.fields.String(
+    new_password2 = String(
         example='8QLa$<w',
-        required=True
+        required=True,
+        validate = user_password_validator,
     )
 
     @post_load
@@ -688,12 +720,14 @@ class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(
         example='hello@tracim.fr',
-        required=True
+        required=True,
+        validate= user_email_validator
     )
-    password = marshmallow.fields.String(
+    password = String(
         example='8QLa$<w',
         required=True,
         load_only=True,
+        validate= user_password_validator,
     )
 
     class Meta:
@@ -705,16 +739,16 @@ class BasicAuthSchema(marshmallow.Schema):
 
 
 class LoginOutputHeaders(marshmallow.Schema):
-    expire_after = marshmallow.fields.String()
+    expire_after = StrippedString()
 
 
 class WorkspaceModifySchema(marshmallow.Schema):
-    label = marshmallow.fields.String(
+    label = StrippedString(
         required=True,
         example='My Workspace',
-        validate=Length(min=1),
+        validate=not_empty_string_validator,
     )
-    description = marshmallow.fields.String(
+    description = StrippedString(
         required=True,
         example='A super description of my workspace.',
     )
@@ -736,20 +770,20 @@ class NoContentSchema(marshmallow.Schema):
 
 
 class WorkspaceMenuEntrySchema(marshmallow.Schema):
-    slug = marshmallow.fields.String(example='markdown-pages')
-    label = marshmallow.fields.String(example='Markdown Documents')
-    route = marshmallow.fields.String(
+    slug = StrippedString(example='markdown-pages')
+    label = StrippedString(example='Markdown Documents')
+    route = StrippedString(
         example='/workspace/{workspace_id}/contents/?type=mardown-page',
         description='the route is the frontend route. '
                     'It may include workspace_id '
                     'which must be replaced on backend size '
                     '(the route must be ready-to-use)'
     )
-    fa_icon = marshmallow.fields.String(
+    fa_icon = StrippedString(
         example='file-text-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon',  # nopep8
     )
-    hexcolor = marshmallow.fields.String(
+    hexcolor = StrippedString(
         example='#F0F9DC',
         description='Hexadecimal color of the entry.'
     )
@@ -761,10 +795,10 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 class WorkspaceDigestSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
-    slug = marshmallow.fields.String(example='intranet')
-    label = marshmallow.fields.String(example='Intranet')
+    slug = StrippedString(example='intranet')
+    label = StrippedString(example='Intranet')
     sidebar_entries = marshmallow.fields.Nested(
         WorkspaceMenuEntrySchema,
         many=True,
@@ -776,24 +810,24 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 
 class WorkspaceSchema(WorkspaceDigestSchema):
-    description = marshmallow.fields.String(example='All intranet data.')
+    description = StrippedString(example='All intranet data.')
 
     class Meta:
         description = 'Full workspace informations'
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
-    role = marshmallow.fields.String(
+    role = StrippedString(
         example='contributor',
-        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+        validate=user_role_validator
     )
     user_id = marshmallow.fields.Int(
         example=3,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
     workspace_id = marshmallow.fields.Int(
         example=4,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
     user = marshmallow.fields.Nested(
         UserDigestSchema()
@@ -831,28 +865,29 @@ class ApplicationConfigSchema(marshmallow.Schema):
 
 
 class TimezoneSchema(marshmallow.Schema):
-    name = marshmallow.fields.String(example='Europe/London')
+    name = StrippedString(example='Europe/London')
 
 
 class AboutSchema(marshmallow.Schema):
-    name = marshmallow.fields.String(example='Tracim', description='Software name')  # nopep8
-    version = marshmallow.fields.String(example='2.0', allow_none=True, description='Version of Tracim')  # nopep8
+    name = StrippedString(example='Tracim', description='Software name')  # nopep8
+    version = StrippedString(example='2.0', allow_none=True, description='Version of Tracim')  # nopep8
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL(allow_none=True)
 
 
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
+    new_user_invitation_do_notify = marshmallow.fields.Bool()
 
 
 class ApplicationSchema(marshmallow.Schema):
-    label = marshmallow.fields.String(example='Calendar')
-    slug = marshmallow.fields.String(example='calendar')
-    fa_icon = marshmallow.fields.String(
+    label = StrippedString(example='Calendar')
+    slug = StrippedString(example='calendar')
+    fa_icon = StrippedString(
         example='file-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
     )
-    hexcolor = marshmallow.fields.String(
+    hexcolor = StrippedString(
         example='#FF0000',
         description='HTML encoded color associated to the application. Example:#FF0000 for red'  # nopep8
     )
@@ -869,38 +904,38 @@ class ApplicationSchema(marshmallow.Schema):
 
 
 class StatusSchema(marshmallow.Schema):
-    slug = marshmallow.fields.String(
+    slug = StrippedString(
         example='open',
         description='the slug represents the type of status. '
                     'Statuses are open, closed-validated, closed-invalidated, closed-deprecated'  # nopep8
     )
-    global_status = marshmallow.fields.String(
+    global_status = StrippedString(
         example='open',
         description='global_status: open, closed',
-        validate=OneOf([status.value for status in GlobalStatus]),
+        validate=content_global_status_validator,
     )
-    label = marshmallow.fields.String(example='Open')
-    fa_icon = marshmallow.fields.String(example='fa-check')
-    hexcolor = marshmallow.fields.String(example='#0000FF')
+    label = StrippedString(example='Open')
+    fa_icon = StrippedString(example='fa-check')
+    hexcolor = StrippedString(example='#0000FF')
 
 
 class ContentTypeSchema(marshmallow.Schema):
-    slug = marshmallow.fields.String(
+    slug = StrippedString(
         example='pagehtml',
         validate=all_content_types_validator,
     )
-    fa_icon = marshmallow.fields.String(
+    fa_icon = StrippedString(
         example='fa-file-text-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
     )
-    hexcolor = marshmallow.fields.String(
+    hexcolor = StrippedString(
         example="#FF0000",
         description='HTML encoded color associated to the application. Example:#FF0000 for red'  # nopep8
     )
-    label = marshmallow.fields.String(
+    label = StrippedString(
         example='Text Documents'
     )
-    creation_label = marshmallow.fields.String(
+    creation_label = StrippedString(
         example='Write a document'
     )
     available_statuses = marshmallow.fields.Nested(
@@ -920,13 +955,13 @@ class ContentMoveSchema(marshmallow.Schema):
         description='id of the new parent content id.',
         allow_none=True,
         required=True,
-        validate=Range(min=0, error="Value must be positive or 0"),
+        validate=positive_int_validator,
     )
     new_workspace_id = marshmallow.fields.Int(
         example=2,
         description='id of the new workspace id.',
         required=True,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
@@ -935,13 +970,13 @@ class ContentMoveSchema(marshmallow.Schema):
 
 
 class ContentCreationSchema(marshmallow.Schema):
-    label = marshmallow.fields.String(
+    label = StrippedString(
         required=True,
         example='contract for client XXX',
         description='Title of the content to create',
-        validate=Length(min=1),
+        validate=not_empty_string_validator,
     )
-    content_type = marshmallow.fields.String(
+    content_type = StrippedString(
         required=True,
         example='html-document',
         validate=all_content_types_validator,
@@ -952,7 +987,7 @@ class ContentCreationSchema(marshmallow.Schema):
                     'in a folder, this should be folder content_id.',
         allow_none=True,
         default=None,
-        validate=Range(min=1, error="Value must be positive"),
+        validate=strictly_positive_int_validator,
     )
 
     @post_load
@@ -963,26 +998,26 @@ class ContentCreationSchema(marshmallow.Schema):
 class ContentDigestSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
         example=6,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
-    slug = marshmallow.fields.Str(example='intervention-report-12')
+    slug = StrippedString(example='intervention-report-12')
     parent_id = marshmallow.fields.Int(
         example=34,
         allow_none=True,
         default=None,
-        validate=Range(min=0, error="Value must be positive or 0"),
+        validate=positive_int_validator,
     )
     workspace_id = marshmallow.fields.Int(
         example=19,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
-    label = marshmallow.fields.Str(example='Intervention Report 12')
-    content_type = marshmallow.fields.Str(
+    label = StrippedString(example='Intervention Report 12')
+    content_type = StrippedString(
         example='html-document',
         validate=all_content_types_validator,
     )
     sub_content_types = marshmallow.fields.List(
-        marshmallow.fields.String(
+        StrippedString(
             example='html-content',
             validate=all_content_types_validator
         ),
@@ -990,9 +1025,9 @@ class ContentDigestSchema(marshmallow.Schema):
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
     )
-    status = marshmallow.fields.Str(
+    status = StrippedString(
         example='closed-deprecated',
-        validate=OneOf(content_status_list.get_all_slugs_values()),
+        validate=content_status_validator,
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -1006,10 +1041,10 @@ class ContentDigestSchema(marshmallow.Schema):
                     'for sub-contents. Default is True. '
                     'In first version of the API, this field is always True',
     )
-    file_extension = marshmallow.fields.String(
+    file_extension = StrippedString(
         example='.txt'
     )
-    filename = marshmallow.fields.String(
+    filename = StrippedString(
         example='nameofthefile.txt'
     )
     modified = marshmallow.fields.DateTime(
@@ -1026,7 +1061,7 @@ class ContentDigestSchema(marshmallow.Schema):
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
         example=6,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
     read_by_user = marshmallow.fields.Bool(example=False, default=False)
 #####
@@ -1041,14 +1076,14 @@ class ContentSchema(ContentDigestSchema):
 
 
 class TextBasedDataAbstractSchema(marshmallow.Schema):
-    raw_content = marshmallow.fields.String(
+    raw_content = StrippedString(
         required=True,
         description='Content of the object, may be raw text or <b>html</b> for example'  # nopep8
     )
 
 
 class FileInfoAbstractSchema(marshmallow.Schema):
-    raw_content = marshmallow.fields.String(
+    raw_content = StrippedString(
         description='raw text or html description of the file'
     )
     page_nb = marshmallow.fields.Int(
@@ -1056,7 +1091,7 @@ class FileInfoAbstractSchema(marshmallow.Schema):
         example=1,
         allow_none=True,
     )
-    mimetype = marshmallow.fields.String(
+    mimetype = StrippedString(
         description='file content mimetype',
         example='image/jpeg',
         required=True,
@@ -1092,16 +1127,16 @@ class RevisionSchema(ContentDigestSchema):
     comment_ids = marshmallow.fields.List(
         marshmallow.fields.Int(
             example=4,
-            validate=Range(min=1, error="Value must be greater than 0"),
+            validate=strictly_positive_int_validator,
         )
     )
     revision_id = marshmallow.fields.Int(
         example=12,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
-    revision_type = marshmallow.fields.String(
+    revision_type = StrippedString(
         example=ActionDescription.CREATION,
-        validate=OneOf(ActionDescription.allowed_values()),
+        validate=action_description_validator,
     )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
@@ -1121,13 +1156,13 @@ class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
         example=6,
-        validate=Range(min=1, error="Value must be greater than 0"),
+        validate=strictly_positive_int_validator,
     )
     parent_id = marshmallow.fields.Int(
         example=34,
-        validate=Range(min=0, error="Value must be positive or 0"),
+        validate=positive_int_validator,
     )
-    raw_content = marshmallow.fields.String(
+    raw_content = StrippedString(
         example='<p>This is just an html comment !</p>'
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
@@ -1138,9 +1173,9 @@ class CommentSchema(marshmallow.Schema):
 
 
 class SetCommentSchema(marshmallow.Schema):
-    raw_content = marshmallow.fields.String(
+    raw_content = StrippedString(
         example='<p>This is just an html comment !</p>',
-        validate=Length(min=1),
+        validate= not_empty_string_validator,
         required=True,
     )
 
@@ -1150,11 +1185,11 @@ class SetCommentSchema(marshmallow.Schema):
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
-    label = marshmallow.fields.String(
+    label = StrippedString(
         required=True,
         example='contract for client XXX',
         description='New title of the content',
-        validate=Length(min=1)
+        validate= not_empty_string_validator
     )
 
 
@@ -1167,7 +1202,7 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
 
 class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep8
     sub_content_types = marshmallow.fields.List(
-        marshmallow.fields.String(
+        StrippedString(
             example='html-document',
             validate=all_content_types_validator,
         ),
@@ -1187,9 +1222,9 @@ class FileContentModifySchema(TextBasedContentModifySchema):
 
 
 class SetContentStatusSchema(marshmallow.Schema):
-    status = marshmallow.fields.Str(
+    status = StrippedString(
         example='closed-deprecated',
-        validate=OneOf(content_status_list.get_all_slugs_values()),
+        validate=content_status_validator,
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

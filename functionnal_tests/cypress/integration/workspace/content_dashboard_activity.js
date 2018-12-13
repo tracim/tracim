@@ -10,11 +10,11 @@ describe('content :: workspace > dashbord', function () {
     cy.visit('/ui/workspaces/1/dashboard')
   })
 
-  it('dashboard__workspaceInfo > activity', function () {
-    cy.get('.activity .activity__header__title').should('be.visible')
-    cy.get('.activity .activity__header__allread').should('be.visible')
-    cy.get('.activity .activity__wrapper').should('be.visible')
-    cy.get('.activity .activity__wrapper .activity__empty').should('be.visible')
-    cy.get('.activity .activity__wrapper button.activity__more__btn').should('be.visible')
+  it('dashboard__workspaceInfo > recentactivity', function () {
+    cy.get('.recentactivity .recentactivity__header__title').should('be.visible')
+    cy.get('.recentactivity .recentactivity__header__allread').should('be.visible')
+    cy.get('.recentactivity .recentactivity__list').should('be.visible')
+    cy.get('.recentactivity .recentactivity__list .recentactivity__empty').should('be.visible')
+    cy.get('.recentactivity .recentactivity__list button.recentactivity__more__btn').should('be.visible')
   })
 })

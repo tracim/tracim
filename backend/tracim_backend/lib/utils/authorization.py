@@ -6,12 +6,18 @@ from typing import TYPE_CHECKING
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
-from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentTypeNotAllowed
+from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
-from tracim_backend.models import Group
+from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
+from tracim_backend.exceptions import UserIsNotContentOwner
+from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.lib.utils.utils import deprecated
+from tracim_backend.models.auth import Group
+from tracim_backend.models.roles import WorkspaceRoles
 
 try:
     from json.decoder import JSONDecodeError
@@ -19,7 +25,7 @@ except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
 if TYPE_CHECKING:
-    from tracim_backend import TracimRequest
+    from tracim_backend.lib.utils.request import TracimRequest
 ###
 # Pyramid default permission/authorization mecanism
 
@@ -43,6 +49,270 @@ class AcceptAllAuthorizationPolicy(object):
     def principals_allowed_by_permission(self, context, permission):
         raise NotImplementedError()
 
+
+class AuthorizationChecker(object):
+    """
+    Abstract class for AuthorizationChecker
+    Authorization Checker are class who does check on tracim_context.
+    There are usable in every tracim context (you just need to implement
+    needed method in TracimContext) and are very flexible (see
+    AndAuthorizationChecker and OrAuthorizationChecker for checker combination
+    )
+    """
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        """Return true or raise TracimException error if check doesnt pass"""
+        raise NotImplemented()
+
+
+class SameUserChecker(AuthorizationChecker):
+    """
+    Check if candidate_user is same as current_user
+    """
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        if tracim_context.current_user.user_id == \
+                tracim_context.candidate_user.user_id:
+            return True
+        raise UserGivenIsNotTheSameAsAuthenticated()
+
+
+class ProfileChecker(AuthorizationChecker):
+    """
+    Check if current_user profile
+    is as high as profile level given
+    """
+
+    def __init__(self, profile_level: int):
+        self.profile_level = profile_level
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        if tracim_context.current_user.profile.id >= self.profile_level:
+            return True
+        raise InsufficientUserProfile()
+
+
+class CandidateUserProfileChecker(AuthorizationChecker):
+    """
+    Check if candidate_user profile
+    is as high as profile level given
+    """
+
+    def __init__(self, profile_level: int):
+        self.profile_level = profile_level
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        if tracim_context.candidate_user.profile.id >= self.profile_level:
+            return True
+        raise InsufficientUserProfile()
+
+
+class RoleChecker(AuthorizationChecker):
+    """
+    Check if current_user in current_workspace role
+    is as high as role level given
+    """
+    def __init__(self, role_level: int):
+        self.role_level = role_level
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        if tracim_context.current_workspace\
+                .get_user_role(tracim_context.current_user) >= self.role_level:
+            return True
+        raise InsufficientUserRoleInWorkspace()
+
+
+class CandidateWorkspaceRoleChecker(AuthorizationChecker):
+    """
+    Check if current_user in candidate_workspace role
+    is as high as role level given
+    """
+    def __init__(self, role_level: int):
+        self.role_level = role_level
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        if tracim_context.candidate_workspace\
+                .get_user_role(tracim_context.current_user) >= self.role_level:
+            return True
+        raise InsufficientUserRoleInWorkspace()
+
+
+class ContentTypeChecker(AuthorizationChecker):
+    """
+    Check if current_content match content_types given
+    """
+    def __init__(self, allowed_content_type_list: typing.List[str]):
+        self.allowed_content_type_list = allowed_content_type_list
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        content = tracim_context.current_content
+        current_content_type_slug = content_type_list\
+            .get_one_by_slug(content.type).slug
+        if current_content_type_slug in self.allowed_content_type_list:
+            return True
+        raise ContentTypeNotAllowed()
+
+class ContentTypeCreationChecker(AuthorizationChecker):
+    """
+    Check if user can create content of this type
+    """
+    def __init__(
+            self,
+            content_type_list: ContentTypeList,
+            content_type_slug: typing.Optional[str] = None,
+    ):
+        """
+        :param content_type_slug: force to check a content_type, if not provided,
+        :param content_type_list: list of all content_type available in tracim
+        check if content type creation is allowed with
+        tracim_context.candidate_content_type
+        """
+        super().__init__()
+        self.content_type_slug = content_type_slug
+        self.content_type_list = content_type_list
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        user_role = tracim_context.current_workspace.get_user_role(
+            tracim_context.current_user
+        )
+        if self.content_type_slug:
+            content_type = self.content_type_list.get_one_by_slug(
+                self.content_type_slug
+            )
+        else:
+            content_type = tracim_context.candidate_content_type
+        if user_role >= content_type.minimal_role_content_creation.level:
+            return True
+        raise InsufficientUserRoleInWorkspace()
+
+
+class CommentOwnerChecker(AuthorizationChecker):
+    """
+    Check if current_user is owner of current_comment
+    """
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+
+        if tracim_context.current_comment.owner.user_id\
+                == tracim_context.current_user.user_id:
+            return True
+        raise UserIsNotContentOwner(
+            'user {} is not owner of comment  {}'.format(
+                tracim_context.current_user.user_id,
+                tracim_context.current_comment.content_id
+            )
+        )
+
+
+class OrAuthorizationChecker(AuthorizationChecker):
+    """
+    Check multiple auth_checker with a logical operator "or"
+    return last exception found in list of checker
+    """
+    def __init__(self, *authorization_checkers):
+        self.authorization_checkers = authorization_checkers
+
+    def check(
+        self,
+        tracim_context: TracimContext
+    ) -> bool:
+        exception_to_raise = None
+        for authorization_checker in self.authorization_checkers:
+            try:
+                authorization_checker.check(
+                    tracim_context=tracim_context,
+                )
+                return True
+            except TracimException as e:
+                exception_to_raise = e
+
+        raise exception_to_raise
+
+
+class AndAuthorizationChecker(AuthorizationChecker):
+    """
+    Check multiple auth_checker with an logical operator "and"
+    return first exception found in list of checker
+    """
+
+    def __init__(self, *authorization_checkers):
+        self.authorization_checkers = authorization_checkers
+
+    def check(
+            self,
+            tracim_context: TracimContext
+    ) -> bool:
+        for authorization_checker in self.authorization_checkers:
+            authorization_checker.check(
+                tracim_context=tracim_context,
+            )
+        return True
+
+# Useful Authorization Checker
+# profile
+is_administrator = ProfileChecker(Group.TIM_ADMIN)
+is_trusted_user = ProfileChecker(Group.TIM_MANAGER)
+is_user = ProfileChecker(Group.TIM_USER)
+# role
+is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
+is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
+is_reader = RoleChecker(WorkspaceRoles.READER.level)
+is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
+# personal_access
+has_personal_access = OrAuthorizationChecker(
+    SameUserChecker(),
+    is_administrator
+)
+# workspace
+can_see_workspace_information = OrAuthorizationChecker(
+    is_administrator,
+    AndAuthorizationChecker(is_reader, is_user)
+)
+can_modify_workspace = OrAuthorizationChecker(
+    is_administrator,
+    AndAuthorizationChecker(is_workspace_manager, is_user)
+)
+can_delete_workspace = OrAuthorizationChecker(
+    is_administrator,
+    AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
+)
+# content
+can_move_content = AndAuthorizationChecker(
+    is_content_manager,
+    CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
+)
+can_create_content = ContentTypeCreationChecker(content_type_list)
+# comments
+is_comment_owner = CommentOwnerChecker()
+can_delete_comment = OrAuthorizationChecker(
+    AndAuthorizationChecker(is_contributor, is_comment_owner),
+    is_workspace_manager
+)
+
 ###
 # Authorization decorators for views
 
@@ -51,169 +321,14 @@ class AcceptAllAuthorizationPolicy(object):
 # We prefer to use decorators
 
 
-def require_same_user_or_profile(group: int) -> typing.Callable:
-    """
-    Decorator for view to restrict access of tracim request if candidate user
-    is distinct from authenticated user and not with high enough profile.
-    :param group: value from Group Object
-    like Group.TIM_USER or Group.TIM_MANAGER
-    :return:
-    """
+def check_right(authorization_checker: AuthorizationChecker):
+
     def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            auth_user = request.current_user
-            candidate_user = request.candidate_user
-            if auth_user.user_id == candidate_user.user_id or \
-                    auth_user.profile.id >= group:
-                return func(self, context, request)
-            raise InsufficientUserProfile()
-        return wrapper
-    return decorator
-
-
-def require_profile(group: int) -> typing.Callable:
-    """
-    Decorator for view to restrict access of tracim request if profile is
-    not high enough
-    :param group: value from Group Object
-    like Group.TIM_USER or Group.TIM_MANAGER
-    :return:
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            user = request.current_user
-            if user.profile.id >= group:
-                return func(self, context, request)
-            raise InsufficientUserProfile()
-        return wrapper
-    return decorator
-
-
-def require_profile_and_workspace_role(
-        minimal_profile: int,
-        minimal_required_role: int,
-        allow_superadmin=False
-) -> typing.Callable:
-    """
-    Allow access for allow_all_group profile
-    or allow access for allow_if_role_group
-    profile if mininal_required_role is correct.
-    :param minimal_profile: value from Group Object
-    like Group.TIM_USER or Group.TIM_MANAGER
-    :param minimal_required_role: value from UserInWorkspace Object like
-    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
-    :return: decorator
-    :param allow_superadmin: if true, Group.TIM_ADMIN user can pass this check
-    no matter of is role in workspace.
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            user = request.current_user
-            workspace = request.current_workspace
-            if allow_superadmin and user.profile.id == Group.TIM_ADMIN:
-                return func(self, context, request)
-            if user.profile.id >= minimal_profile:
-                if workspace.get_user_role(user) >= minimal_required_role:
-                    return func(self, context, request)
-                raise InsufficientUserRoleInWorkspace()
-            else:
-                raise InsufficientUserProfile()
-        return wrapper
-    return decorator
-
-
-def require_workspace_role(minimal_required_role: int) -> typing.Callable:
-    """
-    Restricts access to endpoint to minimal role or raise an exception.
-    Check role for current_workspace.
-    :param minimal_required_role: value from UserInWorkspace Object like
-    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
-    :return: decorator
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            user = request.current_user
-            workspace = request.current_workspace
-            if workspace.get_user_role(user) >= minimal_required_role:
-                return func(self, context, request)
-            raise InsufficientUserRoleInWorkspace()
-
-        return wrapper
-    return decorator
-
-
-def require_candidate_workspace_role(minimal_required_role: int) -> typing.Callable:  # nopep8
-    """
-    Restricts access to endpoint to minimal role or raise an exception.
-    Check role for candidate_workspace.
-    :param minimal_required_role: value from UserInWorkspace Object like
-    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
-    :return: decorator
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            user = request.current_user
-            workspace = request.candidate_workspace
-
-            if workspace.get_user_role(user) >= minimal_required_role:
-                return func(self, context, request)
-            raise InsufficientUserRoleInWorkspace()
-
-        return wrapper
-    return decorator
-
-
-def require_content_types(content_types_slug: typing.List[str]) -> typing.Callable:  # nopep8
-    """
-    Restricts access to specific file type or raise an exception.
-    Check role for candidate_workspace.
-    :param content_types_slug: list of slug of content_types
-    :return: decorator
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            content = request.current_content
-            current_content_type_slug = content_type_list.get_one_by_slug(content.type).slug  # nopep8
-            if current_content_type_slug in content_types_slug:
-                return func(self, context, request)
-            raise ContentTypeNotAllowed()
-        return wrapper
-    return decorator
-
-
-def require_comment_ownership_or_role(
-        minimal_required_role_for_owner: int,
-        minimal_required_role_for_anyone: int,
-) -> typing.Callable:
-    """
-    Decorator for view to restrict access of tracim request if role is
-    not high enough and user is not owner of the current_content
-    :param minimal_required_role_for_owner: minimal role for owner
-    of current_content to access to this view
-    :param minimal_required_role_for_anyone: minimal role for anyone to
-    access to this view.
-    :return:
-    """
-    def decorator(func: typing.Callable) -> typing.Callable:
-        @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            user = request.current_user
-            workspace = request.current_workspace
-            comment = request.current_comment
-            # INFO - G.M - 2018-06-178 - find minimal role required
-            if comment.owner.user_id == user.user_id:
-                minimal_required_role = minimal_required_role_for_owner
-            else:
-                minimal_required_role = minimal_required_role_for_anyone
-            # INFO - G.M - 2018-06-178 - normal role test
-            if workspace.get_user_role(user) >= minimal_required_role:
-                return func(self, context, request)
-            raise InsufficientUserRoleInWorkspace()
+            authorization_checker.check(
+                tracim_context=request,
+            )
+            return func(self, context, request)
         return wrapper
     return decorator

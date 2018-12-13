@@ -12,10 +12,9 @@ from sqlalchemy.exc import IntegrityError
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_engine
-from tracim_backend.models import DeclarativeBase
-from tracim_backend.models import get_session_factory
-from tracim_backend.models import get_tm_session
+from tracim_backend.models.setup_models import get_engine, get_session_factory, \
+    get_tm_session
+from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import ContentRevisionRO
@@ -26,6 +25,8 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend import web
+from tracim_backend import webdav
+from tracim_backend import WebdavAppFactory
 from webtest import TestApp
 from io import BytesIO
 from PIL import Image
@@ -147,6 +148,18 @@ class FunctionalTest(unittest.TestCase):
         self.disconnect_database(remove_tables=True)
         testing.tearDown()
 
+class WebdavFunctionalTest(FunctionalTest):
+    config_uri = 'tests_configs.ini'
+    config_section = 'functional_webdav_test'
+
+    def run_app(self) -> None:
+        settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        app_factory = WebdavAppFactory(**settings)
+        app = app_factory.get_wsgi_app()
+        self.testapp = TestApp(app)
 
 class FunctionalTestEmptyDB(FunctionalTest):
     fixtures = []
@@ -204,6 +217,7 @@ class BaseTest(unittest.TestCase):
         session = get_tm_session(self.session_factory, transaction.manager)
         with transaction.manager:
             try:
+                DeclarativeBase.metadata.drop_all(self.engine)
                 DeclarativeBase.metadata.create_all(self.engine)
                 fixtures_loader = FixturesLoader(session, self.app_config)
                 fixtures_loader.loads(self.fixtures)
@@ -225,14 +239,14 @@ class BaseTest(unittest.TestCase):
             self.config_section
         )
         self.config = testing.setUp(settings = self.settings)
-        self.config.include('tracim_backend.models')
+        self.config.include('tracim_backend.models.setup_models')
         DepotManager._clear()
         DepotManager.configure(
             'test', {'depot.backend': 'depot.io.memory.MemoryFileStorage'}
         )
         settings = self.config.get_settings()
         self.app_config = CFG(settings)
-        from tracim_backend.models import (
+        from tracim_backend.models.setup_models import (
             get_engine,
             get_session_factory,
             get_tm_session,

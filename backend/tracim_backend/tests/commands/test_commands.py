@@ -9,6 +9,8 @@ import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import BadCommandError
 from tracim_backend.exceptions import DatabaseInitializationFailed
+from tracim_backend.exceptions import \
+    ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import InvalidSettingFile
@@ -17,9 +19,11 @@ from tracim_backend.exceptions import \
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import get_engine
-from tracim_backend.models import get_session_factory
-from tracim_backend.models import get_tm_session
+
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.auth import AuthType
 from tracim_backend.tests import CommandFunctionalTest
 
 
@@ -208,6 +212,35 @@ class TestCommands(CommandFunctionalTest):
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
         assert not new_user.validate_password('admin@admin.admin')
+
+    def test_func__user_update_command__err_password_modification_failed__external_auth(self) -> None:
+        """
+        Test user password update
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+        user.auth_type = AuthType.LDAP
+        assert user.auth_type == AuthType.LDAP
+        self.session.add(user)
+        self.session.flush()
+        transaction.commit()
+        self.disconnect_database()
+        app = TracimCLI()
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            result = app.run([
+                'user', 'update',
+                '-c', 'tests_configs.ini#command_test',
+                '-l', 'admin@admin.admin',
+                '-p', 'new_ldap_password',
+                '--debug',
+            ])
 
     def test_func__user_update_command__ok__remove_group(self) -> None:
         """

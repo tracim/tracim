@@ -5,7 +5,6 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
-  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -49,7 +48,7 @@ class WorkspaceAdvanced extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -134,13 +133,7 @@ class WorkspaceAdvanced extends React.Component {
     this.setState({
       content: {
         ...resDetail.body,
-        memberList: resMember.body.map(m => ({
-          ...m,
-          user: {
-            ...m.user,
-            avatar_url: m.user.avatar_url ? m.user.avatar_url : generateAvatarFromPublicName(m.user.public_name)
-          }
-        }))
+        memberList: resMember.body
       }
     })
   }
@@ -187,12 +180,15 @@ class WorkspaceAdvanced extends React.Component {
     const fetchPutUserRole = await handleFetchResult(await putMemberRole(state.config.apiUrl, state.content.workspace_id, idMember, slugNewRole))
 
     switch (fetchPutUserRole.apiResponse.status) {
-      case 200: this.setState(prev => ({
-        content: {
-          ...prev.content,
-          memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
-        }
-      })); break
+      case 200:
+        this.setState(prev => ({
+          content: {
+            ...prev.content,
+            memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
+          }
+        }))
+        GLOBAL_dispatchEvent({ type: 'refreshDashboardMemberList', data: {} })
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
     }
   }
@@ -367,7 +363,8 @@ class WorkspaceAdvanced extends React.Component {
           customClass={`${state.config.slug}`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          title={state.content.label}
+          rawTitle={state.content.label}
+          componentTitle={<div>{state.content.label}</div>}
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}

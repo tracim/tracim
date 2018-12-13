@@ -716,9 +716,9 @@ class ContentRevisionRO(DeclarativeBase):
         copy_columns = cls._cloned_columns
         for column_name in copy_columns:
             # INFO - G-M - 15-03-2018 - set correct parent
-            if column_name == 'parent_id':
+            if column_name == 'parent_id' and parent:
                 column_value = copy.copy(parent.id)
-            elif column_name == 'parent':
+            elif column_name == 'parent' and parent:
                 column_value = copy.copy(parent)
             else:
                 column_value = copy.copy(getattr(revision, column_name))

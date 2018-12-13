@@ -1,17 +1,26 @@
 # -*- coding: utf-8 -*-
 import pytest
 import transaction
-from tracim_backend import models
+from marshmallow import ValidationError
+
 
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import UserAuthTypeDisabled
+from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
+from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import MissingLDAPConnector
+from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import TooShortAutocompleteString
-from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import User
+from tracim_backend.models.auth import User
+from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import DefaultTest
@@ -24,35 +33,321 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bob@bob')
         assert u.email == 'bob@bob'
         assert u.display_name == 'bob'
 
+    @pytest.mark.internal_auth
     def test_unit__create_minimal_user_and_update__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bob@bob')
-        api.update(u, 'bob', 'bob@bob', 'pass', do_save=True)
+        api.update(u, 'bob', 'bob@bob', 'password', do_save=True)
         nu = api.get_one_by_email('bob@bob')
         assert nu is not None
         assert nu.email == 'bob@bob'
         assert nu.display_name == 'bob'
-        assert nu.validate_password('pass')
+        assert nu.validate_password('password')
 
+    def test_unit__create_minimal_user__err__too_short_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(TracimValidationFailed):
+            u = api.create_minimal_user('b@')
+
+    def test_unit__create_minimal_user__err__too_long_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(TracimValidationFailed):
+            email = 'b{}b@bob'.format('o'*255)
+            u = api.create_minimal_user(email)
+
+    # email
+    def test_unit__update_user_email__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.email == 'bob@bob'
+        u = api.update(user=u, email='bib@bib')
+        assert u.email == 'bib@bib'
+
+    def test_unit__update_user_email__err__wrong_format(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+
+        # 2 char
+        with pytest.raises(EmailValidationFailed):
+            u = api.update(user=u, email='b+b')
+
+    def test_unit__update_user_email__err__too_short_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+
+        # 2 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, email='b@')
+
+        # 3 char
+        u = api.update(user=u, email='b@b')
+        assert u.email == 'b@b'
+
+    def test_unit__update_user_email__err__too_long_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 256 char
+        chars = 'o' * (256 - 6)
+        with pytest.raises(TracimValidationFailed):
+            email = 'b{}b@bob'.format(chars)
+            u = api.update(user=u, email=email)
+
+        # 255 char
+        chars = 'o' * (255 - 6)
+        email = 'b{}b@bob'.format(chars)
+        u = api.update(user=u, email=email)
+        assert u.email==email
+
+    # password
+    def test_unit__update_user_password__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.password is None
+        # 8 char
+        u = api.update(user=u, password='password')
+        assert u.password
+        assert u.validate_password('password')
+        # 16 char
+        u = api.update(user=u, password='password'*2)
+        assert u.password
+        assert u.validate_password('password'*2)
+
+    def test_unit__update_user_password__err__too_short_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 5 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, password='passw')
+        # 6 char
+        u = api.update(user=u, password='passwo')
+
+    def test_unit__update_user_password__err__too_long_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            password = 'p' * 513
+            u = api.update(user=u, password=password)
+        password = 'p' * 512
+        u = api.update(user=u, password=password)
+
+    # public_name
+    def test_unit__update_user_public_name__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.display_name == 'bob'
+        # 8 char
+        u = api.update(user=u, name='John Doe')
+        assert u.display_name == 'John Doe'
+        # 16 char
+        u = api.update(user=u, name='John Doe'*2)
+        assert u.display_name == 'John Doe'*2
+
+    def test_unit__update_user_public_name__err__too_short_public_name(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 2 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, name='nn')
+        # 3 char
+        u = api.update(user=u, name='nnn')
+        assert u.display_name == 'nnn'
+
+    def test_unit__update_user_public_name__err__too_long_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            name = 'n' * 256
+            u = api.update(user=u, name=name)
+        name = 'n' * 255
+        u = api.update(user=u, name=name)
+
+    # lang
+    def test_unit__update_user_lang_name__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.lang is None
+        # 2 char
+        u = api.update(user=u, lang='fr')
+        assert u.lang == 'fr'
+        # 3 char
+        u = api.update(user=u, lang='fre')
+        assert u.lang == 'fre'
+
+    def test_unit__update_user_lang__err__too_short_lang(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        # 1 char
+        with pytest.raises(TracimValidationFailed):
+            u = api.update(user=u, lang='f')
+        # 2 char
+        u = api.update(user=u, lang='fr')
+        assert u.lang == 'fr'
+
+    def test_unit__update_user_lang__err__too_long_lang(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            lang = 'n' * 4
+            u = api.update(user=u, lang=lang)
+        lang = 'n' * 3
+        u = api.update(user=u, lang=lang)
+
+    # timezone
+    def test_unit__update_timezone__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        assert u.timezone is None
+        u = api.update(user=u, timezone='Europe/Paris')
+        assert u.timezone == 'Europe/Paris'
+
+
+    def test_unit__update_timezone__too_long_timezone(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(TracimValidationFailed):
+            timezone = 't' * 33
+            u = api.update(user=u, timezone=timezone)
+        timezone = 't' * 32
+        u = api.update(user=u, timezone=timezone)
+
+    @pytest.mark.ldap
+    def test_unit__create_minimal_user_and_update__err__set_unaivalable_auth_type(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        with pytest.raises(UserAuthTypeDisabled):
+            api.update(u, name='bob', email='bob@bob', auth_type=AuthType.LDAP, do_save=True)
+
+
+    @pytest.mark.internal_auth
+    def test_unit__create_minimal_user_and_set_password__ok__nominal_case(self):
+        u = User()
+        u.email = 'bob@bob'
+        u.password = 'pass'
+        u.auth_type = AuthType.INTERNAL
+        u.display_name = 'bob'
+        api = UserApi(
+            current_user=u,
+            session=self.session,
+            config=self.app_config,
+        )
+        assert u.validate_password('pass')
+        api.set_password(u,'pass','newpass','newpass')
+        assert u is not None
+        assert u.email == 'bob@bob'
+        assert u.display_name == 'bob'
+        assert u.validate_password('newpass')
+        assert not u.validate_password('pass')
+
+    @pytest.mark.internal_auth
+    def test_unit__create_minimal_user_and_set_password__ok__nominal_case(self):
+        u = User()
+        u.email = 'bob@bob'
+        u.password = 'pass'
+        u.auth_type = AuthType.INTERNAL
+        u.display_name = 'bob'
+        api = UserApi(
+            current_user=u,
+            session=self.session,
+            config=self.app_config,
+        )
+        assert u.email == 'bob@bob'
+        api.set_email(u,'pass','newbobemail@bob')
+        assert u is not None
+        assert u.email == 'newbobemail@bob'
+
+
+    @pytest.mark.internal_auth
     def test__unit__create__user__ok_nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_user(
             email='bob@bob',
-            password='pass',
+            password='password',
             name='bob',
             timezone='+2',
             lang='en',
@@ -61,7 +356,7 @@ class TestUserApi(DefaultTest):
         )
         assert u is not None
         assert u.email == "bob@bob"
-        assert u.validate_password('pass')
+        assert u.validate_password('password')
         assert u.display_name == 'bob'
         assert u.timezone == '+2'
         assert u.lang == 'en'
@@ -70,10 +365,10 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bibi@bibi')
-        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
+        api.update(u, 'bibi', 'bibi@bibi', 'password', do_save=True)
         transaction.commit()
 
         eq_(True, api.user_with_email_exists('bibi@bibi'))
@@ -83,11 +378,11 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('bibi@bibi')
         self.session.flush()
-        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
+        api.update(u, 'bibi', 'bibi@bibi', 'password', do_save=True)
         uid = u.user_id
         transaction.commit()
 
@@ -97,7 +392,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('unknown')
@@ -106,7 +401,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_minimal_user('bibi@bibi')
 
@@ -118,7 +413,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -133,7 +428,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -147,13 +442,13 @@ class TestUserApi(DefaultTest):
         assert users[0] == u1
 
     def test_unit__get_known__user__user__no_workspace_empty_known_user(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=admin,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -164,19 +459,19 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('email')
         assert len(users) == 0
 
     def test_unit__get_known__user__same_workspaces_users_by_name(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -215,7 +510,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name')
         assert len(users) == 2
@@ -223,13 +518,13 @@ class TestUserApi(DefaultTest):
         assert users[1] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -277,20 +572,20 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u3,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name', exclude_workspace_ids=[workspace.workspace_id])
         assert len(users) == 1
         assert users[0] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace_and_name(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -345,20 +640,20 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u3,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name', exclude_workspace_ids=[workspace.workspace_id], exclude_user_ids=[u4.user_id])
         assert len(users) == 1
         assert users[0] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -406,7 +701,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u3,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name')
         assert len(users) == 2
@@ -414,13 +709,13 @@ class TestUserApi(DefaultTest):
         assert users[1] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_name__exclude_user(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -459,20 +754,20 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('name', exclude_user_ids=[u1.user_id])
         assert len(users) == 1
         assert users[0] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_email(self):
-        admin = self.session.query(models.User) \
-            .filter(models.User.email == 'admin@admin.admin') \
+        admin = self.session.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
             .one()
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -511,7 +806,7 @@ class TestUserApi(DefaultTest):
         api2 = UserApi(
             current_user=u1,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         users = api2.get_known_user('email')
         assert len(users) == 2
@@ -522,7 +817,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u1 = api.create_user(
             email='email@email',
@@ -539,10 +834,10 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         u = api.create_minimal_user('titi@titi')
-        api.update(u, 'titi', 'titi@titi', 'pass', do_save=True)
+        api.update(u, 'titi', 'titi@titi', 'password', do_save=True)
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)
 
@@ -555,7 +850,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         new_user = api.get_user_with_context(user)
         assert isinstance(new_user, UserInContext)
@@ -575,7 +870,7 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=user,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         new_user = api.get_current_user()
         assert isinstance(new_user, User)
@@ -585,36 +880,40 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(UserDoesNotExist):
             api.get_current_user()
 
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
-        user = api.authenticate_user('admin@admin.admin', 'admin@admin.admin')
+        user = api.authenticate('admin@admin.admin', 'admin@admin.admin')
         assert isinstance(user, User)
         assert user.email == 'admin@admin.admin'
+        assert user.auth_type == AuthType.INTERNAL
 
+
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__user_not_active(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         gapi = GroupApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -622,42 +921,44 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
         api.disable(user)
-        with pytest.raises(UserAuthenticatedIsNotActive):
-            api.authenticate_user('test@test.test', 'test@test.test')
+        with pytest.raises(AuthenticationFailed):
+            api.authenticate('test@test.test', 'test@test.test')
 
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_password(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('admin@admin.admin', 'wrong_password')
+            api.authenticate('admin@admin.admin', 'wrong_password')
 
+    @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__wrong_user(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('admin@admin.admin', 'wrong_password')
+            api.authenticate('admin@admin.admin', 'wrong_password')
 
     def test_unit__disable_user___ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         gapi = GroupApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -666,7 +967,7 @@ class TestUserApi(DefaultTest):
         )
         user2 = api.create_user(
             email='test2@test.test',
-            password='pass',
+            password='password',
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
@@ -674,7 +975,7 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
 
-        api2 = UserApi(current_user=user,session=self.session, config=self.config)
+        api2 = UserApi(current_user=user,session=self.session, config=self.app_config)
         from tracim_backend.exceptions import UserCantDisableHimself
         api2.disable(user2)
         updated_user2 = api.get_one(user2.user_id)
@@ -686,17 +987,17 @@ class TestUserApi(DefaultTest):
         api = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         gapi = GroupApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         )
         groups = [gapi.get_one_with_name('users')]
         user = api.create_user(
             email='test@test.test',
-            password='pass',
+            password='password',
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
@@ -704,8 +1005,296 @@ class TestUserApi(DefaultTest):
             do_notify=False,
         )
 
-        api2 = UserApi(current_user=user,session=self.session, config=self.config)
+        api2 = UserApi(current_user=user,session=self.session, config=self.app_config)
         from tracim_backend.exceptions import UserCantDisableHimself
         with pytest.raises(UserCantDisableHimself):
             api2.disable(user)
 
+
+class TestFakeLDAPUserApi(DefaultTest):
+    config_section = 'base_test_ldap'
+
+    @pytest.mark.ldap
+    def test_unit__authenticate_user___err__no_ldap_connector(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(MissingLDAPConnector):
+            user = api.authenticate('hubert@planetexpress.com', 'professor')
+
+    @pytest.mark.xfail(
+        reason='create account with specific profile ldap feature disabled'
+    )
+    @pytest.mark.ldap
+    def test_unit__authenticate_user___ok__new_user_ldap_auth_custom_profile(self):
+        # TODO - G.M - 2018-12-05 - [ldap_profile]
+        # support for profile attribute disabled
+        # Should be reenabled later probably with a better code
+        class fake_ldap_connector(object):
+
+            def authenticate(self, email: str, password: str):
+                if not email == 'hubert@planetexpress.com' \
+                        and password == 'professor':
+                    return None
+                return [None, {'mail': ['huber@planetepress.com'],
+                               'givenName': ['Hubert'],
+                               'profile': ['trusted-users'],
+                               }]
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.authenticate('hubert@planetexpress.com', 'professor', fake_ldap_connector())  # nopep8
+        assert isinstance(user, User)
+        assert user.email == 'hubert@planetexpress.com'
+        assert user.auth_type == AuthType.LDAP
+        assert user.display_name == 'Hubert'
+        assert user.profile.name == 'trusted-users'
+
+
+    @pytest.mark.ldap
+    def test_unit__authenticate_user___ok__new_user_ldap_auth(self):
+        class fake_ldap_connector(object):
+
+            def authenticate(self, email: str, password: str):
+                if not email == 'hubert@planetexpress.com' \
+                        and password == 'professor':
+                    return None
+                return [None, {'mail': ['huber@planetepress.com'],
+                               'givenName': ['Hubert'],
+                               }]
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.authenticate('hubert@planetexpress.com', 'professor', fake_ldap_connector())  # nopep8
+        assert isinstance(user, User)
+        assert user.email == 'hubert@planetexpress.com'
+        assert user.auth_type == AuthType.LDAP
+        assert user.display_name == 'Hubert'
+        assert user.profile.name == 'users'
+
+    @pytest.mark.ldap
+    def test__unit__create_user__err__external_auth_ldap_with_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            u = api.create_user(
+                email='bob@bob',
+                password='password',
+                name='bob',
+                auth_type=AuthType.LDAP,
+                timezone='+2',
+                lang='en',
+                do_save=True,
+                do_notify=False,
+            )
+
+    @pytest.mark.ldap
+    def test__unit__create__user__ok__external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        assert u is not None
+        assert u.email == "bob@bob"
+        assert u.validate_password(None) is False
+        assert u.display_name == 'bob'
+        assert u.timezone == '+2'
+        assert u.lang == 'en'
+
+    @pytest.mark.ldap
+    def test_unit_update__ok_external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        api.update(
+            email='bob@bob',
+            user = u,
+            name='bobi',
+            password=None,
+            auth_type=AuthType.LDAP,
+            timezone='-1',
+            lang='fr',
+            do_save=True,
+        )
+        assert u.display_name == 'bobi'
+
+    @pytest.mark.ldap
+    def test_unit_update__err__external_auth_ldap_set_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            api.update(
+                email='bob@bob',
+                user = u,
+                name='bobi',
+                password='new_password',
+                auth_type=AuthType.LDAP,
+                timezone='-1',
+                lang='fr',
+                do_save=True,
+            )
+
+    @pytest.mark.ldap
+    def test_unit_update__err__external_auth_ldap_set_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
+            api.update(
+                email='bob@bob1',
+                user = u,
+                name='bobi',
+                password=None,
+                auth_type=AuthType.LDAP,
+                timezone='-1',
+                lang='fr',
+                do_save=True,
+            )
+
+    @pytest.mark.ldap
+    def test_unit__check_email_modification_allowed__err_external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
+            api._check_email_modification_allowed(u)
+
+    @pytest.mark.ldap
+    def test_unit__check_password_modification_allowed__err_external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            api._check_password_modification_allowed(u)
+
+    @pytest.mark.ldap
+    def test_unit_set_password__err__external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        api._user = u
+        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
+            api.set_password(
+                u,
+                'pass',
+                'pass',
+                'pass',
+            )
+
+    @pytest.mark.ldap
+    def test_unit_set_email__err__external_auth_ldap(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password=None,
+            name='bob',
+            auth_type=AuthType.LDAP,
+            timezone='+2',
+            lang='en',
+            do_save=True,
+            do_notify=False,
+        )
+        api._user = u
+        with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
+            api.set_email(
+                u,
+                'pass',
+                'bob@bobi',
+            )

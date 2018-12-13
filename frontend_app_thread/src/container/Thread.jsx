@@ -13,7 +13,8 @@ import {
   SelectStatus,
   ArchiveDeleteContent,
   displayDistanceDate,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  generateLocalStorageContentId
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -48,7 +49,7 @@ class Thread extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -72,10 +73,16 @@ class Thread extends React.Component {
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
+
+        const previouslyUnsavedComment = localStorage.getItem(
+          generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
+        )
+
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
-          timelineWysiwyg: false
+          timelineWysiwyg: false,
+          newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
       case 'allApp_changeLang':
@@ -100,6 +107,13 @@ class Thread extends React.Component {
 
   componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
+
+    const { appName, content } = this.state
+    const previouslyUnsavedComment = localStorage.getItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
+    )
+    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
+
     this.loadContent()
   }
 
@@ -208,6 +222,12 @@ class Thread extends React.Component {
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({newComment})
+
+    const { appName, content } = this.state
+    localStorage.setItem(
+      generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment'),
+      newComment
+    )
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -224,6 +244,9 @@ class Thread extends React.Component {
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
         this.setState({newComment: ''})
+        localStorage.removeItem(
+          generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
+        )
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         break
@@ -339,7 +362,8 @@ class Thread extends React.Component {
           customClass={`${config.slug}__contentpage`}
           customColor={config.hexcolor}
           faIcon={config.faIcon}
-          title={content.label}
+          rawTitle={content.label}
+          componentTitle={<div>{content.label}</div>}
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

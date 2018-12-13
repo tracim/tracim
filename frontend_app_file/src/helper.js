@@ -87,7 +87,7 @@ export const debug = {
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 1,
+    content_id: 3,
     content_type: 'file',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,

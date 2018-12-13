@@ -40,5 +40,6 @@
   "Email notification are disabled, please notify users of any change": "Email notification are disabled, please notify users of any change",
   "Please type a name, an email, a password and select a profile": "Please type a name, an email, a password and select a profile",
   "Please set a password": "Please set a password",
-  "Full name": "Full name"
+  "Full name": "Full name",
+  "Full name must be at least 3 characters": "Full name must be at least 3 characters"
 }

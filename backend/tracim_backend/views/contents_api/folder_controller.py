@@ -4,19 +4,20 @@ import typing
 import transaction
 from pyramid.config import Configurator
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.utils.authorization import require_content_types
-from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.authorization import ContentTypeChecker
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import FolderContentModifySchema
@@ -40,13 +41,13 @@ SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS = generate_documentation_swagger_tag(  # n
     SWAGGER_TAG__CONTENT_ENDPOINTS,
     SWAGGER_TAG__CONTENT_FOLDER_SECTION
 )
-
+is_folder_content = ContentTypeChecker([FOLDER_TYPE])
 
 class FolderController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FOLDER_TYPE])
+    @check_right(is_reader)
+    @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedContentSchema())
     def get_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
@@ -70,8 +71,8 @@ class FolderController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([FOLDER_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FolderContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
@@ -106,8 +107,8 @@ class FolderController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([FOLDER_TYPE])
+    @check_right(is_reader)
+    @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedRevisionSchema(many=True))
     def get_folder_revisions(
@@ -138,8 +139,8 @@ class FolderController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([FOLDER_TYPE])
+    @check_right(is_contributor)
+    @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

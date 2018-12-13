@@ -2,6 +2,7 @@
 import datetime
 import random
 import string
+from os.path import normpath as base_normpath
 from urllib.parse import urljoin
 from urllib.parse import urlencode
 
@@ -15,7 +16,6 @@ if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
 CONTENT_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}/contents/{content_type}/{content_id}'  # nopep8
 WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8
@@ -235,3 +235,75 @@ def string_to_list(
         return []
     string_list = base_string.split(separator)
     return [cast_func(item) for item in string_list]
+
+def deprecated(func: typing.Callable):
+    """ Dummy deprecated function"""
+    # TODO - G.M - 2018-12-04 - Replace this with a true deprecated function ?
+    return func
+
+def core_convert_file_name_to_display(string: str) -> str:
+    """
+    """
+    REPLACE_CHARS = {
+        '/': '⧸',
+        '\\': '⧹',
+    }
+
+    for key, value in REPLACE_CHARS.items():
+        string = string.replace(key, value)
+
+    return string
+
+def webdav_convert_file_name_to_display(string: str) -> str:
+    """
+    As characters that Windows does not support may have been inserted
+    through Tracim in names, before displaying information we update path
+    so that all these forbidden characters are replaced with similar
+    shape character that are allowed so that the user isn't trouble and
+    isn't limited in his naming choice
+    """
+    string = core_convert_file_name_to_display(string)
+    REPLACE_CHARS = {
+        ':': '∶',
+        '*': '∗',
+        '?': 'ʔ',
+        '"': 'ʺ',
+        '<': '❮',
+        '>': '❯',
+        '|': '∣'
+    }
+
+    for key, value in REPLACE_CHARS.items():
+        string = string.replace(key, value)
+
+    return string
+
+
+def webdav_convert_file_name_to_bdd(string: str) -> str:
+    """
+    Called before sending request to the database to recover the right names
+    """
+    REPLACE_CHARS = {
+        '⧸': '/',
+        '⧹': '\\',
+        '∶': ':',
+        '∗': '*',
+        'ʔ': '?',
+        'ʺ': '"',
+        '❮': '<',
+        '❯': '>',
+        '∣': '|'
+    }
+
+    for key, value in REPLACE_CHARS.items():
+        string = string.replace(key, value)
+
+    return string
+
+
+def normpath(path):
+    if path == b'':
+        path = b'/'
+    elif path == '':
+        path = '/'
+    return base_normpath(path)

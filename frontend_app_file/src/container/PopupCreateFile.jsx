@@ -27,7 +27,7 @@ class PopupCreateFile extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, this.state.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -57,6 +57,18 @@ class PopupCreateFile extends React.Component {
     if (!newFile || !newFile[0]) return
 
     const fileToSave = newFile[0]
+
+    if (
+      !fileToSave.type.includes('image') ||
+      fileToSave.size > 2000000
+    ) {
+      this.setState({
+        uploadFile: fileToSave,
+        uploadFilePreview: false
+      })
+      return
+    }
+
     this.setState({uploadFile: fileToSave})
 
     var reader = new FileReader()

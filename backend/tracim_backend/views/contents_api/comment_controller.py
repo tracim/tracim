@@ -7,12 +7,12 @@ from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.utils.authorization import \
-    require_comment_ownership_or_role
-from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.authorization import can_delete_comment
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import CommentSchema
@@ -40,7 +40,7 @@ SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS = generate_documentation_swagger_tag(
 class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(CommentSchema(many=True))
     def content_comments(self, context, request: TracimRequest, hapic_data=None):
@@ -69,7 +69,7 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)  # nopep8
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
     @hapic.output_body(CommentSchema())
@@ -99,10 +99,7 @@ class CommentController(Controller):
         return api.get_content_in_context(comment)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
-    @require_comment_ownership_or_role(
-        minimal_required_role_for_anyone=UserRoleInWorkspace.WORKSPACE_MANAGER,
-        minimal_required_role_for_owner=UserRoleInWorkspace.CONTRIBUTOR,
-    )
+    @check_right(can_delete_comment)
     @hapic.input_path(CommentsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_comment(self, context, request: TracimRequest, hapic_data=None):

@@ -12,6 +12,7 @@ import time
 import uuid
 
 from datetime import datetime
+import enum
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
@@ -29,6 +30,7 @@ from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
+from sqlalchemy.types import Enum
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import UnvalidResetPasswordToken
 
@@ -57,6 +59,10 @@ user_group_table = Table('user_group', metadata,
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
+class AuthType(enum.Enum):
+    INTERNAL = 'internal'
+    LDAP = 'ldap'
+    UNKNOWN = 'unknown'
 
 class Group(DeclarativeBase):
 
@@ -76,7 +82,6 @@ class Group(DeclarativeBase):
     group_name = Column(Unicode(16), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     created = Column(DateTime, default=datetime.utcnow)
-
     users = relationship('User', secondary=user_group_table, backref='groups')
 
     def __repr__(self):
@@ -130,6 +135,20 @@ class User(DeclarativeBase):
     least the ``email`` column.
     """
 
+    MIN_PASSWORD_LENGTH =  6
+    MAX_PASSWORD_LENGTH = 512
+    MAX_HASHED_PASSWORD_LENGTH = 128
+    MIN_PUBLIC_NAME_LENGTH = 3
+    MAX_PUBLIC_NAME_LENGTH = 255
+    MIN_EMAIL_LENGTH = 3
+    MAX_EMAIL_LENGTH = 255
+    MAX_IMPORTED_FROM_LENGTH = 32
+    MAX_TIMEZONE_LENGTH = 32
+    MIN_LANG_LENGTH = 2
+    MAX_LANG_LENGTH = 3
+    MAX_AUTH_TOKEN_LENGTH = 255
+    MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
+
     __tablename__ = 'users'
     # INFO - G.M - 2018-10-24 - force table to use utf8 instead of
     # utf8bm4 for mysql only in order to avoid max length of key issue with
@@ -143,24 +162,24 @@ class User(DeclarativeBase):
     }
 
     user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
-    email = Column(Unicode(255), unique=True, nullable=False)
-    display_name = Column(Unicode(255))
-    _password = Column('password', Unicode(128))
+    email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=False)
+    display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
+    _password = Column('password', Unicode(MAX_HASHED_PASSWORD_LENGTH), nullable=True)
     created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
     is_deleted = Column(Boolean, default=False, nullable=False, server_default=sqlalchemy.sql.expression.literal(False))
-    imported_from = Column(Unicode(32), nullable=True)
+    imported_from = Column(Unicode(MAX_IMPORTED_FROM_LENGTH), nullable=True)
     # timezone as tz database format
-    timezone = Column(Unicode(255), nullable=False, server_default='')
+    timezone = Column(Unicode(MAX_TIMEZONE_LENGTH), nullable=False, server_default='')
     # lang in iso639 format
-    lang = Column(Unicode(3), nullable=True, default=None)
+    auth_type = Column(Enum(AuthType), nullable=False, server_default=AuthType.INTERNAL.name)
+    lang = Column(Unicode(MAX_LANG_LENGTH), nullable=True, default=None)
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
     # TODO - G.M - 2018-08-22 - Think about hash instead of direct token
-    auth_token = Column(Unicode(255))
+    auth_token = Column(Unicode(MAX_AUTH_TOKEN_LENGTH))
     auth_token_created = Column(DateTime)
-
-    reset_password_token_hash = Column(Unicode(255), nullable=True, default=None)  # nopep8
+    reset_password_token_hash = Column(Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None)  # nopep8
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
 
     @hybrid_property
@@ -208,14 +227,18 @@ class User(DeclarativeBase):
         """Return the user object whose user name is ``username``."""
         return dbsession.query(cls).filter_by(email=username).first()
 
-    def _set_password(self, cleartext_password: str) -> None:
+    def _set_password(self, cleartext_password: typing.Optional[str]) -> None:
         """
         Set ciphertext password from cleartext password.
 
         Hash cleartext password on the fly,
         Store its ciphertext version,
         """
-        self._password = self._hash(cleartext_password)
+        if cleartext_password is None:
+            self._password = None
+        else:
+            self._password = self._hash(cleartext_password)
+
 
     def _get_password(self) -> str:
         """Return the hashed version of the password."""
@@ -224,7 +247,7 @@ class User(DeclarativeBase):
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
 
-    def validate_password(self, cleartext_password: str) -> bool:
+    def validate_password(self, cleartext_password: typing.Optional[str]) -> bool:
         """
         Check the password against existing credentials.
 
@@ -234,8 +257,11 @@ class User(DeclarativeBase):
         :type cleartext_password: unicode object.
         :return: Whether the password is valid.
         :rtype: bool
-
         """
+
+
+        if not self.password:
+            return False
         return self._validate_hash(self.password, cleartext_password)
 
     def get_display_name(self, remove_email_part: bool=False) -> str:

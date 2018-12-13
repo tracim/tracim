@@ -1,11 +1,7 @@
 @import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-.activity
+.recentactivity
   width 60%
-  &__wrapper
-    border 1px solid grey
-    min-height 480px
-    background-color offWhite
   &__header
     display flex
     justify-content space-between
@@ -14,31 +10,35 @@
     height 45px
     &__allread
       font-size 18px
-  &__workspace
-    display flex
-    align-items center
-    border-bottom 1px solid grey
-    padding 15px
-    cursor pointer
-    font-weight bold
-    &.read
-      font-weight normal
-    &:hover
-      color offWhite
-    &:nth-child(even):not(:hover)
-      background-color lightGrey
-      // &:hover
-      //   background-color fourthColor
-    &__icon
-      margin 0 25px
-      font-size 25px
-    &__name
-      flex 1
-      width 0
-      overflow-x hidden
-      text-overflow ellipsis
-      white-space nowrap
-      font-size 18px
+  &__list
+    border 1px solid grey
+    min-height 480px
+    background-color offWhite
+    &__item
+      display flex
+      align-items center
+      border-bottom 1px solid grey
+      padding 15px
+      cursor pointer
+      font-weight bold
+      &.read
+        font-weight normal
+      &:hover
+        color offWhite
+        & .badgeBackgroundColor
+          background-color inherit
+      &:nth-child(even):not(:hover)
+        background-color lightGrey
+      &__icon
+        margin 0 25px
+        font-size 25px
+      &__name
+        flex 1
+        width 0
+        overflow-x hidden
+        text-overflow ellipsis
+        white-space nowrap
+        font-size 18px
   &__more
     display flex
     justify-content flex-end
@@ -65,13 +65,13 @@
   .activity
     margin 25px 0
     width 100%
-    &__wrapper
-      margin-top 45px
     &__header
       display block
       height auto
       margin 0 15px 20px 15px
       &__title
         margin-bottom 20px
+    &__list
+      margin-top 45px
     &__more__btn
       margin-top 40px

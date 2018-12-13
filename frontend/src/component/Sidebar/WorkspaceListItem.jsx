@@ -1,4 +1,5 @@
 import React from 'react'
+import color from 'color'
 import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -35,10 +36,16 @@ const WorkspaceListItem = props => {
   return (
     <li className='sidebar__content__navigation__workspace__item'>
       <div
-        className='sidebar__content__navigation__workspace__item__wrapper primaryColorBg primaryColorBgDarkenHover primaryColorBorder'
+        className='sidebar__content__navigation__workspace__item__wrapper'
         onClick={props.onClickTitle}
       >
-        <div className='sidebar__content__navigation__workspace__item__number'>
+        <div
+          className='sidebar__content__navigation__workspace__item__number'
+          style={{
+            backgroundColor: GLOBAL_primaryColor,
+            color: color(GLOBAL_primaryColor).light() ? '#333333' : '#fdfdfd'
+          }}
+        >
           {props.label.substring(0, 2).toUpperCase()}
         </div>
 
@@ -57,11 +64,11 @@ const WorkspaceListItem = props => {
             <li key={aa.slug}>
               <Link to={buildLink(aa.route, props.location.search, props.idWs, props.activeIdWorkspace)}>
                 <div className={classnames(
-                  'sidebar__content__navigation__workspace__item__submenu__dropdown primaryColorBgLighten primaryColorBgHover primaryColorBorderDarken',
+                  'sidebar__content__navigation__workspace__item__submenu__dropdown',
                   {'activeFilter': shouldDisplayAsActive(props.location, props.idWs, props.activeIdWorkspace, aa)}
                 )}>
-                  <div className='dropdown__icon'>
-                    <i className={classnames(`fa fa-${aa.faIcon}`)} style={{backgroudColor: aa.hexcolor}} />
+                  <div className='dropdown__icon' style={{backgroundColor: aa.hexcolor}}>
+                    <i className={classnames(`fa fa-${aa.faIcon}`)} />
                   </div>
 
                   <div className='sidebar__content__navigation__workspace__item__submenu__dropdown__showdropdown'>

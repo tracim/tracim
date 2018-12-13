@@ -1,13 +1,13 @@
-const webpack = require('webpack')
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
 console.log('isProduction : ', isProduction)
 
 module.exports = {
+  mode: isProduction ? 'production' : 'development',
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
-    : ['babel-polyfill', './src/index.dev.js'],
+    : ['@babel/polyfill', './src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'thread.app.js' : 'thread.app.dev.js',
@@ -40,6 +40,9 @@ module.exports = {
     // }
   },
   devtool: isProduction ? false : 'cheap-module-source-map',
+  performance: {
+    hints: false
+  },
   module: {
     rules: [{
       test: /\.jsx?$/,
@@ -48,12 +51,19 @@ module.exports = {
       exclude: [/node_modules/]
     }, {
       test: [/\.js$/, /\.jsx$/],
+      exclude: [/node_modules/],
       loader: 'babel-loader',
       options: {
-        presets: ['env', 'react'],
-        plugins: ['transform-object-rest-spread', 'transform-class-properties', 'transform-object-assign']
-      },
-      exclude: [/node_modules/]
+        presets: [
+          '@babel/preset-env',
+          '@babel/preset-react'
+        ],
+        plugins: [
+          '@babel/plugin-proposal-object-rest-spread',
+          '@babel/plugin-proposal-class-properties',
+          '@babel/plugin-transform-object-assign'
+        ]
+      }
     }, {
       test: /\.css$/,
       use: ['style-loader', 'css-loader']
@@ -74,14 +84,7 @@ module.exports = {
   plugins: [
     ...[], // generic plugins always present
     ...(isProduction
-      ? [ // production specific plugins
-        new webpack.DefinePlugin({
-          'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
-        })
-      ]
+      ? [] // production specific plugins
       : [] // development specific plugins
     )
   ]

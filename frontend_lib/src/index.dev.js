@@ -18,8 +18,6 @@ import TimelineDebugData from './component/Timeline/debugData.js'
 // import CardPopup from './component/CardPopup/CardPopup.jsx'
 // import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
-import { generateAvatarFromPublicName } from './helper.js'
-
 // import NewVersionButton from './component/OptionComponent/NewVersionBtn.jsx'
 // import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 
@@ -96,7 +94,7 @@ ReactDOM.render(
                 ...item.author,
                 avatar_url: item.author.avatar_url
                   ? item.author.avatar_url
-                  : generateAvatarFromPublicName(item.author.public_name)
+                  : ''
               }
             }
             : item

@@ -1,74 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import transaction
-from os.path import normpath as base_normpath
 
 from sqlalchemy.orm import Session
+from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
+
 from tracim_backend.app_models.contents import content_type_list
 from wsgidav import util
 from wsgidav import compat
 
+from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
-
-
-def transform_to_display(string: str) -> str:
-    """
-    As characters that Windows does not support may have been inserted
-    through Tracim in names, before displaying information we update path
-    so that all these forbidden characters are replaced with similar
-    shape character that are allowed so that the user isn't trouble and
-    isn't limited in his naming choice
-    """
-    _TO_DISPLAY = {
-        '/': '⧸',
-        '\\': '⧹',
-        ':': '∶',
-        '*': '∗',
-        '?': 'ʔ',
-        '"': 'ʺ',
-        '<': '❮',
-        '>': '❯',
-        '|': '∣'
-    }
-
-    for key, value in _TO_DISPLAY.items():
-        string = string.replace(key, value)
-
-    return string
-
-
-def transform_to_bdd(string: str) -> str:
-    """
-    Called before sending request to the database to recover the right names
-    """
-    _TO_BDD = {
-        '⧸': '/',
-        '⧹': '\\',
-        '∶': ':',
-        '∗': '*',
-        'ʔ': '?',
-        'ʺ': '"',
-        '❮': '<',
-        '❯': '>',
-        '∣': '|'
-    }
-
-    for key, value in _TO_BDD.items():
-        string = string.replace(key, value)
-
-    return string
-
-
-def normpath(path):
-    if path == b'':
-        path = b'/'
-    elif path == '':
-        path = '/'
-    return base_normpath(path)
 
 
 class HistoryType(object):
@@ -176,38 +122,46 @@ class FakeFileStream(object):
         """
 
         is_temporary = self._file_name.startswith('.~') or self._file_name.startswith('~')
-        with self._session.no_autoflush:
-            file = self._api.create(
-                filename=self._file_name,
-                content_type_slug=content_type_list.File.slug,
-                workspace=self._workspace,
-                parent=self._parent,
-                is_temporary=is_temporary,
-                do_save=False,
-            )
-            self._api.update_file_data(
-                file,
-                self._file_name,
-                util.guessMimeType(self._file_name),
-                self._file_stream.read()
-            )
+        try:
+            with self._session.no_autoflush:
+                file = self._api.create(
+                    filename=self._file_name,
+                    content_type_slug=content_type_list.File.slug,
+                    workspace=self._workspace,
+                    parent=self._parent,
+                    is_temporary=is_temporary,
+                    do_save=False,
+                )
+                self._api.update_file_data(
+                    file,
+                    self._file_name,
+                    util.guessMimeType(self._file_name),
+                    self._file_stream.read()
+                )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
         self._api.save(file, ActionDescription.CREATION)
 
     def update_file(self):
         """
         Called when we're updating an existing content; we create a new revision and update the file content
         """
+        try:
+            with new_revision(
+                    session=self._session,
+                    content=self._content,
+                    tm=transaction.manager,
+            ):
+                self._api.update_file_data(
+                    self._content,
+                    self._file_name,
+                    util.guessMimeType(self._content.file_name),
+                    self._file_stream.read()
+                )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN) from exc
 
-        with new_revision(
-                session=self._session,
-                content=self._content,
-                tm=transaction.manager,
-        ):
-            self._api.update_file_data(
-                self._content,
-                self._file_name,
-                util.guessMimeType(self._content.file_name),
-                self._file_stream.read()
-            )
+        self._api.save(self._content, ActionDescription.REVISION)
 
-            self._api.save(self._content, ActionDescription.REVISION)
+    def supportEtag(self):
+        return False

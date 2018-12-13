@@ -1,28 +1,31 @@
 # -*- coding: utf-8 -*-
 import json
+import os
+import typing
 from collections import OrderedDict
+from collections import namedtuple
 from urllib.parse import urlparse
 
-import os
-
-import typing
-
+from depot.manager import DepotManager
 from paste.deploy.converters import asbool
+
+from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
-from depot.manager import DepotManager
-from tracim_backend.app_models.applications import Application
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.models import Group
+from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.roles import WorkspaceRoles
 
+SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key: str, value: typing.Any):
         """
         Log-ready setter.
 
@@ -31,20 +34,19 @@ class CFG(object):
         :param value:
         :return:
         """
-        if 'PASSWORD' not in key and \
-                ('URL' not in key or type(value) == str) and \
-                'CONTENT' not in key:
-            # We do not show PASSWORD for security reason
-            # we do not show URL because At the time of configuration setup,
-            # it can't be evaluated
-            # We do not show CONTENT in order not to pollute log files
-            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
-        else:
+        is_value_secret = False
+        for secret in SECRET_ENDING_STR:
+            if key.endswith(secret):
+                is_value_secret = True
+
+        if is_value_secret:
             logger.info(self, 'CONFIG: [ {} | <value not shown> ]'.format(key))
+        else:
+            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
 
         self.__dict__[key] = value
 
-    def __init__(self, settings):
+    def __init__(self, settings: typing.Dict[str, typing.Any]):
         """Parse configuration file."""
 
         ###
@@ -68,7 +70,7 @@ class CFG(object):
                 self.APPS_COLORS = json.load(json_file)
         except Exception as e:
             raise Exception(
-                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH) # nopep8
+                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH)  # nopep8
             ) from e
 
         try:
@@ -119,6 +121,10 @@ class CFG(object):
                 'ERROR: preview_cache_dir configuration is mandatory. '
                 'Set it before continuing.'
             )
+        auth_type_str = settings.get(
+            'auth_types', 'internal'
+        )
+        self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
 
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
@@ -187,7 +193,7 @@ class CFG(object):
             None,
         )
         if not website_server_name:
-            website_server_name= urlparse(self.WEBSITE_BASE_URL).hostname
+            website_server_name = urlparse(self.WEBSITE_BASE_URL).hostname
             logger.warning(
                 self,
                 'NOTE: Generated website.server_name parameter from '
@@ -304,7 +310,6 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
             'email.notification.processing_mode',
         )
-
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
@@ -413,48 +418,44 @@ class CFG(object):
             'email.async.redis.db',
             0,
         ))
-        self.INVITE_NEW_USER_MINIMAL_PROFILE = settings.get(
-            'invitation.new_user.minimal_profile',
+        self.NEW_USER_INVITATION_DO_NOTIFY = asbool(settings.get(
+            'new_user.invitation.do_notify',
+            'True'
+        ))
+
+        self.NEW_USER_INVITATION_MINIMAL_PROFILE = settings.get(
+            'new_user.invitation.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME
         )
         ###
         # WSGIDAV (Webdav server)
         ###
+        tracim_website = 'http://tracim.fr/'
+        tracim_name = 'Tracim'
+        wsgidav_website = 'https://github.com/mar10/wsgidav/'
+        wsgidav_name = 'WsgiDAV'
 
-        # TODO - G.M - 27-03-2018 - [WebDav] Restore wsgidav config
-        #self.WSGIDAV_CONFIG_PATH = settings.get(
-        #    'wsgidav.config_path',
-        #    'wsgidav.conf',
-        #)
-        # TODO: Convert to importlib
-        # http://stackoverflow.com/questions/41063938/use-importlib-instead-imp-for-non-py-file
-        #self.wsgidav_config = imp.load_source(
-        #    'wsgidav_config',
-        #    self.WSGIDAV_CONFIG_PATH,
-        #)
-        # self.WSGIDAV_PORT = self.wsgidav_config.port
-        # self.WSGIDAV_CLIENT_BASE_URL = settings.get(
-        #     'wsgidav.client.base_url',
-        #     None,
-        # )
-        #
-        # if not self.WSGIDAV_CLIENT_BASE_URL:
-        #     self.WSGIDAV_CLIENT_BASE_URL = \
-        #         '{0}:{1}'.format(
-        #             self.WEBSITE_SERVER_NAME,
-        #             self.WSGIDAV_PORT,
-        #         )
-        #     logger.warning(self,
-        #         'NOTE: Generated wsgidav.client.base_url parameter with '
-        #         'followings parameters: website.server_name and '
-        #         'wsgidav.conf port'.format(
-        #             self.WSGIDAV_CLIENT_BASE_URL,
-        #         )
-        #     )
-        #
-        # if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
-        #     self.WSGIDAV_CLIENT_BASE_URL += '/'
-
+        self.WEBDAV_VERBOSE_LEVEL = int(settings.get('webdav.verbose.level', 1))
+        self.WEBDAV_ROOT_PATH = settings.get('webdav.root_path', '/')
+        self.WEBDAV_BLOCK_SIZE = int(settings.get('webdav.block_size', 8192))
+        self.WEBDAV_DIR_BROWSER_ENABLED = asbool(settings.get('webdav.dir_browser.enabled', True))
+        default_webdav_footnote = '<a href="{instance_url}">{instance_name}</a>.' \
+                                  ' This Webdav is serve by'  \
+                                  ' <a href="{tracim_website}">{tracim_name} software</a> using' \
+                                  ' <a href="{wsgidav_website}">{wsgidav_name}</a>.'.format(
+                                      instance_name=self.WEBSITE_TITLE,
+                                      instance_url=self.WEBSITE_BASE_URL,
+                                      tracim_name=tracim_name,
+                                      tracim_website=tracim_website,
+                                      wsgidav_name=wsgidav_name,
+                                      wsgidav_website=wsgidav_website,
+                                  )
+        self.WEBDAV_DIR_BROWSER_FOOTER = settings.get('webdav.dir_browser.footer', default_webdav_footnote)
+        # TODO : check if tweaking those param does work
+        self.WEBDAV_SHOW_DELETED = False
+        self.WEBDAV_SHOW_ARCHIVED = False
+        self.WEBDAV_SHOW_HISTORY = False
+        self.WEBDAV_MANAGE_LOCK = True
         # TODO - G.M - 27-03-2018 - [Caldav] Restore radicale config
         ###
         # RADICALE (Caldav server)
@@ -556,7 +557,7 @@ class CFG(object):
         # of tracim_v2 parent of both backend and frontend
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
-        backend_i18n_folder = os.path.join(backend_folder,'tracim_backend', 'locale')  # nopep8
+        backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
 
         self.BACKEND_I18N_FOLDER = settings.get(
             'backend.18n_folder_path', backend_i18n_folder
@@ -580,6 +581,61 @@ class CFG(object):
                 'please set frontend.dist_folder.path'
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
+        self.load_ldap_settings(settings)
+
+    def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
+        """
+        Will parse config file to setup new matching attribute in the instance
+        :param settings: dict of source settings (from ini file)
+        """
+        param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
+
+        ldap_parameters = [
+            param('ldap_url',                   'LDAP_URL',          'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_base_dn',               'LDAP_BASE_DN',      'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_dn',               'LDAP_BIND_DN',      'cn=admin, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_pass',             'LDAP_BIND_PASS',    '', None),
+            param('ldap_tls',                   'LDAP_TLS',          False, asbool),
+            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN', 'ou=people, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
+            # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
+            param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
+            # TODO - G.M - 2018-12-05 - [ldap_profile]
+            # support for profile attribute disabled
+            # Should be reenabled later probably with a better code
+            # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
+        ]
+
+        for ldap_parameter in ldap_parameters:
+            if ldap_parameter.adapter:
+                # Apply given function as a data modifier before setting value
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    ldap_parameter.adapter(
+                        settings.get(
+                            ldap_parameter.ini_name,
+                            ldap_parameter.default_value
+                        )
+                    )
+                )
+            else:
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    settings.get(
+                        ldap_parameter.ini_name,
+                        ldap_parameter.default_value
+                    )
+                )
+
+        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
+
+        self.LDAP_USE_POOL = True
+        self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
+        self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
+        self.LDAP_GET_INFO = None
+
 
     def configure_filedepot(self):
 
@@ -651,7 +707,7 @@ class CFG(object):
         folder = Application(
             label='Folder',
             slug='contents/folder',
-            fa_icon='folder-open-o',
+            fa_icon='folder-o',
             is_active=True,
             config={},
             main_route='',
@@ -663,6 +719,7 @@ class CFG(object):
             creation_label='Create a folder',
             available_statuses=content_status_list.get_all(),
             allow_sub_content=True,
+            minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER
         )
 
         markdownpluspage = Application(
