@@ -5,17 +5,75 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import WebdavFunctionalTest
 
 
-class TestWebdav(WebdavFunctionalTest):
-    """
-    """
+class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
+    config_section = 'functional_webdav_test_remote_user'
 
-    fixtures = [BaseFixture]
+    def test_functional__webdav_access_to_root_remote_auth__as_http_header(self) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('remoteuser@emoteuser.remoteuser', password=None, do_save=True,
+                                do_notify=False, groups=groups,
+                                auth_type=AuthType.REMOTE)  # nopep8
+        transaction.commit()
+        headers_auth = {
+            'REMOTE_USER': 'remoteuser@remoteuser.remoteuser',
+        }
+        res = self.testapp.get('/', status=401, headers=headers_auth)
+        assert res
+
+    def test_functional__webdav_access_to_root__remote_auth(self) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user(
+            'remoteuser@remoteuser.remoteuser',
+            password=None,
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+            auth_type=AuthType.REMOTE
+        )
+        uapi.save(user)
+        transaction.commit()
+        extra_environ = {
+            'REMOTE_USER': 'remoteuser@remoteuser.remoteuser',
+        }
+        res = self.testapp.get('/', status=200, extra_environ=extra_environ)
+        assert res
+
+class TestFunctionalWebdav(WebdavFunctionalTest):
 
     def test_functional__webdav_access_to_root__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)

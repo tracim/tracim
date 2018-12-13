@@ -675,15 +675,26 @@ class TestWhoamiEndpointWithApiKeyNoKey(FunctionalTest):
 class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
     config_section = 'functional_test_remote_auth'
 
-    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self):
+    def test_api__try_whoami_enpoint_remote_user__err_401__as_http_header(self):
 
         headers_auth = {
-                'X-Remote-User': 'remoteuser@remoteuser.remoteuser',
+                'REMOTE_USER': 'remoteuser@remoteuser.remoteuser',
+        }
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=401,
+            headers=headers_auth
+        )
+
+    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self):
+
+        extra_environ = {
+                'REMOTE_USER': 'remoteuser@remoteuser.remoteuser',
         }
         res = self.testapp.get(
             '/api/v2/auth/whoami',
             status=200,
-            headers=headers_auth
+            extra_environ=extra_environ
         )
         assert res.json_body['public_name'] == 'remoteuser'
         assert res.json_body['email'] == 'remoteuser@remoteuser.remoteuser'
@@ -699,7 +710,7 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/auth/whoami',
             status=200,
-            headers=headers_auth
+            extra_environ=extra_environ
         )
         assert res.json_body['public_name'] == 'remoteuser'
         assert res.json_body['email'] == 'remoteuser@remoteuser.remoteuser'
@@ -741,13 +752,13 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         uapi.save(test_user)
         uapi.disable(test_user)
         transaction.commit()
-        headers_auth = {
-                'X-Remote-User': 'test@test.test',
+        extra_environ = {
+                'REMOTE_USER': 'test@test.test',
         }
         res = self.testapp.get(
             '/api/v2/auth/whoami',
             status=401,
-            headers=headers_auth
+            extra_environ=extra_environ
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
@@ -765,13 +776,13 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         assert 'details' in res.json.keys()
 
     def test_api__try_whoami_enpoint__err_401__remote_user_bad_email(self):
-        headers_auth = {
-                'X-Remote-User': '',
+        extra_environ = {
+                'REMOTE_USER': '',
         }
         res = self.testapp.get(
             '/api/v2/auth/whoami',
             status=401,
-            headers=headers_auth
+            extra_environ=extra_environ
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()

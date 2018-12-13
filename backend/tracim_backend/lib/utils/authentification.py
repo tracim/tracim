@@ -184,14 +184,14 @@ class RemoteAuthentificationPolicy(
     def authenticated_userid(self, request):
         user = self._remote_authenticated_user(
             request=request,
-            email=request.unauthenticated_userid
+            email=self.unauthenticated_userid(request)
         )
         if not user:
             return None
         return user.user_id
 
     def unauthenticated_userid(self, request):
-        return request.headers.get(self.remote_user_email_login_header)
+        return request.environ.get(self.remote_user_email_login_header)
     def remember(self, request, userid, **kw):
         return []
     def forget(self, request):
