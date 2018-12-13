@@ -9,6 +9,7 @@ few step to do.
 ## 1. Verify Tracim_v1 is up-to-date
 
 In order to avoid issue with migration, you should have latest version of tracim_v1.
+This is the tag for the latest version `release_01.xx.xx_end_of_life`.
 
 ## 2. Save your old data
 
@@ -30,9 +31,9 @@ One easy way to migrate from tracim v1 to tracim v2 with shell script is :
  - verify if tracim v2 is running correctly by launching `pserve development.ini`
  - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your 
 SGDB.
- - modify/copy default config file (`development.ini` name here but you can change it) with `sqlalchemy.url` linking to your own database with tracim_v1 data and `depot_storage_dir` with path giving access to your old tracim v1 depot dir content.
+ - modify default config file (`development.ini` name here but you can change it) with `basic_setup.sqlalchemy_url` linking to your own database with tracim_v1 data and `basic_setup.depot_storage_dir` with path giving access to your old tracim v1 depot dir content.
  - force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)
- - run tracim with those param and check if tracim_v1 content is correctly added.
+ - run tracim with those param and check if tracim_v1 content is correctly added. (If you have used LDAP for auth, verify that you have one tracim administrator user or create one with INTERNAL auth)
 
 ## 4. Configure Tracim_v2 according to old tracim_v1.
 
@@ -83,7 +84,7 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | website.home.tag_line | removed ||
 | website.home.below_login_form | removed ||
 | ldap_ldap_naming_attribute | removed | replaced by `ldap_name_attribute`
-| ldap_user_attribute | removed | partially replaced by `ldap_name_attribute`, `ldap_login_attribute` and `ldap_profile_attribute`
+| ldap_user_attribute | removed | partially replaced by `ldap_name_attribute`, `ldap_login_attribute`
 | ldap_group_enabled | removed ||
 -------------------|-------------------|----------------------------|
 | user.auth_token.validity | disabled   | not really used in tracim_v2 |
@@ -110,9 +111,9 @@ modify parameters, which are mostly in `[DEFAULT]` section.
 | pipeline | new | :warning: metaconfig (PasteDeploy) :  used to ordonnate properly config file with multiple app. you should probably leave this as default like in [developement.ini.sample](../development.ini.sample) |
 | retry.attemps | new | pyramid specific parameter link to [pyramid_retry](https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/), number of try per request. |
 | script_location | new | :warning: required for database migration, in `[alembic]` section, alembic specific param. you probably should use default value: `tracim_backend/migration`|
+| ldap_user_base_dn | new | base dn to make queries of users
 | ldap_login_attribute | new | attribute for email login (default:mail) in ldap
 | ldap_name_attribute | new | attribute for user name in ldap, used only for automatic new tracim user creation at first login
-| ldap_profile_attribute | new | attribute for user profile by default, used only for automatic new tracim user creation at first login, disabled if not provided
 --------------------------------
 
 Others modifications in config file includes :
