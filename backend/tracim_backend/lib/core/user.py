@@ -488,7 +488,7 @@ class UserApi(object):
         if not self._user:
             raise NoUserSetted('Current User should be set in UserApi to use this method')  # nopep8
 
-        self._check_email_modification_allowed(self._user)
+        self._check_email_modification_allowed(user)
 
         if not self._user.validate_password(loggedin_user_password):  # nopep8
             raise WrongUserPassword(
@@ -568,7 +568,7 @@ class UserApi(object):
             password: str=None,
             timezone: str=None,
             lang: str=None,
-            auth_type: AuthType= AuthType.INTERNAL,
+            auth_type: AuthType = None,
             groups: typing.Optional[typing.List[Group]]=None,
             do_save=True,
     ) -> User:
@@ -628,7 +628,7 @@ class UserApi(object):
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 'user {} is link to external auth {},'
                 'password modification disallowed'.format(
@@ -639,7 +639,7 @@ class UserApi(object):
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 'user {} is link to external auth {},'
                 'email modification disallowed'.format(
