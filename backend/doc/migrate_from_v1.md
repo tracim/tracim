@@ -25,15 +25,14 @@ All data which are relevant are:
 There is many way to set up tracim v2, easiest is to use shell script, see [README](../../README.md).
 
 One easy way to migrate from tracim v1 to tracim v2 with shell script is :
-- running shell automatic install with default sqlite database
-- go into tracim v2 python env (in `/backend` folder) `source env/bin/activate`
-- verify if tracim v2 is running correctly by launching `pserve development.ini`
-- do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your
-own SGDB.
-- modify/copy default config file(we will stay with `development.ini` name here but you can change it) with `sqlalchemy.url` linking to your own database with tracim_v1 data and `depot_storage_dir`
-with path giving access to your old tracim v1 depot dir content.
-- force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)
-- run tracim with those param and check if tracim_v1 content is correctly added.
+ - running shell automatic install with default sqlite database
+ - active virtual environment (in `/backend` folder) `source env/bin/activate`
+ - verify if tracim v2 is running correctly by launching `pserve development.ini`
+ - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your 
+SGDB.
+ - modify/copy default config file (`development.ini` name here but you can change it) with `sqlalchemy.url` linking to your own database with tracim_v1 data and `depot_storage_dir` with path giving access to your old tracim v1 depot dir content.
+ - force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)
+ - run tracim with those param and check if tracim_v1 content is correctly added.
 
 ## 4. Configure Tracim_v2 according to old tracim_v1.
 
@@ -46,8 +45,6 @@ Big change in config ini in tracim_v2 was to move most of the config (mostly fro
 separated more properly global config from app specific param like `pyramid.*` param in tracim_web app section , `[app:tracim_web]`  .
 In order to have something working easily, best solution is using  [developement.ini.sample](../development.ini.sample) and
 modify parameters, which are mostly in `[DEFAULT]` section.
-
-
 
 | parameters        | status in tracim v2 |complementary informations  | 
 |-------------------|--------------------|----------------------------|
