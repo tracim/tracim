@@ -70,7 +70,7 @@ class CFG(object):
                 self.APPS_COLORS = json.load(json_file)
         except Exception as e:
             raise Exception(
-                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH) # nopep8
+                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH)  # nopep8
             ) from e
 
         try:
@@ -193,7 +193,7 @@ class CFG(object):
             None,
         )
         if not website_server_name:
-            website_server_name= urlparse(self.WEBSITE_BASE_URL).hostname
+            website_server_name = urlparse(self.WEBSITE_BASE_URL).hostname
             logger.warning(
                 self,
                 'NOTE: Generated website.server_name parameter from '
@@ -430,41 +430,32 @@ class CFG(object):
         ###
         # WSGIDAV (Webdav server)
         ###
+        tracim_website = 'http://tracim.fr/'
+        tracim_name = 'Tracim'
+        wsgidav_website = 'https://github.com/mar10/wsgidav/'
+        wsgidav_name = 'WsgiDAV'
 
-        # TODO - G.M - 27-03-2018 - [WebDav] Restore wsgidav config
-        #self.WSGIDAV_CONFIG_PATH = settings.get(
-        #    'wsgidav.config_path',
-        #    'wsgidav.conf',
-        #)
-        # TODO: Convert to importlib
-        # http://stackoverflow.com/questions/41063938/use-importlib-instead-imp-for-non-py-file
-        #self.wsgidav_config = imp.load_source(
-        #    'wsgidav_config',
-        #    self.WSGIDAV_CONFIG_PATH,
-        #)
-        # self.WSGIDAV_PORT = self.wsgidav_config.port
-        # self.WSGIDAV_CLIENT_BASE_URL = settings.get(
-        #     'wsgidav.client.base_url',
-        #     None,
-        # )
-        #
-        # if not self.WSGIDAV_CLIENT_BASE_URL:
-        #     self.WSGIDAV_CLIENT_BASE_URL = \
-        #         '{0}:{1}'.format(
-        #             self.WEBSITE_SERVER_NAME,
-        #             self.WSGIDAV_PORT,
-        #         )
-        #     logger.warning(self,
-        #         'NOTE: Generated wsgidav.client.base_url parameter with '
-        #         'followings parameters: website.server_name and '
-        #         'wsgidav.conf port'.format(
-        #             self.WSGIDAV_CLIENT_BASE_URL,
-        #         )
-        #     )
-        #
-        # if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
-        #     self.WSGIDAV_CLIENT_BASE_URL += '/'
-
+        self.WEBDAV_VERBOSE_LEVEL = int(settings.get('webdav.verbose.level', 1))
+        self.WEBDAV_ROOT_PATH = settings.get('webdav.root_path', '/')
+        self.WEBDAV_BLOCK_SIZE = int(settings.get('webdav.block_size', 8192))
+        self.WEBDAV_DIR_BROWSER_ENABLED = asbool(settings.get('webdav.dir_browser.enabled', True))
+        default_webdav_footnote = '<a href="{instance_url}">{instance_name}</a>.' \
+                                  ' This Webdav is serve by'  \
+                                  ' <a href="{tracim_website}">{tracim_name} software</a> using' \
+                                  ' <a href="{wsgidav_website}">{wsgidav_name}</a>.'.format(
+                                      instance_name=self.WEBSITE_TITLE,
+                                      instance_url=self.WEBSITE_BASE_URL,
+                                      tracim_name=tracim_name,
+                                      tracim_website=tracim_website,
+                                      wsgidav_name=wsgidav_name,
+                                      wsgidav_website=wsgidav_website,
+                                  )
+        self.WEBDAV_DIR_BROWSER_FOOTER = settings.get('webdav.dir_browser.footer', default_webdav_footnote)
+        # TODO : check if tweaking those param does work
+        self.WEBDAV_SHOW_DELETED = False
+        self.WEBDAV_SHOW_ARCHIVED = False
+        self.WEBDAV_SHOW_HISTORY = False
+        self.WEBDAV_MANAGE_LOCK = True
         # TODO - G.M - 27-03-2018 - [Caldav] Restore radicale config
         ###
         # RADICALE (Caldav server)
@@ -566,7 +557,7 @@ class CFG(object):
         # of tracim_v2 parent of both backend and frontend
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
-        backend_i18n_folder = os.path.join(backend_folder,'tracim_backend', 'locale')  # nopep8
+        backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
 
         self.BACKEND_I18N_FOLDER = settings.get(
             'backend.18n_folder_path', backend_i18n_folder

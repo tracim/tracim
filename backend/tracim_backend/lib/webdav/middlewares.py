@@ -18,10 +18,12 @@ from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
 
-from tracim_backend.models.auth import AuthType
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_scoped_session_factory
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 
@@ -60,7 +62,6 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
     def __call__(self, environ, start_response):
         """"""
-        #        srvcfg = environ["wsgidav.config"]
         verbose = self._config.get("verbose", 2)
         self.last_request_time = '{0}_{1}'.format(
             datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
@@ -265,13 +266,9 @@ class TracimEnv(BaseMiddleware):
     def __init__(self, application, config):
         super().__init__(application, config)
         self._application = application
-        self._config = config
-        global_conf = get_appsettings(config['tracim_config']).global_conf
-        local_conf = get_appsettings(config['tracim_config'], 'tracim_web')
-        self.settings = global_conf
-        self.settings.update(local_conf)
+        self.settings = config['tracim_settings']
         self.engine = get_engine(self.settings)
-        self.session_factory = get_session_factory(self.engine)
+        self.session_factory = get_scoped_session_factory(self.engine)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
 
@@ -280,18 +277,21 @@ class TracimEnv(BaseMiddleware):
         # with thread and database, this should be verify.
         # see https://github.com/tracim/tracim_backend/issues/62
         tm = transaction.manager
-        dbsession = get_tm_session(self.session_factory, tm)
-        environ['tracim_tm'] = tm
-        environ['tracim_dbsession'] = dbsession
-        environ['tracim_cfg'] = self.app_config
+        session = get_tm_session(self.session_factory, tm)
         registry = get_current_registry()
         registry.ldap_connector = None
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ['tracim_registry'] =  registry
-
-        app = self._application(environ, start_response)
-        dbsession.close()
+        environ['tracim_context'] = WebdavTracimContext(environ, self.app_config, session)
+        try:
+            app = self._application(environ, start_response)
+        except Exception as exc:
+            transaction.rollback()
+            raise exc
+        finally:
+            transaction.commit()
+            session.close()
         return app
 
     def setup_ldap(self, registry: Registry, app_config: CFG):
@@ -314,19 +314,3 @@ class TracimEnv(BaseMiddleware):
         )
         registry.ldap_connector = Connector(registry, manager)
         return registry
-
-
-class TracimUserSession(BaseMiddleware):
-
-    def __init__(self, application, config):
-        super().__init__(application, config)
-        self._application = application
-        self._config = config
-
-    def __call__(self, environ, start_response):
-        environ['tracim_user'] = UserApi(
-            None,
-            session=environ['tracim_dbsession'],
-            config=environ['tracim_cfg'],
-        ).get_one_by_email(environ['http_authenticator.username'])
-        return self._application(environ, start_response)

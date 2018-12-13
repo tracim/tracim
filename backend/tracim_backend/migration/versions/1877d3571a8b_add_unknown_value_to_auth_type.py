@@ -28,27 +28,23 @@ def upgrade():
         op.execute("ALTER TABLE users alter auth_type drop default;")
         enum = sa.Enum('INTERNAL', 'LDAP', 'UNKNOWN', name='authtype')
         enum.create(op.get_bind(), checkfirst=False)
-        op.alter_column(
-            'users',
-            'auth_type',
-            type_=enum,
-            postgresql_using="auth_type::text::authtype",
-            server_default='INTERNAL'
-        )
+        with op.batch_alter_table('users') as batch_op:
+            batch_op.alter_column(
+                'auth_type',
+                type_=enum,
+                postgresql_using="auth_type::text::authtype",
+                server_default='INTERNAL'
+            )
         op.execute("DROP TYPE authtype_old;")
-    elif op.get_context().dialect.name == 'sqlite':
-        # INFO - G.M - 2018-11-27 - Don't need to do something in sqlite
-        # because it don't support enum and field is already VARCHAR(8)
-        pass
     else:
         # INFO - G.M - 2018-11-27 - MYSQL case
         enum = sa.Enum('INTERNAL', 'LDAP', 'UNKNOWN', name='authtype')
         enum.create(op.get_bind(), checkfirst=False)
-        op.alter_column(
-            'users',
-            'auth_type',
-            type_=enum,
-        )
+        with op.batch_alter_table('users') as batch_op:
+            batch_op.alter_column(
+                'auth_type',
+                type_=enum,
+            )
 
 
 def downgrade():
@@ -70,24 +66,20 @@ def downgrade():
         op.execute("ALTER TABLE users alter auth_type drop default;")
         enum = sa.Enum('INTERNAL', 'LDAP', name='authtype')
         enum.create(op.get_bind(), checkfirst=False)
-        op.alter_column(
-            'users',
-            'auth_type',
-            type_=enum,
-            postgresql_using="auth_type::text::authtype",
-            server_default='INTERNAL',
-        )
+        with op.batch_alter_table('users') as batch_op:
+            batch_op.alter_column(
+                'auth_type',
+                type_=enum,
+                postgresql_using="auth_type::text::authtype",
+                server_default='INTERNAL',
+            )
         op.execute("DROP TYPE authtype_old;")
-    elif op.get_context().dialect.name == 'sqlite':
-        # # INFO - G.M - 2018-11-27 - Don't need to do something in sqlite
-        # because it don't support enum and field is already VARCHAR(8)
-        pass
     else:
         # INFO - G.M - 2018-11-27 - MYSQL case
         enum = sa.Enum('INTERNAL', 'LDAP', name='authtype')
         enum.create(op.get_bind(), checkfirst=False)
-        op.alter_column(
-            'users',
-            'auth_type',
-            type_=enum,
-        )
+        with op.batch_alter_table('users') as batch_op:
+            batch_op.alter_column(
+                'auth_type',
+                type_=enum,
+            )

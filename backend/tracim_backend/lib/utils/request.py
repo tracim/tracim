@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import re
 import typing
 from json import JSONDecodeError
+from os.path import dirname, basename
 
 from pyramid.request import Request
 from sqlalchemy.orm import Session
@@ -197,12 +199,14 @@ class TracimContext(object):
 
     # General context parameters
 
+    @property
     def dbsession(self) -> Session:
         """
         Current session available
         """
         raise NotImplemented()
 
+    @property
     def app_config(self) -> CFG:
         """
         Current config available

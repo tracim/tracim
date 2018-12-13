@@ -4,6 +4,7 @@ import zope.sqlalchemy
 from sqlalchemy import engine_from_config
 from sqlalchemy.event import listen
 from sqlalchemy.orm import configure_mappers
+from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from tracim_backend.models.auth import Group
@@ -27,6 +28,10 @@ def get_session_factory(engine):
     factory.configure(bind=engine)
     return factory
 
+def get_scoped_session_factory(engine):
+    factory = scoped_session(sessionmaker(expire_on_commit=False))
+    factory.configure(bind=engine)
+    return factory
 
 def get_tm_session(session_factory, transaction_manager):
     """

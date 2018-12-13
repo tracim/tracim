@@ -89,11 +89,6 @@ Stamp current version of database to last (useful for migration):
 
     alembic -c development.ini stamp head
 
-create wsgidav configuration file for webdav:
-
-    cp wsgidav.conf.sample wsgidav.conf
-
-
 ## Run Tracim_backend web services With Uwsgi : great for production ##
 
 if not did before, you need to create a color.json file at root of tracim :
@@ -120,7 +115,6 @@ Run all web services with uwsgi
     ## UWSGI SERVICES
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
-    export TRACIM_WEBDAV_CONF_PATH="$(pwd)/wsgidav.conf"
     # pyramid webserver
     uwsgi -d /tmp/tracim_web.log --http-socket :6543 --plugin python3 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
@@ -155,7 +149,6 @@ and :
     module = wsgi.webdav:application
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
-    env = TRACIM_WEBDAV_CONF_PATH=<PATH>/tracim/backend/wsgidav.conf
 
 You can then run the process this way :
 
