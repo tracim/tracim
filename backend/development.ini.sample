@@ -112,6 +112,8 @@ auth_types = internal
 ; ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
 ## The bind password
 ; ldap_bind_pass = toor
+## Base dn to make queries of users
+; ldap_user_base_dn = ou=Users,dc=directory,dc=fsf,dc=org
 ## Attribute name of user record who contain user login (email)
 ; ldap_login_attribute = mail
 ## Attribute for default name of new user from ldap
