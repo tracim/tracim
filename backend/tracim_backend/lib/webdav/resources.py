@@ -957,7 +957,7 @@ class OtherFileResource(FileResource):
 
     @webdav_check_right(is_reader)
     def getContentType(self) -> str:
-        return 'text/html'
+        return 'text/html; charset=utf-8'
 
     @webdav_check_right(is_reader)
     def getContent(self):
