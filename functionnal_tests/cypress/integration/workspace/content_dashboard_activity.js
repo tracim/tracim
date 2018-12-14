@@ -5,7 +5,7 @@ describe('content :: workspace > dashbord', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
     cy.create_thread()
     cy.visit('/ui/workspaces/1/dashboard')
   })

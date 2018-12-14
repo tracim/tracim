@@ -1,0 +1,113 @@
+const sharedSpaceManager = 'Shared space manager'
+
+describe("Member's workspace", () => {
+  before(() => {
+    cy.resetDB()
+    cy.setupBaseDB()
+  })
+
+  beforeEach(() => {
+    cy.loginAs('administrators')
+    cy.visit('/ui/workspaces/1/dashboard')
+  })
+
+  it('add a new user to workspace using email', () => {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.createRandomUser()
+      .then(user => {
+        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('.autocomplete__item__name')
+          .contains(user.public_name)
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains(sharedSpaceManager)
+          .click()
+        cy.contains('Validate').click()
+        cy.get('[data-cy=flashmessage]').contains('Member added').should('be.visible')
+        cy.get('[data-cy=memberlist]').contains(user.public_name)
+      })
+  })
+
+  it('add a new user to workspace using public name', () => {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.createRandomUser()
+      .then(user => {
+        cy.get('[data-cy=addmember]').type(user.public_name)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains(user.public_name)
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains(sharedSpaceManager)
+          .click()
+        cy.contains('Validate').click()
+        cy.get('[data-cy=flashmessage]').contains('Member added').should('be.visible')
+        cy.get('[data-cy=memberlist]').contains(user.public_name)
+      })
+  })
+
+  it('disable button with no role', () => {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.createRandomUser()
+      .then(user => {
+        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains(user.public_name)
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains('Validate')
+          .should('be.disabled')
+      })
+  })
+
+  it('does not allow to add a member twice using public name', () => {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.createRandomUser()
+      .then(user => {
+        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains(user.public_name)
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains(sharedSpaceManager)
+          .click()
+        cy.contains('Validate').click()
+        cy.get('.flashmessage__container__close__icon').click()
+        cy.get('[data-cy=memberlist__btnadd]').click()
+        cy.get('[data-cy=addmember]').type(user.public_name)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains('I know this user exist')
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains(sharedSpaceManager)
+          .click()
+        cy.contains('Validate').click()
+        cy.get('[data-cy=flashmessage]').contains('Unknown user')
+      })
+  })
+
+  it('does not allow to add a member twice using public email', () => {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.createRandomUser()
+      .then(user => {
+        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains(user.public_name)
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains(sharedSpaceManager)
+          .click()
+        cy.contains('Validate').click()
+        cy.get('.flashmessage__container__close__icon').click()
+        cy.get('[data-cy=memberlist__btnadd]').click()
+        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains('Send an invitational email to this user')
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains(sharedSpaceManager)
+          .click()
+        cy.contains('Validate').click()
+        cy.get('[data-cy=flashmessage]').contains('Unknown user')
+      })
+  })
+})

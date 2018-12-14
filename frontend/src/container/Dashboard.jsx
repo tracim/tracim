@@ -415,6 +415,7 @@ class Dashboard extends React.Component {
                             // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
                             creationLabel={props.t(contentType.creationLabel)}
                             onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                            appSlug={app.slug}
                             key={app.label}
                           />
                         )

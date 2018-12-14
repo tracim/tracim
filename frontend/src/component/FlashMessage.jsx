@@ -24,7 +24,7 @@ const FlashMessage = props => {
   const dataType = dataTypeArray.find(t => t.id === props.flashMessage[0].type)
 
   return (
-    <div className='flashmessage'>
+    <div className='flashmessage' data-cy='flashmessage'>
       {props.flashMessage.length > 0 && (
         <div className='flashmessage__container card'>
           <div className={classnames('flashmessage__container__header', `bg-${dataType.id}`)} />

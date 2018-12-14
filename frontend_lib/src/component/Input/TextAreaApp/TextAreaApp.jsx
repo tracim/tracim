@@ -36,6 +36,7 @@ export const TextAreaApp = props =>
 
       <button
         type='button'
+        data-cy='editionmode__button__submit'
         className={`${props.customClass}__submit editionmode__button__submit btn highlightBtn`}
         onClick={props.onClickValidateBtn}
         disabled={props.disableValidateBtn}

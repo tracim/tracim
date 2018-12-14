@@ -72,11 +72,11 @@ You can now enter the application at
 
 ----
 
-## Running tests with cypress ##
+## Running tests with Cypress ##
 
 ----
 
-## Installation of cypress: Automated script for easy setup ##
+## Installation of Cypress: Automated script for easy setup ##
 
 This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress and his dependency's.
 
@@ -87,18 +87,22 @@ You can run also with root if you add root in parameter of this script.
 
 If you need to run cypress with external server of tracim, modify "baseurl" in cypress.json (look here for more detail: https://docs.cypress.io/guides/references/configuration.html#Options ).
 
-## Run tests with command line ##
+## Prerequisit for running Cypress tests
 
-Warning: cypress use the database that you have configure in development.ini and erase data in this database. Make a backup of your databse before starting test.
+⚠ To launch cypress test, you need a running tracim with specific config
 
-This command run all test present in 'cypress_test' folder.
+    cd backend/
+    source env/bin/activate
+    pserve cypress_test.ini
+
+### Run tests with command line ##
+
+This command run all test present in 'functionnal_tests/cypress/integration' folder.
 
     cd functionnal_tests/
     npm run cypress-run
 
-## Run tests with cypressgui ##
-
-Warning: cypress use the database that you have configure in development.ini and erase data in this database. Make a backup of your databse before starting test.
+### Run tests with cypressgui ##
 
 Open Cypress with graphical interface. You can show test running directly in web interface.
 

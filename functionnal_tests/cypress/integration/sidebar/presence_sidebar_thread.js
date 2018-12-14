@@ -5,7 +5,7 @@ describe('content :: home_page', function () {
   })
 
   beforeEach(function () {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit('/')
     cy.get('.sidebar__content__navigation__workspace__item__number').click()
   })
