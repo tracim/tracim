@@ -1,7 +1,9 @@
 import i18n from './i18n.js'
 
+const radicaleConfig = require('../configRadicale.json')
+
 export const caldavzapConfig = {
-  RADICALE_CLIENT_BASE_URL_TEMPLATE: 'http://127.0.0.1:6543/radicale'
+  radicaleUrl: radicaleConfig.RADICALE_CLIENT_BASE_URL_TEMPLATE
 }
 
 export const FETCH_CONFIG = {

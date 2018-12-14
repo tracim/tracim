@@ -70,13 +70,13 @@ class Caldavzap extends React.Component {
       globalAccountSettings: {
         baseHref: 'http://',
         user :{
-          userBaseUrl: `${caldavzapConfig.RADICALE_CLIENT_BASE_URL_TEMPLATE}/user`,
+          userBaseUrl: `${caldavzapConfig.radicaleUrl}/user/`,
           email: state.loggedUser.email,
           token: ''
         },
         workspace: {
           hasUrls: false, // @fixme this should come from api ?
-          workspaceBaseUrl: `${caldavzapConfig.RADICALE_CLIENT_BASE_URL_TEMPLATE}/workspace`,
+          workspaceBaseUrl: `${caldavzapConfig.radicaleUrl}/workspace/`,
         }
       },
       userLang: state.loggedUser.lang
