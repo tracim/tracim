@@ -71,11 +71,11 @@ module.exports = {
       test: /\.styl$/,
       use: ['style-loader', 'css-loader', 'stylus-loader']
     }, {
-      test: /\.(jpg|png|svg)$/,
-      loader: 'url-loader',
-      options: {
-        limit: 25000
-      }
+      test: /\.(jpg|png|svg|gif)$/,
+      loader: 'url-loader'
+    }, {
+      test: /\.(eot|woff|ttf)$/,
+      loader: 'url-loader'
     }]
   },
   resolve: {

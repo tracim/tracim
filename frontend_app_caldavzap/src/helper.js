@@ -1,5 +1,9 @@
 import i18n from './i18n.js'
 
+export const caldavzapConfig = {
+  RADICALE_CLIENT_BASE_URL_TEMPLATE: 'http://127.0.0.1:6543/radicale'
+}
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',

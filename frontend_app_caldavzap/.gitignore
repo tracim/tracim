@@ -1,6 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 .git/
+dist/app
+dist/assets
 dist/caldavzap.app.js
-dist/caldavzap.app/dev.js
+dist/caldavzap.bundle.app.js
 node_modules/

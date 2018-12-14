@@ -202,6 +202,8 @@ class Tracim extends React.Component {
 
           <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
+          <Route exact path={PAGE.CALENDAR} render={() => <AppFullscreenRouter />} />
+
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}

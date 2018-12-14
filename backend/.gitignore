@@ -69,3 +69,4 @@ radicale_storage/
 .mypy_cache/
 
 backend.json
+radicale.ini

@@ -2,11 +2,10 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n,
-  handleFetchResult,
-  CardPopup
+  addAllResourceI18n
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
+import { caldavzapConfig } from '../helper.js'
 
 require('../css/index.styl')
 
@@ -38,6 +37,7 @@ class Caldavzap extends React.Component {
 
   componentDidMount () {
     console.log('%c<Caldavzap> did mount', `color: ${this.state.config.hexcolor}`)
+    document.getElementById('appFullscreenContainer').style.width = '100%'
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -49,6 +49,7 @@ class Caldavzap extends React.Component {
   componentWillUnmount () {
     console.log('%c<Caldavzap> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.getElementById('appFullscreenContainer').style.width = 'auto'
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
@@ -61,14 +62,32 @@ class Caldavzap extends React.Component {
   })
 
   render () {
-    const { props, state } = this
+    const { state } = this
 
     if (!state.isVisible) return null
 
+    const config = {
+      globalAccountSettings: {
+        baseHref: 'http://',
+        user :{
+          userBaseUrl: `${caldavzapConfig.RADICALE_CLIENT_BASE_URL_TEMPLATE}/user`,
+          email: state.loggedUser.email,
+          token: ''
+        },
+        workspace: {
+          hasUrls: false, // @fixme this should come from api ?
+          workspaceBaseUrl: `${caldavzapConfig.RADICALE_CLIENT_BASE_URL_TEMPLATE}/workspace`,
+        }
+      },
+      userLang: state.loggedUser.lang
+    }
+
     return (
-      <div>
-        Caldav
-      </div>
+      <iframe
+        id='cladavzapIframe'
+        src='/assets/_caldavzap/index.tracim.html'
+        data-config={JSON.stringify(config)}
+      />
     )
   }
 }

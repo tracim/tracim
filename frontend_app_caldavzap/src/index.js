@@ -2,10 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Caldavzap from './container/Caldavzap.jsx'
 
-require('./css/index.styl')
+// require('./css/index.styl')
 
 const appInterface = {
-  name: 'admin_workspace_user',
+  name: 'caldavzap',
   isRendered: false,
   renderAppFullscreen: data => {
     return ReactDOM.render(

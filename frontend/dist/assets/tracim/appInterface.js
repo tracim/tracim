@@ -5,19 +5,21 @@
   getSelectedApp = name => {
     switch (name) {
       case 'html-document':
-        return appHtmlDocument.default
+        return (appHtmlDocument || {defaul: {}}).default
       case 'thread':
-        return appThread.default
+        return (appThread || {defaul: {}}).default
       case 'file':
-        return appFile.default
+        return (appFile || {defaul: {}}).default
       case 'workspace':
-        return appWorkspace.default
+        return (appWorkspace || {defaul: {}}).default
       case 'folder':
-        return appFolderAdvanced.default
+        return (appFolderAdvanced || {defaul: {}}).default
       case 'admin_workspace_user':
-        return appAdminWorkspaceUser.default
+        return (appAdminWorkspaceUser || {defaul: {}}).default
       case 'workspace_advanced':
-        return appWorkspaceAdvanced.default
+        return (appWorkspaceAdvanced || {defaul: {}}).default
+      case 'caldavzap':
+        return (appCaldavzap || {defaul: {}}).default
       default:
         return null
     }
