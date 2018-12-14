@@ -14,11 +14,11 @@ if [ ! -f /etc/tracim/production.ini ]; then
     sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = \/var\/tracim|g" /etc/tracim/production.ini
     case "$DATABASE_TYPE" in
       mysql)
-        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE+pymysql:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/production.ini ;;
+        sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/production.ini ;;
       postgresql)
-        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/production.ini ;;
+        sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/production.ini ;;
       sqlite)
-        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/tracim\/tracim.sqlite/" /etc/tracim/production.ini ;;
+        sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = sqlite:\/\/\/\/var\/tracim\/tracim.sqlite|g" /etc/tracim/production.ini ;;
     esac
 fi
 if [ ! -L /tracim/backend/production.ini ]; then
