@@ -125,7 +125,12 @@ class CFG(object):
             'auth_types', 'internal'
         )
         self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
-
+        if AuthType.REMOTE is self.AUTH_TYPES:
+            raise Exception(
+                'ERROR: "remote" auth not allowed in auth_types'
+                ' list, use remote_user_header instead'
+            )
+        self.REMOTE_USER_HEADER = settings.get('remote_user_header', None)
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
         #     'content.update.allowed.duration',

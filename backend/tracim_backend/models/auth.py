@@ -63,6 +63,7 @@ class AuthType(enum.Enum):
     INTERNAL = 'internal'
     LDAP = 'ldap'
     UNKNOWN = 'unknown'
+    REMOTE = 'remote'
 
 class Group(DeclarativeBase):
 

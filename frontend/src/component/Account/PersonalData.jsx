@@ -61,16 +61,17 @@ export class PersonalData extends React.Component {
             />
           </div>
 
-          <div className='d-flex align-items-center flex-wrap mb-4'>
-            <input
-              className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
-              type='email'
-              placeholder={props.t('New email')}
-              value={state.newEmail}
-              onChange={this.handleChangeEmail}
-            />
-
-          </div>
+          {['internal', 'unknown'].includes(props.userAuthType) && (
+            <div className='d-flex align-items-center flex-wrap mb-4'>
+              <input
+                className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                type='email'
+                placeholder={props.t('New email')}
+                value={state.newEmail}
+                onChange={this.handleChangeEmail}
+              />
+            </div>
+          )}
 
           {state.newEmail !== '' && (
             <div className='d-flex align-items-center flex-wrap mb-4'>
@@ -105,6 +106,7 @@ export class PersonalData extends React.Component {
 }
 
 PersonalData.propTypes = {
+  userAuthType: PropTypes.string,
   onClickSubmit: PropTypes.func
 }
 

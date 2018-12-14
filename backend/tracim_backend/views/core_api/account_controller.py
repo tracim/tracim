@@ -2,6 +2,10 @@ from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import \
+    ExternalAuthUserEmailModificationDisallowed
+from tracim_backend.exceptions import \
+    ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
@@ -122,6 +126,7 @@ class AccountController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST) # nopep8
     @check_right(is_user)
     @hapic.input_body(SetEmailSchema())
     @hapic.output_body(UserSchema())
@@ -146,6 +151,7 @@ class AccountController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST) # nopep8
     @check_right(is_user)
     @hapic.input_body(SetPasswordSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
