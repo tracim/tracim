@@ -21,8 +21,8 @@ if [ ! -f /etc/tracim/production.ini ]; then
         sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = sqlite:\/\/\/\/var\/tracim\/tracim.sqlite|g" /etc/tracim/production.ini ;;
     esac
 fi
-if [ ! -L /tracim/backend/production.ini ]; then
-    ln -sf /etc/tracim/production.ini /tracim/backend/production.ini
+if [ ! -L /tracim/backend/development.ini ]; then
+    ln -sf /etc/tracim/production.ini /tracim/backend/development.ini
 fi
 
 # Create apache conf file if none exists
