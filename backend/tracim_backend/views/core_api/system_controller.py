@@ -76,13 +76,15 @@ class SystemController(Controller):
         return system_api.get_about()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
     @hapic.output_body(ConfigSchema(),)
     def config(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns configuration information required for frontend.
         At the moment it only returns if email notifications are activated.
         """
+        # FIXME - G.M - 2018-12-14 - [config_unauthenticated] #1270
+        # do not allow unauthenticated user to
+        # get all config info
         app_config = request.registry.settings['CFG']
         system_api = SystemApi(app_config)
         return system_api.get_config()
