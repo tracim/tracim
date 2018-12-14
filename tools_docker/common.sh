@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
 # Create tracim conf file if none exists
-if [ ! -f /etc/tracim/config.ini ]; then
+if [ ! -f /etc/tracim/production.ini ]; then
     CONFIG_FILE_IS_NEW=1
     KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
-    cp /tracim/backend/development.ini.sample /etc/tracim/config.ini
-    sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/config.ini
-    sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/config.ini
-    sed -i "s|basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/config.ini
-    sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/config.ini
-    sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = \/var\/tracim\/depot|g" /etc/tracim/config.ini
-    sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = \/var\/tracim|g" /etc/tracim/config.ini
+    cp /tracim/backend/development.ini.sample /etc/tracim/production.ini
+    sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/production.ini
+    sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/production.ini
+    sed -i "s|basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/production.ini
+    sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/production.ini
+    sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = \/var\/tracim\/depot|g" /etc/tracim/production.ini
+    sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = \/var\/tracim|g" /etc/tracim/production.ini
     case "$DATABASE_TYPE" in
       mysql)
-        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE+pymysql:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini ;;
+        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE+pymysql:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/production.ini ;;
       postgresql)
-        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini ;;
+        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/production.ini ;;
       sqlite)
-        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/tracim\/tracim.sqlite/" /etc/tracim/config.ini ;;
+        sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/tracim\/tracim.sqlite/" /etc/tracim/production.ini ;;
     esac
 fi
-if [ ! -L /tracim/backend/development.ini ]; then
-    ln -sf /etc/tracim/config.ini /tracim/backend/development.ini
+if [ ! -L /tracim/backend/production.ini ]; then
+    ln -sf /etc/tracim/production.ini /tracim/backend/production.ini
 fi
 
 # Create apache conf file if none exists
