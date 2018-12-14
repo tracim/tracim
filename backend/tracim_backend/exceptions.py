@@ -232,6 +232,9 @@ class WrongLDAPCredentials(TracimException):
     pass
 
 
+class RemoteUserAuthDisabled(TracimException):
+    pass
+
 class UserAuthenticatedIsDeleted(TracimException):
     error_code = error.AUTHENTICATION_FAILED
 

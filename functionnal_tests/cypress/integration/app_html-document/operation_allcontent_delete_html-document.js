@@ -5,7 +5,7 @@ describe('operation :: workspace > delete > html-document', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
   })
   it('all content > delete html-doc', function () {
     cy.visit('/ui/workspaces/1/dashboard')
@@ -17,7 +17,7 @@ describe('operation :: workspace > delete > html-document', function () {
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'value', titre1)
-    cy.get('.cardPopup__container .createcontent .createcontent__form__button.btn-primary').click()
+    cy.get('.cardPopup__container .createcontent .createcontent__form__button.highlightBtn').click()
     cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('not.be.visible')
     cy.get('.html-document.visible').should('be.visible')
     cy.get('.html-document.visible .html-document__contentpage__messagelist__version.revision').should('be.visible')

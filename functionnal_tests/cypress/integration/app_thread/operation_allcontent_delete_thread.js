@@ -5,7 +5,7 @@ describe('operation :: workspace > delete > thread', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
   })
   it('all content > delete thread', function () {
     cy.visit('/ui/workspaces/1/dashboard')

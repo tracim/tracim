@@ -5,7 +5,7 @@ describe('content :: workspace > dashbord', function () {
   })
 
   beforeEach(function () {
-    cy.login('users')
+    cy.loginAs('users')
     cy.visit('/ui/workspaces/1/dashboard')
   })
 

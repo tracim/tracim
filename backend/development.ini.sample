@@ -93,15 +93,39 @@ advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/session
 # AUTH
 ####
 
-## Backend API config:
-# Api key auth is disabled by default,
-# you should set a not-null value to api.key to active it:
+### API KEY AUTH ###
+# Api key auth allow to access to any authenticated user using
+# 'Tracim-Api-Key'(secret share between client and tracim)
+# and 'Tracim-Api-Login' (mail of existing user) headers.
+
+## Api key auth is disabled by default,
+## you should set a not-null value to api.key to active it:
 api.key = %(basic_setup.api_key)s
 ## base url of the backend API, default to same as website.base_url
 ; api.base_url = http://localhost:6543
 
+### Remote User Auth ###
+# remote user auth give authorized access to user using a simple header with
+# email of user, if user does not exist, new user will be created.
+# This allow to delegate auth mecanism to webserver.
+# this a true auth mecanism like internal or ldap,
+# this mean user created this way will be attached to this mecanism.
+
+
+## Remote user header should be a CGI env var.
+## most common value is "REMOTE_USER".
+## You can also directly use HTTP header instead of standard CGI env var
+## using "HTTP_" CGI env var which are HTTP header
+## but be careful about spoofing, you should be sure that no-one can set
+## header and pretend to be anyone. Only trusted server should be able to
+## set remote_user_header.
+## remote user auth is disabled by default,
+## you should set a not-null value to auth_remote_header to active it:
+remote_user_header =
+
 ## Auth type list (internal or ldap), can be a list of item separated by ','
 ## and ordered by priority
+## auth_type 'remote' is not allowed there, set remote_auth_header.
 auth_types = internal
 # If auth_type is ldap, uncomment following ldap_* parameters
 ## LDAP server address
@@ -112,6 +136,8 @@ auth_types = internal
 ; ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
 ## The bind password
 ; ldap_bind_pass = toor
+## Base dn to make queries of users
+; ldap_user_base_dn = ou=Users,dc=directory,dc=fsf,dc=org
 ## Attribute name of user record who contain user login (email)
 ; ldap_login_attribute = mail
 ## Attribute for default name of new user from ldap

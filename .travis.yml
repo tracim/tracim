@@ -61,7 +61,8 @@ jobs:
   - stage: functional
     name: Functional tests using Cypress
     env:
-      - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
+      - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
       - TRAVIS_NODE_VERSION="10"
     before_install:
       - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
@@ -74,7 +75,7 @@ jobs:
     before_script:
       - cd backend
       - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-      - nohup pserve development.ini&
+      - nohup pserve cypress_test.ini&
       - cd ../functionnal_tests
 
     script:

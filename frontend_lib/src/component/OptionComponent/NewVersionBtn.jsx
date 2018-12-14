@@ -6,6 +6,7 @@ const NewVersionBtn = props => {
   return (
     <button
       className='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
+      data-cy='wsContentGeneric__option__menu__addversion'
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}
       style={{

@@ -40,7 +40,9 @@ class WebdavAppFactory(object):
         config['acceptdigest'] = False
         config['defaultdigest'] = False
         # check this for apache auth mecanism
-        config['trusted_auth_header'] = None
+        if app_config.REMOTE_USER_HEADER:
+            config['trusted_auth_header'] = app_config.REMOTE_USER_HEADER
+
 
         config['verbose'] = app_config.WEBDAV_VERBOSE_LEVEL
         config['dir_browser']['enable'] = app_config.WEBDAV_DIR_BROWSER_ENABLED

@@ -41,13 +41,14 @@ class PopupCreateContent extends React.Component {
               </div>
             </div>
 
-            <form className='createcontent__form'>
+            <form className='createcontent__form' data-cy='createcontent__form'>
               {props.children
                 ? props.children
                 : (
                   <input
                     type='text'
                     className='createcontent__form__input'
+                    data-cy='createcontent__form__input'
                     placeholder={props.inputPlaceholder}
                     value={props.contentName}
                     onChange={props.onChangeContentName}
@@ -60,6 +61,7 @@ class PopupCreateContent extends React.Component {
                 <button
                   type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page
                   className='createcontent__form__button btn highlightBtn'
+                  data-cy='createcontent__form__button'
                   onClick={props.onValidate}
                   style={{
                     backgroundColor: props.customColor,
