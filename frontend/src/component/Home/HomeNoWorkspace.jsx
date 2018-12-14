@@ -32,6 +32,7 @@ export const HomeNoWorkspace = props =>
     {props.canCreateWorkspace && (
       <button
         className='homepagecard__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
+        data-cy='homepagecard__btn'
         onClick={props.onClickCreateWorkspace}
       >
         {props.t('create a shared space')}

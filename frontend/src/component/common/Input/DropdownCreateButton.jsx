@@ -11,6 +11,7 @@ const DropdownCreateButton = props => {
         className={classnames(`${props.parentClass}__label`, 'dropdownCreateBtn__label btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover dropdown-toggle')}
         type='button'
         id='dropdownCreateBtn'
+        data-cy='dropdownCreateBtn'
         data-toggle='dropdown'
         aria-haspopup='true'
         aria-expanded='false'

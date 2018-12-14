@@ -1,4 +1,5 @@
 {
   "description": "A super description of my workspace.",
-  "label": "My Workspace"
+  "label": "My Workspace",
+  "workspace_id": 1
 }

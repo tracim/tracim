@@ -5,7 +5,7 @@ describe('operation :: workspace > delete > html-document', function () {
   })
 
   beforeEach(function () {
-    cy.login('administrators')
+    cy.loginAs('administrators')
   })
   it('all content > delete html-doc', function () {
     cy.visit('/ui/workspaces/1/dashboard')
