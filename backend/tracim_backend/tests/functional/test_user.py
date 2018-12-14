@@ -4416,6 +4416,146 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[1]['avatar_url'] is None
 
 
+class TestSetEmailPasswordLdapEndpoint(FunctionalTest):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for PUT /api/v2/users/{user_id}/email
+    Tests for PUT /api/v2/users/{user_id}/password
+
+    for ldap user
+    """
+    fixtures = [BaseFixture]
+    config_section = 'functional_ldap_and_internal_test'
+
+    def test_api__set_user_email__ok_200__ldap_user(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password=None,
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            auth_type=AuthType.LDAP,
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # check before
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['email'] == 'test@test.test'
+
+        # Set password
+        params = {
+            'email': 'mysuperemail@email.fr',
+            'loggedin_user_password': 'admin@admin.admin',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/email'.format(user_id),
+            params=params,
+            status=400,
+        )
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['email'] == 'test@test.test'
+        assert res['auth_type'] == 'ldap'
+
+    def test_api__set_user_password__ok_200__admin(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password=None,
+            auth_type=AuthType.LDAP,
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # check before
+        user = uapi.get_one(user_id)
+        assert not user.validate_password('mynewpassword')
+        # Set password
+        params = {
+            'new_password': 'mynewpassword',
+            'new_password2': 'mynewpassword',
+            'loggedin_user_password': 'admin@admin.admin',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/{}/password'.format(user_id),
+            params=params,
+            status=400,
+        )
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+        # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one(user_id)
+        assert not user.validate_password('mynewpassword')
+
 class TestSetEmailEndpoint(FunctionalTest):
     # -*- coding: utf-8 -*-
     """
