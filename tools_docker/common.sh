@@ -3,8 +3,12 @@
 # Create tracim conf file if none exists
 if [ ! -f /etc/tracim/config.ini ]; then
     CONFIG_FILE_IS_NEW=1
+    KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
+    SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     cp /tracim/backend/development.ini.sample /etc/tracim/config.ini
-    sed -i "s|listen = .*|listen = 127.0.0.1:6543|g" /etc/tracim/config.ini
+    sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/config.ini
+    sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/config.ini
+    sed -i "s|listen = .*|listen = 127.0.0.1:8080|g" /etc/tracim/config.ini
     sed -i "s/\(depot_storage_dir *= *\).*/depot_storage_dir = \/var\/tracim\/depot/" /etc/tracim/config.ini
     sed -i "s|\(session.data_dir *= *\).*|session.data_dir = \/var\/tracim\/session.data\/|g" /etc/tracim/config.ini
     sed -i "s|\(session.lock_dir *= *\).*|session.lock_dir = \/var\/tracim\/session.lock\/|g" /etc/tracim/config.ini
