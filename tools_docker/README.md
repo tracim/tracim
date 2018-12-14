@@ -61,9 +61,9 @@ To build image
 You can build with specific branch
 
     cd tools_docker/
-    docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<branch_name> .
+    docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
 
-Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:feature/new_app .`
+Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
     
 You can also build image with specific tag (This build is make just with necessary files:)
 
