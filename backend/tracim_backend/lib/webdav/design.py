@@ -128,7 +128,7 @@ _LABELS = {
 
 THREAD_MESSAGE = """
   <p>
-    {posting_time},{comment_owner} wrote :
+    {posting_time},{comment_owner} wrote:
   </p>
   <p style="padding-left: 1em;">
     {comment_content}
