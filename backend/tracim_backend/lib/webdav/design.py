@@ -130,7 +130,7 @@ THREAD_MESSAGE = """
   <p>
     {posting_time},{comment_owner} wrote :
   </p>
-  <p>
+  <p style="padding-left: 1em;">
     {comment_content}
   </p>
 
