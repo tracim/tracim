@@ -8,10 +8,10 @@ if [ ! -f /etc/tracim/config.ini ]; then
     cp /tracim/backend/development.ini.sample /etc/tracim/config.ini
     sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/config.ini
     sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/config.ini
-    sed -i "s|listen = .*|listen = 127.0.0.1:8080|g" /etc/tracim/config.ini
-    sed -i "s/\(depot_storage_dir *= *\).*/depot_storage_dir = \/var\/tracim\/depot/" /etc/tracim/config.ini
-    sed -i "s|\(session.data_dir *= *\).*|session.data_dir = \/var\/tracim\/session.data\/|g" /etc/tracim/config.ini
-    sed -i "s|\(session.lock_dir *= *\).*|session.lock_dir = \/var\/tracim\/session.lock\/|g" /etc/tracim/config.ini
+    sed -i "s|basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/config.ini
+    sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/config.ini
+    sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = \/var\/tracim\/depot|g" /etc/tracim/config.ini
+    sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = \/var\/tracim|g" /etc/tracim/config.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s/\(^sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE+pymysql:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini ;;
