@@ -216,7 +216,11 @@ class Account extends React.Component {
                 {(() => {
                   switch (state.subComponentMenu.find(({active}) => active).name) {
                     case 'personalData':
-                      return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} displayAdminInfo />
+                      return <PersonalData
+                        userAuthType={props.user.auth_type}
+                        onClickSubmit={this.handleSubmitNameOrEmail}
+                        displayAdminInfo
+                      />
 
                     // case 'calendar':
                     //   return <Calendar user={props.user} />
