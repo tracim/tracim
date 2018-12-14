@@ -19,10 +19,11 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 
 
@@ -1671,6 +1672,91 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         assert res[1]['public_name'] == test_user2.display_name
         assert res[1]['avatar_url'] is None
 
+
+class TestAccountSetPasswordEmailLDAPAuthEndpoint(FunctionalTest):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for PUT /api/v2/users/me/email
+    Tests for PUT /api/v2/users/me/password
+    for ldap user
+    """
+    fixtures = [BaseFixture]
+    config_section = 'functional_ldap_and_internal_test'
+
+    @pytest.mark.ldap
+    def test_api_set_account_password__err__400__setting_password_unallowed_for_ldap_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        user_id = res.json_body['user_id']
+        # Set password
+        params = {
+            'new_password': 'mynewpassword',
+            'new_password2': 'mynewpassword',
+            'loggedin_user_password': 'professor',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/me/password',
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['email'] == 'hubert@planetexpress.com'
+        assert res['auth_type'] == 'ldap'
+
+    @pytest.mark.ldap
+    def test_api_set_account_email__err__400__setting_email_unallowed_for_ldap_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'hubert@planetexpress.com',
+                'professor'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        user_id = res.json_body['user_id']
+        # Set password
+        params = {
+            'email': 'hubertnewemail@planetexpress.com',
+            'loggedin_user_password': 'professor',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/users/me/email',
+            params=params,
+            status=400,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['email'] == 'hubert@planetexpress.com'
+        assert res['auth_type'] == 'ldap'
 
 class TestSetEmailEndpoint(FunctionalTest):
     # -*- coding: utf-8 -*-
