@@ -49,10 +49,10 @@ RUN apt update && apt upgrade -qy \
     && rm -rf /var/lib/apt/list/* \
 # Get the source from GitHub
     && git clone $TAG https://github.com/tracim/tracim.git tracim \
-    && git checkout $BRANCH \
-    && cd /tracim/ \
 # Go in repo folder
-    && cd /tracim \
+    && cd /tracim/ \
+# Checkout to branch if ARG BRANCH specify
+    && git checkout $BRANCH \
 # install frontend
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh \
