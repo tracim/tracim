@@ -73,7 +73,7 @@ module.exports = {
       loader: 'file-loader',
       options: {
         name: '[name].[ext]',
-        outputPath: 'images/', // asset/ is in output.path
+        outputPath: 'images/', // assets/ is in output.path
         limit: 2000
       }
     }]
