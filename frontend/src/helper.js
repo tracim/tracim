@@ -148,6 +148,10 @@ export const PROFILE = {
 
 export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}
 
+const USER_AUTH_INTERNAL = 'internal'
+const USER_AUTH_UNKNOWN = 'unknown'
+export const editableUserAuthTypeList = [USER_AUTH_INTERNAL, USER_AUTH_UNKNOWN]
+
 // Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.
 // We will later implement a better solution

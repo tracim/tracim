@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
+import { editableUserAuthTypeList } from '../../helper.js'
 
 require('./PersonalData.styl')
 
@@ -61,7 +62,7 @@ export class PersonalData extends React.Component {
             />
           </div>
 
-          {['internal', 'unknown'].includes(props.userAuthType) && (
+          {editableUserAuthTypeList.includes(props.userAuthType) && (
             <div className='d-flex align-items-center flex-wrap mb-4'>
               <input
                 className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
