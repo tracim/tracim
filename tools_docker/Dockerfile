@@ -8,8 +8,18 @@ ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
+
+RUN \
+# create command to clone repo
+    get_source_from_github() { \
+    if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
+    then git clone -b $TAG --single-branch https://github.com/tracim/tracim.git tracim; \
+    elif ([ "$TAG" = "" ] && [ "$BRANCH" != "" ]); \
+    then git clone https://github.com/tracim/tracim.git tracim && cd tracim/ && git checkout $BRANCH && cd -; \
+    else git clone https://github.com/tracim/tracim.git tracim;fi \
+    } \
 # Install required packages
-RUN apt update && apt upgrade -qy \
+    && apt update && apt upgrade -qy \
     && apt install -qy \
     apache2 \
     build-essential \
@@ -47,12 +57,10 @@ RUN apt update && apt upgrade -qy \
     && apt autoremove -qy \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/* \
-# Get the source from GitHub
-    && git clone $TAG https://github.com/tracim/tracim.git tracim \
+# clone repo
+    && get_source_from_github $TAG $BRANCH \
 # Go in repo folder
     && cd /tracim/ \
-# Checkout to branch if ARG BRANCH specify
-    && git checkout $BRANCH \
 # install frontend
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh \

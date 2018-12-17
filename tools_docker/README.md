@@ -65,9 +65,9 @@ You can build with specific branch
 
 Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
     
-You can also build image with specific tag (This build is make just with necessary files:)
+You can also build image with specific tag (This build is make just with necessary files: no other branch available)
 
     cd tools_docker/
-    docker build --build-arg TAG="-b <tag_name> --single-branch" -t algoo/tracim:<tag_name> .
+    docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
     
-Ex: `docker build --build-arg TAG="-b release_02.00.00 --single-branch" -t algoo/tracim:release_02.00.00 .`
+Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
