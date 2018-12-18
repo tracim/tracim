@@ -12,6 +12,8 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = \/var\/tracim\/depot|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = \/var\/tracim|g" /etc/tracim/development.ini
+    sed -i "s|webdav.listen = .*|webdav.listen = $WEBDAV_HOST:$WEBDAV_PORT|g" /etc/tracim/development.ini
+    sed -i "s|;webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
@@ -77,4 +79,20 @@ if [ ! -L /var/log/apache2/access.log ]; then
 fi
 if [ ! -L /var/log/apache2/error.log ]; then
   ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/error.log
+fi
+
+# Create service
+# UWSI
+if [ ! -f /etc/systemd/system/tracim_uwsgi.service ]; then
+    cp /tracim/tools_docker/Debian_Uwsgi/new_service.service.sample /etc/systemd/system/tracim_uwsgi.service
+    sed -i "s|Description=|Description=tracim_uwsgi service|g" /etc/systemd/system/tracim_uwsgi.service
+    sed -i "s|ExecStart=|ExecStart=/usr/bin/uwsgi --ini /tracim/uwsgi.ini --http-socket :8080 --plugin python3 --uid www-data --gid www-data|g" /etc/systemd/system/tracim_uwsgi.service
+fi
+
+# Webdav
+if [ ! -f /etc/systemd/system/tracim_webdav.service ]; then
+    cp /tracim/tools_docker/Debian_Uwsgi/new_service.service.sample /etc/systemd/system/tracim_webdav.service
+    sed -i "s|Description=|Description=tracim_webdav service|g" /etc/systemd/system/tracim_webdav.service
+    sed -i "s|ExecStart=|ExecStart=/tracim/backend/ tracimcli webdav start|g" /etc/systemd/system/tracim_webdav.service
+    sed -i "s|WorkingDirectory=/tracim/|WorkingDirectory=/tracim/backend/|g" /etc/systemd/system/tracim_webdav.service
 fi

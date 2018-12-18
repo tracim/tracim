@@ -62,4 +62,8 @@ chown www-data:www-data -R /var/tracim
 
 service redis-server start  # async email sending
 service apache2 start
-uwsgi --ini /tracim/uwsgi.ini --http-socket :8080 --plugin python3 --uid www-data --gid www-data
+if ([ "$WEBDAV_HOST" != "" ] && [ "$WEBDAV_PORT" != "" ]) ; then
+    cd /tracim/backend/
+    systemctl start tracim_webdav.service
+fi
+systemctl start tracim_uwsgi.service
