@@ -84,23 +84,7 @@ if [ ! -L /var/log/apache2/error.log ]; then
   ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/error.log
 fi
 
-# Create service
-# UWSI
-if [ ! -f /etc/systemd/system/tracim_uwsgi.service ]; then
-    cp /tracim/tools_docker/Debian_Uwsgi/new_service.service.sample /etc/systemd/system/tracim_uwsgi.service
-    sed -i "s|Description=|Description=tracim_uwsgi service|g" /etc/systemd/system/tracim_uwsgi.service
-    sed -i "s|ExecStart=|ExecStart=/usr/bin/uwsgi --ini /tracim/uwsgi.ini --http-socket :8080 --plugin python3 --uid www-data --gid www-data|g" /etc/systemd/system/tracim_uwsgi.service
-    chmod +x /etc/systemd/system/tracim_uwsgi.service
-fi
-
-# Webdav
-if [ ! -f /etc/systemd/system/tracim_webdav.service ]; then
-    cp /tracim/tools_docker/Debian_Uwsgi/new_service.service.sample /etc/systemd/system/tracim_webdav.service
-    sed -i "s|Description=|Description=tracim_webdav service|g" /etc/systemd/system/tracim_webdav.service
-    sed -i "s|ExecStart=|ExecStart=/usr/bin/uwsgi --ini /tracim/webdav.ini --http-socket :3030|g" /etc/systemd/system/tracim_webdav.service
-    chmod +x /etc/systemd/system/tracim_webdav.service
-fi
-# Webdav config
+# Create Webdav file/config if not exist
 if [ "$WEBDAV" = "start" ]; then
     if [ ! -f /etc/tracim/webdav.ini ];then
         cp /tracim/uwsgi.ini.sample /etc/tracim/webdav.ini
@@ -109,8 +93,12 @@ if [ "$WEBDAV" = "start" ]; then
         ln -s /etc/tracim/webdav.ini /tracim/webdav.ini
         sed -i "s|module = wsgi.web:application|module = wsgi.webdav:application|g" /etc/tracim/webdav.ini
     fi
-fi
-if [ "$WEBDAV" = "start" ]; then
+    if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
+        ln -s /etc/tracim/webdav.ini /etc/uwsgi/apps-available/tracim_webdav.ini
+    fi
+    if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
+        ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
+    fi
     sed -i "s|#<Directory "/">|<Directory "/">|g" /etc/tracim/apache2.conf
     sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
     sed -i "s|#    Dav On|    Dav On|g" /etc/tracim/apache2.conf
