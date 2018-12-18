@@ -143,7 +143,6 @@
   "Not a valid email": "Email invalide",
   "An error has happened": "Une erreur est survenue",
   "Email sent, don't forget to check your spam": "Email envoyé, pensez à vérifier votre dossier spam",
-  "An error has happened, please try again.": "Une erreur est survenue, veuillez réessayer",
   "Error while removing member": "Erreur lors de la suppression du membre",
   "List of": "Liste des",
   "text document": "document texte",
@@ -169,5 +168,7 @@
   "Change my password": "Changer mon mot de passe",
   "Change my profile": "Changer mon profil",
   "This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'": "Cet espace partagé n'a pas encore de contenu de ce type, créez le premier contenu de ce type en cliquant sur le bouton 'Créer'",
-  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères"
+  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
+  "Your account's password cannot be changed, please contact an administrator": "Le mot de passe de votre compte ne peut pas être changé, veuillez contacter un administrateur",
+  "An error has happened, please try again": "Une erreur est survenue, veuillez réessayer"
 }

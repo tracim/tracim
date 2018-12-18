@@ -61,7 +61,7 @@ export class ResetPassword extends React.Component {
         props.history.push(PAGE.LOGIN)
         props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login'), 'info'))
         break
-      default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again.'), 'warning'))
+      default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning'))
     }
   }
 
