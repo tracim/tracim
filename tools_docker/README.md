@@ -71,3 +71,5 @@ You can also build image with specific tag (This build is make just with necessa
     docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
     
 Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
+
+⚠ **Its not possible to build image with ARG TAG and ARG BRANCH in same time.**

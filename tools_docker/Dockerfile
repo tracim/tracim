@@ -9,6 +9,9 @@ ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
 
+RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
+    then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
+
 RUN \
 # create command to clone repo
     get_source_from_github() { \
