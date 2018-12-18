@@ -65,6 +65,6 @@ service apache2 start
 if [ "$WEBDAV" = "start" ]; then
     service uwsgi start
 else
-    rm /etc/uwsgi/apps-enabled/tracim_webdav.ini
+    rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
     service uwsgi start
 fi
