@@ -62,8 +62,7 @@ chown www-data:www-data -R /var/tracim
 
 service redis-server start  # async email sending
 service apache2 start
-if ([ "$WEBDAV_HOST" != "" ] && [ "$WEBDAV_PORT" != "" ]) ; then
-    cd /tracim/backend/
+if [ "$WEBDAV" = "start" ]; then
     systemctl start tracim_webdav.service
 fi
 systemctl start tracim_uwsgi.service

@@ -12,7 +12,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = \/var\/tracim\/depot|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = \/var\/tracim|g" /etc/tracim/development.ini
-    sed -i "s|webdav.listen = .*|webdav.listen = $WEBDAV_HOST:$WEBDAV_PORT|g" /etc/tracim/development.ini
+    sed -i "s|webdav.listen = .*|webdav.listen = 0.0.0.0:3030|g" /etc/tracim/development.ini
     sed -i "s|;webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
@@ -29,7 +29,7 @@ fi
 
 # Create apache conf file if none exists
 if [ ! -f /etc/tracim/apache2.conf ]; then
-    cp /tracim/apache2.conf /etc/tracim/apache2.conf
+    cp /tracim/apache2.conf.sample /etc/tracim/apache2.conf
 fi
 if [ ! -L /etc/apache2/sites-available/tracim.conf ]; then
     ln -s /etc/tracim/apache2.conf /etc/apache2/sites-available/tracim.conf
@@ -40,7 +40,7 @@ fi
 
 # Create uwsgi conf file if none exists
 if [ ! -f /etc/tracim/uwsgi.ini ]; then
-    cp /tracim/uwsgi.ini /etc/tracim/uwsgi.ini
+    cp /tracim/uwsgi.ini.sample /etc/tracim/uwsgi.ini
 fi
 if [ ! -L /etc/uwsgi/apps-available/tracim.ini ]; then
     ln -s /etc/tracim/uwsgi.ini /etc/uwsgi/apps-available/tracim.ini
@@ -93,6 +93,19 @@ fi
 if [ ! -f /etc/systemd/system/tracim_webdav.service ]; then
     cp /tracim/tools_docker/Debian_Uwsgi/new_service.service.sample /etc/systemd/system/tracim_webdav.service
     sed -i "s|Description=|Description=tracim_webdav service|g" /etc/systemd/system/tracim_webdav.service
-    sed -i "s|ExecStart=|ExecStart=/tracim/backend/ tracimcli webdav start|g" /etc/systemd/system/tracim_webdav.service
-    sed -i "s|WorkingDirectory=/tracim/|WorkingDirectory=/tracim/backend/|g" /etc/systemd/system/tracim_webdav.service
+    sed -i "s|ExecStart=|ExecStart=/usr/bin/uwsgi --ini /tracim/webdav.ini --http-socket :3030|g" /etc/systemd/system/tracim_webdav.service
+fi
+# Webdav config
+if [ "$WEBDAV" = "start" ]; then
+    cp /tracim/uwsgi.ini.sample /etc/tracim/webdav.ini
+    ln -s /etc/tracim/webdav.ini /tracim/webdav.ini
+    sed -i "s|module = wsgi.web:application|module = wsgi.webdav:application|g" /etc/tracim/webdav.ini
+fi
+if [ "$WEBDAV" = "start" ]; then
+    sed -i "s|#<Directory "/">|<Directory "/">|g" /etc/tracim/apache2.conf
+    sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
+    sed -i "s|#    Dav On|    Dav On|g" /etc/tracim/apache2.conf
+    sed -i "s|#</Directory>|</Directory>|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPass /webdav http://127.0.0.1:3030/webdav|ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi

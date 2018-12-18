@@ -3,8 +3,17 @@
     CustomLog /var/log/apache2/tracim-access.log combined
     ErrorLog /var/log/apache2/tracim-error.log
 
+    #<Directory "/">
+    #    Require all granted
+    #    Dav On
+    #</Directory>
+
     ProxyPreserveHost On
+
+    #ProxyPass /webdav http://127.0.0.1:3030/webdav
+    #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav
     ProxyPass / http://127.0.0.1:8080/
     ProxyPassReverse / http://127.0.0.1:8080/
+
 
 </VirtualHost>
