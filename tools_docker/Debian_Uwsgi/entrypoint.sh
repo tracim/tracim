@@ -63,6 +63,6 @@ chown www-data:www-data -R /var/tracim
 service redis-server start  # async email sending
 service apache2 start
 if [ "$WEBDAV" = "start" ]; then
-    service tracim_webdav.service start
+    service tracim_webdav.service start./entr
 fi
 service tracim_uwsgi.service start
