@@ -63,10 +63,12 @@ chown www-data:www-data -R /var/tracim
 service redis-server start  # async email sending
 service apache2 start
 if [ "$START_WEBDAV" = "1" ]; then
-    uwsgi --ini /etc/tracim/tracim_webdav.ini
-    #service uwsgi start
+    #uwsgi --ini /etc/tracim/tracim_webdav.ini
+    #uwsgi --ini /etc/tracim/tracim_web.ini
+    service uwsgi start
+    tail -f /var/tracim/logs/tracim_web.log /var/tracim/logs/tracim_webdav.log
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
     uwsgi --ini /etc/tracim/tracim_web.ini
-    #service uwsgi start
+    service uwsgi start
 fi
