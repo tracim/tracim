@@ -98,7 +98,7 @@ fi
 # Create Webdav file/config if not exist
 if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -f /etc/tracim/tracim_webdav.ini ];then
-        cp /tracim/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
+        cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
         sed -i "s|module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_webdav.log|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|http = .*|http = :3030|g" /etc/tracim/tracim_webdav.ini
