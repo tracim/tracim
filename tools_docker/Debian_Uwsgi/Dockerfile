@@ -108,12 +108,6 @@ RUN \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/*
 
-COPY uwsgi.ini.sample /tracim/uwsgi.ini.sample
-COPY apache2.conf.sample /tracim/apache2.conf.sample
-COPY check_env_vars.sh /tracim/check_env_vars.sh
-COPY common.sh /tracim/common.sh
-COPY entrypoint.sh /tracim/entrypoint.sh
-
 VOLUME ["/etc/tracim", "/var/tracim"]
 
 CMD ["/bin/bash","/tracim/entrypoint.sh"]

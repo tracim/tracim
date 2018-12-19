@@ -52,8 +52,8 @@ esac
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/backend/
-    tracimcli db init
-    alembic -c development.ini stamp head
+    tracimcli db init -c /etc/tracim/development.ini
+    alembic -c /etc/tracim/development.ini stamp head
 fi
 
 mkdir -p /var/run/uwsgi/app/tracim/
