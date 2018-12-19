@@ -56,14 +56,14 @@ fi
 
 # Create logo.png file if no exist
 if [ ! -f /etc/tracim/logo.png ]; then
-    cp /tracim/frontend/dist/assets/images/logo-tracim.png /tracim/frontend/dist/assets/images/logo-tracim.png.default
-    mv /tracim/frontend/dist/assets/images/logo-tracim.png /etc/tracim/logo.png
+    mv /tracim/frontend/dist/assets/images/logo-tracim.png /tracim/frontend/dist/assets/images/logo-tracim.png.default
+    cp /tracim/frontend/dist/assets/images/logo-tracim.png.default /etc/tracim/logo.png
 fi
 if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
     ln -s /etc/tracim/logo.png /tracim/frontend/dist/assets/images/logo-tracim.png
 fi
 
-# Create logs and assets directories
+# Create logs, folder and assets directories
 if [ ! -d /var/tracim/logs ]; then
     mkdir /var/tracim/logs -p
     touch /var/tracim/logs/tracim_web.log
@@ -73,7 +73,11 @@ if [ ! -d /var/tracim/logs ]; then
     chown root:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
-
+if [ ! -d /var/tracim/data ]; then
+    mkdir /var/tracim/data -p
+    chown root:www-data -R /var/tracim/data
+    chmod 775 -R /var/tracim/data
+fi
 if [ ! -f /var/tracim/assets ]; then
     mkdir /var/tracim/assets -p
 fi
@@ -95,7 +99,9 @@ fi
 if [ "$WEBDAV" = "start" ]; then
     if [ ! -f /etc/tracim/tracim_webdav.ini ];then
         cp /tracim/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
-        sed -i "s|module = wsgi.web:application|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
+        sed -i "s|module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
+        sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_webdav.log|g" /etc/tracim/tracim_webdav.ini
+        sed -i "s|http = .*|http = :3030|g" /etc/tracim/tracim_webdav.ini
     fi
     if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
         ln -s /etc/tracim/tracim_webdav.ini /etc/uwsgi/apps-available/tracim_webdav.ini

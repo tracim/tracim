@@ -56,7 +56,7 @@ if [ "$INIT_DATABASE" = true ] ; then
     alembic -c /etc/tracim/development.ini stamp head
 fi
 
-mkdir -p /var/run/uwsgi/app/tracim/
+mkdir -p /var/run/uwsgi/app/
 chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
 

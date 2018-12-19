@@ -3,3 +3,5 @@ plugins = python3
 chdir = /tracim/backend/
 module = wsgi.web:application
 env = TRACIM_CONF_PATH=/etc/tracim/development.ini
+http = :8080
+logto = /var/tracim/logs/tracim_web.log
