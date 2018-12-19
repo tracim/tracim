@@ -110,4 +110,4 @@ RUN \
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 
-CMD ["/bin/bash","/tracim/tools_docker/Debian_Uwsgi/entrypoint.sh && tail -f /dev/null"]
+CMD ["/bin/bash","/tracim/tools_docker/Debian_Uwsgi/entrypoint.sh"]

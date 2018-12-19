@@ -96,7 +96,7 @@ if [ ! -L /var/log/apache2/tracim-error.log ]; then
 fi
 
 # Create Webdav file/config if not exist
-if [ "$WEBDAV" = "start" ]; then
+if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -f /etc/tracim/tracim_webdav.ini ];then
         cp /tracim/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
         sed -i "s|module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
