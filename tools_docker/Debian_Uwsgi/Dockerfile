@@ -94,6 +94,8 @@ RUN \
     && a2enmod deflate \
     && a2enmod headers \
     && a2enmod proxy_html \
+    && a2enmod dav_fs \
+    && a2enmod dav \
 # Purges useless packages
     && apt purge -yq \
     build-essential \
@@ -110,4 +112,4 @@ RUN \
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 
-CMD ["/bin/bash","/tracim/tools_docker/Debian_Uwsgi/entrypoint.sh"]
+CMD ["/bin/bash","/tracim/tools_docker/Debian_Uwsgi/entrypoint.sh","||","tail -f /var/tracim/logs/tracim_web.log /var/tracim/logs/tracim_webdav.log"]
