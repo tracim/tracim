@@ -60,15 +60,20 @@ mkdir -p /var/run/uwsgi/app/
 chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
 
+# activate apache mods
+a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
+# starting services
 service redis-server start  # async email sending
 service apache2 restart
 if [ "$START_WEBDAV" = "1" ]; then
-    #uwsgi --ini /etc/tracim/tracim_webdav.ini
-    #uwsgi --ini /etc/tracim/tracim_web.ini
-    service uwsgi start
-    tail -f /var/tracim/logs/tracim_web.log /var/tracim/logs/tracim_webdav.log
+    set +e
+    service uwsgi restart
+    set -e
+    tail -f /var/log/dpkg.log
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
-    uwsgi --ini /etc/tracim/tracim_web.ini
-    service uwsgi start
+    set +e
+    service uwsgi restart
+    set -e
+    tail -f /var/log/dpkg.log
 fi

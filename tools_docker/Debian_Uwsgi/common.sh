@@ -58,7 +58,6 @@ fi
 
 # Create logo.png file if no exist
 if [ ! -f /etc/tracim/logo.png ]; then
-    mv /tracim/frontend/dist/assets/images/logo-tracim.png /tracim/frontend/dist/assets/images/logo-tracim.png.default
     cp /tracim/frontend/dist/assets/images/logo-tracim.png.default /etc/tracim/logo.png
 fi
 if [ ! -L /tracim/frontend/dist/assets/images/logo-tracim.png ]; then
@@ -75,15 +74,6 @@ if [ ! -d /var/tracim/logs ]; then
     chown root:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
-if [ ! -d /var/tracim/data ]; then
-    mkdir /var/tracim/data -p
-    chown root:www-data -R /var/tracim/data
-    chmod 775 -R /var/tracim/data
-fi
-if [ ! -f /var/tracim/assets ]; then
-    mkdir /var/tracim/assets -p
-fi
-
 if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
     ln -sf /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
 fi
@@ -91,10 +81,17 @@ if [ ! -L /var/log/uwsgi/app/tracim_webdav.log ]; then
     ln -sf /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
 fi
 if [ ! -L /var/log/apache2/tracim-access.log ]; then
-    ln -sf /var/tracim/logs/apache2-access.log /var/log/apache2/access.log
+    ln -sf /var/tracim/logs/apache2-access.log /var/log/apache2/tracim-access.log
 fi
 if [ ! -L /var/log/apache2/tracim-error.log ]; then
   ln -sf /var/tracim/logs/apache2-error.log /var/log/apache2/tracim-error.log
+fi
+# Create folder and assets directories
+if [ ! -d /var/tracim/data ]; then
+    mkdir /var/tracim/data -p
+fi
+if [ ! -f /var/tracim/assets ]; then
+    mkdir /var/tracim/assets -p
 fi
 
 # Create Webdav file/config if not exist
@@ -102,8 +99,8 @@ if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -f /etc/tracim/tracim_webdav.ini ];then
         cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
         sed -i "s|module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
-        sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_webdav.log|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|http-socket = .*|http-socket = :3030|g" /etc/tracim/tracim_webdav.ini
+        sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_webdav.log|g" /etc/tracim/tracim_webdav.ini
     fi
     if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
         ln -s /etc/tracim/tracim_webdav.ini /etc/uwsgi/apps-available/tracim_webdav.ini
