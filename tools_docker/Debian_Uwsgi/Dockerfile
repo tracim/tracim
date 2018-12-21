@@ -1,12 +1,28 @@
 FROM debian:stretch
 MAINTAINER contact@tracim.fr
 
+ARG TAG=""
+ARG BRANCH=""
+
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
+
+RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
+    then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
+
+RUN \
+# create command to clone repo
+    get_source_from_github() { \
+    if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
+    then git clone -b $TAG --single-branch https://github.com/tracim/tracim.git tracim; \
+    elif ([ "$TAG" = "" ] && [ "$BRANCH" != "" ]); \
+    then git clone https://github.com/tracim/tracim.git tracim && cd tracim/ && git checkout $BRANCH && cd -; \
+    else git clone https://github.com/tracim/tracim.git tracim;fi \
+    } \
 # Install required packages
-RUN apt update && apt upgrade -qy \
+    && apt update && apt upgrade -qy \
     && apt install -qy \
     apache2 \
     build-essential \
@@ -44,25 +60,23 @@ RUN apt update && apt upgrade -qy \
     && apt autoremove -qy \
     && apt clean -qy \
     && rm -rf /var/lib/apt/list/* \
-# Get the source from GitHub
-    && git clone https://github.com/tracim/tracim.git tracim \
-    && cd /tracim/ \
-    && git checkout -- \
-    && git pull origin develop \
+# clone repo
+    && get_source_from_github $TAG $BRANCH \
 # Go in repo folder
-    && cd /tracim \
+    && cd /tracim/ \
 # install frontend
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh \
 # Clean frontend installation
-    && rm -r frontend/node_modules \
-    && rm -r frontend_app_admin_workspace_user/node_modules \
-    && rm -r frontend_app_file/node_modules \
-    && rm -r frontend_app_html-document/node_modules \
-    && rm -r frontend_app_thread/node_modules \
-    && rm -r frontend_app_workspace/node_modules \
-    && rm -r frontend_app_workspace_advanced/node_modules \
-    && rm -r frontend_lib/node_modules \
+    && rm -rf frontend/node_modules \
+    && rm -rf frontend_app_admin_workspace_user/node_modules \
+    && rm -rf frontend_app_file/node_modules \
+    && rm -rf frontend_app_folder_advanced/node_modules \
+    && rm -rf frontend_app_html-document/node_modules \
+    && rm -rf frontend_app_thread/node_modules \
+    && rm -rf frontend_app_workspace/node_modules \
+    && rm -rf frontend_app_workspace_advanced/node_modules \
+    && rm -rf frontend_lib/node_modules \
 # Go in backend folder
     && cd backend \
 # install backend

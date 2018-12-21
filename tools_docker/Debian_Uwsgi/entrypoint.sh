@@ -62,4 +62,4 @@ chown www-data:www-data -R /var/tracim
 
 service redis-server start  # async email sending
 service apache2 start
-uwsgi --ini /tracim/uwsgi.ini --http-socket :6543 --plugin python3 --uid www-data --gid www-data
+uwsgi --ini /tracim/uwsgi.ini --http-socket :8080 --plugin python3 --uid www-data --gid www-data

@@ -55,6 +55,21 @@ After execute one of these command, tracim will be available on your system on p
 
 To build image
 
-    cd tools_docker/
+    cd tools_docker/Debian_Uwsgi
     docker build -t algoo/tracim:latest .
+
+You can build with specific branch
+
+    cd tools_docker/Debian_Uwsgi
+    docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
+
+Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
     
+You can also build image with specific tag (This build is make just with necessary files: no other branch available)
+
+    cd tools_docker/Debian_Uwsgi
+    docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
+    
+Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
+
+⚠ **Its not possible to build image with ARG TAG and ARG BRANCH in same time.**
