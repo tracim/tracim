@@ -29,9 +29,10 @@ class FrontendController(Controller):
         return index_file_path
 
     def not_found_view(self, context, request: TracimRequest):
-        if request.path.startswith(urljoin('/', FRONTEND_UI_SUBPATH)):
-            return self.index(context, request)
         raise PageNotFound('{} is not a valid path'.format(request.path)) from context  # nopep8
+
+    def ui(self, context, request: TracimRequest):
+        return self.index(context, request)
 
     def index(self, context, request: TracimRequest):
         app_config = request.registry.settings['CFG']
@@ -65,6 +66,8 @@ class FrontendController(Controller):
         # index.html for /index.html and /
         configurator.add_route('root', '/', request_method='GET')
         configurator.add_view(self.index, route_name='root')
+        configurator.add_route('ui', urljoin('/', FRONTEND_UI_SUBPATH, '.*'), request_method='GET')
+        configurator.add_view(self.ui, route_name='ui')
         configurator.add_route('index', INDEX_PAGE_NAME, request_method='GET')
         configurator.add_view(self.index, route_name='index')
 

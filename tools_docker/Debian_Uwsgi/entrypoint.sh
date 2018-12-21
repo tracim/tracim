@@ -6,13 +6,13 @@ export PYTHON_EGG_CACHE=/tmp
 set -e
 
 # Check environment variables
-/bin/bash /tracim/check_env_vars.sh
+/bin/bash /tracim/tools_docker/Debian_Uwsgi/check_env_vars.sh
 if [ ! "$?" = 0 ]; then
     exit 1
 fi
 
 # Execute common tasks
-/bin/bash /tracim/common.sh
+/bin/bash /tracim/tools_docker/Debian_Uwsgi/common.sh
 if [ ! "$?" = 0 ]; then
     exit 1
 fi
@@ -43,7 +43,7 @@ case "$DATABASE_TYPE" in
     ;;
   sqlite)
     # Check if database must be init
-    if [ ! -f /var/tracim/tracim.sqlite ]; then
+    if [ ! -f /var/tracim/data/tracim.sqlite ]; then
         INIT_DATABASE=true
     fi
     ;;
@@ -52,14 +52,28 @@ esac
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/backend/
-    tracimcli db init
-    alembic -c development.ini stamp head
+    tracimcli db init -c /etc/tracim/development.ini
+    alembic -c /etc/tracim/development.ini stamp head
 fi
 
-mkdir -p /var/run/uwsgi/app/tracim/
+mkdir -p /var/run/uwsgi/app/
 chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
 
+# activate apache mods
+a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
+# starting services
 service redis-server start  # async email sending
-service apache2 start
-uwsgi --ini /tracim/uwsgi.ini --http-socket :8080 --plugin python3 --uid www-data --gid www-data
+service apache2 restart
+if [ "$START_WEBDAV" = "1" ]; then
+    set +e
+    service uwsgi restart
+    set -e
+    tail -f /var/log/dpkg.log
+else
+    rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
+    set +e
+    service uwsgi restart
+    set -e
+    tail -f /var/log/dpkg.log
+fi
