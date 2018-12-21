@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -26,7 +27,7 @@ import {
   putUserPassword,
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
-import { translate } from 'react-i18next'
+import { editableUserAuthTypeList } from '../helper.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -53,13 +54,12 @@ class Account extends React.Component {
       //   label: 'Calendrier personnel',
       //   active: false
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
-      // allow pw change only for users in tracim's db (eg. not from ldap)
-      .filter(menu => ['internal', 'unknown'].includes(props.user.auth_type) ? true : menu.name !== 'password')
 
     this.state = {
       idUserToEdit: props.match.params.iduser,
       userToEdit: {
-        public_name: ''
+        public_name: '',
+        auth_type: 'internal'
       },
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
@@ -77,7 +77,13 @@ class Account extends React.Component {
     const fetchGetUser = await props.dispatch(getUser(state.idUserToEdit))
 
     switch (fetchGetUser.status) {
-      case 200: this.setState({userToEdit: fetchGetUser.json}); break
+      case 200:
+        this.setState(prev => ({
+          userToEdit: fetchGetUser.json,
+          subComponentMenu: prev.subComponentMenu
+            .filter(menu => editableUserAuthTypeList.includes(fetchGetUser.json.auth_type) ? true : menu.name !== 'password')
+        }))
+        break
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
   }
@@ -217,7 +223,7 @@ class Account extends React.Component {
                   switch (state.subComponentMenu.find(({active}) => active).name) {
                     case 'personalData':
                       return <PersonalData
-                        userAuthType={props.user.auth_type}
+                        userAuthType={state.userToEdit.auth_type}
                         onClickSubmit={this.handleSubmitNameOrEmail}
                         displayAdminInfo
                       />

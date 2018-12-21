@@ -46,11 +46,13 @@ class Login extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { props } = this
 
     const query = qs.parse(props.location.search)
     if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
+
+    await this.loadConfig()
   }
 
   handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
@@ -84,7 +86,8 @@ class Login extends React.Component {
         props.dispatch(setUserConnected(loggedUser))
         i18n.changeLanguage(loggedUser.lang)
 
-        this.loadAppConfig()
+        this.loadAppList()
+        this.loadContentTypeList()
         this.loadWorkspaceList()
 
         if (props.system.redirectLogin !== '') {
@@ -97,6 +100,7 @@ class Login extends React.Component {
       case 400:
         switch (fetchPostUserLogin.json.code) {
           case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
+          case 2049: props.dispatch(newFlashMessage(props.t("Your account's password cannot be changed, please contact an administrator"), 'warning')); break
           default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
         }
         break
@@ -105,15 +109,22 @@ class Login extends React.Component {
     }
   }
 
-  // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
-  loadAppConfig = async () => {
+  loadConfig = async () => {
     const { props } = this
 
     const fetchGetConfig = await props.dispatch(getConfig())
     if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
+  }
+
+  loadAppList = async () => {
+    const { props } = this
 
     const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
+  }
+
+  loadContentTypeList = async () => {
+    const { props } = this
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))

@@ -4,6 +4,8 @@ from datetime import datetime
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import VirtualEvent
 from tracim_backend.models import data
+from tracim_backend.lib.utils.translation import get_locale
+from babel.dates import format_datetime
 
 # FIXME: fix temporaire ...
 style = """
@@ -124,6 +126,16 @@ _LABELS = {
     'copy' : 'Item copied',
 }
 
+THREAD_MESSAGE = """
+  <p>
+    {posting_time},{comment_owner} wrote:
+  </p>
+  <p style="padding-left: 1em;">
+    {comment_content}
+  </p>
+
+"""
+
 
 def create_readable_date(created, delta_from_datetime: datetime = None):
     if not delta_from_datetime:
@@ -148,239 +160,44 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
 
     return aff
 
-def designPage(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
-    hist = content.get_history(drop_empty_revision=False)
-    histHTML = '<table class="table table-striped table-hover">'
-    for event in hist:
-        if isinstance(event, VirtualEvent):
-            date = event.create_readable_date()
-            label = _LABELS[event.type.id]
 
-            histHTML += '''
-                <tr class="%s">
-                    <td class="my-align"><span class="label label-default"><i class="fa %s"></i> %s</span></td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                </tr>
-                ''' % ('warning' if event.id == content_revision.revision_id else '',
-                       event.type.fa_icon,
-                       label,
-                       date,
-                       event.owner.display_name,
-                       # NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
-                       '<i class="fa fa-caret-left"></i> shown'  if event.id == content_revision.revision_id else '' # '''<span><a class="revision-link" href="/.history/%s/(%s - %s) %s.html">(View revision)</a></span>''' % (
-                       # content.label, event.id, event.type.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
-                   )
-    histHTML += '</table>'
+def designPage(
+    content: data.Content,
+    content_revision: data.ContentRevisionRO
+) -> str:
 
-    page = '''
-<html>
-<head>
-	<meta charset="utf-8" />
-	<title>%s</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<style>%s</style>
-	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
-	<script
-			  src="https://code.jquery.com/jquery-3.1.0.min.js"
-			  integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
-			  crossorigin="anonymous"></script>
-</head>
-<body>
-    <div id="left" class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
-        <div class="title page">
-            <div class="title-text">
-                <i class="fa fa-file-text-o title-icon page"></i>
-                <h1>%s</h1>
-                <h6>page created on <b>%s</b> by <b>%s</b></h6>
-            </div>
-            <div class="pull-right">
-                <div class="btn-group btn-group-vertical">
-                    <!-- NOTE: Not omplemented yet, don't display not working link
-                     <a class="btn btn-default">
-                         <i class="fa fa-external-link"></i> View in tracim</a>
-                     </a>-->
-                </div>
-            </div>
-        </div>
-        <div class="content col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            %s
-        </div>
-    </div>
-    <div id="right" class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-        <h4>History</h4>
-        %s
-    </div>
-    <script type="text/javascript">
-        window.onload = function() {
-            file_location = window.location.href
-            file_location = file_location.replace(/\/[^/]*$/, '')
-            file_location = file_location.replace(/\/.history\/[^/]*$/, '')
-
-            // NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
-            // $('.revision-link').each(function() {
-            //    $(this).attr('href', file_location + $(this).attr('href'))
-            // });
-        }
-    </script>
-</body>
-</html>
-        ''' % (content_revision.label,
-               style,
-               content_revision.label,
-               content.created.strftime("%B %d, %Y at %H:%m"),
-               content.owner.display_name,
-               content_revision.description,
-               histHTML)
-
-    return page
+    return content_revision.description
 
 
-def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
-        hist = content.get_history(drop_empty_revision=False)
+def designThread(
+    content: data.Content,
+    content_revision: data.ContentRevisionRO,
+    comments
+) -> str:
+        first_comment = comments[0]
+        thread = THREAD_MESSAGE.format(
+            posting_time=format_datetime(
+                first_comment.created,
+                locale=get_locale()
+            ),
+            comment_owner=first_comment.owner.display_name,
+            comment_content=first_comment.description_as_raw_text(),
+        )
+        if len(comments) == 1:
+            return thread
 
-        allT = []
-        allT += comments
-        allT += hist
-        allT.sort(key=lambda x: x.created, reverse=True)
-
-        disc = ''
-        participants = {}
-        for t in allT:
-            if t.type == content_type_list.Comment.slug:
-                disc += '''
-                    <div class="row comment comment-row">
-                        <i class="fa fa-comment-o comment-icon"></i>
-                            <div class="comment-content">
-                            <h5>
-                                <span class="comment-author"><b>%s</b> wrote :</span>
-                                <div class="pull-right text-right">%s</div>
-                            </h5>
-                            %s
-                        </div>
-                    </div>
-                    ''' % (t.owner.display_name, create_readable_date(t.created), t.description)
-
-                if t.owner.display_name not in participants:
-                    participants[t.owner.display_name] = [1, t.created]
-                else:
-                    participants[t.owner.display_name][0] += 1
-            else:
-                if isinstance(t, VirtualEvent) and t.type.id != 'comment':
-                    label = _LABELS[t.type.id]
-
-                    disc += '''
-                    <div class="%s row comment comment-row to-hide">
-                        <i class="fa %s comment-icon"></i>
-                            <div class="comment-content">
-                            <h5>
-                                <span class="comment-author"><b>%s</b></span>
-                                <div class="pull-right text-right">%s</div>
-                            </h5>
-                            %s %s
-                        </div>
-                    </div>
-                    ''' % ('warning' if t.id == content_revision.revision_id else '',
-                           t.type.fa_icon,
-                           t.owner.display_name,
-                           t.create_readable_date(),
-                           label,
-                            # NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
-                            '<i class="fa fa-caret-left"></i> shown' if t.id == content_revision.revision_id else '' # else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                               # content.label,
-                               # t.id,
-                               # t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
-                           )
-
-        thread = '''
-<html>
-<head>
-	<meta charset="utf-8" />
-	<title>%s</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<style>%s</style>
-	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
-</head>
-<body>
-    <div id="left" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="title thread">
-            <div class="title-text">
-                <i class="fa fa-comments-o title-icon thread"></i>
-                <h1>%s</h1>
-                <h6>thread created on <b>%s</b> by <b>%s</b></h6>
-            </div>
-            <div class="pull-right">
-                <div class="btn-group btn-group-vertical">
-                    <!-- NOTE: Not omplemented yet, don't display not working link
-                    <a class="btn btn-default" onclick="hide_elements()">
-                       <i id="hideshow" class="fa fa-eye-slash"></i> <span id="hideshowtxt" >Hide history</span></a>
-                    </a>-->
-                    <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> View in tracim</a>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="content col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <div class="description">
-                <span class="description-text">%s</span>
-            </div>
-            %s
-        </div>
-    </div>
-    <script type="text/javascript">
-        window.onload = function() {
-            file_location = window.location.href
-            file_location = file_location.replace(/\/[^/]*$/, '')
-            file_location = file_location.replace(/\/.history\/[^/]*$/, '')
-
-            // NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
-            // $('.revision-link').each(function() {
-            //     $(this).attr('href', file_location + $(this).attr('href'))
-            // });
-        }
-
-        function hide_elements() {
-            elems = document.getElementsByClassName('to-hide');
-            if (elems.length > 0) {
-                for(var i = 0; i < elems.length; i++) {
-                    $(elems[i]).addClass('to-show')
-                    $(elems[i]).hide();
-                }
-                while (elems.length>0) {
-                    $(elems[0]).removeClass('comment-row');
-                    $(elems[0]).removeClass('to-hide');
-                }
-                $('#hideshow').addClass('fa-eye').removeClass('fa-eye-slash');
-                $('#hideshowtxt').html('Show history');
-            }
-            else {
-                elems = document.getElementsByClassName('to-show');
-                for(var i = 0; i<elems.length; i++) {
-                    $(elems[0]).addClass('comment-row');
-                    $(elems[i]).addClass('to-hide');
-                    $(elems[i]).show();
-                }
-                while (elems.length>0) {
-                    $(elems[0]).removeClass('to-show');
-                }
-                $('#hideshow').removeClass('fa-eye').addClass('fa-eye-slash');
-                $('#hideshowtxt').html('Hide history');
-            }
-        }
-    </script>
-</body>
-</html>
-        ''' % (content_revision.label,
-               style,
-               content_revision.label,
-               content.created.strftime("%B %d, %Y at %H:%m"),
-               content.owner.display_name,
-               content_revision.description,
-               disc)
+        thread_closing_tags = ''
+        for comment in comments[1:]:
+            thread += '<blockquote style="border-left: solid 2px #999; margin-left: 1em; padding-left: 1em;">'  # nopep8
+            thread += THREAD_MESSAGE.format(
+                posting_time=format_datetime(
+                    comment.created,
+                    locale=get_locale()
+                ),
+                comment_owner=comment.owner.display_name,
+                comment_content=comment.description_as_raw_text(),
+            )
+            thread_closing_tags += '</blockquote>'
+        thread += thread_closing_tags
 
         return thread

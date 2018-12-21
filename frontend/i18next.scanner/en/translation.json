@@ -143,7 +143,6 @@
   "Not a valid email": "Not a valid email",
   "An error has happened": "An error has happened",
   "Email sent, don't forget to check your spam": "Email sent, don't forget to check your spam",
-  "An error has happened, please try again.": "An error has happened, please try again.",
   "Error while removing member": "Error while removing member",
   "List of": "List of",
   "text document": "text document",
@@ -169,5 +168,7 @@
   "Change my password": "Change my password",
   "Change my profile": "Change my profile",
   "This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'": "This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'",
-  "Full name must be at least 3 characters": "Full name must be at least 3 characters"
+  "Full name must be at least 3 characters": "Full name must be at least 3 characters",
+  "Your account's password cannot be changed, please contact an administrator": "Your account's password cannot be changed, please contact an administrator",
+  "An error has happened, please try again": "An error has happened, please try again"
 }
