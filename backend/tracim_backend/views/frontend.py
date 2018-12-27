@@ -68,7 +68,7 @@ class FrontendController(Controller):
         configurator.add_view(self.index, route_name='root')
         configurator.add_route(
             'ui',
-            '/{}{{path:.*}}'.format(FRONTEND_UI_SUBPATH),
+            '/{}{{ui_subpath:.*}}'.format(FRONTEND_UI_SUBPATH),
             request_method='GET'
         )
         configurator.add_view(self.ui, route_name='ui')
