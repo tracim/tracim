@@ -61,7 +61,7 @@ class PopupCreateContent extends React.Component {
                 <button
                   type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page
                   className='createcontent__form__button btn highlightBtn'
-                  data-cy='createcontent__form__button'
+                  data-cy='popup__createcontent__form__button'
                   onClick={props.onValidate}
                   style={{
                     backgroundColor: props.customColor,
