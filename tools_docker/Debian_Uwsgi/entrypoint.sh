@@ -54,6 +54,9 @@ if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/backend/
     tracimcli db init -c /etc/tracim/development.ini
     alembic -c /etc/tracim/development.ini stamp head
+else
+    cd /tracim/backend/
+    alembic -c /etc/tracim/development.ini upgrade head
 fi
 
 mkdir -p /var/run/uwsgi/app/
