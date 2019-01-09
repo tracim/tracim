@@ -4,4 +4,5 @@ chdir = /tracim/backend/
 module = wsgi.web:application
 env = TRACIM_CONF_PATH=/etc/tracim/development.ini
 http-socket = :8080
+#workers = 1
 logto = /var/tracim/logs/tracim_web.log
