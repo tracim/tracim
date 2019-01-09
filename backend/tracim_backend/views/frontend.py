@@ -66,7 +66,11 @@ class FrontendController(Controller):
         # index.html for /index.html and /
         configurator.add_route('root', '/', request_method='GET')
         configurator.add_view(self.index, route_name='root')
-        configurator.add_route('ui', urljoin('/', FRONTEND_UI_SUBPATH, '.*'), request_method='GET')
+        configurator.add_route(
+            'ui',
+            '/{}{{ui_subpath:.*}}'.format(FRONTEND_UI_SUBPATH),
+            request_method='GET'
+        )
         configurator.add_view(self.ui, route_name='ui')
         configurator.add_route('index', INDEX_PAGE_NAME, request_method='GET')
         configurator.add_view(self.index, route_name='index')
