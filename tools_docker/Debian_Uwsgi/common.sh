@@ -100,6 +100,7 @@ if [ "$START_WEBDAV" = "1" ]; then
         cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_webdav.ini
         sed -i "s|module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|http-socket = .*|http-socket = :3030|g" /etc/tracim/tracim_webdav.ini
+        sed -i "s|#workers = .*|workers = 1|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_webdav.log|g" /etc/tracim/tracim_webdav.ini
     fi
     if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
