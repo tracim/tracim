@@ -51,6 +51,8 @@ RUN \
     uwsgi-plugin-python3 \
     redis-server \
     zlib1g-dev \
+    supervisor \
+    vim \
 # Install nodejs
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt update \

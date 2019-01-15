@@ -62,6 +62,8 @@ fi
 mkdir -p /var/run/uwsgi/app/
 chown www-data:www-data -R /var/run/uwsgi
 chown www-data:www-data -R /var/tracim
+chmod +x /tracim/backend/daemons/mail_fetcher.py
+chmod +x /tracim/backend/daemons/mail_fetcher.py
 
 # activate apache mods
 a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
@@ -69,17 +71,16 @@ a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
 # starting services
 service redis-server start  # async email sending
 service apache2 restart
+supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
 
 # Activate daemon for reply by email
 if [ "$REPLY_BY_EMAIL" = "1" ];then
-    export TRACIM_CONF_PATH="/etc/tracim/development.ini"
-    nohup python3 /tracim/backend/daemons/mail_fetcher.py > /var/tracim/logs/mail_fetcher.log 2>&1 </dev/null &
+    supervisorctl start tracim_mail_fetcher
 fi
 
 # Activate daemon for sending email in async
 if [ "$EMAIL_MODE_ASYNC" = "1" ];then
-    export TRACIM_CONF_PATH="/etc/tracim/development.ini"
-    nohup python3 /tracim/backend/daemons/mail_notifier.py > /var/tracim/logs/mail_notifier.log 2>&1 </dev/null &
+    supervisorctl start tracim_mail_notifier
 fi
 
 # Start tracim with webdav or not
