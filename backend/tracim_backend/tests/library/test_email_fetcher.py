@@ -7,13 +7,61 @@ import responses
 import requests
 
 class TestDecodedMail(object):
-    def test_unit__find_key_from_mail_address_no_key(self):
+    def test_unit__find_key_from_mail_address__subadress_no_key(self):
         mail_address = "a@b"
-        assert DecodedMail.find_key_from_mail_address(mail_address) is None
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='a+{key}@b'
+        ) is None
 
-    def test_unit__find_key_from_mail_adress_key(self):
+    def test_unit__find_key_from_mail_subadress_adress_key(self):
         mail_address = "a+key@b"
-        assert DecodedMail.find_key_from_mail_address(mail_address) == 'key'
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='a+{key}@b'
+        ) == 'key'
+
+    def test_unit__find_key_from_mail_address__dot_adress_no_key(self):
+        mail_address = "z@b"
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='z.{key}@b'
+        ) is None
+
+    def test_unit__find_key_from_mail_dot_adress_key(self):
+        mail_address = "z.key@b"
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='z.{key}@b'
+        ) == 'key'
+
+    def test_unit__find_key_from_mail_address__explicit_subadress_no_key(self):
+        mail_address = "z@b"
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='z+key{key}@b'
+        ) is None
+
+    def test_unit__find_key_from_mail_explicit_subadress_key(self):
+        mail_address = "z+key-mykey@b"
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='z+key-{key}@b'
+        ) == 'mykey'
+
+    def test_unit__find_key_from_mail_address__adress_no_key(self):
+        mail_address = "key@b"
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='{key}@b'
+        ) == 'key'
 
 
 class TestMailFetcher(object):
@@ -34,6 +82,8 @@ class TestMailFetcher(object):
             api_key='apikey',
             connection_max_lifetime=60,
             heartbeat=60,
+            reply_to_pattern='',
+            references_pattern='',
             user='imap_user',
         )
         assert mf._is_active
@@ -54,6 +104,8 @@ class TestMailFetcher(object):
             api_base_url='http://127.0.0.1:6543/api',
             burst=True,
             api_key='apikey',
+            reply_to_pattern='',
+            references_pattern='',
             connection_max_lifetime=60,
             heartbeat=60,
             user='imap_user',
@@ -95,6 +147,8 @@ class TestMailFetcher(object):
             api_key='apikey',
             connection_max_lifetime=60,
             heartbeat=60,
+            reply_to_pattern='',
+            references_pattern='',
             user='imap_user',
         )
         auth_headers = {
@@ -161,6 +215,8 @@ class TestMailFetcher(object):
             api_key='apikey',
             connection_max_lifetime=60,
             heartbeat=60,
+            reply_to_pattern='',
+            references_pattern='',
             user='imap_user',
         )
         auth_headers = {
@@ -224,6 +280,8 @@ class TestMailFetcher(object):
             api_key='apikey',
             connection_max_lifetime=60,
             heartbeat=60,
+            reply_to_pattern='',
+            references_pattern='',
             user='imap_user',
         )
         mf._get_content_info = Mock()
@@ -267,6 +325,8 @@ class TestMailFetcher(object):
             api_key='apikey',
             connection_max_lifetime=60,
             heartbeat=60,
+            reply_to_pattern='',
+            references_pattern='',
             user='imap_user',
         )
         imapc_mock = MagicMock()
@@ -306,6 +366,8 @@ class TestMailFetcher(object):
             api_key='apikey',
             connection_max_lifetime=60,
             heartbeat=60,
+            reply_to_pattern='',
+            references_pattern='',
             user='imap_user',
         )
         imapc_mock = MagicMock()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import re
 import socket
 import ssl
 import time
@@ -47,9 +48,16 @@ class MessageContainer(object):
 
 
 class DecodedMail(object):
-    def __init__(self, message: Message, uid: int=None) -> None:
+    def __init__(self,
+                 message: Message,
+                 uid: int=None,
+                 reply_to_pattern: str = '',
+                 references_pattern: str = '',
+    ) -> None:
         self._message = message
         self.uid = uid
+        self.reply_to_pattern = reply_to_pattern
+        self.references_pattern = references_pattern
 
     def _decode_header(self, header_title: str) -> typing.Optional[str]:
         # FIXME : Handle exception
@@ -134,9 +142,9 @@ class DecodedMail(object):
         if special_key:
             return special_key
         if to_address:
-            return DecodedMail.find_key_from_mail_address(to_address)
+            return DecodedMail.find_key_from_mail_address(to_address, self.reply_to_pattern, 'content_id')
         if first_ref:
-            return DecodedMail.find_key_from_mail_address(first_ref)
+            return DecodedMail.find_key_from_mail_address(first_ref, self.references_pattern, 'content_id')
 
         raise NoSpecialKeyFound()
 
@@ -144,17 +152,33 @@ class DecodedMail(object):
     def find_key_from_mail_address(
         cls,
         mail_address: str,
+        pattern: str,
+        id_marker_name: str
     ) -> typing.Optional[str]:
         """ Parse mail_adress-like string
         to retrieve key.
-
-        :param mail_address: user+key@something like string
+        :param mail_address: mail_adress like user+key@something / key@something
+        :param pattern: pattern like user+{id_marker_name}@something
+        :param id_marker_name: marker_name use to match correcty pattern
         :return: key
         """
-        username = mail_address.split('@')[0]
-        username_data = username.split('+')
-        if len(username_data) == 2:
-            return username_data[1]
+        # regex version of id, regular regex expr, ex : .*
+        regex_type_of_id = '[^,@+]+'
+        # group matching regex, ex: (?P<content_id>.*)
+        regex_id_match_pattern = '(?P<{}>'.format(id_marker_name)+regex_type_of_id+')'
+        # static marker of id, ex: {content_id}
+        id_marker = '{' + re.escape(id_marker_name) + '}'
+        # splitting pattern with static marker,
+        # ex with {content_id} as static marker
+        # noreply+{content_id}@website.tld -> ['noreply+','@website.tld']
+        static_pattern = pattern.split(id_marker)
+        escaped_static_pattern = [re.escape(item) for item in static_pattern]
+        # regex pattern str, ex noreply+(?<content_id>.*)
+        regex_pattern_str = regex_id_match_pattern.join(escaped_static_pattern)
+        regex_pattern = re.compile(regex_pattern_str)
+        match = regex_pattern.match(mail_address)
+        if match:
+            return match.group(id_marker_name)
         return None
 
 
@@ -176,6 +200,8 @@ class MailFetcher(object):
         heartbeat: int,
         api_base_url: str,
         api_key: str,
+        reply_to_pattern: str,
+        references_pattern: str,
         use_html_parsing: bool,
         use_txt_parsing: bool,
         lockfile_path: str,
@@ -198,6 +224,8 @@ class MailFetcher(object):
              lifetime excess this duration.
         :param api_base_url: url to get access to tracim api
         :param api_key: tracim api key
+        :param reply_to_pattern: pattern used in tracim reply_to
+        :param references_pattern: pattern used in tracim references
         :param use_html_parsing: parse html mail
         :param use_txt_parsing: parse txt mail
         :param burst: if true, run only one time,
@@ -213,6 +241,8 @@ class MailFetcher(object):
         self.use_idle = use_idle
         self.connection_max_lifetime = connection_max_lifetime
         self.api_base_url = api_base_url
+        self.reply_to_pattern = reply_to_pattern
+        self.references_pattern = references_pattern
         self.api_key = api_key
         self.use_html_parsing = use_html_parsing
         self.use_txt_parsing = use_txt_parsing
@@ -355,8 +385,12 @@ class MailFetcher(object):
                 timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
         ):
             messages = self._fetch(imapc)
-            cleaned_mails = [DecodedMail(m.message, m.uid)
-                             for m in messages]
+            cleaned_mails = [DecodedMail(
+                m.message,
+                m.uid,
+                self.reply_to_pattern,
+                self.references_pattern
+            ) for m in messages]
             self._notify_tracim(cleaned_mails, imapc)
 
     def stop(self) -> None:
