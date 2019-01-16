@@ -27,7 +27,8 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
-from tracim_backend.app_models.contents import ContentStatus, ContentType
+from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
