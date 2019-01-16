@@ -57,6 +57,7 @@ requires = [
     'pyramid_mako',
     # i18n
     'Babel',
+    'requests',
 ]
 
 tests_require = [
@@ -65,7 +66,6 @@ tests_require = [
     'pytest-cov',
     'pep8',
     'mypy',
-    'requests',
     'responses',
     'mock',
     'Pillow',
