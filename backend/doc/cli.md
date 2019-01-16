@@ -40,8 +40,8 @@ This will drop all your database, be carefull !
 
 ### Help
 
-    tracim user create -h
-    tracim user update -h
+    tracimcli user create -h
+    tracimcli user update -h
  
 ## Help ##
 
