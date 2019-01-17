@@ -467,7 +467,7 @@ class MailFetcher(object):
                 logger.error(self, log)
                 continue
             except Exception as exc:
-                log = 'Failed to create comment request in mail fetcher error {}'  # nopep8
+                log = 'Failed to create comment request in mail fetcher error : {}'  # nopep8
                 logger.error(self, log.format(exc.__str__()))
                 continue
 
@@ -502,7 +502,7 @@ class MailFetcher(object):
             headers=self._get_auth_headers(user_email)
         )
         if result.status_code not in [200, 204]:
-            details = result.json().get('message')
+            details = str(result.content)
             msg = 'bad status code {}(200 is valid) response when trying to get info about a content: {}'  # nopep8
             msg = msg.format(str(result.status_code), details)
             raise BadStatusCode(msg)
