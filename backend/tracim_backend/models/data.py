@@ -28,6 +28,7 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
 from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
@@ -98,9 +99,9 @@ class Workspace(DeclarativeBase):
         """ this method is for interoperability with Content class"""
         return self.label
 
-    def get_allowed_content_types(self):
+    def get_allowed_content_types(self) -> typing.List[ContentType]:
         # @see Content.get_allowed_content_types()
-        return content_type_list.endpoint_allowed_types_slug()
+        return content_type_list.endpoint_allowed_types()
 
     def get_valid_children(
             self,
