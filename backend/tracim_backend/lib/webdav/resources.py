@@ -41,8 +41,8 @@ from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
-from tracim_backend.lib.webdav.design import designPage
-from tracim_backend.lib.webdav.design import designThread
+from tracim_backend.lib.webdav.design import design_page
+from tracim_backend.lib.webdav.design import design_thread
 from tracim_backend.lib.webdav.utils import FakeFileStream
 from tracim_backend.lib.webdav.utils import HistoryType
 from tracim_backend.models.data import ActionDescription
@@ -974,11 +974,19 @@ class OtherFileResource(FileResource):
         }
 
     def design(self):
-        if self.content.type == content_type_list.Page.slug:
-            return designPage(self.content, self.content_revision)
-        else:
-            return designThread(
+        if (
+            content_type_list.get_one_by_slug(self.content.type) ==
+            content_type_list.Page
+        ):
+            return design_page(self.content, self.content_revision)
+        if (
+            content_type_list.get_one_by_slug(self.content.type) ==
+            content_type_list.Thread
+        ):
+            return design_thread(
                 self.content,
                 self.content_revision,
-                self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug)
+                self.content_api.get_all(
+                    [self.content.content_id], content_type_list.Comment.slug
+                )
             )
