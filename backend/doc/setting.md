@@ -80,8 +80,15 @@ exist in tracim, it will be created as standard user.
 
 ## Special auth mecanisms
 
-Those auth mecanism are not linked to
+Thoses special auth mecanism are not linked to `auth_types` in config.
+
 ### Activating API key authentification
+
+:heavy_exclamation_mark: Unlike other mecanism of auth, this mecanism is not build
+for normal user auth but for administrators or daemon like email reply daemon. This
+auth mecanism is the only one that bypass auth mecanism check (user are linked 
+one specific mecanism and can't connect with an other one), so 
+you can impersonate any user linked to any auth mecanisms.
 
 API key is a auth mecanism of tracim which allow user with the key to have
 a superadmin right on tracim api, this allow user with the key to act as anyone
