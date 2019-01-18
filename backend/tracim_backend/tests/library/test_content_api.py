@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import typing
+
 import pytest
 import transaction
 
 from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -623,6 +626,215 @@ class TestContentApi(DefaultTest):
         api.restore_content_default_allowed_content(folder)
         assert 'allowed_content' in folder.properties
         assert folder.properties['allowed_content'] == content_type_list.default_allowed_content_properties(folder.type)  # nopep8
+
+    def test_unit__get_allowed_content_type__ok__html_document(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        allowed_content_type_dict = {'html-document': True, 'file': False}
+        allowed_content_types = api._get_allowed_content_type(
+            allowed_content_type_dict
+        )
+        assert len(allowed_content_types) == 1
+        assert allowed_content_types[0] == \
+               content_type_list.get_one_by_slug('html-document')
+
+    def test_unit__get_allowed_content_type__ok__page_legacy_alias(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        allowed_content_type_dict = {'page': True, 'file': False}
+        allowed_content_types = api._get_allowed_content_type(
+            allowed_content_type_dict
+        )
+        assert len(allowed_content_types) == 1
+        assert allowed_content_types[0] == \
+               content_type_list.get_one_by_slug('html-document')
+
+    def test_unit___check_valid_content_type_in_dir__ok__nominal(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_type_slug_list = [content_type_list.Folder.slug]  # nopep8
+        api.set_allowed_content(
+            folder,
+            allowed_content_type_slug_list=allowed_content_type_slug_list
+        )
+        api._check_valid_content_type_in_dir(
+            content_type=content_type_list.Folder,
+            parent=folder,
+            workspace=workspace
+        )
+
+    def test_unit___check_valid_content_type_in_dir__err__not_valid_in_folder(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_type_slug_list = [content_type_list.Folder.slug]  # nopep8
+        api.set_allowed_content(
+            folder,
+            allowed_content_type_slug_list=allowed_content_type_slug_list
+        )
+        with pytest.raises(UnallowedSubContent):
+            api._check_valid_content_type_in_dir(
+                content_type=content_type_list.File,
+                parent=folder,
+                workspace=workspace
+            )
+
+    def test_unit___check_valid_content_type_in_dir__err__not_valid_in_workspace(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+
+        # INFO - G.M - 2019-01-16 - override get_allowed_content_types methods
+        # to allow setting allowed content types of workspaces as tracim doesn't
+        # support yet to change this.
+        def fake_get_allowed_content_types() -> typing.List[ContentType]:
+            return [content_type_list.File]
+        workspace.get_allowed_content_types = fake_get_allowed_content_types
+
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        api._check_valid_content_type_in_dir(
+            content_type=content_type_list.File,
+            parent=None,
+            workspace=workspace
+        )
+        with pytest.raises(UnallowedSubContent):
+            api._check_valid_content_type_in_dir(
+                content_type=content_type_list.Folder,
+                parent=None,
+                workspace=workspace
+            )
+
 
     def test_delete(self):
         uapi = UserApi(

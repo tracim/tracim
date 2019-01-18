@@ -1508,6 +1508,20 @@ class ContentApi(object):
         )
         item.revision_type = ActionDescription.MOVE
 
+    def _get_allowed_content_type(
+            self,
+            allowed_content_dict: typing.Dict[str, str]
+    ) -> typing.List[ContentType]:
+        allowed_content_type = [] # type: typing.List[ContentType]
+        for slug, value in allowed_content_dict.items():
+            if value:
+                try:
+                    content_type = content_type_list.get_one_by_slug(slug)
+                    allowed_content_type.append(content_type)
+                except ContentTypeNotExist:
+                    pass
+        return allowed_content_type
+
     def _check_valid_content_type_in_dir(self,
         content_type: ContentType,
         parent: Content,
@@ -1516,16 +1530,17 @@ class ContentApi(object):
         if parent:
             assert workspace == parent.workspace
             if parent.properties and 'allowed_content' in parent.properties:
-                if content_type.slug not in parent.properties[ 'allowed_content'] \
-                    or not parent.properties['allowed_content'][content_type.slug]:
-                        raise UnallowedSubContent(
-                            ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
-                                # nopep8
-                                subcontent_type=content_type.slug,
-                                content_id=parent.content_id,
-                            ))
+                if content_type not in self._get_allowed_content_type(
+                        parent.properties['allowed_content']
+                ):
+                    raise UnallowedSubContent(
+                        ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
+                            # nopep8
+                            subcontent_type=content_type.slug,
+                            content_id=parent.content_id,
+                        ))
         if workspace:
-            if content_type.slug not in workspace.get_allowed_content_types():
+            if content_type not in workspace.get_allowed_content_types():
                 raise UnallowedSubContent(
                     ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
                         subcontent_type=content_type.slug,
