@@ -52,6 +52,61 @@ It rely on 2 HTTP headers:
 
 If you let `api.key` with empty value, API key auth will be disabled.
 
+## Activating Remote Auth Authentification provide by webserver
+
+It is possible to connect to tracim using remote auth authentification like
+apache auth for apache.
+The idea is that webserver authenticate user and then pass by uwsgi env var or
+http header email user of the authenticated user.
+
+to do this, you need to configure properly your webserver in order to do
+authentication and to pass correctly uwsgi env var or http header.
+
+in tracim, you just need to change value of `remote_user_header` in ini conf
+file. Value should be a env var in CGI like style, so  `Remote-User` http header
+become  `HTTP-REMOTE-USER`.
+
+:warning: You should be very carefull using this feature with http header, your
+webserver should be configured properly to not allow someone to set custom
+remote user header. You should also be sure if you use the webserver as proxy
+that no one could bypass this proxy and access to tracim in a way that allow
+them to authenticate as anyone without password.
+
+#### Example of remote_user with basic auth using apache as http proxy
+
+in tracim ini conf file :
+
+`
+   auth_
+   remote_user_header = HTTP_X_REMOTE_USER
+`
+
+apache_virtualhost (tracim should be listening on port 6543):
+
+
+```
+Listen 6544
+<VirtualHost *:6544>
+    ServerAdmin webmaster@localhost
+    ServerName localhost
+
+    <Location "/">
+      AuthType Basic
+      AuthName "Restricted Content"
+      AuthUserFile /etc/apache2/password
+      Require valid-user
+    </Location>
+
+    RequestHeader set X-Remote-User expr=%{REMOTE_USER}
+    # SSL
+    # RequestHeader set X-Remote-User %{REMOTE_USER}s
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:6543/
+    ProxyPassReverse / http://127.0.0.1:6543/
+</VirtualHost>
+```
+
 ## Activating Mail Notification feature ##
 
 to activate mail notification, smallest config is this:
