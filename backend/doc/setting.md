@@ -39,7 +39,49 @@ you can add how many server you want separated by ','
 
      cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
 
-## Activating API key authentification
+
+## Setting standard auth types of Tracim
+
+In Tracim there are 2 type of internal auth source : internal database or ldap +
+some special auth mecanism like api or remote_auth which are explained later
+in this document.
+
+You can chose valid auth_source and order them by priority with `auth_types` params in conf ini file.
+
+for example:
+`auth_types = internal`
+or:
+`auth_types = internal,ldap
+`
+this one will check user internal database and then check user in ldap.
+
+### Setting ldap
+
+Ldap auth require some extra parameters, you need to set them all correctly
+to have a working ldap authentication system.
+
+example of the ldap config working with
+https://github.com/rroemhild/docker-test-openldap :
+
+```
+auth_types=ldap
+ldap_url = ldap://localhost:389
+ldap_base_dn = dc=planetexpress,dc=com
+ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
+ldap_bind_pass = GoodNewsEveryone
+ldap_user_base_dn = ou=people,dc=planetexpress,dc=com
+ldap_login_attribute = mail
+ldap_name_attribute = givenName
+ldap_tls = False
+```
+
+:heavy_exclamation_mark: At connection in tracim, if a valid ldap user doesn't
+exist in tracim, it will be created as standard user.
+
+## Special auth mecanisms
+
+Those auth mecanism are not linked to
+### Activating API key authentification
 
 API key is a auth mecanism of tracim which allow user with the key to have
 a superadmin right on tracim api, this allow user with the key to act as anyone
@@ -52,12 +94,15 @@ It rely on 2 HTTP headers:
 
 If you let `api.key` with empty value, API key auth will be disabled.
 
-## Activating Remote Auth Authentification provide by webserver
+### Activating Remote Auth Authentification provide by webserver
 
 It is possible to connect to tracim using remote auth authentification like
 apache auth for apache.
 The idea is that webserver authenticate user and then pass by uwsgi env var or
 http header email user of the authenticated user.
+
+:heavy_exclamation_mark: At connection in tracim, if a valid remote user doesn't
+exist in tracim, it will be created as standard user
 
 to do this, you need to configure properly your webserver in order to do
 authentication and to pass correctly uwsgi env var or http header.
