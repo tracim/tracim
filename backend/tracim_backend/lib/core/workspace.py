@@ -217,7 +217,8 @@ class WorkspaceApi(object):
         for role in workspace.roles:
             if role.do_notify==True \
                     and role.user!=self._user \
-                    and role.user.is_active:
+                    and role.user.is_active\
+                    and not role.user.is_deleted:
                 roles.append(role)
         return roles
 
