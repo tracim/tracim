@@ -336,10 +336,6 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_SMTP_PASSWORD = settings.get(
             'email.notification.smtp.password',
         )
-        self.EMAIL_NOTIFICATION_LOG_FILE_PATH = settings.get(
-            'email.notification.log_file_path',
-            None,
-        )
 
         self.EMAIL_REPLY_ACTIVATED = asbool(settings.get(
             'email.reply.activated',

@@ -207,8 +207,7 @@ email.processing_mode = sync
 
 ## available choice: True or False
 email.notification.activated = False
-## You can change file_path for mail-notifications.log
-; email.notification.log_file_path = /tmp/mail-notifications.log
+# You can activate for mail-notifications.log using 'tracim_notification' logger.
 
 ### SMTP ###
 email.notification.smtp.server = your_smtp_server
@@ -430,6 +429,9 @@ script_location = tracim_backend/migration
 ### LOGGERS ###
 [loggers]
 keys = root, tracim, sqlalchemy, alembic, hapic
+# add Tracim_notification logfile
+# this need to add tracim_notification handler and tracim_notification formatter
+; keys = root, tracim, sqlalchemy, alembic, hapic, tracim_notification
 
 [logger_root]
 level = INFO
@@ -455,6 +457,12 @@ level = DEBUG
 handlers =
 qualname = hapic
 
+[logger_tracim_notification]
+level = INFO
+handlers = tracim_notification
+qualname = tracim_notification
+propagate = 0
+
 ### FORMATTER ###
 # colored log formatter for console (do not work properly with file)
 # this need coloredlog python package, you can install it in venv
@@ -474,11 +482,17 @@ datefmt = %H:%M:%S
 format = %(asctime)s %(levelname)-5.5s [%(name)s:%(lineno)s][%(threadName)s] %(message)s
 datefmt = %H:%M:%S
 
+[formatter_tracim_notification]
+format = %(asctime)s %(network)s %(action)s %(recipient)s %(subject)s %(message)s
+datefmt = %H:%M:%S
+
 ### HANDLERS ###
 [handlers]
 keys = console
 # use file log instead
 ; keys = logfile
+# add tracim_notification_handler
+; keys = console, tracim_notification
 
 ### Console log ###
 [handler_console]
@@ -498,3 +512,10 @@ level=NOTSET
 # number of max log file = 5
 args=('tracim.log','a',10*1024*1024,5)
 formatter=generic
+
+# file log for tracim_notification
+[handler_tracim_notification]
+class=FileHandler
+level=INFO
+args = ('%(here)s/tracim_notification.log','a')
+formatter=tracim_notification

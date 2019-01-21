@@ -55,3 +55,4 @@ class Logger(object):
 
 
 logger = Logger('tracim')
+notification_logger = logging.getLogger('tracim_notification')

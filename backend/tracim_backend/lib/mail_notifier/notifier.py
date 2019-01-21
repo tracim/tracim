@@ -20,6 +20,7 @@ from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.mail_notifier.utils import EST
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.logger import notification_logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.lib.utils.utils import get_login_frontend_url
@@ -192,20 +193,17 @@ class EmailManager(object):
             subject: typing.Optional[str],
     ) -> None:
         """Log notification metadata."""
-        log_path = config.EMAIL_NOTIFICATION_LOG_FILE_PATH
-        if log_path:
-            # TODO - A.P - 2017-09-06 - file logging inefficiency
-            # Updating a document with 100 users to notify will leads to open
-            # and close the file 100 times.
-            with open(log_path, 'a') as log_file:
-                print(
-                    datetime.datetime.now(),
-                    action,
-                    recipient,
-                    subject,
-                    sep='|',
-                    file=log_file,
-                )
+
+        infos = {
+            'action': action,
+            'recipient': recipient,
+            'subject': subject,
+            'network': 'email',
+        }
+        notification_logger.info(
+            msg='new mail notification',
+            extra=infos
+        )
 
     def notify_content_update(
             self,
