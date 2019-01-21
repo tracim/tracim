@@ -71,6 +71,7 @@ class EmailSender(object):
             if self._smtp_config.login:
                 try:
                     starttls_result = self._smtp_connection.starttls()
+                    logger.debug(self, 'SMTP Starttls OK')
                     log = 'SMTP start TLS result: {}'
                     logger.debug(self, log.format(starttls_result))
                 except Exception as e:
@@ -85,10 +86,15 @@ class EmailSender(object):
                     )
                     log = 'SMTP login result: {}'
                     logger.debug(self, log.format(login_res))
+                    logger.info(self, 'SMTP Connection OK')
+                except smtplib.SMTPAuthenticationError as e:
+                    log = 'SMTP auth params combinaison (login/password) ' \
+                          'are uncorrect'
+                    logger.error(self, log)
                 except Exception as e:
-                    log = 'SMTP login error: {}'
+                    log = 'error at SMTP login {}'
                     logger.debug(self, log.format(e.__str__()))
-            logger.info(self, 'Connection OK')
+
 
     def disconnect(self):
         if self._smtp_connection:
