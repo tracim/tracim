@@ -188,6 +188,7 @@ class EmailManager(object):
     @staticmethod
     def log_notification(
             config: CFG,
+            msg: str,
             action: str,
             recipient: typing.Optional[str],
             subject: typing.Optional[str],
@@ -201,8 +202,8 @@ class EmailManager(object):
             'network': 'email',
         }
         notification_logger.info(
-            msg='new mail notification',
-            extra=infos
+            msg=msg,
+            extra=infos,
         )
 
     def notify_content_update(
@@ -349,6 +350,7 @@ class EmailManager(object):
             message.attach(part2)
 
             self.log_notification(
+                msg='an email was created to {}'.format(message['To']),
                 action='CREATED',
                 recipient=message['To'],
                 subject=message['Subject'],
