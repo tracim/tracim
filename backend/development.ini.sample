@@ -216,12 +216,6 @@ email.notification.smtp.port = 25
 email.notification.smtp.user = your_smtp_user
 email.notification.smtp.password = your_smtp_password
 
-### Processing ###
-# processing_mode may be sync or async
-# if async is choosen, you need also to run mail_notifier daemon.
-# more info in README (Run daemons according to your config)
-email.notification.processing_mode = sync
-
 ### Headers ###
 # Note: items between { and } are variable names. Do not remove / rename them
 # email notifications can be sent with the user_id added as an identifier
