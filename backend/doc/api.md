@@ -97,13 +97,13 @@ Set-Cookie:  session_key=50307c9007fff16791f660eed14d47a33cf11eef365b3e0403ce42f
 
 You need to set json properly with `email` and `password` field
 ```                                                                                                                                                                                                     
-$ http --session=/tmp/session.json POST  http://127.0.0.1:6543/api/v2/auth/login email=admin@admin.admin password=admin@admin.admin
+$ http POST http://127.0.0.1:6543/api/v2/auth/login email=admin@admin.admin password=admin@admin.admin
 HTTP/1.1 200 OK
 Content-Length: 276
 Content-Type: application/json
-Date: Tue, 22 Jan 2019 13:26:03 GMT
+Date: Tue, 22 Jan 2019 16:04:37 GMT
 Server: waitress
-Set-Cookie:  session_key=eb61fdb0e496583c7e75a856957ff08b6d66ec1568001dd41d244215a73c1a19de450ca7; expires=Tue, 29-Jan-2019 13:26:03 GMT; Path=/; SameSite=Lax
+Set-Cookie:  session_key=92504e7310aa6433b523405591a9785e056927dab15e49f7c3204aed88ccc35a70761638; expires=Tue, 29-Jan-2019 16:04:37 GMT; Path=/; SameSite=Lax
 
 {
     "auth_type": "internal", 
@@ -119,20 +119,19 @@ Set-Cookie:  session_key=eb61fdb0e496583c7e75a856957ff08b6d66ec1568001dd41d24421
     "timezone": "", 
     "user_id": 1
 }
-
 ```
 
 Then you just need to resend cookie using `Cookie` header like any browser do
 automatically to have a temporary access.
 
 ```
-$ http --session=/tmp/session.json GET  http://127.0.0.1:6543/api/v2/auth/whoami
+$ http GET http://127.0.0.1:6543/api/v2/auth/whoami Cookie:" session_key=92504e7310aa6433b523405591a9785e056927dab15e49f7c3204aed88ccc35a70761638"
 HTTP/1.1 200 OK
 Content-Length: 276
 Content-Type: application/json
-Date: Tue, 22 Jan 2019 13:26:18 GMT
+Date: Tue, 22 Jan 2019 16:05:38 GMT
 Server: waitress
-Set-Cookie:  session_key=fd4b9bdc160dbb079b5dc2e954701a31d561f2dddd8e0534d4374e66b0b311611e56f7f8; expires=Tue, 29-Jan-2019 13:26:18 GMT; Path=/; SameSite=Lax
+Set-Cookie:  session_key=978301c4058de0646a4c6acf55a2b28b102b297f590edf75ffec4295b34435d8bedd3cb7; expires=Tue, 29-Jan-2019 16:05:38 GMT; Path=/; SameSite=Lax
 
 {
     "auth_type": "internal", 
@@ -148,7 +147,6 @@ Set-Cookie:  session_key=fd4b9bdc160dbb079b5dc2e954701a31d561f2dddd8e0534d4374e6
     "timezone": "", 
     "user_id": 1
 }
-
 ```
 
 ## Others info about Api
