@@ -176,7 +176,7 @@ def design_thread(
 ) -> str:
 
         if len(comments) == 0:
-            return ' '
+            return ''
 
         first_comment = comments[0]
         thread = THREAD_MESSAGE.format(
