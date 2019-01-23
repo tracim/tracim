@@ -15,11 +15,13 @@ down_revision = '354d62d490ad'
 
 OLD_SLUG = 'page'
 NEW_SLUG = 'html-document'
+NEW_SLUG_FILE_EXTENSION = '.document.html'
 
 content_revisions = sa.Table(
     'content_revisions',
     sa.MetaData(),
-    sa.Column('type')
+    sa.Column('type'),
+    sa.Column('file_extension'),
 )
 
 
@@ -30,6 +32,7 @@ def upgrade():
             content_revisions.c.type == OLD_SLUG
         ).values(
             type=NEW_SLUG,
+            file_extension=NEW_SLUG_FILE_EXTENSION
         )
     )
 
