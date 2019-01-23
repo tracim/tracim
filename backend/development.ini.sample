@@ -207,7 +207,7 @@ email.processing_mode = sync
 
 ## available choice: True or False
 email.notification.activated = False
-# You can activate for mail-notifications.log using 'tracim_notification' logger.
+# You can activate notification specific log using 'tracim_notification' logger.
 
 ### SMTP ###
 email.notification.smtp.server = your_smtp_server
@@ -492,6 +492,9 @@ keys = console
 # use file log instead
 ; keys = logfile
 # add tracim_notification_handler
+# this logger is useful to log when notification is prepared
+# ( for email: email is build)
+# and when notification is send (for email: email is send)
 ; keys = console, tracim_notification
 
 ### Console log ###
@@ -517,5 +520,5 @@ formatter=generic
 [handler_tracim_notification]
 class=FileHandler
 level=INFO
-args = ('%(here)s/tracim_notification.log','a')
+args=('tracim_notification.log','a')
 formatter=tracim_notification
