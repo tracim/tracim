@@ -142,9 +142,9 @@ class DecodedMail(object):
         if special_key:
             return special_key
         if to_address:
-            return DecodedMail.find_key_from_mail_address(to_address, self.reply_to_pattern, 'content_id')
+            return DecodedMail.find_key_from_mail_address(to_address, self.reply_to_pattern, '{content_id}')
         if first_ref:
-            return DecodedMail.find_key_from_mail_address(first_ref, self.references_pattern, 'content_id')
+            return DecodedMail.find_key_from_mail_address(first_ref, self.references_pattern, '{content_id}')
 
         raise NoSpecialKeyFound()
 
@@ -153,33 +153,32 @@ class DecodedMail(object):
         cls,
         mail_address: str,
         pattern: str,
-        id_marker_name: str
+        marker_str: str
     ) -> typing.Optional[str]:
         """ Parse mail_adress-like string
         to retrieve key.
         :param mail_address: mail_adress like user+key@something / key@something
-        :param pattern: pattern like user+{id_marker_name}@something
-        :param id_marker_name: marker_name use to match correcty pattern
+        :param pattern: pattern like user+{marker_str}@something
+        :param marker_str: marker_name with bracket like {content_id}
         :return: key
         """
-        # regex version of id, regular regex expr, ex : .*
-        regex_type_of_id = '[^,@+]+'
-        # group matching regex, ex: (?P<content_id>.*)
-        regex_id_match_pattern = '(?P<{}>'.format(id_marker_name)+regex_type_of_id+')'
-        # static marker of id, ex: {content_id}
-        id_marker = '{' + re.escape(id_marker_name) + '}'
-        # splitting pattern with static marker,
-        # ex with {content_id} as static marker
+        # splitting pattern with marker_str,
+        # ex with {content_id} as marker_str
         # noreply+{content_id}@website.tld -> ['noreply+','@website.tld']
-        static_pattern = pattern.split(id_marker)
-        escaped_static_pattern = [re.escape(item) for item in static_pattern]
-        # regex pattern str, ex noreply+(?<content_id>.*)
-        regex_pattern_str = regex_id_match_pattern.join(escaped_static_pattern)
-        regex_pattern = re.compile(regex_pattern_str)
-        match = regex_pattern.match(mail_address)
-        if match:
-            return match.group(id_marker_name)
-        return None
+        static_parts = pattern.split(marker_str)
+        assert len(static_parts) > 1
+        assert len(static_parts) < 3
+        if len(static_parts) == 2:
+            before, after = static_parts
+            if mail_address.startswith(before) and mail_address.endswith(after):
+                key = mail_address.replace(before, '').replace(after, '')
+                assert key.isalnum()
+                return key
+            logger.warning(cls, 'pattern {} does not match email address {} '.format(
+                pattern,
+                mail_address
+            ))
+            return None
 
 
 class BadIMAPFetchResponse(Exception):
