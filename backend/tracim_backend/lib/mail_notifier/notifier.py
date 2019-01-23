@@ -186,19 +186,19 @@ class EmailManager(object):
     # Content Notification
 
     @staticmethod
-    def log_notification(
+    def log_email_notification(
             config: CFG,
             msg: str,
             action: str,
-            recipient: typing.Optional[str],
-            subject: typing.Optional[str],
+            email_recipient: typing.Optional[str],
+            email_subject: typing.Optional[str],
     ) -> None:
         """Log notification metadata."""
 
         infos = {
             'action': action,
-            'recipient': recipient,
-            'subject': subject,
+            'recipient': email_recipient,
+            'subject': email_subject,
             'network': 'email',
         }
         notification_logger.info(
@@ -349,11 +349,11 @@ class EmailManager(object):
             message.attach(part1)
             message.attach(part2)
 
-            self.log_notification(
+            self.log_email_notification(
                 msg='an email was created to {}'.format(message['To']),
                 action='CREATED',
-                recipient=message['To'],
-                subject=message['Subject'],
+                email_recipient=message['To'],
+                email_subject=message['Subject'],
                 config=self.config,
             )
 

@@ -119,10 +119,10 @@ class EmailSender(object):
             logger.info(self, 'Sending email to {}'.format(message['To']))
             self._smtp_connection.send_message(message)
             from tracim_backend.lib.mail_notifier.notifier import EmailManager
-            EmailManager.log_notification(
+            EmailManager.log_email_notification(
                 msg='an email was sended to {}'.format(message['To']),
                 action='   SENT',
-                recipient=message['To'],
-                subject=message['Subject'],
+                email_recipient=message['To'],
+                email_subject=message['Subject'],
                 config=self.config,
             )
