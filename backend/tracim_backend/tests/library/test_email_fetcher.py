@@ -8,60 +8,68 @@ import requests
 
 class TestDecodedMail(object):
     def test_unit__find_key_from_mail_address__subadress_no_key(self):
-        mail_address = "a@b"
+        mail_address = "reply@mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='a+{key}@b'
+            pattern='reply+{key}@mydomainname.tld'
         ) is None
 
     def test_unit__find_key_from_mail_subadress_adress_key(self):
-        mail_address = "a+key@b"
+        mail_address = "reply+12@mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='a+{key}@b'
-        ) == 'key'
+            pattern='reply+{key}@mydomainname.tld'
+        ) == '12'
 
     def test_unit__find_key_from_mail_address__dot_adress_no_key(self):
-        mail_address = "z@b"
+        mail_address = "reply@mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='z.{key}@b'
+            pattern='reply.{key}@mydomainname.tld'
         ) is None
 
     def test_unit__find_key_from_mail_dot_adress_key(self):
-        mail_address = "z.key@b"
+        mail_address = "reply.key@mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='z.{key}@b'
+            pattern='reply.{key}@mydomainname.tld'
         ) == 'key'
 
     def test_unit__find_key_from_mail_address__explicit_subadress_no_key(self):
-        mail_address = "z@b"
+        mail_address = "reply+cid@mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='z+key{key}@b'
+            pattern='z+cid{key}@b'
         ) is None
 
     def test_unit__find_key_from_mail_explicit_subadress_key(self):
-        mail_address = "z+key-mykey@b"
+        mail_address = "reply+cid12@mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='z+key-{key}@b'
-        ) == 'mykey'
+            pattern='reply+cid{key}@mydomainname.tld'
+        ) == '12'
 
-    def test_unit__find_key_from_mail_address__adress_no_key(self):
-        mail_address = "key@b"
+    def test_unit__find_key_from_mail_address__adress(self):
+        mail_address = "12@reply.mydomainname.tld"
         assert DecodedMail.find_key_from_mail_address(
             mail_address,
             id_marker_name='key',
-            pattern='{key}@b'
-        ) == 'key'
+            pattern='{key}@reply.mydomainname.tld'
+        ) == '12'
+
+    def test_unit__find_key_from_mail_address__adress_explicit_key(self):
+        mail_address = "cid12@reply.mydomainname.tld"
+        assert DecodedMail.find_key_from_mail_address(
+            mail_address,
+            id_marker_name='key',
+            pattern='cid{key}@reply.mydomainname.tld'
+        ) == '12'
 
 
 class TestMailFetcher(object):
