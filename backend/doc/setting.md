@@ -1,15 +1,16 @@
 # Settings #
 
-Here is a short description of settings available in backend config files.
+Short description about backend config file settings.
 
-# Tracim config ini file #
+## Tracim `.ini` config file #
 
-This file is called'development.ini' file by default, it's located is backend
-subdir, default config is [development.ini.sample](../development.ini.sample) with some doc.
+The default config file is `development.ini`, a template is available in the repo: [development.ini.sample](../development.ini.sample).
 
-## Fix URL for access to tracim from network (simple) ##
+The file includes documentation which should be enough in most cases.
 
-To have a working tracim, you need to explicitly explain where backend and frontend are.
+## Configure URL for tracim access - simple case ##
+
+To have a working tracim instance, you need to explicitly define where backend and frontend are.
 If backend serve frontend or if you do not need frontend at all, you can just set:
 
     website.base_url = http://mysuperdomainame.ndd
@@ -27,7 +28,7 @@ or (for https):
 
 you also need to NOT set website.server_name and api.base_url
 
-## Fix URL for access to tracim from network (complex) ##
+## Configure URL for tracim access - complex case ##
 
 If the `website.base_url` trick is not enough for your own configuration, you can:
 - Explicitly set backend base url different from frontend url with `api.base_url`
@@ -40,24 +41,30 @@ you can add how many server you want separated by ','
      cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
 
 
-## Setting standard auth types of Tracim
+## Authentication in Tracim
 
-In Tracim there are 2 type of internal auth source : internal database or ldap +
-some special auth mecanism like api or remote_auth which are explained later
-in this document.
+Tracim comes with several types of authentication:
 
-You can chose valid auth_source and order them by priority with `auth_types` params in conf ini file.
+- internal database
+- ldap
+- special auth mecanism like Api-Key
+- REMOTE AUTH like Apache Auth later explained in the documentation.
 
-for example:
+You can chose valid auth_source and order them by priority with `auth_types` params in conf ini file
+
+Example:
+
 `auth_types = internal`
+
 or:
-`auth_types = internal,ldap
-`
-this one will check user internal database and then check user in ldap.
 
-### Setting ldap
+`auth_types = internal,ldap`
 
-Ldap auth require some extra parameters, you need to set them all correctly
+This one will check user internal database in a first check, then if the auth fails, it will also try to authenticate the user based on LDAP data.
+
+### LDAP Authentication
+
+LDAP authentication require some extra parameters, you need to set them all correctly
 to have a working ldap authentication system.
 
 example of the ldap config working with
@@ -82,7 +89,7 @@ exist in tracim, it will be created as standard user.
 
 Thoses special auth mecanism are not linked to `auth_types` in config.
 
-### Activating API key authentification
+### API-Key Authentification
 
 :heavy_exclamation_mark: Unlike other mecanism of auth, this mecanism is not build
 for normal user auth but for administrators or daemon like email reply daemon. This
@@ -101,7 +108,7 @@ It rely on 2 HTTP headers:
 
 If you let `api.key` with empty value, API key auth will be disabled.
 
-### Activating Remote Auth Authentification provide by webserver
+### Remote Auth Authentification (eg apache authentication)
 
 It is possible to connect to tracim using remote auth authentification like
 apache auth for apache.
