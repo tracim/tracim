@@ -25,14 +25,11 @@ SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
-    def __setattr__(self, key: str, value: typing.Any):
+    def __setattr__(self, key: str, value: typing.Any) -> None:
         """
         Log-ready setter.
 
-        Logs all configuration parameters except password.
-        :param key:
-        :param value:
-        :return:
+        Logs all configuration parameters except secret ones.
         """
         is_value_secret = False
         for secret in SECRET_ENDING_STR:
@@ -281,38 +278,25 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
             'email.notification.content_update.template.html',
         )
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
-            'email.notification.content_update.template.text',
-        )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
             'email.notification.content_update.subject',
         )
         # Created account notification
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
             'email.notification.created_account.template.html',
-            './tracim_backend/templates/mail/created_account_body_html.mak',
-        )
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = settings.get(
-            'email.notification.created_account.template.text',
-            './tracim_backend/templates/mail/created_account_body_text.mak',
         )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
             'email.notification.created_account.subject',
-            '[{website_title}] Created account',
+            '[{website_title}] Someone created an account for you',
         )
 
         # Reset password notification
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = settings.get(
             'email.notification.reset_password_request.template.html',
-            './tracim_backend/templates/mail/reset_password_body_html.mak',
-        )
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT = settings.get(
-            'email.notification.reset_password_request.template.text',
-            './tracim_backend/templates/mail/reset_password_body_text.mak',
         )
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
             'email.notification.reset_password_request.subject',
-            '[{website_title}] Reset Password Request'
+            '[{website_title}] A password reset has been requested'
         )
 
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
