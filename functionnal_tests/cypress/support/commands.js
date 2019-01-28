@@ -115,13 +115,25 @@ Cypress.Commands.add('logout', () => {
 })
 
 Cypress.Commands.add('typeInTinyMCE', (content) => {
+  // console.log('TARACE')
+  // activeEditor.setContent(content)
+  // activeEditor.save()
+  // console.log('in typeintinymce, before cy.window')
   cy.window()
     .its('tinyMCE')
     .its('activeEditor')
     .then(activeEditor => {
+      console.log('TARACE')
       activeEditor.setContent(content)
       activeEditor.save()
     })
+
+  // cy.window()
+  //   .then(win => {
+  //     console.log('typeintinymce, cy.window. win: ', win)
+  //     win.tinyMCE.activeEditor.setContent(content)
+  //     win.save()
+  //   })
 })
 
 Cypress.Commands.add('assertTinyMCEContent', (content) => {

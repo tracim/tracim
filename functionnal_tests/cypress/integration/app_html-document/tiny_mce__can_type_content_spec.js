@@ -14,17 +14,30 @@ context('Known users as a workspace-manager', function () {
     cy.log('TODO find better way to deal with tinyMCE than using wait')
   })
 
-  it('Type into tiny mce and save from dashboard', function () {
+  it.only('Type into tiny mce and save from dashboard', function () {
     cy.visit(`/ui/workspaces/${this.workspace.workspace_id}/dashboard`)
     cy.contains('Shared space manager')
     cy.get('[data-cy="contentTypeBtn_contents/html-document"]').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
-    cy.wait(2000)
-    cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
-    cy.get('[data-cy=editionmode__button__submit]').click()
-    cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
-    cy.wait(2000)
+
+    cy.window().then(win => {
+      Cypress.$(win.document).on('tinymceLoaded', () => {
+        console.log('cypress detected tinyMce Loaded !')
+        console.log('ACTIVE EDITOR : ', win.tinyMCE)
+
+        cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
+        console.log('setContent')
+        win.tinyMCE.activeEditor.setContent(DOCUMENT_HTML_CONTENT)
+        console.log('save()')
+        win.tinyMCE.activeEditor.save()
+        console.log('click submit')
+        cy.get('[data-cy=editionmode__button__submit]').click()
+        console.log('submit clicked or tried to at least')
+        cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
+        cy.wait(2000)
+      })
+    })
   })
 
   it('Type into tiny mce and save', function () {
