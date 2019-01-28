@@ -932,7 +932,9 @@ class UserApi(object):
             raise UserAuthTypeDisabled('user {} auth type {} is disabled'.format(user.email, user.auth_type.value))
 
     def _user_can_authenticate(self, user: User) -> bool:
-        return user.auth_type and user.auth_type in self._config.AUTH_TYPES
+        valid_auth_types = list(self._config.AUTH_TYPES)
+        valid_auth_types.append(AuthType.UNKNOWN)
+        return user.auth_type and user.auth_type in valid_auth_types
 
     def allowed_to_invite_new_user(self, email: str) -> bool:
         # INFO - G.M - 2018-10-25 - disallow account creation if no
