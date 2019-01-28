@@ -238,7 +238,10 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-
+        self.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION = asbool(settings.get(
+            'email.notification.enabled_on_invitation',
+            True
+        ))
         self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
