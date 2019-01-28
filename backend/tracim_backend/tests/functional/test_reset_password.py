@@ -3,6 +3,7 @@ import requests
 import transaction
 from freezegun import freeze_time
 from tracim_backend.models.auth import User
+from tracim_backend.models.auth import AuthType
 from tracim_backend import error
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
@@ -37,6 +38,55 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     @pytest.mark.email_notification
+    @pytest.mark.unknown_auth
+    def test_api__reset_password_request__ok__unknown_auth(self):
+        # create new user without auth (default is unknown)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'lang': 'fr',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+
+        # make a request of password
+        self.testapp.authorization = None
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        params = {
+            'email': 'test@test.test'
+        }
+        self.testapp.post_json(
+            '/api/v2/auth/password/reset/request',
+            status=204,
+            params=params,
+        )
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'test user <test@test.test>'
+        assert headers['Subject'][0] == '[TRACIM] Reset Password Request'
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+
+    @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_request__err_400__user_not_exist(self):
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
@@ -55,7 +105,6 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
         response = response.json()
         assert len(response) == 0
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
-
 
 class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
 
@@ -76,6 +125,48 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
 
+    @pytest.mark.unknown_auth
+    def test_api__reset_password_request__ok__unknown_auth(self):
+        # create new user without auth (default is unknown)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'lang': 'fr',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+
+        # make a request of password
+        self.testapp.authorization = None
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        params = {
+            'email': 'test@test.test'
+        }
+        res = self.testapp.post_json(
+            '/api/v2/auth/password/reset/request',
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
 
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
     config_section = 'functional_test_with_mail_test_sync'
@@ -96,6 +187,59 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
         transaction.commit()
         params = {
             'email': 'admin@admin.admin',
+            'reset_password_token': reset_password_token
+        }
+        self.testapp.post_json(
+            '/api/v2/auth/password/reset/token/check',
+            status=204,
+            params=params,
+        )
+
+    @pytest.mark.email_notification
+    @pytest.mark.unknown_auth
+    def test_api__reset_password_check_token__ok_204__unknown_auth(self):
+        # create new user without auth (default is unknown)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'lang': 'fr',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+
+        # make a check of token
+        self.testapp.authorization = None
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one_by_email('test@test.test')
+        reset_password_token = uapi.reset_password_notification(user, do_save=True) # nopep8
+        transaction.commit()
+        params = {
+            'email': 'test@test.test',
             'reset_password_token': reset_password_token
         }
         self.testapp.post_json(
@@ -159,6 +303,85 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             '/api/v2/auth/password/reset/modify',
             status=204,
             params=params,
+        )
+        # check if password is correctly setted
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'mynewpassword'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+
+    @pytest.mark.email_notification
+    @pytest.mark.unknown_auth
+    def test_api__reset_password_reset__ok_204__unknown_auth(self):
+        # create new user without auth (default is unknown)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'lang': 'fr',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+
+        # make a check of token
+        self.testapp.authorization = None
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one_by_email('test@test.test')
+        reset_password_token = uapi.reset_password_notification(user, do_save=True)  # nopep8
+        transaction.commit()
+        params = {
+            'email': 'test@test.test',
+            'reset_password_token': reset_password_token,
+            'new_password': 'mynewpassword',
+            'new_password2': 'mynewpassword',
+        }
+        self.testapp.post_json(
+            '/api/v2/auth/password/reset/modify',
+            status=204,
+            params=params,
+        )
+        # check if password is correctly setted
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'mynewpassword'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
         )
 
     @pytest.mark.email_notification
@@ -252,7 +475,6 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.PASSWORD_DO_NOT_MATCH
 
-
 class TestResetPasswordInternalAuthDisabled(FunctionalTest):
     config_section = 'functional_ldap_email_notif_sync_test'
 
@@ -305,7 +527,6 @@ class TestResetPasswordInternalAuthDisabled(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
-
 
 class TestResetPasswordExternalAuthUser(FunctionalTest):
     config_section = 'functional_ldap_email_notif_sync_test'
