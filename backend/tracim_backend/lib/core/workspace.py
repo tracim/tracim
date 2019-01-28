@@ -13,6 +13,7 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -217,7 +218,8 @@ class WorkspaceApi(object):
         for role in workspace.roles:
             if role.do_notify==True \
                     and role.user!=self._user \
-                    and role.user.is_active:
+                    and role.user.is_active\
+                    and role.user.auth_type != AuthType.UNKNOWN:
                 roles.append(role)
         return roles
 
