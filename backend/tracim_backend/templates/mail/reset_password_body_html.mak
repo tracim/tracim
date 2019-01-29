@@ -17,8 +17,8 @@
 
 <pre>
 --
-Suricat', the bot
+${_("Suricat', the bot")}
 ${config.WEBSITE_TITLE}
 <a href="${config.WEBSITE_BASE_URL}">${config.WEBSITE_BASE_URL}</a>
-powered by tracim software - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
+${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>

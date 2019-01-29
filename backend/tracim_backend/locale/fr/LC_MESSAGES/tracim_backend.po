@@ -1,14 +1,13 @@
-# French translations for tracim_backend.
-# Copyright (C) 2018 ORGANIZATION
-# This file is distributed under the same license as the tracim_backend
+# French translations for tracim
+# Copyright (C) 2019 Algoo
+# This file is distributed under the same license as the tracim
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-08-21 16:05+0200\n"
+"POT-Creation-Date: 2019-01-30 10:32+0100\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -19,163 +18,154 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/lib/core/content.py:1578
+#: tracim_backend/lib/core/content.py:2138
 msgid "New folder"
-msgstr ""
+msgstr "Nouveau dossier"
 
-#: tracim_backend/lib/core/content.py:1583
+#: tracim_backend/lib/core/content.py:2143
 msgid "New folder {0}"
-msgstr ""
+msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:291
+#: tracim_backend/lib/core/workspace.py:295
 msgid "Workspace"
-msgstr ""
+msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:294
+#: tracim_backend/lib/core/workspace.py:298
 msgid "Workspace {}"
-msgstr ""
+msgstr "Espace partagé {0}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:294
+#: tracim_backend/lib/mail_notifier/notifier.py:299
 msgid "{username} & all members of {workspace}"
-msgstr ""
+msgstr "{username} & tout tout les membres de {workspace}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:475
-msgid "<span id=\"content-intro-username\">{}</span> added a comment:"
+#: tracim_backend/lib/mail_notifier/notifier.py:601
+msgid ""
+"I modified the status of <i>{content}</i>. The new status is "
+"<i>{new_status}</i>"
 msgstr ""
+"J'ai modifié le status de <i>{content}</i>. Le nouveau status est "
+"<i>{new_status}</i>"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:477
-#: tracim_backend/lib/mail_notifier/notifier.py:486
-msgid "Answer"
-msgstr ""
+#: tracim_backend/lib/mail_notifier/notifier.py:609
+msgid "I added an item entitled <i>{content}</i>."
+msgstr "J'ai ajouté un élément nommé <i>{content}</i>."
 
-#: tracim_backend/lib/mail_notifier/notifier.py:483
-#: tracim_backend/lib/mail_notifier/notifier.py:504
-#: tracim_backend/lib/mail_notifier/notifier.py:533
-#: tracim_backend/lib/mail_notifier/notifier.py:541
-msgid "View online"
-msgstr ""
+#: tracim_backend/lib/mail_notifier/notifier.py:613
+msgid "I updated <i>{content}</i>."
+msgstr "J'ai mis à jour <i>{content}</i>\""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:487
-msgid "<span id=\"content-intro-username\">{}</span> started a thread entitled:"
-msgstr ""
-
-#: tracim_backend/lib/mail_notifier/notifier.py:492
-msgid "<span id=\"content-intro-username\">{}</span> added a file entitled:"
-msgstr ""
-
-#: tracim_backend/lib/mail_notifier/notifier.py:499
-msgid "<span id=\"content-intro-username\">{}</span> added a page entitled:"
-msgstr ""
-
-#: tracim_backend/lib/mail_notifier/notifier.py:507
-msgid "<span id=\"content-intro-username\">{}</span> uploaded a new revision."
-msgstr ""
-
-#: tracim_backend/lib/mail_notifier/notifier.py:511
-msgid "<span id=\"content-intro-username\">{}</span> updated this page."
-msgstr ""
-
-#: tracim_backend/lib/mail_notifier/notifier.py:517
-#: tracim_backend/lib/mail_notifier/notifier.py:528
+#: tracim_backend/lib/mail_notifier/notifier.py:620
 msgid "Here is an overview of the changes:"
-msgstr ""
+msgstr "Voici une vue d'ensemble des changements:"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:522
+#: tracim_backend/templates/mail/content_update_body_html.mak:17
 msgid ""
-"<span id=\"content-intro-username\">{}</span> updated the thread "
-"description."
+"Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
+"on tracim</a>"
 msgstr ""
+"Répondez directement à cet email ou <a "
+"href=\"{call_to_action_url}\">aller voir sur tracim</a>"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:536
+#: tracim_backend/templates/mail/content_update_body_html.mak:19
+msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
+msgstr "<a href=\\{call_to_action_url}\\>aller voir sur tracim</a>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:21
+msgid "You're receiving this email because of your account on {website_title}."
+msgstr "Vous recevez cet email du fait de votre compte sur {website_title}."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:22
 msgid ""
-"<span id=\"content-intro-username\">{}</span> updated the file "
-"description."
+"If you'd like to receive fewer emails, you can <a "
+"href=\"{website_title}/ui/account\">unsubscribe from notifications</a>."
 msgstr ""
+"Si vous voulez recevoir moins de mails, vous pouvez vous <a "
+"href=\"{website_title}/ui/account\">désinscrire des notifications</a>."
 
-#: tracim_backend/lib/mail_notifier/notifier.py:542
+#: tracim_backend/templates/mail/created_account_body_html.mak:2
+#: tracim_backend/templates/mail/reset_password_body_html.mak:2
+msgid "Hello {username},"
+msgstr "Bonjour {username},"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:4
+msgid "Someone invited you to join <i>{website_title}</i>."
+msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title<i>."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:6
+msgid "Your credentials are:"
+msgstr "Vos identifiants sont:"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:9
+msgid "login: {email_address}"
+msgstr "login: {email_address}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:10
+msgid "password: {password}"
+msgstr "mot de passe: {password}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:14
 msgid ""
-"<span id=\"content-intro-username\">{}</span> updated the following "
-"status:"
+"Let start to discuss, share files, agenda and documentation with "
+"collaborators by logging into your shared space: {a_link}"
 msgstr ""
+"Commençez à discuter, partager des fichiers, agendas et documentations "
+"avec vos collaborateurs en vous connectant dans votre espace partagé: "
+"{a_link}"
 
-#: tracim_backend/templates/mail/content_update_body_html.mak:66
+#: tracim_backend/templates/mail/created_account_body_html.mak:16
 msgid ""
-"{user_display_name}, you receive this email because you are registered on"
-" <i>{website_title}</i> and you are <i>{user_role_label}</i> in the "
-"workspace <a href=\"{workspace_url}\">{workspace_label}</a>."
+"note: as soon as you are connected, we strongly recommend that you change"
+" your password and delete this email."
 msgstr ""
+"note: nous vous recommendons fortement de changer votre mot de passe et "
+"de supprimer cet email dès que vous êtes connecté."
 
-#: tracim_backend/templates/mail/content_update_body_html.mak:70
+#: tracim_backend/templates/mail/created_account_body_html.mak:17
+msgid "Enjoy your day :)"
+msgstr "Bonne Journée :)"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:18
+#: tracim_backend/templates/mail/reset_password_body_html.mak:16
+msgid "Suricat', your digital assistant"
+msgstr "Suricate, Votre assistant numérique"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:22
+#: tracim_backend/templates/mail/reset_password_body_html.mak:20
+msgid "Suricat', the bot"
+msgstr "Suricate, le robot"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:25
+#: tracim_backend/templates/mail/reset_password_body_html.mak:23
+msgid "powered by tracim software"
+msgstr "généré par le logiciel tracim"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:4
 msgid ""
-"This email was automatically sent by <i>Tracim</i>, a collaborative "
-"software developped by Algoo."
+"Someone has requested to reset the password for your account on "
+"<i>{website_title}</i>."
 msgstr ""
+"Quelqu'un à demandez la réinitialisation du mot de passe de votre compte "
+"sur <i>{website_title}</i>"
 
-#: tracim_backend/templates/mail/content_update_body_text.mak:3
-msgid "Dear {user}"
-msgstr "Cher {user}"
-
-#: tracim_backend/templates/mail/content_update_body_text.mak:5
-msgid ""
-"This email is intended to be read as HTML content.Please configure your "
-"email client to get the best of Tracim notifications."
+#: tracim_backend/templates/mail/reset_password_body_html.mak:6
+msgid "If you did not perform this request, you can safely ignore this email."
 msgstr ""
+"Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet "
+"email en toute sécurité."
 
-#: tracim_backend/templates/mail/content_update_body_text.mak:6
-msgid ""
-"We understand that Email was originally intended to carry raw text only.\n"
-"And you probably understand on your own that we are a decades after email"
-" \n"
-" was created ;)"
+#: tracim_backend/templates/mail/reset_password_body_html.mak:9
+msgid "In order to reset your password, please click on following link :"
 msgstr ""
+"Afin de réinitialiser votre mot de passe, merci de cliquer sur le lien "
+"suivant :"
 
-#: tracim_backend/templates/mail/content_update_body_text.mak:8
-msgid "Hope you'll switch your mail client configuration and enjoy Tracim :)"
+#: tracim_backend/templates/mail/reset_password_body_html.mak:10
+msgid "Reset my password"
+msgstr "Réinitialiser mon mot de passe"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:12
+msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
-
-#: tracim_backend/templates/mail/content_update_body_text.mak:13
-msgid ""
-"You receive this email because you are registered on {website_title} \n"
-" and you are {role} in the workspace {workspace_label}."
-msgstr ""
-
-#: tracim_backend/templates/mail/content_update_body_text.mak:20
-#: tracim_backend/templates/mail/created_account_body_text.mak:18
-msgid ""
-"This email was sent by *Tracim*,\n"
-"a collaborative software developped by Algoo."
-msgstr ""
-
-#: tracim_backend/templates/mail/created_account_body_html.mak:46
-msgid "Created account"
-msgstr ""
-
-#: tracim_backend/templates/mail/created_account_body_html.mak:55
-#: tracim_backend/templates/mail/created_account_body_text.mak:3
-msgid "An administrator just create account for you on {website_title}"
-msgstr ""
-
-#: tracim_backend/templates/mail/created_account_body_html.mak:61
-#: tracim_backend/templates/mail/created_account_body_text.mak:7
-msgid "Login"
-msgstr ""
-
-#: tracim_backend/templates/mail/created_account_body_html.mak:64
-#: tracim_backend/templates/mail/created_account_body_text.mak:8
-msgid "Password"
-msgstr "Mot de passe"
-
-#: tracim_backend/templates/mail/created_account_body_html.mak:71
-msgid "To go to {website_title}, please click on following link :"
-msgstr ""
-
-#: tracim_backend/templates/mail/created_account_body_html.mak:82
-msgid ""
-"This email was sent by <i>Tracim</i>, a collaborative software developped"
-" by Algoo."
-msgstr ""
-
-#: tracim_backend/templates/mail/created_account_body_text.mak:10
-msgid "To go to {website_title}, please click on following link"
-msgstr ""
+"Si le lien ne fonctionne pas, Je vous suggère de copier/coller l'url "
+"entière:"
 

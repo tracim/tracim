@@ -11,7 +11,7 @@
 </ul>
 
 <p>
-    ${_('Let start to discuss, share files, agenda and documention with collaborators by logging into your shared space: {a_link}').format(a_link='<a href="{url}">{url}</a>'.format(url=login_url))}
+    ${_('Let start to discuss, share files, agenda and documentation with collaborators by logging into your shared space: {a_link}').format(a_link='<a href="{url}">{url}</a>'.format(url=login_url))}
 </p>
 <p>${_("note: as soon as you are connected, we strongly recommend that you change your password and delete this email.")}</p>
 <p>${_("Enjoy your day :)")}</p>
@@ -19,8 +19,8 @@
 
 <pre>
 --
-Suricat', the bot
+${_("Suricat', the bot")}
 ${config.WEBSITE_TITLE}
 <a href="${config.WEBSITE_BASE_URL}">${config.WEBSITE_BASE_URL}</a>
-powered by tracim software - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
+${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
 </pre>
