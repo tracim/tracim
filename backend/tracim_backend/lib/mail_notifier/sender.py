@@ -113,9 +113,14 @@ class EmailSender(object):
             self.connect()  # Actually, this connects to SMTP only if required
             logger.info(self, 'Sending email to {}'.format(message['To']))
             self._smtp_connection.send_message(message)
+            # TODO - G.M - 2019-01-29 - optimisize this code, we should not send
+            # email if connection has failed.
+            send_action = '{:8s}'.format('SENT')
+            failed_action = '{:8s}'.format('SENDFAIL')
+            action = send_action
             from tracim_backend.lib.mail_notifier.notifier import EmailManager
             EmailManager.log_notification(
-                action='   SENT',
+                action=action,
                 recipient=message['To'],
                 subject=message['Subject'],
                 config=self.config,
