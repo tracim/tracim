@@ -62,6 +62,8 @@ class EmailSender(object):
         if not self._smtp_connection:
             log = 'Connecting from SMTP server {}'
             logger.info(self, log.format(self._smtp_config.server))
+            # TODO - G.M - 2019-01-29 - Support for SMTP SSL-only port connection
+            # using smtplib.SMTP_SSL
             self._smtp_connection = smtplib.SMTP(
                 self._smtp_config.server,
                 self._smtp_config.port
