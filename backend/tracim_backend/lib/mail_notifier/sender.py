@@ -94,7 +94,7 @@ class EmailSender(object):
                         )
                     )
                 except Exception as exc:
-                    log = 'Unnexpected exception during SMTP start TLS process: {}'
+                    log = 'Unexpected exception during SMTP start TLS process: {}'
                     logger.error(self, log.format(exc.__str__()))
                     logger.error(self, traceback.format_exc())
 
@@ -141,7 +141,7 @@ class EmailSender(object):
                         )
                     )
                 except Exception as exc:
-                    log = 'Unnexpected exception during SMTP login {}'
+                    log = 'Unexpected exception during SMTP login {}'
                     logger.error(self, log.format(exc.__str__()))
                     logger.error(self, traceback.format_exc())
 
@@ -187,7 +187,7 @@ class EmailSender(object):
                 logger.error(self, log.format(str(exc)))
                 action = failed_action
             except Exception as exc:
-                log = 'Unnexpected exception during sending email message using SMTP: {}'
+                log = 'Unexpected exception during sending email message using SMTP: {}'
                 logger.error(self, log.format(exc.__str__()))
                 logger.error(self, traceback.format_exc())
                 action = failed_action
