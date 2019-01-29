@@ -74,9 +74,11 @@ class EmailSender(object):
             if self._smtp_config.login:
                 try:
                     starttls_result = self._smtp_connection.starttls()
-                    log = 'SMTP Start TLS return code: {} with message: {}'
+
                     if starttls_result[0] == 220:
                         logger.info(self, 'STMP Start TLS OK')
+
+                    log = 'SMTP Start TLS return code: {} with message: {}'
                     logger.debug(
                         self,
                         log.format(
@@ -105,11 +107,13 @@ class EmailSender(object):
                         self._smtp_config.login,
                         self._smtp_config.password
                     )
-                    log = 'SMTP login return code: {} with message: {}'
+
                     if login_res[0] == 235:
                         logger.info(self, 'STMP Authentication Successful')
                     if login_res[0] == 503:
                         logger.info(self, 'STMP Already Authenticated')
+
+                    log = 'SMTP login return code: {} with message: {}'
                     logger.debug(
                         self,
                         log.format(
