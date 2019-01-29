@@ -933,6 +933,10 @@ class UserApi(object):
 
     def _user_can_authenticate(self, user: User) -> bool:
         valid_auth_types = list(self._config.AUTH_TYPES)
+        # INFO - G.M - 2019-01-29 - we need to add Unknown as config doesn't
+        # list it for some reason and as unknown is a valid auth method.
+        # this fix issue 1359 :
+        # https://github.com/tracim/tracim/issues/1359
         valid_auth_types.append(AuthType.UNKNOWN)
         return user.auth_type and user.auth_type in valid_auth_types
 
