@@ -179,7 +179,8 @@ class EmailSender(object):
                     # time. send_message will not raise exception
                     # just if some recipient work and some other failed.
                     # TODO - G.M - 2019-01-29 - better support for multirecipient email
-                    logger.debug(self, 'Mail could not be send to some recipient')
+                    log = 'Mail could not be send to some recipient: {}'
+                    logger.debug(self, log.format(send_message_result))
                     action = failed_action
 
             except smtplib.SMTPException as exc:
