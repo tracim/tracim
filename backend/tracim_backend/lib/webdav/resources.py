@@ -142,7 +142,10 @@ class RootResource(DAVCollection):
 
         Though for perfomance issue, we're not using this function anymore
         """
-        return [workspace.label for workspace in self.workspace_api.get_all()]
+        return [
+            webdav_convert_file_name_to_display(workspace.label)
+            for workspace in self.workspace_api.get_all()
+        ]
 
     @webdav_check_right(is_user)
     def getMember(self, label: str) -> DAVCollection:
@@ -210,7 +213,14 @@ class RootResource(DAVCollection):
 
         members = []
         for workspace in self.workspace_api.get_all():
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', workspace.label)
+            workspace_label = webdav_convert_file_name_to_display(workspace.label)
+
+            if not self.path.endswith('/'):
+                path = '{}/'.format(self.path)
+            else:
+                path = self.path
+
+            workspace_path = '{}{}'.format(path, workspace_label)
             members.append(
                 WorkspaceResource(
                     path=workspace_path,
@@ -284,7 +294,7 @@ class WorkspaceResource(DAVCollection):
             # the purpose is to display .history only if there's at least one content's type that has a history
             if content.type != content_type_list.Folder.slug:
                 self._file_count += 1
-            retlist.append(content.file_name)
+            retlist.append(webdav_convert_file_name_to_display(content.file_name))
 
         return retlist
 
