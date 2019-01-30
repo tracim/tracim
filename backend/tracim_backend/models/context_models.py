@@ -377,9 +377,11 @@ class ActiveContentFilter(object):
             self,
             limit: int = None,
             before_content_id: datetime = None,
+            after_revision_id: int = None
     ) -> None:
         self.limit = limit
         self.before_content_id = before_content_id
+        self.after_revision_id = after_revision_id
 
 
 class ContentIdsQuery(object):

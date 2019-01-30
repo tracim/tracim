@@ -1294,6 +1294,7 @@ class ContentApi(object):
             limit: typing.Optional[int]=None,
             before_content: typing.Optional[Content]= None,
             content_ids: typing.Optional[typing.List[int]] = None,
+            after_revision_id: typing.Optional[int] = None
     ) -> typing.List[Content]:
         """
         get contents list sorted by last update
@@ -1310,6 +1311,8 @@ class ContentApi(object):
         resultset = self._get_all_query(
             workspace=workspace,
         )
+        if after_revision_id:
+            resultset = resultset.filter(Content.revision_id > after_revision_id)
         if content_ids:
             resultset = resultset.filter(
                 or_(

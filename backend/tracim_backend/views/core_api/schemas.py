@@ -599,6 +599,13 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
         allow_none=True,
         description='return only content updated before this content',
     )
+    after_revision_id = marshmallow.fields.Int(
+        example=87,
+        default=None,
+        allow_none=True,
+        description='Return content where last revision of them or of their'
+                    'comments is stricly superior than after_revision_id given'
+    )
 
     @post_load
     def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1056,6 +1063,7 @@ class ContentDigestSchema(marshmallow.Schema):
         format=DATETIME_FORMAT,
         description='Content creation date',
     )
+    current_revision_id = marshmallow.fields.Int(example=12, allow_none=True)
 
 
 class ReadStatusSchema(marshmallow.Schema):
@@ -1070,7 +1078,6 @@ class ReadStatusSchema(marshmallow.Schema):
 
 
 class ContentSchema(ContentDigestSchema):
-    current_revision_id = marshmallow.fields.Int(example=12)
     author = marshmallow.fields.Nested(UserDigestSchema)
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 

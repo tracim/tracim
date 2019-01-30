@@ -414,6 +414,7 @@ class UserController(Controller):
             workspace=workspace,
             limit=content_filter.limit or None,
             before_content=before_content,
+            after_revision_id=content_filter.after_revision_id
         )
         return [
             api.get_content_in_context(content)
