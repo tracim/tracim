@@ -3,9 +3,31 @@
 from tracim_sync_exceptions import ConfigException
 
 
+
+class Config(object):
+
+    BASE_FOLDER = "/tmp/tracym-sync"
+    DB_PATH = "/tmp/test.sqlite"
+    INSTANCES = {
+        "tracim": {
+            "url": "http://localhost:6543",
+            "login": "admin@admin.admin",
+            "password": "admin@admin.admin",
+            "webdav": {
+                "url": "http://localhost:3030"
+            },
+            'excluded_workspaces': [],
+            'excluded_folders': [],
+        }
+    }
+
+    def get_instance(self, instance_label: str):
+        return self.INSTANCES[instance_label]
+
+
 class ConfigParser(object):
 
-    def load_config_from_file(self, file_path='': str):
+    def load_config_from_file(self, file_path=''):
         # TODO - load everything from a file config.yaml
         config = Config()
         self._check(config)
@@ -49,22 +71,3 @@ class ConfigParser(object):
                     'Une url pour le serveur webdav doit etre'
                     'défini pour l\'instance {}'.format(instance_name)
                 )
-
-
-class Config(object):
-
-    BASE_FOLDER = "/tmp/tracym-sync"
-    DB_PATH = ""
-    INSTANCES = {
-        "tracim": {
-            "url": "http://localhost:6543",
-            "login": "admin@admin.admin",
-            "password": "admin@admin.admin",
-            "webdav": {
-                "url": "http://localhost:3030"
-            }
-        }
-    }
-
-    def get_instance(self, instance_label: str):
-        return self.INSTANCES[instance_label]

@@ -3,9 +3,7 @@
 import json
 
 from enum import Enum
-from requests import requests
-
-from config import CONFIG
+import requests
 
 
 from tracim_sync_exceptions import ConnectionException
@@ -37,7 +35,7 @@ class ContentAdapter(object):
     content_model = None
 
     def __init__(self, instance_label, workspace_label, content: dict):
-        self.content = content_as_dict
+        self.content = content
         self.instance_label = instance_label
         self.workspace_label = workspace_label
 
@@ -80,19 +78,19 @@ class ContentAdapter(object):
         self._revision_id = revision_id
 
     def is_file(self) -> bool:
-        return ContentType.FILE = self.content_type
+        return ContentType.FILE.value == self.content_type
 
     def is_folder(self) -> bool:
-        return ContentType.FOLDER = self.content_type
+        return ContentType.FOLDER.value == self.content_type
 
     def is_thread(self) -> bool:
-        return ContentType.THREAD = self.content_type
+        return ContentType.THREAD.value == self.content_type
 
     def is_document(self) -> bool:
-        return ContentType.DOCUMENT = self.content_type
+        return ContentType.DOCUMENT.value == self.content_type
 
     def is_comment(self) -> bool:
-        return ContentType.COMMENT = self.content_type
+        return ContentType.COMMENT.value == self.content_type
 
     def is_sub_content_of(self, parent_id: int) -> bool:
         return self.parent_id == parent_id
@@ -111,7 +109,7 @@ class ContentAdapter(object):
 class WorkspaceAdapter(object):
 
     def __init__(self, workspace: dict):
-        self.workspace = workspace_as_dict
+        self.workspace = workspace
 
     @property
     def workspace_id(self):
@@ -134,8 +132,7 @@ class InstanceAdapter(object):
     def __init__(self, instance_label: str, instance_params: dict):
         self.label = instance_label
         self.remote_url = instance_params.get('url')
-        auth = instance_params.get('auth')
-        self.auth = (auth.get('login'), auth.get('password'))
+        self.auth = (instance_params.get('login'), instance_params.get('password'))
         self.webdav_url = instance_params.get('webdav')
         self.excluded_workspaces = instance_params.get('excluded_workspaces')
         self.excluded_folders = instance_params.get('excluded_folders')
@@ -146,11 +143,11 @@ class InstanceAdapter(object):
         contents = list()
         for workspace in workspaces:
             contents += self.load_workspace_contents(workspace)
-        return 
+        return contents
 
     def load_workspaces(self):
         request = requests.get(
-            Url.WORKSPACE.format(remote=self.remote_url),
+            Url.WORKSPACE.value.format(remote=self.remote_url),
             auth=self.auth
         )
         if request.status_code != 200:
@@ -160,14 +157,14 @@ class InstanceAdapter(object):
 
         for tracim_workspace in tracim_workspaces:
             workspace = WorkspaceAdapter(tracim_workspace)
-            if workspace.content_id not in self.excluded_workspaces:
+            if workspace.workspace_id not in self.excluded_workspaces:
                 workspaces.append(workspace)
 
         return workspaces
 
     def load_workspace_contents(self, workspace: WorkspaceAdapter):
         workspace_id = workspace.workspace_id
-        url = Url.Content.format(
+        url = Url.CONTENT.value.format(
             remote=self.remote_url, workspace_id=workspace_id
         )
         request = requests.get(
@@ -208,12 +205,13 @@ class InstanceAdapter(object):
                     workspace_id=workspace_id,
                     content_id=content.content_id
                 ))
-            contents.append(content)
 
+            if not content.is_comment():
+                contents.append(content)
         return contents
 
     def load_file_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.FILE.format(
+        url = Url.FILE.value.format(
             remote=self.remote_url,
             workspace_id=workspace_id,
             content_id=content_id
@@ -230,7 +228,7 @@ class InstanceAdapter(object):
         )['current_revision_id']
 
     def load_thread_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.THREAD.format(
+        url = Url.THREAD.value.format(
             remote=self.remote_url,
             workspace_id=workspace_id,
             content_id=content_id
@@ -247,7 +245,7 @@ class InstanceAdapter(object):
         )['current_revision_id']
 
     def load_document_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.DOCUMENT.format(
+        url = Url.DOCUMENT.value.format(
             remote=self.remote_url,
             workspace_id=workspace_id,
             content_id=content_id
@@ -264,7 +262,7 @@ class InstanceAdapter(object):
         )['current_revision_id']
 
     def load_folder_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.FOLDER.format(
+        url = Url.FOLDER.value.format(
             remote=self.remote_url,
             workspace_id=workspace_id,
             content_id=content_id
