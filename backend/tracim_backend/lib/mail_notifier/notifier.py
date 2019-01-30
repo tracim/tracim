@@ -301,11 +301,12 @@ class EmailManager(object):
             # may not include all required labels. In order to avoid partial format() (which result in an exception)
             # we do use replace and force the use of .__str__() in order to process LazyString objects
             #
-            subject = self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT
-            subject = subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE_TITLE.__str__())
+            content_status = translator.get_translation(main_content.get_status().label)
+            translated_subject = translator.get_translation(self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT)
+            subject = translated_subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE_TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
-            subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
+            subject = subject.replace(EST.CONTENT_STATUS_LABEL, content_status)
             reply_to_label = _('{username} & all members of {workspace}').format(  # nopep8
                 username=user.display_name,
                 workspace=main_content.workspace.label)
@@ -378,13 +379,14 @@ class EmailManager(object):
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
         )
-
-        subject = \
-            self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT \
-            .replace(
-                EST.WEBSITE_TITLE,
-                str(self.config.WEBSITE_TITLE)
-            )
+        translator = Translator(self.config, default_lang=user.lang)
+        translated_subject = translator.get_translation(
+            self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT
+        )
+        subject = translated_subject.replace(
+            EST.WEBSITE_TITLE,
+            str(self.config.WEBSITE_TITLE)
+        )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
         message['From'] = self._get_sender()
@@ -438,7 +440,10 @@ class EmailManager(object):
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
         )
-        subject = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT.replace(
+        translated_subject = translator.get_translation(
+            self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT
+        )
+        subject = translated_subject.replace(
             EST.WEBSITE_TITLE,
             str(self.config.WEBSITE_TITLE)
         )
@@ -608,10 +613,11 @@ class EmailManager(object):
             content_intro = ''
             call_to_action_url = parent_in_context.frontend_url
         elif ActionDescription.STATUS_UPDATE == action:
+            new_status = translator.get_translation(content.get_status().label)
             main_title = content_in_context.label
             content_intro = _('I modified the status of <i>{content}</i>. The new status is <i>{new_status}</i>').format(
                 content=content.get_label(),
-                new_status=content.get_status().label
+                new_status=new_status
             )
             content_text = ''
             call_to_action_url = content_in_context.frontend_url

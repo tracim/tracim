@@ -1,13 +1,9 @@
-# English translations for tracim
-# Copyright (C) 2019 Algoo
-# This file is distributed under the same license as the tracim
-# project.
-#
+
 msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-01-30 10:32+0100\n"
+"POT-Creation-Date: 2019-01-30 11:47+0100\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -17,6 +13,37 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
+
+#: tracim_backend/config.py:282
+#, fuzzy
+msgid ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+msgstr ""
+
+#: tracim_backend/config.py:290
+msgid "[{website_title}] Someone created an account for you"
+msgstr ""
+
+#: tracim_backend/config.py:299
+msgid "[{website_title}] A password reset has been requested"
+msgstr ""
+
+#: tracim_backend/app_models/contents.py:48
+msgid "Open"
+msgstr ""
+
+#: tracim_backend/app_models/contents.py:56
+msgid "Validated"
+msgstr ""
+
+#: tracim_backend/app_models/contents.py:64
+msgid "Cancelled"
+msgstr ""
+
+#: tracim_backend/app_models/contents.py:72
+msgid "Deprecated"
+msgstr ""
 
 #: tracim_backend/lib/core/content.py:2138
 msgid "New folder"
@@ -34,25 +61,25 @@ msgstr "Shared space"
 msgid "Workspace {}"
 msgstr "Shared space {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:299
+#: tracim_backend/lib/mail_notifier/notifier.py:300
 msgid "{username} & all members of {workspace}"
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:601
+#: tracim_backend/lib/mail_notifier/notifier.py:607
 msgid ""
 "I modified the status of <i>{content}</i>. The new status is "
 "<i>{new_status}</i>"
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:609
+#: tracim_backend/lib/mail_notifier/notifier.py:615
 msgid "I added an item entitled <i>{content}</i>."
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:613
+#: tracim_backend/lib/mail_notifier/notifier.py:619
 msgid "I updated <i>{content}</i>."
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:620
+#: tracim_backend/lib/mail_notifier/notifier.py:626
 msgid "Here is an overview of the changes:"
 msgstr ""
 

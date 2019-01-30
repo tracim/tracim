@@ -15,6 +15,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.translation import translator_marker
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
@@ -46,6 +47,7 @@ class CFG(object):
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         """Parse configuration file."""
 
+        _ = translator_marker
         ###
         # General
         ###
@@ -280,6 +282,7 @@ class CFG(object):
         )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
             'email.notification.content_update.subject',
+            _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
         )
         # Created account notification
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
@@ -287,7 +290,7 @@ class CFG(object):
         )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
             'email.notification.created_account.subject',
-            '[{website_title}] Someone created an account for you',
+            _('[{website_title}] Someone created an account for you'),
         )
 
         # Reset password notification
@@ -296,7 +299,7 @@ class CFG(object):
         )
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
             'email.notification.reset_password_request.subject',
-            '[{website_title}] A password reset has been requested'
+            _('[{website_title}] A password reset has been requested'),
         )
 
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
