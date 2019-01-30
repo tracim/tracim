@@ -132,7 +132,10 @@ class InstanceAdapter(object):
     def __init__(self, instance_label: str, instance_params: dict):
         self.label = instance_label
         self.remote_url = instance_params.get('url')
-        self.auth = (instance_params.get('login'), instance_params.get('password'))
+        self.auth = (
+            instance_params.get('login'),
+            instance_params.get('password')
+        )
         self.webdav_url = instance_params.get('webdav')
         self.excluded_workspaces = instance_params.get('excluded_workspaces')
         self.excluded_folders = instance_params.get('excluded_folders')
@@ -194,19 +197,20 @@ class InstanceAdapter(object):
                     content_id=content.content_id
                 ))
 
-            if content.is_thread():
-                content.set_revision_id(self.load_thread_revision_id(
-                    workspace_id=workspace_id,
-                    content_id=content.content_id
-                ))
-
             if content.is_folder():
                 content.set_revision_id(self.load_folder_revision_id(
                     workspace_id=workspace_id,
                     content_id=content.content_id
                 ))
 
-            if not content.is_comment():
+            if content.is_thread():
+                print('content ignored {}'.format(content.filename))
+                # content.set_revision_id(self.load_thread_revision_id(
+                    # workspace_id=workspace_id,
+                    # content_id=content.content_id
+                # ))
+
+            if not (content.is_comment() or content.is_thread()):
                 contents.append(content)
         return contents
 
