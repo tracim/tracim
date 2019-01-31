@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 import typing
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -185,27 +186,28 @@ class EmailManager(object):
     # Content Notification
 
     @staticmethod
-    def log_notification(
+    def log_email_notification(
             config: CFG,
+            msg: str,
             action: str,
-            recipient: typing.Optional[str],
-            subject: typing.Optional[str],
+            email_recipient: typing.Optional[str],
+            email_subject: typing.Optional[str],
     ) -> None:
         """Log notification metadata."""
-        log_path = config.EMAIL_NOTIFICATION_LOG_FILE_PATH
-        if log_path:
-            # TODO - A.P - 2017-09-06 - file logging inefficiency
-            # Updating a document with 100 users to notify will leads to open
-            # and close the file 100 times.
-            with open(log_path, 'a') as log_file:
-                print(
-                    datetime.datetime.now(),
-                    action,
-                    recipient,
-                    subject,
-                    sep='|',
-                    file=log_file,
-                )
+
+        infos = {
+            'action': action,
+            'recipient': email_recipient,
+            'subject': email_subject,
+            'network': 'email',
+        }
+        email_notification_logger = logging.getLogger(
+            'tracim_email_notification'
+        )
+        email_notification_logger.info(
+            msg=msg,
+            extra=infos,
+        )
 
     def notify_content_update(
             self,
@@ -259,20 +261,28 @@ class EmailManager(object):
             return
 
 
-        logger.info(self, 'Sending asynchronous emails to {} user(s)'.format(len(notifiable_roles)))
+        logger.info(self, 'Generating content {} notification email for {} user(s)'.format(
+            content.content_id,
+            len(notifiable_roles)
+        ))
         # INFO - D.A. - 2014-11-06
         # The following email sender will send emails in the async task queue
         # This allow to build all mails through current thread but really send them (including SMTP connection)
         # In the other thread.
         #
         # This way, the webserver will return sooner (actually before notification emails are sent
-        async_email_sender = EmailSender(
+        email_sender = EmailSender(
             self.config,
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
         )
         for role in notifiable_roles:
-            logger.info(self, 'Sending email to {}'.format(role.user.email))
+            logger.info(self,
+                        'Generating content {} notification email to {}'.format(
+                            content.content_id,
+                            role.user.email
+                        )
+            )
             translator = Translator(app_config=self.config, default_lang=role.user.lang)  # nopep8
             _ = translator.get_translation
             to_addr = formataddr((role.user.display_name, role.user.email))
@@ -342,16 +352,17 @@ class EmailManager(object):
             message.attach(part1)
             message.attach(part2)
 
-            self.log_notification(
+            self.log_email_notification(
+                msg='an email was created to {}'.format(message['To']),
                 action='{:8s}'.format('CREATED'),
-                recipient=message['To'],
-                subject=message['Subject'],
+                email_recipient=message['To'],
+                email_subject=message['Subject'],
                 config=self.config,
             )
 
             send_email_through(
                 self.config,
-                async_email_sender.send_mail,
+                email_sender.send_mail,
                 message
             )
 

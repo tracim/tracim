@@ -25,10 +25,23 @@ def send_email_through(
     :param sendmail_callable: A callable who get message on first parameter
     :param message: The message who have to be sent
     """
-
     if config.EMAIL_PROCESSING_MODE == config.CST.SYNC:
+        logger.info(
+            send_email_through,
+            'send email to {} synchronously'.format(
+                message['To']
+            )
+        )
         sendmail_callable(message)
     elif config.EMAIL_PROCESSING_MODE == config.CST.ASYNC:
+        logger.info(
+            send_email_through,
+            'send email to {} asynchronously:'
+            'mail stored in queue in wait for a'
+            'mail_notifier daemon'.format(
+                message['To']
+            )
+        )
         redis_connection = get_redis_connection(config)
         queue = get_rq_queue(redis_connection, 'mail_sender')
         queue.enqueue(sendmail_callable, message)
@@ -198,9 +211,17 @@ class EmailSender(object):
                 action = failed_action
 
             from tracim_backend.lib.mail_notifier.notifier import EmailManager
-            EmailManager.log_notification(
+            if action == send_action:
+                msg = 'an email was sended to {}'.format(message['To'])
+            else:
+                msg = 'fail to send email to {}'.format(message['To'])
+
+            EmailManager.log_email_notification(
+                msg=msg,
                 action=action,
-                recipient=message['To'],
-                subject=message['Subject'],
+                email_recipient=message['To'],
+                email_subject=message['Subject'],
                 config=self.config,
             )
+
+
