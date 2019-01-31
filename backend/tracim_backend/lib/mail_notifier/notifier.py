@@ -343,7 +343,7 @@ class EmailManager(object):
             message.attach(part2)
 
             self.log_notification(
-                action='CREATED',
+                action='{:8s}'.format('CREATED'),
                 recipient=message['To'],
                 subject=message['Subject'],
                 config=self.config,
