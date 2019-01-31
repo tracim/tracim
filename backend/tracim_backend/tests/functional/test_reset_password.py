@@ -7,11 +7,12 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend import error
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests import MailHogFunctionalTest
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.user import UserApi
 
 
-class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
+class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
 
     fixtures = [BaseFixture]
     config_section = 'functional_test_with_mail_test_sync'
@@ -19,7 +20,6 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_request__ok__nominal_case(self):
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         params = {
             'email': 'admin@admin.admin'
         }
@@ -28,14 +28,12 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
             status=204,
             params=params,
         )
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
         assert headers['Subject'][0] == '[TRACIM] Reset Password Request'
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     @pytest.mark.email_notification
     @pytest.mark.unknown_auth
@@ -68,7 +66,6 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
 
         # make a request of password
         self.testapp.authorization = None
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         params = {
             'email': 'test@test.test'
         }
@@ -77,19 +74,16 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
             status=204,
             params=params,
         )
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'test user <test@test.test>'
         assert headers['Subject'][0] == '[TRACIM] Reset Password Request'
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_request__err_400__user_not_exist(self):
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         params = {
             'email': 'this@does.notexist'
         }
@@ -101,10 +95,8 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 0
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
 class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
 
@@ -112,7 +104,6 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
 
     @pytest.mark.internal_auth
     def test_api__reset_password_request__ok__nominal_case(self):
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         params = {
             'email': 'admin@admin.admin'
         }
@@ -155,7 +146,6 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
 
         # make a request of password
         self.testapp.authorization = None
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         params = {
             'email': 'test@test.test'
         }
