@@ -1117,6 +1117,9 @@ class ContentApi(object):
         label: str = None,
         order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
         complete_path_to_id: int = None,
+        after_revision_id: int = None,
+        limit: int = None,
+        offset: int = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -1128,6 +1131,10 @@ class ContentApi(object):
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
+        :param after_revision_id: filter with only content with revision_id >
+        than after revision_id param
+        :param limit: limit number of elements available
+        :param offset: offset to get elements available
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
@@ -1136,6 +1143,8 @@ class ContentApi(object):
         assert not complete_path_to_id or isinstance(complete_path_to_id, int)
         resultset = self._base_query(workspace)
 
+        if after_revision_id:
+            resultset = resultset.filter(Content.revision_id > after_revision_id)
         # INFO - G.M - 2018-11-12 - Get list of all ancestror
         #  of content, workspace root included
         if complete_path_to_id:
@@ -1186,6 +1195,10 @@ class ContentApi(object):
         for _property in order_by_properties:
             resultset = resultset.order_by(_property)
 
+        if limit is not None:
+            resultset = resultset.limit(limit)
+        if offset is not None:
+            resultset = resultset.offset(offset)
         return resultset
 
     def get_all(
@@ -1196,6 +1209,9 @@ class ContentApi(object):
             label: str=None,
             order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
             complete_path_to_id: int = None,
+            after_revision_id: int = None,
+            limit: int = None,
+            offset: int = None,
     ) -> typing.List[Content]:
         """
         Return all content using some filters
@@ -1207,10 +1223,14 @@ class ContentApi(object):
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
+        :param after_revision_id: filter with only content with revision_id >
+        than after revision_id param
+        :param limit: limit number of elements available
+        :param offset: offset to get elements available
         :return: List of contents
         """
         order_by_properties = order_by_properties or []  # FDV
-        return self._get_all_query(parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id).all()
+        return self._get_all_query(parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id, after_revision_id, limit, offset).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:

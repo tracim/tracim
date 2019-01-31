@@ -16,6 +16,7 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import ContentFilterExtended
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
@@ -584,6 +585,31 @@ class FilterContentQuerySchema(marshmallow.Schema):
     def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentFilter(**data)
 
+class FilterContentQuerySchemaExtended(FilterContentQuerySchema):
+
+    after_revision_id = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description='filter by revision_id number, show only content '
+                    'with revision_id > to rev id givent',
+        validate=positive_int_validator,
+    )
+    limit = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description='limit of elem to receive',
+        validate=positive_int_validator,
+    )
+    offset = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description='offset for element to receive',
+        validate=positive_int_validator,
+    )
+
+    @post_load
+    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentFilterExtended(**data)
 
 class ActiveContentFilterQuerySchema(marshmallow.Schema):
     limit = marshmallow.fields.Int(

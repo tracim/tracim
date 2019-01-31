@@ -342,6 +342,35 @@ class PageQuery(object):
         self.force_download = force_download
         self.page = page
 
+class ContentFilterExtended(object):
+    """
+    Content filter extended model
+    """
+    def __init__(
+            self,
+            workspace_id: int = None,
+            complete_path_to_id: int = None,
+            parent_ids: str = None,
+            show_archived: int = 0,
+            show_deleted: int = 0,
+            show_active: int = 1,
+            content_type: str = None,
+            label: str = None,
+            offset: int = None,
+            limit: int = None,
+            after_revision_id: int = 0
+    ) -> None:
+        self.parent_ids = string_to_list(parent_ids, ',', int)
+        self.complete_path_to_id = complete_path_to_id
+        self.workspace_id = workspace_id
+        self.show_archived = bool(show_archived)
+        self.show_deleted = bool(show_deleted)
+        self.show_active = bool(show_active)
+        self.limit = limit
+        self.offset = offset
+        self.label = label
+        self.content_type = content_type
+        self.after_revision_id = after_revision_id
 
 class ContentFilter(object):
     """

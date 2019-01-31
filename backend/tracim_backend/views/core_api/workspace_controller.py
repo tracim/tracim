@@ -51,6 +51,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
+from tracim_backend.views.core_api.schemas import FilterContentQuerySchemaExtended
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 from tracim_backend.views.core_api.schemas import ContentMoveSchema
@@ -427,6 +428,49 @@ class WorkspaceController(Controller):
             newly_created=newly_created,
             email_sent=email_sent,
         )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @check_right(is_reader)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_query(FilterContentQuerySchemaExtended())
+    @hapic.output_body(ContentDigestSchema(many=True))
+    def workspace_content_extended(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        return a list of contents of the space. extended version.
+        This is NOT the full content list: by default, returned contents are the ones at root level.
+        In order to get contents in a given folder, then use parent_id query filter.
+        You can also show.hide archived/deleted contents.
+        """
+        app_config = request.registry.settings['CFG']
+        content_filter = hapic_data.query
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+            show_archived=content_filter.show_archived,
+            show_deleted=content_filter.show_deleted,
+            show_active=content_filter.show_active,
+        )
+        contents = api.get_all(
+            parent_ids=content_filter.parent_ids,
+            complete_path_to_id=content_filter.complete_path_to_id,
+            workspace=request.current_workspace,
+            content_type=content_filter.content_type or content_type_list.Any_SLUG,
+            label=content_filter.label,
+            order_by_properties=[Content.label],
+            after_revision_id=content_filter.after_revision_id,
+            limit=content_filter.limit,
+            offset=content_filter.offset,
+        )
+        contents = [
+            api.get_content_in_context(content) for content in contents
+        ]
+        return contents
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @check_right(is_reader)
@@ -811,6 +855,9 @@ class WorkspaceController(Controller):
         # Workspace Content
         configurator.add_route('workspace_content', '/workspaces/{workspace_id}/contents', request_method='GET')  # nopep8
         configurator.add_view(self.workspace_content, route_name='workspace_content')  # nopep8
+        # Workspace Content Extended
+        configurator.add_route('workspace_content_extended', '/workspaces/{workspace_id}/contents/extended', request_method='GET')  # nopep8
+        configurator.add_view(self.workspace_content_extended, route_name='workspace_content_extended')  # nopep8
         # Create Generic Content
         configurator.add_route('create_generic_content', '/workspaces/{workspace_id}/contents', request_method='POST')  # nopep8
         configurator.add_view(self.create_generic_empty_content, route_name='create_generic_content')  # nopep8
