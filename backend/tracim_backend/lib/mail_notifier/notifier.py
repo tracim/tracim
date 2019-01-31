@@ -354,7 +354,7 @@ class EmailManager(object):
 
             self.log_email_notification(
                 msg='an email was created to {}'.format(message['To']),
-                action='CREATED',
+                action='{:8s}'.format('CREATED'),
                 email_recipient=message['To'],
                 email_subject=message['Subject'],
                 config=self.config,

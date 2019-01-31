@@ -223,13 +223,22 @@ class ContentTypeList(object):
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
         return allowed_type_slug
 
-    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+    def endpoint_allowed_types(self) -> typing.List[ContentType]:
         """
-        Same as restricted_allowed_types_slug but with special content_type
-        included like comments.
+        Same as restricted_allowed_types_slug but return
+        ContentType instead of str slug
+        and add special content_type included like comments.
         """
         content_types = self._content_types
         content_types.extend(self._special_contents_types)
+        return content_types
+
+    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+        """
+        same as endpoint_allowed_types but return str slug
+        instead of ContentType
+        """
+        content_types = self.endpoint_allowed_types()
         allowed_type_slug = [contents_type.slug for contents_type in content_types]  # nopep8
         return allowed_type_slug
 
