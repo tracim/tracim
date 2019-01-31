@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 import typing
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -20,7 +21,6 @@ from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.mail_notifier.utils import EST
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.logger import notification_logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.lib.utils.utils import get_login_frontend_url
@@ -201,7 +201,10 @@ class EmailManager(object):
             'subject': email_subject,
             'network': 'email',
         }
-        notification_logger.info(
+        email_notification_logger = logging.getLogger(
+            'tracim_email_notification'
+        )
+        email_notification_logger.info(
             msg=msg,
             extra=infos,
         )
