@@ -207,6 +207,10 @@ email.processing_mode = sync
 
 ## available choice: True or False
 email.notification.activated = False
+## you can enable or disable if invited user to shared space will be notified
+## on this shared space by default (default: True).
+## NB: new users will not being notified until they login to tracim a first time
+; email.notification.enabled_on_invitation = True
 ## You can change file_path for mail-notifications.log
 ; email.notification.log_file_path = /tmp/mail-notifications.log
 
