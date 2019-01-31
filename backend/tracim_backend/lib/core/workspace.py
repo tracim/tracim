@@ -219,6 +219,7 @@ class WorkspaceApi(object):
             if role.do_notify==True \
                     and role.user!=self._user \
                     and role.user.is_active\
+                    and not role.user.is_deleted\
                     and role.user.auth_type != AuthType.UNKNOWN:
                 roles.append(role)
         return roles
