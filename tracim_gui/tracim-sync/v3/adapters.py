@@ -21,7 +21,7 @@ class ContentType(Enum):
 class Url(Enum):
 
     WORKSPACE = "{remote}/api/v2/workspaces"
-    CONTENT = "{remote}/api/v2/workspaces/{workspace_id}/contents"
+    CONTENT = "{remote}/api/v2/workspaces/{workspace_id}/contents/extended?show_deleted=1&show_archived=1&after_revision_id={revision_id}"
     FOLDER = "{remote}/api/v2/workspaces/{workspace_id}/folders/{content_id}"
     FILE = "{remote}/api/v2/workspaces/{workspace_id}/files/{content_id}"
     THREAD = "{remote}/api/v2/workspaces/{workspace_id}/threads/{content_id}"  # nopep8
@@ -60,7 +60,7 @@ class ContentAdapter(object):
 
     @property
     def revision_id(self) -> int:
-        return int(self._revision_id)
+        return self.content.get('current_revision_id')
 
     @property
     def content_type(self):
@@ -94,6 +94,12 @@ class ContentAdapter(object):
 
     def is_sub_content_of(self, parent_id: int) -> bool:
         return self.parent_id == parent_id
+
+    def is_deleted(self) -> bool:
+        return self.content.get('is_deleted')
+
+    def is_archived(self) -> bool:
+        return self.content.get('is_archived')
 
     def __repr__(self) -> str:
         return '<Content {}>'.format(self.__str__())
@@ -129,14 +135,20 @@ class WorkspaceAdapter(object):
 
 class InstanceAdapter(object):
 
-    def __init__(self, instance_label: str, instance_params: dict):
+    def __init__(
+            self,
+            instance_label: str,
+            instance_params: dict,
+            revision_id: int
+    ):
+        self.revision_id = revision_id
         self.label = instance_label
         self.remote_url = instance_params.get('url')
         self.auth = (
             instance_params.get('login'),
             instance_params.get('password')
         )
-        self.webdav_url = instance_params.get('webdav')
+        self.workspaces = list()
         self.excluded_workspaces = instance_params.get('excluded_workspaces')
         self.excluded_folders = instance_params.get('excluded_folders')
 
@@ -149,10 +161,17 @@ class InstanceAdapter(object):
         return contents
 
     def load_workspaces(self):
-        request = requests.get(
-            Url.WORKSPACE.value.format(remote=self.remote_url),
-            auth=self.auth
-        )
+        if self.workspaces:
+            return self.workspaces
+        try:
+            request = requests.get(
+                Url.WORKSPACE.value.format(remote=self.remote_url),
+                auth=self.auth
+            )
+        except:
+            raise ConnectionException('Could not connect to {}'.format(
+                    self.remote_url
+                ))
         if request.status_code != 200:
             raise ConnectionException(request.reason)
         workspaces = list()
@@ -163,17 +182,22 @@ class InstanceAdapter(object):
             if workspace.workspace_id not in self.excluded_workspaces:
                 workspaces.append(workspace)
 
-        return workspaces
+        self.workspaces = workspaces
+        return self.workspaces
 
     def load_workspace_contents(self, workspace: WorkspaceAdapter):
         workspace_id = workspace.workspace_id
         url = Url.CONTENT.value.format(
-            remote=self.remote_url, workspace_id=workspace_id
+            remote=self.remote_url,
+            workspace_id=workspace_id,
+            revision_id=self.revision_id
         )
-        request = requests.get(
-            url,
-            auth=self.auth
-        )
+        try:
+            request = requests.get(url, auth=self.auth)
+        except requests.exceptions.ConnectionError:
+            raise ConnectionException('Could not connect to {}'.format(
+                self.remote_url
+            ))
         if request.status_code != 200:
             raise ConnectionException('{} - {}'.format(request.reason, url))
         contents = list()
@@ -185,99 +209,6 @@ class InstanceAdapter(object):
                 workspace.label,
                 tracim_content
             )
-            if content.is_file():
-                content.set_revision_id(self.load_file_revision_id(
-                    workspace_id=workspace_id,
-                    content_id=content.content_id
-                ))
-
-            if content.is_document():
-                content.set_revision_id(self.load_document_revision_id(
-                    workspace_id=workspace_id,
-                    content_id=content.content_id
-                ))
-
-            if content.is_folder():
-                content.set_revision_id(self.load_folder_revision_id(
-                    workspace_id=workspace_id,
-                    content_id=content.content_id
-                ))
-
-            if content.is_thread():
-                print('content ignored {}'.format(content.filename))
-                # content.set_revision_id(self.load_thread_revision_id(
-                    # workspace_id=workspace_id,
-                    # content_id=content.content_id
-                # ))
-
             if not (content.is_comment() or content.is_thread()):
                 contents.append(content)
         return contents
-
-    def load_file_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.FILE.value.format(
-            remote=self.remote_url,
-            workspace_id=workspace_id,
-            content_id=content_id
-        )
-        request = requests.get(
-            url,
-            auth=self.auth
-        )
-        if request.status_code != 200:
-            raise ConnectionException('{} - {}'.format(request.reason, url))
-
-        return json.loads(
-            request.content.decode('utf-8')
-        )['current_revision_id']
-
-    def load_thread_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.THREAD.value.format(
-            remote=self.remote_url,
-            workspace_id=workspace_id,
-            content_id=content_id
-        )
-        request = requests.get(
-            url,
-            auth=self.auth
-        )
-        if request.status_code != 200:
-            raise ConnectionException('{} - {}'.format(request.reason, url))
-
-        return json.loads(
-            request.content.decode('utf-8')
-        )['current_revision_id']
-
-    def load_document_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.DOCUMENT.value.format(
-            remote=self.remote_url,
-            workspace_id=workspace_id,
-            content_id=content_id
-        )
-        request = requests.get(
-            url,
-            auth=self.auth
-        )
-        if request.status_code != 200:
-            raise ConnectionException('{} - {}'.format(request.reason, url))
-
-        return json.loads(
-            request.content.decode('utf-8')
-        )['current_revision_id']
-
-    def load_folder_revision_id(self, workspace_id: int, content_id: int):
-        url = Url.FOLDER.value.format(
-            remote=self.remote_url,
-            workspace_id=workspace_id,
-            content_id=content_id
-        )
-        request = requests.get(
-            url,
-            auth=self.auth
-        )
-        if request.status_code != 200:
-            raise ConnectionException('{} - {}'.format(request.reason, url))
-
-        return json.loads(
-            request.content.decode('utf-8')
-        )['current_revision_id']

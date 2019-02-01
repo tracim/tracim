@@ -46,7 +46,7 @@ class ContentModel(BaseModel):
 
     workspace_id = Column('workspace_id', Integer, nullable=False)
     parent_id = Column(
-        'parent_id', Integer, ForeignKey('content.remote_id'), default=0
+        'parent_id', Integer, ForeignKey('content.remote_id')
     )
     children = relationship(
         "ContentModel",
@@ -63,9 +63,7 @@ class ContentModel(BaseModel):
 
     def _get_relative_path(self):
         if self.parent:
-            return os.path.join(
-                self.parent.relative_path, self.filename
-            )
+            return os.path.join(self.parent._get_relative_path(), self.filename)
         return os.path.join(
             self.instance_label,
             self.workspace_label,

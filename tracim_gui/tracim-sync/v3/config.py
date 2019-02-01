@@ -1,12 +1,20 @@
 # coding: utf8
 
+import os
+
 from tracim_sync_exceptions import ConfigException
 
+from yaml import load as yaml_load
+from yaml import YAMLError
+
+BASE_FOLDER_KEY = 'base_folder'
+DB_PATH_key = 'db_path'
+INSTANCES_key = 'instances'
 
 
 class Config(object):
 
-    BASE_FOLDER = "/tmp/tracym-sync"
+    BASE_FOLDER = "/tmp/tracim-sync"
     DB_PATH = "/tmp/test.sqlite"
     INSTANCES = {
         "tracim": {
@@ -24,12 +32,29 @@ class Config(object):
     def get_instance(self, instance_label: str):
         return self.INSTANCES[instance_label]
 
+    def __init__(self, config_as_dict: dict):
+        self.BASE_FOLDER = config_as_dict.get('base_folder')
+
 
 class ConfigParser(object):
 
     def load_config_from_file(self, file_path=''):
-        # TODO - load everything from a file config.yaml
-        config = Config()
+        if not file_path:
+            file_path = "config.yaml"
+        if not os.path.isfile(file_path):
+            raise ConfigException(
+                'Aucun fichier de configuration correspondans à {}'.format(
+                    file_path
+                )
+            )
+        with open(file_path, 'r') as config_file:
+            try:
+                config = Config(yaml_load(config_file))
+            except YAMLError:
+                import ipdb; ipdb.set_trace()
+                raise ConfigException(
+                    'Erreur de syntax dans le fichier de configuration'
+                )
         self._check(config)
         return config
 

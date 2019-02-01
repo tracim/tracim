@@ -1,0 +1,11 @@
+base_folder: "/tmp/tracim-sync"
+db_path: "/tmp/test.sqlite"
+instances:
+  tracim:
+    url: "http://localhost:6543"
+    login: "admin@admin.admin"
+    password: "admin@admin.admin"
+    webdav:
+      url: "http://localhost:3030"
+    excluded_workspaces: []
+    excluded_folders: []

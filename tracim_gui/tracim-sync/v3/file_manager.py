@@ -41,6 +41,7 @@ class FileManager(object):
             print('deleting {}'.format(content.relative_path))
             self.delete_content(content)
             session.delete(content)
+            session.commit()
 
     def delete_content(self, content):
         absolute_path = self.get_absolute_path(content)
@@ -61,6 +62,7 @@ class FileManager(object):
             session.merge(content)
             for sub_content in content.children:
                 session.merge(sub_content)
+            session.commit()
 
     def move_content(self, content):
         old_absolute_path = self.get_absolute_path(content)
@@ -87,9 +89,12 @@ class FileManager(object):
         for content in contents:
             content.set_relative_path()
             print('new file {}'.format(content.relative_path))
-            self.create_content(content)
-            content.flag = Flag.SYNCED
-            session.merge(content)
+            try:
+                self.create_content(content)
+                content.flag = Flag.SYNCED
+                session.merge(content)
+            except requests.exceptions.ConnectionError:
+                print('Could not download {}'.format(content.filename))
 
     def create_content(self, content):
         if content.content_type == 'folder':
@@ -108,9 +113,10 @@ class FileManager(object):
         instance_params= self.config.get_instance(content.instance_label)
         normalized_url = self.get_download_url(content)
         request = requests.get(
-            normalized_url, auth=(instance_params['login'], instance_params['password']), stream=True
+            normalized_url,
+            auth=(instance_params['login'], instance_params['password']),
+            stream=True
         )
-
         absolute_path = os.path.join(
             self.config.BASE_FOLDER,
             content.relative_path
@@ -118,6 +124,8 @@ class FileManager(object):
         with open(absolute_path, 'wb') as file_:
             request.raw.decode_content = True
             shutil.copyfileobj(request.raw, file_)
+
+
 
     def create_dirs(self, dir_path):
         os.makedirs(
@@ -137,9 +145,3 @@ class FileManager(object):
             content.relative_path[len(content.instance_label) + 1 :]
             )
         )
-
-    
-    
-
-
-
