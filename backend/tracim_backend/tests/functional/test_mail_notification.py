@@ -75,8 +75,7 @@ class TestEmailSender(MailHogTest):
         sender.disconnect()
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'test_send_mail@localhost'
         assert headers['To'][0] == 'receiver_test_send_mail@localhost'
@@ -111,8 +110,7 @@ class TestNotificationsSync(MailHogTest):
         assert u.timezone == '+2'
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob>'
@@ -160,8 +158,7 @@ class TestNotificationsSync(MailHogTest):
         )
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
@@ -213,8 +210,7 @@ class TestNotificationsSync(MailHogTest):
         transaction.commit()
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
@@ -232,8 +228,7 @@ class TestNotificationsSync(MailHogTest):
         uapi.reset_password_notification(current_user, do_save=True)
         transaction.commit()
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
@@ -275,8 +270,7 @@ class TestNotificationsAsync(MailHogTest):
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob>'
@@ -331,8 +325,7 @@ class TestNotificationsAsync(MailHogTest):
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
@@ -360,8 +353,7 @@ class TestNotificationsAsync(MailHogTest):
         worker = SimpleWorker([queue], connection=queue.connection)
         worker.work(burst=True)
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'

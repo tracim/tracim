@@ -26,6 +26,7 @@ from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests import MailHogFunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
 
 
@@ -2470,7 +2471,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         ).json_body
         assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
 
-class TestUserInvitationWithMailActivatedSync(FunctionalTest):
+
+
+class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
     config_section = 'functional_test_with_mail_test_sync'
@@ -2511,7 +2514,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -2555,16 +2557,12 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert res['profile'] == 'users'
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob.bob>'
         assert headers['Subject'][0] == '[TRACIM] Created account'
-
-        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(self):  # nopep8
         """
@@ -2602,7 +2600,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (

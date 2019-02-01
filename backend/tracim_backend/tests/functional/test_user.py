@@ -26,6 +26,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests import MailHogFunctionalTest
 
 
 class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
@@ -3498,14 +3499,13 @@ class TestUserEndpoint(FunctionalTest):
         assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
 
 
-class TestUserWithNotificationEndpoint(FunctionalTest):
+class TestUserWithNotificationEndpoint(MailHogFunctionalTest):
     """
     Tests for POST /api/v2/users/{user_id}
     """
     config_section = 'functional_test_with_mail_test_sync'
 
     def test_api__create_user__ok_200__full_admin_with_notif(self):
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -3552,19 +3552,14 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert user.validate_password('mysuperpassword')
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'test user <test@test.test>'
         assert headers['Subject'][0] == '[TRACIM] Created account'
 
-        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
-
     def test_api__create_user__ok_200__limited_admin_with_notif(self):
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -3607,16 +3602,12 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert user.auth_type == AuthType.UNKNOWN
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'test <test@test.test>'
         assert headers['Subject'][0] == '[TRACIM] Created account'
-
-        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     def test_api_delete_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
