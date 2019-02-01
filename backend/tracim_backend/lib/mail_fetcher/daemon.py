@@ -42,6 +42,8 @@ class MailFetcherDaemon(FakeDaemon):
             connection_max_lifetime=self.config.EMAIL_REPLY_CONNECTION_MAX_LIFETIME,  # nopep8
             api_base_url=self.config.WEBSITE_BASE_URL + BASE_API_V2,
             api_key=self.config.API_KEY,
+            reply_to_pattern=self.config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL,
+            references_pattern=self.config.EMAIL_NOTIFICATION_REFERENCES_EMAIL,
             use_html_parsing=self.config.EMAIL_REPLY_USE_HTML_PARSING,
             use_txt_parsing=self.config.EMAIL_REPLY_USE_TXT_PARSING,
             lockfile_path=self.config.EMAIL_REPLY_LOCKFILE_PATH,
