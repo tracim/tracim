@@ -2472,6 +2472,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
 
 
+
 class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
@@ -2621,6 +2622,155 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
+
+class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
+
+    fixtures = [BaseFixture, ContentFixtures]
+    config_section = 'functional_test_with_mail_test_sync_with_auto_notif'
+
+    def test_api__create_workspace_member_role__ok_200__new_user_notif(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id']
+        user_id = user_role_found['user_id']
+        assert user_role_found['workspace_id'] == workspace.workspace_id
+        assert user_role_found['newly_created'] is True
+        assert user_role_found['email_sent'] is True
+        assert user_role_found['do_notify'] is True
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['profile'] == 'users'
+
+        # check mail received
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] Created account'
+        # check for notification to new user, user should not be notified
+        # until it connected to tracim.
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        api = ContentApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config
+        )
+        api.create(
+            content_type_slug='html-document',
+            workspace=workspace,
+            label='test_document',
+            do_save=True,
+        )
+        transaction.commit()
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 0
+        # check for notification to new connected user, user should not be notified
+        # until it connected to tracim.
+        bob = uapi.get_one_by_email(email='bob@bob.bob')
+        uapi.update(user=bob, password='bob@bob.bob', do_save=True)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@bob.bob',
+                'bob@bob.bob'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        api = ContentApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config
+        )
+        api.create(
+            content_type_slug='html-document',
+            workspace=workspace,
+            label='test_document2',
+            do_save=True,
+        )
+        transaction.commit()
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Global manager via Tracim <test_user_from+1@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] [test] test_document2 (Open)'
+        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
 class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
 
