@@ -11,7 +11,6 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
-    sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
     sed -i "s|email.template_dir = .*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
