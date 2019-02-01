@@ -8,6 +8,7 @@ import requests
 import transaction
 from depot.manager import DepotManager
 from pyramid import testing
+from requests import Response
 from sqlalchemy.exc import IntegrityError
 
 from tracim_backend.lib.core.content import ContentApi
@@ -67,6 +68,25 @@ def create_1000px_png_test_image() -> None:
     file.seek(0)
     return file
 
+class AbstractMailHogTest(object):
+
+    MAILHOG_BASE_URL = 'http://127.0.0.1:8025'
+    MAILHOG_MESSAGES_ENDPOINT = '/api/v1/messages'
+
+
+    def cleanup_mailhog(self) -> Response:
+        logger.debug(self, 'Cleanup MailHog Mails...')
+        return requests.delete('{}{}'.format(
+            self.MAILHOG_BASE_URL,
+            self.MAILHOG_MESSAGES_ENDPOINT
+        ))
+
+    def get_mailhog_mails(self) -> typing.List[typing.Any]:
+        logger.debug(self, 'gets MailHog messages...')
+        return requests.get('{}{}'.format(
+            self.MAILHOG_BASE_URL,
+            self.MAILHOG_MESSAGES_ENDPOINT
+        )).json()
 
 class FunctionalTest(unittest.TestCase):
 
@@ -147,6 +167,19 @@ class FunctionalTest(unittest.TestCase):
         logger.debug(self, 'TearDown Test...')
         self.disconnect_database(remove_tables=True)
         testing.tearDown()
+
+
+class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):
+
+    def setUp(self):
+        self.cleanup_mailhog()
+        super().setUp()
+
+    def tearDown(self):
+       super().tearDown()
+       self.cleanup_mailhog()
+
+
 
 class WebdavFunctionalTest(FunctionalTest):
     config_uri = 'tests_configs.ini'
@@ -356,14 +389,16 @@ class DefaultTest(StandardTest):
         return thread
 
 
-class MailHogTest(DefaultTest):
+class MailHogTest(DefaultTest, AbstractMailHogTest):
     """
     Theses test need a working mailhog
     """
-
     config_section = 'mail_test'
+
+    def setUp(self):
+        self.cleanup_mailhog()
+        super().setUp()
 
     def tearDown(self) -> None:
         super().tearDown()
-        logger.debug(self, 'Cleanup MailHog list...')
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.cleanup_mailhog()
