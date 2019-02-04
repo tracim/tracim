@@ -13,6 +13,7 @@ from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
+from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import translator_marker
@@ -277,9 +278,11 @@ class CFG(object):
             'email.notification.references.email'
         )
         # Content update notification
+
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
             'email.notification.content_update.template.html',
         )
+
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
             'email.notification.content_update.subject',
             _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
@@ -314,6 +317,42 @@ class CFG(object):
                 'Notification by email mecanism is disabled ! '
                 'Notification and mail invitation mecanisms will not work.'
             )
+
+        # INFO - G.M - 2019-02-01 - check if template are available,
+        # do not allow running with email_notification_activated
+        # if templates needed are not available
+        if self.EMAIL_NOTIFICATION_ACTIVATED:
+            if  not self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML or \
+                not os.path.isfile(
+                    self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML
+            ):
+                raise ConfigurationError(
+                    'ERROR: email template for content_update notification '
+                    'not found at {}'.format(
+                        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML
+                    )
+                )
+            if not self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML or \
+                not os.path.isfile(
+                    self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML
+            ):
+                raise ConfigurationError(
+                    'ERROR: email template for created account '
+                    'not found at {}'.format(
+                        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML
+                    )
+                )
+
+            if  not self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML or \
+                not os.path.isfile(
+                    self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+            ):
+                raise ConfigurationError(
+                    'ERROR: email template for password reset '
+                    'not found at {}'.format(
+                        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+                    ))
+
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
             'email.notification.smtp.server',
         )
