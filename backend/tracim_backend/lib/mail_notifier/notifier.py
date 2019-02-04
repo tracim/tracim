@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyNotificationError
+from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.lib.core.notifications import INotifier
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
@@ -496,13 +497,18 @@ class EmailManager(object):
         :param context: dict with template context
         :return: template rendered string
         """
-
-        template = Template(filename=mako_template_filepath)
-        return template.render(
-            _=translator.get_translation,
-            config=self.config,
-            **context
-        )
+        try:
+            template = Template(filename=mako_template_filepath)
+            return template.render(
+                _=translator.get_translation,
+                config=self.config,
+                **context
+            )
+        except Exception as exc:
+            logger.error(self, 'Failed to render email template: {}'.format(exc.__str__()))
+            import traceback
+            logger.error(self, traceback.format_exc())
+            raise EmailTemplateError('Failed to render email template: {}'.format(exc.__str__()))
 
     def _build_context_for_content_update(
             self,

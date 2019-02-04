@@ -25,6 +25,8 @@ class ContentRevisionDeleteError(ContentRevisionUpdateError):
 class ConfigurationError(TracimError):
     pass
 
+class EmailTemplateError(TracimException):
+    pass
 
 class UserAlreadyExistError(TracimError):
     error_code = error.USER_ALREADY_EXIST
