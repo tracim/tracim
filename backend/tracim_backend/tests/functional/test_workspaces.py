@@ -2623,7 +2623,7 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
 
-class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
+class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
     config_section = 'functional_test_with_mail_test_sync_with_auto_notif'
@@ -2664,7 +2664,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.cleanup_mailhog()
         self.testapp.authorization = (
             'Basic',
             (
@@ -2693,6 +2693,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
         assert user_role_found['email_sent'] is True
         assert user_role_found['do_notify'] is True
 
+        self.cleanup_mailhog()
         self.testapp.authorization = (
             'Basic',
             (
@@ -2708,8 +2709,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
         assert res['profile'] == 'users'
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
@@ -2717,7 +2717,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
         assert headers['Subject'][0] == '[TRACIM] Created account'
         # check for notification to new user, user should not be notified
         # until it connected to tracim.
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.cleanup_mailhog()
         api = ContentApi(
             session=dbsession,
             current_user=admin,
@@ -2730,8 +2730,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
             do_save=True,
         )
         transaction.commit()
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        self.get_mailhog_mails()
         assert len(response) == 0
         # check for notification to new connected user, user should not be notified
         # until it connected to tracim.
@@ -2749,7 +2748,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
             '/api/v2/auth/whoami',
             status=200,
         )
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.cleanup_mailhog()
         api = ContentApi(
             session=dbsession,
             current_user=admin,
@@ -2762,15 +2761,13 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(FunctionalTest):
             do_save=True,
         )
         transaction.commit()
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Global manager via Tracim <test_user_from+1@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob.bob>'
         assert headers['Subject'][0] == '[TRACIM] [test] test_document2 (Open)'
-        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+
 
 class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
 
