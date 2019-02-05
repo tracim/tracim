@@ -2693,7 +2693,6 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         assert user_role_found['email_sent'] is True
         assert user_role_found['do_notify'] is True
 
-        self.cleanup_mailhog()
         self.testapp.authorization = (
             'Basic',
             (
@@ -2730,7 +2729,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
             do_save=True,
         )
         transaction.commit()
-        self.get_mailhog_mails()
+        response = self.get_mailhog_mails()
         assert len(response) == 0
         # check for notification to new connected user, user should not be notified
         # until it connected to tracim.
