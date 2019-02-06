@@ -403,23 +403,27 @@ class Dashboard extends React.Component {
 
                   {idRoleUserWorkspace >= 2 && (
                     <div className='dashboard__calltoaction'>
-                      {props.appList.map(app => {
-                        const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-                        return (
-                          <ContentTypeBtn
-                            customClass='dashboard__calltoaction__button'
-                            hexcolor={app.hexcolor}
-                            label={app.label}
-                            faIcon={app.faIcon}
-                            // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
-                            // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
-                            creationLabel={props.t(contentType.creationLabel)}
-                            onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
-                            appSlug={app.slug}
-                            key={app.label}
-                          />
-                        )
-                      })}
+                      {props.appList
+                        .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
+                        .map(app => {
+                          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+                          return (
+                            <ContentTypeBtn
+                              customClass='dashboard__calltoaction__button'
+                              hexcolor={app.hexcolor}
+                              label={app.label}
+                              faIcon={app.faIcon}
+                              // TODO - Côme - 2018/09/12 - translation key bellow is a little hacky:
+                              // The creation label comes from api but since there is no translation in backend
+                              // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                              creationLabel={props.t(contentType.creationLabel)}
+                              onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                              appSlug={app.slug}
+                              key={app.label}
+                            />
+                          )
+                        })
+                      }
                     </div>
                   )}
                 </div>
