@@ -12,7 +12,8 @@ DEFAULT_FALLBACK_LANG = 'en'
 
 def translator_marker(string: str) -> str:
     """
-    Use this and rename it to _ in order to allow translation of string,
+    Use this and rename it to _ in order to allow
+    translation of string by external program like gettext.
     this function does not do any action on string given and return it.
     """
     return string
