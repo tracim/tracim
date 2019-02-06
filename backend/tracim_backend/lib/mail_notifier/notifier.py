@@ -377,13 +377,12 @@ class EmailManager(object):
         :param password: choosed password
         :param user: user to notify
         """
-        # TODO BS 20160712: Cyclic import
-        logger.debug(self, 'user: {}'.format(user.user_id))
-        logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
-            user.email,
-        ))
+        logger.info(
+            self,
+            'Generating created account mail to {}'.format(user.email)
+        )
 
-        async_email_sender = EmailSender(
+        email_sender = EmailSender(
             self.config,
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
@@ -433,7 +432,7 @@ class EmailManager(object):
 
         send_email_through(
             config=self.config,
-            sendmail_callable=async_email_sender.send_mail,
+            sendmail_callable=email_sender.send_mail,
             message=message
         )
 
@@ -448,11 +447,12 @@ class EmailManager(object):
         :param reset_password_token: token for resetting password
         """
         logger.debug(self, 'user: {}'.format(user.user_id))
-        logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
-            user.email,
-        ))
+        logger.info(
+            self,
+            'Generating reset password email to {}'.format(user.email)
+        )
         translator = Translator(self.config, default_lang=user.lang)
-        async_email_sender = EmailSender(
+        email_sender = EmailSender(
             self.config,
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
@@ -501,7 +501,7 @@ class EmailManager(object):
 
         send_email_through(
             config=self.config,
-            sendmail_callable=async_email_sender.send_mail,
+            sendmail_callable=email_sender.send_mail,
             message=message
         )
 
