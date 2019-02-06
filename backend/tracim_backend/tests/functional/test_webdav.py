@@ -102,6 +102,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # check availability of root using webdav
         res = self.testapp.get('/', status=200)
         assert res
 
@@ -113,6 +114,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # check availability of root using webdav
         res = self.testapp.get('/', status=401)
 
     def test_functional__webdav_access_to_workspace__nominal_case(self) -> None:
@@ -157,6 +159,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # check availability of new created content using webdav
         res = self.testapp.get('/test', status=200)
 
     def test_functional__webdav_access_to_workspace__special_characters(self) -> None:
@@ -186,6 +189,9 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # check availability of new created content using webdav
+        # /?\#* -> /⧸ʔ⧹#∗
+        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
         self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=404)
 
         # creating workspace
@@ -205,8 +211,9 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                         False)  # nopep8
         transaction.commit()
 
-        # /?\# -> /⧸ʔ⧹#∗
-        # urlencoded version
+        # check availability of new created content using webdav
+        # /?\#* -> /⧸ʔ⧹#∗
+        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
         self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=200)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(self) -> None:
@@ -244,6 +251,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # check availability of new created content using webdav
         res = self.testapp.get('/test', status=404)
 
     def test_functional__webdav_access_to_workspace__workspace_not_exist(self) -> None:
@@ -274,6 +282,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # check availability of new created content using webdav
         res = self.testapp.get('/test', status=404)
 
     def test_functional__webdav_access_to_content__ok__nominal_case(self) -> None:
@@ -298,13 +307,13 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 None,
-                filename='file.txt',
+                filename='report.txt',
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                'file.txt',
+                'report.txt',
                 'text/plain',
                 b'test_content'
             )
@@ -318,8 +327,9 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
+        # check availability of new created content using webdav
         self.testapp.get('/workspace1', status=200)
-        self.testapp.get('/workspace1/file.txt', status=200)
+        self.testapp.get('/workspace1/report.txt', status=200)
 
     def test_functional__webdav_access_to_content__ok__special_characters(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -343,7 +353,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 None,
-                filename='file.txt',
+                filename='/?\#*.txt',
                 do_save=False,
                 do_notify=False,
             )
@@ -363,8 +373,9 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
-        # /?\#* -> /⧸ʔ⧹#∗
-        # urlencoded version
+        # check availability of new created content using webdav
+        # /?\#* -> /⧸ʔ⧹#∗ (webdav version)
+        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
         self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=200)
         self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97.txt', status=200)
 
@@ -394,8 +405,9 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
+        # check availability of new created content using webdav
         self.testapp.get('/workspace1', status=200)
-        self.testapp.get('/workspace1/file.txt', status=404)
+        self.testapp.get('/workspace1/report.txt', status=404)
 
     def test_functional__webdav_access_to_subdir_content__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -418,7 +430,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
             content_type_list.Folder.slug,
             workspace,
             None,
-            'folder',
+            'examples',
             do_save=True,
             do_notify=False,
         )
@@ -427,13 +439,13 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 folder,
-                filename='file.txt',
+                filename='report.txt',
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                'file.txt',
+                'report.txt',
                 'text/plain',
                 b'test_content'
             )
@@ -447,9 +459,10 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
+        # check availability of new created content using webdav
         self.testapp.get('/workspace1', status=200)
-        self.testapp.get('/workspace1/folder', status=200)
-        self.testapp.get('/workspace1/folder/file.txt', status=200)
+        self.testapp.get('/workspace1/examples', status=200)
+        self.testapp.get('/workspace1/examples/report.txt', status=200)
 
     def test_functional__webdav_access_to_subdir_content__ok__special_characters(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -501,8 +514,9 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
-        # /?\#* -> /⧸ʔ⧹#∗
-        # urlencoded version
+        # check availability of new created content using webdav
+        # /?\#* -> /⧸ʔ⧹#∗ (webdav version)
+        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
         self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=200)
         self.testapp.get(
             '/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97',
@@ -532,7 +546,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
             content_type_list.Folder.slug,
             workspace,
             None,
-            'folder',
+            'examples',
             do_save=True,
             do_notify=False,
         )
@@ -545,6 +559,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
+        # check availability of new created content using webdav
         self.testapp.get('/workspace1', status=200)
-        self.testapp.get('/workspace1/folder', status=200)
-        self.testapp.get('/workspace1/folder/file.txt', status=404)
+        self.testapp.get('/workspace1/examples', status=200)
+        self.testapp.get('/workspace1/examples/report.txt', status=404)
