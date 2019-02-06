@@ -505,9 +505,7 @@ class EmailManager(object):
                 **context
             )
         except Exception as exc:
-            logger.error(self, 'Failed to render email template: {}'.format(exc.__str__()))
-            import traceback
-            logger.error(self, traceback.format_exc())
+            logger.exception(self, 'Failed to render email template: {}'.format(exc.__str__()))
             raise EmailTemplateError('Failed to render email template: {}'.format(exc.__str__()))
 
     def _build_context_for_content_update(
