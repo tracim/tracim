@@ -342,7 +342,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
             config=self.app_config,
             show_deleted=True,
         )
-        workspace = workspace_api.create_workspace('/?\#*', save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace('/?\\#*', save_now=True)  # nopep8
         api = ContentApi(
             current_user=admin,
             session=dbsession,
@@ -353,13 +353,13 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 None,
-                filename='/?\#*.txt',
+                filename='/?\\#*.txt',
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                '/?\#*.txt',
+                '/?\\#*.txt',
                 'text/plain',
                 b'test_content'
             )
@@ -475,7 +475,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
             config=self.app_config,
             show_deleted=True,
         )
-        workspace = workspace_api.create_workspace('/?\#*', save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace('/?\\#*', save_now=True)  # nopep8
         api = ContentApi(
             current_user=admin,
             session=dbsession,
@@ -485,7 +485,7 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
             content_type_list.Folder.slug,
             workspace,
             None,
-            '/?\#*',
+            '/?\\#*',
             do_save=True,
             do_notify=False,
         )
@@ -494,13 +494,13 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 folder,
-                filename='/?\#*.txt',
+                filename='/?\\#*.txt',
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                '/?\#*.txt',
+                '/?\\#*.txt',
                 'text/plain',
                 b'test_content'
             )
