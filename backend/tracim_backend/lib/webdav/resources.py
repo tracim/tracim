@@ -39,6 +39,7 @@ from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.utils import normpath
+from tracim_backend.lib.utils.utils import add_trailing_slash
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
 from tracim_backend.lib.webdav.design import design_page
@@ -214,12 +215,7 @@ class RootResource(DAVCollection):
         members = []
         for workspace in self.workspace_api.get_all():
             workspace_label = webdav_convert_file_name_to_display(workspace.label)
-
-            if not self.path.endswith('/'):
-                path = '{}/'.format(self.path)
-            else:
-                path = self.path
-
+            path = add_trailing_slash(self.path)
             workspace_path = '{}{}'.format(path, workspace_label)
             members.append(
                 WorkspaceResource(
