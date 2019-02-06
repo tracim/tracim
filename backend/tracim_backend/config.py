@@ -322,36 +322,20 @@ class CFG(object):
         # do not allow running with email_notification_activated
         # if templates needed are not available
         if self.EMAIL_NOTIFICATION_ACTIVATED:
-            if  not self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML or \
-                not os.path.isfile(
-                    self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML
-            ):
-                raise ConfigurationError(
-                    'ERROR: email template for content_update notification '
-                    'not found at {}'.format(
-                        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML
+            templates = {
+                'content_update notification': self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
+                'created account': self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML,
+                'password reset': self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+            }
+            for template_description, template_path in templates.items():
+                if not template_path or not os.path.isfile(template_path):
+                    raise ConfigurationError(
+                        'ERROR: email template for {template_description} '
+                        'not found at "{template_path}."'.format(
+                            template_description=template_description,
+                            template_path=template_path
+                        )
                     )
-                )
-            if not self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML or \
-                not os.path.isfile(
-                    self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML
-            ):
-                raise ConfigurationError(
-                    'ERROR: email template for created account '
-                    'not found at {}'.format(
-                        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML
-                    )
-                )
-
-            if  not self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML or \
-                not os.path.isfile(
-                    self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
-            ):
-                raise ConfigurationError(
-                    'ERROR: email template for password reset '
-                    'not found at {}'.format(
-                        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
-                    ))
 
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
             'email.notification.smtp.server',
