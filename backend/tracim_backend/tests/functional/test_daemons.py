@@ -39,8 +39,7 @@ class TestMailNotifyDaemon(MailHogTest):
         daemon = MailSenderDaemon(self.app_config, burst=True)
         daemon.run()
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob>'
@@ -88,8 +87,7 @@ class TestMailNotifyDaemon(MailHogTest):
         daemon = MailSenderDaemon(self.app_config, burst=True)
         daemon.run()
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'

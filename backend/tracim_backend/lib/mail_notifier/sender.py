@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import smtplib
+import traceback
 import typing
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
@@ -24,10 +25,23 @@ def send_email_through(
     :param sendmail_callable: A callable who get message on first parameter
     :param message: The message who have to be sent
     """
-
     if config.EMAIL_PROCESSING_MODE == config.CST.SYNC:
+        logger.info(
+            send_email_through,
+            'send email to {} synchronously'.format(
+                message['To']
+            )
+        )
         sendmail_callable(message)
     elif config.EMAIL_PROCESSING_MODE == config.CST.ASYNC:
+        logger.info(
+            send_email_through,
+            'send email to {} asynchronously:'
+            'mail stored in queue in wait for a'
+            'mail_notifier daemon'.format(
+                message['To']
+            )
+        )
         redis_connection = get_redis_connection(config)
         queue = get_rq_queue(redis_connection, 'mail_sender')
         queue.enqueue(sendmail_callable, message)
@@ -62,6 +76,8 @@ class EmailSender(object):
         if not self._smtp_connection:
             log = 'Connecting from SMTP server {}'
             logger.info(self, log.format(self._smtp_config.server))
+            # TODO - G.M - 2019-01-29 - Support for SMTP SSL-only port connection
+            # using smtplib.SMTP_SSL
             self._smtp_connection = smtplib.SMTP(
                 self._smtp_config.server,
                 self._smtp_config.port
@@ -71,11 +87,32 @@ class EmailSender(object):
             if self._smtp_config.login:
                 try:
                     starttls_result = self._smtp_connection.starttls()
-                    log = 'SMTP start TLS result: {}'
-                    logger.debug(self, log.format(starttls_result))
-                except Exception as e:
-                    log = 'SMTP start TLS error: {}'
-                    logger.debug(self, log.format(e.__str__()))
+
+                    if starttls_result[0] == 220:
+                        logger.info(self, 'SMTP Start TLS OK')
+
+                    log = 'SMTP Start TLS return code: {} with message: {}'
+                    logger.debug(
+                        self,
+                        log.format(
+                            starttls_result[0],
+                            starttls_result[1].decode('utf-8')
+                        )
+                    )
+                except smtplib.SMTPResponseException as exc:
+                    log = 'SMTP start TLS return error code: {} with message: {}'
+                    logger.error(
+                        self,
+                        log.format(
+                            exc.smtp_code,
+                            exc.smtp_error.decode('utf-8')
+                        )
+                    )
+                except Exception as exc:
+                    log = 'Unexpected exception during SMTP start TLS process: {}'
+                    logger.error(self, log.format(exc.__str__()))
+                    logger.error(self, traceback.format_exc())
+
 
             if self._smtp_config.login:
                 try:
@@ -83,12 +120,48 @@ class EmailSender(object):
                         self._smtp_config.login,
                         self._smtp_config.password
                     )
-                    log = 'SMTP login result: {}'
-                    logger.debug(self, log.format(login_res))
-                except Exception as e:
-                    log = 'SMTP login error: {}'
-                    logger.debug(self, log.format(e.__str__()))
-            logger.info(self, 'Connection OK')
+
+                    if login_res[0] == 235:
+                        logger.info(self, 'SMTP Authentication Successful')
+                    if login_res[0] == 503:
+                        logger.info(self, 'SMTP Already Authenticated')
+
+                    log = 'SMTP login return code: {} with message: {}'
+                    logger.debug(
+                        self,
+                        log.format(
+                            login_res[0],
+                            login_res[1].decode('utf-8')
+                        )
+                    )
+                except smtplib.SMTPAuthenticationError as exc:
+
+                    log = 'SMTP auth return error code: {} with message: {}'
+                    logger.error(
+                        self,
+                        log.format(
+                            exc.smtp_code,
+                            exc.smtp_error.decode('utf-8')
+                        )
+                    )
+                    logger.error(self,
+                                 'check your auth params combinaison '
+                                 '(login/password) for SMTP'
+                    )
+                except smtplib.SMTPResponseException as exc:
+                    log = 'SMTP login return error code: {} with message: {}'
+                    logger.error(
+                        self,
+                        log.format(
+                            exc.smtp_code,
+                            exc.smtp_error.decode('utf-8')
+                        )
+                    )
+                except Exception as exc:
+                    log = 'Unexpected exception during SMTP login {}'
+                    logger.error(self, log.format(exc.__str__()))
+                    logger.error(self, traceback.format_exc())
+
 
     def disconnect(self):
         if self._smtp_connection:
@@ -104,11 +177,51 @@ class EmailSender(object):
         else:
             self.connect()  # Actually, this connects to SMTP only if required
             logger.info(self, 'Sending email to {}'.format(message['To']))
-            self._smtp_connection.send_message(message)
+            # TODO - G.M - 2019-01-29 - optimisize this code, we should not send
+            # email if connection has failed.
+            send_action = '{:8s}'.format('SENT')
+            failed_action = '{:8s}'.format('SENDFAIL')
+            action = send_action
+            try:
+                send_message_result = self._smtp_connection.send_message(message)
+                # INFO - G.M - 2019-01-29 - send_message return if not failed,
+                # dict of refused recipients.
+
+                if send_message_result == {}:
+                    logger.debug(self, 'One mail correctly sent using SMTP.')
+                else:
+                    # INFO - G.M - 2019-01-29 - send_message_result != {}
+                    # case should not happened
+                    # as we send not mail with multiple recipient at the same
+                    # time. send_message will not raise exception
+                    # just if some recipient work and some other failed.
+                    # TODO - G.M - 2019-01-29 - better support for multirecipient email
+                    log = 'Mail could not be send to some recipient: {}'
+                    logger.debug(self, log.format(send_message_result))
+                    action = failed_action
+
+            except smtplib.SMTPException as exc:
+                log = 'SMTP sending message return error: {}'
+                logger.error(self, log.format(str(exc)))
+                action = failed_action
+            except Exception as exc:
+                log = 'Unexpected exception during sending email message using SMTP: {}'
+                logger.error(self, log.format(exc.__str__()))
+                logger.error(self, traceback.format_exc())
+                action = failed_action
+
             from tracim_backend.lib.mail_notifier.notifier import EmailManager
-            EmailManager.log_notification(
-                action='   SENT',
-                recipient=message['To'],
-                subject=message['Subject'],
+            if action == send_action:
+                msg = 'an email was sended to {}'.format(message['To'])
+            else:
+                msg = 'fail to send email to {}'.format(message['To'])
+
+            EmailManager.log_email_notification(
+                msg=msg,
+                action=action,
+                email_recipient=message['To'],
+                email_subject=message['Subject'],
                 config=self.config,
             )
+
+
