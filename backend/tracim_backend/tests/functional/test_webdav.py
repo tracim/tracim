@@ -76,7 +76,10 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
         assert res
 
 
-class TestFunctionalWebdav(WebdavFunctionalTest):
+class TestFunctionalWebdavGet(WebdavFunctionalTest):
+    """
+    Test for all Webdav "GET" action in different case
+    """
 
     def test_functional__webdav_access_to_root__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -565,7 +568,10 @@ class TestFunctionalWebdav(WebdavFunctionalTest):
         self.testapp.get('/workspace1/examples', status=200)
         self.testapp.get('/workspace1/examples/report.txt', status=404)
 
-    ## Move test
+class TestFunctionalWebdavMove(WebdavFunctionalTest):
+    """
+    Test for all Webdav "MOVE" action in different case
+    """
     # move same workspaces : file
     def test_functional__webdav_move_file__ok__same_workspace_folder_to_folder(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
