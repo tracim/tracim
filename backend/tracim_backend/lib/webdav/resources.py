@@ -581,14 +581,13 @@ class FolderResource(WorkspaceResource):
                 tm=transaction.manager,
                 session=self.session,
             ):
+                # renaming file if needed
                 if basename(destpath) != self.getDisplayName():
                     self.content_api.update_content(self.content, webdav_convert_file_name_to_bdd(basename(destpath)))
                     self.content_api.save(self.content)
-                else:
-                    if destination_workspace.workspace_id == self.content.workspace.workspace_id:
-                        self.content_api.move(self.content, destination_parent)
-                    else:
-                        self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
+                # move file if needed
+                if destination_workspace != self.content.workspace or destination_parent != self.content.parent :
+                    self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
