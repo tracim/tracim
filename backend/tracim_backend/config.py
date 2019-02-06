@@ -16,7 +16,7 @@ from tracim_backend.app_models.validator import update_validators
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.translation import translator_marker
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
@@ -48,7 +48,6 @@ class CFG(object):
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         """Parse configuration file."""
 
-        _ = translator_marker
         ###
         # General
         ###

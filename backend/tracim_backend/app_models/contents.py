@@ -8,7 +8,7 @@ from tracim_backend.extensions import app_list
 ####
 # Content Status
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.utils.translation import translator_marker
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
@@ -39,8 +39,6 @@ class ContentStatus(object):
 
     def is_editable(self):
         return self.global_status == GlobalStatus.OPEN.value
-
-_ = translator_marker
 
 open_status = ContentStatus(
     slug='open',
