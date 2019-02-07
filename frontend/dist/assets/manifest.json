@@ -3,7 +3,7 @@
   "short_name": "Tracim",
   "start_url": "/",
   "display": "fullscreen",
-  "background_color": "#fdfdfd",
+  "background_color": "#ffffff",
   "description": "Documentez, diffusez vos fichiers, discutez à bâtons rompus, organisez vos agendas avec tracim, votre espace partagé en ligne.",
   "icons": [{
     "src": "/assets/images/wa-tracim-logo-72x72.png",
