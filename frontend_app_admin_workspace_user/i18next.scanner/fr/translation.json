@@ -28,7 +28,6 @@
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
   "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur",
   "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte",
-  "Email notification activated": "Notifications par email activées",
   "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
   "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)",
   "User created and email sent": "Utilisateur créé et email envoyé",
@@ -37,9 +36,9 @@
   "Password": "Mot de passe",
   "Create the user": "Créer l'utilisateur",
   "Create a user": "Créer un utilisateur",
-  "Email notification are disabled, please notify users of any change": "Les notifications par email sont désactivées, pensez à notifier les utilisateurs de tout changement",
   "Please type a name, an email, a password and select a profile": "Veuillez entrer un nom, un email, un mot de passe et choisir un profil",
   "Please set a password": "Veuillez définir un mot de passe",
   "Full name": "Nom complet",
-  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères"
+  "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
+  "Email notification are disabled, please manually notify users of any change": "Les notifications par email sont désactivées, veuillez informer manuellement les utilisateurs des changements"
 }

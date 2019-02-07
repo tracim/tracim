@@ -28,7 +28,6 @@
   "Error while deleting shared space": "Error while deleting shared space",
   "You can't remove yourself from Administrator": "You can't remove yourself from Administrator",
   "You can't deactivate your own account": "You can't deactivate your own account",
-  "Email notification activated": "Email notification activated",
   "New password is too short (minimum 6 characters)": "New password is too short (minimum 6 characters)",
   "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
   "User created and email sent": "User created and email sent",
@@ -37,9 +36,9 @@
   "Password": "Password",
   "Create the user": "Create the user",
   "Create a user": "Create a user",
-  "Email notification are disabled, please notify users of any change": "Email notification are disabled, please notify users of any change",
   "Please type a name, an email, a password and select a profile": "Please type a name, an email, a password and select a profile",
   "Please set a password": "Please set a password",
   "Full name": "Full name",
-  "Full name must be at least 3 characters": "Full name must be at least 3 characters"
+  "Full name must be at least 3 characters": "Full name must be at least 3 characters",
+  "Email notification are disabled, please manually notify users of any change": "Email notification are disabled, please manually notify users of any change"
 }
