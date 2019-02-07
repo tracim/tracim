@@ -1,7 +1,9 @@
-import transaction
-from tracim_backend.app_models.contents import content_type_list
+from urllib.parse import quote
 
+import transaction
+from parameterized import parameterized
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -75,7 +77,6 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
         res = self.testapp.get('/', status=200, extra_environ=extra_environ)
         assert res
 
-
 class TestFunctionalWebdavGet(WebdavFunctionalTest):
     """
     Test for all Webdav "GET" action in different case
@@ -121,7 +122,17 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         # check availability of root using webdav
         res = self.testapp.get('/', status=401)
 
-    def test_functional__webdav_access_to_workspace__nominal_case(self) -> None:
+    @parameterized.expand([
+        # workspace_label, webdav_workspace_label
+        ('myworkspace','myworkspace'),
+        ('/?\\#*','⧸ʔ⧹#∗'),
+        ('Project Z', 'Project Z'),
+    ])
+    def test_functional__webdav_access_to_workspace__nominal_case(
+            self,
+            workspace_label,
+            webdav_workspace_label
+    ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User) \
             .filter(User.email == 'admin@admin.admin') \
@@ -146,7 +157,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             config=self.app_config,
             show_deleted=True,
         )
-        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
         rapi = RoleApi(
             current_user=admin,
             session=dbsession,
@@ -163,62 +174,10 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # convert to %encoded for valid_url
+        urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         # check availability of new created content using webdav
-        res = self.testapp.get('/test', status=200)
-
-    def test_functional__webdav_access_to_workspace__special_characters(self) -> None:
-        # verify initial state, workspace should not exist yet
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User) \
-            .filter(User.email == 'admin@admin.admin') \
-            .one()
-        uapi = UserApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-        )
-        gapi = GroupApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-        )
-        groups = [gapi.get_one_with_name('users')]
-        user = uapi.create_user('test@test.test', password='test@test.test',
-                                do_save=True, do_notify=False,
-                                groups=groups)  # nopep8
-        self.testapp.authorization = (
-            'Basic',
-            (
-                'test@test.test',
-                'test@test.test'
-            )
-        )
-        # check availability of new created content using webdav
-        # /?\#* -> /⧸ʔ⧹#∗
-        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
-        self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=404)
-
-        # creating workspace
-        workspace_api = WorkspaceApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-            show_deleted=True,
-        )
-        workspace = workspace_api.create_workspace('/?\\#*', save_now=True)  # nopep8
-        rapi = RoleApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-        )
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER,
-                        False)  # nopep8
-        transaction.commit()
-
-        # check availability of new created content using webdav
-        # /?\#* -> /⧸ʔ⧹#∗
-        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
-        self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=200)
+        res = self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -289,7 +248,20 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         # check availability of new created content using webdav
         res = self.testapp.get('/test', status=404)
 
-    def test_functional__webdav_access_to_content__ok__nominal_case(self) -> None:
+    @parameterized.expand([
+        # workspace_label, webdav_workspace_label,
+        # content_filename, webdav_content_filename
+        ('myworkspace','myworkspace', 'myfile.txt', 'myfile.txt'),
+        ('/?\\#*','⧸ʔ⧹#∗', '/?\\#*.txt','⧸ʔ⧹#∗.txt'),
+        ('Project Z', 'Project Z', 'report product 47.txt', 'report product 47.txt'),
+    ])
+    def test_functional__webdav_access_to_content__ok__nominal_case(
+            self,
+            workspace_label,
+            webdav_workspace_label,
+            content_filename,
+            webdav_content_filename,
+    ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User) \
             .filter(User.email == 'admin@admin.admin') \
@@ -300,7 +272,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             config=self.app_config,
             show_deleted=True,
         )
-        workspace = workspace_api.create_workspace('workspace1', save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
         api = ContentApi(
             current_user=admin,
             session=dbsession,
@@ -311,13 +283,13 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 None,
-                filename='report.txt',
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                'report.txt',
+                content_filename,
                 'text/plain',
                 b'test_content'
             )
@@ -331,57 +303,12 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
+        # convert to %encoded for valid_url
+        urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
+        urlencoded_webdav_content_filename = quote(webdav_content_filename)
         # check availability of new created content using webdav
-        self.testapp.get('/workspace1', status=200)
-        self.testapp.get('/workspace1/report.txt', status=200)
-
-    def test_functional__webdav_access_to_content__ok__special_characters(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User) \
-            .filter(User.email == 'admin@admin.admin') \
-            .one()
-        workspace_api = WorkspaceApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-            show_deleted=True,
-        )
-        workspace = workspace_api.create_workspace('/?\\#*', save_now=True)  # nopep8
-        api = ContentApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-        )
-        with dbsession.no_autoflush:
-            file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                None,
-                filename='/?\\#*.txt',
-                do_save=False,
-                do_notify=False,
-            )
-            api.update_file_data(
-                file,
-                '/?\\#*.txt',
-                'text/plain',
-                b'test_content'
-            )
-            api.save(file)
-        transaction.commit()
-
-        self.testapp.authorization = (
-            'Basic',
-            (
-                'admin@admin.admin',
-                'admin@admin.admin'
-            )
-        )
-        # check availability of new created content using webdav
-        # /?\#* -> /⧸ʔ⧹#∗ (webdav version)
-        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
-        self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=200)
-        self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97.txt', status=200)
+        self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
+        self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename), status=200)
 
     def test_functional__webdav_access_to_content__err__file_not_exist(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -413,7 +340,23 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         self.testapp.get('/workspace1', status=200)
         self.testapp.get('/workspace1/report.txt', status=404)
 
-    def test_functional__webdav_access_to_subdir_content__ok__nominal_case(self) -> None:
+    @parameterized.expand([
+        # workspace_label, webdav_workspace_label,
+        # dir_label, webdav_dir_label
+        # content_filename, webdav_content_filename
+        ('myworkspace','myworkspace', 'mydir', 'mydir', 'myfile.txt', 'myfile.txt'),
+        ('/?\\#*','⧸ʔ⧹#∗', '/?\\#*','⧸ʔ⧹#∗', '/?\\#*.txt','⧸ʔ⧹#∗.txt'),
+        ('Project Z', 'Project Z',  'Product 47', 'Product 47','report product 47.txt', 'report product 47.txt'),
+    ])
+    def test_functional__webdav_access_to_subdir_content__ok__nominal_case(
+            self,
+            workspace_label,
+            webdav_workspace_label,
+            dir_label,
+            webdav_dir_label,
+            content_filename,
+            webdav_content_filename,
+    ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User) \
             .filter(User.email == 'admin@admin.admin') \
@@ -424,7 +367,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             config=self.app_config,
             show_deleted=True,
         )
-        workspace = workspace_api.create_workspace('workspace1', save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
         api = ContentApi(
             current_user=admin,
             session=dbsession,
@@ -434,7 +377,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             content_type_list.Folder.slug,
             workspace,
             None,
-            'examples',
+            dir_label,
             do_save=True,
             do_notify=False,
         )
@@ -443,13 +386,13 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
                 content_type_list.File.slug,
                 workspace,
                 folder,
-                filename='report.txt',
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                'report.txt',
+                content_filename,
                 'text/plain',
                 b'test_content'
             )
@@ -463,71 +406,27 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
                 'admin@admin.admin'
             )
         )
+        # convert to %encoded for valid_url
+        urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
+        urlencoded_webdav_dir_label = quote(webdav_dir_label)
+        urlencoded_webdav_content_filename = quote(webdav_content_filename)
         # check availability of new created content using webdav
-        self.testapp.get('/workspace1', status=200)
-        self.testapp.get('/workspace1/examples', status=200)
-        self.testapp.get('/workspace1/examples/report.txt', status=200)
-
-    def test_functional__webdav_access_to_subdir_content__ok__special_characters(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User) \
-            .filter(User.email == 'admin@admin.admin') \
-            .one()
-        workspace_api = WorkspaceApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-            show_deleted=True,
-        )
-        workspace = workspace_api.create_workspace('/?\\#*', save_now=True)  # nopep8
-        api = ContentApi(
-            current_user=admin,
-            session=dbsession,
-            config=self.app_config,
-        )
-        folder = api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
-            '/?\\#*',
-            do_save=True,
-            do_notify=False,
-        )
-        with dbsession.no_autoflush:
-            file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                folder,
-                filename='/?\\#*.txt',
-                do_save=False,
-                do_notify=False,
-            )
-            api.update_file_data(
-                file,
-                '/?\\#*.txt',
-                'text/plain',
-                b'test_content'
-            )
-            api.save(file)
-        transaction.commit()
-
-        self.testapp.authorization = (
-            'Basic',
-            (
-                'admin@admin.admin',
-                'admin@admin.admin'
-            )
-        )
-        # check availability of new created content using webdav
-        # /?\#* -> /⧸ʔ⧹#∗ (webdav version)
-        # urlencoded version of /⧸ʔ⧹#∗ is %E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97
-        self.testapp.get('/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97', status=200)
+        self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
         self.testapp.get(
-            '/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97',
-            status=200)
+            '/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir_label
+            ),
+            status=200
+        )
         self.testapp.get(
-            '/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97/%E2%A7%B8%CA%94%E2%A7%B9%23%E2%88%97.txt',
-            status=200)
+            '/{}/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir_label,
+                urlencoded_webdav_content_filename
+            ),
+            status=200
+        )
 
     def test_functional__webdav_access_to_subdir_content__err__file_not_exist(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -573,7 +472,73 @@ class TestFunctionalWebdavMove(WebdavFunctionalTest):
     Test for all Webdav "MOVE" action in different case
     """
     # move same workspaces : file
-    def test_functional__webdav_move_file__ok__same_workspace_folder_to_folder(self) -> None:
+    @parameterized.expand([
+        (
+            # workspace_label, webdav_workspace_label,
+            'workspace1',
+            'workspace1',
+            # dir1_label, webdav_dir1_label
+            'folder1',
+            'folder1',
+            # dir2_label, webdav_dir2_label
+            'folder2',
+            'folder2',
+            # content_filename, webdav_content_filename
+            'myfile.txt',
+            'myfile.txt',
+            # content_new_filename, webdav_content_new_filename
+            'myfilerenamed.txt',
+            'myfilerenamed.txt',
+        ),
+        (
+            # workspace_label, webdav_workspace_label,
+            '/?\\#*wp',
+            '⧸ʔ⧹#∗wp',
+            # dir1_label, webdav_dir1_label
+            '/?\\#*dir1',
+            '⧸ʔ⧹#∗dir1',
+            # dir2_label, webdav_dir2_label
+            '/?\\#*dir2',
+            '⧸ʔ⧹#∗dir2',
+            # content_filename, webdav_content_filename
+            '/?\\#*file.txt',
+            '⧸ʔ⧹#∗file.txt',
+            # content_new_filename, webdav_content_new_filename
+            '/?\\#*filerenamed.txt',
+            '⧸ʔ⧹#∗filerenamed.txt',
+        ),
+        (
+            # workspace_label, webdav_workspace_label,
+            'Project Z',
+            'Project Z',
+            # dir1_label, webdav_dir1_label
+            'Product 21',
+            'Product 21',
+            # dir2_label, webdav_dir2_label
+            'Product 47',
+            'Product 47',
+            # content_filename, webdav_content_filename
+            'report product 47.txt',
+            'report product 47.txt',
+            # content_new_filename, webdav_content_new_filename
+            'Report Product 47.txt',
+            'Report Product 47.txt',
+        ),
+    ])
+    def test_functional__webdav_move_file__ok__same_workspace_folder_to_folder(
+            self,
+            workspace_label,
+            webdav_workspace_label,
+            dir1_label,
+            webdav_dir1_label,
+            dir2_label,
+            webdav_dir2_label,
+            content_filename,
+            webdav_content_filename,
+            new_content_filename,
+            webdav_new_content_filename,
+
+    ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User) \
             .filter(User.email == 'admin@admin.admin') \
@@ -598,7 +563,7 @@ class TestFunctionalWebdavMove(WebdavFunctionalTest):
             config=self.app_config,
             show_deleted=True,
         )
-        workspace = workspace_api.create_workspace('documentation', save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
         rapi = RoleApi(
             current_user=admin,
             session=dbsession,
@@ -611,19 +576,19 @@ class TestFunctionalWebdavMove(WebdavFunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        example_folder = api.create(
+        dir1_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
             None,
-            label='examples',
+            label=dir1_label,
             do_save=True,
             do_notify=False,
         )
-        product_folder = api.create(
+        dir2_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
             None,
-            label='products',
+            label=dir2_label,
             do_save=True,
             do_notify=False,
         )
@@ -631,14 +596,14 @@ class TestFunctionalWebdavMove(WebdavFunctionalTest):
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
-                example_folder,
-                filename='report_sample.txt',
+                dir1_folder,
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
             api.update_file_data(
                 file,
-                'report_sample.txt',
+                content_filename,
                 'text/plain',
                 b'test_content'
             )
@@ -653,21 +618,69 @@ class TestFunctionalWebdavMove(WebdavFunctionalTest):
                 'test@test.test'
             )
         )
+        # convert to %encoded for valid_url
+        urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
+        urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
+        urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
+        urlencoded_webdav_content_filename = quote(webdav_content_filename)
+        urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
         # check availability of content
-        self.testapp.get('/documentation', status=200)
-        self.testapp.get('/documentation/examples', status=200)
-        self.testapp.get('/documentation/examples/report_sample.txt', status=200)
-        self.testapp.get('/documentation/products', status=200)
+        self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label).format(), status=200)
+        self.testapp.get(
+            '/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir1_label
+            ),
+            status=200
+        )
+        self.testapp.get(
+            '/{}/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir1_label,
+                urlencoded_webdav_content_filename
+            ),
+            status=200
+        )
+        self.testapp.get(
+            '/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir2_label
+            ),
+            status=200
+        )
         # do move
         self.testapp.request(
-            '/documentation/examples/report_sample.txt',
+            '/{}/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir1_label,
+                urlencoded_webdav_content_filename
+            ),
             method='MOVE',
-            headers={'destination': '/documentation/products/super_product_readme_ZA41.txt'},
+            headers={'destination': '/{}/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir2_label,
+                urlencoded_webdav_new_content_filename
+            )},
             status=201
         )
+
         # verify move
-        self.testapp.get('/documentation/examples/report_sample.txt', status=404)
-        self.testapp.get('/documentation/products/super_product_readme_ZA41.txt', status=200)
+        self.testapp.get(
+            '/{}/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir1_label,
+                urlencoded_webdav_content_filename,
+            ),
+            status=404
+        )
+        self.testapp.get(
+            '/{}/{}/{}'.format(
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_dir2_label,
+                urlencoded_webdav_new_content_filename,
+            ),
+            status=200
+        )
 
     def test_functional__webdav_move_file__ok__same_workspace_root_to_folder(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
