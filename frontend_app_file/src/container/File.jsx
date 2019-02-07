@@ -426,14 +426,16 @@ class File extends React.Component {
       content: {
         ...prev.content,
         ...revision,
+        workspace_id: state.content.workspace_id, // don't overrides workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
         filenameNoExtension: filenameNoExtension,
         current_revision_id: revision.revision_id,
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
+        // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-          `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
+          `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
         )
       },
       fileCurrentPage: 1, // always set to first page on revision switch
