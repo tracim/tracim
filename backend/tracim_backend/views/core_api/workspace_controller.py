@@ -625,6 +625,11 @@ class WorkspaceController(Controller):
                 new_workspace=new_workspace,
                 must_stay_in_same_workspace=False,
             )
+            api.save(content)
+        api.move_children_content_to_new_workspace(
+            content,
+            new_workspace
+        )
         updated_content = api.get_one(
             path_data.content_id,
             content_type=content_type_list.Any_SLUG

@@ -5371,6 +5371,142 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['content_id'] == 8
         assert res.json_body['workspace_id'] == 1
 
+    def test_api_put_move_content__ok_200__to_another_workspace_folder_and_subcontents(self):
+        """
+        correctly move content from projectA_workspace to another projectA_workspace recursively
+        move all folder documentation from projectA to projectB projectA_workspace
+        - Workspace projectA
+          - folder: documentation
+            - html-document: report_product_47EA
+            - schemas
+              - readme.txt
+        - Workspace projectB
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        projectA_workspace = workspace_api.create_workspace('projectA', save_now=True)  # nopep8
+        projectB_workspace = workspace_api.create_workspace('projectB', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+
+        documentation_folder = content_api.create(
+            label='documentation',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=projectA_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        report = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=projectA_workspace,
+            parent=documentation_folder,
+            label='report_product_47EA',
+            do_save=True,
+            do_notify=False,
+        )
+        schema_folder = content_api.create(
+            label='schemas',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=projectA_workspace,
+            parent=documentation_folder,
+            do_save=True,
+            do_notify=False
+        )
+        readme_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=projectA_workspace,
+            parent=schema_folder,
+            filename='readme.txt',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=readme_file,
+        ):
+            content_api.update_file_data(
+                readme_file,
+                'readme.txt',
+                new_mimetype='plain/text',
+                new_content=b'To be completed',
+            )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': None,  # root
+            'new_workspace_id': projectB_workspace.workspace_id,
+        }
+        # verify coherence of workspace content first.
+        projectA_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectA_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectA_workspace_contents) == 4
+        assert not [content for content in projectA_workspace_contents if content['workspace_id'] != projectA_workspace.workspace_id]
+        projectB_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectB_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectB_workspace_contents) == 0
+        assert not [content for content in projectB_workspace_contents if content['workspace_id'] != projectB_workspace.workspace_id]
+
+        params = {
+            'new_parent_id': None,  # root
+            'new_workspace_id': projectB_workspace.workspace_id,
+        }
+        self.testapp.put_json(
+            '/api/v2/workspaces/{}/contents/{}/move'.format(
+                projectA_workspace.workspace_id,
+                documentation_folder.content_id
+            ),
+            params=params,
+            status=200
+        )
+
+        # verify coherence of workspace after
+        projectA_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectA_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectA_workspace_contents) == 0
+        assert not [content for content in projectA_workspace_contents if content['workspace_id'] != projectA_workspace.workspace_id]
+        projectB_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectB_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectB_workspace_contents) == 4
+        assert not [content for content in projectB_workspace_contents if content['workspace_id'] != projectB_workspace.workspace_id]
+
+
+
+
     def test_api_put_move_content__ok_200__to_another_workspace_root(self):
         """
         Move content

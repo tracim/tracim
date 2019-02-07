@@ -1473,6 +1473,7 @@ class ContentApi(object):
              must_stay_in_same_workspace: bool=True,
              new_workspace: Workspace=None,
     ):
+
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
@@ -1510,6 +1511,7 @@ class ContentApi(object):
             exclude_content_id=item.content_id
         )
         item.revision_type = ActionDescription.MOVE
+
 
     def _get_allowed_content_type(
             self,
@@ -1627,18 +1629,18 @@ class ContentApi(object):
         for child in origin_content.children:
             self.copy(child, new_content)
 
-    def move_recursively(self, item: Content,
-                         new_parent: Content, new_workspace: Workspace):
-        self.move(item, new_parent, False, new_workspace)
-        self.save(item, do_notify=False)
 
+    def move_children_content_to_new_workspace(self, item: Content, new_workspace):
         for child in item.children:
-            with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=child
-            ):
-                self.move_recursively(child, item, new_workspace)
+            if child.workspace_id != new_workspace.workspace_id:
+                with new_revision(
+                    session=self._session,
+                    tm=transaction.manager,
+                    content=child
+                ):
+                    self.move(child, new_parent=item, new_workspace=new_workspace, must_stay_in_same_workspace=False)
+                    self.save(child)
+                self.move_children_content_to_new_workspace(child, new_workspace)
         return
 
     def is_editable(self, item: Content) -> bool:

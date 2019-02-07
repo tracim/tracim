@@ -862,6 +862,11 @@ class FileResource(DAVNonCollection):
                         must_stay_in_same_workspace=False,
                         new_workspace=destination_workspace
                     )
+                    self.content_api.save(self.content)
+                    self.content_api.move_children_content_to_new_workspace(
+                        self.content,
+                        destination_workspace
+                    )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
