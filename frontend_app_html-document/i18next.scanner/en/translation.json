@@ -15,5 +15,7 @@
   "Edit": "Edit",
   "A content with the same name already exists": "A content with the same name already exists",
   "Error while creating document": "Error while creating document",
-  "Error while saving new comment": "Error while saving new comment"
+  "Error while saving new comment": "Error while saving new comment",
+  "A content with same name already exists": "A content with same name already exists",
+  "Error while saving new title": "Error while saving new title"
 }

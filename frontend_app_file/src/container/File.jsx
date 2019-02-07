@@ -255,20 +255,26 @@ class File extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveFile = putFileContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveFile = await handleFetchResult(
+      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
+    )
 
-    handleFetchResult(await fetchResultSaveFile)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.loadContent()
-          this.loadTimeline()
-          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
-        } else {
-          console.warn('Error saving file. Result:', resSave, 'content:', content, 'config:', config)
+    switch (fetchResultSaveFile.apiResponse.status) {
+      case 200:
+        this.loadContent()
+        this.loadTimeline()
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        break
+      case 400:
+        switch (fetchResultSaveFile.body.code) {
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
-      })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+    }
   }
 
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
