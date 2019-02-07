@@ -1477,8 +1477,10 @@ class ContentApi(object):
             if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
 
-        if (new_workspace and new_parent) and \
-            new_parent.workspace_id != new_workspace.workspace_id:
+        if not new_workspace:
+            new_workspace = new_parent.workspace
+
+        if new_parent and new_parent.workspace_id != new_workspace.workspace_id:
             raise WorkspacesDoNotMatch(
                 'new parent workspace and new workspace should be the same.'
             )
