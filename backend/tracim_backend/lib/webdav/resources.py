@@ -593,7 +593,14 @@ class FolderResource(WorkspaceResource):
                     self.content_api.save(self.content)
                 # move file if needed
                 if destination_workspace != self.content.workspace or destination_parent != self.content.parent :
-                    self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
+                    self.content_api.move(
+                        self.content,
+                        new_parent=destination_parent,
+                        new_workspace=destination_workspace,
+                        must_stay_in_same_workspace=False
+                    )
+                    self.content_api.save(self.content)
+                    self.content_api.move_children_content_to_new_workspace(self.content, destination_workspace)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
