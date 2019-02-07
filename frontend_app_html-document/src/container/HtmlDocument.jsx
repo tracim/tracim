@@ -270,19 +270,25 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveHtmlDoc = await handleFetchResult(
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
+    )
 
-    handleFetchResult(await fetchResultSaveHtmlDoc)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.loadContent()
-          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
-        } else {
-          console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
+    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+      case 200:
+        this.loadContent()
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        break
+      case 400:
+        switch (fetchResultSaveHtmlDoc.body.code) {
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
-      })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+    }
   }
 
   handleClickNewVersion = () => {
