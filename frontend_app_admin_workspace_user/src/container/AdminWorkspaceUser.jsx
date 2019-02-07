@@ -247,6 +247,7 @@ class AdminWorkspaceUser extends React.Component {
         return true
       case 400:
         switch (newUserResult.body.code) {
+          case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
           case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
           default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         }
