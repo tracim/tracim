@@ -1,0 +1,47 @@
+version: "3"
+services:
+
+  tracim:
+    image: algoo/tracim
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+      - backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - db
+    environment:
+      - DATABASE_TYPE=postgresql
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=tracim
+      - DATABASE_PASSWORD=tracim
+      - DATABASE_NAME=tracim
+      - START_WEBDAV=0
+      - REPLY_BY_EMAIL=0
+    volumes:
+      - tracim-config:/etc/tracim
+      - tracim-data:/var/tracim
+
+  db:
+    image: postgres:11
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    environment:
+      - POSTGRES_PASSWORD=tracim
+      - POSTGRES_USER=tracim
+      - POSTGRES_DB=tracim
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
+  tracim-config:
+  tracim-data:

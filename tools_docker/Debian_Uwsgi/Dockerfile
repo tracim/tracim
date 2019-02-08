@@ -102,5 +102,6 @@ RUN \
     && rm -rf /var/lib/apt/list/*
 
 VOLUME ["/etc/tracim", "/var/tracim"]
+EXPOSE 80
 
 CMD ["/bin/bash","/tracim/tools_docker/Debian_Uwsgi/entrypoint.sh"]
