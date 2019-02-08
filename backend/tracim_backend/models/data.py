@@ -1150,12 +1150,13 @@ class Content(DeclarativeBase):
         """
         # TODO - G.M - 2019-02-08 - Refactor this code to be more efficient
         all_childrens_revisions = object_session(self).query(ContentRevisionRO).filter( ContentRevisionRO.parent_id == self.content_id).all()
+        children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
         all_up_to_date_revisions_result = object_session(self).query(
             func.max(ContentRevisionRO.revision_id)
-            ).group_by(ContentRevisionRO.content_id).all()
+        ).filter(ContentRevisionRO.content_id.in_(children_content_ids))\
+            .group_by(ContentRevisionRO.content_id).all()
 
         all_up_to_date_revisions_ids = [value[0] for value in all_up_to_date_revisions_result]
-
         valid_children = []
         for revision in all_childrens_revisions:
             if revision.revision_id in all_up_to_date_revisions_ids:
