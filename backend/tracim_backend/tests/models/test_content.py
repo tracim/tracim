@@ -355,6 +355,7 @@ class TestContent(StandardTest):
             parent=parent,
         )
         self.session.flush()
+        assert [type(child) == Content for child in parent.children]
         assert [child.revision_id for child in parent.children] == [children.revision_id]
 
         with new_revision(

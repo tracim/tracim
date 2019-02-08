@@ -1160,7 +1160,7 @@ class Content(DeclarativeBase):
         valid_children = []
         for revision in all_childrens_revisions:
             if revision.revision_id in all_up_to_date_revisions_ids:
-               valid_children.append(revision)
+               valid_children.append(revision.node)
 
         return valid_children
 
