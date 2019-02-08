@@ -330,3 +330,38 @@ class TestContent(StandardTest):
         # tests content of initialized depot file
         # using depot_file.file of type StoredFile to fetch content back
         eq_(content.depot_file.file.read(), b'test')
+
+    def test_unit_get_children(self):
+        user_admin = self._get_user()
+        workspace = Workspace(label="TEST_WORKSPACE_1")
+        parent = self._create_content(
+            owner=user_admin,
+            workspace=workspace,
+            type=content_type_list.Folder.slug,
+            label='TEST_CONTENT_1',
+            description='TEST_CONTENT_DESCRIPTION_1',
+            revision_type=ActionDescription.CREATION,
+        )
+        self.session.flush()
+        assert parent.children == []
+
+        children = self._create_content(
+            owner=user_admin,
+            workspace=workspace,
+            type=content_type_list.Folder.slug,
+            label='TEST_CONTENT_1',
+            description='TEST_CONTENT_DESCRIPTION_1',
+            revision_type=ActionDescription.CREATION,
+            parent=parent,
+        )
+        self.session.flush()
+        assert [child.revision_id for child in parent.children] == [children.revision_id]
+
+        with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=children,
+        ):
+            children.parent = None
+        self.session.flush()
+        assert parent.children == []
