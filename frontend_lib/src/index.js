@@ -34,6 +34,7 @@ import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
+import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
@@ -75,6 +76,6 @@ export {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
+  ErrorFlashMessageTemplateHtml,
   NewMemberForm
 }
-
