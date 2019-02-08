@@ -33,7 +33,7 @@ class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
-        assert headers['Subject'][0] == '[TRACIM] Reset Password Request'
+        assert headers['Subject'][0] == '[TRACIM] A password reset has been requested'
 
     @pytest.mark.email_notification
     @pytest.mark.unknown_auth
@@ -79,7 +79,7 @@ class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'test user <test@test.test>'
-        assert headers['Subject'][0] == '[TRACIM] Reset Password Request'
+        assert headers['Subject'][0] == '[TRACIM] A password reset has been requested'
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth

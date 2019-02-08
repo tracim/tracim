@@ -19,6 +19,7 @@ from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import \
@@ -855,6 +856,9 @@ class UserApi(object):
             email_manager.notify_reset_password(user, token)
         except SMTPException as exc:
             raise NotificationSendingFailed("SMTP error, can't send notification") from exc
+        except EmailTemplateError as exc:
+            raise exc
+
         if do_save:
             self.save(user)
         return token

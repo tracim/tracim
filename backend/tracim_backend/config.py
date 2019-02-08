@@ -13,8 +13,10 @@ from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
+from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
@@ -25,14 +27,11 @@ SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
-    def __setattr__(self, key: str, value: typing.Any):
+    def __setattr__(self, key: str, value: typing.Any) -> None:
         """
         Log-ready setter.
 
-        Logs all configuration parameters except password.
-        :param key:
-        :param value:
-        :return:
+        Logs all configuration parameters except secret ones.
         """
         is_value_secret = False
         for secret in SECRET_ENDING_STR:
@@ -278,41 +277,31 @@ class CFG(object):
             'email.notification.references.email'
         )
         # Content update notification
+
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
             'email.notification.content_update.template.html',
         )
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
-            'email.notification.content_update.template.text',
-        )
+
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
             'email.notification.content_update.subject',
+            _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
         )
         # Created account notification
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
             'email.notification.created_account.template.html',
-            './tracim_backend/templates/mail/created_account_body_html.mak',
-        )
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = settings.get(
-            'email.notification.created_account.template.text',
-            './tracim_backend/templates/mail/created_account_body_text.mak',
         )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
             'email.notification.created_account.subject',
-            '[{website_title}] Created account',
+            _('[{website_title}] Someone created an account for you'),
         )
 
         # Reset password notification
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = settings.get(
             'email.notification.reset_password_request.template.html',
-            './tracim_backend/templates/mail/reset_password_body_html.mak',
-        )
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT = settings.get(
-            'email.notification.reset_password_request.template.text',
-            './tracim_backend/templates/mail/reset_password_body_text.mak',
         )
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
             'email.notification.reset_password_request.subject',
-            '[{website_title}] Reset Password Request'
+            _('[{website_title}] A password reset has been requested'),
         )
 
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
@@ -327,6 +316,26 @@ class CFG(object):
                 'Notification by email mecanism is disabled ! '
                 'Notification and mail invitation mecanisms will not work.'
             )
+
+        # INFO - G.M - 2019-02-01 - check if template are available,
+        # do not allow running with email_notification_activated
+        # if templates needed are not available
+        if self.EMAIL_NOTIFICATION_ACTIVATED:
+            templates = {
+                'content_update notification': self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
+                'created account': self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML,
+                'password reset': self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+            }
+            for template_description, template_path in templates.items():
+                if not template_path or not os.path.isfile(template_path):
+                    raise ConfigurationError(
+                        'ERROR: email template for {template_description} '
+                        'not found at "{template_path}."'.format(
+                            template_description=template_description,
+                            template_path=template_path
+                        )
+                    )
+
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
             'email.notification.smtp.server',
         )

@@ -8,6 +8,7 @@ from tracim_backend.extensions import app_list
 ####
 # Content Status
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
@@ -39,11 +40,10 @@ class ContentStatus(object):
     def is_editable(self):
         return self.global_status == GlobalStatus.OPEN.value
 
-
 open_status = ContentStatus(
     slug='open',
     global_status=GlobalStatus.OPEN.value,
-    label='Open',
+    label=_('Open'),
     fa_icon='square-o',
     hexcolor='#3f52e3',
 )
@@ -51,7 +51,7 @@ open_status = ContentStatus(
 closed_validated_status = ContentStatus(
     slug='closed-validated',
     global_status=GlobalStatus.CLOSED.value,
-    label='Validated',
+    label=_('Validated'),
     fa_icon='check-square-o',
     hexcolor='#008000',
 )
@@ -59,7 +59,7 @@ closed_validated_status = ContentStatus(
 closed_unvalidated_status = ContentStatus(
     slug='closed-unvalidated',
     global_status=GlobalStatus.CLOSED.value,
-    label='Cancelled',
+    label=_('Cancelled'),
     fa_icon='close',
     hexcolor='#f63434',
 )
@@ -67,7 +67,7 @@ closed_unvalidated_status = ContentStatus(
 closed_deprecated_status = ContentStatus(
     slug='closed-deprecated',
     global_status=GlobalStatus.CLOSED.value,
-    label='Deprecated',
+    label=_('Deprecated'),
     fa_icon='warning',
     hexcolor='#ababab',
 )
