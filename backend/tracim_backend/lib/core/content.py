@@ -1472,7 +1472,26 @@ class ContentApi(object):
              new_parent: Content,
              must_stay_in_same_workspace: bool=True,
              new_workspace: Workspace=None,
-    ):
+    ) -> None:
+        self._move_current(
+            item,
+            new_parent,
+            must_stay_in_same_workspace,
+            new_workspace
+        )
+        self.save(item)
+        self._move_children_content_to_new_workspace(item, new_workspace)
+
+    def _move_current(self,
+             item: Content,
+             new_parent: Content,
+             must_stay_in_same_workspace: bool=True,
+             new_workspace: Workspace=None,
+    ) -> None:
+        """
+        Move only current content, use _move_children_content_to_new_workspace
+        to fix workspace_id of children.
+        """
 
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
@@ -1629,7 +1648,11 @@ class ContentApi(object):
             self.copy(child, new_content)
 
 
-    def move_children_content_to_new_workspace(self, item: Content, new_workspace):
+    def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
+        """
+        Change workspace_id of all children of content according to new_workspace
+        given. This is needed for proper move from one workspace to another
+        """
         for child in item.children:
             if child.workspace_id != new_workspace.workspace_id:
                 with new_revision(
@@ -1639,7 +1662,7 @@ class ContentApi(object):
                 ):
                     self.move(child, new_parent=item, new_workspace=new_workspace, must_stay_in_same_workspace=False)
                     self.save(child)
-                self.move_children_content_to_new_workspace(child, new_workspace)
+                self._move_children_content_to_new_workspace(child, new_workspace)
         return
 
     def is_editable(self, item: Content) -> bool:
