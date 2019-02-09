@@ -31,6 +31,6 @@
   "Unexpected error, please inform an administrator": "Erreur inattendue, veuillez contacter un administrateur",
   "Cancel": "Annuler",
   "Full name or email": "Nom complet ou email",
-  "This content is archived": "Ce contenu est archivé",
-  "This content is deleted": "Ce contenu est supprimé"
+  "Unknown error, please inform an administrator": "Erreur inconnu, veuillez contacter un administrateur",
+  "Error detail": "Détail de l'erreur"
 }
