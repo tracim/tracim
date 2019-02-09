@@ -9,7 +9,7 @@ const FolderAdvanced = props => {
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
             <i className='fa fa-fw fa-archive' />
-            {props.t('This folder is archived.')}
+            {props.t('This folder is archived')}
           </div>
 
           <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
@@ -23,7 +23,7 @@ const FolderAdvanced = props => {
         <div className='folder_advanced__content__state'>
           <div className='folder_advanced__content__state__msg'>
             <i className='fa fa-fw fa-trash' />
-            {props.t('This folder is deleted.')}
+            {props.t('This folder is deleted')}
           </div>
 
           <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>

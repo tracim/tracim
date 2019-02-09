@@ -165,7 +165,7 @@ class FolderAdvanced extends React.Component {
   //   const fetchResultStatus = await handleFetchResult(await fetchResultSaveEditStatus)
   //   switch (fetchResultStatus.status) { // 204 no content so dont take status from resSave.apiResponse.status
   //     case 204: this.loadContent(); break
-  //     default: this.sendGlobalFlashMessage(this.props.t("Error saving folder's status. Result:"), 'warning')
+  //     default: this.sendGlobalFlashMessage(this.props.t("Error saving folder's status, result:"), 'warning')
   //   }
   // }
 

@@ -597,8 +597,10 @@ class HtmlDocument extends React.Component {
             onChangeText={this.handleChangeText}
             isArchived={content.is_archived}
             isDeleted={content.is_deleted}
+            isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            onClickShowDraft={this.handleClickNewVersion}
             key={'html-document'}
           />
 

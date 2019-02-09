@@ -14,7 +14,7 @@ export const FileComponent = props =>
       <div className='file__contentpage__preview__state'>
         <div className='file__contentpage__preview__state__msg'>
           <i className='fa fa-fw fa-archive' />
-          {props.t('This content is archived.')}
+          {props.t('This content is archived')}
         </div>
 
         <button className='file__contentpage__preview__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
@@ -28,7 +28,7 @@ export const FileComponent = props =>
       <div className='file__contentpage__preview__state'>
         <div className='file__contentpage__preview__state__msg'>
           <i className='fa fa-fw fa-trash' />
-          {props.t('This content is deleted.')}
+          {props.t('This content is deleted')}
         </div>
 
         <button className='file__contentpage__preview__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
