@@ -323,22 +323,27 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveHtmlDocument = async () => {
-    const { appName, content, config } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
+    const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
-    handleFetchResult(await fetchResultSaveHtmlDoc)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.handleCloseNewVersion()
-          this.loadContent()
-          localStorage.removeItem(
-            generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
-          )
-        } else {
-          console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    localStorage.removeItem(
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+    )
+
+    const fetchResultSaveHtmlDoc = await handleFetchResult(
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
+    )
+
+    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+      case 200:
+        this.handleCloseNewVersion()
+        this.loadContent()
+        break
+      default:
+        this.setLocalStorageItem('rawContent', backupLocalStorage)
+        this.sendGlobalFlashMessage(props.t('Error while saving new version')); break
+    }
   }
 
   handleChangeText = e => {
