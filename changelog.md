@@ -54,7 +54,7 @@
 - correction des tickets : 765, 913, 1155, 1157, 1158, 1168, 1176, 1244, 1272, 1356, 1423
 
 **Image docker**
-- correction des tickets : 1143, 1160, 1300, 1308, 1318
+- correction des tickets : 1143, 1160, 1300, 1308, 1318, 1438
 
 **correction des bugs**
 - correction des tickets : 1137, 1144, 1204, 1222
