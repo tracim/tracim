@@ -12,9 +12,10 @@ from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy import Index
 from sqlalchemy import Sequence
-from sqlalchemy import and_
+from sqlalchemy import UniqueConstraint
 from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -38,7 +39,6 @@ from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
-from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -860,6 +860,28 @@ class Content(DeclarativeBase):
         order_by='ContentRevisionRO.revision_id',
     )
 
+    # INFO - G.M - 2019-02-11 - These "hidden"
+    # column are needed to deal with content
+    # with same label.file_extension in same folder uniqueness.
+    _label = Column('label', Unicode(1024), unique=False, nullable=False)
+    _file_extension = Column('file_extension', Unicode(255), unique=False, nullable=False, server_default='')
+    _workspace_id = Column('workspace_id', Integer, ForeignKey('workspaces.workspace_id'))
+    _parent_id = Column('parent_id', Integer, ForeignKey('content.id'), nullable=True, default=None)
+
+    # # INFO - G.M - 2019-02-11 - hidden relationship,
+    # needed to update workspaces and parent with object and update value in
+    # both tables : Content and ContentRevisionRO
+    _workspace = relationship('Workspace', remote_side=[Workspace.workspace_id], uselist=False)
+    _parent = relationship('Content', remote_side=[id], uselist=False)
+
+    __table_args__ = (
+        # INFO - G.M - 2019-02-11 - Uniqueness of Content label.file_extension
+        # in a specific subdir : /workspace/..../parent/ .
+        UniqueConstraint(
+            'workspace_id', 'parent_id','label','file_extension',
+        ),
+    )
+
     @hybrid_property
     def content_id(self) -> int:
         return self.revision.content_id
@@ -904,7 +926,13 @@ class Content(DeclarativeBase):
 
     @label.setter
     def label(self, value: str) -> None:
+        """
+        Set label of content
+        /!\ this code set label for both table: Content and ContentRevisionRO,
+        to provide consistency.
+        """
         self.revision.label = value
+        self._label = value
 
     @label.expression
     def label(cls) -> InstrumentedAttribute:
@@ -942,7 +970,14 @@ class Content(DeclarativeBase):
 
     @file_extension.setter
     def file_extension(self, value: str) -> None:
+        """
+        Set file_extension of content
+        /!\ this code set file_extension for both table:
+        Content and ContentRevisionRO,
+        to provide consistency.
+        """
         self.revision.file_extension = value
+        self._file_extension = value
 
     @file_extension.expression
     def file_extension(cls) -> InstrumentedAttribute:
@@ -1074,7 +1109,14 @@ class Content(DeclarativeBase):
 
     @workspace_id.setter
     def workspace_id(self, value: int) -> None:
+        """
+        Set workspace_id of content
+        /!\ this code set workspace_id for both table:
+        Content and ContentRevisionRO,
+        to provide consistency.
+        """
         self.revision.workspace_id = value
+        self._workspace_id = value
 
     @workspace_id.expression
     def workspace_id(cls) -> InstrumentedAttribute:
@@ -1086,7 +1128,14 @@ class Content(DeclarativeBase):
 
     @workspace.setter
     def workspace(self, value: Workspace) -> None:
+        """
+        Set workspace of content
+        /!\ this code set workspace for both table:
+        Content and ContentRevisionRO,
+        to provide consistency.
+        """
         self.revision.workspace = value
+        self._workspace = value
 
     @workspace.expression
     def workspace(cls) -> InstrumentedAttribute:
@@ -1098,7 +1147,14 @@ class Content(DeclarativeBase):
 
     @parent_id.setter
     def parent_id(self, value: int) -> None:
+        """
+        Set parent_id of content
+        /!\ this code set parent_id for both table:
+        Content and ContentRevisionRO,
+        to provide consistency.
+        """
         self.revision.parent_id = value
+        self._parent_id = value
 
     @parent_id.expression
     def parent_id(cls) -> InstrumentedAttribute:
@@ -1110,7 +1166,14 @@ class Content(DeclarativeBase):
 
     @parent.setter
     def parent(self, value: 'Content') -> None:
+        """
+        Set parent of content
+        /!\ this code set parent for both table:
+        Content and ContentRevisionRO,
+        to provide consistency.
+        """
         self.revision.parent = value
+        self._parent = value
 
     @parent.expression
     def parent(cls) -> InstrumentedAttribute:
