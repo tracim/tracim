@@ -15,6 +15,7 @@ from tracim_backend.exceptions import InvalidSettingFile
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
@@ -88,6 +89,7 @@ class InitializeDBCommand(AppContextCommand):
             except IntegrityError as exc:
                 transaction.abort()
                 print('Database initialization failed')
+                logger.exception(cls, 'Database Initialization Failed')
                 raise DatabaseInitializationFailed(
                     'Warning, there was a problem when adding default data'
                     ', it may have already been added.'
