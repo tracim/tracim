@@ -616,14 +616,17 @@ class ContentApi(object):
             )
         if not content:
             raise EmptyCommentContentNotAllowed()
-
         item = self.create(
             content_type_slug=content_type_list.Comment.slug,
             workspace=workspace,
             parent=parent,
             do_notify=False,
             do_save=False,
-            label='',
+            label='{}_{}_{}'.format(
+                'comment',
+                str(datetime.datetime.utcnow().timestamp()),
+                self._user.user_id
+            )
         )
         item.description = content
         item.revision_type = ActionDescription.COMMENT

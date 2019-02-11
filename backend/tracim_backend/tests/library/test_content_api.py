@@ -1335,7 +1335,7 @@ class TestContentApi(DefaultTest):
         eq_(workspace, c.workspace)
         eq_(content_type_list.Comment.slug, c.type)
         eq_('this is the comment', c.description)
-        eq_('', c.label)
+        assert c.label.startswith('comment')
         eq_(ActionDescription.COMMENT, c.revision_type)
 
     def test_unit_copy_file_different_label_different_parent_ok(self):
