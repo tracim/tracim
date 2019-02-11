@@ -71,7 +71,7 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-archive' />
-              {props.t('This content is archived.')}
+              {props.t('This content is archived')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreArchived}>
@@ -85,7 +85,7 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-trash' />
-              {props.t('This content is deleted.')}
+              {props.t('This content is deleted')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreDeleted}>
