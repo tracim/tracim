@@ -19,6 +19,7 @@ from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import \
@@ -855,6 +856,9 @@ class UserApi(object):
             email_manager.notify_reset_password(user, token)
         except SMTPException as exc:
             raise NotificationSendingFailed("SMTP error, can't send notification") from exc
+        except EmailTemplateError as exc:
+            raise exc
+
         if do_save:
             self.save(user)
         return token
@@ -932,7 +936,13 @@ class UserApi(object):
             raise UserAuthTypeDisabled('user {} auth type {} is disabled'.format(user.email, user.auth_type.value))
 
     def _user_can_authenticate(self, user: User) -> bool:
-        return user.auth_type and user.auth_type in self._config.AUTH_TYPES
+        valid_auth_types = list(self._config.AUTH_TYPES)
+        # INFO - G.M - 2019-01-29 - we need to add Unknown as config doesn't
+        # list it for some reason and as unknown is a valid auth method.
+        # this fix issue 1359 :
+        # https://github.com/tracim/tracim/issues/1359
+        valid_auth_types.append(AuthType.UNKNOWN)
+        return user.auth_type and user.auth_type in valid_auth_types
 
     def allowed_to_invite_new_user(self, email: str) -> bool:
         # INFO - G.M - 2018-10-25 - disallow account creation if no

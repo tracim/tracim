@@ -270,19 +270,25 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveHtmlDoc = await handleFetchResult(
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
+    )
 
-    handleFetchResult(await fetchResultSaveHtmlDoc)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.loadContent()
-          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
-        } else {
-          console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
+    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+      case 200:
+        this.loadContent()
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        break
+      case 400:
+        switch (fetchResultSaveHtmlDoc.body.code) {
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
-      })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+    }
   }
 
   handleClickNewVersion = () => {
@@ -317,22 +323,27 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveHtmlDocument = async () => {
-    const { appName, content, config } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
+    const backupLocalStorage = this.getLocalStorageItem('rawContent')
 
-    handleFetchResult(await fetchResultSaveHtmlDoc)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.handleCloseNewVersion()
-          this.loadContent()
-          localStorage.removeItem(
-            generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'rawContent')
-          )
-        } else {
-          console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    localStorage.removeItem(
+      generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'rawContent')
+    )
+
+    const fetchResultSaveHtmlDoc = await handleFetchResult(
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, state.content.raw_content)
+    )
+
+    switch (fetchResultSaveHtmlDoc.apiResponse.status) {
+      case 200:
+        this.handleCloseNewVersion()
+        this.loadContent()
+        break
+      default:
+        this.setLocalStorageItem('rawContent', backupLocalStorage)
+        this.sendGlobalFlashMessage(props.t('Error while saving new version')); break
+    }
   }
 
   handleChangeText = e => {
@@ -591,8 +602,10 @@ class HtmlDocument extends React.Component {
             onChangeText={this.handleChangeText}
             isArchived={content.is_archived}
             isDeleted={content.is_deleted}
+            isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            onClickShowDraft={this.handleClickNewVersion}
             key={'html-document'}
           />
 

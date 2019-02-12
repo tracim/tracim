@@ -128,19 +128,12 @@ export class AdminUser extends React.Component {
             </button>
 
             <div className='adminUser__adduser__emailstate'>
-              {props.emailNotifActivated
-                ? (
-                  <div className=''>
-                    <i className='fa fa-envelope' /> {props.t('Email notification activated')}
-                  </div>
-                )
-                : (
-                  <div>
-                    <i className='primaryColorFont fa fa-fw fa-warning' />
-                    {props.t('Email notification are disabled, please notify users of any change')}
-                  </div>
-                )
-              }
+              {!props.emailNotifActivated && (
+                <div>
+                  <i className='primaryColorFont fa fa-fw fa-warning' />
+                  {props.t('Email notification are disabled, please manually notify users of any change')}
+                </div>
+              )}
             </div>
 
           </div>

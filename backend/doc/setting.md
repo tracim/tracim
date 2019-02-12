@@ -1,15 +1,16 @@
 # Settings #
 
-Here is a short description of settings available in backend config files.
+Short description about backend config file settings.
 
-# Tracim config ini file #
+## Tracim `.ini` config file #
 
-This file is called'development.ini' file by default, it's located is backend
-subdir, default config is [development.ini.sample](../development.ini.sample) with some doc.
+The default config file is `development.ini`, a template is available in the repo: [development.ini.sample](../development.ini.sample).
 
-## Fix URL for access to tracim from network (simple) ##
+The file includes documentation which should be enough in most cases.
 
-To have a working tracim, you need to explicitly explain where backend and frontend are.
+## Configure URL for tracim access - simple case ##
+
+To have a working tracim instance, you need to explicitly define where backend and frontend are.
 If backend serve frontend or if you do not need frontend at all, you can just set:
 
     website.base_url = http://mysuperdomainame.ndd
@@ -27,7 +28,7 @@ or (for https):
 
 you also need to NOT set website.server_name and api.base_url
 
-## Fix URL for access to tracim from network (complex) ##
+## Configure URL for tracim access - complex case ##
 
 If the `website.base_url` trick is not enough for your own configuration, you can:
 - Explicitly set backend base url different from frontend url with `api.base_url`
@@ -39,7 +40,62 @@ you can add how many server you want separated by ','
 
      cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
 
-## Activating API key authentification
+
+## Authentication in Tracim
+
+Tracim comes with several types of authentication:
+
+- internal database
+- ldap
+- special auth mecanism like Api-Key
+- REMOTE AUTH like Apache Auth later explained in the documentation.
+
+You can chose valid auth_source and order them by priority with `auth_types` params in conf ini file
+
+Example:
+
+`auth_types = internal`
+
+or:
+
+`auth_types = internal,ldap`
+
+This one will check user internal database in a first check, then if the auth fails, it will also try to authenticate the user based on LDAP data.
+
+### LDAP Authentication
+
+LDAP authentication require some extra parameters, you need to set them all correctly
+to have a working ldap authentication system.
+
+example of the ldap config working with
+https://github.com/rroemhild/docker-test-openldap :
+
+```
+auth_types=ldap
+ldap_url = ldap://localhost:389
+ldap_base_dn = dc=planetexpress,dc=com
+ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
+ldap_bind_pass = GoodNewsEveryone
+ldap_user_base_dn = ou=people,dc=planetexpress,dc=com
+ldap_login_attribute = mail
+ldap_name_attribute = givenName
+ldap_tls = False
+```
+
+:heavy_exclamation_mark: At connection in tracim, if a valid ldap user doesn't
+exist in tracim, it will be created as standard user.
+
+## Special auth mecanisms
+
+Thoses special auth mecanism are not linked to `auth_types` in config.
+
+### API-Key Authentification
+
+:heavy_exclamation_mark: Unlike other mecanism of auth, this mecanism is not build
+for normal user auth but for administrators or daemon like email reply daemon. This
+auth mecanism is the only one that bypass auth mecanism check (user are linked 
+one specific mecanism and can't connect with an other one), so 
+you can impersonate any user linked to any auth mecanisms.
 
 API key is a auth mecanism of tracim which allow user with the key to have
 a superadmin right on tracim api, this allow user with the key to act as anyone
@@ -51,6 +107,64 @@ It rely on 2 HTTP headers:
 - `Tracim-Api-Login` : User email login, in order to act as the user given
 
 If you let `api.key` with empty value, API key auth will be disabled.
+
+### Remote Auth Authentification (eg apache authentication)
+
+It is possible to connect to tracim using remote auth authentification like
+apache auth for apache.
+The idea is that webserver authenticate user and then pass by uwsgi env var or
+http header email user of the authenticated user.
+
+:heavy_exclamation_mark: At connection in tracim, if a valid remote user doesn't
+exist in tracim, it will be created as standard user
+
+to do this, you need to configure properly your webserver in order to do
+authentication and to pass correctly uwsgi env var or http header.
+
+in tracim, you just need to change value of `remote_user_header` in ini conf
+file. Value should be a env var in CGI like style, so  `Remote-User` http header
+become  `HTTP-REMOTE-USER`.
+
+:warning: You should be very carefull using this feature with http header, your
+webserver should be configured properly to not allow someone to set custom
+remote user header. You should also be sure if you use the webserver as proxy
+that no one could bypass this proxy and access to tracim in a way that allow
+them to authenticate as anyone without password.
+
+#### Example of remote_user with basic auth using apache as http proxy
+
+in tracim ini conf file :
+
+`
+   auth_
+   remote_user_header = HTTP_X_REMOTE_USER
+`
+
+apache_virtualhost (tracim should be listening on port 6543):
+
+
+```
+Listen 6544
+<VirtualHost *:6544>
+    ServerAdmin webmaster@localhost
+    ServerName localhost
+
+    <Location "/">
+      AuthType Basic
+      AuthName "Restricted Content"
+      AuthUserFile /etc/apache2/password
+      Require valid-user
+    </Location>
+
+    RequestHeader set X-Remote-User expr=%{REMOTE_USER}
+    # SSL
+    # RequestHeader set X-Remote-User %{REMOTE_USER}s
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:6543/
+    ProxyPassReverse / http://127.0.0.1:6543/
+</VirtualHost>
+```
 
 ## Activating Mail Notification feature ##
 

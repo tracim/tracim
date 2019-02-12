@@ -1,7 +1,8 @@
 # Migration from Tracim v1 to Tracim v2.1
 
-**Warning !** : 2.0 version of Tracim doesn't support folder and ldap. If you want to migrate
-from tracim v1, you should use 2.1 or latest.
+**:warning:**  2.0 version of Tracim doesn't support folder and ldap. If you want to migrate from tracim v1, you should use 2.1 or latest.
+
+**:warning:** Backward migration is not supported from tracim v2 to tracim v1, see "About backward migration" part in this document.
 
 If you are using tracim v1 and want to use now tracim_v 2.1 there is
 few step to do.
@@ -122,3 +123,9 @@ Others modifications in config file includes :
 * new logger for `alembic` and `hapic` (`auth` logger has been removed)
 * old personnalization file from tracim_v1 like  `assets/img/home_illustration.jpg`
  or `/assets/img/bg.jpg` are not anymore used.
+
+# About backward migration
+
+Backward migration from v2 to v1 is not supported, you can tried to downgrade database from
+tracim v2.1 to tracim v1 using `alembic downgrade` command, but some content like `page`/`html-document` will not be accessible anymore.
+That because Tracim v2 use `html-document` whereas Tracim v1 use `page`.

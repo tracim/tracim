@@ -323,7 +323,7 @@ class WorkspaceAdvanced extends React.Component {
             )
             this.sendGlobalFlashMessage(<ErrorMsg />, 'warning')
             break
-          case 3008: this.sendGlobalFlashMessage(props.t('This user already is in the workspace'), 'warning'); break
+          case 3008: this.sendGlobalFlashMessage(props.t('This user already is in the shared space'), 'warning'); break
           default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space'), 'warning')
         }
         break

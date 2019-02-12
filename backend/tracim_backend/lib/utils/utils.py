@@ -300,6 +300,8 @@ def webdav_convert_file_name_to_bdd(string: str) -> str:
 
     return string
 
+def add_trailing_slash(path: str):
+    return (path + '/').replace('//', '/')
 
 def normpath(path):
     if path == b'':

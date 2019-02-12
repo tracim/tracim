@@ -94,6 +94,17 @@ If you need to run cypress with external server of tracim, modify "baseurl" in c
     cd backend/
     source env/bin/activate
     pserve cypress_test.ini
+    
+## If you are running tests in a development environment
+
+You must change the apiUrl property in `frontend/configEnv.json` to 
+
+    http://localhost:1337/api/v2
+
+Then rebuild the frontend
+    
+    cd frontend/
+    npm run build 
 
 ### Run tests with command line ##
 
