@@ -3,31 +3,35 @@ develop branch status:
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
-## Use tracim with docker
+## Quickstart (using docker)
 
-You can find docker documentation [here](tools_docker/README.md). 
+Test  tracim on your computer with docker:
 
-## Install Tracim on your server ##
+```
+TRACIM_STORAGE=~/tracim
+mkdir -p $TRACIM_STORAGE/etc
+mkdir -p $TRACIM_STORAGE/var
+docker run -e DATABASE_TYPE=sqlite -p 80:80 -v $TRACIM_STORAGE/etc/:/etc/tracim -v $TRACIM_STORAGE/var:/var/tracim algoo/tracim`
+```
 
-Following the installation documentation below, you'll be able to run your own instance on your server.
+For advanced docker-based usage, look at the full [tracim docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker), 
 
-----
+## Install tracim from the sources
 
-# Installation #
-
-## Get the source ##
+### Get the source
 
 Get the sources from GitHub (you need git):
 
     git clone https://github.com/tracim/tracim.git
     cd tracim/
 
-## Install backend
-### Option 1: Install backend manually ###
+### Install backend
+
+#### Option 1: Install backend manually
 
 see [Backend README](backend/README.md)
 
-### Option2: Install backend: Automated script for easy setup ###
+#### Option2: Install backend: Automated script for easy setup
 
 This script run backend with simple default conf: development.ini conf file, use
 default config file, sqlite database, etc...
@@ -48,7 +52,7 @@ for more information about configuration file, see development.ini.sample docume
 and [Backend setting file doc](backend/doc/setting.md).
 
 
-## Install frontend: Automated Script for easy setup ##
+### Install frontend: Automated Script for easy setup
 
     ./install_frontend_dependencies.sh
     ./build_full_frontend.sh
@@ -58,7 +62,7 @@ You can run also with root if you add root in parameter of this script.
   
 You can add "-d" to build_full_frontend.sh to disabled obfuscation and reduce build time. 
 
-## Running Tracim using pserve ##
+### Run tracim (using pserve)
 
     cd backend/
     source env/bin/activate
@@ -70,13 +74,9 @@ You can now enter the application at
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
 
-----
+### Running tests with Cypress
 
-## Running tests with Cypress ##
-
-----
-
-## Installation of Cypress: Automated script for easy setup ##
+#### Installation of Cypress: Automated script for easy setup
 
 This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress and his dependency's.
 
@@ -87,7 +87,7 @@ You can run also with root if you add root in parameter of this script.
 
 If you need to run cypress with external server of tracim, modify "baseurl" in cypress.json (look here for more detail: https://docs.cypress.io/guides/references/configuration.html#Options ).
 
-## Prerequisit for running Cypress tests
+#### Prerequisit for running Cypress tests
 
 ⚠ To launch cypress test, you need a running tracim with specific config
 
@@ -95,7 +95,7 @@ If you need to run cypress with external server of tracim, modify "baseurl" in c
     source env/bin/activate
     pserve cypress_test.ini
     
-## If you are running tests in a development environment
+#### If you are running tests in a development environment
 
 You must change the apiUrl property in `frontend/configEnv.json` to 
 
@@ -106,20 +106,20 @@ Then rebuild the frontend
     cd frontend/
     npm run build 
 
-### Run tests with command line ##
+#### Run tests with command line ##
 
 This command run all test present in 'functionnal_tests/cypress/integration' folder.
 
     cd functionnal_tests/
     npm run cypress-run
 
-### Run tests with cypressgui ##
+#### Run tests with cypressgui ##
 
 Open Cypress with graphical interface. You can show test running directly in web interface.
 
     cd functionnal_tests/
     npm run cypress-open
 
-# Contribute
+## Contribute
 
 in order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
