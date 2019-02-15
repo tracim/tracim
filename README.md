@@ -3,6 +3,12 @@ develop branch status:
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
+## What is tracim?
+
+Tracim is a collaborative plateforme software intended for (not only technical) team collaboration. It is simple to use, offers a user-friendly interface and runs on every computer. It is very valuable for R&D teams, assocations, remote collaboration.
+
+More information on the website: https://www.tracim.fr (in French)
+
 ## Quickstart (using docker)
 
 Test  tracim on your computer with docker:
@@ -16,7 +22,15 @@ docker run -e DATABASE_TYPE=sqlite -p 80:80 -v $TRACIM_STORAGE/etc/:/etc/tracim 
 
 For advanced docker-based usage, look at the full [tracim docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker), 
 
-## Install tracim from the sources
+## Licence 
+
+Tracim is distributed under the terms of the MIT License.
+
+## Contribute
+
+In order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
+
+## Advanced - Install tracim from the sources
 
 ### Get the source
 
@@ -119,7 +133,3 @@ Open Cypress with graphical interface. You can show test running directly in web
 
     cd functionnal_tests/
     npm run cypress-open
-
-## Contribute
-
-in order to contribute to tracim source_code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
