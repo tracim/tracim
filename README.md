@@ -17,8 +17,12 @@ Test  tracim on your computer with docker:
 TRACIM_STORAGE=~/tracim
 mkdir -p $TRACIM_STORAGE/etc
 mkdir -p $TRACIM_STORAGE/var
-docker run -e DATABASE_TYPE=sqlite -p 80:80 -v $TRACIM_STORAGE/etc/:/etc/tracim -v $TRACIM_STORAGE/var:/var/tracim algoo/tracim`
+docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v $TRACIM_STORAGE/etc/:/etc/tracim -v $TRACIM_STORAGE/var:/var/tracim algoo/tracim
 ```
+Then visit the url http://localhost:8080 and login in to tracim:
+
+- email: `admin@admin.admin`
+- password: `admin@admin.admin`
 
 For advanced docker-based usage, look at the full [tracim docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker), 
 
