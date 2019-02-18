@@ -1,3 +1,10 @@
+## Next version x.x.x /xxxx-xx-xx
+
+### Known issues
+
+- If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
+
+
 ## 2.1.0 / 2019-02-15
 
 ### New Features
@@ -15,7 +22,6 @@
 - Calendar support still missing (migration from tracim v1 will be available in tracim 2.2 - see #1181)
 - Search & filtering not yet migrated from tracim v1
 - Duplicated creation of content may appear on slow network (issue #1361)
-- If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
 
 ### Fixed issues
 
