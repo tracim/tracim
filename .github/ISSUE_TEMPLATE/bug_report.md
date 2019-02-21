@@ -26,7 +26,9 @@ about: Create a report about bug
 
 ## Screenshots
 
-*If applicable, add screenshots to help explain your problem.* 
+*If applicable, add screenshots to help explain your problem.*
+
+*Please consider sharing a [animated GIF screencast generated with peek](https://github.com/phw/peek)* 
 
 ## Desktop environment (if applicable)
 
