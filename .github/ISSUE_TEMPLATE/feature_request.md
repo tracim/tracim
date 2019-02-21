@@ -4,18 +4,35 @@ about: Suggest an idea for this project
 
 ---
 
-## Problem to solve
-
-*A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]*
-
-## Feature suggestion
-
-*A clear and concise description of what you want to happen.*
-
-## Alternative solutions
-
-*A clear and concise description of any alternative solutions or features you've considered.*
-
 ## Context
 
-*Add any other context or screenshots about the feature request here.*
+*Explain the why and the how of the requested feature.*
+
+## Expected
+
+*Explain the functionnal and technical expectations in order to help developers to understand what is wanted.*
+
+## Prerequisites
+
+*Optional - if some other issues must be closed before the current, list them here.*
+
+- *#xxx*
+- *...*
+
+## Impacted components
+
+*Optional - list components which will be impacted.*
+
+*For example:*
+
+- *backend*
+- *frontend*
+- *htmldoc / file / thread app*
+- *webdav*
+- *...*
+
+*If unsure, write "unknown"*
+
+## Extra information
+
+*Optional - Add any extra information which will be usefull for understanding and developing the feature*
