@@ -1,24 +1,48 @@
 ---
 name: Bug report
-about: Create a report about bug
+about: Report a bug you detected using tracim
 
 ---
+## Bug description & symptom
 
-## Bug description
+*Explain the bug and what is going wrong.*
 
-*A clear and concise description of what the bug is.*
+## Diagnostic
 
-## Expected behavior
+*Optional - explain what has been found and what is not yet clear. If unknown, write "unknown".*
 
-*A clear and concise description of what you expected to happen.*
+## Expected
 
-## Context
+*Describe the expectations in order to consider the bug resolved**
 
-*Add any other context about the problem here, or remove it.*
+## Context and version information
+
+*Optional - describe the environment which reveals the bug:*
+
+- Desktop environment (if applicable)
+    - *OS: [e.g. iOS]*
+    - *Browser [e.g. chrome, safari]*
+    - *Version [e.g. 22]*
+- Smartphone/Tablet (if applicable)
+    - *Device: [e.g. iPhone6]*
+    - *OS: [e.g. iOS8.1]*
+    - *Browser [e.g. stock browser, safari]*
+    - *Version [e.g. 22]*
+
+*...*
+
+## Prerequisites
+
+*Optional - list issues that must be closed before the current one.*
+
+- *#xxx*
+- *...*
+
 
 ## How to reproduce
 
-*Steps to reproduce the behavior:*
+*Optional - detail steps to reproduce the behavior:*
+
 1. *Go to '...'*
 1. *Click on '....'*
 1. *Scroll down to '....'*
@@ -26,19 +50,25 @@ about: Create a report about bug
 
 ## Screenshots
 
-*If applicable, add screenshots to help explain your problem.*
+*Optional - add screenshots to help explain your problem.*
 
 *Please consider sharing a [animated GIF screencast generated with peek](https://github.com/phw/peek)* 
 
-## Desktop environment (if applicable)
+## Impacted components
 
-- *OS: [e.g. iOS]*
-- *Browser [e.g. chrome, safari]*
-- *Version [e.g. 22]*
+*Optional - list components which will be impacted.*
 
-## Smartphone/Tablet (if applicable)
+*For example:*
 
-- *Device: [e.g. iPhone6]*
-- *OS: [e.g. iOS8.1]*
-- *Browser [e.g. stock browser, safari]*
-- *Version [e.g. 22]*
+- *backend*
+- *frontend*
+- *htmldoc / file / thread app*
+- *webdav*
+- *...*
+
+*If unsure, write "unknown"*
+
+## Extra information
+
+*Optional - add any extra information which will be usefull for understanding and developing the feature*
+
