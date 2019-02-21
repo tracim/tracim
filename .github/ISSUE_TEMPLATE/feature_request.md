@@ -1,16 +1,16 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest a new feature
 
 ---
+
+## Feature description
+
+*Explain the requested feature and the functionnal and technical expectations.*
 
 ## Context
 
 *Explain the why and the how of the requested feature.*
-
-## Expected
-
-*Explain the functionnal and technical expectations in order to help developers to understand what is wanted.*
 
 ## Prerequisites
 
