@@ -22,9 +22,17 @@ class PopinFixedHeader extends React.Component {
   }
 
   handleClickChangeTitleBtn = () => {
-    if (this.state.editTitle) this.props.onValidateChangeTitle(this.state.editTitleValue)
+    const { props, state } = this
+    if (state.editTitle) {
+      props.onValidateChangeTitle(state.editTitleValue)
+      this.setState(prevState => ({editTitle: !prevState.editTitle}))
+      return
+    }
 
-    this.setState(prevState => ({editTitle: !prevState.editTitle}))
+    this.setState(prevState => ({
+      editTitle: !prevState.editTitle,
+      editTitleValue: props.rawTitle
+    }))
   }
 
   handleInputKeyPress = e => {

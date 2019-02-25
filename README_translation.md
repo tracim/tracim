@@ -4,6 +4,12 @@
 
 In each frontend repo (frontend, frontend_app_..., frontend_lib), there is a folder i18next.scanner that holds every translation files in JSON.
 
+### Important notice
+:bulb: :warning: There is currently an unknown issue with some translation key that lead to a crash of apps on load.
+  
+While this issue is beeing resolved, the workaround is to not use '.' (dots) in translation keys and/or translation values.
+  
+:bug: see https://github.com/tracim/tracim/issues/1045 for more info
 ___
 
 ### I have found a translation error, how do I fix it ?

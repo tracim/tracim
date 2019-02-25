@@ -204,19 +204,25 @@ class Thread extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveThread = putThreadContent(config.apiUrl, content.workspace_id, content.content_id, newTitle)
+    const fetchResultSaveThread = await handleFetchResult(
+      await putThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle)
+    )
 
-    handleFetchResult(await fetchResultSaveThread)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.loadContent()
-          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
-        } else {
-          console.warn('Error saving threads. Result:', resSave, 'content:', content, 'config:', config)
+    switch (fetchResultSaveThread.apiResponse.status) {
+      case 200:
+        this.loadContent()
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        break
+      case 400:
+        switch (fetchResultSaveThread.body.code) {
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
-      })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+    }
   }
 
   handleChangeNewComment = e => {

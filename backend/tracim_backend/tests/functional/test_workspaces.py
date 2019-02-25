@@ -26,6 +26,7 @@ from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests import MailHogFunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
 
 
@@ -2471,7 +2472,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
 
 
-class TestUserInvitationWithMailActivatedSync(FunctionalTest):
+
+class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
     config_section = 'functional_test_with_mail_test_sync'
@@ -2512,7 +2514,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -2556,16 +2557,12 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert res['profile'] == 'users'
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob.bob>'
         assert headers['Subject'][0] == '[TRACIM] Created account'
-
-        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(self):  # nopep8
         """
@@ -2603,7 +2600,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -2626,6 +2622,151 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert res.json_body['code'] == error.USER_NOT_FOUND
+
+class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalTest):
+
+    fixtures = [BaseFixture, ContentFixtures]
+    config_section = 'functional_test_with_mail_test_sync_with_auto_notif'
+
+    def test_api__create_workspace_member_role__ok_200__new_user_notif(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        self.cleanup_mailhog()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id']
+        user_id = user_role_found['user_id']
+        assert user_role_found['workspace_id'] == workspace.workspace_id
+        assert user_role_found['newly_created'] is True
+        assert user_role_found['email_sent'] is True
+        assert user_role_found['do_notify'] is True
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['profile'] == 'users'
+
+        # check mail received
+        response = self.get_mailhog_mails()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] Created account'
+        # check for notification to new user, user should not be notified
+        # until it connected to tracim.
+        self.cleanup_mailhog()
+        api = ContentApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config
+        )
+        api.create(
+            content_type_slug='html-document',
+            workspace=workspace,
+            label='test_document',
+            do_save=True,
+        )
+        transaction.commit()
+        response = self.get_mailhog_mails()
+        assert len(response) == 0
+        # check for notification to new connected user, user should not be notified
+        # until it connected to tracim.
+        bob = uapi.get_one_by_email(email='bob@bob.bob')
+        uapi.update(user=bob, password='bob@bob.bob', do_save=True)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@bob.bob',
+                'bob@bob.bob'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        self.cleanup_mailhog()
+        api = ContentApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config
+        )
+        api.create(
+            content_type_slug='html-document',
+            workspace=workspace,
+            label='test_document2',
+            do_save=True,
+        )
+        transaction.commit()
+        response = self.get_mailhog_mails()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Global manager via Tracim <test_user_from+1@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] [test] test_document2 (Open)'
+
 
 class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
 
@@ -5225,6 +5366,142 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] == 2
         assert res.json_body['content_id'] == 8
         assert res.json_body['workspace_id'] == 1
+
+    def test_api_put_move_content__ok_200__to_another_workspace_folder_and_subcontents(self):
+        """
+        correctly move content from projectA_workspace to another projectA_workspace recursively
+        move all folder documentation from projectA to projectB projectA_workspace
+        - Workspace projectA
+          - folder: documentation
+            - html-document: report_product_47EA
+            - schemas
+              - readme.txt
+        - Workspace projectB
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        projectA_workspace = workspace_api.create_workspace('projectA', save_now=True)  # nopep8
+        projectB_workspace = workspace_api.create_workspace('projectB', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+
+        documentation_folder = content_api.create(
+            label='documentation',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=projectA_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        report = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=projectA_workspace,
+            parent=documentation_folder,
+            label='report_product_47EA',
+            do_save=True,
+            do_notify=False,
+        )
+        schema_folder = content_api.create(
+            label='schemas',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=projectA_workspace,
+            parent=documentation_folder,
+            do_save=True,
+            do_notify=False
+        )
+        readme_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=projectA_workspace,
+            parent=schema_folder,
+            filename='readme.txt',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=readme_file,
+        ):
+            content_api.update_file_data(
+                readme_file,
+                'readme.txt',
+                new_mimetype='plain/text',
+                new_content=b'To be completed',
+            )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': None,  # root
+            'new_workspace_id': projectB_workspace.workspace_id,
+        }
+        # verify coherence of workspace content first.
+        projectA_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectA_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectA_workspace_contents) == 4
+        assert not [content for content in projectA_workspace_contents if content['workspace_id'] != projectA_workspace.workspace_id]
+        projectB_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectB_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectB_workspace_contents) == 0
+        assert not [content for content in projectB_workspace_contents if content['workspace_id'] != projectB_workspace.workspace_id]
+
+        params = {
+            'new_parent_id': None,  # root
+            'new_workspace_id': projectB_workspace.workspace_id,
+        }
+        self.testapp.put_json(
+            '/api/v2/workspaces/{}/contents/{}/move'.format(
+                projectA_workspace.workspace_id,
+                documentation_folder.content_id
+            ),
+            params=params,
+            status=200
+        )
+
+        # verify coherence of workspace after
+        projectA_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectA_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectA_workspace_contents) == 0
+        assert not [content for content in projectA_workspace_contents if content['workspace_id'] != projectA_workspace.workspace_id]
+        projectB_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectB_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectB_workspace_contents) == 4
+        assert not [content for content in projectB_workspace_contents if content['workspace_id'] != projectB_workspace.workspace_id]
+
+
+
 
     def test_api_put_move_content__ok_200__to_another_workspace_root(self):
         """

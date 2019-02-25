@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 import typing
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -13,6 +14,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyNotificationError
+from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.lib.core.notifications import INotifier
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
@@ -185,27 +187,28 @@ class EmailManager(object):
     # Content Notification
 
     @staticmethod
-    def log_notification(
+    def log_email_notification(
             config: CFG,
+            msg: str,
             action: str,
-            recipient: typing.Optional[str],
-            subject: typing.Optional[str],
+            email_recipient: typing.Optional[str],
+            email_subject: typing.Optional[str],
     ) -> None:
         """Log notification metadata."""
-        log_path = config.EMAIL_NOTIFICATION_LOG_FILE_PATH
-        if log_path:
-            # TODO - A.P - 2017-09-06 - file logging inefficiency
-            # Updating a document with 100 users to notify will leads to open
-            # and close the file 100 times.
-            with open(log_path, 'a') as log_file:
-                print(
-                    datetime.datetime.now(),
-                    action,
-                    recipient,
-                    subject,
-                    sep='|',
-                    file=log_file,
-                )
+
+        infos = {
+            'action': action,
+            'recipient': email_recipient,
+            'subject': email_subject,
+            'network': 'email',
+        }
+        email_notification_logger = logging.getLogger(
+            'tracim_email_notification'
+        )
+        email_notification_logger.info(
+            msg=msg,
+            extra=infos,
+        )
 
     def notify_content_update(
             self,
@@ -259,20 +262,28 @@ class EmailManager(object):
             return
 
 
-        logger.info(self, 'Sending asynchronous emails to {} user(s)'.format(len(notifiable_roles)))
+        logger.info(self, 'Generating content {} notification email for {} user(s)'.format(
+            content.content_id,
+            len(notifiable_roles)
+        ))
         # INFO - D.A. - 2014-11-06
         # The following email sender will send emails in the async task queue
         # This allow to build all mails through current thread but really send them (including SMTP connection)
         # In the other thread.
         #
         # This way, the webserver will return sooner (actually before notification emails are sent
-        async_email_sender = EmailSender(
+        email_sender = EmailSender(
             self.config,
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
         )
         for role in notifiable_roles:
-            logger.info(self, 'Sending email to {}'.format(role.user.email))
+            logger.info(self,
+                        'Generating content {} notification email to {}'.format(
+                            content.content_id,
+                            role.user.email
+                        )
+            )
             translator = Translator(app_config=self.config, default_lang=role.user.lang)  # nopep8
             _ = translator.get_translation
             to_addr = formataddr((role.user.display_name, role.user.email))
@@ -291,11 +302,12 @@ class EmailManager(object):
             # may not include all required labels. In order to avoid partial format() (which result in an exception)
             # we do use replace and force the use of .__str__() in order to process LazyString objects
             #
-            subject = self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT
-            subject = subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE_TITLE.__str__())
+            content_status = translator.get_translation(main_content.get_status().label)
+            translated_subject = translator.get_translation(self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT)
+            subject = translated_subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE_TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
-            subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
+            subject = subject.replace(EST.CONTENT_STATUS_LABEL, content_status)
             reply_to_label = _('{username} & all members of {workspace}').format(  # nopep8
                 username=user.display_name,
                 workspace=main_content.workspace.label)
@@ -315,15 +327,7 @@ class EmailManager(object):
             parent_in_context = None
             if content.parent_id:
                 parent_in_context = content_api.get_content_in_context(content.parent) # nopep8
-            body_text = self._build_email_body_for_content(
-                self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT,
-                role,
-                content_in_context,
-                parent_in_context,
-                workpace_in_context,
-                user,
-                translator,
-            )
+
             body_html = self._build_email_body_for_content(
                 self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
                 role,
@@ -334,24 +338,23 @@ class EmailManager(object):
                 translator,
             )
 
-            part1 = MIMEText(body_text, 'plain', 'utf-8')
             part2 = MIMEText(body_html, 'html', 'utf-8')
             # Attach parts into message container.
             # According to RFC 2046, the last part of a multipart message, in this case
             # the HTML message, is best and preferred.
-            message.attach(part1)
             message.attach(part2)
 
-            self.log_notification(
-                action='CREATED',
-                recipient=message['To'],
-                subject=message['Subject'],
+            self.log_email_notification(
+                msg='an email was created to {}'.format(message['To']),
+                action='{:8s}'.format('CREATED'),
+                email_recipient=message['To'],
+                email_subject=message['Subject'],
                 config=self.config,
             )
 
             send_email_through(
                 self.config,
-                async_email_sender.send_mail,
+                email_sender.send_mail,
                 message
             )
 
@@ -366,30 +369,29 @@ class EmailManager(object):
         :param password: choosed password
         :param user: user to notify
         """
-        # TODO BS 20160712: Cyclic import
-        logger.debug(self, 'user: {}'.format(user.user_id))
-        logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
-            user.email,
-        ))
+        logger.info(
+            self,
+            'Generating created account mail to {}'.format(user.email)
+        )
 
-        async_email_sender = EmailSender(
+        email_sender = EmailSender(
             self.config,
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
         )
-
-        subject = \
-            self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT \
-            .replace(
-                EST.WEBSITE_TITLE,
-                str(self.config.WEBSITE_TITLE)
-            )
+        translator = Translator(self.config, default_lang=user.lang)
+        translated_subject = translator.get_translation(
+            self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT
+        )
+        subject = translated_subject.replace(
+            EST.WEBSITE_TITLE,
+            str(self.config.WEBSITE_TITLE)
+        )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
         message['From'] = self._get_sender()
         message['To'] = formataddr((user.get_display_name(), user.email))
 
-        text_template_file_path = self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT  # nopep8
         html_template_file_path = self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8
 
         context = {
@@ -399,30 +401,22 @@ class EmailManager(object):
             'login_url': get_login_frontend_url(self.config),
         }
         translator = Translator(self.config, default_lang=user.lang)
-        body_text = self._render_template(
-            mako_template_filepath=text_template_file_path,
-            context=context,
-            translator=translator
-        )
-
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path,
             context=context,
             translator=translator
         )
 
-        part1 = MIMEText(body_text, 'plain', 'utf-8')
         part2 = MIMEText(body_html, 'html', 'utf-8')
 
         # Attach parts into message container.
         # According to RFC 2046, the last part of a multipart message,
         # in this case the HTML message, is best and preferred.
-        message.attach(part1)
         message.attach(part2)
 
         send_email_through(
             config=self.config,
-            sendmail_callable=async_email_sender.send_mail,
+            sendmail_callable=email_sender.send_mail,
             message=message
         )
 
@@ -437,16 +431,20 @@ class EmailManager(object):
         :param reset_password_token: token for resetting password
         """
         logger.debug(self, 'user: {}'.format(user.user_id))
-        logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
-            user.email,
-        ))
+        logger.info(
+            self,
+            'Generating reset password email to {}'.format(user.email)
+        )
         translator = Translator(self.config, default_lang=user.lang)
-        async_email_sender = EmailSender(
+        email_sender = EmailSender(
             self.config,
             self._smtp_config,
             self.config.EMAIL_NOTIFICATION_ACTIVATED
         )
-        subject = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT.replace(
+        translated_subject = translator.get_translation(
+            self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT
+        )
+        subject = translated_subject.replace(
             EST.WEBSITE_TITLE,
             str(self.config.WEBSITE_TITLE)
         )
@@ -455,7 +453,6 @@ class EmailManager(object):
         message['From'] = self._get_sender()
         message['To'] = formataddr((user.get_display_name(), user.email))
 
-        text_template_file_path = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT  # nopep8
         html_template_file_path = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML  # nopep8
         # TODO - G.M - 2018-08-17 - Generate token
         context = {
@@ -467,11 +464,6 @@ class EmailManager(object):
                 email=user.email,
             ),
         }
-        body_text = self._render_template(
-            mako_template_filepath=text_template_file_path,
-            context=context,
-            translator=translator,
-        )
 
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path,
@@ -479,18 +471,16 @@ class EmailManager(object):
             translator=translator,
         )
 
-        part1 = MIMEText(body_text, 'plain', 'utf-8')
         part2 = MIMEText(body_html, 'html', 'utf-8')
 
         # Attach parts into message container.
         # According to RFC 2046, the last part of a multipart message,
         # in this case the HTML message, is best and preferred.
-        message.attach(part1)
         message.attach(part2)
 
         send_email_through(
             config=self.config,
-            sendmail_callable=async_email_sender.send_mail,
+            sendmail_callable=email_sender.send_mail,
             message=message
         )
 
@@ -507,13 +497,16 @@ class EmailManager(object):
         :param context: dict with template context
         :return: template rendered string
         """
-
-        template = Template(filename=mako_template_filepath)
-        return template.render(
-            _=translator.get_translation,
-            config=self.config,
-            **context
-        )
+        try:
+            template = Template(filename=mako_template_filepath)
+            return template.render(
+                _=translator.get_translation,
+                config=self.config,
+                **context
+            )
+        except Exception as exc:
+            logger.exception(self, 'Failed to render email template: {}'.format(exc.__str__()))
+            raise EmailTemplateError('Failed to render email template: {}'.format(exc.__str__()))
 
     def _build_context_for_content_update(
             self,
@@ -540,105 +533,52 @@ class EmailManager(object):
         role_label = role.role_as_label()
         content_intro = '<span id="content-intro-username">{}</span> did something.'.format(actor.display_name)  # nopep8
         content_text = content.description
-        call_to_action_text = 'See more'
         call_to_action_url = content_in_context.frontend_url
         logo_url = get_email_logo_frontend_url(self.config)
 
-        if ActionDescription.CREATION == action:
-            call_to_action_text = _('View online')
-            content_intro = _('<span id="content-intro-username">{}</span> create a content:').format(actor.display_name)  # nopep8
-
-            if content_type_list.Thread.slug == content.type:
-                if content.get_last_comment_from(actor):
-                    content_text = content.get_last_comment_from(actor).description  # nopep8
-
-                call_to_action_text = _('Answer')
-                content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
-                content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + content_text  # nopep8
-
-            elif content_type_list.File.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
-                if content.description:
-                    content_text = content.description
-                else:
-                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
-
-            elif content_type_list.Page.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
-                content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
-
-        elif ActionDescription.REVISION == action:
-            content_text = content.description
-            call_to_action_text = _('View online')
-
-            if content_type_list.File.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
-                content_text = content.description
-
-        elif ActionDescription.EDITION == action:
-            call_to_action_text = _('View online')
-
-            if content_type_list.File.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
-                content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + content.description  # nopep8
-
-            elif content_type_list.Thread.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
-                previous_revision = content.get_previous_revision()
-                title_diff = ''
-                if previous_revision.label != content.label:
-                    title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = str('<p id="content-body-intro">{}</p> {text} {title_diff} {content_diff}').format(
-                    text=_('Here is an overview of the changes:'),
-                    title_diff=title_diff,
-                    content_diff=htmldiff(previous_revision.description, content.description)
-                )
-            elif content_type_list.Page.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
-                previous_revision = content.get_previous_revision()
-                title_diff = ''
-                if previous_revision.label != content.label:
-                    title_diff = htmldiff(previous_revision.label, content.label)  # nopep8
-                content_text = str('<p id="content-body-intro">{}</p> {text}</p> {title_diff} {content_diff}').format(  # nopep8
-                    actor.display_name,
-                    text=_('Here is an overview of the changes:'),
-                    title_diff=title_diff,
-                    content_diff=htmldiff(previous_revision.description, content.description)
-                )
-
-        elif ActionDescription.STATUS_UPDATE == action:
-            intro_user_msg = _(
-                '<span id="content-intro-username">{}</span> '
-                'updated the following status:'
-            )
-            intro_body_msg = '<p id="content-body-intro">{}: {}</p>'
-
-            call_to_action_text = _('View online')
-            content_intro = intro_user_msg.format(actor.display_name)
-            content_text = intro_body_msg.format(
-                content.get_label(),
-                content.get_status().label,
-            )
-
-        elif ActionDescription.COMMENT == action:
-            call_to_action_text = _('Answer')
+        if ActionDescription.COMMENT == action:
             main_title = parent_in_context.label
-            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)  # nopep8
+            content_intro = ''
             call_to_action_url = parent_in_context.frontend_url
-
-        if not content_intro and not content_text:
-            # Skip notification, but it's not normal
-            logger.error(
-                self,
-                'A notification is being sent but no content. '
-                'Here are some debug informations: [content_id: {cid}]'
-                '[action: {act}][author: {actor}]'.format(
-                    cid=content.content_id,
-                    act=action,
-                    actor=actor
-                )
+        elif ActionDescription.STATUS_UPDATE == action:
+            new_status = translator.get_translation(content.get_status().label)
+            main_title = content_in_context.label
+            content_intro = _('I modified the status of <i>{content}</i>. The new status is <i>{new_status}</i>').format(
+                content=content.get_label(),
+                new_status=new_status
             )
-            raise EmptyNotificationError('Unexpected empty notification')
+            content_text = ''
+            call_to_action_url = content_in_context.frontend_url
+        elif ActionDescription.CREATION == action:
+            main_title = content_in_context.label
+            content_intro = _('I added an item entitled <i>{content}</i>.').format(content=content.get_label())  # nopep8
+            content_text = ''
+        elif action in (ActionDescription.REVISION, ActionDescription.EDITION):
+            main_title = content_in_context.label
+            content_intro = _('I updated <i>{content}</i>.').format(content=content.get_label())  # nopep8
+
+            previous_revision = content.get_previous_revision()
+            title_diff = htmldiff(previous_revision.label, content.label)
+            content_diff = htmldiff(previous_revision.description, content.description)
+            if title_diff or content_diff:
+                content_text = str('<p>{diff_intro_text}</p>\n{title_diff}\n{content_diff}').format(  # nopep8
+                    diff_intro_text=_('Here is an overview of the changes:'),
+                    title_diff=title_diff,
+                    content_diff=content_diff
+                )
+        # if not content_intro and not content_text:
+        #     # Skip notification, but it's not normal
+        #     logger.error(
+        #         self,
+        #         'A notification is being sent but no content. '
+        #         'Here are some debug informations: [content_id: {cid}]'
+        #         '[action: {act}][author: {actor}]'.format(
+        #             cid=content.content_id,
+        #             act=action,
+        #             actor=actor
+        #         )
+        #     )
+        #     raise EmptyNotificationError('Unexpected empty notification')
 
         # FIXME: remove/readapt assert to debug easily broken case
         assert user
@@ -647,9 +587,8 @@ class EmailManager(object):
         assert status_label
         # assert status_icon_url
         assert role_label
-        assert content_intro
+        # assert content_intro
         assert content_text or content_text == content.description
-        assert call_to_action_text
         assert call_to_action_url
         assert logo_url
 
@@ -663,7 +602,6 @@ class EmailManager(object):
             'role_label': role_label,
             'content_intro': content_intro,
             'content_text': content_text,
-            'call_to_action_text': call_to_action_text,
             'call_to_action_url': call_to_action_url,
             'logo_url': logo_url,
         }
