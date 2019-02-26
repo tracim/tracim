@@ -207,7 +207,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
-    pass
+    error_code = error.EMPTY_COMMENT_NOT_ALLOWED
 
 
 class EmptyEmailBody(EmptyValueNotAllowed):
