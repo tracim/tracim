@@ -309,3 +309,4 @@ def normpath(path):
     elif path == '':
         path = '/'
     return base_normpath(path)
+

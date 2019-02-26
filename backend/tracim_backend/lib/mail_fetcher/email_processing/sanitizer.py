@@ -7,6 +7,8 @@ from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_black
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_whitelist import TAG_WHITELIST  # nopep8
 
 
+SELF_CLOSING_TAGS = ['img', 'source', 'video', 'iframe']
+
 class HtmlSanitizerConfig(object):
 
     def __init__(
@@ -46,6 +48,7 @@ class HtmlSanitizer(object):
     def sanitize(self) -> typing.Optional[str]:
         for tag in self.soup.findAll():
             if self._tag_to_extract(tag):
+                # INFO - BL - 2019/4/8 - extract removes the tag and all its children
                 tag.extract()
             elif tag.name.lower() in self.config.tag_whitelist:
                 attrs = dict(tag.attrs)
@@ -53,6 +56,7 @@ class HtmlSanitizer(object):
                     if attr not in self.config.attrs_whitelist:
                         del tag.attrs[attr]
             else:
+                # INFO - BL - 2019/4/8 - unwrap removes the tag but not its children
                 tag.unwrap()
 
         if self._is_content_empty(self.soup):
@@ -61,11 +65,15 @@ class HtmlSanitizer(object):
             return str(self.soup)
 
     def _is_content_empty(self, soup: Tag):
-        img = soup.find('img')
+        for tag in SELF_CLOSING_TAGS:
+            if soup.find(tag):
+                return False
         txt = soup.get_text().replace('\n', '').strip()
-        return (not img and not txt)
+        return not txt
 
     def _tag_to_extract(self, tag: Tag) -> bool:
+        # INFO - BL - 2019/4/8 - returns True if tag is blacklisted or contains a 
+        # contains a blacklisted class or id
         if tag.name.lower() in self.config.tag_blacklist:
             return True
         if 'class' in tag.attrs:
