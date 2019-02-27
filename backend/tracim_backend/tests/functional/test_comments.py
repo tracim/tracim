@@ -203,9 +203,6 @@ class TestCommentsEndpoint(FunctionalTest):
         assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__post_content_comment__err_400__empty_raw_content(self) -> None:
-        """
-        Get alls comments of a content
-        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -256,7 +253,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert 'code' in res.json_body
         assert res.json_body['code'] == error.EMPTY_COMMENT_NOT_ALLOWED
 
-    def test_api__post_content_comment__err_400__only__tags_nested_html(self) -> None:
+    def test_api__post_content_comment__err_400__only_br_tags_nested_html(self) -> None:
         self.testapp.authorization = (
             'Basic',
             ('admin@admin.admin', 'admin@admin.admin')
