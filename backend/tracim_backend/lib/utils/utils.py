@@ -311,31 +311,3 @@ def normpath(path):
     elif path == '':
         path = '/'
     return base_normpath(path)
-
-def html_is_empty(html_str: str) -> bool:
-    """
-        Checks if all the elements of the xml are empty
-        :param html: string containing a valid xml
-        :type xml: str
-        :return: boolean
-
-        :Example:
-        <p></p> return True
-        <p><p></p></p> returns True
-        <p><p>some text</p></p> return False
-
-    """
-    try:
-        html_root = html.fromstring(html_str)
-        return recursive_empty(html_root)
-    except ParseError:
-        return True
-
-def recursive_empty(element: html.HtmlElement) -> bool:
-    """
-        Checks if an lxml.etree.Element and all its children are empty
-        :param: element
-    """
-    if element.text_content().strip():
-       return False
-    return all((recursive_empty(c) for c in element.iterchildren()))

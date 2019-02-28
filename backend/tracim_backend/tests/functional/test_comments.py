@@ -41,7 +41,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[0]
         assert comment['content_id'] == 18
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>'  # nopep8
+        assert comment['raw_content'] == '<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>'  # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -254,7 +254,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert 'code' in res.json_body
         assert res.json_body['code'] == error.EMPTY_COMMENT_NOT_ALLOWED
 
-    def test_api__post_content_comment__err_400__only_br_tags_nested_html(self) -> None:
+    def test_api__post_content_comment__err_400__only__tags_nested_html(self) -> None:
         self.testapp.authorization = (
             'Basic',
             ('admin@admin.admin', 'admin@admin.admin')
@@ -331,7 +331,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[0]
         assert comment['content_id'] == 18
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>'   # nopep8
+        assert comment['raw_content'] == '<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>'   # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
