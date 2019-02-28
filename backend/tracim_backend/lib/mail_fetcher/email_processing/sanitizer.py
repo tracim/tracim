@@ -60,7 +60,7 @@ class HtmlSanitizer(object):
         else:
             return str(self.soup)
 
-    def _is_content_empty(self, soup: Tag):
+    def _is_content_empty(self, soup: Tag) -> bool:
         img = soup.find('img')
         txt = soup.get_text().replace('\n', '').strip()
         return (not img and not txt)
@@ -78,12 +78,37 @@ class HtmlSanitizer(object):
                     return True
         return False
 
-    def html_is_empty(self, soup: Tag = None) -> bool:
-        if not soup:
-            soup = self.soup
-        if not self._is_content_empty(self.soup):
-            return False
-        return all((self.html_is_empty(child) for child in soup.children))
+    def html_is_empty(self, node_to_inspect: Tag = None) -> bool:
+        """
+        Inspects all nodes of an html tag and returns True if all of them are
+        empty.
 
-    def is_html(self):
+        :param node_to_inspect: Node to inspect, if None the root node is used
+        :type node_to_inspect: bs4.Tag
+        :returns: boolean
+
+        :Example:
+        <p></p> return True
+        <p><p></p></p> returns True
+        <p><p>some text</p></p> return False
+
+        """
+        if not node_to_inspect:
+            node_to_inspect = self.soup
+        if not self._is_content_empty(node_to_inspect):
+            return False
+        return all(
+            (self.html_is_empty(child) for child in node_to_inspect.children)
+        )
+
+    def is_html(self) -> bool:
+        """
+        Checks if the html_body given to the constructor contains html
+
+        :returns: boolean
+
+        :Example:
+        <p>some text</p> return True
+        'some text' return False
+        """
         return self.soup.find() is not None
