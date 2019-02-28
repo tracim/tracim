@@ -4,7 +4,7 @@ import transaction
 from freezegun import freeze_time
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import AuthType
-from tracim_backend import error
+from tracim_backend.error import ErrorCodes as error
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import MailHogFunctionalTest

@@ -12,6 +12,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
+from tracim_backend.error import ErrorCodes
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
@@ -55,6 +56,15 @@ class ConfigModel(object):
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
+
+class ErrorCodeModel(object):
+    def __init__(
+        self,
+        error_code: ErrorCodes
+    ) -> None:
+        self.name = error_code.name
+        self.code = error_code.value
+
 
 class PreviewAllowedDim(object):
 

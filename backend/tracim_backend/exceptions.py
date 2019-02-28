@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tracim_backend import error
+from tracim_backend.error import ErrorCodes as error
 
 
 class TracimError(Exception):

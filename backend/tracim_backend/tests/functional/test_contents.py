@@ -16,7 +16,7 @@ import transaction
 from depot.io.utils import FileIntent
 from PIL import Image
 
-from tracim_backend import error
+from tracim_backend.error import ErrorCodes as error
 from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
