@@ -228,7 +228,7 @@ class CFG(object):
             '604800',
         ))
         self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(settings.get(
-            'user.reset_password.validity',
+            'user.reset_password.token_validity',
             '900'
         ))
 
