@@ -8,7 +8,7 @@ import pytest
 import requests
 import transaction
 
-from tracim_backend.error import ErrorCodes as error
+from tracim_backend.error import ErrorCode as error
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures

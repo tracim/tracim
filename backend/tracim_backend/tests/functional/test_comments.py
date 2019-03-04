@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import transaction
 
-from tracim_backend.error import ErrorCodes as error
+from tracim_backend.error import ErrorCode as error
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -11,7 +11,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
-from tracim_backend.error import ErrorCodes as error
+from tracim_backend.error import ErrorCode as error
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 

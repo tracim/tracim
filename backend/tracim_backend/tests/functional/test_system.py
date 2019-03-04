@@ -3,7 +3,7 @@ import pytest
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.error import ErrorCodes
+from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_timezones_list
@@ -254,4 +254,4 @@ class TestErrorCodeEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/error_codes', status=200)
         # check if all error_codes are available by checking number of item
         # received
-        assert len(res.json_body) == len(list(map(int, ErrorCodes)))
+        assert len(res.json_body) == len(list(map(int, ErrorCode)))

@@ -3,7 +3,7 @@ import datetime
 import transaction
 from freezegun import freeze_time
 from tracim_backend.models.auth import User
-from tracim_backend.error import ErrorCodes as error
+from tracim_backend.error import ErrorCode as error
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.setup_models import get_tm_session

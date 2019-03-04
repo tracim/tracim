@@ -2,7 +2,7 @@ import datetime
 import typing
 
 from tracim_backend.config import CFG
-from tracim_backend.error import ErrorCodes
+from tracim_backend.error import ErrorCode
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
@@ -33,6 +33,6 @@ class SystemApi(object):
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:
         error_codes = []
-        for error_code in ErrorCodes:
+        for error_code in ErrorCode:
             error_codes.append(ErrorCodeModel(error_code))
         return error_codes

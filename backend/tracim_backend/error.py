@@ -8,7 +8,7 @@ from enum import IntEnum
 # for unclassable errors or very low level errors)
 
 
-class ErrorCodes(IntEnum):
+class ErrorCode(IntEnum):
     # Tracim Not found Error
     USER_NOT_FOUND = 1001
     WORKSPACE_NOT_FOUND = 1002
