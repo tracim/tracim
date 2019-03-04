@@ -91,7 +91,7 @@ setup(
     description='Rest API (Back-end) of Tracim v2',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python',
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
