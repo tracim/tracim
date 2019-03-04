@@ -4,7 +4,7 @@ import transaction
 from freezegun import freeze_time
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import AuthType
-from tracim_backend.error import ErrorCode as error
+from tracim_backend.error import ErrorCode
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import MailHogFunctionalTest
@@ -94,7 +94,7 @@ class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_NOT_FOUND
         response = self.get_mailhog_mails()
         assert len(response) == 0
 
@@ -114,7 +114,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
+        assert res.json_body['code'] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
 
     @pytest.mark.unknown_auth
     def test_api__reset_password_request__ok__unknown_auth(self):
@@ -156,7 +156,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
+        assert res.json_body['code'] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD  # nopep8
 
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
     config_section = 'functional_test_with_mail_test_sync'
@@ -263,7 +263,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INVALID_RESET_PASSWORD_TOKEN
+        assert res.json_body['code'] == ErrorCode.INVALID_RESET_PASSWORD_TOKEN
 
 
 class TestResetPasswordModifyEndpoint(FunctionalTest):
@@ -400,7 +400,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INVALID_RESET_PASSWORD_TOKEN
+        assert res.json_body['code'] == ErrorCode.INVALID_RESET_PASSWORD_TOKEN
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -434,7 +434,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             )
             assert isinstance(res.json, dict)
             assert 'code' in res.json.keys()
-            assert res.json_body['code'] == error.EXPIRED_RESET_PASSWORD_TOKEN  # nopep8
+            assert res.json_body['code'] == ErrorCode.EXPIRED_RESET_PASSWORD_TOKEN  # nopep8
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -463,7 +463,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.PASSWORD_DO_NOT_MATCH
+        assert res.json_body['code'] == ErrorCode.PASSWORD_DO_NOT_MATCH
 
 class TestResetPasswordInternalAuthDisabled(FunctionalTest):
     config_section = 'functional_ldap_email_notif_sync_test'
@@ -482,7 +482,7 @@ class TestResetPasswordInternalAuthDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
+        assert res.json_body['code'] == ErrorCode.USER_AUTH_TYPE_DISABLED
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -498,7 +498,7 @@ class TestResetPasswordInternalAuthDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
+        assert res.json_body['code'] == ErrorCode.USER_AUTH_TYPE_DISABLED
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -516,7 +516,7 @@ class TestResetPasswordInternalAuthDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_AUTH_TYPE_DISABLED
+        assert res.json_body['code'] == ErrorCode.USER_AUTH_TYPE_DISABLED
 
 class TestResetPasswordExternalAuthUser(FunctionalTest):
     config_section = 'functional_ldap_email_notif_sync_test'
@@ -547,7 +547,7 @@ class TestResetPasswordExternalAuthUser(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+        assert res.json_body['code'] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
 
     @pytest.mark.email_notification
     @pytest.mark.ldap
@@ -576,7 +576,7 @@ class TestResetPasswordExternalAuthUser(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+        assert res.json_body['code'] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
 
 
     @pytest.mark.email_notification
@@ -608,4 +608,4 @@ class TestResetPasswordExternalAuthUser(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+        assert res.json_body['code'] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED

@@ -8,7 +8,7 @@ import pytest
 import requests
 import transaction
 
-from tracim_backend.error import ErrorCode as error
+from tracim_backend.error import ErrorCode
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -347,7 +347,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
 
 class TestUserReadStatusEndpoint(FunctionalTest):
@@ -1572,7 +1572,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__get_user__ok_200__normal_user_by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -1710,7 +1710,7 @@ class TestAccountSetPasswordEmailLDAPAuthEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+        assert res.json_body['code'] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
 
         # Check After
         res = self.testapp.get(
@@ -1747,7 +1747,7 @@ class TestAccountSetPasswordEmailLDAPAuthEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+        assert res.json_body['code'] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
 
         # Check After
         res = self.testapp.get(
@@ -1822,7 +1822,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body['code'] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
         # Check After
         res = self.testapp.get(
             '/api/v2/users/me',
@@ -1888,7 +1888,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WRONG_USER_PASSWORD  # nopep8
+        assert res.json_body['code'] == ErrorCode.WRONG_USER_PASSWORD  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/me',
@@ -2029,7 +2029,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WRONG_USER_PASSWORD
+        assert res.json_body['code'] == ErrorCode.WRONG_USER_PASSWORD
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
             current_user=admin,
@@ -2096,7 +2096,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.PASSWORD_DO_NOT_MATCH
+        assert res.json_body['code'] == ErrorCode.PASSWORD_DO_NOT_MATCH
         # Check After
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
