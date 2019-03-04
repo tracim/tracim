@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import transaction
 
-from tracim_backend import error
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -11,7 +10,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
-from tracim_backend import error
+from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
@@ -201,7 +200,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+        assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__post_content_comment__err_400__empty_raw_content(self) -> None:
         self.testapp.authorization = (
@@ -222,7 +221,7 @@ class TestCommentsEndpoint(FunctionalTest):
         # INFO - G.M - 2018-09-10 - error handle by marshmallow validator.
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__post_content_comment__err_400__empty_simple_html(self) -> None:
         self.testapp.authorization = (
@@ -237,7 +236,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.EMPTY_COMMENT_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__empty_nested_html(self) -> None:
         self.testapp.authorization = (
@@ -252,7 +251,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.EMPTY_COMMENT_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__only__tags_nested_html(self) -> None:
         self.testapp.authorization = (
@@ -267,7 +266,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.EMPTY_COMMENT_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__unclosed_empty_tag(self) -> None:
         self.testapp.authorization = (
@@ -282,7 +281,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.EMPTY_COMMENT_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__unclosed_tag_not_empty(self) -> None:
         """
@@ -445,7 +444,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
     def test_api__delete_content_comment__err_403__user_is_owner_and_reader(self) -> None:
         """
@@ -478,7 +477,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
     def test_api__delete_content_comment__err_403__user_is_reader(self) -> None:
         """
@@ -511,4 +510,4 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
