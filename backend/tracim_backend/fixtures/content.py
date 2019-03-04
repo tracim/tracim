@@ -280,7 +280,7 @@ class Content(Fixture):
 
         content_api.create_comment(
             parent=best_cake_thread,
-            content='<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>',  # nopep8
+            content='<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>',  # nopep8
             do_save=True,
         )
         bob_content_api.create_comment(
