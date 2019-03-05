@@ -5,8 +5,8 @@
 #    pip-compile --output-file requirements.txt setup.py
 #
 alembic==1.0.5
-apispec-hapic-marshmallow==0.2  # via hapic
-apispec==1.0.0b5          # via apispec-hapic-marshmallow, hapic
+apispec-marshmallow-advanced==0.3  # via hapic
+apispec==1.0.0b5
 attrs==18.2.0             # via cmd2
 babel==2.6.0
 beaker==1.10.0
@@ -22,7 +22,7 @@ defusedxml==0.5.0         # via wsgidav
 email-reply-parser==0.5.9
 filedepot==0.5.2
 filelock==3.0.10
-hapic[marshmallow]==0.62
+hapic[marshmallow]==0.64
 hupper==1.4.2             # via pyramid
 idna==2.8                 # via requests
 imapclient==2.1.0
