@@ -4,9 +4,20 @@ import typing
 from urllib.parse import urljoin
 
 import requests
-from pyramid.response import Response
+from pyramid.response import Response as PyramidResponse
+from requests import Response as RequestsResponse
 from tracim_backend.lib.utils.request import TracimRequest
 
+HOP_BY_HOP_HEADER_HTTP = [
+    'connection',
+    'keep-alive',
+    'proxy-authenticate',
+    'proxy-authorization',
+    'te',
+    'trailers',
+    'transfer-encoding',
+    'upgrade',
+]
 
 class Proxy(object):
     def __init__(
@@ -15,40 +26,93 @@ class Proxy(object):
     ) -> None:
         self._base_address = base_address
 
+    def _is_hop_by_hop_header(self, header_name: str):
+        return header_name.lower() in HOP_BY_HOP_HEADER_HTTP
+
+    def _get_behind_response(
+            self,
+            method: str,
+            headers: dict,
+            data: dict,
+            url: str
+    ) -> RequestsResponse:
+        return requests.request(
+            method=method,
+            # FIXME BS 2018-11-29: Exclude some headers (like basic auth)
+            headers=headers,
+            data=data,
+            url=url,
+        )
+
+    def _generate_proxy_response(self, status, headers: dict, body):
+        return PyramidResponse(
+            status=status,
+            headers=headers,
+            body=body,
+        )
+    def _add_extra_headers(self, headers: dict, extra_headers: dict):
+        extra_headers = copy.deepcopy(extra_headers)
+        new_headers = copy.deepcopy(headers)
+        new_headers.update(extra_headers)
+        return new_headers
+
+    def _drop_request_headers(self, headers: dict) -> dict:
+        new_headers = {}
+        for header_name, header_value in dict(headers).items():
+            if self._is_hop_by_hop_header(header_name):
+                continue
+            new_headers[header_name] = header_value
+        return new_headers
+
+    def _drop_response_headers(self, headers: dict) -> dict:
+        new_headers = {}
+        for header_name, header_value in dict(headers).items():
+            if self._is_hop_by_hop_header(header_name):
+                continue
+            # FIXME - G.M - 2019-03-08 - for unknown reason content_length and
+            # content-encoding
+            # differ between radicale_header and proxy response.
+            # This make pyramid raise exception, to force renew creation of
+            # content_length, we can disable content_length header and
+            # content-encoding header
+            if header_name.lower() == 'content-length':
+                continue
+            if header_name.lower() == 'content-encoding':
+                continue
+            new_headers[header_name] = header_value
+        return new_headers
+
     def get_response_for_request(
         self,
         request: TracimRequest,
         path: str,
-        extra_headers: typing.Optional[dict]=None,
-    ) -> Response:
-        extra_headers = extra_headers or {}
+        extra_request_headers: typing.Optional[dict]=None,
+        extra_response_headers: typing.Optional[dict]=None,
+    ) -> PyramidResponse:
+        # INFO - G.M - 2019-03-08 - Prepare behind request
+        request_headers = dict(request.headers)
+        extra_request_headers = extra_request_headers or {}
+        request_headers = self._drop_request_headers(request_headers)
+        if extra_request_headers:
+            request_headers = self._add_extra_headers(request_headers, extra_request_headers)
         behind_url = urljoin(self._base_address, path)
-        headers = copy.deepcopy(extra_headers)
-        headers.update(extra_headers)
 
-        behind_response = requests.request(
+
+        behind_response = self._get_behind_response(
             method=request.method,
-            # FIXME BS 2018-11-29: Exclude some headers (like basic auth)
-            headers=dict(request.headers),
+            headers=request_headers,
             data=request.body,
             url=behind_url,
         )
 
-        drop_headers = {
-            'keep-alive': None,
-            'connection': 'keep-alive',
-            'content-encoding': None,
-            'content-length': None,
-            'transfer-encoding': None,
-        }
-        headers = []
-        for header_name, header_value in dict(behind_response.headers).items():
-            if (header_name.lower(), header_value.lower()) not in drop_headers\
-                    and header_name.lower() not in drop_headers.keys():
-                headers.append((header_name, header_value))
+        # INFO - G.M - 2019-03-08 - Prepare proxy response
+        response_headers = dict(behind_response.headers)
+        response_headers = self._drop_response_headers(response_headers)
+        if extra_response_headers:
+            response_headers = self._add_extra_headers(request_headers, extra_response_headers)
 
-        return Response(
+        return self._generate_proxy_response(
             status=behind_response.status_code,
-            headerlist=headers,
-            body=behind_response.content,
+            headers=response_headers,
+            body=behind_response.content
         )
