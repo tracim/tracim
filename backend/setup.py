@@ -59,6 +59,8 @@ requires = [
     # i18n
     'Babel',
     'requests',
+    # caldav support
+    'radicale',
 ]
 
 tests_require = [
