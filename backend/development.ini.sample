@@ -21,6 +21,7 @@ basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
 basic_setup.depot_storage_dir = %(here)s/depot/
+basic_setup.caldav_storage_dir = %(here)s/radicale_storage/
 basic_setup.preview_cache_dir = /tmp/tracim/preview/
 basic_setup.sessions_data_root_dir = %(here)s
 ## secret
@@ -340,6 +341,40 @@ webdav.listen = localhost:3030
 ## footer.
 ; webdav.dir_browser.footer = Just another footer
 
+####
+# CALDAV (Radicale)
+####
+
+### Main Config for Caldav ##
+caldav.enabled = True
+
+### Radicale Proxy config ##
+## path to tracim radicale server, usually at localhost:port
+caldav.radicale_proxy.base_url = http://localhost:5232
+
+### Radicale config ###
+# those params are same as in config file of radicale but syntax
+# is different.
+# use syntax:
+; caldav.radicale.section.param_name = value
+# instead of radicale.ini syntax:
+; [section]
+; param_name = value
+caldav.radicale.server.host = localhost:5232
+## To make tracim work, we need to disable auth and rights.
+caldav.radicale.auth.type = None
+caldav.radicale.rights.type = None
+## We do not need radicale web ui
+caldav.radicale.web.type = None
+## for tracim we do use file storage.
+caldav.radicale.storage.type = multifilesystem
+caldav.radicale.storage.filesystem_folder = %(basic_setup.caldav_storage_dir)s
+# CORS config for radicale
+caldav.radicale.headers.Access-Control-Allow-Origin = *
+caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROPFIND, PROPPATCH, REPORT, PUT, MOVE, DELETE, LOCK, UNLOCK
+caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With
+caldav.radicale.headers.Access-Control-Expose-Headers = Etag
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################
@@ -387,6 +422,10 @@ pipeline = tracim_webdav
 [app:tracim_webdav]
 use = egg:tracim_backend#webdav
 
+[pipeline:caldav]
+pipeline = tracim_caldav
+[app:tracim_caldav]
+use = egg:tracim_backend#caldav
 
 [server:main]
 use = egg:waitress#main
@@ -396,6 +435,9 @@ listen = %(basic_setup.listen)s
 use = egg:waitress#main
 listen = %(webdav.listen)s
 
+[server:caldav]
+use = egg:waitress#main
+listen = %(caldav.radicale.server.host)s
 ######################
 # DATABASE MIGRATION #
 ######################

@@ -120,7 +120,8 @@ setup(
     entry_points={
         'paste.app_factory': [
             'main = tracim_backend:web',
-            'webdav = tracim_backend:webdav'
+            'webdav = tracim_backend:webdav',
+            'caldav = tracim_backend:caldav',
         ],
         'console_scripts': [
             'tracimcli = tracim_backend.command:main',
@@ -132,6 +133,7 @@ setup(
             'db_init = tracim_backend.command.database:InitializeDBCommand',
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
+            'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
         ]
     },
     message_extractors={'tracim_backend': [

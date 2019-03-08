@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from pyramid_multiauth import MultiAuthenticationPolicy
+from tracim_backend.lib.calendar import CaldavAppFactory
 
 from tracim_backend.models.auth import AuthType
+from tracim_backend.lib.calendar.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.radicale_proxy.proxy import RadicaleProxyController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -27,6 +30,9 @@ from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.calendar import RADICALE_CALENDAR_DIR
+from tracim_backend.lib.calendar import RADICALE_STORAGE_USER_SUBDIR
+from tracim_backend.lib.calendar import RADICALE_STORAGE_WORKSPACE_SUBDIR
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
@@ -43,6 +49,9 @@ from tracim_backend.views.core_api.reset_password_controller import ResetPasswor
 from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
+from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
+from tracim_backend.exceptions import CaldavNotAuthorized
+from tracim_backend.exceptions import CaldavNotAuthenticated
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import ContentInNotEditableState
@@ -159,6 +168,7 @@ def web(global_config, **local_settings):
     context.handle_exception(SameValueError, HTTPStatus.BAD_REQUEST)
     # Auth exception
     context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
+    context.handle_exception(UserGivenIsNotTheSameAsAuthenticated, HTTPStatus.FORBIDDEN)
     context.handle_exception(UserAuthenticatedIsNotActive, HTTPStatus.FORBIDDEN)
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
@@ -190,6 +200,21 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
+    if app_config.CALDAV_ENABLED:
+
+        configurator.include(add_www_authenticate_header_for_caldav)
+        # caldav exception
+        context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
+        context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
+        # controller
+        radicale_proxy_controller = RadicaleProxyController(
+            proxy_base_address=app_config.CALDAV_RADICALE_PROXY_BASE_URL,
+            radicale_storage_dir=RADICALE_CALENDAR_DIR,
+            radicale_user_storage_dir=RADICALE_STORAGE_USER_SUBDIR,
+            radicale_workspace_storage_dir=RADICALE_STORAGE_WORKSPACE_SUBDIR,
+        )
+        configurator.include(radicale_proxy_controller.bind)
+
     if app_config.FRONTEND_SERVE:
         configurator.include('pyramid_mako')
         frontend_controller = FrontendController(app_config.FRONTEND_DIST_FOLDER_PATH)  # nopep8
@@ -207,6 +232,14 @@ def webdav(global_config, **local_settings):
     settings = global_config
     settings.update(local_settings)
     app_factory = WebdavAppFactory(
+        **settings
+    )
+    return app_factory.get_wsgi_app()
+
+def caldav(global_config, **local_settings):
+    settings = global_config
+    settings.update(local_settings)
+    app_factory = CaldavAppFactory(
         **settings
     )
     return app_factory.get_wsgi_app()

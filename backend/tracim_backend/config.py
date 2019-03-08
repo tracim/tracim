@@ -473,74 +473,20 @@ class CFG(object):
         ###
         # RADICALE (Caldav server)
         ###
-        # self.RADICALE_SERVER_HOST = settings.get(
-        #     'radicale.server.host',
-        #     '127.0.0.1',
-        # )
-        # self.RADICALE_SERVER_PORT = int(settings.get(
-        #     'radicale.server.port',
-        #     5232,
-        # ))
-        # # Note: Other parameters needed to work in SSL (cert file, etc)
-        # self.RADICALE_SERVER_SSL = asbool(settings.get(
-        #     'radicale.server.ssl',
-        #     False,
-        # ))
-        # self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = settings.get(
-        #     'radicale.server.filesystem.folder',
-        # )
-        # if not self.RADICALE_SERVER_FILE_SYSTEM_FOLDER:
-        #     raise Exception(
-        #         mandatory_msg.format('radicale.server.filesystem.folder')
-        #     )
-        # self.RADICALE_SERVER_ALLOW_ORIGIN = settings.get(
-        #     'radicale.server.allow_origin',
-        #     None,
-        # )
-        # if not self.RADICALE_SERVER_ALLOW_ORIGIN:
-        #     self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_BASE_URL
-        #     logger.warning(self,
-        #         'NOTE: Generated radicale.server.allow_origin parameter with '
-        #         'followings parameters: website.base_url ({0})'
-        #         .format(self.WEBSITE_BASE_URL)
-        #     )
-        #
-        # self.RADICALE_SERVER_REALM_MESSAGE = settings.get(
-        #     'radicale.server.realm_message',
-        #     'Tracim Calendar - Password Required',
-        # )
-        #
-        # self.RADICALE_CLIENT_BASE_URL_HOST = settings.get(
-        #     'radicale.client.base_url.host',
-        #     'http://{}:{}'.format(
-        #         self.RADICALE_SERVER_HOST,
-        #         self.RADICALE_SERVER_PORT,
-        #     ),
-        # )
-        #
-        # self.RADICALE_CLIENT_BASE_URL_PREFIX = settings.get(
-        #     'radicale.client.base_url.prefix',
-        #     '/',
-        # )
-        # # Ensure finished by '/'
-        # if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[-1]:
-        #     self.RADICALE_CLIENT_BASE_URL_PREFIX += '/'
-        # if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[0]:
-        #     self.RADICALE_CLIENT_BASE_URL_PREFIX \
-        #         = '/' + self.RADICALE_CLIENT_BASE_URL_PREFIX
-        #
-        # if not self.RADICALE_CLIENT_BASE_URL_HOST:
-        #     logger.warning(self,
-        #         'Generated radicale.client.base_url.host parameter with '
-        #         'followings parameters: website.server_name -> {}'
-        #         .format(self.WEBSITE_SERVER_NAME)
-        #     )
-        #     self.RADICALE_CLIENT_BASE_URL_HOST = self.WEBSITE_SERVER_NAME
-        #
-        # self.RADICALE_CLIENT_BASE_URL_TEMPLATE = '{}{}'.format(
-        #     self.RADICALE_CLIENT_BASE_URL_HOST,
-        #     self.RADICALE_CLIENT_BASE_URL_PREFIX,
-        # )
+        self.CALDAV_ENABLED = asbool(settings.get(
+            'caldav.enabled',
+            False
+        ))
+        self.CALDAV_RADICALE_PROXY_BASE_URL = settings.get(
+            'caldav.radicale_proxy.base_url',
+            None
+        )
+        if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
+            raise ConfigurationError(
+                'ERROR: Caldav radicale proxy cannot be activated if no radicale'
+                'base url is configured. set "caldav.radicale_proxy.base_url" properly'
+            )
+
         self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(settings.get(
             'preview.jpg.restricted_dims', False
         ))
