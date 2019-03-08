@@ -51,7 +51,7 @@ class RadicaleProxyController(Controller):
         proxy user calendar
         example: /calendar/user/1.ics/ to radicale path /calendar/user/1.ics
         """
-        path = '{}{}.ics'.format(
+        path = '{}{}.ics/'.format(
             self.radicale_path_user_dir,
             request.candidate_user.user_id
         )
@@ -85,7 +85,7 @@ class RadicaleProxyController(Controller):
         proxy workspace calendar
         example: /calendar/workspace/1.ics/ to radicale path /calendar/workspace/1.ics
         """
-        path = '{}{}.ics'.format(
+        path = '{}{}.ics/'.format(
             self.radicale_path_workspace_dir,
             request.current_workspace.workspace_id
         )
