@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import multiprocessing
 import typing
 import unittest
 
@@ -25,12 +26,14 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
-from tracim_backend import web
+from tracim_backend import web, CaldavAppFactory
 from tracim_backend import webdav
 from tracim_backend import WebdavAppFactory
+from waitress import serve
 from webtest import TestApp
 from io import BytesIO
 from PIL import Image
+import threading
 
 
 def eq_(a, b, msg=None) -> None:
@@ -193,6 +196,38 @@ class WebdavFunctionalTest(FunctionalTest):
         app_factory = WebdavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
         self.testapp = TestApp(app)
+
+class CaldavRadicaleProxyFunctionalTest(FunctionalTest):
+    config_section = 'functional_caldav_radicale_proxy_test'
+    radicale_server = None
+
+    def start_radicale_server(self):
+        settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        app_factory = CaldavAppFactory(**settings)
+        app = app_factory.get_wsgi_app()
+        self.radicale_server = multiprocessing.Process(target=serve, kwargs={
+            'app': app,
+            'listen': 'localhost:5232'
+            }
+        )
+        self.radicale_server.daemon = True
+        self.radicale_server.start()
+
+    def stop_radicale_server(self):
+        if self.radicale_server:
+            self.radicale_server.terminate()
+    def setUp(self):
+        super().setUp()
+        self.start_radicale_server()
+
+
+    def tearDown(self):
+       super().tearDown()
+       self.stop_radicale_server()
+
 
 class FunctionalTestEmptyDB(FunctionalTest):
     fixtures = []
