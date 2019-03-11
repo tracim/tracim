@@ -73,6 +73,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         result = self.testapp.get('/calendar/user/{}.ics/'.format(user.user_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
         result = self.testapp.put('/calendar/user/{}.ics/'.format(user.user_id), event, content_type='text/calendar', status=201)
+        result = self.testapp.get('/calendar/user/{}.ics/'.format(user.user_id), status=200)
         result = self.testapp.delete('/calendar/user/{}.ics/'.format(user.user_id), status=200)
 
     def test_proxy_user_calendar__err__other_user_calendar(self) -> None:
@@ -151,6 +152,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         result = self.testapp.get('/calendar/workspace/{}.ics/'.format(workspace.workspace_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
         result = self.testapp.put('/calendar/workspace/{}.ics/'.format(workspace.workspace_id), event, content_type='text/calendar', status=201)
+        result = self.testapp.get('/calendar/workspace/{}.ics/'.format(workspace.workspace_id), status=200)
         result = self.testapp.delete('/calendar/workspace/1.ics/'.format(workspace.workspace_id), status=200)
 
     def test_proxy_workspace_calendar__err__other_workspace_calendar(self) -> None:
