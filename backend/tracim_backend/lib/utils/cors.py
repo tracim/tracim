@@ -51,25 +51,7 @@ def add_cors_preflight_handler(config):
         route_name='cors-options-preflight',
     )
 
-
-def cors_options_view(context, request):
-    response = request.response
-    # @TODO Côme - 2018/09/04 - I commented the test bellow because I can't work with for editing a file in app file.
-    # I checked with GM and this test might require some fixes
-    # if 'Access-Control-Request-Headers' in request.headers:
-    response.headers['Access-Control-Allow-Methods'] = (
-        'OPTIONS,HEAD,GET,POST,PUT,DELETE'
-    )
-    response.headers['Access-Control-Allow-Headers'] = (
-        'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID'
-    )
-    return response
-
-
-def add_cors_to_response(event):
-    # INFO - G.M - 17-05-2018 - Add some CORS headers to all requests
-    request = event.request
-    response = event.response
+def set_cors_headers(request, response):
     app_config = request.registry.settings['CFG']
     if 'Origin' in request.headers and request.headers['Origin'] in app_config.CORS_ALLOWED_ORIGIN:  # nopep8
         response.headers['Access-Control-Expose-Headers'] = (
@@ -78,3 +60,24 @@ def add_cors_to_response(event):
         response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']  # nopep8
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Vary'] = 'Origin'
+
+def cors_options_view(context, request):
+    response = request.response
+    # @TODO Côme - 2018/09/04 - I commented the test bellow because I can't work with for editing a file in app file.
+    # I checked with GM and this test might require some fixes
+    # if 'Access-Control-Request-Headers' in request.headers:
+    response.headers['Access-Control-Allow-Methods'] = (
+        'OPTIONS,HEAD,GET,POST,PUT,DELETE,PROPFIND,PROPPATCH,REPORT,MOVE,LOCK,UNLOCK'
+    )
+    response.headers['Access-Control-Allow-Headers'] = (
+        'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth'
+    )
+    set_cors_headers(request, response)
+    return response
+
+
+def add_cors_to_response(event):
+    # INFO - G.M - 17-05-2018 - Add some CORS headers to all requests
+    request = event.request
+    response = event.response
+    set_cors_headers(request, response)
