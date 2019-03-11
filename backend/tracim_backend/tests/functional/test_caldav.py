@@ -70,11 +70,11 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
                 'test@test.test'
             )
         )
-        result = self.testapp.get('/calendar/user/{}.ics/'.format(user.user_id), status=404)
+        result = self.testapp.get('/calendar/user/{}/'.format(user.user_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
-        result = self.testapp.put('/calendar/user/{}.ics/'.format(user.user_id), event, content_type='text/calendar', status=201)
-        result = self.testapp.get('/calendar/user/{}.ics/'.format(user.user_id), status=200)
-        result = self.testapp.delete('/calendar/user/{}.ics/'.format(user.user_id), status=200)
+        result = self.testapp.put('/calendar/user/{}/'.format(user.user_id), event, content_type='text/calendar', status=201)
+        result = self.testapp.get('/calendar/user/{}/'.format(user.user_id), status=200)
+        result = self.testapp.delete('/calendar/user/{}/'.format(user.user_id), status=200)
 
     def test_proxy_user_calendar__err__other_user_calendar(self) -> None:
         dbsession = get_tm_session(self.session_factory,
@@ -108,7 +108,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             )
         )
         result = self.testapp.get(
-            '/calendar/user/{}.ics/'.format(user2.user_id), status=403)
+            '/calendar/user/{}/'.format(user2.user_id), status=403)
         assert result.json_body['code'] == 5001
 
     def test_proxy_workspace_calendar__ok__nominal_case(self) -> None:
@@ -149,11 +149,11 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
                 'test@test.test'
             )
         )
-        result = self.testapp.get('/calendar/workspace/{}.ics/'.format(workspace.workspace_id), status=404)
+        result = self.testapp.get('/calendar/workspace/{}/'.format(workspace.workspace_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
-        result = self.testapp.put('/calendar/workspace/{}.ics/'.format(workspace.workspace_id), event, content_type='text/calendar', status=201)
-        result = self.testapp.get('/calendar/workspace/{}.ics/'.format(workspace.workspace_id), status=200)
-        result = self.testapp.delete('/calendar/workspace/1.ics/'.format(workspace.workspace_id), status=200)
+        result = self.testapp.put('/calendar/workspace/{}/'.format(workspace.workspace_id), event, content_type='text/calendar', status=201)
+        result = self.testapp.get('/calendar/workspace/{}/'.format(workspace.workspace_id), status=200)
+        result = self.testapp.delete('/calendar/workspace/{}/'.format(workspace.workspace_id), status=200)
 
     def test_proxy_workspace_calendar__err__other_workspace_calendar(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -191,6 +191,6 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             )
         )
         result = self.testapp.get(
-            '/calendar/workspace/{}.ics/'.format(workspace.workspace_id),
+            '/calendar/workspace/{}/'.format(workspace.workspace_id),
             status=403)
         assert result.json_body['code'] == 5001
