@@ -67,10 +67,10 @@ def cors_options_view(context, request):
     # I checked with GM and this test might require some fixes
     # if 'Access-Control-Request-Headers' in request.headers:
     response.headers['Access-Control-Allow-Methods'] = (
-        'OPTIONS,HEAD,GET,POST,PUT,DELETE'
+        'OPTIONS,HEAD,GET,POST,PUT,DELETE,PROPFIND,PROPPATCH,REPORT,MOVE,LOCK,UNLOCK'
     )
     response.headers['Access-Control-Allow-Headers'] = (
-        'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID'
+        'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth'
     )
     set_cors_headers(request, response)
     return response
