@@ -51,6 +51,15 @@ def add_cors_preflight_handler(config):
         route_name='cors-options-preflight',
     )
 
+def set_cors_headers(request, response):
+    app_config = request.registry.settings['CFG']
+    if 'Origin' in request.headers and request.headers['Origin'] in app_config.CORS_ALLOWED_ORIGIN:  # nopep8
+        response.headers['Access-Control-Expose-Headers'] = (
+            'Content-Type,Date,Content-Length,Authorization,X-Request-ID'
+        )
+        response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']  # nopep8
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Vary'] = 'Origin'
 
 def cors_options_view(context, request):
     response = request.response
@@ -63,6 +72,7 @@ def cors_options_view(context, request):
     response.headers['Access-Control-Allow-Headers'] = (
         'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID'
     )
+    set_cors_headers(request, response)
     return response
 
 
@@ -70,11 +80,4 @@ def add_cors_to_response(event):
     # INFO - G.M - 17-05-2018 - Add some CORS headers to all requests
     request = event.request
     response = event.response
-    app_config = request.registry.settings['CFG']
-    if 'Origin' in request.headers and request.headers['Origin'] in app_config.CORS_ALLOWED_ORIGIN:  # nopep8
-        response.headers['Access-Control-Expose-Headers'] = (
-            'Content-Type,Date,Content-Length,Authorization,X-Request-ID'
-        )
-        response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']  # nopep8
-        response.headers['Access-Control-Allow-Credentials'] = 'true'
-        response.headers['Vary'] = 'Origin'
+    set_cors_headers(request, response)
