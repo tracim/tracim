@@ -126,7 +126,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__user',
-            self.radicale_path_user_dir + '{user_id:[0-9]+}/',
+            self.radicale_path_user_dir + '{user_id:[0-9]+}{trailing_slash:[/]?}',
         )
         configurator.add_view(
             self.radicale_proxy__user,
@@ -135,7 +135,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__user_x',
-            self.radicale_path_user_dir + '{user_id:[0-9]+}/{what_is_it_id:[a-zA-Z0-9]+}.ics/',
+            self.radicale_path_user_dir + '{user_id:[0-9]+}/{event_id:[a-zA-Z0-9]+}.ics{trailing_slash:[/]?}',
         )
         configurator.add_view(
             self.radicale_proxy__user,
@@ -154,7 +154,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__workspace',
-            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/',
+            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}{trailing_slash:[/]?}',
         )
         configurator.add_view(
             self.radicale_proxy__workspace,
@@ -163,7 +163,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__workspace_x',
-            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{what_is_it_id:[a-zA-Z0-9]+}.ics/',
+            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{event_id:[a-zA-Z0-9]+}.ics{trailing_slash:[/]?}',
         )
         configurator.add_view(
             self.radicale_proxy__workspace,
