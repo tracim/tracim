@@ -1,11 +1,11 @@
 # coding=utf-8
+import re
 import typing
 
 import marshmallow
-import re
 from marshmallow import post_load
-
 from marshmallow.fields import String
+
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
@@ -31,6 +31,8 @@ from tracim_backend.models.context_models import KnownMemberQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
+from tracim_backend.models.context_models import RadicaleUserSubitemsPath
+from tracim_backend.models.context_models import RadicaleWorkspaceSubitemsPath
 from tracim_backend.models.context_models import ResetPasswordCheckToken
 from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
@@ -310,6 +312,8 @@ class UserCreationSchema(marshmallow.Schema):
 
 
 # Path Schemas
+class RadicaleSubItemPathSchema(object):
+    sub_item = marshmallow.fields.String()
 
 class UserIdPathSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(
@@ -332,6 +336,16 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
     def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)
 
+
+class RadicaleUserSubItemPathSchema(RadicaleSubItemPathSchema, UserIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return RadicaleUserSubitemsPath(**data)
+
+class RadicaleWorkspaceSubItemPathSchema(RadicaleSubItemPathSchema, WorkspaceIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return RadicaleWorkspaceSubitemsPath(**data)
 
 class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
