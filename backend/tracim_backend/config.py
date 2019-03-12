@@ -95,7 +95,6 @@ class CFG(object):
         else:
             enabled_app = default_enabled_app
         self.ENABLED_APP = enabled_app
-        self._set_default_app(self.ENABLED_APP)
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
         self.DEPOT_STORAGE_DIR = settings.get(
@@ -248,20 +247,6 @@ class CFG(object):
             ActionDescription.REVISION,
             ActionDescription.STATUS_UPDATE
         ]
-
-        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-            content_type_list.Page.slug,
-            content_type_list.Thread.slug,
-            content_type_list.File.slug,
-            content_type_list.Comment.slug,
-            # content_type_list.Folder.slug -- Folder is skipped
-        ]
-        if settings.get('email.notification.from'):
-            raise Exception(
-                'email.notification.from configuration is deprecated. '
-                'Use instead email.notification.from.email and '
-                'email.notification.from.default_label.'
-            )
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
@@ -481,6 +466,19 @@ class CFG(object):
             'caldav.radicale_proxy.base_url',
             None
         )
+        self.CALDAV_RADICALE_CALENDAR_DIR = 'calendar'
+        self.CALDAV_RADICALE_WORKSPACE_SUBDIR = 'workspace'
+        self.CALDAV_RADICALE_USER_SUBDIR = 'user'
+        self.CALDAV_RADICALE_BASE_PATH = '/{}/'.format(self.CALDAV_RADICALE_CALENDAR_DIR)
+        self.CALDAV_RADICALE_USER_PATH = '/{}/{}/'.format(
+            self.CALDAV_RADICALE_CALENDAR_DIR,
+            self.CALDAV_RADICALE_USER_SUBDIR,
+        )
+        self.CALDAV_RADICALE_WORKSPACE_PATH = '/{}/{}/'.format(
+            self.CALDAV_RADICALE_CALENDAR_DIR,
+            self.CALDAV_RADICALE_WORKSPACE_SUBDIR,
+        )
+
         if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
             raise ConfigurationError(
                 'ERROR: Caldav radicale proxy cannot be activated if no radicale'
@@ -541,6 +539,21 @@ class CFG(object):
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
         self.load_ldap_settings(settings)
+        self._set_default_app(self.ENABLED_APP)
+
+        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
+            content_type_list.Page.slug,
+            content_type_list.Thread.slug,
+            content_type_list.File.slug,
+            content_type_list.Comment.slug,
+            # content_type_list.Folder.slug -- Folder is skipped
+        ]
+        if settings.get('email.notification.from'):
+            raise Exception(
+                'email.notification.from configuration is deprecated. '
+                'Use instead email.notification.from.email and '
+                'email.notification.from.default_label.'
+            )
 
     def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
         """

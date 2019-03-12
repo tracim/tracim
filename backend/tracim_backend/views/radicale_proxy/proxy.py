@@ -26,20 +26,14 @@ class RadicaleProxyController(Controller):
     def __init__(
             self,
             proxy_base_address,
-            radicale_storage_dir,
-            radicale_user_storage_dir,
-            radicale_workspace_storage_dir
+            radicale_base_path,
+            radicale_user_path,
+            radicale_workspace_path
     ):
         self._authorization = CaldavAuthorizationDeterminer()
-        self.radicale_base_path_dir = '/{}/'.format(radicale_storage_dir)
-        self.radicale_path_user_dir = '/{}/{}/'.format(
-            radicale_storage_dir,
-            radicale_user_storage_dir
-        )
-        self.radicale_path_workspace_dir = '/{}/{}/'.format(
-            radicale_storage_dir,
-            radicale_workspace_storage_dir
-        )
+        self.radicale_base_path_dir = radicale_base_path
+        self.radicale_path_user_dir = radicale_user_path
+        self.radicale_path_workspace_dir = radicale_workspace_path
         self._proxy = Proxy(
             base_address=proxy_base_address
         )

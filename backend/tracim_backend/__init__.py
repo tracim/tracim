@@ -30,9 +30,6 @@ from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
-from tracim_backend.lib.calendar import RADICALE_CALENDAR_DIR
-from tracim_backend.lib.calendar import RADICALE_STORAGE_USER_SUBDIR
-from tracim_backend.lib.calendar import RADICALE_STORAGE_WORKSPACE_SUBDIR
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
@@ -209,9 +206,9 @@ def web(global_config, **local_settings):
         # controller
         radicale_proxy_controller = RadicaleProxyController(
             proxy_base_address=app_config.CALDAV_RADICALE_PROXY_BASE_URL,
-            radicale_storage_dir=RADICALE_CALENDAR_DIR,
-            radicale_user_storage_dir=RADICALE_STORAGE_USER_SUBDIR,
-            radicale_workspace_storage_dir=RADICALE_STORAGE_WORKSPACE_SUBDIR,
+            radicale_base_path=app_config.CALDAV_RADICALE_BASE_PATH,
+            radicale_user_path=app_config.CALDAV_RADICALE_USER_PATH,
+            radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
         )
         configurator.include(radicale_proxy_controller.bind)
 
