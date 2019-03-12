@@ -1,6 +1,8 @@
 from tracim_backend import TracimRequest
 from tracim_backend.lib.proxy.proxy import Proxy
 
+
+
 class TestProxy(object):
 
     def test_add_extra_headers__ok__empty_extra_headers(self):
@@ -40,12 +42,8 @@ class TestProxy(object):
         }
 
     def test_drop_request_headers__ok__nominal_case(self):
-        proxy = Proxy('http://localhost:8080')
+        proxy = Proxy('http://localhost:8080', default_request_header_to_drop=('connection'))
 
-        def mocked_is_hop_by_hop(header_name):
-            return header_name.lower() == 'connection'
-
-        proxy._is_hop_by_hop_header = mocked_is_hop_by_hop
         headers = {
             'Authorization': 'Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=',
             'Content-Length': '0',
@@ -64,12 +62,7 @@ class TestProxy(object):
         }
 
     def test_drop_response_headers__ok__nominal_case(self):
-        proxy = Proxy('http://localhost:8080')
-
-        def mocked_is_hop_by_hop(header_name):
-            return header_name.lower() == 'connection'
-
-        proxy._is_hop_by_hop_header = mocked_is_hop_by_hop
+        proxy = Proxy('http://localhost:8080', default_response_header_to_drop=('connection'))
         headers = {
             'Authorization': 'Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=',
             'Content-Length': '0',
@@ -83,6 +76,8 @@ class TestProxy(object):
         assert new_headers == {
             'Authorization': 'Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=',
             'Host': 'localhost:80',
+            'Content-Length': '0',
+            'Content-Encoding': 'gzip',
         }
 
     def test_get_response_for_request__ok_nominal_case(self):
