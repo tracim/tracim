@@ -15,6 +15,9 @@ from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import RadicaleUserSubItemPathSchema
+from tracim_backend.views.core_api.schemas import \
+    RadicaleWorkspaceSubItemPathSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
@@ -49,11 +52,31 @@ class RadicaleProxyController(Controller):
     ) -> Response:
         """
         proxy user calendar
-        example: /calendar/user/1.ics/ to radicale path /calendar/user/1.ics
+        example: /calendar/user/1/ to radicale path /calendar/user/1/
         """
         path = '{}{}/'.format(
             self.radicale_path_user_dir,
             request.candidate_user.user_id
+        )
+        return self._proxy.get_response_for_request(
+            request,
+            path
+        )
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_user_calendar)
+    @hapic.input_path(RadicaleUserSubItemPathSchema())
+    def radicale_proxy__user_subitems(
+        self, context, request: TracimRequest, hapic_data: HapicData,
+    ) -> Response:
+        """
+        proxy user calendar
+        example: /calendar/user/1/blabla.ics/ to radicale path /calendar/user/1/blabla.ics
+        """
+        path = '{}{}/{}'.format(
+            self.radicale_path_user_dir,
+            request.candidate_user.user_id,
+            hapic_data.path.sub_item
         )
         return self._proxy.get_response_for_request(
             request,
@@ -83,11 +106,32 @@ class RadicaleProxyController(Controller):
     ) -> Response:
         """
         proxy workspace calendar
-        example: /calendar/workspace/1.ics/ to radicale path /calendar/workspace/1.ics
+        example: /calendar/workspace/1.ics/ to radicale path /calendar/workspace/1.ics/
         """
         path = '{}{}/'.format(
             self.radicale_path_workspace_dir,
             request.current_workspace.workspace_id
+        )
+        return self._proxy.get_response_for_request(
+            request,
+            path
+        )
+
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_workspace_calendar)
+    @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
+    def radicale_proxy__workspace_subitems(
+        self, context, request: TracimRequest, hapic_data: HapicData,
+    ) -> Response:
+        """
+        proxy workspace calendar
+        example: /calendar/workspace/1.ics/blabla.ics to radicale path /calendar/workspace/1.ics/blabla.ics
+        """
+        path = '{}{}/{}'.format(
+            self.radicale_path_workspace_dir,
+            request.current_workspace.workspace_id,
+            hapic_data.path.sub_item
         )
         return self._proxy.get_response_for_request(
             request,
@@ -135,10 +179,10 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__user_x',
-            self.radicale_path_user_dir + '{user_id:[0-9]+}/{event_id:[a-zA-Z0-9]+}.ics{trailing_slash:[/]?}',
+            self.radicale_path_user_dir + '{user_id:[0-9]+}/{sub_item:[a-zA-Z0-9]+\.ics}{trailing_slash:[/]?}',
         )
         configurator.add_view(
-            self.radicale_proxy__user,
+            self.radicale_proxy__user_subitems,
             route_name='radicale_proxy__user_x',
         )
 
@@ -163,9 +207,9 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__workspace_x',
-            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{event_id:[a-zA-Z0-9]+}.ics{trailing_slash:[/]?}',
+            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{sub_item:[a-zA-Z0-9]+\.ics}{trailing_slash:[/]?}',
         )
         configurator.add_view(
-            self.radicale_proxy__workspace,
+            self.radicale_proxy__workspace_subitems,
             route_name='radicale_proxy__workspace_x',
         )
