@@ -70,7 +70,7 @@ def cors_options_view(context, request):
         'OPTIONS,HEAD,GET,POST,PUT,DELETE,PROPFIND,PROPPATCH,REPORT,MOVE,LOCK,UNLOCK'
     )
     response.headers['Access-Control-Allow-Headers'] = (
-        'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth,Prefer'
+        'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth,Prefer,If-None-Match,If-match'
     )
     set_cors_headers(request, response)
     return response
