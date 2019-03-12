@@ -8,7 +8,7 @@ from pyramid.response import Response as PyramidResponse
 from requests import Response as RequestsResponse
 from tracim_backend.lib.utils.request import TracimRequest
 
-HOP_BY_HOP_HEADER_HTTP = [
+HOP_BY_HOP_HEADER_HTTP = (
     'connection',
     'keep-alive',
     'proxy-authenticate',
@@ -17,17 +17,32 @@ HOP_BY_HOP_HEADER_HTTP = [
     'trailers',
     'transfer-encoding',
     'upgrade',
-]
+)
+
+DEFAULT_RESPONSE_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
+    # FIXME - G.M - 2019-03-08 - for unknown reason content_length and
+    # content-encoding
+    # differ between radicale_header and proxy response.
+    # This make pyramid raise exception, to force renew creation of
+    # content_length, we can disable content_length header and
+    # content-encoding header
+    'content-length',
+    'content-encoding'
+)
+DEFAULT_REQUEST_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
+    'authorization',
+)
 
 class Proxy(object):
     def __init__(
         self,
         base_address,
+        default_request_header_to_drop = DEFAULT_REQUEST_HEADER_TO_DROP,
+        default_response_header_to_drop = DEFAULT_RESPONSE_HEADER_TO_DROP,
     ) -> None:
         self._base_address = base_address
-
-    def _is_hop_by_hop_header(self, header_name: str):
-        return header_name.lower() in HOP_BY_HOP_HEADER_HTTP
+        self.default_request_header_to_drop = default_request_header_to_drop
+        self.default_response_header_to_drop = default_response_header_to_drop
 
     def _get_behind_response(
             self,
@@ -59,7 +74,7 @@ class Proxy(object):
     def _drop_request_headers(self, headers: dict) -> dict:
         new_headers = {}
         for header_name, header_value in dict(headers).items():
-            if self._is_hop_by_hop_header(header_name):
+            if header_name.lower() in self.default_request_header_to_drop:
                 continue
             new_headers[header_name] = header_value
         return new_headers
@@ -67,17 +82,7 @@ class Proxy(object):
     def _drop_response_headers(self, headers: dict) -> dict:
         new_headers = {}
         for header_name, header_value in dict(headers).items():
-            if self._is_hop_by_hop_header(header_name):
-                continue
-            # FIXME - G.M - 2019-03-08 - for unknown reason content_length and
-            # content-encoding
-            # differ between radicale_header and proxy response.
-            # This make pyramid raise exception, to force renew creation of
-            # content_length, we can disable content_length header and
-            # content-encoding header
-            if header_name.lower() == 'content-length':
-                continue
-            if header_name.lower() == 'content-encoding':
+            if header_name.lower() in self.default_response_header_to_drop:
                 continue
             new_headers[header_name] = header_value
         return new_headers
