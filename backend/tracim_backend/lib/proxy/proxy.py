@@ -29,7 +29,9 @@ DEFAULT_RESPONSE_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
     'content-length',
     'content-encoding'
 )
-DEFAULT_REQUEST_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP
+DEFAULT_REQUEST_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
+    'authorization',
+)
 
 class Proxy(object):
     def __init__(
