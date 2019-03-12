@@ -51,7 +51,7 @@ class RadicaleProxyController(Controller):
         proxy user calendar
         example: /calendar/user/1.ics/ to radicale path /calendar/user/1.ics
         """
-        path = '{}{}.ics/'.format(
+        path = '{}{}/'.format(
             self.radicale_path_user_dir,
             request.candidate_user.user_id
         )
@@ -85,7 +85,7 @@ class RadicaleProxyController(Controller):
         proxy workspace calendar
         example: /calendar/workspace/1.ics/ to radicale path /calendar/workspace/1.ics
         """
-        path = '{}{}.ics/'.format(
+        path = '{}{}/'.format(
             self.radicale_path_workspace_dir,
             request.current_workspace.workspace_id
         )
@@ -126,7 +126,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__user',
-            self.radicale_path_user_dir + '{user_id:[0-9]+}.ics/',
+            self.radicale_path_user_dir + '{user_id:[0-9]+}/',
         )
         configurator.add_view(
             self.radicale_proxy__user,
@@ -135,7 +135,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__user_x',
-            self.radicale_path_user_dir + '{user_id:[0-9]+}.ics/{what_is_it_id:[a-zA-Z0-9]+}.ics/',
+            self.radicale_path_user_dir + '{user_id:[0-9]+}/{what_is_it_id:[a-zA-Z0-9]+}.ics/',
         )
         configurator.add_view(
             self.radicale_proxy__user,
@@ -154,7 +154,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__workspace',
-            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}.ics/',
+            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/',
         )
         configurator.add_view(
             self.radicale_proxy__workspace,
@@ -163,7 +163,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__workspace_x',
-            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}.ics/{what_is_it_id:[a-zA-Z0-9]+}.ics/',
+            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{what_is_it_id:[a-zA-Z0-9]+}.ics/',
         )
         configurator.add_view(
             self.radicale_proxy__workspace,

@@ -147,7 +147,7 @@ class UserSchema(UserDigestSchema):
         allow_none=True,
         relative=True,
         attribute='calendar_url',
-        example="/api/v2/calendar/user/3.ics/",
+        example="/api/v2/calendar/user/3/",
         description="CalDAV url of the user dedicated calendar",
     )
     profile = StrippedString(
