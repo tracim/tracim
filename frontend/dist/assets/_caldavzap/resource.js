@@ -235,6 +235,7 @@ function addLoadCalDAVCollection(loadingArray, isEvent)
 	calendarsArray.sort(customResourceCompare);
 	globalResourceCalDAVList.sortedCollections = calendarsArray;
 }
+
 // ResourceCalDAVList Class
 function ResourceCalDAVList()
 {
@@ -488,43 +489,9 @@ function ResourceCalDAVList()
 		if(globalCalDAVInitLoad)
 			newElement.addClass('r_operate');
 
-    var uniqueIdForLabel = inputResource.displayvalue.replace('.', '') // remove the point so jquery doesn't consider it as 2 differents classes when used in a selector
-    // Côme - 2018/03/19 - added custom style to avoid the '...' for long workspace name that hide the entire name
-		var customStyle = 'display: inline-block;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;vertical-align: top;width: 80%;'
-		newElement.html("\
-      <div class='resourceCalDAVColor' style='background:"+inputResource.ecolor+"'></div>\
-      <input type='text' class='colorPicker'/>\
-      <input type='checkbox' name="+inputResource.uid+" />\
-      <div class='"+uniqueIdForLabel+"' style='"+customStyle+"'>"+inputResource.displayvalue+"</div>");
-
-    // +$('<div/>').text(inputResource.displayvalue).html()); // legacy code
-    $.ajax({
-      url: '/api/calendars/',
-      method: 'GET',
-      contentType: 'application/json'
-    }).done(function (data) {
-      var currentICS = parseInt(inputResource.displayvalue.replace('.ics', ''))
-
-      var regExpUser = new RegExp('\/user\/')
-      var regExpWorkspace = new RegExp('\/workspace\/')
-
-      var user_or_workspace
-
-      if (regExpUser.test(inputResource.uid))
-        user_or_workspace = 'user'
-      else if (regExpWorkspace.test(inputResource.uid))
-        user_or_workspace = 'workspace'
-      else
-        user_or_workspace = 'fail'
-
-      // console.log('user_or_workspace : ', user_or_workspace, 'for : ', inputResource.uid)
-      // data.value_list.forEach((item) => item.id === currentICS && item.type === user_or_workspace && $('.'+uniqueIdForLabel).html(item.label)) // ES 6 approach
-      data.value_list.forEach(function (item) {
-        if (item.id === currentICS && item.type === user_or_workspace) $('.'+uniqueIdForLabel).html(item.label)
-      })
-    })
-
+    newElement.html("<div class='resourceCalDAVColor' style='background:"+inputResource.ecolor+"'></div><input type='text' class='colorPicker'/><input type='checkbox' name="+inputResource.uid+" />"+$('<div/>').text(inputResource.displayvalue).html());
 		newElement.attr('title', $('<div/>').text(inputResource.displayvalue).html());
+
 		if(todoString=='')
 			newElement.find('input[type=checkbox]').attr({'data-id':inputResource.uid, 'onclick':'var evt = arguments[0];evt.stopPropagation();collectionChBoxClick(this, \'#\'+$(this).parent().parent().attr(\'id\'), \''+resHeader+'\', \''+resItem+'\', null, false);if(isCalDAVLoaded && $(this).parent().parent().attr(\'id\')== \'ResourceCalDAV'+todoString+'List\'){$(this).prop(\'checked\')?enableCalendar(\''+inputResource.uid+'\'):disableCalendar(\''+inputResource.uid+'\');}'});
 		else
