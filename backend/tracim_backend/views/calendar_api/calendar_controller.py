@@ -4,6 +4,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.calendar.calendar import CalendarApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
+from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.views.calendar_api.schemas import CalendarFilterQuerySchema
@@ -44,6 +45,22 @@ class CalendarController(Controller):
             workspaces_ids_filter=hapic_data.query.workspace_ids
         )
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALENDAR_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.input_query(CalendarFilterQuerySchema())
+    @hapic.output_body(CalendarSchema(many=True))
+    def account_calendars(self, context, request: TracimRequest, hapic_data=None):
+        app_config = request.registry.settings['CFG']
+        calendar_api = CalendarApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        return calendar_api.get_user_calendars(
+            request.current_user,
+            workspaces_ids_filter=hapic_data.query.workspace_ids
+        )
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -55,3 +72,8 @@ class CalendarController(Controller):
                                '/users/{user_id:\d+}/calendar',
                                request_method='GET')
         configurator.add_view(self.user_calendars, route_name='user_calendars')
+
+        configurator.add_route('account_calendars',
+                               '/users/me/calendar',
+                               request_method='GET')
+        configurator.add_view(self.account_calendars, route_name='account_calendars')
