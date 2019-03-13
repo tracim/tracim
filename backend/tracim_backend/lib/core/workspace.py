@@ -56,6 +56,9 @@ class WorkspaceApi(object):
         return query
 
     def _base_query(self):
+        if not self._user:
+            return self._base_query_without_roles()
+
         if not self._force_role and self._user.profile.id>=Group.TIM_ADMIN:
             return self._base_query_without_roles()
 
