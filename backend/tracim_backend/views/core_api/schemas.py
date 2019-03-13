@@ -872,12 +872,6 @@ class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
                     'creation'
     )
 
-
-class ApplicationConfigSchema(marshmallow.Schema):
-    pass
-    #  TODO - G.M - 24-05-2018 - Set this
-
-
 class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example='Europe/London')
 
@@ -913,9 +907,7 @@ class ApplicationSchema(marshmallow.Schema):
         example=True,
         description='if true, the application is in use in the context',
     )
-    config = marshmallow.fields.Nested(
-        ApplicationConfigSchema,
-    )
+    config = marshmallow.fields.Dict()
 
     class Meta:
         description = 'Tracim Application informations'

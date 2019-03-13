@@ -85,6 +85,7 @@ class CFG(object):
             'contents/file',
             'contents/html-document',
             'contents/folder',
+            'calendar',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
@@ -716,8 +717,11 @@ class CFG(object):
             label='Calendar',
             slug='calendar',
             fa_icon='calendar',
-            is_active=False,
-            config={},
+            is_active=self.CALDAV_ENABLED,
+            config={
+                'workspace_calendar_path': self.CALDAV_RADICALE_WORKSPACE_PATH,
+                'user_calendar_path': self.CALDAV_RADICALE_USER_PATH,
+            },
             main_route='/ui/workspaces/{workspace_id}/calendar',
             app_config=self
         )
