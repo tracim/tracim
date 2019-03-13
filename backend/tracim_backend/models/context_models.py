@@ -344,6 +344,12 @@ class KnownMemberQuery(object):
         self.exclude_user_ids = string_to_list(exclude_user_ids, ',', int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ',', int)  # nopep8
 
+class CalendarFilterQuery(object):
+    """
+    Calendar filter query model
+    """
+    def __init__(self, workspace_ids: str = None):
+        self.workspace_ids = string_to_list(workspace_ids, ',', int)
 
 class FileQuery(object):
     """
@@ -528,6 +534,15 @@ class TypeUser(Enum):
     EMAIL = 'found_email'
     PUBLIC_NAME = 'found_public_name'
 
+class Calendar(object):
+
+    def __init__(
+            self,
+            calendar_url: str,
+            with_credentials: bool,
+    ) -> None:
+        self.calendar_url = calendar_url
+        self.with_credentials = with_credentials
 
 class UserInContext(object):
     """

@@ -4,6 +4,7 @@ import pytest
 import requests
 import transaction
 from requests.exceptions import ConnectionError
+
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -12,6 +13,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import CaldavRadicaleProxyFunctionalTest
+from tracim_backend.tests import FunctionalTest
 
 VALID_CALDAV_BODY_PUT_EVENT = """
 BEGIN:VCALENDAR
@@ -135,6 +137,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             show_deleted=True,
         )
         workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace.calendar_enabled=True
         rapi = RoleApi(
             current_user=admin,
             session=dbsession,
@@ -194,3 +197,126 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             '/calendar/workspace/{}/'.format(workspace.workspace_id),
             status=403)
         assert result.json_body['code'] == 5001
+
+class TestCalendarApi(FunctionalTest):
+    config_section = 'functional_caldav_radicale_proxy_test'
+
+    def test_proxy_user_calendar__ok__nominal_case(self) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('wp1', save_now=True)  # nopep8
+        workspace.calendar_enabled = True
+        workspace2 = workspace_api.create_workspace('wp2', save_now=True)  # nopep8
+        workspace2.calendar_enabled = True
+        workspace3 = workspace_api.create_workspace('wp3', save_now=True)  # nopep8
+        workspace3.calendar_enabled = False
+        secret_workspace = workspace_api.create_workspace('secret', save_now=True)  # nopep8
+        secret_workspace.calendar_enabled = True
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        result = self.testapp.get('/api/v2/users/{}/calendar'.format(user.user_id), status=200)
+        calendars = result.json_body
+        assert len(result.json_body) == 3
+        calendar = result.json_body[0]
+        assert calendar['calendar_url'] == 'http://localhost:6543/calendar/user/{}/'.format(user.user_id)
+        assert calendar['with_credentials'] == True
+        calendar = result.json_body[1]
+        assert calendar['calendar_url'] == 'http://localhost:6543/calendar/workspace/{}/'.format(workspace.workspace_id)
+        assert calendar['with_credentials'] == True
+        calendar = result.json_body[2]
+        assert calendar['calendar_url'] == 'http://localhost:6543/calendar/workspace/{}/'.format(workspace2.workspace_id)
+        assert calendar['with_credentials'] == True
+
+
+
+    def test_proxy_user_calendar__ok__workspace_filter(self) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('wp1', save_now=True)  # nopep8
+        workspace.calendar_enabled = True
+        workspace2 = workspace_api.create_workspace('wp2', save_now=True)  # nopep8
+        workspace2.calendar_enabled = True
+        workspace3 = workspace_api.create_workspace('wp3', save_now=True)  # nopep8
+        workspace3.calendar_enabled = True
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        params = {
+            'workspace_ids': '{},{}'.format(workspace.workspace_id, workspace3.workspace_id)
+        }
+        result = self.testapp.get('/api/v2/users/{}/calendar'.format(user.user_id), params=params, status=200)
+        calendars = result.json_body
+        assert len(result.json_body) == 2
+        calendar = result.json_body[0]
+        assert calendar['calendar_url'] == 'http://localhost:6543/calendar/workspace/{}/'.format(workspace.workspace_id)
+        assert calendar['with_credentials'] == True
+        calendar = result.json_body[1]
+        assert calendar['calendar_url'] == 'http://localhost:6543/calendar/workspace/{}/'.format(workspace3.workspace_id)
+        assert calendar['with_credentials'] == True

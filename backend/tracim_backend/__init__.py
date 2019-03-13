@@ -4,6 +4,8 @@ from tracim_backend.lib.calendar import CaldavAppFactory
 
 from tracim_backend.models.auth import AuthType
 from tracim_backend.lib.calendar.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.views.calendar_api.calendar_controller import \
+    CalendarController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.calendar_api.radicale_proxy_controller import RadicaleProxyController
 
@@ -210,6 +212,8 @@ def web(global_config, **local_settings):
             radicale_user_path=app_config.CALDAV_RADICALE_USER_PATH,
             radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
         )
+        calendar_controller = CalendarController()
+        configurator.include(calendar_controller.bind, route_prefix=BASE_API_V2)
         configurator.include(radicale_proxy_controller.bind)
 
     if app_config.FRONTEND_SERVE:
