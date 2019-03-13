@@ -718,10 +718,7 @@ class CFG(object):
             slug='calendar',
             fa_icon='calendar',
             is_active=self.CALDAV_ENABLED,
-            config={
-                'workspace_calendar_path': self.CALDAV_RADICALE_WORKSPACE_PATH,
-                'user_calendar_path': self.CALDAV_RADICALE_USER_PATH,
-            },
+            config={},
             main_route='/ui/workspaces/{workspace_id}/calendar',
             app_config=self
         )
