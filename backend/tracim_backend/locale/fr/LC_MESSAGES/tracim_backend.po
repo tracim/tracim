@@ -26,7 +26,7 @@ msgstr ""
 
 #: tracim_backend/config.py:290
 msgid "[{website_title}] Someone created an account for you"
-msgstr "[{website_title}] Quelqu'un vous à créer un compte"
+msgstr "[{website_title}] Quelqu'un vous à créé un compte"
 
 #: tracim_backend/config.py:299
 msgid "[{website_title}] A password reset has been requested"
@@ -66,14 +66,14 @@ msgstr "Espace partagé {0}"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:300
 msgid "{username} & all members of {workspace}"
-msgstr "{username} & tout tout les membres de {workspace}"
+msgstr "{username} & tous les membres de {workspace}"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:607
 msgid ""
 "I modified the status of <i>{content}</i>. The new status is "
 "<i>{new_status}</i>"
 msgstr ""
-"J'ai modifié le status de <i>{content}</i>. Le nouveau status est "
+"J'ai modifié le statut de <i>{content}</i>. Le nouveau statut est "
 "<i>{new_status}</i>"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:615
@@ -86,7 +86,7 @@ msgstr "J'ai mis à jour <i>{content}</i>\""
 
 #: tracim_backend/lib/mail_notifier/notifier.py:626
 msgid "Here is an overview of the changes:"
-msgstr "Voici une vue d'ensemble des changements:"
+msgstr "Voici une vue d'ensemble des changements :"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:17
 msgid ""
@@ -94,7 +94,7 @@ msgid ""
 "on tracim</a>"
 msgstr ""
 "Répondez directement à cet email ou <a "
-"href=\"{call_to_action_url}\">aller voir sur tracim</a>"
+"href=\"{call_to_action_url}\">allez voir sur tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:19
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
@@ -123,15 +123,15 @@ msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title<i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:6
 msgid "Your credentials are:"
-msgstr "Vos identifiants sont:"
+msgstr "Vos identifiants sont :"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:9
 msgid "login: {email_address}"
-msgstr "login: {email_address}"
+msgstr "login : {email_address}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:10
 msgid "password: {password}"
-msgstr "mot de passe: {password}"
+msgstr "mot de passe : {password}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:14
 msgid ""
@@ -139,7 +139,7 @@ msgid ""
 "collaborators by logging into your shared space: {a_link}"
 msgstr ""
 "Commençez à discuter, partager des fichiers, agendas et documentations "
-"avec vos collaborateurs en vous connectant dans votre espace partagé: "
+"avec vos collaborateurs en vous connectant dans votre espace partagé : "
 "{a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:16
@@ -174,7 +174,7 @@ msgid ""
 "Someone has requested to reset the password for your account on "
 "<i>{website_title}</i>."
 msgstr ""
-"Quelqu'un à demandez la réinitialisation du mot de passe de votre compte "
+"Quelqu'un à demandé la réinitialisation du mot de passe de votre compte "
 "sur <i>{website_title}</i>"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:6
@@ -197,5 +197,4 @@ msgstr "Réinitialiser mon mot de passe"
 msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
 "Si le lien ne fonctionne pas, Je vous suggère de copier/coller l'url "
-"entière:"
-
+"entière :"
