@@ -8,6 +8,7 @@ from tracim_backend.exceptions import CaldavNotAuthorized
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
+from tracim_backend.exceptions import WorkspaceCalendarDisabled
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.calendar.determiner import \
     CaldavAuthorizationDeterminer
@@ -61,6 +62,8 @@ class CanAccessWorkspaceCalendarChecker(AuthorizationChecker):
         work in pyramid http request context.
         :return: bool
         """
+        if not tracim_context.current_workspace.calendar_enabled:
+            raise WorkspaceCalendarDisabled()
         if self._authorization.determine_requested_mode(tracim_context) == \
                 DavAuthorization.WRITE:
             is_contributor.check(tracim_context)
