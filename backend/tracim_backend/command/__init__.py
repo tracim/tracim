@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
+import logging
 import sys
 import argparse
-import transaction
 
 from cliff.app import App
 from cliff.command import Command
 from cliff.commandmanager import CommandManager
 
 from pyramid.paster import bootstrap
-from pyramid.scripting import AppEnvironment
-from tracim_backend.exceptions import BadCommandError
+from pyramid.paster import setup_logging
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
-
 
 class TracimCLI(App):
     def __init__(self) -> None:
@@ -50,12 +49,28 @@ class AppContextCommand(Command):
     auto_setup_context = True
 
     def take_action(self, parsed_args: argparse.Namespace) -> None:
-        super(AppContextCommand, self).take_action(parsed_args)
-        if self.auto_setup_context:
-            with bootstrap(parsed_args.config_file) as app_context:
-                with app_context['request'].tm:
-                    self.take_app_action(parsed_args, app_context)
+        try:
+            super(AppContextCommand, self).take_action(parsed_args)
+            self._setup_logging(parsed_args)
+            if self.auto_setup_context:
+                with bootstrap(parsed_args.config_file) as app_context:
+                    with app_context['request'].tm:
+                        self.take_app_action(parsed_args, app_context)
+        except Exception as exc:
+            logger.exception(self, exc)
+            print('Something goes wrong during command')
+            raise exc
 
+    def _setup_logging(self, parsed_args):
+        if parsed_args.debug:
+            # INFO - G.M - 2019-03-13 - setup logging for config file
+            setup_logging(parsed_args.config_file)
+        else:
+            # INFO - G.M - 2019-03-13 - disable all logging
+            logging.config.dictConfig({
+                'version': 1,
+                'disable_existing_loggers': True,
+            })
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
@@ -69,11 +84,16 @@ class AppContextCommand(Command):
             dest='config_file',
             default=DEFAULT_TRACIM_CONFIG_FILE,
         )
+        parser.add_argument(
+            "-d",
+            "--debug_mode",
+            help='enable_tracim log for debug',
+            dest='debug',
+            required=False,
+            action='store_true',
+            default=False,
+        )
         return parser
-
-    # def run(self, parsed_args):
-    #     super().run(parsed_args)
-    #     transaction.commit()
 
 
 class Extender(argparse.Action):
