@@ -5,7 +5,7 @@ from tracim_backend.lib.calendar import CaldavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.lib.calendar.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.views.core_api.account_controller import AccountController
-from tracim_backend.views.radicale_proxy.proxy import RadicaleProxyController
+from tracim_backend.views.calendar_api.radicale_proxy_controller import RadicaleProxyController
 
 try:  # Python 3.5+
     from http import HTTPStatus
