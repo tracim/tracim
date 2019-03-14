@@ -42,6 +42,7 @@ RUN \
     locales \
     mysql-client \
     poppler-utils \
+    qpdf \
     postgresql-client \
     python3 \
     python3-dev \
