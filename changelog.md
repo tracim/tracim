@@ -4,6 +4,11 @@
 
 - If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
 
+### Others Changes
+
+- rename 'user.reset_password.validity' to 'user.reset_password.token_validity' in config,
+old parameter is now deprecated. (issue #970)
+
 
 ## 2.1.0 / 2019-02-15
 
