@@ -144,14 +144,6 @@ class UserSchema(UserDigestSchema):
         example="Europe/Paris",
         validate=user_timezone_validator,
     )
-    # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
-    caldav_url = marshmallow.fields.Url(
-        allow_none=True,
-        relative=True,
-        attribute='calendar_url',
-        example="/api/v2/calendar/user/3/",
-        description="CalDAV url of the user dedicated calendar",
-    )
     profile = StrippedString(
         attribute='profile',
         validate=user_profile_validator,

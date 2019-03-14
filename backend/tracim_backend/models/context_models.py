@@ -599,16 +599,6 @@ class UserInContext(object):
     # Context related
 
     @property
-    def calendar_url(self) -> typing.Optional[str]:
-        # TODO - G-M - 20-04-2018 - [Calendar] Replace calendar code to get
-        # url calendar url.
-        #
-        # from tracim.lib.calendar import CalendarManager
-        # calendar_manager = CalendarManager(None)
-        # return calendar_manager.get_workspace_calendar_url(self.workspace_id)
-        return None
-
-    @property
     def avatar_url(self) -> typing.Optional[str]:
         # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
         return None
