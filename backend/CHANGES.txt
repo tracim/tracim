@@ -1,15 +1,3 @@
-2.2
----
-
-- (#970) rename 'user.reset_password.validity' to 'user.reset_password.token_validity' in config,
-old parameter is now deprecated.
-
-2.1
----
-
-2.0
----
-
 1.9.1
 ---
 
