@@ -227,10 +227,24 @@ class CFG(object):
             'user.auth_token.validity',
             '604800',
         ))
-        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(settings.get(
+
+        # TODO - G.M - 2019-03-14 - retrocompat code,
+        # will be deleted in the future
+        legacy_reset_password_validity = settings.get('user.reset_password.validity', None)
+        if legacy_reset_password_validity:
+            logger.warning(
+                self,
+                'user.reset_password.validity parameter is deprecated ! '
+                'please use user.reset_password.token_validity instead.'
+            )
+        reset_password_validity = settings.get(
             'user.reset_password.token_validity',
-            '900'
-        ))
+            None
+        )
+        defaut_reset_password_validity = '900'
+        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = reset_password_validity or \
+                                                  legacy_reset_password_validity or \
+                                                  defaut_reset_password_validity
 
         self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
