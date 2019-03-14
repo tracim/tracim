@@ -242,9 +242,9 @@ class CFG(object):
             None
         )
         defaut_reset_password_validity = '900'
-        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = reset_password_validity or \
+        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(reset_password_validity or \
                                                   legacy_reset_password_validity or \
-                                                  defaut_reset_password_validity
+                                                  defaut_reset_password_validity)
 
         self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
