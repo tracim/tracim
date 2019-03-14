@@ -908,10 +908,6 @@ class UserApi(object):
         Execute actions when user just been created
         :return:
         """
-        # NOTE: Cyclic import
-        # TODO - G.M - 28-03-2018 - [Calendar] Reenable Calendar stuff
-        #from tracim.lib.calendar import CalendarManager
-        #from tracim.model.organisational import UserCalendar
 
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with
@@ -923,13 +919,6 @@ class UserApi(object):
         # Ensure database is up-to-date
         self._session.flush()
         transaction.commit()
-
-        # TODO - G.M - 28-03-2018 - [Calendar] Reenable Calendar stuff
-        # calendar_manager = CalendarManager(created_user)
-        # calendar_manager.create_then_remove_fake_event(
-        #     calendar_class=UserCalendar,
-        #     related_object_id=created_user.user_id,
-        # )
 
     def _check_user_auth_validity(self, user:User) -> None:
         if not self._user_can_authenticate(user):

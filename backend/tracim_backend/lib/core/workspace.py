@@ -120,13 +120,6 @@ class WorkspaceApi(object):
 
         if save_now:
             self._session.flush()
-
-        # TODO - G.M - 28-03-2018 - [Calendar] Reenable calendar stuff
-        # if calendar_enabled:
-        #     self._ensure_calendar_exist(workspace)
-        # else:
-        #     self._disable_calendar(workspace)
-
         return workspace
 
     def update_workspace(
@@ -248,45 +241,6 @@ class WorkspaceApi(object):
         pass
         # TODO - G.M - 28-03-2018 - [Calendar] Re-enable this calendar stuff
         # self.ensure_calendar_exist(workspace)
-
-    # TODO - G.M - 28-03-2018 - [Calendar] Re-enable this calendar stuff
-    # def ensure_calendar_exist(self, workspace: Workspace) -> None:
-    #     # Note: Cyclic imports
-    #     from tracim.lib.calendar import CalendarManager
-    #     from tracim.model.organisational import WorkspaceCalendar
-    #
-    #     calendar_manager = CalendarManager(self._user)
-    #
-    #     try:
-    #         calendar_manager.enable_calendar_file(
-    #             calendar_class=WorkspaceCalendar,
-    #             related_object_id=workspace.workspace_id,
-    #             raise_=True,
-    #         )
-    #     # If previous calendar file no exist, calendar must be created
-    #     except FileNotFoundError:
-    #         self._user.ensure_auth_token()
-    #
-    #         # Ensure database is up-to-date
-    #         self.session.flush()
-    #         transaction.commit()
-    #
-    #         calendar_manager.create_then_remove_fake_event(
-    #             calendar_class=WorkspaceCalendar,
-    #             related_object_id=workspace.workspace_id,
-    #         )
-    #
-    # def disable_calendar(self, workspace: Workspace) -> None:
-    #     # Note: Cyclic imports
-    #     from tracim.lib.calendar import CalendarManager
-    #     from tracim.model.organisational import WorkspaceCalendar
-    #
-    #     calendar_manager = CalendarManager(self._user)
-    #     calendar_manager.disable_calendar_file(
-    #         calendar_class=WorkspaceCalendar,
-    #         related_object_id=workspace.workspace_id,
-    #         raise_=False,
-    #     )
 
     def get_base_query(self) -> Query:
         return self._base_query()
