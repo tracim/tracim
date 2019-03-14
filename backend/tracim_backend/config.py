@@ -229,7 +229,7 @@ class CFG(object):
         ))
 
         # TODO - G.M - 2019-03-14 - retrocompat code,
-        # will be deleted in the future
+        # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         legacy_reset_password_validity = settings.get('user.reset_password.validity', None)
         if legacy_reset_password_validity:
             logger.warning(
