@@ -6,7 +6,7 @@
 
 ### Others Changes
 
-- rename 'user.reset_password.validity' to 'user.reset_password.token_validity' in config,
+- rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config,
 old parameter is now deprecated. (issue #970)
 
 
