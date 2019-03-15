@@ -28,9 +28,9 @@ RUN \
     apache2 \
     build-essential \
     curl \
+    ghostscript \
     git \
     gnupg \
-    ghostscript \
     imagemagick \
     inkscape \
     libapache2-mod-wsgi-py3 \
@@ -42,18 +42,18 @@ RUN \
     locales \
     mysql-client \
     poppler-utils \
-    qpdf \
     postgresql-client \
     python3 \
     python3-dev \
     python3-pip \
     python3-venv \
+    qpdf \
+    redis-server \
+    supervisor \
     uwsgi \
     uwsgi-plugin-python3 \
-    redis-server \
-    zlib1g-dev \
-    supervisor \
     vim \
+    zlib1g-dev \
 # Install nodejs
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt update \
