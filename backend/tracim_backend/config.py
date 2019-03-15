@@ -304,9 +304,9 @@ class CFG(object):
             _('[{website_title}] A password reset has been requested'),
         )
 
-        self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
-            'email.notification.processing_mode',
-        )
+        # TODO - G.M - 2019-01-22 - add feature to process notification email
+        # asynchronously see issue https://github.com/tracim/tracim/issues/1345
+        self.EMAIL_NOTIFICATION_PROCESSING_MODE = 'sync'
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
