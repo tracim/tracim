@@ -83,6 +83,17 @@ depot_storage_dir = %(basic_setup.depot_storage_dir)s
 ## preview cache directory
 preview_cache_dir = %(basic_setup.preview_cache_dir)s
 
+## You can parametrized allowed jpg preview dimension list, if not set, default
+## is 256x256. First {width}x{length} items is default preview dimensions.
+## all items should be separated by ',' and you should be really careful to do
+## set anything else than '{int}x{int}' item and ', ' separator
+; preview.jpg.allowed_dims = 256x256,512x512,1024x1024
+## Preview dimensions can be set as restricted, if set as restricted, access
+## endpoint to  to get any other preview dimensions than allowed_dims will
+## return error
+; preview.jpg.restricted_dims = True
+
+
 ### Session ###
 # shortcut for pyramid_beaker specific config
 # see tracim_web app section to see where those shortcut are used
