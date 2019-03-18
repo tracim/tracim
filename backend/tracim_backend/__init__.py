@@ -4,8 +4,6 @@ from tracim_backend.lib.calendar import CaldavAppFactory
 
 from tracim_backend.models.auth import AuthType
 from tracim_backend.lib.calendar.authorization import add_www_authenticate_header_for_caldav
-from tracim_backend.views.calendar_api.calendar_controller import \
-    CalendarController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.calendar_api.radicale_proxy_controller import RadicaleProxyController
 
@@ -200,7 +198,11 @@ def web(global_config, **local_settings):
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
     if app_config.CALDAV_ENABLED:
-
+        # FIXME - G.M - 2019-03-18 - check if possible to avoid this import here,
+        # import is here because import CalendarController without adding it to
+        # pyramid make trouble in hapic which try to get view related
+        # to controller but failed.
+        from tracim_backend.views.calendar_api.calendar_controller import CalendarController
         configurator.include(add_www_authenticate_header_for_caldav)
         # caldav exception
         context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
