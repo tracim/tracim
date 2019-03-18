@@ -5,6 +5,7 @@ from colour import Color
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CalendarServerConnectionError
 from tracim_backend.exceptions import CannotCreateCalendar
 from tracim_backend.exceptions import WorkspaceCalendarDisabled
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -50,7 +51,12 @@ class CalendarApi(object):
 
 
     def _check_calendar_exist(self, calendar_url) -> bool:
-        result = requests.get(calendar_url)
+        try:
+            result = requests.get(calendar_url)
+        except requests.exceptions.ConnectionError as exc:
+            logger.error(self, 'Cannot check calendar existence, connection error to radicale server')
+            logger.exception(self, exc)
+            raise CalendarServerConnectionError() from exc
         if result.status_code < 400:
             return True
         else:
@@ -64,7 +70,10 @@ class CalendarApi(object):
             calendar_color=Color(pick_for='calendar_name').get_hex(),
             calendar_description=calendar_description,
         )
-        result = requests.request('mkcol', calendar_url, data=body)
+        try:
+            result = requests.request('mkcol', calendar_url, data=body)
+        except requests.exceptions.ConnectionError as exc:
+            raise CalendarServerConnectionError() from exc
         if not result.status_code == 201:
             raise CannotCreateCalendar('Calendar {} cannot be created:{},{}'.format(calendar_url, result.status_code, result.content))
         logger.info(self, 'new caldav calendar created at url {}'.format(calendar_url))

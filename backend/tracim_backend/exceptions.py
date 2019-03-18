@@ -63,7 +63,7 @@ class WorkspaceCalendarDisabled(TracimException):
     error_code = ErrorCode.WORKSPACE_CALENDAR_DISABLED
 
 
-class CannotAccessToCalendar(TracimException):
+class CalendarServerConnectionError(TracimException):
     pass
 
 class CannotCreateCalendar(TracimException):
