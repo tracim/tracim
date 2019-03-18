@@ -301,7 +301,7 @@ class UserApi(object):
             if self._config.LDAP_NAME_ATTR:
                 name = ldap_data[self._config.LDAP_NAME_ATTR][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
-            self.create_user(
+            user = self.create_user(
                 email=email,
                 name=name,
                 groups=groups,
@@ -309,6 +309,7 @@ class UserApi(object):
                 do_save=True,
                 do_notify=False
             )
+            self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-11-08 - get new created user
             user = self.get_one_by_email(email)
@@ -388,13 +389,14 @@ class UserApi(object):
         # INFO - G.M - 2018-12-12 - Create new user
         if not user:
             groups = None
-            self.create_user(
+            user = self.create_user(
                 email=email,
                 groups=groups,
                 auth_type=AuthType.REMOTE,
                 do_save=True,
                 do_notify=False
             )
+            self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-12-02 - get new created user
             user = self.get_one_by_email(email)
