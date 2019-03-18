@@ -348,8 +348,9 @@ class CalendarFilterQuery(object):
     """
     Calendar filter query model
     """
-    def __init__(self, workspace_ids: str = None):
+    def __init__(self, workspace_ids: str = None, calendar_types: str = None):
         self.workspace_ids = string_to_list(workspace_ids, ',', int)
+        self.calendar_types = string_to_list(calendar_types, ',', str) or None
 
 class FileQuery(object):
     """
@@ -540,9 +541,13 @@ class Calendar(object):
             self,
             calendar_url: str,
             with_credentials: bool,
+            workspace_id: typing.Optional[int],
+            calendar_type: str,
     ) -> None:
         self.calendar_url = calendar_url
         self.with_credentials = with_credentials
+        self.workspace_id = workspace_id
+        self.calendar_type = calendar_type
 
 class UserInContext(object):
     """

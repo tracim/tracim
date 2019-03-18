@@ -309,7 +309,8 @@ class TestCalendarApi(FunctionalTest):
             )
         )
         params = {
-            'workspace_ids': '{},{}'.format(workspace.workspace_id, workspace3.workspace_id)
+            'workspace_ids': '{},{}'.format(workspace.workspace_id, workspace3.workspace_id),
+            'calendar_types': 'workspace'
         }
         result = self.testapp.get('/api/v2/users/{}/calendar'.format(user.user_id), params=params, status=200)
         calendars = result.json_body

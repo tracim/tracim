@@ -42,7 +42,8 @@ class CalendarController(Controller):
         )
         return calendar_api.get_user_calendars(
             request.candidate_user,
-            workspaces_ids_filter=hapic_data.query.workspace_ids
+            workspaces_ids_filter=hapic_data.query.workspace_ids,
+            calendar_types_filter = hapic_data.query.calendar_types
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALENDAR_ENDPOINTS])
@@ -58,7 +59,8 @@ class CalendarController(Controller):
         )
         return calendar_api.get_user_calendars(
             request.current_user,
-            workspaces_ids_filter=hapic_data.query.workspace_ids
+            workspaces_ids_filter=hapic_data.query.workspace_ids,
+            calendar_types_filter=hapic_data.query.calendar_types
         )
 
     def bind(self, configurator: Configurator) -> None:

@@ -12,6 +12,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import Calendar
 from tracim_backend.models.data import Workspace
+from tracim_backend.views.calendar_api.schemas import CalendarType
 
 CREATE_CALENDAR_TEMPLATE = \
 """<?xml version="1.0" encoding="UTF-8" ?>
@@ -117,31 +118,44 @@ class CalendarApi(object):
             return False
         return True
 
-    def get_user_calendars(self, user:User, workspaces_ids_filter: typing.Optional[typing.List[int]]) -> typing.List[Calendar]:
+    def get_user_calendars(
+            self,
+            user:User,
+            workspaces_ids_filter: typing.Optional[typing.List[int]],
+            calendar_types_filter: typing.Optional[str]
+    ) -> typing.List[Calendar]:
         user_calendars = []
 
-        if not workspaces_ids_filter:
+        if not calendar_types_filter:
+            calendar_types_filter = [calendar.value for calendar in CalendarType]
+
+        if CalendarType.private.value in calendar_types_filter and not workspaces_ids_filter:
             user_calendars.append(
                 Calendar(
-                calendar_url=self.get_user_calendar_url(user, use_proxy=True),
-                with_credentials=True,
+                    calendar_url=self.get_user_calendar_url(user, use_proxy=True),
+                    with_credentials=True,
+                    calendar_type=CalendarType.private.value,
+                    workspace_id=None,
                 )
             )
-        workspace_api = WorkspaceApi(
-            current_user=self._user,
-            session=self._session,
-            config=self._config
-        )
-        workspaces = workspace_api.get_all_for_user(user)
-        for workspace in workspaces:
-            if workspaces_ids_filter and workspace.workspace_id not in workspaces_ids_filter:
-                continue
-            if not workspace.calendar_enabled:
-                continue
-            user_calendars.append(
-                Calendar(
-                    calendar_url=self.get_workspace_calendar_url(workspace, use_proxy=True),
-                    with_credentials=True
-                )
+        if CalendarType.workspace.value in calendar_types_filter:
+            workspace_api = WorkspaceApi(
+                current_user=self._user,
+                session=self._session,
+                config=self._config
             )
+            workspaces = workspace_api.get_all_for_user(user)
+            for workspace in workspaces:
+                if workspaces_ids_filter and workspace.workspace_id not in workspaces_ids_filter:
+                    continue
+                if not workspace.calendar_enabled:
+                    continue
+                user_calendars.append(
+                    Calendar(
+                        calendar_url=self.get_workspace_calendar_url(workspace, use_proxy=True),
+                        with_credentials=True,
+                        calendar_type=CalendarType.workspace.value,
+                        workspace_id=workspace.workspace_id
+                    )
+                )
         return user_calendars
