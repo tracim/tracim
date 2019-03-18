@@ -42,7 +42,7 @@ class CaldavAppFactory(object):
             if not os.path.isdir(workspace_dir):
                 os.mkdir(workspace_dir)
         else:
-            raise ConfigurationError("{} is not a correct folder, can't set properly storage folder of radicale", parent_folder)
+            raise ConfigurationError("{} is not a correct folder, can't set properly storage folder of radicale".format(parent_folder))
 
 
     def _sliced_dict(self, data: typing.Dict[str, any], beginning_key_string: str):
