@@ -85,7 +85,7 @@ class WorkspaceApi(object):
             self,
             label: str='',
             description: str='',
-            calendar_enabled: bool=False,
+            calendar_enabled: bool=True,
             save_now: bool=False,
     ) -> Workspace:
         if not label:
