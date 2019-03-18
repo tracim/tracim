@@ -6,14 +6,16 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CalendarServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -238,9 +240,29 @@ class WorkspaceApi(object):
         return workspace
 
     def execute_created_workspace_actions(self, workspace: Workspace) -> None:
-        pass
-        # TODO - G.M - 28-03-2018 - [Calendar] Re-enable this calendar stuff
-        # self.ensure_calendar_exist(workspace)
+
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_created_user should start hook use by calendar code.
+        from tracim_backend.lib.calendar.calendar import CalendarApi
+        if self._config.CALDAV_ENABLED:
+            calendar_api = CalendarApi(
+                current_user = self._user,
+                session = self._session,
+                config = self._config
+            )
+            if workspace.calendar_enabled:
+                try:
+                    calendar_already_exist = calendar_api.ensure_workspace_calendar_exist(workspace)
+                    if calendar_already_exist:
+                        logger.warning(
+                            self,
+                            'workspace {} is just created but it own calendar already exist !!'.format(workspace.user_id)
+                        )
+                except CalendarServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to calendar server')
+                    logger.exception(self, exc)
+
 
     def get_base_query(self) -> Query:
         return self._base_query()
