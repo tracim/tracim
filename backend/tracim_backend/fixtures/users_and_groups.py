@@ -18,7 +18,6 @@ class Base(Fixture):
             session=self._session,
             config=self._config,
             current_user=u)
-        uapi.execute_created_user_actions(u)
 
         g1 = Group()
         g1.group_id = 1
