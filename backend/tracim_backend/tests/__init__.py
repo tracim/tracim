@@ -116,7 +116,12 @@ class FunctionalTest(unittest.TestCase):
             self.config_section
         )
         self.settings = self.override_settings(settings)
+        # INFO - G.M - 2019-03-19 - Reset all hapic context: PyramidContext
+        # and controllers
         hapic.reset_context()
+        # TODO - G.M - 2019-03-19 - Replace this code by something better, see
+        # https://github.com/algoo/hapic/issues/144
+        hapic._controllers = []
         self.connect_database(create_tables=True)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
