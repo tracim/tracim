@@ -119,7 +119,7 @@ msgstr "Bonjour {username},"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:4
 msgid "Someone invited you to join <i>{website_title}</i>."
-msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title<i>."
+msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title}<i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:6
 msgid "Your credentials are:"
