@@ -4,6 +4,9 @@
 
 - If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
 
+### REST API Changes
+
+- Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
 
 ## 2.1.0 / 2019-02-15
 

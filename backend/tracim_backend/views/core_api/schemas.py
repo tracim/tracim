@@ -11,7 +11,6 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.validator import *
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -143,14 +142,6 @@ class UserSchema(UserDigestSchema):
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         validate=user_timezone_validator,
-    )
-    # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
-    caldav_url = marshmallow.fields.Url(
-        allow_none=True,
-        relative=True,
-        attribute='calendar_url',
-        example="/api/v2/calendar/user/3/",
-        description="CalDAV url of the user dedicated calendar",
     )
     profile = StrippedString(
         attribute='profile',
@@ -872,12 +863,6 @@ class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
                     'creation'
     )
 
-
-class ApplicationConfigSchema(marshmallow.Schema):
-    pass
-    #  TODO - G.M - 24-05-2018 - Set this
-
-
 class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example='Europe/London')
 
@@ -913,9 +898,7 @@ class ApplicationSchema(marshmallow.Schema):
         example=True,
         description='if true, the application is in use in the context',
     )
-    config = marshmallow.fields.Nested(
-        ApplicationConfigSchema,
-    )
+    config = marshmallow.fields.Dict()
 
     class Meta:
         description = 'Tracim Application informations'

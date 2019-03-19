@@ -5,27 +5,26 @@ import os
 from configparser import ConfigParser
 
 from radicale.config import load as load_radicale_config
+from tracim_backend.config import CFG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.exceptions import ConfigurationError
 
 RADICALE_MAIN_SECTION = 'caldav'
 RADICALE_SUBMAIN_SECTION = 'radicale'
-RADICALE_CALENDAR_DIR = 'calendar'
-RADICALE_STORAGE_WORKSPACE_SUBDIR = 'workspace'
-RADICALE_STORAGE_USER_SUBDIR = 'user'
 
 class CaldavAppFactory(object):
 
     def __init__(self, **settings):
         logger.info(self, 'Add additional radicale config')
-        self.config = load_radicale_config(())
-        self.config = self._parse_additional_radicale_config(self.config, settings)
-        self.create_dir_tree(self.config)
+        self.radicale_config = load_radicale_config(())
+        self.radicale_config = self._parse_additional_radicale_config(self.radicale_config, settings)
+        self.app_config = CFG(settings)
+        self.create_dir_tree(self.radicale_config, self.app_config)
 
-    def create_dir_tree(self, config):
+    def create_dir_tree(self, radicale_config: ConfigParser, app_config: CFG):
         # FIXME - G.M - 2019-03-08 - create dir tree if not exist in order
         # to allow item creation without trouble in radicale
-        storage_path = self.config.get('storage','filesystem_folder')
+        storage_path = radicale_config.get('storage', 'filesystem_folder')
         sub_dir_storage_path = os.path.join(storage_path, 'collection-root')
         parent_folder = os.path.dirname(storage_path)
         if os.path.isdir(parent_folder):
@@ -33,17 +32,17 @@ class CaldavAppFactory(object):
                 os.mkdir(storage_path)
             if not os.path.isdir(sub_dir_storage_path):
                 os.mkdir(sub_dir_storage_path)
-            calendar_dir = os.path.join(sub_dir_storage_path, RADICALE_CALENDAR_DIR)
+            calendar_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR)
             if not os.path.isdir(calendar_dir):
                 os.mkdir(calendar_dir)
-            user_dir = os.path.join(sub_dir_storage_path, RADICALE_CALENDAR_DIR, RADICALE_STORAGE_USER_SUBDIR)
+            user_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR, app_config.CALDAV_RADICALE_USER_SUBDIR)
             if not os.path.isdir(user_dir):
                 os.mkdir(user_dir)
-            workspace_dir = os.path.join(sub_dir_storage_path, RADICALE_CALENDAR_DIR, RADICALE_STORAGE_WORKSPACE_SUBDIR)
+            workspace_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR, app_config.CALDAV_RADICALE_WORKSPACE_SUBDIR)
             if not os.path.isdir(workspace_dir):
                 os.mkdir(workspace_dir)
         else:
-            raise ConfigurationError("{} is not a correct folder, can't set properly storage folder of radicale", parent_folder)
+            raise ConfigurationError("{} is not a correct folder, can't set properly storage folder of radicale".format(parent_folder))
 
 
     def _sliced_dict(self, data: typing.Dict[str, any], beginning_key_string: str):
@@ -93,4 +92,4 @@ class CaldavAppFactory(object):
         logger = logging.getLogger('radicale')
 
         from radicale import Application as RadicaleApplication
-        return RadicaleApplication(self.config, logger)
+        return RadicaleApplication(self.radicale_config, logger)
