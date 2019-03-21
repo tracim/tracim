@@ -5,8 +5,8 @@
 #    pip-compile --output-file requirements.txt setup.py
 #
 alembic==1.0.5
-apispec-marshmallow-advanced==0.3  # via hapic
-apispec==1.1.0
+apispec-marshmallow-advanced==0.4
+apispec==1.1.0            # via apispec-marshmallow-advanced, hapic
 attrs==18.2.0             # via cmd2
 babel==2.6.0
 beaker==1.10.0
