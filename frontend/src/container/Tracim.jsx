@@ -188,9 +188,9 @@ class Tracim extends React.Component {
               } />
 
               <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
-              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
               <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
               <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
+              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() => <AppFullscreenRouter />} />
             </div>
           } />
 
@@ -203,6 +203,7 @@ class Tracim extends React.Component {
           <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
           <Route exact path={PAGE.CALENDAR} render={() => <AppFullscreenRouter />} />
+          <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 

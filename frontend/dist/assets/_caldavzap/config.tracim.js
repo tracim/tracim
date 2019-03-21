@@ -3,41 +3,24 @@
 var importedConfig = window.parent.document.getElementById('cladavzapIframe').getAttribute('data-config')
 var configObj = JSON.parse(importedConfig)
 
-var globalAccountSettings=[{
-  href: configObj.globalAccountSettings.user.userBaseUrl,
+var globalAccountSettings = configObj.globalAccountSettings.calendarList.map(c => ({
+  href: c.href,
   userAuth: {
-    userName: configObj.globalAccountSettings.user.email,
-    userPassword: configObj.globalAccountSettings.user.token
+    userName: 'notaname',
+    userPassword: 'notapw'
   },
+  withCredentials: c.withCredentials,
+  hrefLabel: c.hrefLabel,
   timeOut: 90000,
   lockTimeOut: 10000,
   checkContentType: true,
-  settingsAccount: false,
+  settingsAccount: c.settingsAccount,
   delegation: false,
   forceReadOnly: null,
   ignoreAlarms: false,
   backgroundCalendars: [],
-  basehref: configObj.globalAccountSettings.baseHref
-}]
-
-if (configObj.globalAccountSettings.workspace.hasUrls) {
-  globalAccountSettings.push({
-    href: configObj.globalAccountSettings.workspace.workspaceBaseUrl,
-    userAuth: {
-      userName: configObj.globalAccountSettings.user.email,
-      userPassword: configObj.globalAccountSettings.user.token
-    },
-    timeOut: 90000,
-    lockTimeOut: 10000,
-    checkContentType: true,
-    settingsAccount: false,
-    delegation: false,
-    forceReadOnly: null,
-    ignoreAlarms: false,
-    backgroundCalendars: [],
-    basehref: configObj.globalAccountSettings.baseHref
-  })
-}
+  basehref: c.href.split('/')[2] // const [protocol, empty, hostname, ...path] = c.href.split('/')
+}))
 
 var globalBackgroundSync=true
 var globalSyncResourcesInterval=120000
@@ -78,7 +61,7 @@ var globalEditorFadeAnimation=666
 var globalEventStartPastLimit=3
 var globalEventStartFutureLimit=3
 var globalTodoPastLimit=1
-var globalLoadedCalendarCollections=[]
+var globalLoadedCalendarCollections = []
 var globalLoadedTodoCollections=[]
 var globalActiveCalendarCollections=[]
 var globalActiveTodoCollections=[]

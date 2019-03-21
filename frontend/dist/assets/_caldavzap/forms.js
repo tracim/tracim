@@ -2363,17 +2363,8 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
 			$('#event_details_template').find('svg[data-type="select_icon"]').replaceWith($('<div>').append($(newSVG).clone()).html());
 		}
 		/*************************** END OF BAD HACKS SECTION ***************************/
-		if(calEvent.etag!='') {
-      var interval = window.setInterval(function () {
-        if (calendarsApiHasResponded === true) {
-          $('#event_calendar').val(calEvent.res_id);
-          stopInterval()
-        }
-      }, 500)
-      var stopInterval = function () {
-        window.clearInterval(interval)
-      }
-    }
+		if(calEvent.etag!='')
+      $('#event_calendar').val(calEvent.res_id);
 	}
 
 	if(repeatOne=='editOnly' || $('#recurrenceID').val()!='')

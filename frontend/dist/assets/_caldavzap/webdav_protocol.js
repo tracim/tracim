@@ -20,8 +20,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 // VersionCheck (check for new version)
-function netVersionCheck()
-{
+function netVersionCheck() {
+  // CH - 2019-03-20 - removed version check since we dont plan to upgrade it
+  return false
 	$.ajax({
 		type: 'GET',
 		url: globalVersionCheckURL,
@@ -1799,7 +1800,8 @@ function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex,
 
 		if(saveHref!='')
 		{
-			var saveUserHref=saveHref.replace(new RegExp('[^/]+/$'),'');
+		  // CH - 2018-03-20 - Removed regex because it make all workspaces calendar to be deleted
+			var saveUserHref=saveHref // .replace(new RegExp('[^/]+/$'),'');
 			if(typeof globalResourceCalDAVList!='undefined' && globalResourceCalDAVList!=null)
 				globalResourceCalDAVList.removeOldResources(saveUserHref, resultTimestamp);
 			if(typeof globalResourceCardDAVList!='undefined' && globalResourceCardDAVList!=null)

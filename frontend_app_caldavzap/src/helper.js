@@ -1,11 +1,5 @@
 import i18n from './i18n.js'
 
-const radicaleConfig = require('../configRadicale.json')
-
-export const caldavzapConfig = {
-  radicaleUrl: radicaleConfig.RADICALE_CLIENT_BASE_URL_TEMPLATE
-}
-
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',

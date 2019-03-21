@@ -404,6 +404,7 @@ class Dashboard extends React.Component {
                   {idRoleUserWorkspace >= 2 && (
                     <div className='dashboard__calltoaction'>
                       {props.appList
+                        .filter(app => app.slug !== 'calendar')
                         .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
                         .map(app => {
                           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}

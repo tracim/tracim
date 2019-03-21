@@ -50,7 +50,18 @@ class AppFullscreenRouter extends React.Component {
             }} />
 
             <Route exact path={PAGE.CALENDAR} render={() => {
-              props.renderAppFullscreen({slug: 'caldavzap', hexcolor: '#7d4e24'}, props.user, {})
+              const caldavzapConfig = {
+                idWorkspace: null
+              }
+              props.renderAppFullscreen({slug: 'caldavzap', hexcolor: '#7d4e24', appConfig: caldavzapConfig}, props.user, {})
+              return null
+            }} />
+
+            <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() => {
+              const caldavzapConfig = {
+                idWorkspace: props.match.params.idws
+              }
+              props.renderAppFullscreen({slug: 'caldavzap', hexcolor: '#7d4e24', appConfig: caldavzapConfig}, props.user, {})
               return null
             }} />
           </div>

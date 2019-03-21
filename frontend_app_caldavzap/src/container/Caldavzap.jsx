@@ -2,10 +2,11 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n
+  addAllResourceI18n,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
-import { caldavzapConfig } from '../helper.js'
+import { getCalendarList } from '../action.async.js'
 
 require('../css/index.styl')
 
@@ -18,7 +19,9 @@ class Caldavzap extends React.Component {
       isVisible: true,
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content
+      content: props.data ? props.data.content : debug.content,
+      userWorkspaceList: [],
+      userWorkspaceListLoaded: false
     }
 
     // i18n has been init, add resources from frontend
@@ -35,9 +38,30 @@ class Caldavzap extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
+    const { state } = this
+
     console.log('%c<Caldavzap> did mount', `color: ${this.state.config.hexcolor}`)
     document.getElementById('appFullscreenContainer').style.width = '100%'
+
+    const fetchResultUserWorkspace = await handleFetchResult(
+      await getCalendarList(state.config.apiUrl, state.config.appConfig.idWorkspace)
+    )
+
+    switch (fetchResultUserWorkspace.apiResponse.status) {
+      case 200:
+        this.setState({
+          userWorkspaceList: fetchResultUserWorkspace.body,
+          userWorkspaceListLoaded: true
+        })
+        break
+      case 400:
+        switch (fetchResultUserWorkspace.body.code) {
+          default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+        }
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -62,22 +86,20 @@ class Caldavzap extends React.Component {
   })
 
   render () {
-    const { state } = this
+    const { props, state } = this
 
-    if (!state.isVisible) return null
+    if (!state.isVisible || !state.userWorkspaceListLoaded) return null
 
     const config = {
       globalAccountSettings: {
-        baseHref: 'http://',
-        user :{
-          userBaseUrl: `${caldavzapConfig.radicaleUrl}/user/`,
-          email: state.loggedUser.email,
-          token: ''
-        },
-        workspace: {
-          hasUrls: false, // @fixme this should come from api ?
-          workspaceBaseUrl: `${caldavzapConfig.radicaleUrl}/workspace/`,
-        }
+        calendarList: state.userWorkspaceList.map(c => ({
+          href: c.calendar_url,
+          hrefLabel: c.calendar_type === 'private'
+            ? props.t('User')
+            : state.userWorkspaceList.length > 1 ? props.t('Shared spaces') : props.t('Shared space'),
+          settingsAccount: c.calendar_type === 'private',
+          withCredentials: c.with_credentials
+        }))
       },
       userLang: state.loggedUser.lang
     }
