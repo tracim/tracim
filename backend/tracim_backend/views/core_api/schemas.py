@@ -757,6 +757,12 @@ class WorkspaceModifySchema(marshmallow.Schema):
         required=True,
         example='A super description of my workspace.',
     )
+    calendar_enabled = marshmallow.fields.Bool(
+        allow_none=True,
+        required=False,
+        default=None,
+        description='has workspace has an associated calendar ?'
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
@@ -809,7 +815,7 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         many=True,
     )
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
-
+    calendar_enabled = marshmallow.fields.Bool(example=True, default=True)
     class Meta:
         description = 'Digest of workspace informations'
 

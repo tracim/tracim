@@ -130,6 +130,7 @@ class WorkspaceApi(object):
             label: str,
             description: str,
             save_now: bool=False,
+            calendar_enabled: bool = None
     ) -> Workspace:
         """
         Update workspace
@@ -143,7 +144,8 @@ class WorkspaceApi(object):
             raise EmptyLabelNotAllowed('Workspace label cannot be empty')
         workspace.label = label
         workspace.description = description
-
+        if calendar_enabled is not None:
+            workspace.calendar_enabled = calendar_enabled
         if save_now:
             self.save(workspace)
 

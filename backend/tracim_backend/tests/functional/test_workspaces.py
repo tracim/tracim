@@ -199,7 +199,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         params = {
             'label': 'superworkspace',
-            'description': 'mysuperdescription'
+            'description': 'mysuperdescription',
+            'calendar_enabled': False,
         }
         # Before
         res = self.testapp.get(
@@ -214,6 +215,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'All importants documents'
         assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
+        assert workspace['calendar_enabled'] == True
 
         # modify workspace
         res = self.testapp.put_json(
@@ -229,6 +231,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'mysuperdescription'
         assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
+        assert workspace['calendar_enabled'] == False
 
         # after
         res = self.testapp.get(
@@ -243,6 +246,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'mysuperdescription'
         assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
+        assert workspace['calendar_enabled'] == False
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:
         """
