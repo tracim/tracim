@@ -1471,6 +1471,7 @@ h3
 	left: 224px;
 	right: 0px;
 	border-left: 1px solid #c0c0c0;
+	background-color: #f0f0f0; /* delete this line if you want to restore the default theme */
 }
 
 #main_h_TODO
@@ -1610,9 +1611,9 @@ h3
 	top: 50px;
 	left: 224px;
 	bottom: 0;
-	padding: 0px 7px;
-	background: #ffffff;
-	border-left: 1px solid;
+	padding: 0px; /* default value: 0 7px */
+	background: #fdfdfd; /* default value: #ffffff; */
+ 	border-left: 1px solid;
 	border-right: 1px solid;
 	border-color: #c0c0c0;
 	overflow-x: hidden;
@@ -2712,4 +2713,11 @@ img[data-type="invalidVerySmall"]
 {
 	white-space: normal;
 	word-wrap: break-word;
+}
+
+
+/***** Modification tracim v2 *****/
+
+.integration_d {
+	display: none !important;
 }

@@ -200,56 +200,58 @@ class Account extends React.Component {
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
-        <PageWrapper customClass='account'>
-          <PageTitle
-            parentClass={'account'}
-            title={props.t('{{userName}} account edition', {userName: state.userToEdit.public_name})}
-            icon='user-o'
-          />
+        <div className='tracim__content-scrollview'>
+          <PageWrapper customClass='account'>
+            <PageTitle
+              parentClass={'account'}
+              title={props.t('{{userName}} account edition', {userName: state.userToEdit.public_name})}
+              icon='user-o'
+            />
 
-          <PageContent parentClass='account'>
-            <UserInfo user={state.userToEdit} />
+            <PageContent parentClass='account'>
+              <UserInfo user={state.userToEdit} />
 
-            <Delimiter customClass={'account__delimiter'} />
+              <Delimiter customClass={'account__delimiter'} />
 
-            <div className='account__userpreference'>
-              <MenuSubComponent
-                menu={state.subComponentMenu}
-                onClickMenuItem={this.handleClickSubComponentMenuItem}
-              />
+              <div className='account__userpreference'>
+                <MenuSubComponent
+                  menu={state.subComponentMenu}
+                  onClickMenuItem={this.handleClickSubComponentMenuItem}
+                />
 
-              <div className='account__userpreference__setting'>
-                {(() => {
-                  switch (state.subComponentMenu.find(({active}) => active).name) {
-                    case 'personalData':
-                      return <PersonalData
-                        userAuthType={state.userToEdit.auth_type}
-                        onClickSubmit={this.handleSubmitNameOrEmail}
-                        displayAdminInfo
-                      />
+                <div className='account__userpreference__setting'>
+                  {(() => {
+                    switch (state.subComponentMenu.find(({active}) => active).name) {
+                      case 'personalData':
+                        return <PersonalData
+                          userAuthType={state.userToEdit.auth_type}
+                          onClickSubmit={this.handleSubmitNameOrEmail}
+                          displayAdminInfo
+                        />
 
-                    // case 'calendar':
-                    //   return <Calendar user={props.user} />
+                      // case 'calendar':
+                      //   return <Calendar user={props.user} />
 
-                    case 'notification':
-                      return <Notification
-                        idMyself={parseInt(state.idUserToEdit)}
-                        workspaceList={state.userToEditWorkspaceList}
-                        onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                      />
+                      case 'notification':
+                        return <Notification
+                          idMyself={parseInt(state.idUserToEdit)}
+                          workspaceList={state.userToEditWorkspaceList}
+                          onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                        />
 
-                    case 'password':
-                      return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
+                      case 'password':
+                        return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
 
-                    // case 'timezone':
-                    //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
-                  }
-                })()}
+                      // case 'timezone':
+                      //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
+                    }
+                  })()}
+                </div>
               </div>
-            </div>
 
-          </PageContent>
-        </PageWrapper>
+            </PageContent>
+          </PageWrapper>
+        </div>
       </div>
     )
   }

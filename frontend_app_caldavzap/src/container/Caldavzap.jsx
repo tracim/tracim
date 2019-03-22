@@ -32,28 +32,56 @@ class Caldavzap extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
+
     switch (type) {
+      case 'caldavzap_showApp':
+        console.log('%c<Caldavzap> Custom event', 'color: #28a745', type, data)
+        if (data.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
+          this.loadCalendarList(data.config.appConfig.idWorkspace)
+        }
+        break
       default:
         break
     }
   }
 
-  async componentDidMount () {
+  componentDidMount () {
+    console.log('%c<Caldavzap> did mount', `color: ${this.state.config.hexcolor}`)
+
+    this.loadCalendarList(this.state.config.appConfig.idWorkspace)
+  }
+
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Caldavzap> did mount', `color: ${this.state.config.hexcolor}`)
-    document.getElementById('appFullscreenContainer').style.width = '100%'
+    console.log('%c<Caldavzap> did update', `color: ${state.config.hexcolor}`, prevState, state)
+
+    if (prevState.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
+      this.caldavzapIframe.contentWindow.location.reload()
+    }
+  }
+
+  loadCalendarList = async idWorkspace => {
+    const { state } = this
 
     const fetchResultUserWorkspace = await handleFetchResult(
-      await getCalendarList(state.config.apiUrl, state.config.appConfig.idWorkspace)
+      await getCalendarList(state.config.apiUrl, idWorkspace)
     )
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
       case 200:
-        this.setState({
+        this.setState(prev => ({
+          config: {
+            ...prev.config,
+            appConfig: {
+              ...prev.config.appConfig,
+              idWorkspace: idWorkspace
+            }
+          },
           userWorkspaceList: fetchResultUserWorkspace.body,
           userWorkspaceListLoaded: true
-        })
+        }))
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
@@ -64,16 +92,9 @@ class Caldavzap extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    const { state } = this
-
-    console.log('%c<Caldavzap> did update', `color: ${state.config.hexcolor}`, prevState, state)
-  }
-
   componentWillUnmount () {
     console.log('%c<Caldavzap> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
-    document.getElementById('appFullscreenContainer').style.width = 'auto'
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
@@ -109,6 +130,7 @@ class Caldavzap extends React.Component {
         id='cladavzapIframe'
         src='/assets/_caldavzap/index.tracim.html'
         data-config={JSON.stringify(config)}
+        ref={f => this.caldavzapIframe = f}
       />
     )
   }

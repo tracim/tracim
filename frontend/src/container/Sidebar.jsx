@@ -115,52 +115,54 @@ class Sidebar extends React.Component {
 
     return (
       <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
-        <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
-          <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
-        </div>
+        <div className='sidebar__scrollview'>
+          <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
+            <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
+          </div>
 
-        <div className='sidebar__scrollup' onClick={this.handleClickScollUp}>
-          <i className='fa fa-chevron-up' />
-        </div>
+          <div className='sidebar__scrollup' onClick={this.handleClickScollUp}>
+            <i className='fa fa-chevron-up' />
+          </div>
 
-        <div className='sidebar__content'>
-          <div style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
+          <div className='sidebar__content'>
+            <div style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
 
-          <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
-            <ul className='sidebar__content__navigation__workspace'>
-              { workspaceList.map(ws =>
-                <WorkspaceListItem
-                  idWs={ws.id}
-                  label={ws.label}
-                  allowedApp={ws.sidebarEntry}
-                  lang={activeLang}
-                  activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}
-                  isOpenInSidebar={ws.isOpenInSidebar}
-                  onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
-                  onClickAllContent={this.handleClickAllContent}
-                  key={ws.id}
-                />
-              )}
-            </ul>
-          </nav>
+            <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
+              <ul className='sidebar__content__navigation__workspace'>
+                { workspaceList.map(ws =>
+                  <WorkspaceListItem
+                    idWs={ws.id}
+                    label={ws.label}
+                    allowedApp={ws.sidebarEntry}
+                    lang={activeLang}
+                    activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}
+                    isOpenInSidebar={ws.isOpenInSidebar}
+                    onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
+                    onClickAllContent={this.handleClickAllContent}
+                    key={ws.id}
+                  />
+                )}
+              </ul>
+            </nav>
 
-          {getUserProfile(user.profile).id <= 2 &&
-            <div className='sidebar__content__btnnewworkspace'>
-              <button
-                className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-                onClick={this.handleClickNewWorkspace}
-              >
-                {t('Create a shared space')}
-              </button>
-            </div>
-          }
-        </div>
+            {getUserProfile(user.profile).id <= 2 &&
+              <div className='sidebar__content__btnnewworkspace'>
+                <button
+                  className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+                  onClick={this.handleClickNewWorkspace}
+                >
+                  {t('Create a shared space')}
+                </button>
+              </div>
+            }
+          </div>
 
-        <div className='sidebar__footer mb-2'>
-          <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
-            Copyright - 2013 - 2018
-            <div className='sidebar__footer__text__link'>
-              <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
+          <div className='sidebar__footer mb-2'>
+            <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+              Copyright - 2013 - 2018
+              <div className='sidebar__footer__text__link'>
+                <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
+              </div>
             </div>
           </div>
         </div>

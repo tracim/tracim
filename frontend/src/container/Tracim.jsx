@@ -158,14 +158,7 @@ class Tracim extends React.Component {
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
         <div className='sidebarpagecontainer'>
-          <Route
-            // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
-            // able to access props.match.params.idws
-            // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
-            path='/ui/:first?/:idws?/*' render={() => <Sidebar />}
-            // @FIXME - Côme - 2018/11/02 - upgrade ReactRouter and refactor the route path='/ui' with array of string in this route path
-          />
-          <Route exact strict path='/ui' render={() => <Sidebar />} />
+          <Route render={() => <Sidebar />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
@@ -178,7 +171,7 @@ class Tracim extends React.Component {
           <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
 
           <Route path='/ui/workspaces/:idws?' render={() => // Workspace Router
-            <div className='fullWidthFullHeight'>
+            <div className='tracim__content fullWidthFullHeight'>
               <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
                 <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
               } />
@@ -187,10 +180,17 @@ class Tracim extends React.Component {
                 <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
               } />
 
+              <Route path={[
+                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                PAGE.WORKSPACE.CONTENT_LIST(':idws')
+              ]} component={WorkspaceContent} />
+
               <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
-              <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
-              <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
-              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() => <AppFullscreenRouter />} />
+
+              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() =>
+                // the route bellow should not have the wrapper div.tracim__content
+                <AppFullscreenRouter />
+              } />
             </div>
           } />
 
@@ -198,12 +198,11 @@ class Tracim extends React.Component {
 
           <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() => <AdminAccount />} />
 
-          <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
-
-          <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
-
-          <Route exact path={PAGE.CALENDAR} render={() => <AppFullscreenRouter />} />
-          <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() => <AppFullscreenRouter />} />
+          <Route exact path={[
+            PAGE.ADMIN.USER,
+            PAGE.ADMIN.WORKSPACE,
+            PAGE.CALENDAR
+          ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 

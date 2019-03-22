@@ -175,24 +175,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 		<div class="update_d" style="display: none;">
 			<div class="update_h"></div>
 		</div>
-		<div class="headers" id="resourceCalDAV_h">
-			<span class="resourceCalDAV_text" data-type="resourcesCalDAV_txt">Resources</span>
-			<img src="images/add_cal_white.svg" alt="Enable all calendars" title="Enable all calendars" data-type="addAll" class="addRemoveAll addRemoveAllCalDAV" onclick="enableAll()" />
-			<img src="images/remove_cal_white.svg" alt="Disable all calendars" title="Disable all calendars" data-type="removeAll" class="addRemoveAll addRemoveAllCalDAV" onclick="disableAll()" />
-			<img id="showUnloadedCalendars" src="images/delegation.svg" alt="Subscribe" title="Subscribe" onclick="showUnloadedCollections('event');" />
-			<input id="loadUnloadedCalendars" type="button" value="save" onclick="loadAdditionalCollections('event');" style="margin-top:4px;margin-left:6px;" />
-			<input id="loadUnloadedCalendarsCancel" type="button" value="cancel" onclick="cancelUnloadedCollections('event');" style="margin-top:4px;margin-right:6px;float:right;" />
-		</div>
-		<div id="ResourceCalDAVList">
-			<div id="ResourceCalDAVListTemplate" style="display: none;">
-				<div class="resourceCalDAV_header"><input type="checkbox"></div>
-				<div class="resourceCalDAV_item"></div>
+		<div class="sidebarleft">
+			<div class="headers" id="resourceCalDAV_h">
+				<span class="resourceCalDAV_text" data-type="resourcesCalDAV_txt">Resources</span>
+				<img src="images/add_cal_white.svg" alt="Enable all calendars" title="Enable all calendars" data-type="addAll" class="addRemoveAll addRemoveAllCalDAV" onclick="enableAll()" />
+				<img src="images/remove_cal_white.svg" alt="Disable all calendars" title="Disable all calendars" data-type="removeAll" class="addRemoveAll addRemoveAllCalDAV" onclick="disableAll()" />
+				<img id="showUnloadedCalendars" src="images/delegation.svg" alt="Subscribe" title="Subscribe" onclick="showUnloadedCollections('event');" />
+				<input id="loadUnloadedCalendars" type="button" value="save" onclick="loadAdditionalCollections('event');" style="margin-top:4px;margin-left:6px;" />
+				<input id="loadUnloadedCalendarsCancel" type="button" value="cancel" onclick="cancelUnloadedCollections('event');" style="margin-top:4px;margin-right:6px;float:right;" />
 			</div>
-		</div>
-		<div id="timezoneWrapper">
-			<label data-type="txt_timezonePicker" for="timezonePicker">Timezone:</label>
-			<div id="timezoneSelectDiv">
-				<select id="timezonePicker" name="timezonePicker" data-type="timezonesPicker"></select>
+			<div id="ResourceCalDAVList">
+				<div id="ResourceCalDAVListTemplate" style="display: none;">
+					<div class="resourceCalDAV_header"><input type="checkbox"></div>
+					<div class="resourceCalDAV_item"></div>
+				</div>
+			</div>
+			<div id="timezoneWrapper">
+				<label data-type="txt_timezonePicker" for="timezonePicker">Timezone:</label>
+				<div id="timezoneSelectDiv">
+					<select id="timezonePicker" name="timezonePicker" data-type="timezonesPicker"></select>
+				</div>
 			</div>
 		</div>
 		<div class="headers" id="main_h">

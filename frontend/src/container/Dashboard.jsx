@@ -368,7 +368,7 @@ class Dashboard extends React.Component {
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
-        <div className='dashboard'>
+        <div className='tracim__content-scrollview'>
           <PageWrapper customeClass='dashboard'>
             <PageTitle
               parentClass='dashboard__header'

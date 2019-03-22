@@ -81,32 +81,32 @@
 
 #resourceCalDAV_h, #resourceCalDAVTODO_h, #ResourceCalDAVList, #ResourceCalDAVTODOList, #timezoneWrapper, #timezoneWrapperTODO
 {
-	left: 50px;
+	left: 0; /* default value 50px */
 }
 
 #main, #main_h, #searchForm, #mainTODO, #main_h_TODO, #searchFormTODO
 {
-	left: 274px;
+	left: 224px; /* default value 274px */
 }
 
 #MainLoader, #EventDisabler, #TodoDisabler, #AlertDisabler, #ProjectsDisabler
 {
-	left: 50px;
+	left: 0; /* default value 50px */
 }
 
 #CalendarLoader, #CalendarLoaderTODO
 {
-	left: 275px;
+	left: 224px; /* default value 275px */
 }
 
 .resourcesCardDAV_d, #ResourceCardDAVList, #ResourceCardDAVListOverlay
 {
-	left: 50px;
+	left: 0; /* default value 50px */
 }
 
 .collection_d, #SearchBox, #ABList, #ABListOverlay, #AddressbookOverlay
 {
-	left: 275px;
+	left: 224px; /* default value 275px */
 }
 
 /*.contact_d, #ABContactColor, #ABContactOverlay, #ABMessage
@@ -121,60 +121,60 @@
 
 .filters_d, .statistics_d, #FilterList, #ProjectsData, #SystemProjectsLock, #SystemReportsLock, #ProjectListDisabler
 {
-	left: 50px;
+	left: 50px; /* default value 50px */
 }
 
 .projects_d, #ProjectList, #SearchBoxProject, #ProjectListOverlay
 {
-	left: 375px;
+	left: 375px; /* default value 375px */
 }
 
 .project_d, #ProjectForm, #ProjectFormLoader, #ProjectEventsContainer, #ActivityListDisabler, #ProjectFormMessage
 {
-	left: 626px;
+	left: 626px; /* default value 626px */
 }
 
 .resourcesReports_d, #ResourceReportsList
 {
-	left: 50px;
+	left: 50px; /* default value 50px */
 }
 
 .resourcesSettings_d, #ResourceSettingsList
 {
-	left: 50px;
+	left: 50px; /* default value 50px */
 }
 
 #ResourceReportsListOverlay
 {
-	left: 50px;
+	left: 50px; /* default value 50px */
 }
 
 .report_filters_d, #ReportFilterList
 {
-	left: 275px;
+	left: 275px; /* default value 275px */
 }
 
 .reports_d, #ReportsColor, #ReportsFormOverlay
 {
-	left: 600px;
+	left: 600px; /* default value 600px */
 }
 
 #ReportsForm
 {
-	left: 603px;
+	left: 603px; /* default value 603px */
 }
 
 #ResourceSettingsListOverlay
 {
-	left: 50px;
+	left: 50px; /* default value 50px */
 }
 
 .settings_d, #SettingsColor, #SettingsFormOverlay
 {
-	left: 275px;
+	left: 275px; /* default value 275px */
 }
 
 #SettingsForm
 {
-	left: 278px;
+	left: 278px; /* default value 278px */
 }

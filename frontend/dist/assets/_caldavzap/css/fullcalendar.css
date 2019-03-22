@@ -135,15 +135,17 @@ html .fc,
 .fc-widget-content {  /* <td>, usually */
 	border-top: 1px solid #c0c0c0;
 	border-right: 1px solid transparent;
+	/*background-color: #fdfdfd;*/ /* change this line if you want to change the content background */
 	}
 .fc-state-highlight { /* <td> today cell */ /* TODO: add .fc-today to <th> */
-	background: #fafadd;
+	background: #f0f0f0;
 	}
 .fc-source-bg {
 	background-color: #fff4f4;
 }
+
 .fc-widget-content.fc-weekend-day, .fc-widget-content tr.fc-weekend-day {
-	background: #f7f7f7;
+	background: #f0f0f0; /* default value #f7f7f7 */
 }
 .fc-source-bg.fc-state-highlight {
 	background: #fdf7e9;

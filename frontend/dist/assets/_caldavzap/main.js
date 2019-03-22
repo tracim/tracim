@@ -826,7 +826,8 @@ function run()
 
 	if(typeof globalAvailableAppsArray!='undefined' && globalAvailableAppsArray!=null && globalAvailableAppsArray.length>1) {
 		// show integration banner
-		$('.integration_d').css('display', 'block');
+			$('.integration_d').css('display', 'none');
+		// $('.integration_d').css('display', 'block'); => tracim v1
 
 		// show app buttons for available apps only
 		if(globalAvailableAppsArray.indexOf('CalDavZAP')!=-1)
@@ -1774,6 +1775,59 @@ function runCalDAV()
 	}
 }
 
+// function fullMain(){
+
+	// $(window).load(function() {
+
+		// $(".sidebarleft").css({'display': 'none'});
+
+		// $("#main").css({'left': '0'});
+		// $("#searchForm").css({'left': '0'});
+		// $("#main_h").css({'left': '0'});
+
+		// $( "#ResourceCalDAVToggle" ).click(function() {
+		//   $(".sidebarleft").css({'display': 'block'});
+
+		//   $("#main").animate({'left': '224px'},600);
+		// 	$("#searchForm").animate({'left': '224px'},600);
+		// 	$("#main_h").animate({'left': '224px'},600);
+
+		// });
+
+// 	});
+// }
+
+// fullMain();
+
+function algooCustomToggleSidebarleft () {
+	console.log('in algooCustomToggleSidebarleft', $('#ResourceCalDAVList').width())
+	var transSpeedResource=70;
+	var isResourceVisible=$('#ResourceCalDAVList').width()>1;
+	var col0=isResourceVisible? 0:218;
+	var col1=isResourceVisible? 0:224;
+	var col2=isResourceVisible? 0:224;
+	var col3=isResourceVisible? 0:225;
+
+	if(isIntegrated)
+	{
+		col2+=isResourceVisible? 0:1; // default value 49:50
+		col3+=1; // default value 50
+	}
+
+	if(typeof globalCalDAVInitLoad!='undefined' && !globalCalDAVInitLoad && !globalResourceRefreshNumber)
+		$('#CalendarLoader').children('.loaderInfo').text(localization[globalInterfaceLanguage].resizeLoader).parent().css('display','block');
+
+	if(globalSettings.timezonesupport.value)
+		$('#timezoneWrapper').animate({width: col0}, transSpeedResource);
+
+	$('#resourceCalDAV_h, #ResourceCalDAVList').animate({width: col1}, transSpeedResource);
+	$('#CalendarLoader').animate({left: col3}, transSpeedResource);
+	$('#main_h, #searchForm, #main').animate({left: col2}, transSpeedResource).promise().done(function(){
+		$('#SystemCalDavZAP .fc-header-title').width($('#main_h_placeholder').width()-$('#SystemCalDavZAP .fc-header-left').width()-$('#SystemCalDavZAP .fc-header-right').width()-20);
+		$(window).resize();
+	});
+}
+
 function globalMainCalDAV()
 {
 	$(window).resize(function(evt){
@@ -1805,31 +1859,7 @@ function globalMainCalDAV()
 	});
 
 	$('#ResourceCalDAVToggle').click(function(){
-		var transSpeedResource=70;
-		var isResourceVisible=$('#ResourceCalDAVList').width()>1;
-		var col0=isResourceVisible? 0:218;
-		var col1=isResourceVisible? 0:224;
-		var col2=isResourceVisible? 0:224;
-		var col3=isResourceVisible? 0:225;
-
-		if(isIntegrated)
-		{
-			col2+=isResourceVisible? 49:50;
-			col3+=50;
-		}
-
-		if(typeof globalCalDAVInitLoad!='undefined' && !globalCalDAVInitLoad && !globalResourceRefreshNumber)
-			$('#CalendarLoader').children('.loaderInfo').text(localization[globalInterfaceLanguage].resizeLoader).parent().css('display','block');
-
-		if(globalSettings.timezonesupport.value)
-			$('#timezoneWrapper').animate({width: col0}, transSpeedResource);
-
-		$('#resourceCalDAV_h, #ResourceCalDAVList').animate({width: col1}, transSpeedResource);
-		$('#CalendarLoader').animate({left: col3}, transSpeedResource);
-		$('#main_h, #searchForm, #main').animate({left: col2}, transSpeedResource).promise().done(function(){
-			$('#SystemCalDavZAP .fc-header-title').width($('#main_h_placeholder').width()-$('#SystemCalDavZAP .fc-header-left').width()-$('#SystemCalDavZAP .fc-header-right').width()-20);
-			$(window).resize();
-		});
+		algooCustomToggleSidebarleft()
 	});
 
 	$('#ResourceCalDAVTODOToggle').click(function(){
@@ -1842,8 +1872,8 @@ function globalMainCalDAV()
 
 		if(isIntegrated)
 		{
-			col2+=isResourceVisible? 49:50;
-			col3+=50;
+			col2+=isResourceVisible? 0:1; // default value 49:50
+			col3+=1; // default value 50
 		}
 
 		if(globalSettings.timezonesupport.value)
@@ -1956,3 +1986,7 @@ function algoo_replace_regex(href, globalAccountSettings) {
 
 	return [href, protocol, base_href, path]
 }
+
+// 2018/05/03 - Côme: the call bellow is to auto hide the sidebarleft on startup
+// @TODO: call the function algooCustomToggleSidebarleft at the right place in the code instead of hacking it with the setTimeout
+if (globalAccountSettings.length === 1) setTimeout(algooCustomToggleSidebarleft, 500)

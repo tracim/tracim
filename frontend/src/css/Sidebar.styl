@@ -14,13 +14,11 @@ sidebarColorDarken = darken(sidebarColor, 15%)
   height 100%
 
 .sidebar
-  display flex
-  flex-direction column
-  justify-content space-between
   position relative
   transition all sidebar-animate-speed
   width sidebar-width
-  min-height 100%
+  height calc(100vh - 90px)
+  overflow hidden
   background-image url('../img/applat.png')
   background-repeat repeat
   z-index 10
@@ -28,6 +26,10 @@ sidebarColorDarken = darken(sidebarColor, 15%)
   background-color sidebarColor // #1168
   &.sidebarclose
     width 0
+  &__scrollview
+    width "calc(%s + 20px)" % sidebar-width
+    height 100%
+    overflow-y scroll
   &__expand
     position fixed
     left sidebar-width
@@ -60,7 +62,6 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__scrollup
       left 0
   &__content
-    height 100%
     &__btnnewworkspace
       margin 50px 0
       overflow hidden
