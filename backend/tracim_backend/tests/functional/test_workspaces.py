@@ -285,7 +285,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         params = {
             'label': 'superworkspace',
-            'description': 'mysuperdescription'
+            'description': 'mysuperdescription',
+            'calendar_enabled': False,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces',
@@ -294,6 +295,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert res.json_body
         workspace = res.json_body
+        assert workspace['label'] == 'superworkspace'
+        assert workspace['calendar_enabled'] == False
+        assert workspace['description'] == 'mysuperdescription'
         workspace_id = res.json_body['workspace_id']
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
