@@ -28,10 +28,11 @@ class Sidebar extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
-    // switch (type) {
-    //   default:
-    //     return
-    // }
+    switch (type) {
+      case 'showCreateWorkspacePopup':
+        this.handleClickNewWorkspace()
+        break
+    }
   }
 
   componentDidMount () {
