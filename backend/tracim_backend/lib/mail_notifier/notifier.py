@@ -535,7 +535,7 @@ class EmailManager(object):
         content_text = content.description
         call_to_action_url = content_in_context.frontend_url
         logo_url = get_email_logo_frontend_url(self.config)
-
+        content_name_pattern = "<i><a href={call_to_action_url}>{content}</a></i>"
         if ActionDescription.COMMENT == action:
             main_title = parent_in_context.label
             content_intro = ''
@@ -543,20 +543,33 @@ class EmailManager(object):
         elif ActionDescription.STATUS_UPDATE == action:
             new_status = translator.get_translation(content.get_status().label)
             main_title = content_in_context.label
-            content_intro = _('I modified the status of <i>{content}</i>. The new status is <i>{new_status}</i>').format(
-                content=content.get_label(),
-                new_status=new_status
+            content_name = content_name_pattern.format(
+                call_to_action_url=call_to_action_url,
+                content=content.get_label()
+            )
+            content_intro = _('I modified the status of {content_name}. The new status is <i>{new_status}</i>').format(
+                content_name=content_name,
+                new_status=new_status,
             )
             content_text = ''
             call_to_action_url = content_in_context.frontend_url
         elif ActionDescription.CREATION == action:
             main_title = content_in_context.label
-            content_intro = _('I added an item entitled <i>{content}</i>.').format(content=content.get_label())  # nopep8
+            content_name = content_name_pattern.format(
+                call_to_action_url=call_to_action_url,
+                content=content.get_label()
+            )
+            content_intro = _('I added an item entitled {content_name}.').format(
+                content_name=content_name,
+            )
             content_text = ''
         elif action in (ActionDescription.REVISION, ActionDescription.EDITION):
             main_title = content_in_context.label
-            content_intro = _('I updated <i>{content}</i>.').format(content=content.get_label())  # nopep8
-
+            content_name = content_name_pattern.format(
+                call_to_action_url=call_to_action_url,
+                content=content.get_label()
+            )
+            content_intro = _('I updated {content_name}.').format(content_name=content_name)
             previous_revision = content.get_previous_revision()
             title_diff = htmldiff(previous_revision.label, content.label)
             content_diff = htmldiff(previous_revision.description, content.description)
