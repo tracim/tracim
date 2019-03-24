@@ -82,7 +82,7 @@ msgstr "J'ai ajouté un élément nommé <i>{content}</i>."
 
 #: tracim_backend/lib/mail_notifier/notifier.py:619
 msgid "I updated <i>{content}</i>."
-msgstr "J'ai mis à jour <i>{content}</i>\""
+msgstr "J'ai mis à jour <i>{content}</i>"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:626
 msgid "Here is an overview of the changes:"
