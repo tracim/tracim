@@ -574,7 +574,12 @@ class EmailManager(object):
             title_diff = htmldiff(previous_revision.label, content.label)
             content_diff = htmldiff(previous_revision.description, content.description)
             if title_diff or content_diff:
-                content_text = str('<p>{diff_intro_text}</p>\n{title_diff}\n{content_diff}').format(  # nopep8
+                content_text = '<p>{diff_intro_text}</p>\n<br/>' \
+                               '<div style="border-left: 1em solid #ccc; padding-left: 0.5em;"><br/>\n' \
+                               '<b>{title_diff}</b>\n' \
+                               '{content_diff}\n' \
+                               '</div>\n'\
+                               .format(
                     diff_intro_text=_('Here is an overview of the changes:'),
                     title_diff=title_diff,
                     content_diff=content_diff
