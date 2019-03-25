@@ -26,57 +26,57 @@ const RevisionLabel = props => {
     switch (type) {
       case 'archiving':return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>achived</span> this
+          <span className='revision__data__label'>Item archived</span>
         </Trans>
       )
       case 'content-comment': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>commented</span> this
+          <span className='revision__data__label'>Comment</span>
         </Trans>
       )
       case 'creation': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>created</span> this
+          <span className='revision__data__label'>Item created</span>
         </Trans>
       )
       case 'deletion': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>deleted</span> this
+          <span className='revision__data__label'>Item deleted</span>
         </Trans>
       )
       case 'edition': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>edited</span> this
+          <span className='revision__data__label'>New revision</span>
         </Trans>
       )
       case 'revision': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>new revision</span>
+          <span className='revision__data__label'>New revision</span>
         </Trans>
       )
       case 'status-update': return (
         <Trans i18nKey='revisionDataLabel'>
-          changed status to <span className='revision__data__label'>{formatStatus(status)}</span>
+          Status changed to {formatStatus(status)}
         </Trans>
       )
       case 'unarchiving': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>unarchived</span> this
+          <span className='revision__data__label'>Item unarchived</span>
         </Trans>
       )
       case 'undeletion': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>undeleted</span> this
+          <span className='revision__data__label'>Item undeleted</span>
         </Trans>
       )
       case 'move': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>moved</span> this
+          <span className='revision__data__label'>Item moved</span>
         </Trans>
       )
       case 'copy': return (
         <Trans i18nKey='revisionDataLabel'>
-          <span className='revision__data__label'>copied</span> this
+          <span className='revision__data__label'>Item copied</span>
         </Trans>
       )
       default:
@@ -86,7 +86,7 @@ const RevisionLabel = props => {
   }
 
   return (
-    <span>
+    <span className='revision__data'>
       <span className='revision__data__nb'>{props.number}</span>
       <i className={`fa fa-fw fa-${props.revisionType.faIcon} revision__data__icon`} style={{color: props.customColor}} />
       <Avatar
@@ -94,7 +94,7 @@ const RevisionLabel = props => {
         publicName={props.authorPublicName}
         style={{display: 'inline-block', marginRight: '5px', title: props.authorPublicName}}
       />
-      {props.authorPublicName} {label(props.revisionType.id, props.status)} {props.createdDistance}
+      {label(props.revisionType.id, props.status)}<span className='revision__data__created'>{props.createdDistance}</span>
     </span>
   )
 }
