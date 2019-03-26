@@ -41,14 +41,14 @@ class CalendarFilterQuerySchema(marshmallow.Schema):
     workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
-        description='comma separated list of excluded user',
+        description='comma separated list of included workspace ids',
         default='',
         allow_none=True,
     )
     calendar_types = StrippedString(
         validate=regex_string_as_list_of_string,
         example="private,workspace",
-        descriptions="types of calendar can be any value in {}".format([calendar_type.value for calendar_type in CalendarType]),
+        descriptions="comma separated list of types of calendar, can contain any value in {}".format([calendar_type.value for calendar_type in CalendarType]),
     )
 
     @post_load
