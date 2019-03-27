@@ -178,8 +178,6 @@ to activate mail notification, smallest config is this:
     # references header of mail, similar to mail, used to have threaded mail
     # but do not need to be a valid email address
     email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
-
-    email.notification.processing_mode = sync
     email.processing_mode = async
     email.notification.smtp.server = supersmtpserver.ndd
     email.notification.smtp.port = 1025

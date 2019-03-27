@@ -8,16 +8,6 @@ import ContentItem from './ContentItem.jsx'
 require('./Folder.styl')
 
 class Folder extends React.Component {
-  // componentDidMount () {
-  //   const { props } = this
-  //   if (props.folderData.isOpen) props.setFolderRead(props.folderData.id)
-  // }
-  //
-  // componentDidUpdate (prevProps) {
-  //   const { props } = this
-  //   if (!prevProps.folderData.isOpen && props.folderData.isOpen) props.setFolderRead(props.folderData.id)
-  // }
-
   render () {
     const { props } = this
 
@@ -72,7 +62,12 @@ class Folder extends React.Component {
                       aria-expanded='false'
                       onClick={e => e.stopPropagation()}
                     >
-                      {`${props.t('Create in folder')}...`}
+                      <span className='folder__header__button__addbtn__text-desktop'>
+                        {`${props.t('Create in folder')}...`}
+                      </span>
+                      <span className='folder__header__button__addbtn__text-responsive'>
+                        <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
+                      </span>
                     </button>
 
                     <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>

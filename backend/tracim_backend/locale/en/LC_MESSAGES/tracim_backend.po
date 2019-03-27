@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-01-30 11:47+0100\n"
+"POT-Creation-Date: 2019-03-24 17:01+0100\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -14,72 +14,72 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:282
+#: tracim_backend/config.py:287
 #, fuzzy
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:290
+#: tracim_backend/config.py:295
 msgid "[{website_title}] Someone created an account for you"
 msgstr ""
 
-#: tracim_backend/config.py:299
+#: tracim_backend/config.py:304
 msgid "[{website_title}] A password reset has been requested"
 msgstr ""
 
-#: tracim_backend/app_models/contents.py:48
+#: tracim_backend/app_models/contents.py:46
 msgid "Open"
 msgstr ""
 
-#: tracim_backend/app_models/contents.py:56
+#: tracim_backend/app_models/contents.py:54
 msgid "Validated"
 msgstr ""
 
-#: tracim_backend/app_models/contents.py:64
+#: tracim_backend/app_models/contents.py:62
 msgid "Cancelled"
 msgstr ""
 
-#: tracim_backend/app_models/contents.py:72
+#: tracim_backend/app_models/contents.py:70
 msgid "Deprecated"
 msgstr ""
 
-#: tracim_backend/lib/core/content.py:2138
+#: tracim_backend/lib/core/content.py:2174
 msgid "New folder"
 msgstr ""
 
-#: tracim_backend/lib/core/content.py:2143
+#: tracim_backend/lib/core/content.py:2179
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim_backend/lib/core/workspace.py:295
+#: tracim_backend/lib/core/workspace.py:298
 msgid "Workspace"
 msgstr "Shared space"
 
-#: tracim_backend/lib/core/workspace.py:298
+#: tracim_backend/lib/core/workspace.py:301
 msgid "Workspace {}"
 msgstr "Shared space {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:300
+#: tracim_backend/lib/mail_notifier/notifier.py:311
 msgid "{username} & all members of {workspace}"
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:607
+#: tracim_backend/lib/mail_notifier/notifier.py:550
 msgid ""
-"I modified the status of <i>{content}</i>. The new status is "
+"I modified the status of {content_name}. The new status is "
 "<i>{new_status}</i>"
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:615
-msgid "I added an item entitled <i>{content}</i>."
+#: tracim_backend/lib/mail_notifier/notifier.py:562
+msgid "I added an item entitled {content_name}."
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:619
-msgid "I updated <i>{content}</i>."
+#: tracim_backend/lib/mail_notifier/notifier.py:572
+msgid "I updated {content_name}."
 msgstr ""
 
-#: tracim_backend/lib/mail_notifier/notifier.py:626
+#: tracim_backend/lib/mail_notifier/notifier.py:578
 msgid "Here is an overview of the changes:"
 msgstr ""
 
@@ -176,4 +176,3 @@ msgstr ""
 #: tracim_backend/templates/mail/reset_password_body_html.mak:12
 msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
-

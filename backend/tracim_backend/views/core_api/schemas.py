@@ -879,6 +879,10 @@ class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
 
+class ErrorCodeSchema(marshmallow.Schema):
+    name = marshmallow.fields.Str()
+    code = marshmallow.fields.Int()
+
 
 class ApplicationSchema(marshmallow.Schema):
     label = StrippedString(example='Calendar')

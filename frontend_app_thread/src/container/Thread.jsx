@@ -410,6 +410,7 @@ class Thread extends React.Component {
             timelineData={listMessage}
             newComment={newComment}
             disableComment={!content.is_editable}
+            availableStatusList={config.availableStatuses}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

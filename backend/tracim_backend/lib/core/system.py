@@ -1,8 +1,11 @@
 import datetime
+import typing
 
 from tracim_backend.config import CFG
+from tracim_backend.error import ErrorCode
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
+from tracim_backend.models.context_models import ErrorCodeModel
 
 
 class SystemApi(object):
@@ -27,3 +30,9 @@ class SystemApi(object):
             email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED,  # nopep8
             new_user_invitation_do_notify=self._config.NEW_USER_INVITATION_DO_NOTIFY,  # nopep8
         )
+
+    def get_error_codes(self) -> typing.List[ErrorCodeModel]:
+        error_codes = []
+        for error_code in ErrorCode:
+            error_codes.append(ErrorCodeModel(error_code))
+        return error_codes

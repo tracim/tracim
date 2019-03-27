@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tracim_backend import error
+from tracim_backend.error import ErrorCode
 
 
 class TracimError(Exception):
@@ -29,11 +29,11 @@ class EmailTemplateError(TracimException):
     pass
 
 class UserAlreadyExistError(TracimError):
-    error_code = error.USER_ALREADY_EXIST
+    error_code = ErrorCode.USER_ALREADY_EXIST
 
 
 class RoleAlreadyExistError(TracimError):
-    error_code = error.USER_ROLE_ALREADY_EXIST
+    error_code = ErrorCode.USER_ROLE_ALREADY_EXIST
 
 
 class ForceArgumentNeeded(TracimException):
@@ -73,7 +73,7 @@ class NotFound(TracimException):
 
 
 class SameValueError(ValueError):
-    error_code = error.SAME_VALUE_ERROR
+    error_code = ErrorCode.SAME_VALUE_ERROR
 
 
 class NotAuthenticated(TracimException):
@@ -81,21 +81,21 @@ class NotAuthenticated(TracimException):
 
 
 class WorkspaceNotFound(NotFound):
-    error_code = error.WORKSPACE_NOT_FOUND
+    error_code = ErrorCode.WORKSPACE_NOT_FOUND
 
 
 class WorkspaceNotFoundInTracimRequest(NotFound):
-    error_code = error.WORKSPACE_NOT_IN_TRACIM_REQUEST
+    error_code = ErrorCode.WORKSPACE_NOT_IN_TRACIM_REQUEST
 
 class ContentTypeNotInTracimRequest(NotFound):
-    error_code = error.CONTENT_TYPE_NOT_IN_TRACIM_REQUEST
+    error_code = ErrorCode.CONTENT_TYPE_NOT_IN_TRACIM_REQUEST
 
 class InsufficientUserRoleInWorkspace(TracimException):
-    error_code = error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+    error_code = ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
 
 
 class InsufficientUserProfile(TracimException):
-    error_code = error.INSUFFICIENT_USER_PROFILE
+    error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
 class ImmutableAttribute(TracimException):
@@ -107,32 +107,32 @@ class DigestAuthNotImplemented(Exception):
 
 
 class AuthenticationFailed(TracimException):
-    error_code = error.AUTHENTICATION_FAILED
+    error_code = ErrorCode.AUTHENTICATION_FAILED
 
 
 class WrongUserPassword(TracimException):
-    error_code = error.WRONG_USER_PASSWORD
+    error_code = ErrorCode.WRONG_USER_PASSWORD
 
 
 class UnvalidResetPasswordToken(TracimException):
-    error_code = error.INVALID_RESET_PASSWORD_TOKEN
+    error_code = ErrorCode.INVALID_RESET_PASSWORD_TOKEN
     pass
 
 
 class ExpiredResetPasswordToken(TracimException):
-    error_code = error.EXPIRED_RESET_PASSWORD_TOKEN
+    error_code = ErrorCode.EXPIRED_RESET_PASSWORD_TOKEN
 
 
 class NotificationSendingFailed(TracimException):
-    error_code = error.NOTIFICATION_SENDING_FAILED
+    error_code = ErrorCode.NOTIFICATION_SENDING_FAILED
 
 
 class NotificationDisabledCantCreateUserWithInvitation(TracimException):
-    error_code = error.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
+    error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_NOTIFY_NEW_USER
 
 
 class NotificationDisabledCantResetPassword(TracimException):
-    error_code = error.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
+    error_code = ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 
 class GroupDoesNotExist(TracimError):
@@ -144,19 +144,19 @@ class ContentStatusNotExist(TracimError):
 
 
 class ContentTypeNotExist(TracimError):
-    error_code = error.CONTENT_TYPE_NOT_EXIST
+    error_code = ErrorCode.CONTENT_TYPE_NOT_EXIST
 
 
 class UserDoesNotExist(TracimException):
-    error_code = error.USER_NOT_FOUND
+    error_code = ErrorCode.USER_NOT_FOUND
 
 
 class UserNotFoundInTracimRequest(TracimException):
-    error_code = error.USER_NOT_IN_TRACIM_REQUEST
+    error_code = ErrorCode.USER_NOT_IN_TRACIM_REQUEST
 
 
 class ContentNotFoundInTracimRequest(TracimException):
-    error = error.CONTENT_NOT_IN_TRACIM_REQUEST
+    error_code = ErrorCode.CONTENT_NOT_IN_TRACIM_REQUEST
 
 
 class InvalidId(TracimException):
@@ -164,34 +164,34 @@ class InvalidId(TracimException):
 
 
 class InvalidContentId(InvalidId):
-    error_code = error.CONTENT_INVALID_ID
+    error_code = ErrorCode.CONTENT_INVALID_ID
 
 
 class InvalidCommentId(InvalidId):
-    error_code = error.COMMENT_INVALID_ID
+    error_code = ErrorCode.COMMENT_INVALID_ID
 
 
 class InvalidWorkspaceId(InvalidId):
-    error_code = error.WORKSPACE_INVALID_ID
+    error_code = ErrorCode.WORKSPACE_INVALID_ID
 
 
 class InvalidUserId(InvalidId):
-    error_code = error.USER_INVALID_USER_ID
+    error_code = ErrorCode.USER_INVALID_USER_ID
 
 
 class ContentNotFound(TracimException):
-    error_code = error.CONTENT_NOT_FOUND
+    error_code = ErrorCode.CONTENT_NOT_FOUND
 
 
 class ContentTypeNotAllowed(TracimException):
-    error_code = error.CONTENT_TYPE_NOT_ALLOWED
+    error_code = ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
 class WorkspacesDoNotMatch(TracimException):
-    error_code = error.WORKSPACE_DO_NOT_MATCH
+    error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
 
 
 class PasswordDoNotMatch(TracimException):
-    error_code = error.PASSWORD_DO_NOT_MATCH
+    error_code = ErrorCode.PASSWORD_DO_NOT_MATCH
 
 
 class EmptyValueNotAllowed(TracimException):
@@ -199,7 +199,7 @@ class EmptyValueNotAllowed(TracimException):
 
 
 class TracimUnavailablePreviewType(TracimException):
-    error_code = error.UNAVAILABLE_PREVIEW_TYPE
+    error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):
@@ -207,7 +207,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
-    pass
+    error_code = ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
 
 class EmptyEmailBody(EmptyValueNotAllowed):
@@ -238,35 +238,35 @@ class RemoteUserAuthDisabled(TracimException):
     pass
 
 class UserAuthenticatedIsDeleted(TracimException):
-    error_code = error.AUTHENTICATION_FAILED
+    error_code = ErrorCode.AUTHENTICATION_FAILED
 
 
 class UserAuthenticatedIsNotActive(TracimException):
-    error_code = error.AUTHENTICATION_FAILED
+    error_code = ErrorCode.AUTHENTICATION_FAILED
 
 
 class UserIsNotActive(TracimException):
-    error_code = error.USER_NOT_ACTIVE
+    error_code = ErrorCode.USER_NOT_ACTIVE
 
 
 class UserIsDeleted(TracimException):
-    error_code = error.USER_DELETED
+    error_code = ErrorCode.USER_DELETED
 
 
 class UserCantDisableHimself(TracimException):
-    error_code = error.USER_CANT_DISABLE_HIMSELF
+    error_code = ErrorCode.USER_CANT_DISABLE_HIMSELF
 
 
 class UserCantDeleteHimself(TracimException):
-    error_code = error.USER_CANT_DELETE_HIMSELF
+    error_code = ErrorCode.USER_CANT_DELETE_HIMSELF
 
 
 class UserCantRemoveHisOwnRoleInWorkspace(TracimException):
-    error_code = error.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
+    error_code = ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
 
 
 class UserCantChangeIsOwnProfile(TracimException):
-    error_code = error.USER_CANT_CHANGE_IS_OWN_PROFILE
+    error_code = ErrorCode.USER_CANT_CHANGE_IS_OWN_PROFILE
 
 
 class UserIsNotContentOwner(TracimException):
@@ -286,14 +286,14 @@ class RoleDoesNotExist(TracimException):
 
 
 class UserRoleNotFound(TracimException):
-    error_code = error.USER_ROLE_NOT_FOUND
+    error_code = ErrorCode.USER_ROLE_NOT_FOUND
 
 
 class TracimValidationFailed(TracimException):
-    error_code = error.INTERNAL_TRACIM_VALIDATION_ERROR
+    error_code = ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
 
 class EmailValidationFailed(TracimValidationFailed):
-    error_code = error.INTERNAL_TRACIM_VALIDATION_ERROR
+    error_code = ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
 
 
 class InconsistentDatabase(TracimException):
@@ -301,15 +301,15 @@ class InconsistentDatabase(TracimException):
 
 
 class ContentFilenameAlreadyUsedInFolder(TracimException):
-    error_code = error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+    error_code = ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
 
 class WorkspaceLabelAlreadyUsed(TracimException):
-    error_code = error.WORKSPACE_LABEL_ALREADY_USED
+    error_code = ErrorCode.WORKSPACE_LABEL_ALREADY_USED
 
 
 class ParentNotFound(NotFound):
-    error_code = error.PARENT_NOT_FOUND
+    error_code = ErrorCode.PARENT_NOT_FOUND
 
 
 class RevisionDoesNotMatchThisContent(TracimException):
@@ -317,15 +317,15 @@ class RevisionDoesNotMatchThisContent(TracimException):
 
 
 class PageOfPreviewNotFound(NotFound):
-    error_code = error.PAGE_OF_PREVIEW_NOT_FOUND
+    error_code = ErrorCode.PAGE_OF_PREVIEW_NOT_FOUND
 
 
 class PreviewDimNotAllowed(TracimException):
-    error_code = error.PREVIEW_DIM_NOT_ALLOWED
+    error_code = ErrorCode.PREVIEW_DIM_NOT_ALLOWED
 
 
 class UnallowedSubContent(TracimException):
-    error_code = error.UNALLOWED_SUBCONTENT
+    error_code = ErrorCode.UNALLOWED_SUBCONTENT
 
 
 class TooShortAutocompleteString(TracimException):
@@ -341,11 +341,11 @@ class AppDoesNotExist(TracimException):
 
 
 class EmailAlreadyExistInDb(TracimException):
-    error_code = error.EMAIL_ALREADY_EXIST_IN_DB
+    error_code = ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
 
 
 class UnavailablePreview(TracimException):
-    error_code = error.UNAIVALABLE_PREVIEW
+    error_code = ErrorCode.UNAIVALABLE_PREVIEW
 
 
 class EmptyNotificationError(TracimException):
@@ -353,7 +353,7 @@ class EmptyNotificationError(TracimException):
 
 
 class ContentInNotEditableState(TracimException):
-    error_code = error.CONTENT_IN_NOT_EDITABLE_STATE
+    error_code = ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
 
 class UnknownAuthType(TracimException):
@@ -366,16 +366,16 @@ class WrongAuthTypeForUser(TracimException):
     pass
 
 class UserAuthTypeDisabled(TracimException):
-    error_code = error.USER_AUTH_TYPE_DISABLED
+    error_code = ErrorCode.USER_AUTH_TYPE_DISABLED
 
 class DisabledFeatureForExternalAuth(TracimException):
     pass
 
 class ExternalAuthUserEmailModificationDisallowed(DisabledFeatureForExternalAuth):
-    error_code = error.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
+    error_code = ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
 
 class ExternalAuthUserPasswordModificationDisallowed(DisabledFeatureForExternalAuth):
-    error_code = error.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+    error_code = ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
 
 class DepotCorrupted(TracimException):
     pass

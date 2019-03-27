@@ -116,6 +116,10 @@ folderopen()
             margin-right 0
           &::after
             margin-left 20px
+          &-desktop
+            display inline
+          &-responsive
+            display none
       .addbtn__subdropdown
         padding 0
     &__status
@@ -131,7 +135,7 @@ folderopen()
       &__icon
         font-size 17px
         color darkBlue
-        & > i
+        & > ifolder__header__button__addbtn__text-responsivez
           margin-right 3px
 
 // MEDIAQUERIES
@@ -158,3 +162,11 @@ folderopen()
         margin-right 15px
       &__status
         display none
+      &__button__addbtn__text
+        &-desktop
+          display none
+        &-responsive
+          display inline
+        &::after
+          display none // hide the dropdown triangle
+      
