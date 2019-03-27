@@ -86,7 +86,7 @@ const RevisionLabel = props => {
   }
 
   return (
-    <span className='revision__data'>
+    <span className='revision__data' data-cy={`revision_data_${props.number}`}>
       <span className='revision__data__nb'>{props.number}</span>
       <i className={`fa fa-fw fa-${props.revisionType.faIcon} revision__data__icon`} style={{color: props.customColor}} />
       <Avatar
