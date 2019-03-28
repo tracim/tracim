@@ -459,9 +459,11 @@ class WorkspaceUpdate(object):
         self,
         label: str,
         description: str,
+        calendar_enabled: bool = None
     ) -> None:
         self.label = label
         self.description = description
+        self.calendar_enabled = calendar_enabled
 
 
 class ContentCreation(object):
@@ -664,6 +666,13 @@ class WorkspaceInContext(object):
         Is the workspace deleted ?
         """
         return self.workspace.is_deleted
+
+    @property
+    def calendar_enabled(self) -> bool:
+        """
+        is calendar of workspace enabled ?
+        """
+        return self.workspace.calendar_enabled
 
     @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:
