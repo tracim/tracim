@@ -16,6 +16,7 @@ import {
   getWorkspaceMember,
   putLabel,
   putDescription,
+  putCalendarEnabled,
   putMemberRole,
   deleteMember,
   getMyselfKnownMember,
@@ -145,7 +146,8 @@ class WorkspaceAdvanced extends React.Component {
 
   handleSaveEditLabel = async newLabel => {
     const { props, state } = this
-    const fetchPutWorkspaceLabel = await handleFetchResult(await putLabel(state.config.apiUrl, state.content.workspace_id, newLabel, state.content.description))
+    const fetchPutWorkspaceLabel = await handleFetchResult(await putLabel(state.config.apiUrl, state.content, newLabel))
+
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
@@ -164,7 +166,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleClickValidateNewDescription = async () => {
     const { props, state } = this
-    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content.workspace_id, state.content.label, state.content.description))
+    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, state.content.description))
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200:
@@ -190,6 +192,33 @@ class WorkspaceAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: 'refreshDashboardMemberList', data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
+    }
+  }
+
+  handleToggleCalendarEnabled = async () => {
+    const { props, state } = this
+    const oldCalendarEnabledValue = state.content.calendar_enabled
+    const newCalendarEnabledValue = !state.content.calendar_enabled
+
+    this.setState(prev => ({content: {...prev.content, calendar_enabled: newCalendarEnabledValue}}))
+    const fetchToggleCalendarEnabled = await handleFetchResult(await putCalendarEnabled(state.config.apiUrl, state.content, newCalendarEnabledValue))
+
+    switch (fetchToggleCalendarEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newCalendarEnabledValue ? props.t('Calendar activated') : props.t('Calendar deactivated'),
+          'info'
+        )
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        break
+      default:
+        this.setState(prev => ({content: {...prev.content, calendar_enabled: oldCalendarEnabledValue}}))
+        this.sendGlobalFlashMessage(
+          newCalendarEnabledValue
+            ? props.t('Error while activating calendar')
+            : props.t('Error while deactivating calendar'),
+          'warning'
+        )
     }
   }
 
@@ -383,27 +412,16 @@ class WorkspaceAdvanced extends React.Component {
           <WorkspaceAdvancedComponent
             customColor={state.config.hexcolor}
             description={state.content.description}
-            onChangeDescription={this.handleChangeDescription}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             roleList={state.config.roleList}
-            onClickNewRole={this.handleClickNewRole}
             memberList={state.content.memberList}
+            calendarEnabled={state.content.calendar_enabled}
             displayFormNewMember={state.displayFormNewMember}
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
             newMemberName={state.newMember.nameOrEmail}
             isEmail={state.newMember.isEmail}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
             newMemberRole={state.newMember.role}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickDeleteMember={this.handleClickDeleteMember}
             searchedKnownMemberList={state.searchedKnownMemberList}
-            onClickKnownMember={this.handleClickKnownMember}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
-            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
-            onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
-            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             loggedUser={state.loggedUser}
             idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
             canSendInviteNewUser={
@@ -411,7 +429,20 @@ class WorkspaceAdvanced extends React.Component {
             }
             emailNotifActivated={state.config.system.config.email_notification_activated}
             autoCompleteClicked={state.autoCompleteClicked}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            onClickNewRole={this.handleClickNewRole}
+            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+            onClickNewMemberRole={this.handleClickNewMemberRole}
+            onClickDeleteMember={this.handleClickDeleteMember}
+            onClickKnownMember={this.handleClickKnownMember}
+            onClickValidateNewMember={this.handleClickValidateNewMember}
+            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
+            onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
+            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             onClickAutoComplete={this.handleClickAutoComplete}
+            onChangeDescription={this.handleChangeDescription}
+            onChangeNewMemberName={this.handleChangeNewMemberName}
+            onToggleCalendarEnabled={this.handleToggleCalendarEnabled}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>
