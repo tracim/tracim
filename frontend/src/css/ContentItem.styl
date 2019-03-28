@@ -17,14 +17,18 @@
   border-bottom 0
   cursor pointer
   font-weight bold
+  // transition-property background-color, color
+  // transition-duration 50ms
   &.read
     font-weight normal
-  &:hover > .content__name
-    color offWhite
-  &:hover > .content__status
-    color offWhite
-  &:hover .badgeBackgroundColor
-    background-color inherit
+  &:hover
+    // opacity 0.9
+    & > .content__name
+      color offWhite
+    & > .content__status
+      color offWhite
+    & .badgeBackgroundColor
+      background-color inherit
   &__type
     padding 0 25px
     font-size 30px

@@ -48,6 +48,7 @@ class Caldavzap extends React.Component {
 
   componentDidMount () {
     console.log('%c<Caldavzap> did mount', `color: ${this.state.config.hexcolor}`)
+    document.getElementById('appFullscreenContainer').style.flex = '1'
 
     this.loadCalendarList(this.state.config.appConfig.idWorkspace)
   }
@@ -95,6 +96,7 @@ class Caldavzap extends React.Component {
   componentWillUnmount () {
     console.log('%c<Caldavzap> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.getElementById('appFullscreenContainer').style.flex = 'none'
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({

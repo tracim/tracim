@@ -126,7 +126,7 @@ class Header extends React.Component {
 
               <li className='header__menu__rightside__calendar'>
                 <button
-                  className='btn outlineTextBtn primaryColorBorder no-hover'
+                  className='btn outlineTextBtn primaryColorBorder nohover'
                   onClick={this.handleClickCalendar}
                 >
                   <i className='fa fa-fw fa-calendar' />

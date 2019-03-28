@@ -22,7 +22,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
   background-image url('../img/applat.png')
   background-repeat repeat
   z-index 10
-  box-shadow 0 0 2px 1px #333
+  box-shadow -1px 2px 2px 1px #333
   background-color sidebarColor // #1168
   &.sidebarclose
     width 0
@@ -43,7 +43,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     color white
     transition all sidebar-animate-speed
     background-color sidebarColor // #1168
-    ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__expand
+    ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__expand
       left 0
   &__scrollup
     position fixed
@@ -59,11 +59,11 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     color white
     transition all sidebar-animate-speed
     background-color sidebarColor // #1168
-    ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__scrollup
+    ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
       left 0
   &__content
     &__btnnewworkspace
-      margin 50px 0
+      padding 50px 0
       overflow hidden
       color fontColor
       &__btn

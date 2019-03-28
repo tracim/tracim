@@ -2721,3 +2721,24 @@ img[data-type="invalidVerySmall"]
 .integration_d {
 	display: none !important;
 }
+#ResourceCalDAVToggle {
+  display: none;
+}
+#ResourceCalDAVList {
+  top: 34px;
+}
+#resourceCalDAV_h {
+  height: 69px;
+}
+.headers span[data-type=resourcesCalDAV_txt] {
+  padding: 10px 0 0 50px
+}
+#showUnloadedCalendars {
+  display: none;
+}
+#searchForm > img {
+  margin-left: 48px !important;
+}
+.searchContainer {
+  left: 70px;
+}
