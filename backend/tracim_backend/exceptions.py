@@ -396,3 +396,6 @@ class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
 class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
     pass
 
+class ContentStatusException(TracimError):
+    error_code = ErrorCode.INVALID_STATUS_CHANGE
+
