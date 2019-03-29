@@ -1834,7 +1834,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert 'code' in res.json_body
         assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
-    def test_api__set_same_html_document_status__err_400(self) -> None:
+    def test_api__set_document_status__err_400__same_status(self) -> None:
 
         self.testapp.authorization = (
             'Basic',
@@ -5338,7 +5338,7 @@ class TestFiles(FunctionalTest):
         assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
-    def test_api__set_same_file_status__err_400(self) -> None:
+    def test_api__set_file_status__err_400__same_status(self) -> None:
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User) \
@@ -6010,7 +6010,6 @@ class TestThreads(FunctionalTest):
             params=params,
             status=400
         )
-        # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
         assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE  # nopep8
