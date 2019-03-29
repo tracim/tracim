@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
 import { revisionTypeList } from '../../helper.js'
@@ -27,7 +28,7 @@ const Revision = props => {
         <div className={classnames(`${props.customClass}__messagelist__version__data`, 'revision__data')}>
           <div className='revision__data__nb'>{props.number}</div>
           <i className={`fa fa-fw fa-${revisionType.faIcon} revision__data__icon`} style={{color: props.customColor}} />
-          {revisionType.label}
+          {props.t(revisionType.label)}
         </div>
 
         <div
@@ -40,4 +41,4 @@ const Revision = props => {
   )
 }
 
-export default Radium(Revision)
+export default translate()(Radium(Revision))

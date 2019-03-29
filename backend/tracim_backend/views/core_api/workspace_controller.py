@@ -406,7 +406,7 @@ class WorkspaceController(Controller):
                 )
                 if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
                     app_config.NEW_USER_INVITATION_DO_NOTIFY and \
-                    app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    app_config.EMAIL_PROCESSING_MODE.lower() == 'sync':
                     email_sent = True
             else:
                 user = uapi.create_user(
