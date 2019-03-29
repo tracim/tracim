@@ -377,7 +377,6 @@ class WorkspaceContent extends React.Component {
                             ...content,
                             content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
                           }}
-                          onClickItem={this.handleClickContentItem}
                           idRoleUserWorkspace={idRoleUserWorkspace}
                           onClickExtendedAction={{
                             edit: this.handleClickEditContentItem,
@@ -405,7 +404,7 @@ class WorkspaceContent extends React.Component {
                           statusSlug={content.statusSlug}
                           read={currentWorkspace.contentReadStatusList.includes(content.id)}
                           contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                          onClickItem={() => this.handleClickContentItem(content)}
+                          urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
                           idRoleUserWorkspace={idRoleUserWorkspace}
                           onClickExtendedAction={{
                             edit: e => this.handleClickEditContentItem(e, content),

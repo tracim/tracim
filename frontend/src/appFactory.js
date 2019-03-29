@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import { FETCH_CONFIG, ROLE, PROFILE } from './helper.js'
 import i18n from './i18n.js'
 
 const mapStateToProps = ({ system }) => ({ system })
 
 export function appFactory (WrappedComponent) {
-  return connect(mapStateToProps)(class AppFactory extends React.Component {
+  return withRouter(connect(mapStateToProps)(class AppFactory extends React.Component {
     renderAppFeature = (appConfig, user, idRoleUserWorkspace, content) => GLOBAL_renderAppFeature({
       loggedUser: user.logged
         ? {...user, idRoleUserWorkspace}
@@ -35,7 +36,8 @@ export function appFactory (WrappedComponent) {
         translation: i18n.store.data,
         system: this.props.system,
         roleList: ROLE,
-        profileObject: PROFILE
+        profileObject: PROFILE,
+        history: this.props.history
       },
       content
     })
@@ -71,6 +73,6 @@ export function appFactory (WrappedComponent) {
         />
       )
     }
-  })
+  }))
 }
 export default appFactory
