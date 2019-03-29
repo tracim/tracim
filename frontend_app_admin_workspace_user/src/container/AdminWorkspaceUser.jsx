@@ -12,7 +12,6 @@ import { debug } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
-  // getWorkspaceDetail,
   deleteWorkspace,
   getUserList,
   getUserDetail,
@@ -293,15 +292,6 @@ class AdminWorkspaceUser extends React.Component {
     GLOBAL_dispatchEvent({type: 'showCreateWorkspacePopup', data: {}})
   }
 
-  handleClickUser = idUser => {
-    GLOBAL_dispatchEvent({
-      type: 'redirect',
-      data: {
-        url: `/ui/admin/user/${idUser}`
-      }
-    })
-  }
-
   render () {
     const { props, state } = this
 
@@ -324,7 +314,6 @@ class AdminWorkspaceUser extends React.Component {
             idLoggedUser={state.loggedUser.user_id}
             profile={state.config.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
-            onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
