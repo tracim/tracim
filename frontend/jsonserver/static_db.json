@@ -18,7 +18,6 @@
     },
     "email": "admin@admin.admin",
     "is_active": true,
-    "caldav_url": null,
     "user_id": 1,
     "avatar_url": "https://rawgit.com/tracim/tracim_frontend/develop/src/img/adminProfil.png",
     "created": "2018-05-17T08:43:03.745219+00:00",
