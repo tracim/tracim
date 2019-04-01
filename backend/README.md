@@ -15,7 +15,7 @@ on Debian Stretch (9) with sudo:
     sudo apt install python3 python3-venv python3-dev python3-pip
     sudo apt install redis-server
     sudo apt install zlib1g-dev libjpeg-dev
-    sudo apt install imagemagick libmagickwand-dev ghostscript poppler-utils libfile-mimeinfo-perl
+    sudo apt install imagemagick libmagickwand-dev ghostscript poppler-utils libfile-mimeinfo-perl qpdf
     sudo apt install libldap2-dev libsasl2-dev
 
 for better preview support:

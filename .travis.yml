@@ -99,6 +99,7 @@ addons:
     - ghostscript
     - libfile-mimeinfo-perl
     - poppler-utils
+    - qpdf
     - libldap2-dev
     - libsasl2-dev
     - docker-ce
