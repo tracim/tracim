@@ -21,15 +21,15 @@ def translator_marker(string: str) -> str:
 class Translator(object):
     """
     Get translation from json file
+    you should provide either valid fallback_lang(true value) or valid
+    app.config.DEFAULT_LANG (true value).
     """
 
     def __init__(self, app_config: 'CFG', default_lang: str = None, fallback_lang: str = None):  # nopep8
         self.config = app_config
         if not fallback_lang:
-            if app_config.DEFAULT_LANG:
-                fallback_lang = app_config.DEFAULT_LANG
-            else:
-                fallback_lang = DEFAULT_FALLBACK_LANG
+            assert app_config.DEFAULT_LANG
+            fallback_lang = app_config.DEFAULT_LANG
         self.fallback_lang = fallback_lang
         if not default_lang:
             default_lang = fallback_lang

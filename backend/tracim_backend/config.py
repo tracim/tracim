@@ -52,7 +52,7 @@ class CFG(object):
         ###
         # General
         ###
-        self.DEFAULT_LANG = settings.get('default_lang', DEFAULT_FALLBACK_LANG)
+        self.DEFAULT_LANG = settings.get('default_lang') or DEFAULT_FALLBACK_LANG
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
         default_color_config_file_path = os.path.join(tracim_v2_folder, 'color.json')  # nopep8
