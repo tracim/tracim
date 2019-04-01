@@ -70,9 +70,9 @@ class CaldavAppFactory(object):
                 )
         )
         for param_name, value in radicales_params.items():
-            param_name_elems = param_name.split('.')
-            assert len(param_name_elems) == 4
-            main_section, sub_main_section, radicale_section, radicale_param_config = param_name.split('.')
+            parameter_parts = param_name.split('.')
+            assert len(parameter_parts) == 4
+            main_section, sub_main_section, radicale_section, radicale_param_config = parameter_parts
             assert main_section == 'caldav'
             assert sub_main_section == 'radicale'
             if not config.has_section(radicale_section):
