@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CalendarServerConnectionError
 from tracim_backend.exceptions import CannotCreateCalendar
-from tracim_backend.exceptions import WorkspaceCalendarDisabled
+from tracim_backend.exceptions import WorkspaceCalendarDisabledException
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
@@ -100,7 +100,7 @@ class CalendarApi(object):
         """
         logger.debug(self, 'check for calendar existence of workspace {}'.format(workspace.workspace_id))
         if not workspace.calendar_enabled:
-            raise WorkspaceCalendarDisabled()
+            raise WorkspaceCalendarDisabledException()
         workspace_calendar_url = self.get_workspace_calendar_url(workspace, use_proxy=False)
         if not self._check_calendar_exist(workspace_calendar_url):
             self._create_calendar(
