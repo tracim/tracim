@@ -45,6 +45,20 @@ describe("Member's workspace", () => {
       })
   })
 
+  it('disable button with no role', () => {
+    cy.get('[data-cy=memberlist__btnadd]').click()
+    cy.createRandomUser()
+      .then(user => {
+        cy.get('[data-cy=addmember]').type(user.email)
+        cy.get('[data-cy=autocomplete__item__name]')
+          .contains(user.public_name)
+          .click()
+        cy.get('[data-cy=memberlist]')
+          .contains('Validate')
+          .should('be.enabled')
+      })
+  })
+
   it('does not allow to add a member twice using public name', () => {
     cy.get('[data-cy=memberlist__btnadd]').click()
     cy.createRandomUser()
