@@ -77,7 +77,7 @@ class CaldavChecker(AuthorizationChecker):
     """
     Wrapper for NotAuthenticated case
     """
-    def __init__(self, checker) -> None:
+    def __init__(self, checker: AuthorizationChecker) -> None:
         self.checker = checker
 
     def check(
