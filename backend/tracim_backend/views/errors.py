@@ -1,9 +1,9 @@
-from hapic.error import DefaultErrorBuilder
+from hapic.error.marshmallow import MarshmallowDefaultErrorBuilder
 from hapic.processor.main import ProcessValidationError
 from tracim_backend.error import ErrorCode
 
 
-class ErrorSchema(DefaultErrorBuilder):
+class ErrorSchema(MarshmallowDefaultErrorBuilder):
     """
     This class is both a builder and a Marshmallow Schema, His named is used for
     swagger ui error schema. That's why we call it ErrorSchema To have
@@ -14,7 +14,7 @@ class ErrorSchema(DefaultErrorBuilder):
         exception: Exception,
         include_traceback: bool = False,
     ) -> dict:
-        error_dict = DefaultErrorBuilder.build_from_exception(
+        error_dict = MarshmallowDefaultErrorBuilder.build_from_exception(
             self,
             exception,
             include_traceback
@@ -27,6 +27,6 @@ class ErrorSchema(DefaultErrorBuilder):
         self,
         error: ProcessValidationError,
     ) -> dict:
-        error_dict = DefaultErrorBuilder.build_from_validation_error(self, error)  # nopep8
+        error_dict = MarshmallowDefaultErrorBuilder.build_from_validation_error(self, error)
         error_dict['code'] = ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
         return error_dict
