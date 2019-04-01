@@ -47,10 +47,11 @@ class CaldavAppFactory(object):
         :param beginning_key_string:
         :return:
         """
-        return {
-            key: value for key, value in data.items()
-            if key.startswith(beginning_key_string)
-        }
+        sliced_dict={}
+        for key, value in data.items():
+            if key.startswith(beginning_key_string):
+                sliced_dict[key] = value
+        return sliced_dict
 
     def _parse_additional_radicale_config(
             self,
