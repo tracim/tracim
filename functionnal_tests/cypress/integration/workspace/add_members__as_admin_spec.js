@@ -55,7 +55,7 @@ describe("Member's workspace", () => {
           .click()
         cy.get('[data-cy=memberlist]')
           .contains('Validate')
-          .should('be.disabled')
+          .should('be.enabled')
       })
   })
 
