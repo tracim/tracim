@@ -52,12 +52,12 @@ class CalendarApi(object):
 
     def _check_calendar_exist(self, calendar_url) -> bool:
         try:
-            result = requests.get(calendar_url)
+            response = requests.get(calendar_url)
         except requests.exceptions.ConnectionError as exc:
             logger.error(self, 'Cannot check calendar existence, connection error to radicale server')
             logger.exception(self, exc)
             raise CalendarServerConnectionError() from exc
-        if result.status_code < 400:
+        if response.status_code < 400:
             return True
         else:
             # TODO - G.M - 2019-03-13 - Better deal with other error code
@@ -71,11 +71,11 @@ class CalendarApi(object):
             calendar_description=calendar_description,
         )
         try:
-            result = requests.request('mkcol', calendar_url, data=body)
+            response = requests.request('mkcol', calendar_url, data=body)
         except requests.exceptions.ConnectionError as exc:
             raise CalendarServerConnectionError() from exc
-        if not result.status_code == 201:
-            raise CannotCreateCalendar('Calendar {} cannot be created:{},{}'.format(calendar_url, result.status_code, result.content))
+        if not response.status_code == 201:
+            raise CannotCreateCalendar('Calendar {} cannot be created:{},{}'.format(calendar_url, response.status_code, response.content))
         logger.info(self, 'new caldav calendar created at url {}'.format(calendar_url))
 
     def _get_calendar_base_url(self, use_proxy: bool):
