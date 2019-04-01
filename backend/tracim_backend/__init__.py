@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
+
 from pyramid_multiauth import MultiAuthenticationPolicy
 from tracim_backend.lib.calendar import CaldavAppFactory
 
@@ -70,7 +72,7 @@ from tracim_backend.exceptions import ContentTypeNotAllowed
 def web(global_config, **local_settings):
     """ This function returns a Pyramid WSGI application.
     """
-    settings = global_config
+    settings = deepcopy(global_config)
     settings.update(local_settings)
     # set CFG object
     app_config = CFG(settings)
@@ -232,7 +234,7 @@ def web(global_config, **local_settings):
 
 
 def webdav(global_config, **local_settings):
-    settings = global_config
+    settings = deepcopy(global_config)
     settings.update(local_settings)
     app_factory = WebdavAppFactory(
         **settings
@@ -240,7 +242,7 @@ def webdav(global_config, **local_settings):
     return app_factory.get_wsgi_app()
 
 def caldav(global_config, **local_settings):
-    settings = global_config
+    settings = deepcopy(global_config)
     settings.update(local_settings)
     app_factory = CaldavAppFactory(
         **settings
