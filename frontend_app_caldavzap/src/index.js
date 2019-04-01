@@ -16,9 +16,6 @@ const appInterface = {
   unmountApp: domId => {
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   }
-  // renderAppPopupCreation: data => {
-  //   return null
-  // }
 }
 
 export default appInterface
