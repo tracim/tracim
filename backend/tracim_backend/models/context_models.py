@@ -670,7 +670,7 @@ class WorkspaceInContext(object):
     @property
     def calendar_enabled(self) -> bool:
         """
-        is calendar of workspace enabled ?
+        returns True if workspace's calendar is enabled
         """
         return self.workspace.calendar_enabled
 
