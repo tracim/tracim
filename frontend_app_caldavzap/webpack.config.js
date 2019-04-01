@@ -16,14 +16,6 @@ module.exports = {
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
-  // isProduction ? { // Côme - since plugins are imported through <script>, cannot externalize libraries
-  //   react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-  //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
-  //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
-  //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
-  //   tracim_frontend_lib: {commonjs: 'tracim_frontend_lib', commonjs2: 'tracim_frontend_lib', amd: 'tracim_frontend_lib', root: '_'}
-  // }
-  // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     host: '0.0.0.0',
@@ -35,9 +27,6 @@ module.exports = {
       errors: true
     },
     historyApiFallback: true
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*'
-    // }
   },
   devtool: isProduction ? false : 'cheap-module-source-map',
   performance: {
@@ -45,11 +34,6 @@ module.exports = {
   },
   module: {
     rules: [{
-    //   test: /\.jsx?$/,
-    //   enforce: 'pre',
-    //   use: 'standard-loader',
-    //   exclude: [/node_modules/]
-    // }, {
       test: [/\.js$/, /\.jsx$/],
       exclude: [/node_modules/],
       loader: 'babel-loader',
@@ -82,10 +66,10 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   plugins: [
-    ...[], // generic plugins always present
+    ...[], // @INFO - CH - 2019/04/01 - generic plugins always present
     ...(isProduction
-      ? [] // production specific plugins
-      : [] // development specific plugins
+      ? [] // @INFO - CH - 2019/04/01 - production specific plugins
+      : [] // @INFO - CH - 2019/04/01 - development specific plugins
     )
   ]
 }

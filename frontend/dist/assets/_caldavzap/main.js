@@ -1800,7 +1800,6 @@ function runCalDAV()
 // fullMain();
 
 function algooCustomToggleSidebarleft () {
-	console.log('in algooCustomToggleSidebarleft', $('#ResourceCalDAVList').width())
 	var transSpeedResource=70;
 	var isResourceVisible=$('#ResourceCalDAVList').width()>1;
 	var col0=isResourceVisible? 0:218;

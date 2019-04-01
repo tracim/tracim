@@ -96,7 +96,7 @@ class Caldavzap extends React.Component {
   componentWillUnmount () {
     console.log('%c<Caldavzap> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
-    document.getElementById('appFullscreenContainer').style.flex = 'auto'
+    document.getElementById('appFullscreenContainer').style.flex = 'none'
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({

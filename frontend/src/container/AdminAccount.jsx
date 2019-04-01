@@ -229,21 +229,15 @@ class Account extends React.Component {
                           displayAdminInfo
                         />
 
-                      // case 'calendar':
-                      //   return <Calendar user={props.user} />
-
                       case 'notification':
                         return <Notification
-                          idMyself={parseInt(state.idUserToEdit)}
+                          idUserLogged={parseInt(state.idUserToEdit)}
                           workspaceList={state.userToEditWorkspaceList}
                           onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                         />
 
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
-
-                      // case 'timezone':
-                      //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
                     }
                   })()}
                 </div>

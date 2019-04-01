@@ -82,7 +82,7 @@ class Header extends React.Component {
     }
   }
 
-  handleClickCalendar = () => {
+  handleClickCalendarButton = () => {
     this.props.history.push(PAGE.CALENDAR)
   }
 
@@ -127,7 +127,7 @@ class Header extends React.Component {
               <li className='header__menu__rightside__calendar'>
                 <button
                   className='btn outlineTextBtn primaryColorBorder nohover'
-                  onClick={this.handleClickCalendar}
+                  onClick={this.handleClickCalendarButton}
                 >
                   <i className='fa fa-fw fa-calendar' />
                   {props.t('Calendar')}

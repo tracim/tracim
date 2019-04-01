@@ -132,9 +132,9 @@ class Sidebar extends React.Component {
               <ul className='sidebar__content__navigation__workspace'>
                 { workspaceList.map(ws =>
                   <WorkspaceListItem
-                    idWs={ws.id}
+                    idWorkspace={ws.id}
                     label={ws.label}
-                    allowedApp={ws.sidebarEntry}
+                    allowedAppList={ws.sidebarEntry}
                     lang={activeLang}
                     activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}
                     isOpenInSidebar={ws.isOpenInSidebar}

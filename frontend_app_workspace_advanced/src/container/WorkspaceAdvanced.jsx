@@ -209,7 +209,7 @@ class WorkspaceAdvanced extends React.Component {
           newCalendarEnabledValue ? props.t('Calendar activated') : props.t('Calendar deactivated'),
           'info'
         )
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // @INFO - CH - 2018-04-01 - for sidebar and dashboard and admin workspace
         break
       default:
         this.setState(prev => ({content: {...prev.content, calendar_enabled: oldCalendarEnabledValue}}))

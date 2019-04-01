@@ -190,21 +190,15 @@ class Account extends React.Component {
                           onClickSubmit={this.handleSubmitNameOrEmail}
                         />
 
-                      // case 'calendar':
-                      //   return <Calendar user={props.user} />
-
                       case 'notification':
                         return <Notification
-                          idMyself={props.user.user_id}
+                          idUserLogged={props.user.user_id}
                           workspaceList={props.workspaceList}
                           onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                         />
 
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} />
-
-                      // case 'timezone':
-                      //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
                     }
                   })()}
                 </div>
