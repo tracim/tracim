@@ -36,9 +36,9 @@ DEFAULT_REQUEST_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
 class Proxy(object):
     def __init__(
         self,
-        base_address,
-        default_request_header_to_drop = DEFAULT_REQUEST_HEADER_TO_DROP,
-        default_response_header_to_drop = DEFAULT_RESPONSE_HEADER_TO_DROP,
+        base_address: str,
+        default_request_header_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
+        default_response_header_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
     ) -> None:
         self._base_address = base_address
         self.default_request_header_to_drop = default_request_header_to_drop
