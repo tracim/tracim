@@ -868,7 +868,7 @@ class UserApi(object):
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
             token=token,
-            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_VALIDITY,
+            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
