@@ -112,7 +112,7 @@ class TestApplicationApi(DefaultTest):
 
         calendar = Application(
             label='Calendar',
-            slug='calendar',
+            slug='caldavzap',
             fa_icon='calendar',
             is_active=True,
             config={},
@@ -140,7 +140,7 @@ class TestApplicationApi(DefaultTest):
 
         calendar = Application(
             label='Calendar',
-            slug='calendar',
+            slug='caldavzap',
             fa_icon='calendar',
             is_active=True,
             config={},
