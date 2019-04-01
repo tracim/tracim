@@ -293,7 +293,7 @@ class RadicaleUserSubitemsPath(object):
     Paths params with workspace id and subitem
     """
     def __init__(self, user_id: int, sub_item: str) -> None:
-        self.workspace_id = user_id
+        self.user_id = user_id
         self.sub_item = sub_item
 
 class RadicaleWorkspaceSubitemsPath(object):
