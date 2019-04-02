@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import argparse
 import sys
+import typing
+from copy import deepcopy
 
 import transaction
 from cliff.app import App
@@ -52,19 +54,13 @@ class AppContextCommand(Command):
     Command who initialize app context at beginning of take_action method.
     """
     auto_setup_context = True
+    default_settings = {}
 
     def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(AppContextCommand, self).take_action(parsed_args)
         if self.auto_setup_context:
             config_uri = parsed_args.config_file
-            # setup_logging(config_uri)
-            settings = get_appsettings(config_uri)
-            settings.update(settings.global_conf)
-            if 'sqlalchemy.url' not in settings or not settings[
-                'sqlalchemy.url']:
-                raise InvalidSettingFile(
-                    'Wrong or empty sqlalchemy database url,'
-                    'check config file')
+            settings = self.setup_settings(config_uri)
             engine = get_engine(settings)
             app_config = CFG(settings)
             app_config.configure_filedepot()
@@ -74,10 +70,24 @@ class AppContextCommand(Command):
                 self.take_app_action(parsed_args, app_config, session)
             except Exception as exc:
                 session.rollback()
+                transaction.abort()
                 raise exc
             finally:
                 transaction.commit()
-                session.close()
+                session.close_all()
+
+    def setup_settings(self, config_uri) -> typing.Dict[str, str]:
+        settings = self.default_settings
+        local_settings = get_appsettings(config_uri)
+        global_settings = local_settings.global_conf
+        settings.update(global_settings)
+        settings.update(local_settings)
+        if 'sqlalchemy.url' not in settings or not settings[
+            'sqlalchemy.url']:
+            raise InvalidSettingFile(
+                'Wrong or empty sqlalchemy database url,'
+                'check config file')
+        return settings
 
     def take_app_action(
             self,

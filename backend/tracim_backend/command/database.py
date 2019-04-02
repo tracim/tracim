@@ -42,14 +42,7 @@ class InitializeDBCommand(AppContextCommand):
     def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(InitializeDBCommand, self).take_action(parsed_args)
         config_uri = parsed_args.config_file
-        settings = get_appsettings(config_uri)
-        # INFO - G.M - 2018-06-178 - We need to add info from [DEFAULT]
-        # section of config file in order to have both global and
-        # web app specific param.
-        settings.update(settings.global_conf)
-        if 'sqlalchemy.url' not in settings or not settings['sqlalchemy.url']:
-            raise InvalidSettingFile('Wrong or empty sqlalchemy database url,'
-                                     'check config file')
+        settings = self.setup_settings(config_uri)
         self._create_schema(settings)
         self._populate_database(settings, add_test_data=parsed_args.test_data)
 
@@ -115,12 +108,7 @@ class DeleteDBCommand(AppContextCommand):
     def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(DeleteDBCommand, self).take_action(parsed_args)
         config_uri = parsed_args.config_file
-        # setup_logging(config_uri)
-        settings = get_appsettings(config_uri)
-        settings.update(settings.global_conf)
-        if 'sqlalchemy.url' not in settings or not settings['sqlalchemy.url']:
-            raise InvalidSettingFile('Wrong or empty sqlalchemy database url,'
-                                     'check config file')
+        settings = self.setup_settings(config_uri)
         engine = get_engine(settings)
         app_config = CFG(settings)
         app_config.configure_filedepot()

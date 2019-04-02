@@ -19,15 +19,15 @@ from tracim_backend.exceptions import \
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
-
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
-from tracim_backend.models.auth import AuthType
-from tracim_backend.tests import CommandFunctionalTest
+from tracim_backend.tests import CommandFunctionalTestBase
+from tracim_backend.tests import CommandFunctionalTestWithDB
 
 
-class TestCommands(CommandFunctionalTest):
+class TestCommands(CommandFunctionalTestWithDB):
     """
     Test tracimcli command line ui.
     """
@@ -357,33 +357,6 @@ class TestCommands(CommandFunctionalTest):
         ])
         assert result == 1
 
-    def test__init__db__no_sqlalchemy_url(self):
-        """
-        Test database initialisation
-        """
-        api = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
-        )
-        user = api.get_one_by_email('admin@admin.admin')
-        assert user.email == 'admin@admin.admin'
-        assert user.validate_password('admin@admin.admin')
-        assert not user.validate_password('new_password')
-        self.disconnect_database()
-        app = TracimCLI()
-        with pytest.raises(InvalidSettingFile):
-            app.run([
-                'db', 'init',
-                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
-                '--debug',
-            ])
-        result = app.run([
-                'db', 'init',
-                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
-        ])
-        assert result == 1
-
     def test__delete__db__ok_nominal_case(self):
         """
         Test database deletion
@@ -457,6 +430,34 @@ class TestCommands(CommandFunctionalTest):
         result = app.run([
             'db', 'delete',
             '-c', 'donotexist.ini#command_test',
+        ])
+        assert result == 1
+
+class TestCommandsNoDB(CommandFunctionalTestBase):
+    def test__init__db__no_sqlalchemy_url(self):
+        """
+        Test database initialisation
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+        self.disconnect_database()
+        app = TracimCLI()
+        with pytest.raises(InvalidSettingFile):
+            app.run([
+                'db', 'init',
+                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
+                '--debug',
+            ])
+        result = app.run([
+                'db', 'init',
+                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
         ])
         assert result == 1
 

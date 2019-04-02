@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import os
 import typing
 import unittest
 
@@ -10,6 +11,7 @@ from depot.manager import DepotManager
 from pyramid import testing
 from requests import Response
 from sqlalchemy.exc import IntegrityError
+from tracim_backend.command import AppContextCommand
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -32,6 +34,25 @@ from webtest import TestApp
 from io import BytesIO
 from PIL import Image
 
+DEFAULT_TEST_STORAGE_NAME = 'test'
+TEST_STORAGE_NAME_ENV_VAR = 'TRACIM_TEST_DEPOT_NAME'
+
+DEFAULT_TEST_STORAGE_DIR = '/tmp/test/depot'
+TEST_STORAGE_DIR_ENV_VAR = 'TRACIM_TEST_DEPOT_DIR'
+
+DEFAULT_TEST_PREVIEW_CACHE_DIR = '/tmp/test/preview_cache'
+TEST_PREVIEW_CACHE_DIR_ENV_VAR = 'TRACIM_TEST_PREVIEW_CACHE_DIR'
+
+DEFAULT_TEST_SQLALCHEMY_URL= 'sqlite:///tracim_test.sqlite'
+TEST_SQLALCHEMY_URL_ENV_VAR = 'TRACIM_TEST_SQLALCHEMY_URL'
+
+DEFAULT_TEST_SESSIONS_DATA_DIR = '/tmp/test/sessions/sessions_data'
+TEST_SESSIONS_DATA_DIR_ENV_VAR = 'TRACIM_TEST_SESSIONS_DATA_DIR'
+
+DEFAULT_TEST_SESSIONS_LOCK_DIR = '/tmp/test/sessions/sessions_lock'
+TEST_SESSIONS_LOCK_DIR_ENV_VAR = 'TRACIM_TEST_SESSIONS_LOCK_DIR'
+
+
 
 def eq_(a, b, msg=None) -> None:
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
@@ -39,6 +60,43 @@ def eq_(a, b, msg=None) -> None:
 
 # TODO - G.M - 2018-06-179 - Refactor slug change function
 #  as a kind of pytest fixture ?
+
+
+
+def setup_parametrizable_config(settings: typing.Dict[str, str]):
+    settings['depot_storage_name'] = os.environ.get(
+        TEST_STORAGE_NAME_ENV_VAR,
+        DEFAULT_TEST_STORAGE_NAME
+    )
+    settings['depot_storage_dir'] = os.environ.get(
+        TEST_STORAGE_DIR_ENV_VAR,
+        DEFAULT_TEST_STORAGE_DIR
+    )
+    settings['preview_cache_dir'] = os.environ.get(
+        TEST_PREVIEW_CACHE_DIR_ENV_VAR,
+        DEFAULT_TEST_PREVIEW_CACHE_DIR
+    )
+
+    settings['sqlalchemy.url'] = os.environ.get(
+        TEST_SQLALCHEMY_URL_ENV_VAR,
+        DEFAULT_TEST_SQLALCHEMY_URL
+    )
+    settings['session.data_dir'] = os.environ.get(
+        TEST_SESSIONS_DATA_DIR_ENV_VAR,
+        DEFAULT_TEST_SESSIONS_DATA_DIR
+    )
+
+    settings['session.lock_dir'] = os.environ.get(
+        TEST_SESSIONS_LOCK_DIR_ENV_VAR,
+        DEFAULT_TEST_SESSIONS_LOCK_DIR
+    )
+    # INFO - G.M - 2019-04-02 - try to create dir if no exist to avoid trouble
+    # in test
+    os.makedirs(settings['preview_cache_dir'], exist_ok=True)
+    os.makedirs(settings['depot_storage_dir'], exist_ok=True)
+    os.makedirs(settings['session.data_dir'], exist_ok=True)
+    os.makedirs(settings['session.lock_dir'], exist_ok=True)
+    return settings
 
 
 def set_html_document_slug_to_legacy(session_factory) -> None:
@@ -88,7 +146,21 @@ class AbstractMailHogTest(object):
             self.MAILHOG_MESSAGES_ENDPOINT
         )).json()
 
-class FunctionalTest(unittest.TestCase):
+class AbstractSettingsTest(unittest.TestCase):
+
+    def setup_settings(self) -> typing.Dict[str, typing.Any]:
+        settings = self.default_settings()
+        settings.update(plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        ))
+        settings = self.override_settings(settings)
+        return settings
+
+    def default_settings(self) -> typing.Dict[str, typing.Any]:
+        return setup_parametrizable_config({})
+
+class FunctionalTest(AbstractSettingsTest):
 
     fixtures = [BaseFixture]
     config_uri = 'tests_configs.ini'
@@ -108,12 +180,8 @@ class FunctionalTest(unittest.TestCase):
     def setUp(self) -> None:
         self._set_logger()
         DepotManager._clear()
-        settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
-        self.settings = self.override_settings(settings)
         hapic.reset_context()
+        self.settings = self.setup_settings()
         self.connect_database(create_tables=True)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
@@ -131,7 +199,7 @@ class FunctionalTest(unittest.TestCase):
     def override_settings(self, settings: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:  # nopep8
         """
         Allow to override some setting by code.
-        by default : do nothing.
+        by default : do nothing
         """
         return settings
 
@@ -186,11 +254,7 @@ class WebdavFunctionalTest(FunctionalTest):
     config_section = 'functional_webdav_test'
 
     def run_app(self) -> None:
-        settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
-        app_factory = WebdavAppFactory(**settings)
+        app_factory = WebdavAppFactory(**self.settings)
         app = app_factory.get_wsgi_app()
         self.testapp = TestApp(app)
 
@@ -216,8 +280,7 @@ class FunctionalTestNoDB(FunctionalTest):
         self.engine = get_engine(settings)
 
 
-class CommandFunctionalTest(FunctionalTest):
-
+class CommandFunctionalTestBase(FunctionalTest):
     def _set_logger(self):
         super()._set_logger()
         logging.getLogger('_jb_pytest_runner').setLevel('CRITICAL')
@@ -226,8 +289,23 @@ class CommandFunctionalTest(FunctionalTest):
         """ Disable run pyramid app for command functional test"""
         pass
 
+class CommandFunctionalTestWithDB(FunctionalTest):
 
-class BaseTest(unittest.TestCase):
+    tmp_command_default_settings = None
+
+    def override_settings(self, settings: typing.Dict[str, typing.Any]):
+        settings = super().override_settings(settings)
+        # FIXME - G.M - 2019-04-02 - hack to be able to override default config
+        # for command tests
+        self.tmp_command_default_settings=AppContextCommand.default_settings
+        AppContextCommand.default_settings = setup_parametrizable_config({})
+        return settings
+
+    def tearDown(self):
+        super().tearDown()
+        AppContextCommand.default_settings = self.tmp_command_default_settings
+
+class BaseTest(AbstractSettingsTest):
     """
     Pyramid default test.
     """
@@ -264,13 +342,18 @@ class BaseTest(unittest.TestCase):
                 transaction.abort()
                 logger.error(self, 'Database initialization failed')
 
+    def override_settings(self, settings: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:  # nopep8
+        """
+        Allow to override some setting by code.
+        by default : setup depot, sqlalchemy database and other paths
+        """
+        settings = setup_parametrizable_config(settings)
+        return settings
+
     def setUp(self) -> None:
         self._set_logger()
         logger.debug(self, 'Setup Test...')
-        self.settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
+        self.settings = self.setup_settings()
         self.config = testing.setUp(settings = self.settings)
         self.config.include('tracim_backend.models.setup_models')
         DepotManager._clear()
