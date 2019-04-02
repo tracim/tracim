@@ -89,7 +89,12 @@ cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
 ./build_folder.sh $dev
 
 
-# build Tracim
+# app Caldavzap
+log "cd $DEFAULTDIR/frontend_app_caldavzap"
+cd $DEFAULTDIR/frontend_app_caldavzap || exit 1
+./build_caldavzap.sh $dev
+
+# build Tracimtracim
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend || exit 1
 log "build Tracim"
