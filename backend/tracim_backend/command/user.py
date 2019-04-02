@@ -4,6 +4,7 @@ import argparse
 import transaction
 from pyramid.scripting import AppEnvironment
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
@@ -162,12 +163,13 @@ class UserCommand(AppContextCommand):
     def take_app_action(
             self,
             parsed_args: argparse.Namespace,
-            app_context: AppEnvironment
+            app_config: CFG,
+            session: Session
     ) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
-        self._session = app_context['request'].dbsession
-        self._app_config = app_context['registry'].settings['CFG']
+        self._session = session
+        self._app_config = app_config
         self._user_api = UserApi(
             current_user=None,
             session=self._session,

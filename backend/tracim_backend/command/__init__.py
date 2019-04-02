@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-import sys
 import argparse
-import transaction
+import sys
 
+import transaction
 from cliff.app import App
 from cliff.command import Command
 from cliff.commandmanager import CommandManager
+from pyramid.paster import get_appsettings
+from sqlalchemy.orm import Session
 
-from pyramid.paster import bootstrap
-from pyramid.scripting import AppEnvironment
-from tracim_backend.exceptions import BadCommandError
+from tracim_backend import CFG
+from tracim_backend.exceptions import InvalidSettingFile
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import get_tm_session
 
 
 class TracimCLI(App):
@@ -52,10 +56,36 @@ class AppContextCommand(Command):
     def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(AppContextCommand, self).take_action(parsed_args)
         if self.auto_setup_context:
-            with bootstrap(parsed_args.config_file) as app_context:
-                with app_context['request'].tm:
-                    self.take_app_action(parsed_args, app_context)
+            config_uri = parsed_args.config_file
+            # setup_logging(config_uri)
+            settings = get_appsettings(config_uri)
+            settings.update(settings.global_conf)
+            if 'sqlalchemy.url' not in settings or not settings[
+                'sqlalchemy.url']:
+                raise InvalidSettingFile(
+                    'Wrong or empty sqlalchemy database url,'
+                    'check config file')
+            engine = get_engine(settings)
+            app_config = CFG(settings)
+            app_config.configure_filedepot()
+            session_factory = get_session_factory(engine)
+            session = get_tm_session(session_factory, transaction.manager)
+            try:
+                self.take_app_action(parsed_args, app_config, session)
+            except Exception as exc:
+                session.rollback()
+                raise exc
+            finally:
+                transaction.commit()
+                session.close()
 
+    def take_app_action(
+            self,
+            parsed_args: argparse.Namespace,
+            app_config: CFG,
+            session: Session,
+    ):
+        pass
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
@@ -70,11 +100,6 @@ class AppContextCommand(Command):
             default=DEFAULT_TRACIM_CONFIG_FILE,
         )
         return parser
-
-    # def run(self, parsed_args):
-    #     super().run(parsed_args)
-    #     transaction.commit()
-
 
 class Extender(argparse.Action):
     """
