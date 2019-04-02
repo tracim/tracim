@@ -14,9 +14,11 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
@@ -96,36 +98,29 @@ class CFG(object):
             enabled_app = default_enabled_app
         self.ENABLED_APP = enabled_app
         self._set_default_app(self.ENABLED_APP)
-        mandatory_msg = \
-            'ERROR: {} configuration is mandatory. Set it before continuing.'
-        self.DEPOT_STORAGE_DIR = settings.get(
-            'depot_storage_dir',
+
+        self.DEPOT_STORAGE_DIR = self.get_writable_directory_path_param(
+            param_name='depot_storage_dir',
+            path=settings.get('depot_storage_dir'),
+            is_mandatory=True,
         )
-        if not self.DEPOT_STORAGE_DIR:
-            raise Exception(
-                mandatory_msg.format('depot_storage_dir')
-            )
-        self.DEPOT_STORAGE_NAME = settings.get(
+        self.DEPOT_STORAGE_NAME = self.get_mandatory_param(
             'depot_storage_name',
+            settings.get('depot_storage_name')
         )
-        if not self.DEPOT_STORAGE_NAME:
-            raise Exception(
-                mandatory_msg.format('depot_storage_name')
-            )
-        self.PREVIEW_CACHE_DIR = settings.get(
-            'preview_cache_dir',
+
+        self.PREVIEW_CACHE_DIR = self.get_writable_directory_path_param(
+            param_name='preview_cache_dir',
+            path=settings.get('preview_cache_dir'),
+            is_mandatory=True,
         )
-        if not self.PREVIEW_CACHE_DIR:
-            raise Exception(
-                'ERROR: preview_cache_dir configuration is mandatory. '
-                'Set it before continuing.'
-            )
+
         auth_type_str = settings.get(
             'auth_types', 'internal'
         )
         self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
         if AuthType.REMOTE is self.AUTH_TYPES:
-            raise Exception(
+            raise ConfigurationError(
                 'ERROR: "remote" auth not allowed in auth_types'
                 ' list, use remote_user_header instead'
             )
@@ -144,6 +139,18 @@ class CFG(object):
             'session.reissue_time',
             120
         ))
+        # INFO - G.M - 2019-04-02 - check session path writable
+        self.get_writable_directory_path_param(
+            is_mandatory=True,
+            param_name='session.data_dir',
+            path=settings.get('session.data_dir'),
+        )
+        self.get_writable_directory_path_param(
+            is_mandatory=True,
+            param_name='session.lock_dir',
+            path=settings.get('session.lock_dir'),
+        )
+
         self.WEBSITE_TITLE = settings.get(
             'website.title',
             'TRACIM',
@@ -155,7 +162,7 @@ class CFG(object):
             '',
         )
         if not self.WEBSITE_BASE_URL:
-            raise Exception(
+            raise ConfigurationError(
                 'website.base_url is needed in order to have correct path in'
                 'few place like in email.'
                 'You should set it with frontend root url.'
@@ -410,9 +417,12 @@ class CFG(object):
             'email.reply.lockfile_path',
             ''
         )
-        if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
-            raise Exception(
-                mandatory_msg.format('email.reply.lockfile_path')
+        if self.EMAIL_REPLY_ACTIVATED and not self.EMAIL_REPLY_LOCKFILE_PATH:
+            raise ConfigurationError(
+                'When "{}" is true, "{}" should not be empty'.format(
+                'email.reply.activated'
+                'email.reply.lockfile_path'
+                )
             )
 
         self.EMAIL_PROCESSING_MODE = settings.get(
@@ -590,7 +600,7 @@ class CFG(object):
             'backend.18n_folder_path', backend_i18n_folder
         )
         if not os.path.isdir(self.BACKEND_I18N_FOLDER):
-            raise Exception(
+            raise ConfigurationError(
                 'ERROR: {} folder does not exist as folder. '
                 'please set backend.i8n_folder_path'
                 'with a correct value'.format(self.BACKEND_I18N_FOLDER)
@@ -603,12 +613,48 @@ class CFG(object):
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
         if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
-            raise Exception(
+            raise ConfigurationError(
                 'ERROR: {} folder does not exist as folder. '
                 'please set frontend.dist_folder.path'
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
         self.load_ldap_settings(settings)
+
+    def get_mandatory_param(self, param_name, value):
+        if not value:
+            raise ConfigurationError(
+                'ERROR: "{}" configuration is mandatory. '
+                'Set it before continuing.'.format(param_name)
+            )
+        return value
+
+    def get_writable_directory_path_param(self, param_name, path, is_mandatory):
+        if is_mandatory:
+            self.get_mandatory_param(param_name, path)
+        else:
+            return
+        try:
+            is_dir_writable(path)
+        except NotADirectoryError as exc:
+            not_a_directory_msg = \
+                'ERROR: "{}" is not a valid directory path, ' \
+                'create it or change "{}" value in config ' \
+                'to a valid directory path.'
+            raise ConfigurationError(
+                not_a_directory_msg.format(path, param_name)
+            ) from exc
+        except NotWritableDirectory as exc:
+            directory_not_writable_msg = \
+                'ERROR: current user as not enough right to write and create file' \
+                ' into "{}" directory.' \
+                ' Change permission of current user on this directory,' \
+                ' change user running this code or change' \
+                ' directory path of parameter in config "{}" to solve this.'
+            raise ConfigurationError(
+                directory_not_writable_msg.format(path, param_name)
+            ) from exc
+        return path
+
 
     def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
         """

@@ -13,6 +13,8 @@ class TracimException(Exception):
 class RunTimeError(TracimError):
     pass
 
+class NotWritableDirectory(Exception):
+    pass
 
 class ContentRevisionUpdateError(RuntimeError):
     pass

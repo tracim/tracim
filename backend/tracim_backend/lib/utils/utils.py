@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import os
 import random
 import string
 from lxml import html
@@ -13,6 +14,8 @@ import pytz
 from redis import Redis
 from rq import Queue
 import typing
+
+from tracim_backend.exceptions import NotWritableDirectory
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
@@ -311,3 +314,11 @@ def normpath(path):
     elif path == '':
         path = '/'
     return base_normpath(path)
+
+def is_dir_writable(path) -> bool:
+    if not os.path.isdir(path):
+        raise NotADirectoryError('{} is not a directory'.format(path))
+
+    if not os.access(path=path, mode=os.W_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids):
+        raise NotWritableDirectory('{} is not a writable directory'.format(path))
+    return True
