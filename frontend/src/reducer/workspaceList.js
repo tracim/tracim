@@ -22,6 +22,7 @@ export function workspaceList (state = [], action) {
           label: sbe.label
         })),
         isOpenInSidebar: ws.isOpenInSidebar,
+        calendarEnabled: ws.calendar_enabled,
         memberList: []
       }))
 

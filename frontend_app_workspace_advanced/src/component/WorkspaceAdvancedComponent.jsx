@@ -157,6 +157,21 @@ const WorkspaceAdvancedComponent = props => {
         )}
       </div>
 
+      <div className='formBlock workspace_advanced__calendarconfig'>
+        <div className='formBlock__title workspace_advanced__calendarconfig__title'>
+          {props.t('Calendar')}
+        </div>
+
+        <div className='formBlock__field workspace_advanced__calendarconfig__content'>
+          <BtnSwitch
+            checked={props.calendarEnabled}
+            onChange={props.onToggleCalendarEnabled}
+            activeLabel={props.t('Calendar activated')}
+            inactiveLabel={props.t('Calendar deactivated')}
+          />
+        </div>
+      </div>
+
       <div className='formBlock workspace_advanced__delete'>
         <div className='formBlock__title workspace_advanced__delete__title'>
           {props.t('Delete shared space')}

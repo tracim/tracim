@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from pyramid_multiauth import MultiAuthenticationPolicy
+from tracim_backend.lib.calendar import CaldavAppFactory
 
 from tracim_backend.models.auth import AuthType
+from tracim_backend.lib.calendar.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.calendar_api.radicale_proxy_controller import RadicaleProxyController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -43,6 +46,9 @@ from tracim_backend.views.core_api.reset_password_controller import ResetPasswor
 from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
+from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
+from tracim_backend.exceptions import CaldavNotAuthorized
+from tracim_backend.exceptions import CaldavNotAuthenticated
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import ContentInNotEditableState
@@ -159,6 +165,7 @@ def web(global_config, **local_settings):
     context.handle_exception(SameValueError, HTTPStatus.BAD_REQUEST)
     # Auth exception
     context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
+    context.handle_exception(UserGivenIsNotTheSameAsAuthenticated, HTTPStatus.FORBIDDEN)
     context.handle_exception(UserAuthenticatedIsNotActive, HTTPStatus.FORBIDDEN)
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
@@ -190,6 +197,27 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
+    if app_config.CALDAV_ENABLED:
+        # FIXME - G.M - 2019-03-18 - check if possible to avoid this import here,
+        # import is here because import CalendarController without adding it to
+        # pyramid make trouble in hapic which try to get view related
+        # to controller but failed.
+        from tracim_backend.views.calendar_api.calendar_controller import CalendarController
+        configurator.include(add_www_authenticate_header_for_caldav)
+        # caldav exception
+        context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
+        context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
+        # controller
+        radicale_proxy_controller = RadicaleProxyController(
+            proxy_base_address=app_config.CALDAV_RADICALE_PROXY_BASE_URL,
+            radicale_base_path=app_config.CALDAV_RADICALE_BASE_PATH,
+            radicale_user_path=app_config.CALDAV_RADICALE_USER_PATH,
+            radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
+        )
+        calendar_controller = CalendarController()
+        configurator.include(calendar_controller.bind, route_prefix=BASE_API_V2)
+        configurator.include(radicale_proxy_controller.bind)
+
     if app_config.FRONTEND_SERVE:
         configurator.include('pyramid_mako')
         frontend_controller = FrontendController(app_config.FRONTEND_DIST_FOLDER_PATH)  # nopep8
@@ -207,6 +235,14 @@ def webdav(global_config, **local_settings):
     settings = global_config
     settings.update(local_settings)
     app_factory = WebdavAppFactory(
+        **settings
+    )
+    return app_factory.get_wsgi_app()
+
+def caldav(global_config, **local_settings):
+    settings = global_config
+    settings.update(local_settings)
+    app_factory = CaldavAppFactory(
         **settings
     )
     return app_factory.get_wsgi_app()

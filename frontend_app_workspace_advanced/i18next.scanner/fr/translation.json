@@ -25,5 +25,10 @@
   "This account is deactivated": "Ce compte est désactivé",
   "Error while removing member": "Erreur lors de la suppression du membre",
   "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par email",
-  "This user already is in the shared space": "Cet utilisateur est déjà dans cet espace partagé"
+  "This user already is in the shared space": "Cet utilisateur est déjà dans cet espace partagé",
+  "Calendar": "Calendrier",
+  "Calendar activated": "Calendrier activé",
+  "Calendar deactivated": "Calendrier désactivé",
+  "Error while activating calendar": "Erreur lors de l'activation du calendrier",
+  "Error while deactivating calendar": "Erreur lors de la désactivation du calendrier"
 }

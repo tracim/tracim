@@ -38,6 +38,7 @@ export const PAGE = {
   FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
   RESET_PASSWORD: '/ui/reset-password',
   ACCOUNT: '/ui/account',
+  CALENDAR: '/ui/calendar',
   ADMIN: {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',

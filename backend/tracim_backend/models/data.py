@@ -83,15 +83,6 @@ class Workspace(DeclarativeBase):
 
         return contents
 
-    # TODO - G-M - 27-03-2018 - [Calendar] Replace this in context model object
-    # @property
-    # def calendar_url(self) -> str:
-    #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-    #     from tracim.lib.calendar import CalendarManager
-    #     calendar_manager = CalendarManager(None)
-    #
-    #     return calendar_manager.get_workspace_calendar_url(self.workspace_id)
-
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
             if role.workspace.workspace_id==self.workspace_id:
