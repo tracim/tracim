@@ -289,6 +289,10 @@ class AdminWorkspaceUser extends React.Component {
     this.setState({workspaceIdOpened: idWorkspace})
   }
 
+  handleClickNewWorkspace = () => {
+    GLOBAL_dispatchEvent({type: 'showCreateWorkspacePopup', data: {}})
+  }
+
   handleClickUser = idUser => {
     GLOBAL_dispatchEvent({
       type: 'redirect',
@@ -309,6 +313,7 @@ class AdminWorkspaceUser extends React.Component {
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickWorkspace}
+            onClickNewWorkspace={this.handleClickNewWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
           />
         )}
