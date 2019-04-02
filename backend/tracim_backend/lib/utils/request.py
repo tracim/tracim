@@ -50,7 +50,7 @@ class TracimContext(object):
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
 
     @property
-    def current_user(self):
+    def current_user(self) -> User:
         """
         Current authenticated user if exist
         """
@@ -61,7 +61,7 @@ class TracimContext(object):
         )
 
     @property
-    def current_workspace(self):
+    def current_workspace(self) -> Workspace:
         """
         Workspace of current ressources used if exist, for example,
         if you are editing content 21 in workspace 3,
@@ -74,7 +74,7 @@ class TracimContext(object):
         )
 
     @property
-    def current_content(self):
+    def current_content(self) -> Content:
         """
         Current content if exist, if you are editing content 21, current content
         will be content 21.

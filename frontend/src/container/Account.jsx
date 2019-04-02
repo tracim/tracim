@@ -162,55 +162,51 @@ class Account extends React.Component {
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
-        <PageWrapper customClass='account'>
-          <PageTitle
-            parentClass={'account'}
-            title={props.t('My account')}
-            icon='user-o'
-          />
+        <div className='tracim__content-scrollview'>
+          <PageWrapper customClass='account'>
+            <PageTitle
+              parentClass={'account'}
+              title={props.t('My account')}
+              icon='user-o'
+            />
 
-          <PageContent parentClass='account'>
-            <UserInfo user={props.user} />
+            <PageContent parentClass='account'>
+              <UserInfo user={props.user} />
 
-            <Delimiter customClass={'account__delimiter'} />
+              <Delimiter customClass={'account__delimiter'} />
 
-            <div className='account__userpreference'>
-              <MenuSubComponent
-                menu={state.subComponentMenu}
-                onClickMenuItem={this.handleClickSubComponentMenuItem}
-              />
+              <div className='account__userpreference'>
+                <MenuSubComponent
+                  menu={state.subComponentMenu}
+                  onClickMenuItem={this.handleClickSubComponentMenuItem}
+                />
 
-              <div className='account__userpreference__setting'>
-                {(() => {
-                  switch (state.subComponentMenu.find(({active}) => active).name) {
-                    case 'personalData':
-                      return <PersonalData
-                        userAuthType={props.user.auth_type}
-                        onClickSubmit={this.handleSubmitNameOrEmail}
-                      />
+                <div className='account__userpreference__setting'>
+                  {(() => {
+                    switch (state.subComponentMenu.find(({active}) => active).name) {
+                      case 'personalData':
+                        return <PersonalData
+                          userAuthType={props.user.auth_type}
+                          onClickSubmit={this.handleSubmitNameOrEmail}
+                        />
 
-                    // case 'calendar':
-                    //   return <Calendar user={props.user} />
+                      case 'notification':
+                        return <Notification
+                          idUserLogged={props.user.user_id}
+                          workspaceList={props.workspaceList}
+                          onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                        />
 
-                    case 'notification':
-                      return <Notification
-                        idMyself={props.user.user_id}
-                        workspaceList={props.workspaceList}
-                        onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                      />
-
-                    case 'password':
-                      return <Password onClickSubmit={this.handleSubmitPassword} />
-
-                    // case 'timezone':
-                    //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
-                  }
-                })()}
+                      case 'password':
+                        return <Password onClickSubmit={this.handleSubmitPassword} />
+                    }
+                  })()}
+                </div>
               </div>
-            </div>
 
-          </PageContent>
-        </PageWrapper>
+            </PageContent>
+          </PageWrapper>
+        </div>
       </div>
     )
   }

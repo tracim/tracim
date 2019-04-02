@@ -43,14 +43,26 @@ This will drop all your database, be carefull !
     tracimcli user create -h
     tracimcli user update -h
  
-## Help ##
+## Caldav ##
 
-    tracimcli -h
-    
-## Run services ##
+### Run service ###
 
-### Webdav wsgidav server ###
+    tracimcli caldav start
+
+### Check and recreate calendar for user/workspace ###
+
+in some case, calendars of user or workspace can failed to be created, to
+check if calendar are all created and force creation of those where not
+properly created, you can do :
+
+    tracimcli caldav calendar create
+
+## Webdav ##
+
+### Run service ###
 
     tracimcli webdav start
 
+## Help ##
 
+    tracimcli -h

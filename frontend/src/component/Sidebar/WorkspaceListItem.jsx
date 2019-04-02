@@ -24,7 +24,7 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
   if (search === '') return route
 
   // to keep query param (like opened folder) we need to copy theses param.
-  // But "type" already is in allowedApp.route, so we need to remove it before passing props.location.search
+  // But "type" already is in allowedAppList.route, so we need to remove it before passing props.location.search
   let urlSearch = qs.parse(search)
   delete urlSearch.type
   urlSearch = qs.stringify(urlSearch, {encode: false})
@@ -60,12 +60,12 @@ const WorkspaceListItem = props => {
 
       <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
         <ul className='sidebar__content__navigation__workspace__item__submenu'>
-          {props.allowedApp.map(aa =>
+          {props.allowedAppList.map(aa =>
             <li key={aa.slug}>
-              <Link to={buildLink(aa.route, props.location.search, props.idWs, props.activeIdWorkspace)}>
+              <Link to={buildLink(aa.route, props.location.search, props.idWorkspace, props.activeIdWorkspace)}>
                 <div className={classnames(
                   'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                  {'activeFilter': shouldDisplayAsActive(props.location, props.idWs, props.activeIdWorkspace, aa)}
+                  {'activeFilter': shouldDisplayAsActive(props.location, props.idWorkspace, props.activeIdWorkspace, aa)}
                 )}>
                   <div className='dropdown__icon' style={{backgroundColor: aa.hexcolor}}>
                     <i className={classnames(`fa fa-${aa.faIcon}`)} />
@@ -91,8 +91,9 @@ const WorkspaceListItem = props => {
 export default withRouter(translate()(WorkspaceListItem))
 
 WorkspaceListItem.propTypes = {
+  idWorkspace: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
-  allowedApp: PropTypes.array,
+  allowedAppList: PropTypes.array,
   onClickTitle: PropTypes.func,
   onClickAllContent: PropTypes.func,
   isOpenInSidebar: PropTypes.bool,
