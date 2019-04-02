@@ -209,15 +209,6 @@ class User(DeclarativeBase):
             profile_id = max(group.group_id for group in self.groups)
         return Profile(profile_id)
 
-    # TODO - G-M - 20-04-2018 - [Calendar] Replace this in context model object
-    # @property
-    # def calendar_url(self) -> str:
-    #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-    #     from tracim.lib.calendar import CalendarManager
-    #     calendar_manager = CalendarManager(None)
-    #
-    #     return calendar_manager.get_user_calendar_url(self.user_id)
-
     @classmethod
     def by_email_address(cls, email, dbsession):
         """Return the user object whose email address is ``email``."""

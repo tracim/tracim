@@ -164,6 +164,7 @@ class WorkspaceController(Controller):
             request.current_workspace,
             label=hapic_data.body.label,
             description=hapic_data.body.description,
+            calendar_enabled=hapic_data.body.calendar_enabled,
             save_now=True,
         )
         return wapi.get_workspace_with_context(request.current_workspace)
@@ -188,7 +189,9 @@ class WorkspaceController(Controller):
             label=hapic_data.body.label,
             description=hapic_data.body.description,
             save_now=True,
+            calendar_enabled=hapic_data.body.calendar_enabled
         )
+        wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
@@ -412,7 +415,7 @@ class WorkspaceController(Controller):
                     password=None,
                     do_notify=False
                 )
-
+            uapi.execute_created_user_actions(user)
             newly_created = True
 
         role = rapi.create_one(

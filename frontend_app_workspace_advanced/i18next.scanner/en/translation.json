@@ -25,5 +25,10 @@
   "This account is deactivated": "This account is deactivated",
   "Error while removing member": "Error while removing member",
   "Note, only administrators can send invitational email": "Note, only administrators can send invitational email",
-  "This user already is in the shared space": "This user already is in the shared space"
+  "This user already is in the shared space": "This user already is in the shared space",
+  "Calendar": "Calendar",
+  "Calendar activated": "Calendar activated",
+  "Calendar deactivated": "Calendar deactivated",
+  "Error while activating calendar": "warning",
+  "Error while deactivating calendar": "warning"
 }

@@ -6,13 +6,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import CalendarServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -53,6 +55,9 @@ class WorkspaceApi(object):
         return query
 
     def _base_query(self):
+        if not self._user:
+            return self._base_query_without_roles()
+
         if not self._force_role and self._user.profile.id>=Group.TIM_ADMIN:
             return self._base_query_without_roles()
 
@@ -79,7 +84,7 @@ class WorkspaceApi(object):
             self,
             label: str='',
             description: str='',
-            calendar_enabled: bool=False,
+            calendar_enabled: bool=True,
             save_now: bool=False,
     ) -> Workspace:
         if not label:
@@ -114,13 +119,6 @@ class WorkspaceApi(object):
 
         if save_now:
             self._session.flush()
-
-        # TODO - G.M - 28-03-2018 - [Calendar] Reenable calendar stuff
-        # if calendar_enabled:
-        #     self._ensure_calendar_exist(workspace)
-        # else:
-        #     self._disable_calendar(workspace)
-
         return workspace
 
     def update_workspace(
@@ -129,6 +127,7 @@ class WorkspaceApi(object):
             label: str,
             description: str,
             save_now: bool=False,
+            calendar_enabled: bool = None
     ) -> Workspace:
         """
         Update workspace
@@ -142,7 +141,8 @@ class WorkspaceApi(object):
             raise EmptyLabelNotAllowed('Workspace label cannot be empty')
         workspace.label = label
         workspace.description = description
-
+        if calendar_enabled is not None:
+            workspace.calendar_enabled = calendar_enabled
         if save_now:
             self.save(workspace)
 
@@ -239,48 +239,29 @@ class WorkspaceApi(object):
         return workspace
 
     def execute_created_workspace_actions(self, workspace: Workspace) -> None:
-        pass
-        # TODO - G.M - 28-03-2018 - [Calendar] Re-enable this calendar stuff
-        # self.ensure_calendar_exist(workspace)
 
-    # TODO - G.M - 28-03-2018 - [Calendar] Re-enable this calendar stuff
-    # def ensure_calendar_exist(self, workspace: Workspace) -> None:
-    #     # Note: Cyclic imports
-    #     from tracim.lib.calendar import CalendarManager
-    #     from tracim.model.organisational import WorkspaceCalendar
-    #
-    #     calendar_manager = CalendarManager(self._user)
-    #
-    #     try:
-    #         calendar_manager.enable_calendar_file(
-    #             calendar_class=WorkspaceCalendar,
-    #             related_object_id=workspace.workspace_id,
-    #             raise_=True,
-    #         )
-    #     # If previous calendar file no exist, calendar must be created
-    #     except FileNotFoundError:
-    #         self._user.ensure_auth_token()
-    #
-    #         # Ensure database is up-to-date
-    #         self.session.flush()
-    #         transaction.commit()
-    #
-    #         calendar_manager.create_then_remove_fake_event(
-    #             calendar_class=WorkspaceCalendar,
-    #             related_object_id=workspace.workspace_id,
-    #         )
-    #
-    # def disable_calendar(self, workspace: Workspace) -> None:
-    #     # Note: Cyclic imports
-    #     from tracim.lib.calendar import CalendarManager
-    #     from tracim.model.organisational import WorkspaceCalendar
-    #
-    #     calendar_manager = CalendarManager(self._user)
-    #     calendar_manager.disable_calendar_file(
-    #         calendar_class=WorkspaceCalendar,
-    #         related_object_id=workspace.workspace_id,
-    #         raise_=False,
-    #     )
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_created_user should start hook use by calendar code.
+        from tracim_backend.lib.calendar.calendar import CalendarApi
+        if self._config.CALDAV_ENABLED:
+            calendar_api = CalendarApi(
+                current_user = self._user,
+                session = self._session,
+                config = self._config
+            )
+            if workspace.calendar_enabled:
+                try:
+                    calendar_already_exist = calendar_api.ensure_workspace_calendar_exist(workspace)
+                    if calendar_already_exist:
+                        logger.warning(
+                            self,
+                            'workspace {} is just created but it own calendar already exist !!'.format(workspace.user_id)
+                        )
+                except CalendarServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to calendar server')
+                    logger.exception(self, exc)
+
 
     def get_base_query(self) -> Query:
         return self._base_query()

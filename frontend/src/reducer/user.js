@@ -20,7 +20,6 @@ const defaultUser = {
   },
   email: '',
   is_active: true,
-  caldav_url: null,
   avatar_url: null,
   created: '',
   public_name: '',

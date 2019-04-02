@@ -17,7 +17,6 @@ const debug = { // outdated
     creationLabel: 'Write a thread',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:3001',
-    mockApiUrl: 'http://localhost:8071',
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'

@@ -43,7 +43,6 @@ Set-Cookie:  session_key=22fd293b6d850faabc8e3f167bcfc804d8713deed03bc15e5029434
 {
     "auth_type": "internal", 
     "avatar_url": null, 
-    "caldav_url": null, 
     "created": "2019-01-18T13:07:02Z", 
     "email": "admin@admin.admin", 
     "is_active": true, 
@@ -74,7 +73,6 @@ Set-Cookie:  session_key=50307c9007fff16791f660eed14d47a33cf11eef365b3e0403ce42f
 {
     "auth_type": "internal", 
     "avatar_url": null, 
-    "caldav_url": null, 
     "created": "2019-01-18T13:07:02Z", 
     "email": "admin@admin.admin", 
     "is_active": true, 
@@ -101,9 +99,8 @@ Server: waitress
 Set-Cookie:  session_key=92504e7310aa6433b523405591a9785e056927dab15e49f7c3204aed88ccc35a70761638; expires=Tue, 29-Jan-2019 16:04:37 GMT; Path=/; SameSite=Lax
 
 {
-    "auth_type": "internal", 
-    "avatar_url": null, 
-    "caldav_url": null, 
+    "auth_type": "internal",
+    "avatar_url": null,
     "created": "2019-01-18T13:07:02Z", 
     "email": "admin@admin.admin", 
     "is_active": true, 
@@ -129,8 +126,7 @@ Set-Cookie:  session_key=978301c4058de0646a4c6acf55a2b28b102b297f590edf75ffec429
 
 {
     "auth_type": "internal", 
-    "avatar_url": null, 
-    "caldav_url": null, 
+    "avatar_url": null,
     "created": "2019-01-18T13:07:02Z", 
     "email": "admin@admin.admin", 
     "is_active": true, 

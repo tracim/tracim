@@ -288,6 +288,22 @@ class WorkspaceAndUserPath(object):
         self.workspace_id = workspace_id
         self.user_id = user_id
 
+class RadicaleUserSubitemsPath(object):
+    """
+    Paths params with workspace id and subitem
+    """
+    def __init__(self, user_id: int, sub_item: str) -> None:
+        self.workspace_id = user_id
+        self.sub_item = sub_item
+
+class RadicaleWorkspaceSubitemsPath(object):
+    """
+    Paths params with workspace id and subitem
+    """
+    def __init__(self, workspace_id: int, sub_item: str) -> None:
+        self.workspace_id = workspace_id
+        self.sub_item = sub_item
+
 
 class UserWorkspaceAndContentPath(object):
     """
@@ -328,6 +344,13 @@ class KnownMemberQuery(object):
         self.exclude_user_ids = string_to_list(exclude_user_ids, ',', int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ',', int)  # nopep8
 
+class CalendarFilterQuery(object):
+    """
+    Calendar filter query model
+    """
+    def __init__(self, workspace_ids: str = None, calendar_types: str = None):
+        self.workspace_ids = string_to_list(workspace_ids, ',', int)
+        self.calendar_types = string_to_list(calendar_types, ',', str) or None
 
 class FileQuery(object):
     """
@@ -436,9 +459,11 @@ class WorkspaceUpdate(object):
         self,
         label: str,
         description: str,
+        calendar_enabled: bool = None
     ) -> None:
         self.label = label
         self.description = description
+        self.calendar_enabled = calendar_enabled
 
 
 class ContentCreation(object):
@@ -512,6 +537,19 @@ class TypeUser(Enum):
     EMAIL = 'found_email'
     PUBLIC_NAME = 'found_public_name'
 
+class Calendar(object):
+
+    def __init__(
+            self,
+            calendar_url: str,
+            with_credentials: bool,
+            workspace_id: typing.Optional[int],
+            calendar_type: str,
+    ) -> None:
+        self.calendar_url = calendar_url
+        self.with_credentials = with_credentials
+        self.workspace_id = workspace_id
+        self.calendar_type = calendar_type
 
 class UserInContext(object):
     """
@@ -566,16 +604,6 @@ class UserInContext(object):
         return self.user.is_deleted
 
     # Context related
-
-    @property
-    def calendar_url(self) -> typing.Optional[str]:
-        # TODO - G-M - 20-04-2018 - [Calendar] Replace calendar code to get
-        # url calendar url.
-        #
-        # from tracim.lib.calendar import CalendarManager
-        # calendar_manager = CalendarManager(None)
-        # return calendar_manager.get_workspace_calendar_url(self.workspace_id)
-        return None
 
     @property
     def avatar_url(self) -> typing.Optional[str]:
@@ -638,6 +666,13 @@ class WorkspaceInContext(object):
         Is the workspace deleted ?
         """
         return self.workspace.is_deleted
+
+    @property
+    def calendar_enabled(self) -> bool:
+        """
+        is calendar of workspace enabled ?
+        """
+        return self.workspace.calendar_enabled
 
     @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:

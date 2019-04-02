@@ -315,8 +315,8 @@ class WorkspaceContent extends React.Component {
       .filter(ct => idRoleUserWorkspace === 2 ? ct.slug !== 'folder' : true)
 
     return (
-      <div className='tracim__content fullWidthFullHeight'>
-        <div className='WorkspaceContent' style={{width: '100%'}}>
+      <div className='tracim__content-scrollview fullWidthFullHeight'>
+        <div className='WorkspaceContent'>
           {state.contentLoaded &&
             <OpenContentApp
               // automatically open the app for the idContent in url
