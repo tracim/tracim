@@ -85,7 +85,7 @@ export const revisionTypeList = [{
 }, {
   id: 'status-update',
   faIcon: 'random',
-  label: statusLabel => i18n.t('Status changed to {{status}}', {status: i18n.t(statusLabel)})
+  label: statusLabel => i18n.t('Status changed to {{status}}', {status: statusLabel})
 }, {
   id: 'unarchiving',
   faIcon: 'file-archive-o',
