@@ -60,7 +60,6 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'internal'
 
@@ -174,7 +173,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -199,7 +197,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -262,7 +259,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -286,7 +282,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -342,7 +337,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -367,7 +361,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -391,7 +384,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'internal'
 
@@ -437,7 +429,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -461,7 +452,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -480,7 +470,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
         assert res.json_body['auth_type'] == 'internal'
@@ -515,7 +504,6 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
         assert res.json_body['auth_type'] == 'internal'
@@ -598,7 +586,6 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'internal'
 
@@ -702,7 +689,6 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'users'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'remote'
         user_id = res.json_body['user_id']
@@ -718,7 +704,6 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'users'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'remote'
         assert res.json_body['user_id'] == user_id

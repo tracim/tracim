@@ -24,7 +24,12 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic[marshmallow]>=0.62',
+    'hapic[marshmallow]==0.73',
+    # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
+    # in hapic, apispec-marshmallow-advanced==0.3
+    # and hapic==0.73 aren't compatible
+    'apispec-marshmallow-advanced>=0.4'
+    'apispec==1.1.0',
     'marshmallow <3.0.0a1,>2.0.0',
     # CLI
     'cliff',
@@ -35,7 +40,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator>=0.9',
+    'preview-generator>=0.10',
     'colour',
     # mail-notifier
     'mako',
@@ -58,6 +63,8 @@ requires = [
     # i18n
     'Babel',
     'requests',
+    # caldav support
+    'radicale',
 ]
 
 tests_require = [
@@ -119,7 +126,8 @@ setup(
     entry_points={
         'paste.app_factory': [
             'main = tracim_backend:web',
-            'webdav = tracim_backend:webdav'
+            'webdav = tracim_backend:webdav',
+            'caldav = tracim_backend:caldav',
         ],
         'console_scripts': [
             'tracimcli = tracim_backend.command:main',
@@ -131,6 +139,8 @@ setup(
             'db_init = tracim_backend.command.database:InitializeDBCommand',
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
+            'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
+            'caldav_calendar_create = tracim_backend.command.caldav:CaldavCreateCalendarsCommand'
         ]
     },
     message_extractors={'tracim_backend': [

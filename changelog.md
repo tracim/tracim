@@ -4,6 +4,15 @@
 
 - If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
 
+### REST API Changes
+
+- Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
+
+### Others Changes
+
+- rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config,
+old parameter is now deprecated. (issue #970)
+
 
 ## 2.1.0 / 2019-02-15
 

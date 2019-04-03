@@ -194,6 +194,7 @@ class RootResource(DAVCollection):
         workspace_name = webdav_convert_file_name_to_bdd(name)
         new_workspace = self.workspace_api.create_workspace(workspace_name)
         self.workspace_api.save(new_workspace)
+        self.workspace_api.execute_created_workspace_actions(new_workspace)
         transaction.commit()
         # fix path
         workspace_path = '%s%s%s' % (

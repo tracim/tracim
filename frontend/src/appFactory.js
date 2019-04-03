@@ -15,7 +15,6 @@ export function appFactory (WrappedComponent) {
         ...appConfig,
         domContainer: 'appFeatureContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
-        mockApiUrl: FETCH_CONFIG.mockApiUrl, // Côme - 2018/07/31 - this should not be used, I deprecate it
         apiHeader: FETCH_CONFIG.headers,
         translation: i18n.store.data,
         system: this.props.system,
@@ -46,7 +45,6 @@ export function appFactory (WrappedComponent) {
         ...appConfig,
         domContainer: 'popupCreateContentContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
-        mockApiUrl: FETCH_CONFIG.mockApiUrl,
         apiHeader: FETCH_CONFIG.headers, // should this be used by app ? right now, apps have their own headers
         translation: i18n.store.data,
         system: this.props.system,
