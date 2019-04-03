@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+import multiprocessing
 import typing
 import unittest
 
@@ -27,12 +28,14 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
-from tracim_backend import web
+from tracim_backend import web, CaldavAppFactory
 from tracim_backend import webdav
 from tracim_backend import WebdavAppFactory
+from waitress import serve
 from webtest import TestApp
 from io import BytesIO
 from PIL import Image
+import threading
 
 DEFAULT_TEST_STORAGE_NAME = 'test'
 TEST_STORAGE_NAME_ENV_VAR = 'TRACIM_TEST_DEPOT_NAME'
@@ -180,8 +183,13 @@ class FunctionalTest(AbstractSettingsTest):
     def setUp(self) -> None:
         self._set_logger()
         DepotManager._clear()
-        hapic.reset_context()
         self.settings = self.setup_settings()
+        # INFO - G.M - 2019-03-19 - Reset all hapic context: PyramidContext
+        # and controllers
+        hapic.reset_context()
+        # TODO - G.M - 2019-03-19 - Replace this code by something better, see
+        # https://github.com/algoo/hapic/issues/144
+        hapic._controllers = []
         self.connect_database(create_tables=True)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
@@ -257,6 +265,38 @@ class WebdavFunctionalTest(FunctionalTest):
         app_factory = WebdavAppFactory(**self.settings)
         app = app_factory.get_wsgi_app()
         self.testapp = TestApp(app)
+
+class CaldavRadicaleProxyFunctionalTest(FunctionalTest):
+    config_section = 'functional_caldav_radicale_proxy_test'
+    radicale_server = None
+
+    def start_radicale_server(self):
+        settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        app_factory = CaldavAppFactory(**settings)
+        app = app_factory.get_wsgi_app()
+        self.radicale_server = multiprocessing.Process(target=serve, kwargs={
+            'app': app,
+            'listen': 'localhost:5232'
+            }
+        )
+        self.radicale_server.daemon = True
+        self.radicale_server.start()
+
+    def stop_radicale_server(self):
+        if self.radicale_server:
+            self.radicale_server.terminate()
+    def setUp(self):
+        super().setUp()
+        self.start_radicale_server()
+
+
+    def tearDown(self):
+       super().tearDown()
+       self.stop_radicale_server()
+
 
 class FunctionalTestEmptyDB(FunctionalTest):
     fixtures = []

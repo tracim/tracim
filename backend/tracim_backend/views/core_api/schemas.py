@@ -1,17 +1,16 @@
 # coding=utf-8
+import re
 import typing
 
 import marshmallow
-import re
 from marshmallow import post_load
-
 from marshmallow.fields import String
+
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.validator import *
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -31,6 +30,8 @@ from tracim_backend.models.context_models import KnownMemberQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
+from tracim_backend.models.context_models import RadicaleUserSubitemsPath
+from tracim_backend.models.context_models import RadicaleWorkspaceSubitemsPath
 from tracim_backend.models.context_models import ResetPasswordCheckToken
 from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
@@ -141,14 +142,6 @@ class UserSchema(UserDigestSchema):
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         validate=user_timezone_validator,
-    )
-    # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
-    caldav_url = marshmallow.fields.Url(
-        allow_none=True,
-        relative=True,
-        attribute='calendar_url',
-        example="/api/v2/calendar/user/3.ics/",
-        description="CalDAV url of the user dedicated calendar",
     )
     profile = StrippedString(
         attribute='profile',
@@ -310,6 +303,8 @@ class UserCreationSchema(marshmallow.Schema):
 
 
 # Path Schemas
+class RadicaleSubItemPathSchema(object):
+    sub_item = marshmallow.fields.String()
 
 class UserIdPathSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(
@@ -332,6 +327,16 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
     def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)
 
+
+class RadicaleUserSubItemPathSchema(RadicaleSubItemPathSchema, UserIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return RadicaleUserSubitemsPath(**data)
+
+class RadicaleWorkspaceSubItemPathSchema(RadicaleSubItemPathSchema, WorkspaceIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return RadicaleWorkspaceSubitemsPath(**data)
 
 class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
@@ -752,6 +757,12 @@ class WorkspaceModifySchema(marshmallow.Schema):
         required=True,
         example='A super description of my workspace.',
     )
+    calendar_enabled = marshmallow.fields.Bool(
+        allow_none=True,
+        required=False,
+        default=None,
+        description='has workspace has an associated calendar ?'
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
@@ -804,7 +815,7 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         many=True,
     )
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
-
+    calendar_enabled = marshmallow.fields.Bool(example=True, default=True)
     class Meta:
         description = 'Digest of workspace informations'
 
@@ -858,12 +869,6 @@ class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
                     'creation'
     )
 
-
-class ApplicationConfigSchema(marshmallow.Schema):
-    pass
-    #  TODO - G.M - 24-05-2018 - Set this
-
-
 class TimezoneSchema(marshmallow.Schema):
     name = StrippedString(example='Europe/London')
 
@@ -886,7 +891,7 @@ class ErrorCodeSchema(marshmallow.Schema):
 
 class ApplicationSchema(marshmallow.Schema):
     label = StrippedString(example='Calendar')
-    slug = StrippedString(example='calendar')
+    slug = StrippedString(example='caldavzap')
     fa_icon = StrippedString(
         example='file-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
@@ -899,9 +904,7 @@ class ApplicationSchema(marshmallow.Schema):
         example=True,
         description='if true, the application is in use in the context',
     )
-    config = marshmallow.fields.Nested(
-        ApplicationConfigSchema,
-    )
+    config = marshmallow.fields.Dict()
 
     class Meta:
         description = 'Tracim Application informations'

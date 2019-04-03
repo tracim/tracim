@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import logging
+import sys
 import argparse
+
 import sys
 import typing
 from copy import deepcopy
@@ -13,11 +16,12 @@ from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
 from tracim_backend.exceptions import InvalidSettingFile
+from pyramid.paster import setup_logging
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
-
 
 class TracimCLI(App):
     def __init__(self) -> None:
@@ -57,24 +61,41 @@ class AppContextCommand(Command):
     default_settings = {}
 
     def take_action(self, parsed_args: argparse.Namespace) -> None:
-        super(AppContextCommand, self).take_action(parsed_args)
-        if self.auto_setup_context:
-            config_uri = parsed_args.config_file
-            settings = self.setup_settings(config_uri)
-            engine = get_engine(settings)
-            app_config = CFG(settings)
-            app_config.configure_filedepot()
-            session_factory = get_session_factory(engine)
-            session = get_tm_session(session_factory, transaction.manager)
-            try:
-                self.take_app_action(parsed_args, app_config, session)
-            except Exception as exc:
-                session.rollback()
-                transaction.abort()
-                raise exc
-            finally:
-                transaction.commit()
-                session.close_all()
+        try:
+            super(AppContextCommand, self).take_action(parsed_args)
+            self._setup_logging(parsed_args)
+            if self.auto_setup_context:
+                config_uri = parsed_args.config_file
+                settings = self.setup_settings(config_uri)
+                engine = get_engine(settings)
+                app_config = CFG(settings)
+                app_config.configure_filedepot()
+                session_factory = get_session_factory(engine)
+                session = get_tm_session(session_factory, transaction.manager)
+                try:
+                    self.take_app_action(parsed_args, app_config, session)
+                except Exception as exc:
+                    session.rollback()
+                    transaction.abort()
+                    raise exc
+                finally:
+                    transaction.commit()
+                    session.close_all()
+        except Exception as exc:
+            logger.exception(self, exc)
+            print('Something goes wrong during command')
+            raise exc
+
+    def _setup_logging(self, parsed_args):
+        if parsed_args.debug:
+            # INFO - G.M - 2019-03-13 - setup logging for config file
+            setup_logging(parsed_args.config_file)
+        else:
+            # INFO - G.M - 2019-03-13 - disable all logging
+            logging.config.dictConfig({
+                'version': 1,
+                'disable_existing_loggers': True,
+            })
 
     def setup_settings(self, config_uri) -> typing.Dict[str, str]:
         settings = self.default_settings
@@ -109,7 +130,17 @@ class AppContextCommand(Command):
             dest='config_file',
             default=DEFAULT_TRACIM_CONFIG_FILE,
         )
+        parser.add_argument(
+            "-d",
+            "--debug_mode",
+            help='enable_tracim log for debug',
+            dest='debug',
+            required=False,
+            action='store_true',
+            default=False,
+        )
         return parser
+
 
 class Extender(argparse.Action):
     """

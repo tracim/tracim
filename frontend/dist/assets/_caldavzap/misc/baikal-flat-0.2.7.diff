@@ -1,0 +1,35 @@
+diff -rc baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/PrincipalBackend/PDO.php baikal-flat-0.2.7.new/vendor/sabre/dav/lib/Sabre/DAVACL/PrincipalBackend/PDO.php
+*** baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/PrincipalBackend/PDO.php	2013-10-02 20:38:26.000000000 +0200
+--- baikal-flat-0.2.7.new/vendor/sabre/dav/lib/Sabre/DAVACL/PrincipalBackend/PDO.php	2014-02-16 16:25:15.873574244 +0100
+***************
+*** 70,75 ****
+--- 70,80 ----
+          '{http://sabredav.org/ns}email-address' => array(
+              'dbField' => 'email',
+          ),
++ 
++         /* necessary to access with PROPFIND caldavzap settings (Zellner, 2014-02-14) */
++         '{http://inf-it.com/ns/dav/}settings' => array(
++             'dbField' => 'inf_it_settings',
++         ),
+      );
+  
+      /**
+diff -rc baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php baikal-flat-0.2.7.new/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php
+*** baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php	2013-10-02 20:38:26.000000000 +0200
+--- baikal-flat-0.2.7.new/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php	2014-02-16 16:26:05.393981448 +0100
+***************
+*** 242,247 ****
+--- 242,253 ----
+                  'principal' => $this->getPrincipalUrl(),
+                  'protected' => true,
+              ),
++             /* give write permissions to principal properties (Zellner, 2014-02-14) */
++             array(
++                 'privilege' => '{DAV:}write',
++                 'principal' => $this->getPrincipalUrl(),
++                 'protected' => true,
++             ),
+          );
+  
+      }

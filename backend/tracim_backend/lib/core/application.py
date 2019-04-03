@@ -51,6 +51,12 @@ class ApplicationApi(object):
             copy(all_content_menu_entry),
         ]
         for app in self.get_all():
+            # FIXME - G.M - 2019-04-01 - temporary fix to avoid giving calendar
+            # menu entry, menu entry should be added through hook in app itself
+            # see issue #706, https://github.com/tracim/tracim/issues/706
+            if app.slug == 'caldavzap' and not workspace.calendar_enabled:
+                continue
+
             if app.main_route:
                 new_entry = WorkspaceMenuEntry(
                     slug=app.slug,

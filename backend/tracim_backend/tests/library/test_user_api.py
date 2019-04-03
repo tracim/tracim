@@ -863,7 +863,6 @@ class TestUserApi(DefaultTest):
         # TODO - G.M - 03-05-2018 - [avatar][calendar] Should test this
         # with true value when those param will be available.
         assert new_user.avatar_url is None
-        assert new_user.calendar_url is None
 
     def test_unit__get_current_user_ok__nominal_case(self):
         user = User(email='admin@tracim.tracim')

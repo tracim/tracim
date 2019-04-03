@@ -61,6 +61,15 @@ class DaemonException(TracimException):
 class AlreadyRunningDaemon(DaemonException):
     pass
 
+class WorkspaceCalendarDisabledException(TracimException):
+    error_code = ErrorCode.WORKSPACE_CALENDAR_DISABLED
+
+
+class CalendarServerConnectionError(TracimException):
+    pass
+
+class CannotCreateCalendar(TracimException):
+    pass
 
 class CalendarException(TracimException):
     pass
@@ -81,6 +90,11 @@ class SameValueError(ValueError):
 class NotAuthenticated(TracimException):
     pass
 
+class CaldavNotAuthenticated(NotAuthenticated):
+    error_code = ErrorCode.CALDAV_NOT_AUTHENTICATED
+
+class CaldavNotAuthorized(TracimException):
+    error_code = ErrorCode.CALDAV_NOT_AUTHORIZED
 
 class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
