@@ -271,10 +271,7 @@ class CaldavRadicaleProxyFunctionalTest(FunctionalTest):
     radicale_server = None
 
     def start_radicale_server(self):
-        settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
+        settings = self.setup_settings()
         app_factory = CaldavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
         self.radicale_server = multiprocessing.Process(target=serve, kwargs={

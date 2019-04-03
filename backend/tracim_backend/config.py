@@ -98,7 +98,6 @@ class CFG(object):
         else:
             enabled_app = default_enabled_app
         self.ENABLED_APP = enabled_app
-        self._set_default_app(self.ENABLED_APP)
 
         self.DEPOT_STORAGE_DIR = self.get_writable_directory_path_param(
             param_name='depot_storage_dir',
