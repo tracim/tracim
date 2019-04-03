@@ -7,6 +7,7 @@ from pyramid.config import Configurator
 from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
+from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -144,6 +145,7 @@ class ThreadController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.handle_exception(ContentStatusException, HTTPStatus.BAD_REQUEST)
     def set_thread_status(self, context, request: TracimRequest, hapic_data=None) -> None:  # nopep8
         """
         set thread status
@@ -160,6 +162,12 @@ class ThreadController(Controller):
             hapic_data.path.content_id,
             content_type=content_type_list.Any_SLUG
         )
+        if content.status == request.json_body.get('status'):
+            raise ContentStatusException(
+                'Content id {} already have status {}'.format(
+                    content.content_id, content.status
+                )
+            )
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,

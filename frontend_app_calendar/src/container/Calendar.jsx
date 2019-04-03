@@ -10,12 +10,12 @@ import { getCalendarList } from '../action.async.js'
 
 require('../css/index.styl')
 
-class Caldavzap extends React.Component {
+class Calendar extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      appName: 'caldavzap',
+      appName: 'calendar',
       isVisible: true,
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
@@ -35,8 +35,8 @@ class Caldavzap extends React.Component {
     const { state } = this
 
     switch (type) {
-      case 'caldavzap_showApp':
-        console.log('%c<Caldavzap> Custom event', 'color: #28a745', type, data)
+      case 'calendar_showApp':
+        console.log('%c<Calendar> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
           this.loadCalendarList(data.config.appConfig.idWorkspace)
         }
@@ -47,7 +47,7 @@ class Caldavzap extends React.Component {
   }
 
   componentDidMount () {
-    console.log('%c<Caldavzap> did mount', `color: ${this.state.config.hexcolor}`)
+    console.log('%c<Calendar> did mount', `color: ${this.state.config.hexcolor}`)
     document.getElementById('appFullscreenContainer').style.flex = '1'
 
     this.loadCalendarList(this.state.config.appConfig.idWorkspace)
@@ -56,10 +56,10 @@ class Caldavzap extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Caldavzap> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    console.log('%c<Calendar> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
-      this.caldavzapIframe.contentWindow.location.reload()
+      this.calendarIframe.contentWindow.location.reload()
     }
   }
 
@@ -94,7 +94,7 @@ class Caldavzap extends React.Component {
   }
 
   componentWillUnmount () {
-    console.log('%c<Caldavzap> will Unmount', `color: ${this.state.config.hexcolor}`)
+    console.log('%c<Calendar> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
     document.getElementById('appFullscreenContainer').style.flex = 'none'
   }
@@ -129,13 +129,13 @@ class Caldavzap extends React.Component {
 
     return (
       <iframe
-        id='cladavzapIframe'
+        id='calendarIframe'
         src='/assets/_caldavzap/index.tracim.html'
         data-config={JSON.stringify(config)}
-        ref={f => this.caldavzapIframe = f}
+        ref={f => this.calendarIframe = f}
       />
     )
   }
 }
 
-export default translate()(Caldavzap)
+export default translate()(Calendar)

@@ -1,15 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Caldavzap from './container/Caldavzap.jsx'
+import Calendar from './container/Calendar.jsx'
 
 // require('./css/index.styl')
 
 const appInterface = {
-  name: 'caldavzap',
+  name: 'calendar',
   isRendered: false,
   renderAppFullscreen: data => {
     return ReactDOM.render(
-      <Caldavzap data={data} />
+      <Calendar data={data} />
       , document.getElementById(data.config.domContainer)
     )
   },

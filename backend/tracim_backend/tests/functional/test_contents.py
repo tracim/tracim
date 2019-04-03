@@ -1834,6 +1834,27 @@ class TestHtmlDocuments(FunctionalTest):
         assert 'code' in res.json_body
         assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
+    def test_api__set_document_status__err_400__same_status(self) -> None:
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'open',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6/status',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE
+
 
 class TestFiles(FunctionalTest):
     """
@@ -5317,6 +5338,68 @@ class TestFiles(FunctionalTest):
         assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
+    def test_api__set_file_status__err_400__same_status(self) -> None:
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'open',
+        }
+        # set status
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}/status'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE
+
 
 class TestThreads(FunctionalTest):
     """
@@ -5909,3 +5992,24 @@ class TestThreads(FunctionalTest):
         assert res.json_body
         assert 'code' in res.json_body
         assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+
+    def test_api__set_thread_status__err_400__same_status(self) -> None:
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'open',
+        }
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7/status',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE  # nopep8
