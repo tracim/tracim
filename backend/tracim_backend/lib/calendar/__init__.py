@@ -27,22 +27,17 @@ class CaldavAppFactory(object):
         storage_path = radicale_config.get('storage', 'filesystem_folder')
         sub_dir_storage_path = os.path.join(storage_path, 'collection-root')
         parent_folder = os.path.dirname(storage_path)
-        if os.path.isdir(parent_folder):
-            if not os.path.isdir(storage_path):
-                os.mkdir(storage_path)
-            if not os.path.isdir(sub_dir_storage_path):
-                os.mkdir(sub_dir_storage_path)
-            calendar_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR)
-            if not os.path.isdir(calendar_dir):
-                os.mkdir(calendar_dir)
-            user_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR, app_config.CALDAV_RADICALE_USER_SUBDIR)
-            if not os.path.isdir(user_dir):
-                os.mkdir(user_dir)
-            workspace_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR, app_config.CALDAV_RADICALE_WORKSPACE_SUBDIR)
-            if not os.path.isdir(workspace_dir):
-                os.mkdir(workspace_dir)
-        else:
-            raise ConfigurationError("{} is not a correct folder, can't set properly storage folder of radicale".format(parent_folder))
+        if not os.path.isdir(parent_folder):
+            raise ConfigurationError(
+                "{} is not a correct folder, can't set properly storage folder of radicale".format(
+            parent_folder
+            )
+        )
+        user_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR, app_config.CALDAV_RADICALE_USER_SUBDIR)
+        os.makedirs(user_dir, exist_ok=True)
+        workspace_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_CALENDAR_DIR, app_config.CALDAV_RADICALE_WORKSPACE_SUBDIR)
+        os.makedirs(workspace_dir, exist_ok=True)
+
 
 
     def _sliced_dict(self, data: typing.Dict[str, any], beginning_key_string: str):
@@ -52,10 +47,11 @@ class CaldavAppFactory(object):
         :param beginning_key_string:
         :return:
         """
-        return {
-            key: value for key, value in data.items()
-            if key.startswith(beginning_key_string)
-        }
+        sliced_dict={}
+        for key, value in data.items():
+            if key.startswith(beginning_key_string):
+                sliced_dict[key] = value
+        return sliced_dict
 
     def _parse_additional_radicale_config(
             self,
@@ -74,9 +70,9 @@ class CaldavAppFactory(object):
                 )
         )
         for param_name, value in radicales_params.items():
-            param_name_elems = param_name.split('.')
-            assert len(param_name_elems) == 4
-            main_section, sub_main_section, radicale_section, radicale_param_config = param_name.split('.')
+            parameter_parts = param_name.split('.')
+            assert len(parameter_parts) == 4
+            main_section, sub_main_section, radicale_section, radicale_param_config = parameter_parts
             assert main_section == 'caldav'
             assert sub_main_section == 'radicale'
             if not config.has_section(radicale_section):

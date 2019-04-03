@@ -33,18 +33,19 @@ TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
 """
+CALDAV_URL_FOR_TEST = ('http://localhost:5232')
 
 class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
 
     @pytest.mark.skip('This Need sleep method actually')
     def test_radicale_available(self) -> None:
         try:
-            result = requests.get('http://localhost:5232', timeout=3)
+            result = requests.get(CALDAV_URL_FOR_TEST, timeout=3)
         except ConnectionError as exc:
             # we do retry just one time in order to be sure server was
             # correctly setup
             sleep(0.1)
-            result = requests.get('http://localhost:5232', timeout=3)
+            result = requests.get(CALDAV_URL_FOR_TEST, timeout=3)
         assert result.status_code == 200
 
     def test_proxy_user_calendar__ok__nominal_case(self) -> None:

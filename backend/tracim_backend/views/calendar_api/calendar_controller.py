@@ -69,12 +69,13 @@ class CalendarController(Controller):
         for this controller
         """
 
-        # # enable workspace notification
+        # INFO - G.M - 2019-04-01 - user calendar
         configurator.add_route('user_calendars',
                                '/users/{user_id:\d+}/calendar',
                                request_method='GET')
         configurator.add_view(self.user_calendars, route_name='user_calendars')
 
+        # INFO - G.M - 2019-04-01 - own user calendar
         configurator.add_route('account_calendars',
                                '/users/me/calendar',
                                request_method='GET')

@@ -85,7 +85,7 @@ class CFG(object):
             'contents/file',
             'contents/html-document',
             'contents/folder',
-            'calendar',
+            'caldavzap',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
@@ -729,7 +729,7 @@ class CFG(object):
 
         calendar = Application(
             label='Calendar',
-            slug='calendar',
+            slug='caldavzap',
             fa_icon='calendar',
             is_active=self.CALDAV_ENABLED,
             config={},
