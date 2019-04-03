@@ -26,7 +26,7 @@ var globalBackgroundSync=true
 var globalSyncResourcesInterval=120000
 var globalEnableRefresh=false
 var globalEnableKbNavigation=true
-// var globalInterfaceLanguage=window.parent.globalTracimLang === 'fr' ? 'fr_FR' : window.parent.globalTracimLang // Côme - 2017/09/14 - line outdated
+
 // globalTracimLang is declared in tracim header (caldavzap is in an iframe)
 var globalInterfaceLanguage = (function (lang) {
   switch (lang) {
@@ -113,7 +113,7 @@ var globalDocCookies = {
     document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
     return true;
   },
-  // @INFO - CH - 2019-04-02 - bellow is unused
+  // @INFO - CH - 2019-04-02 - bellow functions are unused
   // removeItem: function (sKey, sPath, sDomain) {
   //   if (!this.hasItem(sKey)) { return false; }
   //   document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "");
@@ -130,6 +130,8 @@ var globalDocCookies = {
   // }
 };
 
+// FIXME - CH - 2019-04-03 - Saving the timezone in a cookie in ok but a better solution should be implement
+// see https://github.com/tracim/tracim/issues/1551
 var globalTimezoneCookieName = 'caldavzap_default_timezone'
 var globalUpdateTimezoneCookieValue = function (newTimezone) {
   globalDocCookies.setItem(globalTimezoneCookieName, newTimezone, 60*60*24*365)

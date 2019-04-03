@@ -1897,7 +1897,7 @@ function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex,
 }// Save the client settings (stored as DAV property on server)
 function netSaveSettings(inputResource, inputSettings, isFormSave, collectionLoad)
 {
-  // @INFO - CH - 2019-04-02 - removed this because we don't understand how it works and it cause some side effects
+  // INFO - CH - 2019-04-02 - removed this because we don't understand how it works and it cause some side effects
   // Side effect example: it saves the timezone and canno't be changed afterwards
   return true
 	var tmp = algoo_replace_regex(inputResource.href, globalAccountSettings);
