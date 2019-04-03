@@ -509,6 +509,30 @@ class CFG(object):
                 'ERROR: Caldav radicale proxy cannot be activated if no radicale'
                 'base url is configured. set "caldav.radicale_proxy.base_url" properly'
             )
+        if self.CALDAV_ENABLED:
+            radicale_storage_dir = self.get_writable_directory_path_param(
+                'caldav.radicale.storage.filesystem_folder',
+                settings.get('caldav.radicale.storage.filesystem_folder'),
+                is_mandatory=False,
+            )
+            if not radicale_storage_dir:
+                raise ConfigurationError(
+                    '"{}" is needed if "{}" is true.'.format(
+                        'caldav.radicale.storage.filesystem_folder',
+                        'caldav.enabled'
+                    )
+                )
+            radicale_storage_type = settings.get('caldav.radicale.storage.type')
+            if radicale_storage_type != 'multifilesystem':
+                raise ConfigurationError(
+                    '"{}" should be set to "{}"'
+                    ' (currently only valid value)'
+                    ' when "{}" is true'.format(
+                        'caldav.radicale.storage.type',
+                        'multifilesystem',
+                        'caldav.enabled',
+                    )
+                )
 
         self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(settings.get(
             'preview.jpg.restricted_dims', False

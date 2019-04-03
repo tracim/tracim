@@ -55,7 +55,8 @@ TEST_SESSIONS_DATA_DIR_ENV_VAR = 'TRACIM_TEST_SESSIONS_DATA_DIR'
 DEFAULT_TEST_SESSIONS_LOCK_DIR = '/tmp/test/sessions/sessions_lock'
 TEST_SESSIONS_LOCK_DIR_ENV_VAR = 'TRACIM_TEST_SESSIONS_LOCK_DIR'
 
-
+DEFAULT_TEST_RADICALE_STORAGE_DIR = '/tmp/test/radicale_storage'
+TEST_RADICALE_STORAGE_DIR_ENV_VAR = 'TRACIM_TEST_RADICALE_STORAGE_DIR'
 
 def eq_(a, b, msg=None) -> None:
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
@@ -93,12 +94,17 @@ def setup_parametrizable_config(settings: typing.Dict[str, str]):
         TEST_SESSIONS_LOCK_DIR_ENV_VAR,
         DEFAULT_TEST_SESSIONS_LOCK_DIR
     )
+    settings['caldav.radicale.storage.filesystem_folder'] = os.environ.get(
+        TEST_RADICALE_STORAGE_DIR_ENV_VAR,
+        DEFAULT_TEST_RADICALE_STORAGE_DIR
+    )
     # INFO - G.M - 2019-04-02 - try to create dir if no exist to avoid trouble
     # in test
     os.makedirs(settings['preview_cache_dir'], exist_ok=True)
     os.makedirs(settings['depot_storage_dir'], exist_ok=True)
     os.makedirs(settings['session.data_dir'], exist_ok=True)
     os.makedirs(settings['session.lock_dir'], exist_ok=True)
+    os.makedirs(settings['caldav.radicale.storage.filesystem_folder'], exist_ok=True)
     return settings
 
 

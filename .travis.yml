@@ -7,7 +7,7 @@ env:
     - TRACIM_TEST_SQLALCHEMY_URL=
     - TRACIM_TEST_SESSIONS_DATA_DIR=/tmp/test/sessions/data
     - TRACIM_TEST_SESSIONS_LOCK_DIR=/tmp/test/sessions/lock
-
+    - TRACIM_TEST_RADICALE_STORAGE_DIR=/tmp/test/radicale_storage
 
 sudo: false
 language: python
