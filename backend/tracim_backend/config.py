@@ -85,7 +85,7 @@ class CFG(object):
             'contents/file',
             'contents/html-document',
             'contents/folder',
-            'calendar',
+            'caldavzap',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
