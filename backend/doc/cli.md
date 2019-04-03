@@ -51,9 +51,9 @@ This will drop all your database, be carefull !
 
 ### Check and recreate calendar for user/workspace ###
 
-in some case, calendars of user or workspace can failed to be created, to
-check if calendar are all created and force creation of those where not
-properly created, you can do :
+in some case, calendars of user or workspace can failed to be created,
+to check if all calendars are created and force their creation if they're not,
+you can do:
 
     tracimcli caldav calendar create
 

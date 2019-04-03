@@ -293,7 +293,7 @@ class RadicaleUserSubitemsPath(object):
     Paths params with workspace id and subitem
     """
     def __init__(self, user_id: int, sub_item: str) -> None:
-        self.workspace_id = user_id
+        self.user_id = user_id
         self.sub_item = sub_item
 
 class RadicaleWorkspaceSubitemsPath(object):
@@ -348,8 +348,8 @@ class CalendarFilterQuery(object):
     """
     Calendar filter query model
     """
-    def __init__(self, workspace_ids: str = None, calendar_types: str = None):
-        self.workspace_ids = string_to_list(workspace_ids, ',', int)
+    def __init__(self, workspace_ids: str = '', calendar_types: str = ''):
+        self.workspace_ids = string_to_list(workspace_ids, ',', int) or None
         self.calendar_types = string_to_list(calendar_types, ',', str) or None
 
 class FileQuery(object):
@@ -670,7 +670,7 @@ class WorkspaceInContext(object):
     @property
     def calendar_enabled(self) -> bool:
         """
-        is calendar of workspace enabled ?
+        returns True if workspace's calendar is enabled
         """
         return self.workspace.calendar_enabled
 

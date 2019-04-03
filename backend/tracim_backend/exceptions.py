@@ -59,7 +59,7 @@ class DaemonException(TracimException):
 class AlreadyRunningDaemon(DaemonException):
     pass
 
-class WorkspaceCalendarDisabled(TracimException):
+class WorkspaceCalendarDisabledException(TracimException):
     error_code = ErrorCode.WORKSPACE_CALENDAR_DISABLED
 
 

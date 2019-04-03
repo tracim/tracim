@@ -729,7 +729,7 @@ class CFG(object):
 
         calendar = Application(
             label='Calendar',
-            slug='calendar',
+            slug='caldavzap',
             fa_icon='calendar',
             is_active=self.CALDAV_ENABLED,
             config={},
