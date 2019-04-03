@@ -406,7 +406,7 @@ class CFG(object):
         if self.EMAIL_REPLY_ACTIVATED and not self.EMAIL_REPLY_LOCKFILE_PATH:
             raise ConfigurationError(
                 'When "{}" is true, "{}" should not be empty'.format(
-                'email.reply.activated'
+                'email.reply.activated',
                 'email.reply.lockfile_path'
                 )
             )
