@@ -173,7 +173,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__user_x',
-            self.radicale_path_user_dir + '{user_id:[0-9]+}/{sub_item:[a-zA-Z0-9]+\.ics}{trailing_slash:[/]?}',
+            self.radicale_path_user_dir + '{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}{trailing_slash:[/]?}',
         )
         configurator.add_view(
             self.radicale_proxy__user_subitems,
@@ -201,7 +201,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             'radicale_proxy__workspace_x',
-            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{sub_item:[a-zA-Z0-9]+\.ics}{trailing_slash:[/]?}',
+            self.radicale_path_workspace_dir + '{workspace_id:[0-9]+}/{sub_item:[^\/]+\.ics}{trailing_slash:[/]?}',
         )
         configurator.add_view(
             self.radicale_proxy__workspace_subitems,
