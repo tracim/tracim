@@ -29,7 +29,7 @@ describe('New statuses are visible in timeline', () => {
     )
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_3]').within(() => {
-      cy.contains(`${statusMessage} open`)
+      cy.contains(`${statusMessage} Open`)
     })
   })
 
@@ -41,7 +41,7 @@ describe('New statuses are visible in timeline', () => {
     )
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.contains(`${statusMessage} validated`)
+      cy.contains(`${statusMessage} Validated`)
     })
   })
 
@@ -53,7 +53,7 @@ describe('New statuses are visible in timeline', () => {
     )
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.contains(`${statusMessage} unvalidated`)
+      cy.contains(`${statusMessage} Cancelled`)
     })
   })
 
@@ -65,7 +65,7 @@ describe('New statuses are visible in timeline', () => {
     )
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
-      cy.contains(`${statusMessage} deprecated`)
+      cy.contains(`${statusMessage} Deprecated`)
     })
   })
 })
