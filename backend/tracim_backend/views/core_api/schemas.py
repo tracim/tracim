@@ -891,7 +891,7 @@ class ErrorCodeSchema(marshmallow.Schema):
 
 class ApplicationSchema(marshmallow.Schema):
     label = StrippedString(example='Calendar')
-    slug = StrippedString(example='caldavzap')
+    slug = StrippedString(example='calendar')
     fa_icon = StrippedString(
         example='file-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8

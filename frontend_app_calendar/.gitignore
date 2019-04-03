@@ -3,6 +3,6 @@
 .git/
 dist/app
 dist/assets
-dist/caldavzap.app.js
-dist/caldavzap.bundle.app.js
+dist/calendar.app.js
+dist/calendar.bundle.app.js
 node_modules/
