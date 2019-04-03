@@ -591,8 +591,8 @@ class CFG(object):
     def get_writable_directory_path_param(self, param_name, path, is_mandatory):
         if is_mandatory:
             self.get_mandatory_param(param_name, path)
-        else:
-            return
+        elif not path:
+            return None
         try:
             is_dir_writable(path)
         except NotADirectoryError as exc:
