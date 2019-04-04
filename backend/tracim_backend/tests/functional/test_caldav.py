@@ -16,8 +16,8 @@ from tracim_backend.tests import CaldavRadicaleProxyFunctionalTest
 from tracim_backend.tests import FunctionalTest
 
 VALID_CALDAV_BODY_PUT_EVENT = """
-BEGIN:VAGENDA
-PRODID:-//Mozilla.org/NONSGML Mozilla Agenda V1.1//EN
+BEGIN:VCALENDAR
+PRODID:-//Mozilla.org/NONSGML Mozilla Calendar V1.1//EN
 VERSION:2.0
 X-WR-CALNAME:test
 X-WR-TIMEZONE:Europe/Paris
@@ -31,7 +31,7 @@ DTSTART;VALUE=DATE:20190306
 DTEND;VALUE=DATE:20190307
 TRANSP:TRANSPARENT
 END:VEVENT
-END:VAGENDA
+END:VCALENDAR
 """
 CALDAV_URL_FOR_TEST = ('http://localhost:5232')
 
