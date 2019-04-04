@@ -3,6 +3,6 @@
 .git/
 dist/app
 dist/assets
-dist/calendar.app.js
-dist/calendar.bundle.app.js
+dist/agenda.app.js
+dist/agenda.bundle.app.js
 node_modules/

@@ -90,8 +90,8 @@ cd $DEFAULTDIR/frontend_app_folder_advanced || exit 1
 
 
 # app Calendar
-log "cd $DEFAULTDIR/frontend_app_calendar"
-cd $DEFAULTDIR/frontend_app_calendar || exit 1
+log "cd $DEFAULTDIR/frontend_app_agenda"
+cd $DEFAULTDIR/frontend_app_agenda || exit 1
 ./build_calendar.sh $dev
 
 # build Tracimtracim

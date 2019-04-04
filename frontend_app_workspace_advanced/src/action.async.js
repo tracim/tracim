@@ -41,7 +41,8 @@ export const putDescription = (apiUrl, workspace, newDescription) =>
 export const putCalendarEnabled = (apiUrl, workspace, calendarEnabled) =>
   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
     credentials: 'include',
-    headers: {...FETCH_CONFIG.headers},method: 'PUT',
+    headers: {...FETCH_CONFIG.headers},
+    method: 'PUT',
     body: JSON.stringify({
       label: workspace.label,
       description: workspace.description,

@@ -173,7 +173,7 @@ class Tracim extends React.Component {
           <Route path='/ui/workspaces/:idws?' render={() => [// Workspace Router
             // @FIXME - CH - 2018-03-26 - the use of array in a render function avoid having to wrap everything into
             // a wrapper div.
-            // This is required here to avoid having the div.tracim__content in the calendars pages.
+            // This is required here to avoid having the div.tracim__content in the agendas pages.
             // To fix this, upgrade React to at least 16.2.0 and use the first class component React.Fragment instead
             // of the array syntax that is kind of misleading. Also remove the key props
             <Route exact path={PAGE.WORKSPACE.ROOT} key='workspace_root' render={() =>
@@ -203,7 +203,7 @@ class Tracim extends React.Component {
               </div>
             } />,
 
-            <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} key='workspace_calendar' render={() =>
+            <Route path={PAGE.WORKSPACE.AGENDA(':idws')} key='workspace_agenda' render={() =>
               <AppFullscreenRouter />
             } />
           ]} />
@@ -215,7 +215,7 @@ class Tracim extends React.Component {
           <Route exact path={[
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
-            PAGE.CALENDAR
+            PAGE.AGENDA
           ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}

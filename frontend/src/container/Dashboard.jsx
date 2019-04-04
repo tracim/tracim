@@ -40,7 +40,6 @@ import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-// import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -60,8 +59,7 @@ class Dashboard extends React.Component {
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
       displayNotifBtn: false,
-      displayWebdavBtn: false,
-      displayCalendarBtn: false
+      displayWebdavBtn: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -159,8 +157,6 @@ class Dashboard extends React.Component {
   handleToggleNotifBtn = () => this.setState(prevState => ({displayNotifBtn: !prevState.displayNotifBtn}))
 
   handleToggleWebdavBtn = () => this.setState(prevState => ({displayWebdavBtn: !prevState.displayWebdavBtn}))
-
-  handleToggleCalendarBtn = () => this.setState(prevState => ({displayCalendarBtn: !prevState.displayCalendarBtn}))
 
   handleClickRecentContent = (idContent, typeContent) => this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.curWs.id, typeContent, idContent))
 
@@ -498,18 +494,6 @@ class Dashboard extends React.Component {
                   t={props.t}
                 />
               </div>
-
-              {/*
-                AC - 11/09/2018 - not included in v2.0 roadmap
-                <MoreInfo
-                  onClickToggleWebdav={this.handleToggleWebdavBtn}
-                  displayWebdavBtn={state.displayWebdavBtn}
-                  onClickToggleCalendar={this.handleToggleCalendarBtn}
-                  displayCalendarBtn={state.displayCalendarBtn}
-                  t={props.t}
-                />
-              */}
-
             </PageContent>
           </PageWrapper>
         </div>
