@@ -222,6 +222,17 @@ class CFG(object):
             ActionDescription.REVISION,
             ActionDescription.STATUS_UPDATE
         ]
+        # TODO - G.M - 2019-04-04 - need to be better handled:
+        # dynamic default value and allow user to set this value.
+        # see :https://github.com/tracim/tracim/issues/1555
+        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
+            'html-document',
+            'thread',
+            'file',
+            'comment',
+            # 'folder' --folder is skipped
+        ]
+
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
@@ -588,14 +599,6 @@ class CFG(object):
 
     def _post_actions(self):
         self._set_default_app(self.ENABLED_APP)
-
-        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-            content_type_list.Page.slug,
-            content_type_list.Thread.slug,
-            content_type_list.File.slug,
-            content_type_list.Comment.slug,
-            # content_type_list.Folder.slug -- Folder is skipped
-        ]
 
     def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
         """
