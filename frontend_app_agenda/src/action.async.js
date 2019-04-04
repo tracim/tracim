@@ -1,9 +1,9 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const getCalendarList = (apiUrl, idWorkspace = null) => {
+export const getAgendaList = (apiUrl, idWorkspace = null) => {
   const href = idWorkspace
-    ? `users/me/calendar?workspace_ids=${idWorkspace}`
-    : 'users/me/calendar'
+    ? `users/me/agenda?workspace_ids=${idWorkspace}`
+    : 'users/me/agenda'
 
   return fetch(`${apiUrl}/${href}`, {
     credentials: 'include',

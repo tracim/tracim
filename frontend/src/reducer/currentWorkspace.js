@@ -15,7 +15,7 @@ const defaultWorkspace = {
   slug: '',
   label: '',
   description: '',
-  calendarEnabled: false,
+  agendaEnabled: false,
   sidebarEntryList: [],
   memberList: [],
   recentActivityList: [],
@@ -32,7 +32,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         slug: action.workspaceDetail.slug,
         label: action.workspaceDetail.label,
         description: action.workspaceDetail.description,
-        calendarEnabled: action.workspaceDetail.calendar_enabled,
+        agendaEnabled: action.workspaceDetail.agenda_enabled,
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
           route: sbe.route,

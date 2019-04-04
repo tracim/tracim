@@ -10,9 +10,9 @@ module.exports = {
     : ['@babel/polyfill', './src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'calendar.app.js' : 'calendar.app.dev.js',
+    filename: isProduction ? 'agenda.app.js' : 'agenda.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appCalendar' : undefined,
+    library: isProduction ? 'appAgenda' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
