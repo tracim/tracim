@@ -38,6 +38,7 @@ RUN \
     libimage-exiftool-perl \
     libjpeg-dev \
     libmagickwand-dev \
+    libpq-dev \
     libreoffice \
     locales \
     mysql-client \
