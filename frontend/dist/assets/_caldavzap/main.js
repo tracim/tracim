@@ -1917,6 +1917,8 @@ function globalMainCalDAV()
 		$('#timezonePicker').val($(this).val());
 		$('#timezonePickerTODO').val($(this).val());
 		applyTimezone(previousTimezone);
+
+    globalUpdateTimezoneCookieValue($(this).val())
 	});
 
 	/*************************** BAD HACKS SECTION ***************************/

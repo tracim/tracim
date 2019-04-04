@@ -2742,3 +2742,22 @@ img[data-type="invalidVerySmall"]
 .searchContainer {
   left: 70px;
 }
+#timezoneWrapper {
+  height: 37px;
+  z-index: 25;
+}
+#timezoneWrapper > label {
+  display: block;
+  max-width: none;
+  margin-right: 86px;
+  text-align: right;
+}
+#timezoneWrapper > #timezoneSelectDiv {
+  position: static;
+  width: calc(100% - 42px);
+  margin-left: 42px;
+  text-align: right;
+}
+#timezoneWrapper > #timezoneSelectDiv > #timezonePicker {
+  width: 100%;
+}
