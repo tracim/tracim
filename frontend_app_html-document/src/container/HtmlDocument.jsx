@@ -283,6 +283,7 @@ class HtmlDocument extends React.Component {
         break
       case 400:
         switch (fetchResultSaveHtmlDoc.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
