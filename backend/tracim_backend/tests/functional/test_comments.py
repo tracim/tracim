@@ -203,6 +203,9 @@ class TestCommentsEndpoint(FunctionalTest):
         assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__post_content_comment__err_400__empty_raw_content(self) -> None:
+        """
+        Get alls comments of a content
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -224,6 +227,9 @@ class TestCommentsEndpoint(FunctionalTest):
         assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__post_content_comment__err_400__empty_simple_html(self) -> None:
+        """
+        Get alls comments of a content
+        """
         self.testapp.authorization = (
             'Basic',
             ('admin@admin.admin', 'admin@admin.admin')
@@ -239,6 +245,9 @@ class TestCommentsEndpoint(FunctionalTest):
         assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__empty_nested_html(self) -> None:
+        """
+        Get alls comments of a content
+        """
         self.testapp.authorization = (
             'Basic',
             ('admin@admin.admin', 'admin@admin.admin')
@@ -254,6 +263,9 @@ class TestCommentsEndpoint(FunctionalTest):
         assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__only_br_tags_nested_html(self) -> None:
+        """
+        Get alls comments of a content
+        """
         self.testapp.authorization = (
             'Basic',
             ('admin@admin.admin', 'admin@admin.admin')
@@ -267,52 +279,6 @@ class TestCommentsEndpoint(FunctionalTest):
         assert res.json_body
         assert 'code' in res.json_body
         assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
-
-    def test_api__post_content_comment__err_400__unclosed_empty_tag(self) -> None:
-        self.testapp.authorization = (
-            'Basic',
-            ('admin@admin.admin', 'admin@admin.admin')
-        )
-        params = {'raw_content': '<p></i>'}
-        res = self.testapp.post_json(
-            '/api/v2/workspaces/2/contents/7/comments',
-            params=params,
-            status=400
-        )
-        assert res.json_body
-        assert 'code' in res.json_body
-        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
-
-    def test_api__post_content_comment__err_400__unclosed_tag_not_empty(self) -> None:
-        """
-        This test should raise an error if we validate the html
-        The browser will close the p tag and removes the i tag so the html is valid
-        """
-        self.testapp.authorization = (
-            'Basic',
-            ('admin@admin.admin', 'admin@admin.admin')
-        )
-        params = {'raw_content': '<p>Hello</i>'}
-        self.testapp.post_json(
-            '/api/v2/workspaces/2/contents/7/comments',
-            params=params,
-            status=200
-        )
-
-    def test_api__post_content_comment__err_400__invalid_html(self) -> None:
-        """
-        This test should raise an error as the html isn't valid
-        """
-        self.testapp.authorization = (
-            'Basic',
-            ('admin@admin.admin', 'admin@admin.admin')
-        )
-        params = {'raw_content': '<p></p>Hello'}
-        self.testapp.post_json(
-            '/api/v2/workspaces/2/contents/7/comments',
-            params=params,
-            status=200
-        )
 
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:  # nopep8
         """
