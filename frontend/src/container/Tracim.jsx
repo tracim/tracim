@@ -4,6 +4,10 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
+import {
+  Route, withRouter, Redirect
+} from 'react-router-dom'
+import { Switch } from 'react-router'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
@@ -16,9 +20,6 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import {
-  Route, withRouter, Redirect
-} from 'react-router-dom'
 import {
   PAGE,
   unLoggedAllowedPageList,
@@ -184,18 +185,26 @@ class Tracim extends React.Component {
               <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
             } />,
 
-            <Route
-              path={[
-                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
-                PAGE.WORKSPACE.CONTENT_LIST(':idws')
-              ]}
-              key='workspace_contentlist'
-              render={() =>
-                <div className='tracim__content fullWidthFullHeight'>
-                  <WorkspaceContent />
-                </div>
-              }
-            />,
+            <Switch>
+              <Route
+                path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')}
+                key='workspace_content'
+                render={() =>
+                  <div className='tracim__content fullWidthFullHeight'>
+                    <WorkspaceContent />
+                  </div>
+                }
+              />
+              <Route
+                path={PAGE.WORKSPACE.CONTENT_LIST(':idws')}
+                key='workspace_contentlist'
+                render={() =>
+                  <div className='tracim__content fullWidthFullHeight'>
+                    <WorkspaceContent />
+                  </div>
+                }
+              />
+            </Switch>,
 
             <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
               <div className='tracim__content fullWidthFullHeight'>
