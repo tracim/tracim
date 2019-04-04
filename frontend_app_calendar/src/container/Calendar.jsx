@@ -3,7 +3,10 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  handleFetchResult
+  handleFetchResult,
+  PageContent,
+  PageTitle,
+  PageWrapper
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import { getCalendarList } from '../action.async.js'
@@ -128,12 +131,24 @@ class Calendar extends React.Component {
     }
 
     return (
-      <iframe
-        id='calendarIframe'
-        src='/assets/_caldavzap/index.tracim.html'
-        data-config={JSON.stringify(config)}
-        ref={f => this.calendarIframe = f}
-      />
+      <PageWrapper customClass='calendarPage'>
+        <PageTitle
+          parentClass='calendarPage'
+          title={props.t('Calendar')}
+          icon={'calendar'}
+        />
+
+        <PageContent parentClass='calendarPage'>
+          <iframe
+            id='calendarIframe'
+            src='/assets/_caldavzap/index.tracim.html'
+            allow='fullscreen'
+            allowfullscreen
+            data-config={JSON.stringify(config)}
+            ref={f => this.calendarIframe = f}
+          />
+        </PageContent>
+      </PageWrapper>
     )
   }
 }

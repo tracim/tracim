@@ -121,9 +121,13 @@ class Sidebar extends React.Component {
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 
+          {/*
+          FIXME - CH - 2019-04-04 - button scroll to top removed for now
+          see https://github.com/tracim/tracim/issues/1554
           <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
             <i className='fa fa-chevron-up' />
           </div>
+          */}
 
           <div className='sidebar__content'>
             <div id='sidebar__content__scrolltopmarker' style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
