@@ -58,7 +58,7 @@ class Workspace(DeclarativeBase):
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
-    agenda_enabled = Column('calendar_enabled', Boolean, unique=False, nullable=False, default=False)
+    agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
 
     #  Default value datetime.utcnow,
     # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
