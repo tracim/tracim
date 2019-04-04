@@ -46,8 +46,17 @@ class CFG(object):
         self.__dict__[key] = value
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
-        """Parse configuration file."""
+        logger.debug(self, 'CONFIG_PROCESS:1: load config from settings')
+        self._load_var_from_settings(settings)
+        logger.debug(self, 'CONFIG_PROCESS:2: load env_var, override settings according to them')
+        self._env_var_config_overriding()
+        logger.debug(self, 'CONFIG_PROCESS:3: check validity of config given')
+        self._check_validity()
+        logger.debug(self, 'CONFIG_PROCESS:4: do post actions')
+        self._post_actions()
 
+    def _load_var_from_settings(self, settings: typing.Dict[str, typing.Any]):
+        """Parse configuration file."""
         ###
         # General
         ###
@@ -57,29 +66,6 @@ class CFG(object):
         self.COLOR_CONFIG_FILE_PATH = settings.get(
             'color.config_file_path', default_color_config_file_path
         )
-        if not os.path.exists(self.COLOR_CONFIG_FILE_PATH):
-            raise Exception(
-                'ERROR: {} file does not exist. '
-                'please create it or set color.config_file_path'
-                'with a correct value'.format(self.COLOR_CONFIG_FILE_PATH)
-            )
-
-        try:
-            with open(self.COLOR_CONFIG_FILE_PATH) as json_file:
-                self.APPS_COLORS = json.load(json_file)
-        except Exception as e:
-            raise Exception(
-                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH)  # nopep8
-            ) from e
-
-        try:
-            self.APPS_COLORS['primary']
-        except KeyError as e:
-            raise Exception(
-                'Error: primary color is required in {} file'.format(
-                    self.COLOR_CONFIG_FILE_PATH)  # nopep8
-            ) from e
-
         default_enabled_app = [
             'contents/thread',
             'contents/file',
@@ -96,39 +82,22 @@ class CFG(object):
         else:
             enabled_app = default_enabled_app
         self.ENABLED_APP = enabled_app
-        mandatory_msg = \
-            'ERROR: {} configuration is mandatory. Set it before continuing.'
+
         self.DEPOT_STORAGE_DIR = settings.get(
             'depot_storage_dir',
         )
-        if not self.DEPOT_STORAGE_DIR:
-            raise Exception(
-                mandatory_msg.format('depot_storage_dir')
-            )
         self.DEPOT_STORAGE_NAME = settings.get(
             'depot_storage_name',
         )
-        if not self.DEPOT_STORAGE_NAME:
-            raise Exception(
-                mandatory_msg.format('depot_storage_name')
-            )
         self.PREVIEW_CACHE_DIR = settings.get(
             'preview_cache_dir',
         )
-        if not self.PREVIEW_CACHE_DIR:
-            raise Exception(
-                'ERROR: preview_cache_dir configuration is mandatory. '
-                'Set it before continuing.'
-            )
+
         auth_type_str = settings.get(
             'auth_types', 'internal'
         )
         self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
-        if AuthType.REMOTE is self.AUTH_TYPES:
-            raise Exception(
-                'ERROR: "remote" auth not allowed in auth_types'
-                ' list, use remote_user_header instead'
-            )
+
         self.REMOTE_USER_HEADER = settings.get('remote_user_header', None)
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
@@ -154,29 +123,22 @@ class CFG(object):
             'website.base_url',
             '',
         )
-        if not self.WEBSITE_BASE_URL:
-            raise Exception(
-                'website.base_url is needed in order to have correct path in'
-                'few place like in email.'
-                'You should set it with frontend root url.'
-            )
 
         self.API_BASE_URL = settings.get(
             'api.base_url',
             self.WEBSITE_BASE_URL,
         )
-        allowed_origin = []
+        self.CORS_ALLOWED_ORIGIN = []
         allowed_origin_string = settings.get(
             'cors.access-control-allowed-origin',
             ''
         )
         if allowed_origin_string:
-            allowed_origin.extend(allowed_origin_string.split(','))  # nopep8
-        if not allowed_origin:
-            allowed_origin.append(self.WEBSITE_BASE_URL)
+            self.CORS_ALLOWED_ORIGIN.extend(allowed_origin_string.split(','))  # nopep8
+        if not self.CORS_ALLOWED_ORIGIN:
+            self.CORS_ALLOWED_ORIGIN.append(self.WEBSITE_BASE_URL)
             if self.API_BASE_URL != self.WEBSITE_BASE_URL:
-                allowed_origin.append(self.API_BASE_URL)
-        self.CORS_ALLOWED_ORIGIN = allowed_origin
+                self.CORS_ALLOWED_ORIGIN.append(self.API_BASE_URL)
 
         # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
         # Verify this
@@ -192,19 +154,18 @@ class CFG(object):
         #     '/assets/img/bg.jpg',
         # )
         #
-        website_server_name = settings.get(
+        self.WEBSITE_SERVER_NAME = settings.get(
             'website.server_name',
             None,
         )
-        if not website_server_name:
-            website_server_name = urlparse(self.WEBSITE_BASE_URL).hostname
+        if not self.WEBSITE_SERVER_NAME:
+            self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
             logger.warning(
                 self,
                 'NOTE: Generated website.server_name parameter from '
                 'website.base_url parameter -> {0}'
-                .format(website_server_name)
+                .format(self.WEBSITE_SERVER_NAME)
             )
-        self.WEBSITE_SERVER_NAME = website_server_name
         # TODO - G.M - 2018-09-11 - Deprecated params
         # self.WEBSITE_HOME_TAG_LINE = settings.get(
         #     'website.home.tag_line',
@@ -230,21 +191,20 @@ class CFG(object):
 
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
-        legacy_reset_password_validity = settings.get('user.reset_password.validity', None)
+        defaut_reset_password_validity = '900'
+        legacy_reset_password_validity = settings.get('user.reset_password.validity')
         if legacy_reset_password_validity:
             logger.warning(
                 self,
                 'user.reset_password.validity parameter is deprecated ! '
                 'please use user.reset_password.token_lifetime instead.'
             )
-        reset_password_token_lifetime = settings.get(
+        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(legacy_reset_password_validity or defaut_reset_password_validity)
+        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(settings.get(
             'user.reset_password.token_lifetime',
-            None
-        )
-        defaut_reset_password_validity = '900'
-        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(reset_password_token_lifetime or \
-                                                      legacy_reset_password_validity or \
-                                                      defaut_reset_password_validity)
+            self.USER_RESET_PASSWORD_TOKEN_LIFETIME
+        ))
+
 
         self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
@@ -266,6 +226,13 @@ class CFG(object):
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
         )
+        if settings.get('email.notification.from'):
+            raise Exception(
+                'email.notification.from configuration is deprecated. '
+                'Use instead email.notification.from.email and '
+                'email.notification.from.default_label.'
+            )
+
         self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = settings.get(
             'email.notification.from.default_label',
             'Tracim Notifications'
@@ -310,31 +277,6 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
-        if not self.EMAIL_NOTIFICATION_ACTIVATED:
-            logger.warning(
-                self,
-                'Notification by email mecanism is disabled ! '
-                'Notification and mail invitation mecanisms will not work.'
-            )
-
-        # INFO - G.M - 2019-02-01 - check if template are available,
-        # do not allow running with email_notification_activated
-        # if templates needed are not available
-        if self.EMAIL_NOTIFICATION_ACTIVATED:
-            templates = {
-                'content_update notification': self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
-                'created account': self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML,
-                'password reset': self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
-            }
-            for template_description, template_path in templates.items():
-                if not template_path or not os.path.isfile(template_path):
-                    raise ConfigurationError(
-                        'ERROR: email template for {template_description} '
-                        'not found at "{template_path}."'.format(
-                            template_description=template_description,
-                            template_path=template_path
-                        )
-                    )
 
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
             'email.notification.smtp.server',
@@ -396,28 +338,12 @@ class CFG(object):
             'email.reply.lockfile_path',
             ''
         )
-        if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
-            raise Exception(
-                mandatory_msg.format('email.reply.lockfile_path')
-            )
 
         self.EMAIL_PROCESSING_MODE = settings.get(
             'email.processing_mode',
             'sync',
         ).upper()
 
-        if self.EMAIL_PROCESSING_MODE not in (
-                self.CST.ASYNC,
-                self.CST.SYNC,
-        ):
-            raise Exception(
-                'email.processing_mode '
-                'can ''be "{}" or "{}", not "{}"'.format(
-                    self.CST.ASYNC,
-                    self.CST.SYNC,
-                    self.EMAIL_PROCESSING_MODE,
-                )
-            )
 
         self.EMAIL_SENDER_REDIS_HOST = settings.get(
             'email.async.redis.host',
@@ -494,11 +420,6 @@ class CFG(object):
             self.CALDAV_RADICALE_WORKSPACE_SUBDIR,
         )
 
-        if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
-            raise ConfigurationError(
-                'ERROR: Caldav radicale proxy cannot be activated if no radicale'
-                'base url is configured. set "caldav.radicale_proxy.base_url" properly'
-            )
 
         self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(settings.get(
             'preview.jpg.restricted_dims', False
@@ -534,17 +455,128 @@ class CFG(object):
         self.BACKEND_I18N_FOLDER = settings.get(
             'backend.18n_folder_path', backend_i18n_folder
         )
+
+        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
+        self.FRONTEND_DIST_FOLDER_PATH = settings.get(
+            'frontend.dist_folder_path', frontend_dist_folder
+        )
+
+        self.load_ldap_settings(settings)
+
+    def _env_var_config_overriding(self):
+        pass
+
+    def _check_validity(self):
+        mandatory_msg = \
+            'ERROR: {} configuration is mandatory. Set it before continuing.'
+        # INFO - G.M - 2019-04-03 - check color file validity
+        if not os.path.exists(self.COLOR_CONFIG_FILE_PATH):
+            raise Exception(
+                'ERROR: {} file does not exist. '
+                'please create it or set color.config_file_path'
+                'with a correct value'.format(self.COLOR_CONFIG_FILE_PATH)
+            )
+
+        try:
+            with open(self.COLOR_CONFIG_FILE_PATH) as json_file:
+                self.APPS_COLORS = json.load(json_file)
+        except Exception as e:
+            raise Exception(
+                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH)  # nopep8
+            ) from e
+
+        try:
+            self.APPS_COLORS['primary']
+        except KeyError as e:
+            raise Exception(
+                'Error: primary color is required in {} file'.format(
+                    self.COLOR_CONFIG_FILE_PATH)  # nopep8
+            ) from e
+
+        # INFO - G.M - 2019-04-03 - depot dir validity
+        if not self.DEPOT_STORAGE_DIR:
+            raise Exception(
+                mandatory_msg.format('depot_storage_dir')
+            )
+        if not self.DEPOT_STORAGE_NAME:
+            raise Exception(
+                mandatory_msg.format('depot_storage_name')
+            )
+
+        if not self.PREVIEW_CACHE_DIR:
+            raise Exception(
+                'ERROR: preview_cache_dir configuration is mandatory. '
+                'Set it before continuing.'
+            )
+
+        if AuthType.REMOTE is self.AUTH_TYPES:
+            raise Exception(
+                'ERROR: "remote" auth not allowed in auth_types'
+                ' list, use remote_user_header instead'
+            )
+
+        if not self.WEBSITE_BASE_URL:
+            raise Exception(
+                'website.base_url is needed in order to have correct path in'
+                'few place like in email.'
+                'You should set it with frontend root url.'
+            )
+
+        if not self.EMAIL_NOTIFICATION_ACTIVATED:
+            logger.warning(
+                self,
+                'Notification by email mecanism is disabled ! '
+                'Notification and mail invitation mecanisms will not work.'
+            )
+
+        if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
+            raise Exception(
+                mandatory_msg.format('email.reply.lockfile_path')
+            )
+        # INFO - G.M - 2019-02-01 - check if template are available,
+        # do not allow running with email_notification_activated
+        # if templates needed are not available
+        if self.EMAIL_NOTIFICATION_ACTIVATED:
+            templates = {
+                'content_update notification': self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
+                'created account': self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML,
+                'password reset': self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+            }
+            for template_description, template_path in templates.items():
+                if not template_path or not os.path.isfile(template_path):
+                    raise ConfigurationError(
+                        'ERROR: email template for {template_description} '
+                        'not found at "{template_path}."'.format(
+                            template_description=template_description,
+                            template_path=template_path
+                        )
+                    )
+
+        if self.EMAIL_PROCESSING_MODE not in (
+                self.CST.ASYNC,
+                self.CST.SYNC,
+        ):
+            raise Exception(
+                'email.processing_mode '
+                'can ''be "{}" or "{}", not "{}"'.format(
+                    self.CST.ASYNC,
+                    self.CST.SYNC,
+                    self.EMAIL_PROCESSING_MODE,
+                )
+            )
+
+        if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
+            raise ConfigurationError(
+                'ERROR: Caldav radicale proxy cannot be activated if no radicale'
+                'base url is configured. set "caldav.radicale_proxy.base_url" properly'
+            )
+
         if not os.path.isdir(self.BACKEND_I18N_FOLDER):
             raise Exception(
                 'ERROR: {} folder does not exist as folder. '
                 'please set backend.i8n_folder_path'
                 'with a correct value'.format(self.BACKEND_I18N_FOLDER)
             )
-
-        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
-        self.FRONTEND_DIST_FOLDER_PATH = settings.get(
-            'frontend.dist_folder_path', frontend_dist_folder
-        )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
         if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
@@ -553,7 +585,8 @@ class CFG(object):
                 'please set frontend.dist_folder.path'
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
-        self.load_ldap_settings(settings)
+
+    def _post_actions(self):
         self._set_default_app(self.ENABLED_APP)
 
         self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
@@ -563,12 +596,6 @@ class CFG(object):
             content_type_list.Comment.slug,
             # content_type_list.Folder.slug -- Folder is skipped
         ]
-        if settings.get('email.notification.from'):
-            raise Exception(
-                'email.notification.from configuration is deprecated. '
-                'Use instead email.notification.from.email and '
-                'email.notification.from.default_label.'
-            )
 
     def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
         """
@@ -622,7 +649,6 @@ class CFG(object):
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
         self.LDAP_GET_INFO = None
-
 
     def configure_filedepot(self):
 
