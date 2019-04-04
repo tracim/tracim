@@ -12,7 +12,6 @@ from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -47,8 +46,6 @@ class WorkspaceApi(object):
         default_lang = None
         if self._user:
             default_lang = self._user.lang
-        if not default_lang:
-            default_lang = DEFAULT_FALLBACK_LANG
         self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
 
     def _base_query_without_roles(self):

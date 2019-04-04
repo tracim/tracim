@@ -617,6 +617,7 @@ class HtmlDocument extends React.Component {
             showHeader
             newComment={newComment}
             disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
+            availableStatusList={config.availableStatuses}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

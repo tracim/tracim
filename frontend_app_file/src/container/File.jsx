@@ -667,6 +667,7 @@ class File extends React.Component {
             timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

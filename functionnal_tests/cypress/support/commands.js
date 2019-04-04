@@ -101,13 +101,14 @@ Cypress.Commands.add('loginAs', (role = 'administrators') => {
     }))
     .then(response => cy.request({
       method: 'PUT',
-      url: '/api/v2/users/'+response.body.user_id,
+      url: '/api/v2/users/' + response.body.user_id,
       body: {
-        "lang": "en",
-        "public_name": response.body.public_name,
-        "timezone": "Europe/Paris"
-        }
-    })).then(response => response.body)
+        lang: 'en',
+        public_name: response.body.public_name,
+        timezone: 'Europe/Paris'
+      }
+    }))
+    .then(response => response.body)
 })
 
 Cypress.Commands.add('logout', () => {

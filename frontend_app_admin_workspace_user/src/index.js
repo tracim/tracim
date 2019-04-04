@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Router } from 'react-router'
 import AdminWorkspaceUser from './container/AdminWorkspaceUser.jsx'
 
 require('./css/index.styl')
@@ -9,7 +10,9 @@ const appInterface = {
   isRendered: false,
   renderAppFullscreen: data => {
     return ReactDOM.render(
-      <AdminWorkspaceUser data={data} />
+      <Router history={data.config.history}>
+        <AdminWorkspaceUser data={data} />
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },

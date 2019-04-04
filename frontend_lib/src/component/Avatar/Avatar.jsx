@@ -38,7 +38,7 @@ export class Avatar extends React.Component {
     const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.width)) / 2
 
     return (
-      <div className='avatar-wrapper' style={{...props.style}}>
+      <div className='avatar-wrapper' style={{...props.style}} title={props.publicName}>
         <div
           className='avatar'
           data-cy='avatar'

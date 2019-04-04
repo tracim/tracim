@@ -24,6 +24,7 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
@@ -49,7 +50,6 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
@@ -138,7 +138,7 @@ class ContentApi(object):
             self,
             session: Session,
             current_user: typing.Optional[User],
-            config,
+            config: CFG,
             show_archived: bool = False,
             show_deleted: bool = False,
             show_temporary: bool = False,
@@ -162,9 +162,7 @@ class ContentApi(object):
         default_lang = None
         if self._user:
             default_lang = self._user.lang
-        if not default_lang:
-            default_lang = DEFAULT_FALLBACK_LANG
-        self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
+        self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     @contextmanager
     def show(
