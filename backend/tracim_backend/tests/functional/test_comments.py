@@ -224,61 +224,7 @@ class TestCommentsEndpoint(FunctionalTest):
         # INFO - G.M - 2018-09-10 - error handle by marshmallow validator.
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
-
-    def test_api__post_content_comment__err_400__empty_simple_html(self) -> None:
-        """
-        Get alls comments of a content
-        """
-        self.testapp.authorization = (
-            'Basic',
-            ('admin@admin.admin', 'admin@admin.admin')
-        )
-        params = {'raw_content': '<p></p>'}
-        res = self.testapp.post_json(
-            '/api/v2/workspaces/2/contents/7/comments',
-            params=params,
-            status=400
-        )
-        assert res.json_body
-        assert 'code' in res.json_body
-        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
-
-    def test_api__post_content_comment__err_400__empty_nested_html(self) -> None:
-        """
-        Get alls comments of a content
-        """
-        self.testapp.authorization = (
-            'Basic',
-            ('admin@admin.admin', 'admin@admin.admin')
-        )
-        params = {'raw_content': '<p><p></p><p><p></p></p></p>'}
-        res = self.testapp.post_json(
-            '/api/v2/workspaces/2/contents/7/comments',
-            params=params,
-            status=400
-        )
-        assert res.json_body
-        assert 'code' in res.json_body
-        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
-
-    def test_api__post_content_comment__err_400__only_br_tags_nested_html(self) -> None:
-        """
-        Get alls comments of a content
-        """
-        self.testapp.authorization = (
-            'Basic',
-            ('admin@admin.admin', 'admin@admin.admin')
-        )
-        params = {'raw_content': '<p><p></p><p><p><br/><br/></p><br/></p></p>'}
-        res = self.testapp.post_json(
-            '/api/v2/workspaces/2/contents/7/comments',
-            params=params,
-            status=400
-        )
-        assert res.json_body
-        assert 'code' in res.json_body
-        assert res.json_body['code'] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:  # nopep8
         """
