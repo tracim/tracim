@@ -366,6 +366,31 @@ class Dashboard extends React.Component {
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
 
+    const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
+      ? props.appList
+        .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
+        .filter(app => app.slug === 'calendar' ? props.curWs.calendarEnabled : true)
+        .map(app => {
+          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+          // INFO - CH - 2019-04-03 - hard coding some calendar properties for now since some end points requires some clarifications
+          // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
+          return {
+            ...app,
+            creationLabel: app.slug === 'calendar' ? props.t('Open the calendar') : contentType.creationLabel,
+            route: app.slug === 'calendar'
+              ? PAGE.WORKSPACE.CALENDAR(props.curWs.id)
+              : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
+          }
+        })
+      : []
+
+    // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
+    contentTypeButtonList.push({
+      ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
+      creationLabel: props.t('Explore contents'),
+      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id)
+    })
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -403,28 +428,21 @@ class Dashboard extends React.Component {
 
                   {idRoleUserWorkspace >= 2 && (
                     <div className='dashboard__calltoaction'>
-                      {props.appList
-                        .filter(app => app.slug !== 'calendar')
-                        .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
-                        .map(app => {
-                          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-                          return (
-                            <ContentTypeBtn
-                              customClass='dashboard__calltoaction__button'
-                              hexcolor={app.hexcolor}
-                              label={app.label}
-                              faIcon={app.faIcon}
-                              // TODO - Côme - 2018/09/12 - translation key bellow is a little hacky:
-                              // The creation label comes from api but since there is no translation in backend
-                              // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
-                              creationLabel={props.t(contentType.creationLabel)}
-                              onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
-                              appSlug={app.slug}
-                              key={app.label}
-                            />
-                          )
-                        })
-                      }
+                      {contentTypeButtonList.map(app =>
+                        <ContentTypeBtn
+                          customClass='dashboard__calltoaction__button'
+                          hexcolor={app.hexcolor}
+                          label={app.label}
+                          faIcon={app.faIcon}
+                          // TODO - Côme - 2018/09/12 - translation key below is a little hacky:
+                          // The creation label comes from api but since there is no translation in backend
+                          // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                          creationLabel={props.t(app.creationLabel)}
+                          onClickBtn={() => props.history.push(app.route)}
+                          appSlug={app.slug}
+                          key={app.slug}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
