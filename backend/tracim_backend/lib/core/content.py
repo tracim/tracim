@@ -54,8 +54,7 @@ from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.lib.utils.utils import preview_manager_page_format
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizerConfig  # nopep8
+from tracim_backend.lib.utils.utils import html_is_empty
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
@@ -616,15 +615,8 @@ class ContentApi(object):
             raise ContentInNotEditableState(
                 "Can't create comment on content, you need to change his status or state (deleted/archived) before any change."
             )
-        if not content:
+        if (not content) or html_is_empty(content):
             raise EmptyCommentContentNotAllowed()
-
-        config = HtmlSanitizerConfig(tag_blacklist=['script'])
-        satinizer = HtmlSanitizer(html_body=content, config=config)
-        if satinizer.is_html():
-            content = satinizer.sanitize()
-            if satinizer.html_is_empty():
-                raise EmptyCommentContentNotAllowed()
 
         item = self.create(
             content_type_slug=content_type_list.Comment.slug,
