@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Calendar from './container/Calendar.jsx'
+import Agenda from './container/Agenda.jsx'
 
 require('./css/index.styl')
 
 ReactDOM.render(
-  <Calendar data={undefined} />
+  <Agenda data={undefined} />
   , document.getElementById('content')
 )

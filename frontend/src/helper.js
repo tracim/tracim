@@ -28,7 +28,7 @@ export const PAGE = {
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
-    CALENDAR: (idws = ':idws') => `/ui/workspaces/${idws}/calendar`,
+    AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`
@@ -38,7 +38,7 @@ export const PAGE = {
   FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
   RESET_PASSWORD: '/ui/reset-password',
   ACCOUNT: '/ui/account',
-  CALENDAR: '/ui/calendar',
+  AGENDA: '/ui/agenda',
   ADMIN: {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',

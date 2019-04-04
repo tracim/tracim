@@ -4,8 +4,6 @@ import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
-// import Calendar from '../component/Account/Calendar.jsx'
-// import Timezone from '../component/Account/Timezone.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
@@ -49,14 +47,6 @@ class Account extends React.Component {
       active: false,
       label: 'Password',
       translationKey: props.t('Password')
-    // }, {
-    //   name: 'timezone',
-    //   active: false,
-    //   label: 'Timezone'
-    // }, {
-    //   name: 'calendar',
-    //   label: 'Calendrier personnel',
-    //   active: false
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
       // allow pw change only for users in tracim's db (eg. not from ldap)
       .filter(menu => editableUserAuthTypeList.includes(props.user.auth_type) ? true : menu.name !== 'password')

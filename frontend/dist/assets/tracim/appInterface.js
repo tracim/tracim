@@ -18,8 +18,8 @@
         return (appAdminWorkspaceUser || {defaul: {}}).default
       case 'workspace_advanced':
         return (appWorkspaceAdvanced || {defaul: {}}).default
-      case 'calendar':
-        return (appCalendar || {defaul: {}}).default
+      case 'agenda':
+        return (appAgenda || {defaul: {}}).default
       default:
         return null
     }
