@@ -37,6 +37,10 @@ basic_setup.session_secret = change_this_value_please!
 # CORE
 ####
 
+### Lang ###
+## default lang used in backend if user doesn't provided any lang.
+# default_lang = en
+
 ### Apps ###
 ## app enabled explicit list:
 # this allow you to explictly disable default app or enabled beta app now
@@ -264,7 +268,7 @@ email.notification.reply_to.email = reply+{content_id}@trac.im
 ## valid variable is 'content_id' for 'references' header
 email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
-email.notification.created_account.subject = [{website_title}] Created account
+email.notification.created_account.subject = [{website_title}] Someone created an account for you
 
 ### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
