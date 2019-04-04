@@ -85,7 +85,7 @@ class CFG(object):
             'contents/file',
             'contents/html-document',
             'contents/folder',
-            'calendar',
+            'agenda',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
@@ -481,16 +481,16 @@ class CFG(object):
             'caldav.radicale_proxy.base_url',
             None
         )
-        self.CALDAV_RADICALE_CALENDAR_DIR = 'calendar'
+        self.CALDAV_RADICALE_AGENDA_DIR = 'agenda'
         self.CALDAV_RADICALE_WORKSPACE_SUBDIR = 'workspace'
         self.CALDAV_RADICALE_USER_SUBDIR = 'user'
-        self.CALDAV_RADICALE_BASE_PATH = '/{}/'.format(self.CALDAV_RADICALE_CALENDAR_DIR)
+        self.CALDAV_RADICALE_BASE_PATH = '/{}/'.format(self.CALDAV_RADICALE_AGENDA_DIR)
         self.CALDAV_RADICALE_USER_PATH = '/{}/{}/'.format(
-            self.CALDAV_RADICALE_CALENDAR_DIR,
+            self.CALDAV_RADICALE_AGENDA_DIR,
             self.CALDAV_RADICALE_USER_SUBDIR,
         )
         self.CALDAV_RADICALE_WORKSPACE_PATH = '/{}/{}/'.format(
-            self.CALDAV_RADICALE_CALENDAR_DIR,
+            self.CALDAV_RADICALE_AGENDA_DIR,
             self.CALDAV_RADICALE_WORKSPACE_SUBDIR,
         )
 
@@ -727,13 +727,13 @@ class CFG(object):
             available_statuses=content_status_list.get_all(),
         )
 
-        calendar = Application(
-            label='Calendar',
-            slug='calendar',
-            fa_icon='calendar',
+        agenda = Application(
+            label='Agenda',
+            slug='agenda',
+            fa_icon='agenda',
             is_active=self.CALDAV_ENABLED,
             config={},
-            main_route='/ui/workspaces/{workspace_id}/calendar',
+            main_route='/ui/workspaces/{workspace_id}/agenda',
             app_config=self
         )
 
@@ -744,7 +744,7 @@ class CFG(object):
             (thread.slug, thread),
             (folder.slug, folder),
             (markdownpluspage.slug, markdownpluspage),
-            (calendar.slug, calendar)
+            (agenda.slug, agenda)
         ])
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var

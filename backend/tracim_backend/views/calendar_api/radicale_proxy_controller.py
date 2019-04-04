@@ -4,12 +4,12 @@ from pyramid.response import Response
 
 from hapic import HapicData
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.calendar.authorization import \
-    can_access_to_calendar_list
-from tracim_backend.lib.calendar.authorization import can_access_user_calendar
-from tracim_backend.lib.calendar.authorization import \
-    can_access_workspace_calendar
-from tracim_backend.lib.calendar.determiner import \
+from tracim_backend.lib.agenda.authorization import \
+    can_access_to_agenda_list
+from tracim_backend.lib.agenda.authorization import can_access_user_agenda
+from tracim_backend.lib.agenda.authorization import \
+    can_access_workspace_agenda
+from tracim_backend.lib.agenda.determiner import \
     CaldavAuthorizationDeterminer
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
@@ -39,14 +39,14 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_calendar)
+    @check_right(can_access_user_agenda)
     @hapic.input_path(UserIdPathSchema())
     def radicale_proxy__user(
         self, context, request: TracimRequest, hapic_data: HapicData,
     ) -> Response:
         """
-        proxy user calendar
-        example: /calendar/user/1/ to radicale path /calendar/user/1/
+        proxy user agenda
+        example: /agenda/user/1/ to radicale path /agenda/user/1/
         """
         path = '{}{}/'.format(
             self.radicale_path_user_dir,
@@ -58,14 +58,14 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_calendar)
+    @check_right(can_access_user_agenda)
     @hapic.input_path(RadicaleUserSubItemPathSchema())
     def radicale_proxy__user_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData,
     ) -> Response:
         """
-        proxy user calendar
-        example: /calendar/user/1/blabla.ics/ to radicale path /calendar/user/1/blabla.ics
+        proxy user agenda
+        example: /agenda/user/1/blabla.ics/ to radicale path /agenda/user/1/blabla.ics
         """
         path = '{}{}/{}'.format(
             self.radicale_path_user_dir,
@@ -78,13 +78,13 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_to_calendar_list)
+    @check_right(can_access_to_agenda_list)
     def radicale_proxy__users(
         self, context, request: TracimRequest,
     ) -> Response:
         """
-        proxy users calendars list
-        example: /calendar/user/ to radicale path /calendar/user/
+        proxy users agendas list
+        example: /agenda/user/ to radicale path /agenda/user/
         """
         path = self.radicale_path_user_dir
         return self._proxy.get_response_for_request(
@@ -93,14 +93,14 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_workspace_calendar)
+    @check_right(can_access_workspace_agenda)
     @hapic.input_path(WorkspaceIdPathSchema())
     def radicale_proxy__workspace(
         self, context, request: TracimRequest, hapic_data: HapicData,
     ) -> Response:
         """
-        proxy workspace calendar
-        example: /calendar/workspace/1.ics/ to radicale path /calendar/workspace/1.ics/
+        proxy workspace agenda
+        example: /agenda/workspace/1.ics/ to radicale path /agenda/workspace/1.ics/
         """
         path = '{}{}/'.format(
             self.radicale_path_workspace_dir,
@@ -113,14 +113,14 @@ class RadicaleProxyController(Controller):
 
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_workspace_calendar)
+    @check_right(can_access_workspace_agenda)
     @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
     def radicale_proxy__workspace_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData,
     ) -> Response:
         """
-        proxy workspace calendar
-        example: /calendar/workspace/1.ics/blabla.ics to radicale path /calendar/workspace/1.ics/blabla.ics
+        proxy workspace agenda
+        example: /agenda/workspace/1.ics/blabla.ics to radicale path /agenda/workspace/1.ics/blabla.ics
         """
         path = '{}{}/{}'.format(
             self.radicale_path_workspace_dir,
@@ -133,13 +133,13 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_to_calendar_list)
+    @check_right(can_access_to_agenda_list)
     def radicale_proxy__workspaces(
         self, context, request: TracimRequest,
     ) -> Response:
         """
-         proxy users calendars list
-         example: /calendar/user/ to radicale path /calendar/user/
+         proxy users agendas list
+         example: /agenda/user/ to radicale path /agenda/user/
          """
         path = self.radicale_path_workspace_dir
         return self._proxy.get_response_for_request(
@@ -152,7 +152,7 @@ class RadicaleProxyController(Controller):
         Create all routes and views using pyramid configurator
         for this controller
         """
-        # Radicale user calendar
+        # Radicale user agenda
         configurator.add_route(
             'radicale_proxy__users',
             self.radicale_path_user_dir,
@@ -180,7 +180,7 @@ class RadicaleProxyController(Controller):
             route_name='radicale_proxy__user_x',
         )
 
-        # Radicale workspace calendar
+        # Radicale workspace agenda
         configurator.add_route(
             'radicale_proxy__workspaces',
             self.radicale_path_workspace_dir,
