@@ -113,7 +113,7 @@ class TestApplicationApi(DefaultTest):
         agenda = Application(
             label='Agenda',
             slug='agenda',
-            fa_icon='agenda',
+            fa_icon='calendar',
             is_active=True,
             config={},
             main_route='/ui/workspaces/{workspace_id}/agenda',
@@ -141,7 +141,7 @@ class TestApplicationApi(DefaultTest):
         agenda = Application(
             label='Agenda',
             slug='agenda',
-            fa_icon='agenda',
+            fa_icon='calendar',
             is_active=True,
             config={},
             main_route='/ui/workspaces/{workspace_id}/agenda',
