@@ -9,7 +9,10 @@ import {
   PageWrapper
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
-import { getAgendaList } from '../action.async.js'
+import {
+  getAgendaList,
+  getWorkspaceDetail
+} from '../action.async.js'
 
 require('../css/index.styl')
 
@@ -44,16 +47,29 @@ class Agenda extends React.Component {
           this.loadAgendaList(data.config.appConfig.idWorkspace)
         }
         break
+      case 'allApp_changeLang':
+        console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        break
       default:
         break
     }
   }
 
   componentDidMount () {
-    console.log('%c<Agenda> did mount', `color: ${this.state.config.hexcolor}`)
+    const { state } = this
+
+    console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
     document.getElementById('appFullscreenContainer').style.flex = '1'
 
-    this.loadAgendaList(this.state.config.appConfig.idWorkspace)
+    this.loadAgendaList(state.config.appConfig.idWorkspace)
+    if (state.config.appConfig.idWorkspace !== null) this.loadWorkspaceData()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -75,17 +91,10 @@ class Agenda extends React.Component {
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
       case 200:
-        this.setState(prev => ({
-          config: {
-            ...prev.config,
-            appConfig: {
-              ...prev.config.appConfig,
-              idWorkspace: idWorkspace
-            }
-          },
+        this.setState({
           userWorkspaceList: fetchResultUserWorkspace.body,
           userWorkspaceListLoaded: true
-        }))
+        })
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
@@ -96,20 +105,28 @@ class Agenda extends React.Component {
     }
   }
 
+  loadWorkspaceData = async () => {
+    const { state } = this
+
+    const fetchResultWorkspaceDetail = await handleFetchResult(
+      await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.idWorkspace)
+    )
+
+    switch (fetchResultWorkspaceDetail.apiResponse.status) {
+      case 200:
+        this.setState({
+          content: {
+            workspaceLabel: fetchResultWorkspaceDetail.body.label
+          }
+        })
+    }
+  }
+
   componentWillUnmount () {
     console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
     document.getElementById('appFullscreenContainer').style.flex = 'none'
   }
-
-  sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
-    data: {
-      msg: msg,
-      type: type,
-      delay: undefined
-    }
-  })
 
   render () {
     const { props, state } = this
@@ -118,23 +135,27 @@ class Agenda extends React.Component {
 
     const config = {
       globalAccountSettings: {
-        agendaList: state.userWorkspaceList.map(c => ({
-          href: c.agenda_url,
-          hrefLabel: c.agenda_type === 'private'
+        agendaList: state.userWorkspaceList.map(a => ({
+          href: a.agenda_url,
+          hrefLabel: a.agenda_type === 'private'
             ? props.t('User')
             : state.userWorkspaceList.length > 1 ? props.t('Shared spaces') : props.t('Shared space'),
-          settingsAccount: c.agenda_type === 'private',
-          withCredentials: c.with_credentials
+          settingsAccount: a.agenda_type === 'private',
+          withCredentials: a.with_credentials
         }))
       },
       userLang: state.loggedUser.lang
     }
 
+    const pageTitle = state.config.appConfig.idWorkspace === null
+      ? props.t('All my agendas')
+      : props.t('Agenda of shared space {{workspaceLabel}}', {workspaceLabel: state.content.workspaceLabel})
+
     return (
       <PageWrapper customClass='agendaPage'>
         <PageTitle
           parentClass='agendaPage'
-          title={props.t('Agenda')}
+          title={pageTitle}
           icon={'calendar'}
         />
 

@@ -13,3 +13,13 @@ export const getAgendaList = (apiUrl, idWorkspace = null) => {
     method: 'GET'
   })
 }
+
+export const getWorkspaceDetail = (apiUrl, idWorkspace) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+}

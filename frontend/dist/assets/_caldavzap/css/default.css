@@ -2742,6 +2742,9 @@ img[data-type="invalidVerySmall"]
 .searchContainer {
   left: 70px;
 }
+/*
+  FIXME - CH - 2018/04/05 - commented css below is used to move the timezone to give space to the scroll to top btn
+  from sidebar. See https://github.com/tracim/tracim/issues/1554
 #timezoneWrapper {
   height: 37px;
   z-index: 25;
@@ -2761,3 +2764,4 @@ img[data-type="invalidVerySmall"]
 #timezoneWrapper > #timezoneSelectDiv > #timezonePicker {
   width: 100%;
 }
+*/
