@@ -300,8 +300,8 @@ class UserApi(object):
             #             )
             #         )
             name = None
-            if self._config.LDAP_NAME_ATTR:
-                name = ldap_data[self._config.LDAP_NAME_ATTR][0]
+            if self._config.LDAP_NAME_ATTRIBUTE:
+                name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
             user = self.create_user(
                 email=email,

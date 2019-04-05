@@ -148,7 +148,7 @@ class CFG(object):
                               'calendar'
 
 
-        self.ENABLED_APP = string_to_list(
+        self.APP_ENABLED = string_to_list(
             self.get_raw_config('app.enabled', default_enabled_app),
             separator=',',
             cast_func=str,
@@ -210,7 +210,7 @@ class CFG(object):
         else:
             default_cors_allowed_origin = self.WEBSITE_BASE_URL
 
-        self.CORS_ALLOWED_ORIGIN = string_to_list(
+        self.CORS_ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_list(
             self.get_raw_config('cors.access-control-allowed-origin', default_cors_allowed_origin),
             separator=',',
             cast_func=str,
@@ -276,7 +276,7 @@ class CFG(object):
         tracim_v2_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
 
-        self.BACKEND_I18N_FOLDER = self.get_raw_config(
+        self.BACKEND_I18N_FOLDER_PATH = self.get_raw_config(
             'backend.18n_folder_path', backend_i18n_folder
         )
 
@@ -551,12 +551,12 @@ class CFG(object):
             'ldap_user_base_dn',
             'ou=people, dc=directory,dc=fsf,dc=org'
         )
-        self.LDAP_LOGIN_ATTR = self.get_raw_config(
+        self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config(
             'ldap_login_attribute',
             'mail'
         )
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTR = self.get_raw_config(
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config(
             'ldap_name_attribute'
         )
         # TODO - G.M - 2018-12-05 - [ldap_profile]
@@ -567,7 +567,7 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
+        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTRIBUTE)  # nopep8
         self.LDAP_USE_POOL = True
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
@@ -642,11 +642,11 @@ class CFG(object):
                 'You should set it with frontend root url.'
             )
 
-        if not os.path.isdir(self.BACKEND_I18N_FOLDER):
+        if not os.path.isdir(self.BACKEND_I18N_FOLDER_PATH):
             raise Exception(
                 'ERROR: {} folder does not exist as folder. '
                 'please set backend.i8n_folder_path'
-                'with a correct value'.format(self.BACKEND_I18N_FOLDER)
+                'with a correct value'.format(self.BACKEND_I18N_FOLDER_PATH)
             )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
@@ -718,7 +718,7 @@ class CFG(object):
 
     # INFO - G.M - 2019-04-05 - Post Actions Methods
     def do_post_check_action(self) -> None:
-        self._set_default_app(self.ENABLED_APP)
+        self._set_default_app(self.APP_ENABLED)
 
     def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
 
