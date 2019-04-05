@@ -23,6 +23,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
 
 SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
+ENV_VAR_PREFIX = 'TRACIM_'
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
@@ -46,12 +47,83 @@ class CFG(object):
         self.__dict__[key] = value
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
+        self.settings = settings
         logger.debug(self, 'CONFIG_PROCESS:1: load config from settings')
         self._load_var_from_settings(settings)
         logger.debug(self, 'CONFIG_PROCESS:2: check validity of config given')
         self._check_validity()
         logger.debug(self, 'CONFIG_PROCESS:3: do post actions')
         self._post_actions()
+
+    def _get_associated_env_var_name(self, config_name: str) -> str:
+        """
+        Get associated env var name of any config_name.
+        example: app.enabled become TRACIM_APP_ENABLED
+        """
+        return '{env_var_prefix}{config_name}'.format(
+            env_var_prefix=ENV_VAR_PREFIX,
+            config_name=config_name.replace('.', '_').upper(),
+        )
+
+    def _get_printed_val_value(self, value: str, secret: bool) -> str:
+        if secret:
+            return '<value not shown>'
+        else:
+            return value
+
+    def get_raw_config(
+        self,
+        config_name: str,
+        default_value: str,
+        secret:bool = False,
+    ) -> str:
+        """
+        Get config parameter according to a config name.
+        Priority:
+         - 1: Environement variable
+         - 2: Config file data (stored in CFG.settings dict)
+         - 3: default_value
+        :param config_name: name of the config parameter name
+        :param default_value: default value if not setted value found
+        :param secret: is the value of the parameter secret ? (if true, it will not be printed)
+        :return:
+        """
+        val_cfg = self.settings.get(config_name)
+        val_name_env = self._get_associated_env_var_name(config_name)
+        val_env = os.environ.get(val_name_env)
+        if val_env:
+            logger.info(
+                self,
+                "CONFIG: [ {config_name} | {config_value} ]"
+                " from ENV VAR {val_name_env}".format(
+                    config_name=config_name,
+                    config_value=self._get_printed_val_value(val_env, secret=secret),
+                    val_name_env=val_name_env
+                )
+            )
+            return val_env
+        elif val_cfg:
+            logger.info(
+                self,
+                "CONFIG: [ {config_name} | {config_value} ]"
+                " from CONFIG FILE".format(
+                    config_name=config_name,
+                    config_value=self._get_printed_val_value(val_cfg, secret=secret),
+                    val_name_env=val_name_env
+                )
+            )
+            return val_cfg
+        else:
+            logger.info(
+                self,
+                "CONFIG: [ {config_name} | {config_value} ]"
+                " default value from TRACIM".format(
+                    config_name=config_name,
+                    config_value=self._get_printed_val_value(default_value, secret=secret),
+                    val_name_env=val_name_env
+                )
+            )
+            return default_value
 
     def _load_var_from_settings(self, settings: typing.Dict[str, typing.Any]):
         """Parse configuration file."""
