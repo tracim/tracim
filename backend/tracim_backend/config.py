@@ -17,6 +17,7 @@ from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
@@ -55,7 +56,7 @@ class CFG(object):
     def get_raw_config(
         self,
         config_name: str,
-        default_value: str,
+        default_value: typing.Optional[str] = None,
         secret:bool = False,
     ) -> str:
         """
@@ -75,8 +76,8 @@ class CFG(object):
         if val_env:
             logger.info(
                 self,
-                "CONFIG: [ {config_name} | {config_value} ]"
-                " from ENV VAR {val_name_env}".format(
+                "CONFIG: [ {config_name} | {config_value} |"
+                " from ENV VAR {val_name_env} ]".format(
                     config_name=config_name,
                     config_value=self._get_printed_val_value(val_env, secret=secret),
                     val_name_env=val_name_env
@@ -114,103 +115,109 @@ class CFG(object):
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
         default_color_config_file_path = os.path.join(tracim_v2_folder, 'color.json')  # nopep8
-        self.COLOR_CONFIG_FILE_PATH = settings.get(
+        self.COLOR_CONFIG_FILE_PATH = self.get_raw_config(
             'color.config_file_path', default_color_config_file_path
         )
-        default_enabled_app = [
-            'contents/thread',
-            'contents/file',
-            'contents/html-document',
-            'contents/folder',
-            'calendar',
-        ]
-        enabled_app = []
-        enabled_app_str = settings.get('app.enabled', None)
-        if enabled_app_str:
-            for app in enabled_app_str.split(','):
-                app_name = app.strip()
-                enabled_app.append(app_name)
-        else:
-            enabled_app = default_enabled_app
-        self.ENABLED_APP = enabled_app
 
-        self.DEPOT_STORAGE_DIR = settings.get(
+        default_enabled_app = 'contents/thread,' \
+                              'contents/file,' \
+                              'contents/html-document,' \
+                              'contents/folder,' \
+                              'calendar'
+
+
+        self.ENABLED_APP = string_to_list(
+            self.get_raw_config('app.enabled', default_enabled_app),
+            separator=',',
+            cast_func=str,
+            stripped=True,
+        )
+
+        self.DEPOT_STORAGE_DIR = self.get_raw_config(
             'depot_storage_dir',
         )
-        self.DEPOT_STORAGE_NAME = settings.get(
+        self.DEPOT_STORAGE_NAME = self.get_raw_config(
             'depot_storage_name',
         )
-        self.PREVIEW_CACHE_DIR = settings.get(
+        self.PREVIEW_CACHE_DIR = self.get_raw_config(
             'preview_cache_dir',
         )
 
-        auth_type_str = settings.get(
-            'auth_types', 'internal'
-        )
-        self.AUTH_TYPES = [AuthType(auth.strip()) for auth in auth_type_str.split(',')]
+        self.AUTH_TYPES =  string_to_list(
+            self.get_raw_config('auth_types', 'internal'),
+            separator=',',
+            cast_func=AuthType,
+            stripped=True,
 
-        self.REMOTE_USER_HEADER = settings.get('remote_user_header', None)
+        )
+        self.REMOTE_USER_HEADER = self.get_raw_config('remote_user_header', None)
         # TODO - G.M - 2018-09-11 - Deprecated param
-        # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
+        # self.DATA_UPDATE_ALLOWED_DURATION = int(self.get_raw_config(
         #     'content.update.allowed.duration',
         #     0,
         # ))
 
-        self.API_KEY = settings.get(
+        self.API_KEY = self.get_raw_config(
             'api.key',
-            ''
+            '',
+            secret=True
         )
-        self.SESSION_REISSUE_TIME = int(settings.get(
+        self.SESSION_REISSUE_TIME = int(self.get_raw_config(
             'session.reissue_time',
-            120
+            '120'
         ))
-        self.WEBSITE_TITLE = settings.get(
+        self.WEBSITE_TITLE = self.get_raw_config(
             'website.title',
             'TRACIM',
         )
 
         # base url of the frontend
-        self.WEBSITE_BASE_URL = settings.get(
+        self.WEBSITE_BASE_URL = self.get_raw_config(
             'website.base_url',
             '',
         )
 
-        self.API_BASE_URL = settings.get(
+        self.API_BASE_URL = self.get_raw_config(
             'api.base_url',
             self.WEBSITE_BASE_URL,
         )
-        self.CORS_ALLOWED_ORIGIN = []
-        allowed_origin_string = settings.get(
-            'cors.access-control-allowed-origin',
-            ''
+
+
+        if self.API_BASE_URL != self.WEBSITE_BASE_URL:
+            default_cors_allowed_origin = '{},{}'.format(self.WEBSITE_BASE_URL, self.API_BASE_URL)
+        else:
+            default_cors_allowed_origin = self.WEBSITE_BASE_URL
+
+        self.CORS_ALLOWED_ORIGIN = string_to_list(
+            self.get_raw_config('cors.access-control-allowed-origin', 'internal'),
+            separator=',',
+            cast_func=str,
+            stripped=True,
+
         )
-        if allowed_origin_string:
-            self.CORS_ALLOWED_ORIGIN.extend(allowed_origin_string.split(','))  # nopep8
-        if not self.CORS_ALLOWED_ORIGIN:
-            self.CORS_ALLOWED_ORIGIN.append(self.WEBSITE_BASE_URL)
-            if self.API_BASE_URL != self.WEBSITE_BASE_URL:
-                self.CORS_ALLOWED_ORIGIN.append(self.API_BASE_URL)
 
         # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
         # Verify this
         #
-        # self.WEBSITE_HOME_TITLE_COLOR = settings.get(
+        # self.WEBSITE_HOME_TITLE_COLOR = self.get_raw_config(
         #     'website.title.color',
         #     '#555',
         # )
-        # self.WEBSITE_HOME_IMAGE_PATH = settings.get(
+        # self.WEBSITE_HOME_IMAGE_PATH = self.get_raw_config(
         #     '/assets/img/home_illustration.jpg',
         # )
-        # self.WEBSITE_HOME_BACKGROUND_IMAGE_PATH = settings.get(
+        # self.WEBSITE_HOME_BACKGROUND_IMAGE_PATH = self.get_raw_config(
         #     '/assets/img/bg.jpg',
         # )
         #
-        self.WEBSITE_SERVER_NAME = settings.get(
+        self.WEBSITE_SERVER_NAME = self.get_raw_config(
             'website.server_name',
-            None,
         )
         if not self.WEBSITE_SERVER_NAME:
-            self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
+            self.WEBSITE_SERVER_NAME = self.get_raw_config(
+                'website.server_name',
+                default_value=urlparse(self.WEBSITE_BASE_URL).hostname
+            )
             logger.warning(
                 self,
                 'NOTE: Generated website.server_name parameter from '
@@ -218,24 +225,24 @@ class CFG(object):
                 .format(self.WEBSITE_SERVER_NAME)
             )
         # TODO - G.M - 2018-09-11 - Deprecated params
-        # self.WEBSITE_HOME_TAG_LINE = settings.get(
+        # self.WEBSITE_HOME_TAG_LINE = self.get_raw_config(
         #     'website.home.tag_line',
         #     '',
         # )
-        # self.WEBSITE_SUBTITLE = settings.get(
+        # self.WEBSITE_SUBTITLE = self.get_raw_config(
         #     'website.home.subtitle',
         #     '',
         # )
-        # self.WEBSITE_HOME_BELOW_LOGIN_FORM = settings.get(
+        # self.WEBSITE_HOME_BELOW_LOGIN_FORM = self.get_raw_config(
         #     'website.home.below_login_form',
         #     '',
         # )
         #
-        # self.WEBSITE_TREEVIEW_CONTENT = settings.get(
+        # self.WEBSITE_TREEVIEW_CONTENT = self.get_raw_config(
         #     'website.treeview.content',
         # )
 
-        self.USER_AUTH_TOKEN_VALIDITY = int(settings.get(
+        self.USER_AUTH_TOKEN_VALIDITY = int(self.get_raw_config(
             'user.auth_token.validity',
             '604800',
         ))
@@ -243,29 +250,30 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = '900'
-        legacy_reset_password_validity = settings.get('user.reset_password.validity')
-        if legacy_reset_password_validity:
+        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = self.get_raw_config('user.reset_password.validity')
+        if self.USER_RESET_PASSWORD_TOKEN_LIFETIME:
             logger.warning(
                 self,
                 'user.reset_password.validity parameter is deprecated ! '
                 'please use user.reset_password.token_lifetime instead.'
             )
-        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(legacy_reset_password_validity or defaut_reset_password_validity)
-        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(settings.get(
-            'user.reset_password.token_lifetime',
-            self.USER_RESET_PASSWORD_TOKEN_LIFETIME
-        ))
+        else:
+            self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(self.get_raw_config(
+                'user.reset_password.token_lifetime',
+                defaut_reset_password_validity
+            ))
 
 
-        self.DEBUG = asbool(settings.get('debug', False))
+        self.DEBUG = asbool(self.get_raw_config('debug', 'false'))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION = asbool(settings.get(
+        self.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION = asbool(self.get_raw_config(
             'email.notification.enabled_on_invitation',
-            True
+            'true'
         ))
+        # TODO - G.M - 2019-04-05 - make this parameterisable
         self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
@@ -284,51 +292,51 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
+        self.EMAIL_NOTIFICATION_FROM_EMAIL = self.get_raw_config(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
         )
-        if settings.get('email.notification.from'):
+        if self.get_raw_config('email.notification.from'):
             raise Exception(
                 'email.notification.from configuration is deprecated. '
                 'Use instead email.notification.from.email and '
                 'email.notification.from.default_label.'
             )
 
-        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = settings.get(
+        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = self.get_raw_config(
             'email.notification.from.default_label',
             'Tracim Notifications'
         )
-        self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = settings.get(
+        self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = self.get_raw_config(
             'email.notification.reply_to.email',
         )
-        self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = settings.get(
+        self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = self.get_raw_config(
             'email.notification.references.email'
         )
         # Content update notification
 
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = self.get_raw_config(
             'email.notification.content_update.template.html',
         )
 
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = self.get_raw_config(
             'email.notification.content_update.subject',
             _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
         )
         # Created account notification
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = self.get_raw_config(
             'email.notification.created_account.template.html',
         )
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = self.get_raw_config(
             'email.notification.created_account.subject',
             _('[{website_title}] Someone created an account for you'),
         )
 
         # Reset password notification
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = settings.get(
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = self.get_raw_config(
             'email.notification.reset_password_request.template.html',
         )
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = self.get_raw_config(
             'email.notification.reset_password_request.subject',
             _('[{website_title}] A password reset has been requested'),
         )
@@ -336,95 +344,97 @@ class CFG(object):
         # TODO - G.M - 2019-01-22 - add feature to process notification email
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = 'sync'
-        self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
+        self.EMAIL_NOTIFICATION_ACTIVATED = asbool(self.get_raw_config(
             'email.notification.activated',
         ))
 
-        self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
+        self.EMAIL_NOTIFICATION_SMTP_SERVER = self.get_raw_config(
             'email.notification.smtp.server',
         )
-        self.EMAIL_NOTIFICATION_SMTP_PORT = settings.get(
+        self.EMAIL_NOTIFICATION_SMTP_PORT = self.get_raw_config(
             'email.notification.smtp.port',
         )
-        self.EMAIL_NOTIFICATION_SMTP_USER = settings.get(
+        self.EMAIL_NOTIFICATION_SMTP_USER = self.get_raw_config(
             'email.notification.smtp.user',
         )
-        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = settings.get(
+        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = self.get_raw_config(
             'email.notification.smtp.password',
+            secret=True
         )
 
-        self.EMAIL_REPLY_ACTIVATED = asbool(settings.get(
+        self.EMAIL_REPLY_ACTIVATED = asbool(self.get_raw_config(
             'email.reply.activated',
-            False,
+            'false',
         ))
 
-        self.EMAIL_REPLY_IMAP_SERVER = settings.get(
+        self.EMAIL_REPLY_IMAP_SERVER = self.get_raw_config(
             'email.reply.imap.server',
         )
-        self.EMAIL_REPLY_IMAP_PORT = settings.get(
+        self.EMAIL_REPLY_IMAP_PORT = self.get_raw_config(
             'email.reply.imap.port',
         )
-        self.EMAIL_REPLY_IMAP_USER = settings.get(
+        self.EMAIL_REPLY_IMAP_USER = self.get_raw_config(
             'email.reply.imap.user',
         )
-        self.EMAIL_REPLY_IMAP_PASSWORD = settings.get(
+        self.EMAIL_REPLY_IMAP_PASSWORD = self.get_raw_config(
             'email.reply.imap.password',
+            secret=True
         )
-        self.EMAIL_REPLY_IMAP_FOLDER = settings.get(
+        self.EMAIL_REPLY_IMAP_FOLDER = self.get_raw_config(
             'email.reply.imap.folder',
         )
-        self.EMAIL_REPLY_CHECK_HEARTBEAT = int(settings.get(
+        self.EMAIL_REPLY_CHECK_HEARTBEAT = int(self.get_raw_config(
             'email.reply.check.heartbeat',
-            60,
+            '60',
         ))
-        self.EMAIL_REPLY_IMAP_USE_SSL = asbool(settings.get(
+        self.EMAIL_REPLY_IMAP_USE_SSL = asbool(self.get_raw_config(
             'email.reply.imap.use_ssl',
         ))
-        self.EMAIL_REPLY_IMAP_USE_IDLE = asbool(settings.get(
+        self.EMAIL_REPLY_IMAP_USE_IDLE = asbool(self.get_raw_config(
             'email.reply.imap.use_idle',
-            True,
+            'true',
         ))
-        self.EMAIL_REPLY_CONNECTION_MAX_LIFETIME = int(settings.get(
+        self.EMAIL_REPLY_CONNECTION_MAX_LIFETIME = int(self.get_raw_config(
             'email.reply.connection.max_lifetime',
-            600,  # 10 minutes
+            '600',  # 10 minutes
         ))
-        self.EMAIL_REPLY_USE_HTML_PARSING = asbool(settings.get(
+        self.EMAIL_REPLY_USE_HTML_PARSING = asbool(self.get_raw_config(
             'email.reply.use_html_parsing',
-            True,
+            'true',
         ))
-        self.EMAIL_REPLY_USE_TXT_PARSING = asbool(settings.get(
+        self.EMAIL_REPLY_USE_TXT_PARSING = asbool(self.get_raw_config(
             'email.reply.use_txt_parsing',
-            True,
+            'true',
         ))
-        self.EMAIL_REPLY_LOCKFILE_PATH = settings.get(
+        self.EMAIL_REPLY_LOCKFILE_PATH = self.get_raw_config(
             'email.reply.lockfile_path',
             ''
         )
 
-        self.EMAIL_PROCESSING_MODE = settings.get(
+        self.EMAIL_PROCESSING_MODE = self.get_raw_config(
             'email.processing_mode',
             'sync',
         ).upper()
 
 
-        self.EMAIL_SENDER_REDIS_HOST = settings.get(
+        self.EMAIL_SENDER_REDIS_HOST = self.get_raw_config(
             'email.async.redis.host',
             'localhost',
         )
-        self.EMAIL_SENDER_REDIS_PORT = int(settings.get(
+        self.EMAIL_SENDER_REDIS_PORT = int(self.get_raw_config(
             'email.async.redis.port',
-            6379,
+            '6379',
         ))
-        self.EMAIL_SENDER_REDIS_DB = int(settings.get(
+        self.EMAIL_SENDER_REDIS_DB = int(self.get_raw_config(
             'email.async.redis.db',
-            0,
+            '0',
         ))
-        self.NEW_USER_INVITATION_DO_NOTIFY = asbool(settings.get(
+        self.NEW_USER_INVITATION_DO_NOTIFY = asbool(self.get_raw_config(
             'new_user.invitation.do_notify',
             'True'
         ))
 
-        self.NEW_USER_INVITATION_MINIMAL_PROFILE = settings.get(
+        self.NEW_USER_INVITATION_MINIMAL_PROFILE = self.get_raw_config(
             'new_user.invitation.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME
         )
@@ -436,10 +446,10 @@ class CFG(object):
         wsgidav_website = 'https://github.com/mar10/wsgidav/'
         wsgidav_name = 'WsgiDAV'
 
-        self.WEBDAV_VERBOSE_LEVEL = int(settings.get('webdav.verbose.level', 1))
-        self.WEBDAV_ROOT_PATH = settings.get('webdav.root_path', '/')
-        self.WEBDAV_BLOCK_SIZE = int(settings.get('webdav.block_size', 8192))
-        self.WEBDAV_DIR_BROWSER_ENABLED = asbool(settings.get('webdav.dir_browser.enabled', True))
+        self.WEBDAV_VERBOSE_LEVEL = int(self.get_raw_config('webdav.verbose.level', '1'))
+        self.WEBDAV_ROOT_PATH = self.get_raw_config('webdav.root_path', '/')
+        self.WEBDAV_BLOCK_SIZE = int(self.get_raw_config('webdav.block_size', '8192'))
+        self.WEBDAV_DIR_BROWSER_ENABLED = asbool(self.get_raw_config('webdav.dir_browser.enabled', 'true'))
         default_webdav_footnote = '<a href="{instance_url}">{instance_name}</a>.' \
                                   ' This Webdav is serve by'  \
                                   ' <a href="{tracim_website}">{tracim_name} software</a> using' \
@@ -451,7 +461,7 @@ class CFG(object):
                                       wsgidav_name=wsgidav_name,
                                       wsgidav_website=wsgidav_website,
                                   )
-        self.WEBDAV_DIR_BROWSER_FOOTER = settings.get('webdav.dir_browser.footer', default_webdav_footnote)
+        self.WEBDAV_DIR_BROWSER_FOOTER = self.get_raw_config('webdav.dir_browser.footer', default_webdav_footnote)
         # TODO : check if tweaking those param does work
         self.WEBDAV_SHOW_DELETED = False
         self.WEBDAV_SHOW_ARCHIVED = False
@@ -461,11 +471,11 @@ class CFG(object):
         ###
         # RADICALE (Caldav server)
         ###
-        self.CALDAV_ENABLED = asbool(settings.get(
+        self.CALDAV_ENABLED = asbool(self.get_raw_config(
             'caldav.enabled',
-            False
+            'false'
         ))
-        self.CALDAV_RADICALE_PROXY_BASE_URL = settings.get(
+        self.CALDAV_RADICALE_PROXY_BASE_URL = self.get_raw_config(
             'caldav.radicale_proxy.base_url',
             None
         )
@@ -483,29 +493,17 @@ class CFG(object):
         )
 
 
-        self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(settings.get(
-            'preview.jpg.restricted_dims', False
+        self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(self.get_raw_config(
+            'preview.jpg.restricted_dims', 'false'
         ))
-        preview_jpg_allowed_dims_str = settings.get('preview.jpg.allowed_dims', '')  # nopep8
-        allowed_dims = []
-        if preview_jpg_allowed_dims_str:
-            for sizes in preview_jpg_allowed_dims_str.split(','):
-                parts = sizes.split('x')
-                assert len(parts) == 2
-                width, height = parts
-                assert width.isdecimal()
-                assert height.isdecimal()
-                size = PreviewDim(int(width), int(height))
-                allowed_dims.append(size)
+        self.PREVIEW_JPG_ALLOWED_DIMS = string_to_list(
+            self.get_raw_config('preview.jpg.allowed_dims', '256x256'),
+            cast_func=PreviewDim.from_string,
+            separator=','
+        )
 
-        if not allowed_dims:
-            size = PreviewDim(256, 256)
-            allowed_dims.append(size)
-
-        self.PREVIEW_JPG_ALLOWED_DIMS = allowed_dims
-
-        self.FRONTEND_SERVE = asbool(settings.get(
-            'frontend.serve', False
+        self.FRONTEND_SERVE = asbool(self.get_raw_config(
+            'frontend.serve', 'false'
         ))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
@@ -514,12 +512,12 @@ class CFG(object):
         tracim_v2_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
 
-        self.BACKEND_I18N_FOLDER = settings.get(
+        self.BACKEND_I18N_FOLDER = self.get_raw_config(
             'backend.18n_folder_path', backend_i18n_folder
         )
 
         frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
-        self.FRONTEND_DIST_FOLDER_PATH = settings.get(
+        self.FRONTEND_DIST_FOLDER_PATH = self.get_raw_config(
             'frontend.dist_folder_path', frontend_dist_folder
         )
 
@@ -555,7 +553,7 @@ class CFG(object):
                     self,
                     ldap_parameter.cfg_name,
                     ldap_parameter.adapter(
-                        settings.get(
+                        self.get_raw_config(
                             ldap_parameter.ini_name,
                             ldap_parameter.default_value
                         )
@@ -565,7 +563,7 @@ class CFG(object):
                 setattr(
                     self,
                     ldap_parameter.cfg_name,
-                    settings.get(
+                    self.get_raw_config(
                         ldap_parameter.ini_name,
                         ldap_parameter.default_value
                     )
@@ -844,6 +842,20 @@ class PreviewDim(object):
     def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
+
+    @classmethod
+    def from_string(cls, dim: str) -> 'PreviewDim':
+        """
+        Alternative initialisation method, instead of setting width and height
+        directly, we can give a valid [width]x[height] string to create
+        a PreviewDim object
+        """
+        parts = dim.split('x')
+        assert len(parts) == 2
+        width, height = parts
+        assert width.isdecimal()
+        assert height.isdecimal()
+        return PreviewDim(int(width), int(height))
 
     def __repr__(self):
         return "<PreviewDim width:{width} height:{height}>".format(
