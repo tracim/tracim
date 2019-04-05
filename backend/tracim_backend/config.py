@@ -99,7 +99,7 @@ class CFG(object):
         logger.info(
             self,
             CONFIG_LOG_TEMPLATE.format(
-                config_value=config_value,
+                config_value=self._get_printed_val_value(config_value, secret),
                 config_source=config_source,
                 config_name=config_name,
                 config_name_source=config_name_source,
