@@ -344,13 +344,13 @@ class KnownMemberQuery(object):
         self.exclude_user_ids = string_to_list(exclude_user_ids, ',', int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ',', int)  # nopep8
 
-class CalendarFilterQuery(object):
+class AgendaFilterQuery(object):
     """
-    Calendar filter query model
+    Agenda filter query model
     """
-    def __init__(self, workspace_ids: str = '', calendar_types: str = ''):
+    def __init__(self, workspace_ids: str = '', agenda_types: str = ''):
         self.workspace_ids = string_to_list(workspace_ids, ',', int) or None
-        self.calendar_types = string_to_list(calendar_types, ',', str) or None
+        self.agenda_types = string_to_list(agenda_types, ',', str) or None
 
 class FileQuery(object):
     """
@@ -459,11 +459,11 @@ class WorkspaceUpdate(object):
         self,
         label: str,
         description: str,
-        calendar_enabled: bool = None
+        agenda_enabled: bool = None
     ) -> None:
         self.label = label
         self.description = description
-        self.calendar_enabled = calendar_enabled
+        self.agenda_enabled = agenda_enabled
 
 
 class ContentCreation(object):
@@ -537,19 +537,19 @@ class TypeUser(Enum):
     EMAIL = 'found_email'
     PUBLIC_NAME = 'found_public_name'
 
-class Calendar(object):
+class Agenda(object):
 
     def __init__(
             self,
-            calendar_url: str,
+            agenda_url: str,
             with_credentials: bool,
             workspace_id: typing.Optional[int],
-            calendar_type: str,
+            agenda_type: str,
     ) -> None:
-        self.calendar_url = calendar_url
+        self.agenda_url = agenda_url
         self.with_credentials = with_credentials
         self.workspace_id = workspace_id
-        self.calendar_type = calendar_type
+        self.agenda_type = agenda_type
 
 class UserInContext(object):
     """
@@ -668,11 +668,11 @@ class WorkspaceInContext(object):
         return self.workspace.is_deleted
 
     @property
-    def calendar_enabled(self) -> bool:
+    def agenda_enabled(self) -> bool:
         """
-        returns True if workspace's calendar is enabled
+        returns True if workspace's agenda is enabled
         """
-        return self.workspace.calendar_enabled
+        return self.workspace.agenda_enabled
 
     @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:

@@ -1,7 +1,7 @@
 # coding: utf-8
 import typing
 
-from tracim_backend.lib.calendar.utils import DavAuthorization
+from tracim_backend.lib.agenda.utils import DavAuthorization
 from tracim_backend.lib.utils.logger import logger
 
 if typing.TYPE_CHECKING:
@@ -25,7 +25,7 @@ CALDAV_WRITE_METHODS = [
     'COPY',
     'MOVE',
     'MKCOL',
-    'MKCALENDAR',
+    'MKAGENDA',
 ]
 
 

@@ -1,14 +1,14 @@
 from pyramid.config import Configurator
 
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.calendar.calendar import CalendarApi
+from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.views.calendar_api.schemas import CalendarFilterQuerySchema
-from tracim_backend.views.calendar_api.schemas import CalendarSchema
+from tracim_backend.views.agenda_api.schemas import AgendaFilterQuerySchema
+from tracim_backend.views.agenda_api.schemas import AgendaSchema
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.user_controller import \
@@ -19,48 +19,48 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-SWAGGER_TAG__CALENDAR_SECTION = 'Calendar'
-SWAGGER_TAG__USER_CALENDAR_ENDPOINTS = generate_documentation_swagger_tag(
+SWAGGER_TAG__AGENDA_SECTION = 'Agenda'
+SWAGGER_TAG__USER_AGENDA_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__USER_ENDPOINTS,
-    SWAGGER_TAG__CALENDAR_SECTION
+    SWAGGER_TAG__AGENDA_SECTION
 )
 
 
-class CalendarController(Controller):
+class AgendaController(Controller):
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALENDAR_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_AGENDA_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(CalendarFilterQuerySchema())
-    @hapic.output_body(CalendarSchema(many=True))
-    def user_calendars(self, context, request: TracimRequest, hapic_data=None):
+    @hapic.input_query(AgendaFilterQuerySchema())
+    @hapic.output_body(AgendaSchema(many=True))
+    def user_agendas(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        calendar_api = CalendarApi(
+        agenda_api = AgendaApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
-        return calendar_api.get_user_calendars(
+        return agenda_api.get_user_agendas(
             request.candidate_user,
             workspaces_ids_filter=hapic_data.query.workspace_ids,
-            calendar_types_filter = hapic_data.query.calendar_types
+            agenda_types_filter = hapic_data.query.agenda_types
         )
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALENDAR_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_AGENDA_ENDPOINTS])
     @check_right(is_user)
-    @hapic.input_query(CalendarFilterQuerySchema())
-    @hapic.output_body(CalendarSchema(many=True))
-    def account_calendars(self, context, request: TracimRequest, hapic_data=None):
+    @hapic.input_query(AgendaFilterQuerySchema())
+    @hapic.output_body(AgendaSchema(many=True))
+    def account_agendas(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        calendar_api = CalendarApi(
+        agenda_api = AgendaApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
-        return calendar_api.get_user_calendars(
+        return agenda_api.get_user_agendas(
             request.current_user,
             workspaces_ids_filter=hapic_data.query.workspace_ids,
-            calendar_types_filter=hapic_data.query.calendar_types
+            agenda_types_filter=hapic_data.query.agenda_types
         )
 
     def bind(self, configurator: Configurator) -> None:
@@ -69,14 +69,14 @@ class CalendarController(Controller):
         for this controller
         """
 
-        # INFO - G.M - 2019-04-01 - user calendar
-        configurator.add_route('user_calendars',
-                               '/users/{user_id:\d+}/calendar',
+        # INFO - G.M - 2019-04-01 - user agenda
+        configurator.add_route('user_agendas',
+                               '/users/{user_id:\d+}/agenda',
                                request_method='GET')
-        configurator.add_view(self.user_calendars, route_name='user_calendars')
+        configurator.add_view(self.user_agendas, route_name='user_agendas')
 
-        # INFO - G.M - 2019-04-01 - own user calendar
-        configurator.add_route('account_calendars',
-                               '/users/me/calendar',
+        # INFO - G.M - 2019-04-01 - own user agenda
+        configurator.add_route('account_agendas',
+                               '/users/me/agenda',
                                request_method='GET')
-        configurator.add_view(self.account_calendars, route_name='account_calendars')
+        configurator.add_view(self.account_agendas, route_name='account_agendas')

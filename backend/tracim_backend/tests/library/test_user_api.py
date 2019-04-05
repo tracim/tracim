@@ -860,7 +860,7 @@ class TestUserApi(DefaultTest):
         assert new_user.email == 'admin@tracim.tracim'
         assert new_user.display_name == 'Admin'
         assert new_user.is_active is True
-        # TODO - G.M - 03-05-2018 - [avatar][calendar] Should test this
+        # TODO - G.M - 03-05-2018 - [avatar][agenda] Should test this
         # with true value when those param will be available.
         assert new_user.avatar_url is None
 

@@ -164,7 +164,7 @@ class WorkspaceController(Controller):
             request.current_workspace,
             label=hapic_data.body.label,
             description=hapic_data.body.description,
-            calendar_enabled=hapic_data.body.calendar_enabled,
+            agenda_enabled=hapic_data.body.agenda_enabled,
             save_now=True,
         )
         return wapi.get_workspace_with_context(request.current_workspace)
@@ -189,7 +189,7 @@ class WorkspaceController(Controller):
             label=hapic_data.body.label,
             description=hapic_data.body.description,
             save_now=True,
-            calendar_enabled=hapic_data.body.calendar_enabled
+            agenda_enabled=hapic_data.body.agenda_enabled
         )
         wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)

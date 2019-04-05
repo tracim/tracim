@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class CalendarType(Enum):
+class AgendaType(Enum):
     private = 'private'
     workspace = 'workspace'
     remote = 'remote'
