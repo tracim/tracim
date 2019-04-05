@@ -22,29 +22,10 @@ from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
 
-SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
 ENV_VAR_PREFIX = 'TRACIM_'
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
-
-    def __setattr__(self, key: str, value: typing.Any) -> None:
-        """
-        Log-ready setter.
-
-        Logs all configuration parameters except secret ones.
-        """
-        is_value_secret = False
-        for secret in SECRET_ENDING_STR:
-            if key.endswith(secret):
-                is_value_secret = True
-
-        if is_value_secret:
-            logger.info(self, 'CONFIG: [ {} | <value not shown> ]'.format(key))
-        else:
-            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
-
-        self.__dict__[key] = value
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         self.settings = settings
