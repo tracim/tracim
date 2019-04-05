@@ -97,14 +97,14 @@ class DecodedMail(object):
                 if use_txt_parsing:
                     txt_body = EmailReplyParser.parse_reply(txt_body)
                 html_body = markdown.markdown(txt_body)
-                body = HtmlSanitizer(html_body).sanitize()
+                body = HtmlSanitizer.sanitize(html_body)
 
             elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(
                     charset)
                 if use_html_parsing:
                     html_body = str(ParsedHTMLMail(html_body))
-                body = HtmlSanitizer(html_body).sanitize()
+                body = HtmlSanitizer.sanitize(html_body)
             if not body:
                 raise EmptyEmailBody()
         return body
