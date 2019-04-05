@@ -1,6 +1,7 @@
 import pytest
 
-from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
+from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR, \
+    string_to_list
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.lib.utils.utils import clamp
@@ -67,3 +68,29 @@ class TestExtendedColor(object):
         # add X% more light to something already dark.
         assert color_darken == color_lighten
         assert color_darken.web == color.web
+
+class TestStringToList(object):
+
+    def test__unit__string_to_list__ok__list_of_string_unstripped(self):
+        assert string_to_list(
+            'one , two,three,fo ur',
+            separator=',',
+            cast_func=str,
+            stripped=False,
+        ) == [ 'one ', ' two', 'three', 'fo ur']
+
+    def test_unit__string_to_list__ok__list_of_string_stripped(self):
+        assert string_to_list(
+            'one , two,three,fo ur',
+            separator=',',
+            cast_func=str,
+            stripped=True
+        ) == ['one', 'two', 'three', 'fo ur']
+
+    def test_unit__string_to_list__ok__list_of_int_(self):
+        assert string_to_list(
+            '1,2,3,4',
+            separator=',',
+            cast_func=int,
+            stripped=True
+        ) == [1,2,3,4]
