@@ -789,8 +789,6 @@ class CFG(object):
         ASYNC = 'ASYNC'
         SYNC = 'SYNC'
 
-        TREEVIEW_FOLDERS = 'folders'
-        TREEVIEW_ALL = 'all'
 
 
 class PreviewDim(object):
