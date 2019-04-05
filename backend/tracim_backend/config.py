@@ -472,6 +472,59 @@ class CFG(object):
 
         self.load_ldap_settings(settings)
 
+    def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
+        """
+        Will parse config file to setup new matching attribute in the instance
+        :param settings: dict of source settings (from ini file)
+        """
+        param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
+
+        ldap_parameters = [
+            param('ldap_url',                   'LDAP_URL',          'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_base_dn',               'LDAP_BASE_DN',      'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_dn',               'LDAP_BIND_DN',      'cn=admin, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_pass',             'LDAP_BIND_PASS',    '', None),
+            param('ldap_tls',                   'LDAP_TLS',          False, asbool),
+            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN', 'ou=people, dc=directory,dc=fsf,dc=org', None),
+            param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
+            # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
+            param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
+            # TODO - G.M - 2018-12-05 - [ldap_profile]
+            # support for profile attribute disabled
+            # Should be reenabled later probably with a better code
+            # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
+        ]
+
+        for ldap_parameter in ldap_parameters:
+            if ldap_parameter.adapter:
+                # Apply given function as a data modifier before setting value
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    ldap_parameter.adapter(
+                        settings.get(
+                            ldap_parameter.ini_name,
+                            ldap_parameter.default_value
+                        )
+                    )
+                )
+            else:
+                setattr(
+                    self,
+                    ldap_parameter.cfg_name,
+                    settings.get(
+                        ldap_parameter.ini_name,
+                        ldap_parameter.default_value
+                    )
+                )
+
+        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
+
+        self.LDAP_USE_POOL = True
+        self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
+        self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
+        self.LDAP_GET_INFO = None
+
     def _check_validity(self):
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
@@ -594,59 +647,6 @@ class CFG(object):
 
     def _post_actions(self):
         self._set_default_app(self.ENABLED_APP)
-
-    def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
-        """
-        Will parse config file to setup new matching attribute in the instance
-        :param settings: dict of source settings (from ini file)
-        """
-        param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
-
-        ldap_parameters = [
-            param('ldap_url',                   'LDAP_URL',          'dc=directory,dc=fsf,dc=org', None),
-            param('ldap_base_dn',               'LDAP_BASE_DN',      'dc=directory,dc=fsf,dc=org', None),
-            param('ldap_bind_dn',               'LDAP_BIND_DN',      'cn=admin, dc=directory,dc=fsf,dc=org', None),
-            param('ldap_bind_pass',             'LDAP_BIND_PASS',    '', None),
-            param('ldap_tls',                   'LDAP_TLS',          False, asbool),
-            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN', 'ou=people, dc=directory,dc=fsf,dc=org', None),
-            param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
-            # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-            param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
-            # TODO - G.M - 2018-12-05 - [ldap_profile]
-            # support for profile attribute disabled
-            # Should be reenabled later probably with a better code
-            # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
-        ]
-
-        for ldap_parameter in ldap_parameters:
-            if ldap_parameter.adapter:
-                # Apply given function as a data modifier before setting value
-                setattr(
-                    self,
-                    ldap_parameter.cfg_name,
-                    ldap_parameter.adapter(
-                        settings.get(
-                            ldap_parameter.ini_name,
-                            ldap_parameter.default_value
-                        )
-                    )
-                )
-            else:
-                setattr(
-                    self,
-                    ldap_parameter.cfg_name,
-                    settings.get(
-                        ldap_parameter.ini_name,
-                        ldap_parameter.default_value
-                    )
-                )
-
-        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
-
-        self.LDAP_USE_POOL = True
-        self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
-        self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
-        self.LDAP_GET_INFO = None
 
     def configure_filedepot(self):
 
