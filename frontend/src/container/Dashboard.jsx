@@ -365,16 +365,16 @@ class Dashboard extends React.Component {
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
-        .filter(app => app.slug === 'calendar' ? props.curWs.calendarEnabled : true)
+        .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-          // INFO - CH - 2019-04-03 - hard coding some calendar properties for now since some end points requires some clarifications
+          // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
           return {
             ...app,
-            creationLabel: app.slug === 'calendar' ? props.t('Open the calendar') : contentType.creationLabel,
-            route: app.slug === 'calendar'
-              ? PAGE.WORKSPACE.CALENDAR(props.curWs.id)
+            creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,
+            route: app.slug === 'agenda'
+              ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
               : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
           }
         })
@@ -390,7 +390,7 @@ class Dashboard extends React.Component {
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper customeClass='dashboard'>
+          <PageWrapper customClass='dashboard'>
             <PageTitle
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
