@@ -48,11 +48,9 @@ class CFG(object):
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         logger.debug(self, 'CONFIG_PROCESS:1: load config from settings')
         self._load_var_from_settings(settings)
-        logger.debug(self, 'CONFIG_PROCESS:2: load env_var, override settings according to them')
-        self._env_var_config_overriding()
-        logger.debug(self, 'CONFIG_PROCESS:3: check validity of config given')
+        logger.debug(self, 'CONFIG_PROCESS:2: check validity of config given')
         self._check_validity()
-        logger.debug(self, 'CONFIG_PROCESS:4: do post actions')
+        logger.debug(self, 'CONFIG_PROCESS:3: do post actions')
         self._post_actions()
 
     def _load_var_from_settings(self, settings: typing.Dict[str, typing.Any]):
@@ -473,9 +471,6 @@ class CFG(object):
         )
 
         self.load_ldap_settings(settings)
-
-    def _env_var_config_overriding(self):
-        pass
 
     def _check_validity(self):
         mandatory_msg = \
