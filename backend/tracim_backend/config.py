@@ -31,11 +31,13 @@ class CFG(object):
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         self.settings = settings
         logger.debug(self, 'CONFIG_PROCESS:1: load config from settings')
-        self._load_var_from_settings(settings)
+        self.load_config()
         logger.debug(self, 'CONFIG_PROCESS:2: check validity of config given')
-        self._check_validity()
+        self.check_config_validity()
         logger.debug(self, 'CONFIG_PROCESS:3: do post actions')
-        self._post_actions()
+        self.do_post_check_action()
+
+    # INFO - G.M - 2019-04-05 - Utils Methods
 
     def _get_associated_env_var_name(self, config_name: str) -> str:
         """
@@ -107,11 +109,20 @@ class CFG(object):
             )
             return default_value
 
-    def _load_var_from_settings(self, settings: typing.Dict[str, typing.Any]):
-        """Parse configuration file."""
-        ###
-        # General
-        ###
+    # INFO - G.M - 2019-04-05 - Config loading methods
+
+    def load_config(self) -> None:
+        """Parse configuration file and env variables"""
+        self._load_global_config()
+        self._load_email_config()
+        self._load_ldap_config()
+        self._load_webdav_config()
+        self._load_caldav_config()
+
+    def _load_global_config(self) -> None:
+        """
+        Load generic config
+        """
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
         default_color_config_file_path = os.path.join(tracim_v2_folder, 'color.json')  # nopep8
@@ -234,6 +245,39 @@ class CFG(object):
 
 
         self.DEBUG = asbool(self.get_raw_config('debug', 'false'))
+
+        self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(self.get_raw_config(
+            'preview.jpg.restricted_dims', 'false'
+        ))
+        self.PREVIEW_JPG_ALLOWED_DIMS = string_to_list(
+            self.get_raw_config('preview.jpg.allowed_dims', '256x256'),
+            cast_func=PreviewDim.from_string,
+            separator=','
+        )
+
+        self.FRONTEND_SERVE = asbool(self.get_raw_config(
+            'frontend.serve', 'false'
+        ))
+        # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
+        # is probably in frontend subfolder
+        # of tracim_v2 parent of both backend and frontend
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        tracim_v2_folder = os.path.dirname(backend_folder)
+        backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
+
+        self.BACKEND_I18N_FOLDER = self.get_raw_config(
+            'backend.18n_folder_path', backend_i18n_folder
+        )
+
+        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
+        self.FRONTEND_DIST_FOLDER_PATH = self.get_raw_config(
+            'frontend.dist_folder_path', frontend_dist_folder
+        )
+
+    def _load_email_config(self) -> None:
+        """
+        Load config for email related stuff
+        """
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
         ###
         # EMAIL related stuff (notification, reply)
@@ -410,9 +454,11 @@ class CFG(object):
             'new_user.invitation.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME
         )
-        ###
-        # WSGIDAV (Webdav server)
-        ###
+
+    def _load_webdav_config(self) -> None:
+        """
+        load config for webdav related stuff
+        """
         tracim_website = 'http://tracim.fr/'
         tracim_name = 'Tracim'
         wsgidav_website = 'https://github.com/mar10/wsgidav/'
@@ -443,10 +489,11 @@ class CFG(object):
         self.WEBDAV_SHOW_ARCHIVED = False
         self.WEBDAV_SHOW_HISTORY = False
         self.WEBDAV_MANAGE_LOCK = True
-        # TODO - G.M - 27-03-2018 - [Caldav] Restore radicale config
-        ###
-        # RADICALE (Caldav server)
-        ###
+
+    def _load_caldav_config(self) -> None:
+        """
+        load config for caldav related stuff
+        """
         self.CALDAV_ENABLED = asbool(self.get_raw_config(
             'caldav.enabled',
             'false'
@@ -468,36 +515,10 @@ class CFG(object):
             self.CALDAV_RADICALE_WORKSPACE_SUBDIR,
         )
 
-
-        self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(self.get_raw_config(
-            'preview.jpg.restricted_dims', 'false'
-        ))
-        self.PREVIEW_JPG_ALLOWED_DIMS = string_to_list(
-            self.get_raw_config('preview.jpg.allowed_dims', '256x256'),
-            cast_func=PreviewDim.from_string,
-            separator=','
-        )
-
-        self.FRONTEND_SERVE = asbool(self.get_raw_config(
-            'frontend.serve', 'false'
-        ))
-        # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
-        # is probably in frontend subfolder
-        # of tracim_v2 parent of both backend and frontend
-        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
-        tracim_v2_folder = os.path.dirname(backend_folder)
-        backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
-
-        self.BACKEND_I18N_FOLDER = self.get_raw_config(
-            'backend.18n_folder_path', backend_i18n_folder
-        )
-
-        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
-        self.FRONTEND_DIST_FOLDER_PATH = self.get_raw_config(
-            'frontend.dist_folder_path', frontend_dist_folder
-        )
-
-        # INFO - G.M - 2019-04-05 - LDAP parameters
+    def _load_ldap_config(self) ->  None:
+        """
+        Load config for ldap related stuff
+        """
         self.LDAP_URL = self.get_raw_config(
             'ldap_url',
             'dc=directory,dc=fsf,dc=org'
@@ -541,7 +562,20 @@ class CFG(object):
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
         self.LDAP_GET_INFO = None
 
-    def _check_validity(self):
+    # INFO - G.M - 2019-04-05 - Config validation methods
+
+    def check_config_validity(self) -> None:
+        """
+        Check if config setted is correct
+        """
+        self._check_global_config_validity()
+        self._check_email_config_validity()
+        self._check_caldav_config_validity()
+
+    def _check_global_config_validity(self) -> None:
+        """
+        Check config for global stuff
+        """
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
         # INFO - G.M - 2019-04-03 - check color file validity
@@ -597,6 +631,27 @@ class CFG(object):
                 'You should set it with frontend root url.'
             )
 
+        if not os.path.isdir(self.BACKEND_I18N_FOLDER):
+            raise Exception(
+                'ERROR: {} folder does not exist as folder. '
+                'please set backend.i8n_folder_path'
+                'with a correct value'.format(self.BACKEND_I18N_FOLDER)
+            )
+
+        # INFO - G.M - 2018-08-06 - We check dist folder existence
+        if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
+            raise Exception(
+                'ERROR: {} folder does not exist as folder. '
+                'please set frontend.dist_folder.path'
+                'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
+            )
+
+    def _check_email_config_validity(self) -> None:
+        """
+        Check if config is correctly setted for email features
+        """
+        mandatory_msg = \
+            'ERROR: {} configuration is mandatory. Set it before continuing.'
         if not self.EMAIL_NOTIFICATION_ACTIVATED:
             logger.warning(
                 self,
@@ -640,44 +695,21 @@ class CFG(object):
                 )
             )
 
+    def _check_caldav_config_validity(self) -> None:
+        """
+        Check if config is correctly setted for caldav features
+        """
         if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
             raise ConfigurationError(
                 'ERROR: Caldav radicale proxy cannot be activated if no radicale'
                 'base url is configured. set "caldav.radicale_proxy.base_url" properly'
             )
 
-        if not os.path.isdir(self.BACKEND_I18N_FOLDER):
-            raise Exception(
-                'ERROR: {} folder does not exist as folder. '
-                'please set backend.i8n_folder_path'
-                'with a correct value'.format(self.BACKEND_I18N_FOLDER)
-            )
-
-        # INFO - G.M - 2018-08-06 - We check dist folder existence
-        if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
-            raise Exception(
-                'ERROR: {} folder does not exist as folder. '
-                'please set frontend.dist_folder.path'
-                'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
-            )
-
-    def _post_actions(self):
+    # INFO - G.M - 2019-04-05 - Post Actions Methods
+    def do_post_check_action(self) -> None:
         self._set_default_app(self.ENABLED_APP)
 
-    def configure_filedepot(self):
-
-        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
-        # of tracim_backend, Be careful DepotManager is a Singleton !
-
-        depot_storage_name = self.DEPOT_STORAGE_NAME
-        depot_storage_path = self.DEPOT_STORAGE_DIR
-        depot_storage_settings = {'depot.storage_path': depot_storage_path}
-        DepotManager.configure(
-            depot_storage_name,
-            depot_storage_settings,
-        )
-
-    def _set_default_app(self, enabled_app_list: typing.List[str]):
+    def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
 
         # init applications
         html_documents = Application(
@@ -795,6 +827,21 @@ class CFG(object):
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.
         update_validators()
+
+    # INFO - G.M - 2019-04-05 - Others methods
+
+    def configure_filedepot(self) -> None:
+
+        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
+        # of tracim_backend, Be careful DepotManager is a Singleton !
+
+        depot_storage_name = self.DEPOT_STORAGE_NAME
+        depot_storage_path = self.DEPOT_STORAGE_DIR
+        depot_storage_settings = {'depot.storage_path': depot_storage_path}
+        DepotManager.configure(
+            depot_storage_name,
+            depot_storage_settings,
+        )
 
     class CST(object):
         ASYNC = 'ASYNC'
