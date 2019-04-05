@@ -273,7 +273,10 @@ class CFG(object):
             'email.notification.enabled_on_invitation',
             'true'
         ))
-        # TODO - G.M - 2019-04-05 - make this parameterisable
+
+        # TODO - G.M - 2019-04-05 - keep as parameters
+        # or set it as constant,
+        # see https://github.com/tracim/tracim/issues/1569
         self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
@@ -463,6 +466,10 @@ class CFG(object):
                                   )
         self.WEBDAV_DIR_BROWSER_FOOTER = self.get_raw_config('webdav.dir_browser.footer', default_webdav_footnote)
         # TODO : check if tweaking those param does work
+
+        # TODO - G.M - 2019-04-05 - keep as parameters
+        # or set it as constant,
+        # see https://github.com/tracim/tracim/issues/1569
         self.WEBDAV_SHOW_DELETED = False
         self.WEBDAV_SHOW_ARCHIVED = False
         self.WEBDAV_SHOW_HISTORY = False
@@ -569,8 +576,11 @@ class CFG(object):
                     )
                 )
 
-        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
 
+        # TODO - G.M - 2019-04-05 - keep as parameters
+        # or set it as constant,
+        # see https://github.com/tracim/tracim/issues/1569
+        self.LDAP_USER_FILTER = '({}=%(login)s)'.format(self.LDAP_LOGIN_ATTR)  # nopep8
         self.LDAP_USE_POOL = True
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
