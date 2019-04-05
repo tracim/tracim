@@ -56,6 +56,7 @@ class Agenda extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.agendaIframe.contentWindow.location.reload()
         break
       default:
         break
