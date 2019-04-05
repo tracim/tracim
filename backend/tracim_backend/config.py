@@ -189,7 +189,7 @@ class CFG(object):
             default_cors_allowed_origin = self.WEBSITE_BASE_URL
 
         self.CORS_ALLOWED_ORIGIN = string_to_list(
-            self.get_raw_config('cors.access-control-allowed-origin', 'internal'),
+            self.get_raw_config('cors.access-control-allowed-origin', default_cors_allowed_origin),
             separator=',',
             cast_func=str,
             stripped=True,
