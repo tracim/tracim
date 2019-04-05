@@ -7,7 +7,9 @@ import {
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
   WORKSPACE_MEMBER, UPDATE,
-  USER_WORKSPACE_DO_NOTIFY, FOLDER_READ
+  USER_WORKSPACE_DO_NOTIFY,
+  FOLDER_READ,
+  WORKSPACE_AGENDA_URL
 } from '../action-creator.sync.js'
 
 const defaultWorkspace = {
@@ -20,7 +22,8 @@ const defaultWorkspace = {
   memberList: [],
   recentActivityList: [],
   recentActivityForUserList: [],
-  contentReadStatusList: []
+  contentReadStatusList: [],
+  agendaUrl: ''
 }
 
 export default function currentWorkspace (state = defaultWorkspace, action) {
@@ -124,6 +127,9 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           ...state,
           contentReadStatusList: [...state.contentReadStatusList, action.idFolder]
         }
+
+    case `${SET}/${WORKSPACE_AGENDA_URL}`:
+      return {...state, agendaUrl: action.agendaUrl}
 
     default:
       return state

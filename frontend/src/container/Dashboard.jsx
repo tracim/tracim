@@ -17,7 +17,7 @@ import {
   postWorkspaceMember,
   putMyselfWorkspaceRead,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -27,7 +27,8 @@ import {
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
   removeWorkspaceMember,
-  updateUserWorkspaceSubscriptionNotif
+  updateUserWorkspaceSubscriptionNotif,
+  setWorkspaceAgendaUrl
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -40,6 +41,7 @@ import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -111,12 +113,29 @@ class Dashboard extends React.Component {
 
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
-      case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        if (fetchWorkspaceDetail.json.agenda_enabled) this.loadCalendarDetail()
+        break
       case 400:
         props.history.push(PAGE.HOME)
         props.dispatch(newFlashMessage('Unknown shared space'))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+    }
+  }
+
+  loadCalendarDetail = async () => {
+    const { props } = this
+
+    const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
+    switch (fetchCalendar.status) {
+      case 200:
+        const idCurrentWorkspace = parseInt(props.match.params.idws)
+        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === idCurrentWorkspace) || {agenda_url: ''}).agenda_url
+        this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
+        break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('calendar details')}`, 'warning')); break
     }
   }
 
@@ -494,6 +513,10 @@ class Dashboard extends React.Component {
                   t={props.t}
                 />
               </div>
+
+              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled &&
+                <AgendaInfo agendaUrl={props.curWs.agendaUrl} />
+              }
             </PageContent>
           </PageWrapper>
         </div>
