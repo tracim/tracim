@@ -196,20 +196,6 @@ class CFG(object):
 
         )
 
-        # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
-        # Verify this
-        #
-        # self.WEBSITE_HOME_TITLE_COLOR = self.get_raw_config(
-        #     'website.title.color',
-        #     '#555',
-        # )
-        # self.WEBSITE_HOME_IMAGE_PATH = self.get_raw_config(
-        #     '/assets/img/home_illustration.jpg',
-        # )
-        # self.WEBSITE_HOME_BACKGROUND_IMAGE_PATH = self.get_raw_config(
-        #     '/assets/img/bg.jpg',
-        # )
-        #
         self.WEBSITE_SERVER_NAME = self.get_raw_config(
             'website.server_name',
         )
@@ -224,23 +210,6 @@ class CFG(object):
                 'website.base_url parameter -> {0}'
                 .format(self.WEBSITE_SERVER_NAME)
             )
-        # TODO - G.M - 2018-09-11 - Deprecated params
-        # self.WEBSITE_HOME_TAG_LINE = self.get_raw_config(
-        #     'website.home.tag_line',
-        #     '',
-        # )
-        # self.WEBSITE_SUBTITLE = self.get_raw_config(
-        #     'website.home.subtitle',
-        #     '',
-        # )
-        # self.WEBSITE_HOME_BELOW_LOGIN_FORM = self.get_raw_config(
-        #     'website.home.below_login_form',
-        #     '',
-        # )
-        #
-        # self.WEBSITE_TREEVIEW_CONTENT = self.get_raw_config(
-        #     'website.treeview.content',
-        # )
 
         self.USER_AUTH_TOKEN_VALIDITY = int(self.get_raw_config(
             'user.auth_token.validity',
