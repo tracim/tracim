@@ -83,16 +83,26 @@ if [ "$EMAIL_MODE_ASYNC" = "1" ];then
     supervisorctl start tracim_mail_notifier
 fi
 
-# Start tracim with webdav or not
+# Activate or deactivate webdav
 if [ "$START_WEBDAV" = "1" ]; then
-    set +e
-    service uwsgi restart
-    set -e
-    tail -f /var/log/dpkg.log
+    if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
+        ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
+    fi
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
-    set +e
-    service uwsgi restart
-    set -e
-    tail -f /var/log/dpkg.log
 fi
+
+# Activate or deactivate caldav
+if [ "$START_CALDAV" = "1" ]; then
+    if [ ! -L /etc/uwsgi/apps-enabled/tracim_caldav.ini ]; then
+        ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
+    fi
+else
+    rm -f /etc/uwsgi/apps-enabled/tracim_caldav.ini
+fi
+
+# Start tracim
+set +e
+service uwsgi restart
+set -e
+tail -f /var/log/dpkg.log

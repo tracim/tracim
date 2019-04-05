@@ -108,13 +108,41 @@ if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
         ln -s /etc/tracim/tracim_webdav.ini /etc/uwsgi/apps-available/tracim_webdav.ini
     fi
-    if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
-        ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
-    fi
+
     sed -i "s|#<Directory \"/\">|<Directory \"/\">|g" /etc/tracim/apache2.conf
     sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
     sed -i "s|#    Dav On|    Dav On|g" /etc/tracim/apache2.conf
     sed -i "s|#</Directory>|</Directory>|g" /etc/tracim/apache2.conf
     sed -i "s|#ProxyPass /webdav http://127.0.0.1:3030/webdav|ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+fi
+
+# Create Webdav file/config if not exist
+if [ "$START_CALDAV" = "1" ]; then
+    if [ ! -f /etc/tracim/tracim_caldav.ini ];then
+        cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_caldav.ini
+        sed -i "s|module = .*|module = wsgi.caldav:application|g" /etc/tracim/tracim_caldav.ini
+        sed -i "s|http-socket = .*|http-socket = :5232|g" /etc/tracim/tracim_caldav.ini
+        sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_caldav.log|g" /etc/tracim/tracim_caldav.ini
+    fi
+    if [ ! -L /etc/uwsgi/apps-available/tracim_caldav.ini ]; then
+        ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
+    fi
+    sed -i "s|caldav.enabled = .*|caldav.enabled = True|g" /etc/tracim/development.ini
+
+    sed -i "s|#<Directory \"/\">|<Directory \"/\">|g" /etc/tracim/apache2.conf
+    sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
+    sed -i "s|#</Directory>|</Directory>|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPass http://127.0.0.1:5232/ retry=0|ProxyPass http://127.0.0.1:5232/ retry=0|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPassReverse http://127.0.0.1:5232/|ProxyPassReverse http://127.0.0.1:5232/|g" /etc/tracim/apache2.conf
+    sed -i "s|#RequestHeader set X-Script-Name /radicale/|RequestHeader set X-Script-Name /radicale/|g" /etc/tracim/apache2.conf
+else
+    sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
+
+    sed -i "s|<Directory \"/\">|#<Directory \"/\">|g" /etc/tracim/apache2.conf
+    sed -i "s|    Require all granted|#    Require all granted|g" /etc/tracim/apache2.conf
+    sed -i "s|</Directory>|#</Directory>|g" /etc/tracim/apache2.conf
+    sed -i "s|ProxyPass http://127.0.0.1:5232/ retry=0|#ProxyPass http://127.0.0.1:5232/ retry=0|g" /etc/tracim/apache2.conf
+    sed -i "s|ProxyPassReverse http://127.0.0.1:5232/|#ProxyPassReverse http://127.0.0.1:5232/|g" /etc/tracim/apache2.conf
+    sed -i "s|RequestHeader set X-Script-Name /radicale/|#RequestHeader set X-Script-Name /radicale/|g" /etc/tracim/apache2.conf
 fi
