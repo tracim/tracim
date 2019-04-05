@@ -24,6 +24,10 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.roles import WorkspaceRoles
 
 ENV_VAR_PREFIX = 'TRACIM_'
+CONFIG_LOG_TEMPLATE = 'CONFIG: [ {config_source: <15} | {config_name} | {config_value} | {config_name_source} ]'
+ID_SOURCE_ENV_VAR='SOURCE_ENV_VAR'
+ID_SOURCE_CONFIG='SOURCE_CONFIG'
+ID_SOURCE_DEFAULT='SOURCE_DEFAULT'
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
@@ -76,43 +80,45 @@ class CFG(object):
         val_name_env = self._get_associated_env_var_name(config_name)
         val_env = os.environ.get(val_name_env)
         if val_env:
-            logger.info(
-                self,
-                "CONFIG: [ {config_name} | {config_value} |"
-                " from ENV VAR {val_name_env} ]".format(
-                    config_name=config_name,
-                    config_value=self._get_printed_val_value(val_env, secret=secret),
-                    val_name_env=val_name_env
-                )
-            )
-            return val_env
+            config_value = val_env
+            config_source = ID_SOURCE_ENV_VAR
+            config_name_source = val_name_env
+            config_name = config_name
         elif val_cfg:
-            logger.info(
-                self,
-                "CONFIG: [ {config_name} | {config_value} ]"
-                " from CONFIG FILE".format(
-                    config_name=config_name,
-                    config_value=self._get_printed_val_value(val_cfg, secret=secret),
-                    val_name_env=val_name_env
-                )
-            )
-            return val_cfg
+            config_value = val_cfg
+            config_source = ID_SOURCE_CONFIG
+            config_name_source = config_name
+            config_name = config_name
         else:
-            logger.info(
-                self,
-                "CONFIG: [ {config_name} | {config_value} ]"
-                " default value from TRACIM".format(
-                    config_name=config_name,
-                    config_value=self._get_printed_val_value(default_value, secret=secret),
-                    val_name_env=val_name_env
-                )
+            config_value = default_value
+            config_source = ID_SOURCE_DEFAULT
+            config_name_source = None
+            config_name = config_name
+
+        logger.info(
+            self,
+            CONFIG_LOG_TEMPLATE.format(
+                config_value=config_value,
+                config_source=config_source,
+                config_name=config_name,
+                config_name_source=config_name_source,
             )
-            return default_value
+        )
+        return config_value
 
     # INFO - G.M - 2019-04-05 - Config loading methods
 
     def load_config(self) -> None:
         """Parse configuration file and env variables"""
+        logger.info(
+            self,
+            CONFIG_LOG_TEMPLATE.format(
+                config_value='<config_value>',
+                config_source='<config_source>',
+                config_name='<config_name>',
+                config_name_source='<config_name_source>',
+            )
+        )
         self._load_global_config()
         self._load_email_config()
         self._load_ldap_config()
