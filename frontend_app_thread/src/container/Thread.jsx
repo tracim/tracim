@@ -217,6 +217,7 @@ class Thread extends React.Component {
         break
       case 400:
         switch (fetchResultSaveThread.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
@@ -410,6 +411,7 @@ class Thread extends React.Component {
             timelineData={listMessage}
             newComment={newComment}
             disableComment={!content.is_editable}
+            availableStatusList={config.availableStatuses}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

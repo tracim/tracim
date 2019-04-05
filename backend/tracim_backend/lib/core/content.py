@@ -24,6 +24,7 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
@@ -49,13 +50,10 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.lib.utils.utils import preview_manager_page_format
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizerConfig  # nopep8
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
@@ -138,7 +136,7 @@ class ContentApi(object):
             self,
             session: Session,
             current_user: typing.Optional[User],
-            config,
+            config: CFG,
             show_archived: bool = False,
             show_deleted: bool = False,
             show_temporary: bool = False,
@@ -162,9 +160,7 @@ class ContentApi(object):
         default_lang = None
         if self._user:
             default_lang = self._user.lang
-        if not default_lang:
-            default_lang = DEFAULT_FALLBACK_LANG
-        self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
+        self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     @contextmanager
     def show(
@@ -618,13 +614,6 @@ class ContentApi(object):
             )
         if not content:
             raise EmptyCommentContentNotAllowed()
-
-        config = HtmlSanitizerConfig(tag_blacklist=['script'])
-        satinizer = HtmlSanitizer(html_body=content, config=config)
-        if satinizer.is_html():
-            content = satinizer.sanitize()
-            if satinizer.html_is_empty():
-                raise EmptyCommentContentNotAllowed()
 
         item = self.create(
             content_type_slug=content_type_list.Comment.slug,

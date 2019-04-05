@@ -269,6 +269,7 @@ class File extends React.Component {
         break
       case 400:
         switch (fetchResultSaveFile.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
@@ -667,6 +668,7 @@ class File extends React.Component {
             timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

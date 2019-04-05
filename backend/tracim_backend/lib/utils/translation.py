@@ -24,9 +24,14 @@ class Translator(object):
     """
 
     def __init__(self, app_config: 'CFG', default_lang: str = None, fallback_lang: str = None):  # nopep8
+        """
+        you should provide either valid fallback_lang(true value) or valid
+        app.config.DEFAULT_LANG (true value).
+        """
         self.config = app_config
         if not fallback_lang:
-            fallback_lang = DEFAULT_FALLBACK_LANG
+            assert app_config.DEFAULT_LANG
+            fallback_lang = app_config.DEFAULT_LANG
         self.fallback_lang = fallback_lang
         if not default_lang:
             default_lang = fallback_lang

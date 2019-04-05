@@ -1,5 +1,6 @@
 from time import sleep
 
+from parameterized import parameterized
 import pytest
 import requests
 import transaction
@@ -78,6 +79,44 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         result = self.testapp.put('/calendar/user/{}/'.format(user.user_id), event, content_type='text/calendar', status=201)
         result = self.testapp.get('/calendar/user/{}/'.format(user.user_id), status=200)
         result = self.testapp.delete('/calendar/user/{}/'.format(user.user_id), status=200)
+
+    @parameterized.expand([
+        #  sub_items label
+        ('2d89ab53-e66f-6a48-634a-f112fb27b5e8'), # thunderbird-like
+        ('c584046fa2a358f646aa18e94f61a011f32e7d14a5735cd80bceaca8351d8fa4'), # caldavzap-like
+    ])
+    def test_proxy_user_calendar__ok__on_sub_items(self, sub_item_label) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        result = self.testapp.get('/calendar/user/{}/{}'.format(user.user_id, sub_item_label), status=404)
+        event = VALID_CALDAV_BODY_PUT_EVENT
+        result = self.testapp.put('/calendar/user/{}/'.format(user.user_id), event, content_type='text/calendar', status=201)
+        result = self.testapp.put('/calendar/user/{}/{}.ics'.format(user.user_id, sub_item_label), event, content_type='text/calendar', status='*')
+        result = self.testapp.get('/calendar/user/{}/{}.ics'.format(user.user_id, sub_item_label), status=200)
+        result = self.testapp.delete('/calendar/user/{}/{}.ics'.format(user.user_id, sub_item_label), status=200)
+        result = self.testapp.delete('/calendar/user/{}/'.format(user.user_id, sub_item_label), status=200)
 
     def test_proxy_user_calendar__err__other_user_calendar(self) -> None:
         dbsession = get_tm_session(self.session_factory,

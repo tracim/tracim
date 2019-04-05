@@ -2,8 +2,6 @@
 import datetime
 import random
 import string
-from lxml import html
-from lxml.etree import ParseError
 from os.path import normpath as base_normpath
 from urllib.parse import urljoin
 from urllib.parse import urlencode
