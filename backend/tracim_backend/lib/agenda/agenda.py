@@ -22,16 +22,16 @@ CREATE_AGENDA_TEMPLATE = \
     <prop>
       <resourcetype>
         <collection />
-        <C:agenda />
+        <C:calendar />
       </resourcetype>
-      <C:supported-agenda-component-set>
+      <C:supported-calendar-component-set>
         <C:comp name="VEVENT" />
         <C:comp name="VJOURNAL" />
         <C:comp name="VTODO" />
-      </C:supported-agenda-component-set>
+      </C:supported-calendar-component-set>
       <displayname>{agenda_name}</displayname>
-      <C:agenda-description>{agenda_description}</C:agenda-description>
-      <I:agenda-color>{agenda_color}</I:agenda-color>
+      <C:calendar-description>{agenda_description}</C:calendar-description>
+      <I:calendar-color>{agenda_color}</I:calendar-color>
     </prop>
   </set>
 </create>
