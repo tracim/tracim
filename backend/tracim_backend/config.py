@@ -497,54 +497,40 @@ class CFG(object):
             'frontend.dist_folder_path', frontend_dist_folder
         )
 
-        self.load_ldap_settings(settings)
-
-    def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
-        """
-        Will parse config file to setup new matching attribute in the instance
-        :param settings: dict of source settings (from ini file)
-        """
-        param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
-
-        ldap_parameters = [
-            param('ldap_url',                   'LDAP_URL',          'dc=directory,dc=fsf,dc=org', None),
-            param('ldap_base_dn',               'LDAP_BASE_DN',      'dc=directory,dc=fsf,dc=org', None),
-            param('ldap_bind_dn',               'LDAP_BIND_DN',      'cn=admin, dc=directory,dc=fsf,dc=org', None),
-            param('ldap_bind_pass',             'LDAP_BIND_PASS',    '', None),
-            param('ldap_tls',                   'LDAP_TLS',          False, asbool),
-            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN', 'ou=people, dc=directory,dc=fsf,dc=org', None),
-            param('ldap_login_attribute', 'LDAP_LOGIN_ATTR', 'mail', None),
-            # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-            param('ldap_name_attribute', 'LDAP_NAME_ATTR', None, None),
-            # TODO - G.M - 2018-12-05 - [ldap_profile]
-            # support for profile attribute disabled
-            # Should be reenabled later probably with a better code
-            # param('ldap_profile_attribute', 'LDAP_PROFILE_ATTR', None, None),
-        ]
-
-        for ldap_parameter in ldap_parameters:
-            if ldap_parameter.adapter:
-                # Apply given function as a data modifier before setting value
-                setattr(
-                    self,
-                    ldap_parameter.cfg_name,
-                    ldap_parameter.adapter(
-                        self.get_raw_config(
-                            ldap_parameter.ini_name,
-                            ldap_parameter.default_value
-                        )
-                    )
-                )
-            else:
-                setattr(
-                    self,
-                    ldap_parameter.cfg_name,
-                    self.get_raw_config(
-                        ldap_parameter.ini_name,
-                        ldap_parameter.default_value
-                    )
-                )
-
+        # INFO - G.M - 2019-04-05 - LDAP parameters
+        self.LDAP_URL = self.get_raw_config(
+            'ldap_url',
+            'dc=directory,dc=fsf,dc=org'
+        )
+        self.LDAP_BASE_URL = self.get_raw_config(
+            'ldap_base_url',
+            'dc=directory,dc=fsf,dc=org'
+        )
+        self.LDAP_BIND_DN = self.get_raw_config(
+            'ldap_bind_dn',
+            'cn=admin, dc=directory,dc=fsf,dc=org'
+        )
+        self.LDAP_BIND_PASS = self.get_raw_config(
+            'ldap_bind_pass',
+            secret=True
+        )
+        self.LDAP_TLS = asbool(self.get_raw_config('ldap_tls', 'false'))
+        self.LDAP_USER_BASE_DN = self.get_raw_config(
+            'ldap_user_base_dn',
+            'ou=people, dc=directory,dc=fsf,dc=org'
+        )
+        self.LDAP_LOGIN_ATTR = self.get_raw_config(
+            'ldap_login_attribute',
+            'mail'
+        )
+        # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
+        self.LDAP_NAME_ATTR = self.get_raw_config(
+            'ldap_name_attribute'
+        )
+        # TODO - G.M - 2018-12-05 - [ldap_profile]
+        # support for profile attribute disabled
+        # Should be reenabled later probably with a better code
+        # self.LDAP_PROFILE_ATTR = self.get_raw_config('ldap_profile_attribute')
 
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
