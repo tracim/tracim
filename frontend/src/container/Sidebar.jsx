@@ -72,6 +72,9 @@ class Sidebar extends React.Component {
     // check if pathname has changed
     if (props.location.pathname !== nextProps.location.pathname) return true
 
+    // check if language changed
+    if (props.user.lang !== nextProps.user.lang) return true
+
     const propsUrlSearch = qs.parse(props.location.search)
     const nextPropsUrlSearch = qs.parse(nextProps.location.search)
     // check if url filter of workspace content has changed
@@ -110,7 +113,7 @@ class Sidebar extends React.Component {
 
   render () {
     const { sidebarClose } = this.state
-    const { user, activeLang, workspaceList, t } = this.props
+    const { user, workspaceList, t } = this.props
 
     if (!this.shouldDisplaySidebar(this.props)) return null
 
@@ -139,7 +142,6 @@ class Sidebar extends React.Component {
                     idWorkspace={ws.id}
                     label={ws.label}
                     allowedAppList={ws.sidebarEntry}
-                    lang={activeLang}
                     activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}
                     isOpenInSidebar={ws.isOpenInSidebar}
                     onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
@@ -176,10 +178,5 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, workspaceList, system }) => ({
-  activeLang: lang.find(l => l.active) || {id: 'en'},
-  user,
-  workspaceList,
-  system
-})
+const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))
