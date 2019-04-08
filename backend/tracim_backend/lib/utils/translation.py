@@ -38,9 +38,9 @@ class Translator(object):
         self.default_lang = default_lang
 
     def _get_json_translation_lang_filepath(self, lang: str) -> typing.Optional[str]:  # nopep8
-        i18n_folder = self.config.BACKEND_I18N_FOLDER_PATH
+        i18n_folder = self.config.BACKEND__I18N_FOLDER_PATH
         lang_filepath = os.path.join(i18n_folder, lang, TRANSLATION_FILENAME)
-        if not os.path.isdir(self.config.BACKEND_I18N_FOLDER_PATH):
+        if not os.path.isdir(self.config.BACKEND__I18N_FOLDER_PATH):
             return None
         else:
             return lang_filepath

@@ -767,7 +767,7 @@ class UserApi(object):
         do_save: bool=True,
         do_notify: bool=True,
     ) -> User:
-        if do_notify and not self._config.EMAIL_NOTIFICATION_ACTIVATED:
+        if do_notify and not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantCreateUserWithInvitation(
                 "Can't create user with invitation mail because "
                 "notification are disabled."
@@ -852,7 +852,7 @@ class UserApi(object):
         """
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
-        if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
+        if not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantResetPassword("cant reset password with notification disabled")  # nopep8
         token = user.generate_reset_password_token()
         try:
@@ -872,7 +872,7 @@ class UserApi(object):
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
             token=token,
-            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_LIFETIME,
+            validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
@@ -917,7 +917,7 @@ class UserApi(object):
         # Check if this is already needed with
         # new auth system
         user.ensure_auth_token(
-            validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY
+            validity_seconds=self._config.USER__AUTH_TOKEN_VALIDITY
         )
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
@@ -955,11 +955,11 @@ class UserApi(object):
         # email provided or email_notification disabled.
         if not email:
             return False
-        if not self._config.EMAIL_NOTIFICATION_ACTIVATED and self._config.NEW_USER_INVITATION_DO_NOTIFY:
+        if not self._config.EMAIL__NOTIFICATION__ACTIVATED and self._config.NEW_USER__INVITATION__DO_NOTIFY:
             return False
         # INFO - G.M - 2018-10-25 - do not allow all profile to invite new user
         gapi = GroupApi(self._session, self._user, self._config)
-        invite_minimal_profile = gapi.get_one_with_name(group_name=self._config.NEW_USER_INVITATION_MINIMAL_PROFILE)  # nopep8
+        invite_minimal_profile = gapi.get_one_with_name(group_name=self._config.NEW_USER__INVITATION__MINIMAL_PROFILE)  # nopep8
 
         if not self._user.profile.id >= invite_minimal_profile.group_id:
             return False

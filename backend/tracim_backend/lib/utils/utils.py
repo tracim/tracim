@@ -42,7 +42,7 @@ def get_root_frontend_url(config: 'CFG') -> str:
     """
     Return website base url with always '/' at the end
     """
-    return as_url_folder(config.WEBSITE_BASE_URL)
+    return as_url_folder(config.WEBSITE__BASE_URL)
 
 
 def get_frontend_ui_base_url(config: 'CFG') -> str:
@@ -95,9 +95,9 @@ def get_redis_connection(config: 'CFG') -> Redis:
     :return: redis connection
     """
     return Redis(
-        host=config.EMAIL_SENDER_REDIS_HOST,
-        port=config.EMAIL_SENDER_REDIS_PORT,
-        db=config.EMAIL_SENDER_REDIS_DB,
+        host=config.EMAIL__ASYNC__REDIS__HOST,
+        port=config.EMAIL__ASYNC__REDIS_PORT,
+        db=config.EMAIL_ASYNC__REDIS__DB,
     )
 
 

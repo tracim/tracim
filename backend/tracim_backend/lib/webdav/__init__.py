@@ -44,7 +44,7 @@ class WebdavAppFactory(object):
             config['trusted_auth_header'] = app_config.REMOTE_USER_HEADER
 
 
-        config['verbose'] = app_config.WEBDAV_VERBOSE_LEVEL
+        config['verbose'] = app_config.WEBDAV__VERBOSE_LEVEL
         config['dir_browser']['enable'] = app_config.WEBDAV_DIR_BROWSER_ENABLED
         config['dir_browser']['response_trailer'] = app_config.WEBDAV_DIR_BROWSER_FOOTER
 
@@ -55,7 +55,7 @@ class WebdavAppFactory(object):
             )
 
         config['provider_mapping'] = {
-            app_config.WEBDAV_ROOT_PATH: Provider(
+            app_config.WEBDAV__ROOT_PATH: Provider(
                 show_history=app_config.WEBDAV_SHOW_ARCHIVED,
                 show_archived=app_config.WEBDAV_SHOW_DELETED,
                 show_deleted=app_config.WEBDAV_SHOW_HISTORY,
@@ -63,7 +63,7 @@ class WebdavAppFactory(object):
                 app_config=app_config,
             )
         }
-        config['block_size'] = app_config.WEBDAV_BLOCK_SIZE
+        config['block_size'] = app_config.WEBDAV__BLOCK_SIZE
 
         config['domaincontroller'] = TracimDomainController(
             presetdomain=None,

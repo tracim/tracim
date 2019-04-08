@@ -1020,8 +1020,8 @@ class ContentApi(object):
         Get jpg preview allowed dimensions and strict bool param.
         """
         return PreviewAllowedDim(
-            self._config.PREVIEW_JPG_RESTRICTED_DIMS,
-            self._config.PREVIEW_JPG_ALLOWED_DIMS,
+            self._config.PREVIEW__JPG__RESTRICTED_DIMS,
+            self._config.PREVIEW__JPG__ALLOWED_DIMS,
         )
 
     def get_jpg_preview_path(
@@ -1056,16 +1056,16 @@ class ContentApi(object):
                     ),
                 )
             if not width and not height:
-                width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
-                height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
+                width = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].width
+                height = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].height
 
             allowed_dim = False
-            for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+            for preview_dim in self._config.PREVIEW__JPG__ALLOWED_DIMS:
                 if width == preview_dim.width and height == preview_dim.height:
                     allowed_dim = True
                     break
 
-            if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+            if not allowed_dim and self._config.PREVIEW__JPG__RESTRICTED_DIMS:
                 raise PreviewDimNotAllowed(
                     'Size {width}x{height} is not allowed for jpeg preview'.format(
                         width=width,

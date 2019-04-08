@@ -91,7 +91,7 @@ def web(global_config, **local_settings):
         )
     policies.append(
         CookieSessionAuthentificationPolicy(
-            reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
+            reissue_time=app_config.SESSION__REISSUE_TIME),  # nopep8
     )
     if app_config.API_KEY:
         policies.append(
@@ -220,9 +220,9 @@ def web(global_config, **local_settings):
         configurator.include(calendar_controller.bind, route_prefix=BASE_API_V2)
         configurator.include(radicale_proxy_controller.bind)
 
-    if app_config.FRONTEND_SERVE:
+    if app_config.FRONTEND__SERVE:
         configurator.include('pyramid_mako')
-        frontend_controller = FrontendController(app_config.FRONTEND_DIST_FOLDER_PATH)  # nopep8
+        frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)  # nopep8
         configurator.include(frontend_controller.bind)
 
     hapic.add_documentation_view(

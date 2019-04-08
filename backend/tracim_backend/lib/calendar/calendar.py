@@ -80,7 +80,7 @@ class CalendarApi(object):
 
     def _get_calendar_base_url(self, use_proxy: bool):
         if use_proxy:
-            base_url = self._config.WEBSITE_BASE_URL
+            base_url = self._config.WEBSITE__BASE_URL
         else:
             base_url = self._config.CALDAV_RADICALE_PROXY_BASE_URL
         return base_url

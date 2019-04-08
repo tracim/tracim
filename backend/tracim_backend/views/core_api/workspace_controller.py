@@ -397,16 +397,16 @@ class WorkspaceController(Controller):
             if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
                 raise exc
 
-            if app_config.NEW_USER_INVITATION_DO_NOTIFY:
+            if app_config.NEW_USER__INVITATION__DO_NOTIFY:
                 user = uapi.create_user(
                     auth_type=AuthType.UNKNOWN,
                     email=hapic_data.body.user_email,
                     password=password_generator(),
                     do_notify=True
                 )
-                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                    app_config.NEW_USER_INVITATION_DO_NOTIFY and \
-                    app_config.EMAIL_PROCESSING_MODE.lower() == 'sync':
+                if app_config.EMAIL__NOTIFICATION__ACTIVATED and \
+                    app_config.NEW_USER__INVITATION__DO_NOTIFY and \
+                    app_config.EMAIL__PROCESSING_MODE.lower() == 'sync':
                     email_sent = True
             else:
                 user = uapi.create_user(
@@ -422,7 +422,7 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
-            with_notif=app_config.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION,
+            with_notif=app_config.EMAIl__NOTIFICATION__ENABLED_ON_INVITATION,
             flush=True,
         )
         return rapi.get_user_role_workspace_with_context(

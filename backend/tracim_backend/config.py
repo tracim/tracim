@@ -184,33 +184,33 @@ class CFG(object):
             '',
             secret=True
         )
-        self.SESSION_REISSUE_TIME = int(self.get_raw_config(
+        self.SESSION__REISSUE_TIME = int(self.get_raw_config(
             'session.reissue_time',
             '120'
         ))
-        self.WEBSITE_TITLE = self.get_raw_config(
+        self.WEBSITE__TITLE = self.get_raw_config(
             'website.title',
             'TRACIM',
         )
 
         # base url of the frontend
-        self.WEBSITE_BASE_URL = self.get_raw_config(
+        self.WEBSITE__BASE_URL = self.get_raw_config(
             'website.base_url',
             '',
         )
 
-        self.API_BASE_URL = self.get_raw_config(
+        self.API__BASE_URL = self.get_raw_config(
             'api.base_url',
-            self.WEBSITE_BASE_URL,
+            self.WEBSITE__BASE_URL,
         )
 
 
-        if self.API_BASE_URL != self.WEBSITE_BASE_URL:
-            default_cors_allowed_origin = '{},{}'.format(self.WEBSITE_BASE_URL, self.API_BASE_URL)
+        if self.API__BASE_URL != self.WEBSITE__BASE_URL:
+            default_cors_allowed_origin = '{},{}'.format(self.WEBSITE__BASE_URL, self.API__BASE_URL)
         else:
-            default_cors_allowed_origin = self.WEBSITE_BASE_URL
+            default_cors_allowed_origin = self.WEBSITE__BASE_URL
 
-        self.CORS_ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_list(
+        self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_list(
             self.get_raw_config('cors.access-control-allowed-origin', default_cors_allowed_origin),
             separator=',',
             cast_func=str,
@@ -218,22 +218,22 @@ class CFG(object):
 
         )
 
-        self.WEBSITE_SERVER_NAME = self.get_raw_config(
+        self.WEBSITE__SERVER_NAME = self.get_raw_config(
             'website.server_name',
         )
-        if not self.WEBSITE_SERVER_NAME:
-            self.WEBSITE_SERVER_NAME = self.get_raw_config(
+        if not self.WEBSITE__SERVER_NAME:
+            self.WEBSITE__SERVER_NAME = self.get_raw_config(
                 'website.server_name',
-                default_value=urlparse(self.WEBSITE_BASE_URL).hostname
+                default_value=urlparse(self.WEBSITE__BASE_URL).hostname
             )
             logger.warning(
                 self,
                 'NOTE: Generated website.server_name parameter from '
                 'website.base_url parameter -> {0}'
-                .format(self.WEBSITE_SERVER_NAME)
+                .format(self.WEBSITE__SERVER_NAME)
             )
 
-        self.USER_AUTH_TOKEN_VALIDITY = int(self.get_raw_config(
+        self.USER__AUTH_TOKEN_VALIDITY = int(self.get_raw_config(
             'user.auth_token.validity',
             '604800',
         ))
@@ -241,15 +241,15 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = '900'
-        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = self.get_raw_config('user.reset_password.validity')
-        if self.USER_RESET_PASSWORD_TOKEN_LIFETIME:
+        self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.get_raw_config('user.reset_password.validity')
+        if self.USER__RESET_PASSWORD__TOKEN_LIFETIME:
             logger.warning(
                 self,
                 'user.reset_password.validity parameter is deprecated ! '
                 'please use user.reset_password.token_lifetime instead.'
             )
         else:
-            self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(self.get_raw_config(
+            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(self.get_raw_config(
                 'user.reset_password.token_lifetime',
                 defaut_reset_password_validity
             ))
@@ -257,16 +257,16 @@ class CFG(object):
 
         self.DEBUG = asbool(self.get_raw_config('debug', 'false'))
 
-        self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(self.get_raw_config(
+        self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(self.get_raw_config(
             'preview.jpg.restricted_dims', 'false'
         ))
-        self.PREVIEW_JPG_ALLOWED_DIMS = string_to_list(
+        self.PREVIEW__JPG__ALLOWED_DIMS = string_to_list(
             self.get_raw_config('preview.jpg.allowed_dims', '256x256'),
             cast_func=PreviewDim.from_string,
             separator=','
         )
 
-        self.FRONTEND_SERVE = asbool(self.get_raw_config(
+        self.FRONTEND__SERVE = asbool(self.get_raw_config(
             'frontend.serve', 'false'
         ))
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
@@ -276,12 +276,12 @@ class CFG(object):
         tracim_v2_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
 
-        self.BACKEND_I18N_FOLDER_PATH = self.get_raw_config(
+        self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             'backend.18n_folder_path', backend_i18n_folder
         )
 
         frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
-        self.FRONTEND_DIST_FOLDER_PATH = self.get_raw_config(
+        self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             'frontend.dist_folder_path', frontend_dist_folder
         )
 
@@ -293,7 +293,7 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION = asbool(self.get_raw_config(
+        self.EMAIl__NOTIFICATION__ENABLED_ON_INVITATION = asbool(self.get_raw_config(
             'email.notification.enabled_on_invitation',
             'true'
         ))
@@ -301,7 +301,7 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
+        self.EMAIL__NOTIFICATION__NOTIFIED_EVENTS = [
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
             ActionDescription.EDITION,
@@ -311,7 +311,7 @@ class CFG(object):
         # TODO - G.M - 2019-04-04 - need to be better handled:
         # dynamic default value and allow user to set this value.
         # see :https://github.com/tracim/tracim/issues/1555
-        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
+        self.EMAIL__NOTIFICATION__NOTIFIED_CONTENTS = [
             'html-document',
             'thread',
             'file',
@@ -319,7 +319,7 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL_NOTIFICATION_FROM_EMAIL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__FROM_EMAIL = self.get_raw_config(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
         )
@@ -330,138 +330,138 @@ class CFG(object):
                 'email.notification.from.default_label.'
             )
 
-        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__FROM_DEFAULT_LABEL = self.get_raw_config(
             'email.notification.from.default_label',
             'Tracim Notifications'
         )
-        self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__REPLY_TO_EMAIL = self.get_raw_config(
             'email.notification.reply_to.email',
         )
-        self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__REFERENCES_EMAIL = self.get_raw_config(
             'email.notification.references.email'
         )
         # Content update notification
 
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CONTENT_UPDATE_TEMPLATE_HTML = self.get_raw_config(
             'email.notification.content_update.template.html',
         )
 
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CONTENT_UPDATE_SUBJECT = self.get_raw_config(
             'email.notification.content_update.subject',
             _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
         )
         # Created account notification
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CREATED_ACCOUNT_TEMPLATE_HTML = self.get_raw_config(
             'email.notification.created_account.template.html',
         )
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CREATED_ACCOUNT_SUBJECT = self.get_raw_config(
             'email.notification.created_account.subject',
             _('[{website_title}] Someone created an account for you'),
         )
 
         # Reset password notification
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__RESET_PASSWORD_TEMPLATE_HTML = self.get_raw_config(
             'email.notification.reset_password_request.template.html',
         )
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__RESET_PASSWORD_SUBJECT = self.get_raw_config(
             'email.notification.reset_password_request.subject',
             _('[{website_title}] A password reset has been requested'),
         )
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
-        self.EMAIL_NOTIFICATION_PROCESSING_MODE = 'sync'
-        self.EMAIL_NOTIFICATION_ACTIVATED = asbool(self.get_raw_config(
+        self.EMAIL__NOTIFICATION__PROCESSING_MODE = 'sync'
+        self.EMAIL__NOTIFICATION__ACTIVATED = asbool(self.get_raw_config(
             'email.notification.activated',
         ))
 
-        self.EMAIL_NOTIFICATION_SMTP_SERVER = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__SMTP__SERVER = self.get_raw_config(
             'email.notification.smtp.server',
         )
-        self.EMAIL_NOTIFICATION_SMTP_PORT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__SMTP__PORT = self.get_raw_config(
             'email.notification.smtp.port',
         )
-        self.EMAIL_NOTIFICATION_SMTP_USER = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__SMTP__USER = self.get_raw_config(
             'email.notification.smtp.user',
         )
-        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             'email.notification.smtp.password',
             secret=True
         )
 
-        self.EMAIL_REPLY_ACTIVATED = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config(
             'email.reply.activated',
             'false',
         ))
 
-        self.EMAIL_REPLY_IMAP_SERVER = self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__SERVER = self.get_raw_config(
             'email.reply.imap.server',
         )
-        self.EMAIL_REPLY_IMAP_PORT = self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__PORT = self.get_raw_config(
             'email.reply.imap.port',
         )
-        self.EMAIL_REPLY_IMAP_USER = self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__USER = self.get_raw_config(
             'email.reply.imap.user',
         )
-        self.EMAIL_REPLY_IMAP_PASSWORD = self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__PASSWORD = self.get_raw_config(
             'email.reply.imap.password',
             secret=True
         )
-        self.EMAIL_REPLY_IMAP_FOLDER = self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config(
             'email.reply.imap.folder',
         )
-        self.EMAIL_REPLY_CHECK_HEARTBEAT = int(self.get_raw_config(
+        self.EMAIL__REPLY__CHECK__HEARTBEAT = int(self.get_raw_config(
             'email.reply.check.heartbeat',
             '60',
         ))
-        self.EMAIL_REPLY_IMAP_USE_SSL = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__USE__SSL = asbool(self.get_raw_config(
             'email.reply.imap.use_ssl',
         ))
-        self.EMAIL_REPLY_IMAP_USE_IDLE = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__USE__IDLE = asbool(self.get_raw_config(
             'email.reply.imap.use_idle',
             'true',
         ))
-        self.EMAIL_REPLY_CONNECTION_MAX_LIFETIME = int(self.get_raw_config(
+        self.EMAIL__REPLY__CONNECTION__MAX_LIFETIME = int(self.get_raw_config(
             'email.reply.connection.max_lifetime',
             '600',  # 10 minutes
         ))
-        self.EMAIL_REPLY_USE_HTML_PARSING = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__USE_HTML_PARSING = asbool(self.get_raw_config(
             'email.reply.use_html_parsing',
             'true',
         ))
-        self.EMAIL_REPLY_USE_TXT_PARSING = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__USE_TXT_PARSING = asbool(self.get_raw_config(
             'email.reply.use_txt_parsing',
             'true',
         ))
-        self.EMAIL_REPLY_LOCKFILE_PATH = self.get_raw_config(
+        self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
             'email.reply.lockfile_path',
             ''
         )
 
-        self.EMAIL_PROCESSING_MODE = self.get_raw_config(
+        self.EMAIL__PROCESSING_MODE = self.get_raw_config(
             'email.processing_mode',
             'sync',
         ).upper()
 
 
-        self.EMAIL_SENDER_REDIS_HOST = self.get_raw_config(
+        self.EMAIL__ASYNC__REDIS__HOST = self.get_raw_config(
             'email.async.redis.host',
             'localhost',
         )
-        self.EMAIL_SENDER_REDIS_PORT = int(self.get_raw_config(
+        self.EMAIL__ASYNC__REDIS__PORT = int(self.get_raw_config(
             'email.async.redis.port',
             '6379',
         ))
-        self.EMAIL_SENDER_REDIS_DB = int(self.get_raw_config(
+        self.EMAIL_ASYNC__REDIS__DB = int(self.get_raw_config(
             'email.async.redis.db',
             '0',
         ))
-        self.NEW_USER_INVITATION_DO_NOTIFY = asbool(self.get_raw_config(
+        self.NEW_USER__INVITATION__DO_NOTIFY = asbool(self.get_raw_config(
             'new_user.invitation.do_notify',
             'True'
         ))
 
-        self.NEW_USER_INVITATION_MINIMAL_PROFILE = self.get_raw_config(
+        self.NEW_USER__INVITATION__MINIMAL_PROFILE = self.get_raw_config(
             'new_user.invitation.minimal_profile',
             Group.TIM_MANAGER_GROUPNAME
         )
@@ -475,16 +475,16 @@ class CFG(object):
         wsgidav_website = 'https://github.com/mar10/wsgidav/'
         wsgidav_name = 'WsgiDAV'
 
-        self.WEBDAV_VERBOSE_LEVEL = int(self.get_raw_config('webdav.verbose.level', '1'))
-        self.WEBDAV_ROOT_PATH = self.get_raw_config('webdav.root_path', '/')
-        self.WEBDAV_BLOCK_SIZE = int(self.get_raw_config('webdav.block_size', '8192'))
+        self.WEBDAV__VERBOSE_LEVEL = int(self.get_raw_config('webdav.verbose.level', '1'))
+        self.WEBDAV__ROOT_PATH = self.get_raw_config('webdav.root_path', '/')
+        self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config('webdav.block_size', '8192'))
         self.WEBDAV_DIR_BROWSER_ENABLED = asbool(self.get_raw_config('webdav.dir_browser.enabled', 'true'))
         default_webdav_footnote = '<a href="{instance_url}">{instance_name}</a>.' \
                                   ' This Webdav is serve by'  \
                                   ' <a href="{tracim_website}">{tracim_name} software</a> using' \
                                   ' <a href="{wsgidav_website}">{wsgidav_name}</a>.'.format(
-                                      instance_name=self.WEBSITE_TITLE,
-                                      instance_url=self.WEBSITE_BASE_URL,
+                                      instance_name=self.WEBSITE__TITLE,
+                                      instance_url=self.WEBSITE__BASE_URL,
                                       tracim_name=tracim_name,
                                       tracim_website=tracim_website,
                                       wsgidav_name=wsgidav_name,
@@ -635,26 +635,26 @@ class CFG(object):
                 ' list, use remote_user_header instead'
             )
 
-        if not self.WEBSITE_BASE_URL:
+        if not self.WEBSITE__BASE_URL:
             raise Exception(
                 'website.base_url is needed in order to have correct path in'
                 'few place like in email.'
                 'You should set it with frontend root url.'
             )
 
-        if not os.path.isdir(self.BACKEND_I18N_FOLDER_PATH):
+        if not os.path.isdir(self.BACKEND__I18N_FOLDER_PATH):
             raise Exception(
                 'ERROR: {} folder does not exist as folder. '
                 'please set backend.i8n_folder_path'
-                'with a correct value'.format(self.BACKEND_I18N_FOLDER_PATH)
+                'with a correct value'.format(self.BACKEND__I18N_FOLDER_PATH)
             )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
-        if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
+        if self.FRONTEND__SERVE and not os.path.isdir(self.FRONTEND__DIST_FOLDER_PATH):  # nopep8
             raise Exception(
                 'ERROR: {} folder does not exist as folder. '
                 'please set frontend.dist_folder.path'
-                'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
+                'with a correct value'.format(self.FRONTEND__DIST_FOLDER_PATH)
             )
 
     def _check_email_config_validity(self) -> None:
@@ -663,25 +663,25 @@ class CFG(object):
         """
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
-        if not self.EMAIL_NOTIFICATION_ACTIVATED:
+        if not self.EMAIL__NOTIFICATION__ACTIVATED:
             logger.warning(
                 self,
                 'Notification by email mecanism is disabled ! '
                 'Notification and mail invitation mecanisms will not work.'
             )
 
-        if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
+        if not self.EMAIL__REPLY__LOCKFILE_PATH and self.EMAIL__REPLY__ACTIVATED:
             raise Exception(
                 mandatory_msg.format('email.reply.lockfile_path')
             )
         # INFO - G.M - 2019-02-01 - check if template are available,
         # do not allow running with email_notification_activated
         # if templates needed are not available
-        if self.EMAIL_NOTIFICATION_ACTIVATED:
+        if self.EMAIL__NOTIFICATION__ACTIVATED:
             templates = {
-                'content_update notification': self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
-                'created account': self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML,
-                'password reset': self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+                'content_update notification': self.EMAIL__NOTIFICATION__CONTENT_UPDATE_TEMPLATE_HTML,
+                'created account': self.EMAIL__NOTIFICATION__CREATED_ACCOUNT_TEMPLATE_HTML,
+                'password reset': self.EMAIL__NOTIFICATION__RESET_PASSWORD_TEMPLATE_HTML
             }
             for template_description, template_path in templates.items():
                 if not template_path or not os.path.isfile(template_path):
@@ -693,7 +693,7 @@ class CFG(object):
                         )
                     )
 
-        if self.EMAIL_PROCESSING_MODE not in (
+        if self.EMAIL__PROCESSING_MODE not in (
                 self.CST.ASYNC,
                 self.CST.SYNC,
         ):
@@ -702,7 +702,7 @@ class CFG(object):
                 'can ''be "{}" or "{}", not "{}"'.format(
                     self.CST.ASYNC,
                     self.CST.SYNC,
-                    self.EMAIL_PROCESSING_MODE,
+                    self.EMAIL__PROCESSING_MODE,
                 )
             )
 

@@ -25,7 +25,7 @@ def send_email_through(
     :param sendmail_callable: A callable who get message on first parameter
     :param message: The message who have to be sent
     """
-    if config.EMAIL_PROCESSING_MODE == config.CST.SYNC:
+    if config.EMAIL__PROCESSING_MODE == config.CST.SYNC:
         logger.info(
             send_email_through,
             'send email to {} synchronously'.format(
@@ -33,7 +33,7 @@ def send_email_through(
             )
         )
         sendmail_callable(message)
-    elif config.EMAIL_PROCESSING_MODE == config.CST.ASYNC:
+    elif config.EMAIL__PROCESSING_MODE == config.CST.ASYNC:
         logger.info(
             send_email_through,
             'send email to {} asynchronously:'
@@ -48,7 +48,7 @@ def send_email_through(
     else:
         raise NotImplementedError(
             'Mail sender processing mode {} is not implemented'.format(
-                config.EMAIL_PROCESSING_MODE,
+                config.EMAIL__PROCESSING_MODE,
             )
         )
 
