@@ -17,16 +17,17 @@ import {
   setWorkspaceListMemberList,
   updateUserName,
   updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif
+  updateUserWorkspaceSubscriptionNotif, updateUserAgendaUrl
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
   putMyselfPassword,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
 } from '../action-creator.async.js'
 import { editableUserAuthTypeList } from '../helper.js'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
   constructor (props) {
@@ -47,6 +48,11 @@ class Account extends React.Component {
       active: false,
       label: 'Password',
       translationKey: props.t('Password')
+    }, {
+      name: 'agenda',
+      active: false,
+      label: 'Agenda',
+      translationKey: props.t('Agenda')
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
       // allow pw change only for users in tracim's db (eg. not from ldap)
       .filter(menu => editableUserAuthTypeList.includes(props.user.auth_type) ? true : menu.name !== 'password')
@@ -59,6 +65,20 @@ class Account extends React.Component {
   componentDidMount () {
     const { props } = this
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
+    this.loadAgendaUrl()
+  }
+
+  loadAgendaUrl = async () => {
+    const { props } = this
+    const fetchUserAgenda = await props.dispatch(getLoggedUserCalendar())
+    switch (fetchUserAgenda.status) {
+      case 200:
+        const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || {agenda_url: ''}).agenda_url
+        props.dispatch(updateUserAgendaUrl(newAgendaUrl))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
+    }
   }
 
   loadWorkspaceListMemberList = async () => {
@@ -175,20 +195,33 @@ class Account extends React.Component {
                   {(() => {
                     switch (state.subComponentMenu.find(({active}) => active).name) {
                       case 'personalData':
-                        return <PersonalData
-                          userAuthType={props.user.auth_type}
-                          onClickSubmit={this.handleSubmitNameOrEmail}
-                        />
+                        return (
+                          <PersonalData
+                            userAuthType={props.user.auth_type}
+                            onClickSubmit={this.handleSubmitNameOrEmail}
+                          />
+                        )
 
                       case 'notification':
-                        return <Notification
-                          idUserLogged={props.user.user_id}
-                          workspaceList={props.workspaceList}
-                          onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                        />
+                        return (
+                          <Notification
+                            idUserLogged={props.user.user_id}
+                            workspaceList={props.workspaceList}
+                            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                          />
+                        )
 
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} />
+
+                      case 'agenda':
+                        return (
+                          <AgendaInfo
+                            customClass='account__agenda'
+                            introText={props.t('Use this link to access your personal agenda from anyhere')}
+                            agendaUrl={props.user.agendaUrl}
+                          />
+                        )
                     }
                   })()}
                 </div>

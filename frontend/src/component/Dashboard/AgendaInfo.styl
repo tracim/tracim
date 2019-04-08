@@ -1,14 +1,22 @@
 .agendaInfo
-  padding 30px
   &__header
     height 45px
     margin-bottom 20px
   &__content
-    display flex
-    align-items center
+    &__text
+      margin-bottom 15px
     &__link
-      margin-left 15px
-      padding 5px 15px
-      border-radius 5px
-      border 1px solid #ccc
-      box-shadow inset 1px 1px 1px
+      display flex
+      align-items center
+      &__icon
+        padding 5px 15px
+        border-top-left-radius 5px
+        border-bottom-left-radius 5px
+        border 1px solid #ccc
+        border-right-width 0
+        background-color #eceeef
+      &__url
+        padding 5px 15px
+        border-top-right-radius 5px
+        border-bottom-right-radius 5px
+        border 1px solid #ccc

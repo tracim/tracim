@@ -37,6 +37,8 @@ export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newN
 export const USER_EMAIL = `${USER}/Email`
 export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
+export const updateUserAgendaUrl = newAgendaUrl => ({ type: `${SET}/${USER_AGENDA_URL}`, newAgendaUrl })
+export const USER_AGENDA_URL = `${USER}/Agenda`
 
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'

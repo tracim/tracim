@@ -5,18 +5,24 @@ import PropTypes from 'prop-types'
 require('./AgendaInfo.styl')
 
 export const AgendaInfo = props => (
-  <div className='agendaInfo'>
+  <div className={`agendaInfo ${props.customClass}`}>
     <div className='agendaInfo__header subTitle'>
       {props.t('Agenda')}
     </div>
 
     <div className='agendaInfo__content'>
       <div className='agendaInfo__content__text'>
-        {props.t('Use this link to access this shared space agenda from anyhere')}
+        {props.introText}
       </div>
 
       <div className='agendaInfo__content__link'>
-        {props.agendaUrl}
+        <div className='agendaInfo__content__link__icon'>
+          <i className='fa fa-calendar' />
+        </div>
+
+        <div className='agendaInfo__content__link__url'>
+          {props.agendaUrl}
+        </div>
       </div>
     </div>
   </div>
@@ -25,9 +31,11 @@ export const AgendaInfo = props => (
 export default translate()(AgendaInfo)
 
 AgendaInfo.propTypes = {
+  introText: PropTypes.string,
   agendaUrl: PropTypes.string
 }
 
 AgendaInfo.defaultProps = {
+  introText: '',
   agendaUrl: ''
 }

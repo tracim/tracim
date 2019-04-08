@@ -173,5 +173,9 @@
   "Click here to subscribe": "Cliquez ici pour vous abonner",
   "Explore contents": "Explorer les contenus",
   "Open the agenda": "Ouvrir l'agenda",
-  "Agenda": "Agenda"
+  "Agenda": "Agenda",
+  "Error while loading your agenda": "Erreur lors du chargement de votre agenda",
+  "Use this link to access your personal agenda from anyhere": "Utiliser ce lien pour accéder à votre agenda depuis n'importe où",
+  "Use this link to access this shared space agenda from anywhere": "Utiliser ce lien pour accéder à l'agenda de cet espace partagé depuis n'importe où",
+  "agenda details": "de l'agenda"
 }

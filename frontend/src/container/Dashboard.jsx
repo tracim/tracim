@@ -135,7 +135,7 @@ class Dashboard extends React.Component {
         const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === idCurrentWorkspace) || {agenda_url: ''}).agenda_url
         this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
         break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('calendar details')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
     }
   }
 
@@ -515,7 +515,11 @@ class Dashboard extends React.Component {
               </div>
 
               {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled &&
-                <AgendaInfo agendaUrl={props.curWs.agendaUrl} />
+                <AgendaInfo
+                  customClass='dashboard__agenda'
+                  introText={props.t('Use this link to access this shared space agenda from anywhere')}
+                  agendaUrl={props.curWs.agendaUrl}
+                />
               }
             </PageContent>
           </PageWrapper>
