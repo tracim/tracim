@@ -115,7 +115,9 @@ class Dashboard extends React.Component {
     switch (fetchWorkspaceDetail.status) {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        if (fetchWorkspaceDetail.json.agenda_enabled) this.loadCalendarDetail()
+        if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
+          this.loadCalendarDetail()
+        }
         break
       case 400:
         props.history.push(PAGE.HOME)
@@ -423,6 +425,7 @@ class Dashboard extends React.Component {
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickOpenAdvancedDashboard}
                   >
+                    <i className='fa fa-fw fa-lock' />
                     {props.t('Open advanced Dashboard')}
                   </button>
                 }

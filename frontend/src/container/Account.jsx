@@ -37,28 +37,30 @@ class Account extends React.Component {
       name: 'personalData',
       active: true,
       label: 'My profile',
-      translationKey: props.t('My profile')
+      translationKey: props.t('My profile'),
+      display: true
     }, {
       name: 'notification',
       active: false,
       label: 'Shared spaces and notifications',
-      translationKey: props.t('Shared spaces and notifications')
+      translationKey: props.t('Shared spaces and notifications'),
+      display: props.system.config.email_notification_activated
     }, {
       name: 'password',
       active: false,
       label: 'Password',
-      translationKey: props.t('Password')
+      translationKey: props.t('Password'),
+      display: editableUserAuthTypeList.includes(props.user.auth_type) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
       name: 'agenda',
       active: false,
       label: 'Agenda',
-      translationKey: props.t('Agenda')
-    }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
-      // allow pw change only for users in tracim's db (eg. not from ldap)
-      .filter(menu => editableUserAuthTypeList.includes(props.user.auth_type) ? true : menu.name !== 'password')
+      translationKey: props.t('Agenda'),
+      display: props.appList.some(a => a.slug === 'agenda')
+    }]
 
     this.state = {
-      subComponentMenu: builtSubComponentMenu
+      subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
     }
   }
 
@@ -235,5 +237,5 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, timezone, system }) => ({ user, workspaceList, timezone, system })
+const mapStateToProps = ({ user, workspaceList, timezone, system, appList }) => ({ user, workspaceList, timezone, system, appList })
 export default connect(mapStateToProps)(translate()(Account))

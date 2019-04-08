@@ -88,6 +88,7 @@ class Header extends React.Component {
 
   render () {
     const { props } = this
+    const unLoggedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD]
 
     return (
       <header className='header'>
@@ -105,7 +106,7 @@ class Header extends React.Component {
               onClickAbout={this.handleClickAbout}
             />
 
-            {![PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD].includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+            {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
               <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                 <i className='header__menu__system__icon slowblink fa fa-warning' />
                 <span className='header__menu__system__text d-none d-xl-block'>
@@ -120,19 +121,23 @@ class Header extends React.Component {
                 onClickSubmit={this.handleClickSubmit}
               />
 
-              {props.user.profile === PROFILE.ADMINISTRATOR.slug &&
-                <MenuActionListAdminLink t={this.props.t} />
-              }
+              {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
+                <li className='header__menu__rightside__adminlink'>
+                  <MenuActionListAdminLink />
+                </li>
+              )}
 
-              <li className='header__menu__rightside__agenda'>
-                <button
-                  className='btn outlineTextBtn primaryColorBorder nohover'
-                  onClick={this.handleClickAgendaButton}
-                >
-                  <i className='fa fa-fw fa-calendar' />
-                  {props.t('Agenda')}
-                </button>
-              </li>
+              {!unLoggedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
+                <li className='header__menu__rightside__agenda'>
+                  <button
+                    className='btn outlineTextBtn primaryColorBorder nohover'
+                    onClick={this.handleClickAgendaButton}
+                  >
+                    <i className='fa fa-fw fa-calendar' />
+                    {props.t('Agenda')}
+                  </button>
+                </li>
+              )}
 
               <MenuActionListItemDropdownLang
                 langList={props.lang}
@@ -158,5 +163,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, system }) => ({ lang, user, system })
+const mapStateToProps = ({ lang, user, system, appList }) => ({ lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))
