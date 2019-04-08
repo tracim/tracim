@@ -1,8 +1,8 @@
 # coding: utf-8
+from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
 
-from hapic import HapicData
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.calendar.authorization import \
     can_access_to_calendar_list
@@ -11,6 +11,7 @@ from tracim_backend.lib.calendar.authorization import \
     can_access_workspace_calendar
 from tracim_backend.lib.calendar.determiner import \
     CaldavAuthorizationDeterminer
+from tracim_backend.lib.proxy.proxy import HOP_BY_HOP_HEADER_HTTP
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.request import TracimRequest
@@ -35,7 +36,8 @@ class RadicaleProxyController(Controller):
         self.radicale_path_user_dir = radicale_user_path
         self.radicale_path_workspace_dir = radicale_workspace_path
         self._proxy = Proxy(
-            base_address=proxy_base_address
+            base_address=proxy_base_address,
+            default_request_header_to_drop=HOP_BY_HOP_HEADER_HTTP
         )
 
     @hapic.with_api_doc(disable_doc=True)
