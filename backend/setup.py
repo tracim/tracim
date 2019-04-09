@@ -65,6 +65,7 @@ requires = [
     'requests',
     # caldav support
     'radicale',
+    'caldav'
 ]
 
 tests_require = [
