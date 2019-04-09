@@ -44,9 +44,6 @@ CREATE_CALENDAR_TEMPLATE = \
 class CalendarDescription(ValuedBaseElement):
     tag = ns("C", "calendar-description")
 
-class CalendarColor(ValuedBaseElement):
-    tag = ns("I", "calendar-color")
-
 
 class CalendarApi(object):
 
@@ -105,7 +102,6 @@ class CalendarApi(object):
             calendar.set_properties([
                 caldav.dav.DisplayName(calendar_name),
                 CalendarDescription(calendar_description),
-                CalendarColor(Color(pick_for=calendar_name).get_hex())
             ])
         except Exception as exc:
             raise CalendarPropsUpdateFailed('Failed to update props of calendar') from exc
