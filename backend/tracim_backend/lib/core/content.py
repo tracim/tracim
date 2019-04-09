@@ -56,7 +56,6 @@ from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.lib.utils.utils import preview_manager_page_format
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer  # nopep8
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizerConfig  # nopep8
-from tracim_backend.lib.utils.utils import html_is_empty
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
