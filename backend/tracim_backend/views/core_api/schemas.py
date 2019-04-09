@@ -758,9 +758,8 @@ class WorkspaceModifySchema(marshmallow.Schema):
         example='A super description of my workspace.',
     )
     agenda_enabled = marshmallow.fields.Bool(
-        allow_none=True,
         required=False,
-        default=None,
+        default=True,
         description='has workspace has an associated agenda ?'
     )
 

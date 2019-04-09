@@ -459,7 +459,7 @@ class WorkspaceUpdate(object):
         self,
         label: str,
         description: str,
-        agenda_enabled: bool = None
+        agenda_enabled: bool = True
     ) -> None:
         self.label = label
         self.description = description
