@@ -30,11 +30,35 @@ ID_SOURCE_ENV_VAR='SOURCE_ENV_VAR'
 ID_SOURCE_CONFIG='SOURCE_CONFIG'
 ID_SOURCE_DEFAULT='SOURCE_DEFAULT'
 
+class ConfigParam(object):
+    def __init__(self, config_file_name):
+        self.config_file_name = config_file_name
+        self.config_name = self._get_associated_config_name(config_file_name)
+        self.env_var_name = self._get_associated_env_var_name(self.config_name)
+
+    def _get_associated_env_var_name(self, config_name: str) -> str:
+        """
+        Get associated env var name of any config_name.
+        example: APP_ENABLED become TRACIM_APP_ENABLED
+        """
+        return '{env_var_prefix}{config_name}'.format(
+            env_var_prefix=ENV_VAR_PREFIX,
+            config_name=config_name
+        )
+
+    def _get_associated_config_name(self, config_name: str) -> str:
+        """
+        Get associated config_name to config_file_name
+        example: app.enabled become APP__ENABLED
+        """
+        return config_name.replace('.', '__').upper()
+
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         self.settings = settings
+        self.config_naming = []
         logger.debug(self, 'CONFIG_PROCESS:1: load config from settings')
         self.load_config()
         logger.debug(self, 'CONFIG_PROCESS:2: check validity of config given')
@@ -44,15 +68,6 @@ class CFG(object):
 
     # INFO - G.M - 2019-04-05 - Utils Methods
 
-    def _get_associated_env_var_name(self, config_name: str) -> str:
-        """
-        Get associated env var name of any config_name.
-        example: app.enabled become TRACIM_APP_ENABLED
-        """
-        return '{env_var_prefix}{config_name}'.format(
-            env_var_prefix=ENV_VAR_PREFIX,
-            config_name=config_name.replace('.', '_').upper(),
-        )
 
     def _get_printed_val_value(self, value: str, secret: bool) -> str:
         if secret:
@@ -62,7 +77,7 @@ class CFG(object):
 
     def get_raw_config(
         self,
-        config_name: str,
+        config_file_name: str,
         default_value: typing.Optional[str] = None,
         secret:bool = False,
     ) -> str:
@@ -72,36 +87,34 @@ class CFG(object):
          - 1: Environement variable
          - 2: Config file data (stored in CFG.settings dict)
          - 3: default_value
-        :param config_name: name of the config parameter name
+        :param config_file_name: name of the config parameter name
         :param default_value: default value if not setted value found
         :param secret: is the value of the parameter secret ? (if true, it will not be printed)
         :return:
         """
-        val_cfg = self.settings.get(config_name)
-        val_name_env = self._get_associated_env_var_name(config_name)
-        val_env = os.environ.get(val_name_env)
+        param = ConfigParam(config_file_name)
+        self.config_naming.append(param)
+        val_cfg = self.settings.get(param.config_file_name)
+        val_env = os.environ.get(param.env_var_name)
         if val_env:
             config_value = val_env
             config_source = ID_SOURCE_ENV_VAR
-            config_name_source = val_name_env
-            config_name = config_name
+            config_name_source = param.env_var_name
         elif val_cfg:
             config_value = val_cfg
             config_source = ID_SOURCE_CONFIG
-            config_name_source = config_name
-            config_name = config_name
+            config_name_source = param.config_file_name
         else:
             config_value = default_value
             config_source = ID_SOURCE_DEFAULT
             config_name_source = None
-            config_name = config_name
 
         logger.info(
             self,
             CONFIG_LOG_TEMPLATE.format(
                 config_value=self._get_printed_val_value(config_value, secret),
                 config_source=config_source,
-                config_name=config_name,
+                config_name=param.config_name,
                 config_name_source=config_name_source,
             )
         )

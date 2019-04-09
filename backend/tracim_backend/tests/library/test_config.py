@@ -33,7 +33,7 @@ class TestConfig(object):
                 self.settings = {}
 
         fake_cfg=FakeCFG()
-        assert fake_cfg.get_raw_config( config_name='app.enabled', default_value='contents/thread') == 'contents/thread'
+        assert fake_cfg.get_raw_config(config_file_name='app.enabled', default_value='contents/thread') == 'contents/thread'
 
     def test_get_raw_config__ok__from_config_file(self):
         class FakeCFG(CFG):
@@ -41,7 +41,7 @@ class TestConfig(object):
                 self.settings= {'app.enabled': 'content/folder, contents/files'}
 
         fake_cfg=FakeCFG()
-        assert fake_cfg.get_raw_config(config_name='app.enabled', default_value='contents/thread') == 'content/folder, contents/files'
+        assert fake_cfg.get_raw_config(config_file_name='app.enabled', default_value='contents/thread') == 'content/folder, contents/files'
 
     def test_get_raw_config__ok__from_env_var(self):
         with patch('os.environ', {'TRACIM_APP_ENABLED': 'contents/html-document,agenda'}):
@@ -50,4 +50,4 @@ class TestConfig(object):
                     self.settings = {'app.enabled': 'content/folder, contents/files'}
 
             fake_cfg = FakeCFG()
-            assert fake_cfg.get_raw_config(config_name='app.enabled', default_value='contents/thread') == 'contents/html-document,agenda'
+            assert fake_cfg.get_raw_config(config_file_name='app.enabled', default_value='contents/thread') == 'contents/html-document,agenda'
