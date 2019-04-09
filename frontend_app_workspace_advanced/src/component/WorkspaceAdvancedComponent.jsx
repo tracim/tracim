@@ -182,7 +182,7 @@ const WorkspaceAdvancedComponent = props => {
         <div className='formBlock__field workspace_advanced__delete__content'>
           <button
             className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
-            onClick={props.onClickDelteWorkspaceBtn}
+            onClick={props.onClickDeleteWorkspaceBtn}
           >
             {props.t('Delete')}
           </button>

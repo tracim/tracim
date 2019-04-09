@@ -1991,3 +1991,21 @@ function algoo_replace_regex(href, globalAccountSettings) {
 // 2018/05/03 - Côme: the call bellow is to auto hide the sidebarleft on startup
 // @TODO: call the function algooCustomToggleSidebarleft at the right place in the code instead of hacking it with the setTimeout
 if (globalAccountSettings.length === 1) setTimeout(algooCustomToggleSidebarleft, 500)
+
+var isIframeCaldavzapInFullscreen = false
+function setAgendaFullscreen () {
+  var iframeElement = window.parent.document.getElementById('agendaIframe')
+
+  if (isIframeCaldavzapInFullscreen) {
+    iframeElement.style.position = 'static'
+    document.getElementById('caldavzap__fullscreenbtn__icon').setAttribute('class', 'fa fa-expand')
+  } else {
+    iframeElement.style.position = 'fixed'
+    iframeElement.style.top = '0px'
+    iframeElement.style.left = '0px'
+    iframeElement.style.zIndex = '11'
+    document.getElementById('caldavzap__fullscreenbtn__icon').setAttribute('class', 'fa fa-compress')
+  }
+  isIframeCaldavzapInFullscreen = !isIframeCaldavzapInFullscreen
+}
+

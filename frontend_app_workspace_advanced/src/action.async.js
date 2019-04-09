@@ -46,7 +46,7 @@ export const putDescription = (apiUrl, workspace, newDescription) =>
     })
   })
 
-export const putAgendaEnabled = (apiUrl, workspace, calendarEnabled) =>
+export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
@@ -54,7 +54,7 @@ export const putAgendaEnabled = (apiUrl, workspace, calendarEnabled) =>
     body: JSON.stringify({
       label: workspace.label,
       description: workspace.description,
-      calendar_enabled: calendarEnabled
+      agenda_enabled: agendaEnabled
     })
   })
 

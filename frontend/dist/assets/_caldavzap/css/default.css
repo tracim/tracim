@@ -2765,3 +2765,13 @@ img[data-type="invalidVerySmall"]
   width: 100%;
 }
 */
+
+#caldavzap__fullscreenbtn {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  cursor: pointer;
+}
+#loadUnloadedCalendars, #loadUnloadedCalendarsCancel {
+  display: none;
+}

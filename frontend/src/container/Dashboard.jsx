@@ -405,7 +405,8 @@ class Dashboard extends React.Component {
     contentTypeButtonList.push({
       ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id)
+      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
+      hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
     return (

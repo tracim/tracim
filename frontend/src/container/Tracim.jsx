@@ -116,7 +116,7 @@ class Tracim extends React.Component {
   loadWorkspaceList = async (idOpenInSidebar = undefined) => {
     const { props } = this
 
-    const idWsToOpen = idOpenInSidebar || (props.workspaceList.find(ws => ws.isOpenInSidebar) || {id: undefined}).id
+    const idWsToOpen = idOpenInSidebar || props.currentWorkspace.id || undefined
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
@@ -235,5 +235,5 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, appList, contentType, workspaceList, flashMessage, system }) => ({ user, appList, contentType, workspaceList, flashMessage, system })
+const mapStateToProps = ({ user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({ user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system })
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))
