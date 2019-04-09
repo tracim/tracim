@@ -52,43 +52,6 @@ class Sidebar extends React.Component {
     }
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    // Côme - 2018/10/16 - this is to avoid rerender workspace list if a workspace is open and if it isn't required.
-    // the point is to avoid rerender the height animation
-    const { props, state } = this
-
-    // return true if sidebar should not be rendered because it'll only go into the return null on the render ()
-    if (!this.shouldDisplaySidebar(nextProps)) return true
-
-    // no ws open, rerender in case one gets opened by componentDidUpdate
-    if (props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined) return true
-
-    // check if state sidebarClose has changed
-    if (state.sidebarClose !== nextState.sidebarClose) return true
-
-    // check if a label has been changed (if label changed, slug changed too)
-    if (JSON.stringify(props.workspaceList.map(ws => ws.slug)) !== JSON.stringify(nextProps.workspaceList.map(ws => ws.slug))) return true
-
-    // check if pathname has changed
-    if (props.location.pathname !== nextProps.location.pathname) return true
-
-    // check if language changed
-    if (props.user.lang !== nextProps.user.lang) return true
-
-    const propsUrlSearch = qs.parse(props.location.search)
-    const nextPropsUrlSearch = qs.parse(nextProps.location.search)
-    // check if url filter of workspace content has changed
-    if (propsUrlSearch.type !== nextPropsUrlSearch.type) return true
-    // check if opened folder list of workspace content has changed
-    if (propsUrlSearch.folder_open !== nextPropsUrlSearch.folder_open) return true
-
-    const oldOpenedList = props.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
-    const newOpenedList = nextProps.workspaceList.filter(ws => ws.isOpenInSidebar).map(ws => ws.id)
-
-    // stringify compare doesn't work if array contain objects
-    return JSON.stringify(oldOpenedList) !== JSON.stringify(newOpenedList)
-  }
-
   componentWillUnmount () {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
