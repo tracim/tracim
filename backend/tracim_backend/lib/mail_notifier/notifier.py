@@ -168,7 +168,7 @@ class EmailManager(object):
         """
 
         email_template = self.config.EMAIL__NOTIFICATION__FROM__EMAIL
-        mail_sender_name = self.config.EMAIL__NOTIFICATION__FROM_DEFAULT_LABEL  # nopep8
+        mail_sender_name = self.config.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL  # nopep8
         if user:
             mail_sender_name = '{name} via Tracim'.format(name=user.display_name)
             email_address = email_template.replace('{user_id}', str(user.user_id))
@@ -289,11 +289,11 @@ class EmailManager(object):
             to_addr = formataddr((role.user.display_name, role.user.email))
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
-            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO_EMAIL.replace( # nopep8
+            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace( # nopep8
                 '{content_id}', str(main_content.content_id)
             )
 
-            reference_addr = self.config.EMAIL__NOTIFICATION__REFERENCES_EMAIL.replace( #nopep8
+            reference_addr = self.config.EMAIL__NOTIFICATION__REFERENCES__EMAIL.replace( #nopep8
                 '{content_id}',str(main_content.content_id)
              )
             #
@@ -303,7 +303,7 @@ class EmailManager(object):
             # we do use replace and force the use of .__str__() in order to process LazyString objects
             #
             content_status = translator.get_translation(main_content.get_status().label)
-            translated_subject = translator.get_translation(self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE_SUBJECT)
+            translated_subject = translator.get_translation(self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT)
             subject = translated_subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE__TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
@@ -329,7 +329,7 @@ class EmailManager(object):
                 parent_in_context = content_api.get_content_in_context(content.parent) # nopep8
 
             body_html = self._build_email_body_for_content(
-                self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE_TEMPLATE_HTML,
+                self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML,
                 role,
                 content_in_context,
                 parent_in_context,
@@ -381,7 +381,7 @@ class EmailManager(object):
         )
         translator = Translator(self.config, default_lang=user.lang)
         translated_subject = translator.get_translation(
-            self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT_SUBJECT
+            self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT
         )
         subject = translated_subject.replace(
             EST.WEBSITE_TITLE,
@@ -392,7 +392,7 @@ class EmailManager(object):
         message['From'] = self._get_sender()
         message['To'] = formataddr((user.get_display_name(), user.email))
 
-        html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML  # nopep8
 
         context = {
             'user': user,
@@ -442,7 +442,7 @@ class EmailManager(object):
             self.config.EMAIL__NOTIFICATION__ACTIVATED
         )
         translated_subject = translator.get_translation(
-            self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_SUBJECT
+            self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT
         )
         subject = translated_subject.replace(
             EST.WEBSITE_TITLE,
@@ -453,7 +453,7 @@ class EmailManager(object):
         message['From'] = self._get_sender()
         message['To'] = formataddr((user.get_display_name(), user.email))
 
-        html_template_file_path = self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_TEMPLATE_HTML  # nopep8
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML  # nopep8
         # TODO - G.M - 2018-08-17 - Generate token
         context = {
             'user': user,

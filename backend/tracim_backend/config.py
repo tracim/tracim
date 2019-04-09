@@ -695,9 +695,9 @@ class CFG(object):
         # if templates needed are not available
         if self.EMAIL__NOTIFICATION__ACTIVATED:
             templates = {
-                'content_update notification': self.EMAIL__NOTIFICATION__CONTENT_UPDATE_TEMPLATE_HTML,
-                'created account': self.EMAIL__NOTIFICATION__CREATED_ACCOUNT_TEMPLATE_HTML,
-                'password reset': self.EMAIL__NOTIFICATION__RESET_PASSWORD_TEMPLATE_HTML
+                'content_update notification': self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML,
+                'created account': self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML,
+                'password reset': self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML,
             }
             for template_description, template_path in templates.items():
                 if not template_path or not os.path.isfile(template_path):

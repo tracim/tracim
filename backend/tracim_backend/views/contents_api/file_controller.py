@@ -89,7 +89,7 @@ class FileController(Controller):
         """
         Create a file .This will create 2 new revision.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -148,7 +148,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -187,7 +187,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -230,7 +230,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_r{revision_id}{file_extension}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -287,7 +287,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -331,7 +331,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -370,7 +370,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -416,7 +416,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -465,7 +465,7 @@ class FileController(Controller):
         Good pratice for filename is `filename is {label}_page_{page_number}.jpg`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -513,7 +513,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_page_{page_number}_{width}x{height}.jpg`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -562,7 +562,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -611,7 +611,7 @@ class FileController(Controller):
         Get allowed dimensions of jpg preview. If restricted is true,
         only those dimensions are strictly accepted.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -631,7 +631,7 @@ class FileController(Controller):
         """
         Get thread content
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -657,7 +657,7 @@ class FileController(Controller):
         """
         update thread
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -697,7 +697,7 @@ class FileController(Controller):
         """
         get file revisions
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -727,7 +727,7 @@ class FileController(Controller):
         """
         set file status
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,

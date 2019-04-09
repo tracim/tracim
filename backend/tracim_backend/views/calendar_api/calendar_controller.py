@@ -34,7 +34,7 @@ class CalendarController(Controller):
     @hapic.input_query(CalendarFilterQuerySchema())
     @hapic.output_body(CalendarSchema(many=True))
     def user_calendars(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         calendar_api = CalendarApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -51,7 +51,7 @@ class CalendarController(Controller):
     @hapic.input_query(CalendarFilterQuerySchema())
     @hapic.output_body(CalendarSchema(many=True))
     def account_calendars(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         calendar_api = CalendarApi(
             current_user=request.current_user,
             session=request.dbsession,

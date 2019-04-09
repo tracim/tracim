@@ -3,6 +3,7 @@
 # original code from https://gist.github.com/mmerickel/1afaf64154b335b596e4
 # see also
 # here : https://groups.google.com/forum/#!topic/pylons-discuss/2Sw4OkOnZcE
+from tracim_backend.config import CFG
 from pyramid.events import NewResponse
 
 
@@ -52,8 +53,8 @@ def add_cors_preflight_handler(config):
     )
 
 def set_cors_headers(request, response):
-    app_config = request.registry.settings['CFG']
-    if 'Origin' in request.headers and request.headers['Origin'] in app_config.CORS_ALLOWED_ORIGIN:  # nopep8
+    app_config = request.registry.settings['CFG']  # type: CFG
+    if 'Origin' in request.headers and request.headers['Origin'] in app_config.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN:  # nopep8
         response.headers['Access-Control-Expose-Headers'] = (
             'Content-Type,Date,Content-Length,Authorization,X-Request-ID'
         )

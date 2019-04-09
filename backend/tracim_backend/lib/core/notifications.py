@@ -25,8 +25,8 @@ class INotifier(object):
 class NotifierFactory(object):
 
     @classmethod
-    def create(cls, config, session, current_user: User=None) -> INotifier:
-        if not config.EMAIL_NOTIFICATION_ACTIVATED:
+    def create(cls, config: CFG, session, current_user: User=None) -> INotifier:
+        if not config.EMAIL__NOTIFICATION__ACTIVATED:
             return DummyNotifier(config, session, current_user)
         from tracim_backend.lib.mail_notifier.notifier import EmailNotifier
         return EmailNotifier(config, session, current_user)

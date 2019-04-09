@@ -96,7 +96,7 @@ def get_redis_connection(config: 'CFG') -> Redis:
     """
     return Redis(
         host=config.EMAIL__ASYNC__REDIS__HOST,
-        port=config.EMAIL__ASYNC__REDIS_PORT,
+        port=config.EMAIL__ASYNC__REDIS__PORT,
         db=config.EMAIL__ASYNC__REDIS__DB,
     )
 

@@ -55,7 +55,7 @@ class HTMLDocumentController(Controller):
         """
         Get html document content
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -81,7 +81,7 @@ class HTMLDocumentController(Controller):
         """
         update_html_document
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -121,7 +121,7 @@ class HTMLDocumentController(Controller):
         """
         get html_document revisions
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -155,7 +155,7 @@ class HTMLDocumentController(Controller):
         """
         set html_document status
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
