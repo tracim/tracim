@@ -58,10 +58,11 @@ class CFG(object):
 
     def __init__(self, settings: typing.Dict[str, typing.Any]):
         self.settings = settings
-        self.config_naming = []
+        self.config_naming = [] # type: typing.List[ConfigParam]
         logger.debug(self, 'CONFIG_PROCESS:1: load config from settings')
         self.load_config()
         logger.debug(self, 'CONFIG_PROCESS:2: check validity of config given')
+        self._check_consistency()
         self.check_config_validity()
         logger.debug(self, 'CONFIG_PROCESS:3: do post actions')
         self.do_post_check_action()
@@ -853,6 +854,14 @@ class CFG(object):
         update_validators()
 
     # INFO - G.M - 2019-04-05 - Others methods
+    def _check_consistency(self):
+        """
+        Verify all config_name_attribute are correctly associated with
+        a true cfg attribute. Will raise AttributeError if not.
+        """
+        for config_param in self.config_naming:
+            getattr(self, config_param.config_name)
+
 
     def configure_filedepot(self) -> None:
 
