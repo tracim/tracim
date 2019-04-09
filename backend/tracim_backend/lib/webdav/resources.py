@@ -400,9 +400,19 @@ class WorkspaceResource(DAVCollection):
                 raise DAVError(HTTP_FORBIDDEN)
 
             try:
-                self.workspace.label = webdav_convert_file_name_to_bdd(basename(normpath(destpath)))
+                workspace_api = WorkspaceApi(
+                    current_user=self.user,
+                    session=self.session,
+                    config=self.provider.app_config,
+                )
+                workspace_api.update_workspace(
+                    workspace=self.workspace,
+                    label=webdav_convert_file_name_to_bdd(basename(normpath(destpath))),
+                    description=self.workspace.description
+                )
                 self.session.add(self.workspace)
                 self.session.flush()
+                workspace_api.execute_update_workspace_actions(self.workspace)
                 transaction.commit()
             except TracimException as exc:
                 raise DAVError(HTTP_FORBIDDEN)

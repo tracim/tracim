@@ -1,11 +1,15 @@
 import typing
 
 import requests
+import caldav
+from caldav.elements.base import ValuedBaseElement
+from caldav.lib.namespace import ns
 from colour import Color
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import CalendarServerConnectionError
+from tracim_backend.exceptions import CalendarServerConnectionError, \
+    CalendarPropsUpdateFailed
 from tracim_backend.exceptions import CannotCreateCalendar
 from tracim_backend.exceptions import WorkspaceCalendarDisabledException
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -37,6 +41,13 @@ CREATE_CALENDAR_TEMPLATE = \
 </create>
 """
 
+class CalendarDescription(ValuedBaseElement):
+    tag = ns("C", "calendar-description")
+
+class CalendarColor(ValuedBaseElement):
+    tag = ns("I", "calendar-color")
+
+
 class CalendarApi(object):
 
     def __init__(
@@ -67,7 +78,7 @@ class CalendarApi(object):
         logger.debug(self, 'create a new caldav calendar at url {}'.format(calendar_url))
         body = CREATE_CALENDAR_TEMPLATE.format(
             calendar_name=calendar_name,
-            calendar_color=Color(pick_for='calendar_name').get_hex(),
+            calendar_color=Color(pick_for=calendar_name).get_hex(),
             calendar_description=calendar_description,
         )
         try:
@@ -77,6 +88,29 @@ class CalendarApi(object):
         if not response.status_code == 201:
             raise CannotCreateCalendar('Calendar {} cannot be created:{},{}'.format(calendar_url, response.status_code, response.content))
         logger.info(self, 'new caldav calendar created at url {}'.format(calendar_url))
+
+    def _update_calendar_props(self, calendar_url, calendar_name, calendar_description):
+        logger.debug(self, 'update existing caldav calendar props at url {}'.format(calendar_url))
+        # force renaming of calendar to be sure of consistency
+        try:
+            caldav_client = caldav.DAVClient(
+                username='tracim',
+                password='tracim',
+                url=calendar_url
+            )
+            calendar = caldav.objects.Calendar(
+                client=caldav_client,
+                url=calendar_url,
+            )
+            calendar.set_properties([
+                caldav.dav.DisplayName(calendar_name),
+                CalendarDescription(calendar_description),
+                CalendarColor(Color(pick_for=calendar_name).get_hex())
+            ])
+        except Exception as exc:
+            raise CalendarPropsUpdateFailed('Failed to update props of calendar') from exc
+
+
 
     def _get_calendar_base_url(self, use_proxy: bool):
         if use_proxy:
@@ -109,7 +143,13 @@ class CalendarApi(object):
                 calendar_description=workspace.description,
             )
             return False
-        return True
+        else:
+            self._update_calendar_props(
+                calendar_url=workspace_calendar_url,
+                calendar_name=workspace.label,
+                calendar_description=workspace.description,
+            )
+            return True
 
     def ensure_user_calendar_exist(self, user: User) -> bool:
         """
@@ -125,7 +165,13 @@ class CalendarApi(object):
                 calendar_description='',
             )
             return False
-        return True
+        else:
+            self._update_calendar_props(
+                calendar_url=user_calendar_url,
+                calendar_name=user.display_name,
+                calendar_description='',
+            )
+            return True
 
     def get_user_calendars(
             self,

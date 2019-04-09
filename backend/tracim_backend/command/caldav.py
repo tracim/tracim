@@ -92,6 +92,10 @@ class CaldavCreateCalendarsCommand(AppContextCommand):
                 nb_error_calendar_access += 1
                 print('Cannot access to calendar server: connection error.')
                 logger.exception(self, exc)
+            except Exception as exc:
+                nb_error_calendar_access += 1
+                print('Something goes wrong during calendar create/update')
+                logger.exception(self, exc)
         nb_user_calendars = len(users)
         nb_verified_user_calendar = len(users) - nb_error_calendar_access
         print('{}/{} users calendar verified'.format(nb_verified_user_calendar, nb_user_calendars))

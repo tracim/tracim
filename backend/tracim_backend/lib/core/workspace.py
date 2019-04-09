@@ -261,6 +261,32 @@ class WorkspaceApi(object):
                 except CalendarServerConnectionError as exc:
                     logger.error(self, 'Cannot connect to calendar server')
                     logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, 'Something goes wrong during calendar create/update')
+                    logger.exception(self, exc)
+
+    def execute_update_workspace_actions(self, workspace: Workspace) -> None:
+        from tracim_backend.lib.calendar.calendar import CalendarApi
+        if self._config.CALDAV_ENABLED:
+            calendar_api = CalendarApi(
+                current_user = self._user,
+                session = self._session,
+                config = self._config
+            )
+            if workspace.calendar_enabled:
+                try:
+                    calendar_already_exist = calendar_api.ensure_workspace_calendar_exist(workspace)
+                    if calendar_already_exist:
+                        logger.warning(
+                            self,
+                            'workspace {} is just created but it own calendar already exist !!'.format(workspace.user_id)
+                        )
+                except CalendarServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to calendar server')
+                    logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, 'Something goes wrong during calendar create/update')
+                    logger.exception(self, exc)
 
 
     def get_base_query(self) -> Query:

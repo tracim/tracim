@@ -66,6 +66,9 @@ class WorkspaceCalendarDisabledException(TracimException):
 class CalendarServerConnectionError(TracimException):
     pass
 
+class CalendarPropsUpdateFailed(TracimException):
+    pass
+
 class CannotCreateCalendar(TracimException):
     pass
 

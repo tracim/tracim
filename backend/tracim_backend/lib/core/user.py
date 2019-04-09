@@ -60,6 +60,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.views import calendar_api
 
 
 class UserApi(object):
@@ -907,6 +908,22 @@ class UserApi(object):
     def save(self, user: User):
         self._session.flush()
 
+    def execute_updated_user_actions(self, user: User) -> None:
+        if self._config.CALDAV_ENABLED:
+            calendar_api = CalendarApi(
+                current_user = self._user,
+                session = self._session,
+                config = self._config
+            )
+            try:
+                calendar_api.ensure_user_calendar_exist(user)
+            except CalendarServerConnectionError as exc:
+                logger.error(self, 'Cannot connect to calendar server')
+                logger.exception(self, exc)
+            except Exception as exc:
+                logger.error(self, 'Something goes wrong during calendar create/update')
+                logger.exception(self, exc)
+
     def execute_created_user_actions(self, user: User) -> None:
         """
         Execute actions when user just been created
@@ -935,6 +952,9 @@ class UserApi(object):
                     logger.warning(self,'user {} is just created but his own calendar already exist !!'.format(user.user_id))
             except CalendarServerConnectionError as exc:
                 logger.error(self, 'Cannot connect to calendar server')
+                logger.exception(self, exc)
+            except Exception as exc:
+                logger.error(self,'Something goes wrong during calendar create/update')
                 logger.exception(self, exc)
 
     def _check_user_auth_validity(self, user:User) -> None:
