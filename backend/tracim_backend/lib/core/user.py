@@ -917,13 +917,13 @@ class UserApi(object):
         # Check if this is already needed with
         # new auth system
         user.ensure_auth_token(
-            validity_seconds=self._config.USER__AUTH_TOKEN_VALIDITY
+            validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY
         )
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_user should start hook use by calendar code.
-        if self._config.CALDAV_ENABLED:
+        if self._config.CALDAV__ENABLED:
             calendar_api = CalendarApi(
                 current_user = self._user,
                 session = self._session,

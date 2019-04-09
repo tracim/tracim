@@ -422,7 +422,7 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
-            with_notif=app_config.EMAIl__NOTIFICATION__ENABLED_ON_INVITATION,
+            with_notif=app_config.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION,
             flush=True,
         )
         return rapi.get_user_role_workspace_with_context(

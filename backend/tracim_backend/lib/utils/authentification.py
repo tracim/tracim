@@ -215,7 +215,7 @@ class ApiTokenAuthentificationPolicy(
 
     def authenticated_userid(self, request):
         app_config = request.registry.settings['CFG']  # type:'CFG'
-        valid_api_key = app_config.API_KEY
+        valid_api_key = app_config.API__KEY
         api_key = request.headers.get(self.api_key_header)
         if not api_key or not valid_api_key:
             return None

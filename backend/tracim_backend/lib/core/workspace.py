@@ -244,7 +244,7 @@ class WorkspaceApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_created_user should start hook use by calendar code.
         from tracim_backend.lib.calendar.calendar import CalendarApi
-        if self._config.CALDAV_ENABLED:
+        if self._config.CALDAV__ENABLED:
             calendar_api = CalendarApi(
                 current_user = self._user,
                 session = self._session,

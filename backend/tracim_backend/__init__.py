@@ -93,7 +93,7 @@ def web(global_config, **local_settings):
         CookieSessionAuthentificationPolicy(
             reissue_time=app_config.SESSION__REISSUE_TIME),  # nopep8
     )
-    if app_config.API_KEY:
+    if app_config.API__KEY:
         policies.append(
             ApiTokenAuthentificationPolicy(
                 api_key_header=TRACIM_API_KEY_HEADER,
@@ -199,7 +199,7 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
-    if app_config.CALDAV_ENABLED:
+    if app_config.CALDAV__ENABLED:
         # FIXME - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import CalendarController without adding it to
         # pyramid make trouble in hapic which try to get view related
@@ -211,9 +211,9 @@ def web(global_config, **local_settings):
         context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
         # controller
         radicale_proxy_controller = RadicaleProxyController(
-            proxy_base_address=app_config.CALDAV_RADICALE_PROXY_BASE_URL,
-            radicale_base_path=app_config.CALDAV_RADICALE_BASE_PATH,
-            radicale_user_path=app_config.CALDAV_RADICALE_USER_PATH,
+            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL,
+            radicale_base_path=app_config.CALDAV__RADICALE__BASE_PATH,
+            radicale_user_path=app_config.CALDAV__RADICALE__USER_PATH,
             radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
         )
         calendar_controller = CalendarController()

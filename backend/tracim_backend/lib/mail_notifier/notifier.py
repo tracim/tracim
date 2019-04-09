@@ -167,7 +167,7 @@ class EmailManager(object):
         :return: sender string
         """
 
-        email_template = self.config.EMAIL__NOTIFICATION__FROM_EMAIL
+        email_template = self.config.EMAIL__NOTIFICATION__FROM__EMAIL
         mail_sender_name = self.config.EMAIL__NOTIFICATION__FROM_DEFAULT_LABEL  # nopep8
         if user:
             mail_sender_name = '{name} via Tracim'.format(name=user.display_name)

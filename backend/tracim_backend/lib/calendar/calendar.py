@@ -82,7 +82,7 @@ class CalendarApi(object):
         if use_proxy:
             base_url = self._config.WEBSITE__BASE_URL
         else:
-            base_url = self._config.CALDAV_RADICALE_PROXY_BASE_URL
+            base_url = self._config.CALDAV__RADICALE_PROXY__BASE_URL
         return base_url
 
     def get_workspace_calendar_url(self, workspace: Workspace, use_proxy: bool) -> str:
@@ -91,7 +91,7 @@ class CalendarApi(object):
 
     def get_user_calendar_url(self, user: User, use_proxy: bool) -> str:
         base_url = self._get_calendar_base_url(use_proxy=use_proxy)
-        return '{}{}{}/'.format(base_url, self._config.CALDAV_RADICALE_USER_PATH, user.user_id)
+        return '{}{}{}/'.format(base_url, self._config.CALDAV__RADICALE__USER_PATH, user.user_id)
 
     def ensure_workspace_calendar_exist(self, workspace: Workspace) -> bool:
         """

@@ -51,7 +51,7 @@ class ConfigParam(object):
         Get associated config_name to config_file_name
         example: app.enabled become APP__ENABLED
         """
-        return config_name.replace('.', '__').upper()
+        return config_name.replace('.', '__').replace('-','_').upper()
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
@@ -151,7 +151,7 @@ class CFG(object):
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
         default_color_config_file_path = os.path.join(tracim_v2_folder, 'color.json')  # nopep8
-        self.COLOR_CONFIG_FILE_PATH = self.get_raw_config(
+        self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             'color.config_file_path', default_color_config_file_path
         )
 
@@ -162,7 +162,7 @@ class CFG(object):
                               'calendar'
 
 
-        self.APP_ENABLED = string_to_list(
+        self.APP__ENABLED = string_to_list(
             self.get_raw_config('app.enabled', default_enabled_app),
             separator=',',
             cast_func=str,
@@ -193,7 +193,7 @@ class CFG(object):
         #     0,
         # ))
 
-        self.API_KEY = self.get_raw_config(
+        self.API__KEY = self.get_raw_config(
             'api.key',
             '',
             secret=True
@@ -247,7 +247,7 @@ class CFG(object):
                 .format(self.WEBSITE__SERVER_NAME)
             )
 
-        self.USER__AUTH_TOKEN_VALIDITY = int(self.get_raw_config(
+        self.USER__AUTH_TOKEN__VALIDITY = int(self.get_raw_config(
             'user.auth_token.validity',
             '604800',
         ))
@@ -255,13 +255,14 @@ class CFG(object):
         # TODO - G.M - 2019-03-14 - retrocompat code,
         # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
         defaut_reset_password_validity = '900'
-        self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.get_raw_config('user.reset_password.validity')
-        if self.USER__RESET_PASSWORD__TOKEN_LIFETIME:
+        self.USER__RESET_PASSWORD__VALIDITY = self.get_raw_config('user.reset_password.validity')
+        if self.USER__RESET_PASSWORD__VALIDITY:
             logger.warning(
                 self,
                 'user.reset_password.validity parameter is deprecated ! '
                 'please use user.reset_password.token_lifetime instead.'
             )
+            self.USER__RESET_PASSWORD__TOKEN_LIFETIME = self.USER__RESET_PASSWORD__VALIDITY
         else:
             self.USER__RESET_PASSWORD__TOKEN_LIFETIME = int(self.get_raw_config(
                 'user.reset_password.token_lifetime',
@@ -291,7 +292,7 @@ class CFG(object):
         backend_i18n_folder = os.path.join(backend_folder, 'tracim_backend', 'locale')  # nopep8
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
-            'backend.18n_folder_path', backend_i18n_folder
+            'backend.i18n_folder_path', backend_i18n_folder
         )
 
         frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
@@ -307,7 +308,7 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIl__NOTIFICATION__ENABLED_ON_INVITATION = asbool(self.get_raw_config(
+        self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(self.get_raw_config(
             'email.notification.enabled_on_invitation',
             'true'
         ))
@@ -333,10 +334,11 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL__NOTIFICATION__FROM_EMAIL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
         )
+        self.EMAIL__NOTIFICATION__FROM = self.get_raw_config('email.notification.from')
         if self.get_raw_config('email.notification.from'):
             raise Exception(
                 'email.notification.from configuration is deprecated. '
@@ -344,40 +346,40 @@ class CFG(object):
                 'email.notification.from.default_label.'
             )
 
-        self.EMAIL__NOTIFICATION__FROM_DEFAULT_LABEL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             'email.notification.from.default_label',
             'Tracim Notifications'
         )
-        self.EMAIL__NOTIFICATION__REPLY_TO_EMAIL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__REPLY_TO__EMAIL = self.get_raw_config(
             'email.notification.reply_to.email',
         )
-        self.EMAIL__NOTIFICATION__REFERENCES_EMAIL = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__REFERENCES__EMAIL = self.get_raw_config(
             'email.notification.references.email'
         )
         # Content update notification
 
-        self.EMAIL__NOTIFICATION__CONTENT_UPDATE_TEMPLATE_HTML = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML = self.get_raw_config(
             'email.notification.content_update.template.html',
         )
 
-        self.EMAIL__NOTIFICATION__CONTENT_UPDATE_SUBJECT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT = self.get_raw_config(
             'email.notification.content_update.subject',
             _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
         )
         # Created account notification
-        self.EMAIL__NOTIFICATION__CREATED_ACCOUNT_TEMPLATE_HTML = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
             'email.notification.created_account.template.html',
         )
-        self.EMAIL__NOTIFICATION__CREATED_ACCOUNT_SUBJECT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT = self.get_raw_config(
             'email.notification.created_account.subject',
             _('[{website_title}] Someone created an account for you'),
         )
 
         # Reset password notification
-        self.EMAIL__NOTIFICATION__RESET_PASSWORD_TEMPLATE_HTML = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML = self.get_raw_config(
             'email.notification.reset_password_request.template.html',
         )
-        self.EMAIL__NOTIFICATION__RESET_PASSWORD_SUBJECT = self.get_raw_config(
+        self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             'email.notification.reset_password_request.subject',
             _('[{website_title}] A password reset has been requested'),
         )
@@ -428,10 +430,10 @@ class CFG(object):
             'email.reply.check.heartbeat',
             '60',
         ))
-        self.EMAIL__REPLY__IMAP__USE__SSL = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__USE_SSL = asbool(self.get_raw_config(
             'email.reply.imap.use_ssl',
         ))
-        self.EMAIL__REPLY__IMAP__USE__IDLE = asbool(self.get_raw_config(
+        self.EMAIL__REPLY__IMAP__USE_IDLE = asbool(self.get_raw_config(
             'email.reply.imap.use_idle',
             'true',
         ))
@@ -466,7 +468,7 @@ class CFG(object):
             'email.async.redis.port',
             '6379',
         ))
-        self.EMAIL_ASYNC__REDIS__DB = int(self.get_raw_config(
+        self.EMAIL__ASYNC__REDIS__DB = int(self.get_raw_config(
             'email.async.redis.db',
             '0',
         ))
@@ -489,10 +491,10 @@ class CFG(object):
         wsgidav_website = 'https://github.com/mar10/wsgidav/'
         wsgidav_name = 'WsgiDAV'
 
-        self.WEBDAV__VERBOSE_LEVEL = int(self.get_raw_config('webdav.verbose.level', '1'))
+        self.WEBDAV__VERBOSE__LEVEL = int(self.get_raw_config('webdav.verbose.level', '1'))
         self.WEBDAV__ROOT_PATH = self.get_raw_config('webdav.root_path', '/')
         self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config('webdav.block_size', '8192'))
-        self.WEBDAV_DIR_BROWSER_ENABLED = asbool(self.get_raw_config('webdav.dir_browser.enabled', 'true'))
+        self.WEBDAV__DIR_BROWSER__ENABLED = asbool(self.get_raw_config('webdav.dir_browser.enabled', 'true'))
         default_webdav_footnote = '<a href="{instance_url}">{instance_name}</a>.' \
                                   ' This Webdav is serve by'  \
                                   ' <a href="{tracim_website}">{tracim_name} software</a> using' \
@@ -504,7 +506,7 @@ class CFG(object):
                                       wsgidav_name=wsgidav_name,
                                       wsgidav_website=wsgidav_website,
                                   )
-        self.WEBDAV_DIR_BROWSER_FOOTER = self.get_raw_config('webdav.dir_browser.footer', default_webdav_footnote)
+        self.WEBDAV__DIR_BROWSER__FOOTER = self.get_raw_config('webdav.dir_browser.footer', default_webdav_footnote)
         # TODO : check if tweaking those param does work
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -519,25 +521,25 @@ class CFG(object):
         """
         load config for caldav related stuff
         """
-        self.CALDAV_ENABLED = asbool(self.get_raw_config(
+        self.CALDAV__ENABLED = asbool(self.get_raw_config(
             'caldav.enabled',
             'false'
         ))
-        self.CALDAV_RADICALE_PROXY_BASE_URL = self.get_raw_config(
+        self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
             'caldav.radicale_proxy.base_url',
             None
         )
-        self.CALDAV_RADICALE_CALENDAR_DIR = 'calendar'
-        self.CALDAV_RADICALE_WORKSPACE_SUBDIR = 'workspace'
-        self.CALDAV_RADICALE_USER_SUBDIR = 'user'
-        self.CALDAV_RADICALE_BASE_PATH = '/{}/'.format(self.CALDAV_RADICALE_CALENDAR_DIR)
-        self.CALDAV_RADICALE_USER_PATH = '/{}/{}/'.format(
-            self.CALDAV_RADICALE_CALENDAR_DIR,
-            self.CALDAV_RADICALE_USER_SUBDIR,
+        self.CALDAV__RADICALE__CALENDAR_DIR = 'calendar'
+        self.CALDAV__RADICALE__WORKSPACE_SUBDIR = 'workspace'
+        self.CALDAV__RADICALE__USER_SUBDIR = 'user'
+        self.CALDAV__RADICALE__BASE_PATH = '/{}/'.format(self.CALDAV__RADICALE__CALENDAR_DIR)
+        self.CALDAV__RADICALE__USER_PATH = '/{}/{}/'.format(
+            self.CALDAV__RADICALE__CALENDAR_DIR,
+            self.CALDAV__RADICALE__USER_SUBDIR,
         )
         self.CALDAV_RADICALE_WORKSPACE_PATH = '/{}/{}/'.format(
-            self.CALDAV_RADICALE_CALENDAR_DIR,
-            self.CALDAV_RADICALE_WORKSPACE_SUBDIR,
+            self.CALDAV__RADICALE__CALENDAR_DIR,
+            self.CALDAV__RADICALE__WORKSPACE_SUBDIR,
         )
 
     def _load_ldap_config(self) ->  None:
@@ -604,19 +606,19 @@ class CFG(object):
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
         # INFO - G.M - 2019-04-03 - check color file validity
-        if not os.path.exists(self.COLOR_CONFIG_FILE_PATH):
+        if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
             raise Exception(
                 'ERROR: {} file does not exist. '
                 'please create it or set color.config_file_path'
-                'with a correct value'.format(self.COLOR_CONFIG_FILE_PATH)
+                'with a correct value'.format(self.COLOR__CONFIG_FILE_PATH)
             )
 
         try:
-            with open(self.COLOR_CONFIG_FILE_PATH) as json_file:
+            with open(self.COLOR__CONFIG_FILE_PATH) as json_file:
                 self.APPS_COLORS = json.load(json_file)
         except Exception as e:
             raise Exception(
-                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH)  # nopep8
+                'Error: {} file could not be load as json'.format(self.COLOR__CONFIG_FILE_PATH)  # nopep8
             ) from e
 
         try:
@@ -624,7 +626,7 @@ class CFG(object):
         except KeyError as e:
             raise Exception(
                 'Error: primary color is required in {} file'.format(
-                    self.COLOR_CONFIG_FILE_PATH)  # nopep8
+                    self.COLOR__CONFIG_FILE_PATH)  # nopep8
             ) from e
 
         # INFO - G.M - 2019-04-03 - depot dir validity
@@ -724,7 +726,7 @@ class CFG(object):
         """
         Check if config is correctly setted for caldav features
         """
-        if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
+        if self.CALDAV__ENABLED and not self.CALDAV__RADICALE_PROXY__BASE_URL:
             raise ConfigurationError(
                 'ERROR: Caldav radicale proxy cannot be activated if no radicale'
                 'base url is configured. set "caldav.radicale_proxy.base_url" properly'
@@ -732,7 +734,7 @@ class CFG(object):
 
     # INFO - G.M - 2019-04-05 - Post Actions Methods
     def do_post_check_action(self) -> None:
-        self._set_default_app(self.APP_ENABLED)
+        self._set_default_app(self.APP__ENABLED)
 
     def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
 
@@ -828,7 +830,7 @@ class CFG(object):
             label='Calendar',
             slug='calendar',
             fa_icon='calendar',
-            is_active=self.CALDAV_ENABLED,
+            is_active=self.CALDAV__ENABLED,
             config={},
             main_route='/ui/workspaces/{workspace_id}/calendar',
             app_config=self

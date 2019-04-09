@@ -44,9 +44,9 @@ class WebdavAppFactory(object):
             config['trusted_auth_header'] = app_config.REMOTE_USER_HEADER
 
 
-        config['verbose'] = app_config.WEBDAV__VERBOSE_LEVEL
-        config['dir_browser']['enable'] = app_config.WEBDAV_DIR_BROWSER_ENABLED
-        config['dir_browser']['response_trailer'] = app_config.WEBDAV_DIR_BROWSER_FOOTER
+        config['verbose'] = app_config.WEBDAV__VERBOSE__LEVEL
+        config['dir_browser']['enable'] = app_config.WEBDAV__DIR_BROWSER__ENABLED
+        config['dir_browser']['response_trailer'] = app_config.WEBDAV__DIR_BROWSER__FOOTER
 
         if not useLxml and config["verbose"] >= 1:
             print(
