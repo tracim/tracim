@@ -26,12 +26,11 @@ class TestDummyNotifier(DefaultTest):
 class TestNotifierFactory(DefaultTest):
     def test_notifier_factory_method(self):
         u = User()
-
-        self.app_config.EMAIL_NOTIFICATION_ACTIVATED = True
+        self.app_config.EMAIL__NOTIFICATION__ACTIVATED = True
         notifier = NotifierFactory.create(self.app_config, u)
         eq_(EmailNotifier, notifier.__class__)
 
-        self.app_config.EMAIL_NOTIFICATION_ACTIVATED = False
+        self.app_config.EMAIL__NOTIFICATION__ACTIVATED = False
         notifier = NotifierFactory.create(self.app_config, u)
         eq_(DummyNotifier, notifier.__class__)
 
