@@ -757,11 +757,10 @@ class WorkspaceModifySchema(marshmallow.Schema):
         required=True,
         example='A super description of my workspace.',
     )
-    calendar_enabled = marshmallow.fields.Bool(
-        allow_none=True,
+    agenda_enabled = marshmallow.fields.Bool(
         required=False,
-        default=None,
-        description='has workspace has an associated calendar ?'
+        default=True,
+        description='has workspace has an associated agenda ?'
     )
 
     @post_load
@@ -815,7 +814,7 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         many=True,
     )
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
-    calendar_enabled = marshmallow.fields.Bool(example=True, default=True)
+    agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
     class Meta:
         description = 'Digest of workspace informations'
 
@@ -890,8 +889,8 @@ class ErrorCodeSchema(marshmallow.Schema):
 
 
 class ApplicationSchema(marshmallow.Schema):
-    label = StrippedString(example='Calendar')
-    slug = StrippedString(example='calendar')
+    label = StrippedString(example='Agenda')
+    slug = StrippedString(example='agenda')
     fa_icon = StrippedString(
         example='file-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8

@@ -31,8 +31,8 @@ class Application(object):
         @param config: a dict with eventual application config
         @param main_route: the route of the frontend "home" screen of
         the application. For exemple, if you have an application
-        called "calendar", the main route will be something
-        like /workspace/{wid}/calendar.
+        called "agenda", the main route will be something
+        like /workspace/{wid}/agenda.
         """
         self.label = label
         self.slug = slug

@@ -1,8 +1,0 @@
-# Created by .ignore support plugin (hsz.mobi)
-.idea/
-.git/
-dist/app
-dist/assets
-dist/calendar.app.js
-dist/calendar.bundle.app.js
-node_modules/
