@@ -37,13 +37,13 @@ class Proxy(object):
     def __init__(
         self,
         base_address: str,
-        default_request_header_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
-        default_response_header_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
+        default_request_headers_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
+        default_response_headers_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
         auth: typing.Optional[tuple] = None
     ) -> None:
         self._base_address = base_address
-        self.default_request_header_to_drop = default_request_header_to_drop
-        self.default_response_header_to_drop = default_response_header_to_drop
+        self.default_request_headers_to_drop = default_request_headers_to_drop
+        self.default_response_headers_to_drop = default_response_headers_to_drop
         self.auth = auth
 
     def _get_behind_response(
@@ -78,7 +78,7 @@ class Proxy(object):
     def _drop_request_headers(self, headers: dict) -> dict:
         new_headers = {}
         for header_name, header_value in dict(headers).items():
-            if header_name.lower() in self.default_request_header_to_drop:
+            if header_name.lower() in self.default_request_headers_to_drop:
                 continue
             new_headers[header_name] = header_value
         return new_headers
@@ -86,7 +86,7 @@ class Proxy(object):
     def _drop_response_headers(self, headers: dict) -> dict:
         new_headers = {}
         for header_name, header_value in dict(headers).items():
-            if header_name.lower() in self.default_response_header_to_drop:
+            if header_name.lower() in self.default_response_headers_to_drop:
                 continue
             new_headers[header_name] = header_value
         return new_headers
