@@ -39,17 +39,20 @@ class Proxy(object):
         base_address: str,
         default_request_header_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
         default_response_header_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
+        auth: typing.Optional[tuple] = None
     ) -> None:
         self._base_address = base_address
         self.default_request_header_to_drop = default_request_header_to_drop
         self.default_response_header_to_drop = default_response_header_to_drop
+        self.auth = auth
 
     def _get_behind_response(
             self,
             method: str,
             headers: dict,
             data: dict,
-            url: str
+            url: str,
+            auth: typing.Optional[tuple],
     ) -> RequestsResponse:
         return requests.request(
             method=method,
@@ -57,6 +60,7 @@ class Proxy(object):
             headers=headers,
             data=data,
             url=url,
+            auth=auth,
         )
 
     def _generate_proxy_response(self, status, headers: dict, body):
@@ -108,6 +112,7 @@ class Proxy(object):
             headers=request_headers,
             data=request.body,
             url=behind_url,
+            auth=self.auth,
         )
 
         # INFO - G.M - 2019-03-08 - Prepare proxy response

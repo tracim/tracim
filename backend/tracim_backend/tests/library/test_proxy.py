@@ -91,7 +91,7 @@ class TestProxy(object):
             response.body =body
             return response
 
-        def mocked_get_behind_response(method, headers, data, url):
+        def mocked_get_behind_response(method, headers, data, url, auth):
             return FakeResponse()
 
         class FakeResponse(object):
@@ -119,6 +119,7 @@ class TestProxy(object):
                 }
                 self.body = b'Nothing'
                 self.method = 'GET'
+                self.auth = None
 
         proxy._generate_proxy_response = mocked_generate_proxy_response
         proxy._get_behind_response = mocked_get_behind_response
