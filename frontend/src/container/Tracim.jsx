@@ -30,7 +30,8 @@ import {
   getAppList,
   getContentTypeList,
   getUserIsConnected,
-  getMyselfWorkspaceList
+  getMyselfWorkspaceList,
+  putUserLang
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -83,12 +84,17 @@ class Tracim extends React.Component {
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
+        if (fetchGetUserIsConnected.json.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
+
         props.dispatch(setUserConnected({
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
+
         Cookies.set('lastConnection', '1', {expires: 180})
+
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
+
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
@@ -130,6 +136,15 @@ class Tracim extends React.Component {
       return true
     }
     return false
+  }
+
+  setDefaultUserLang = async (loggedUser) => {
+    const { props } = this
+    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    switch (fetchPutUserLang.status) {
+      case 200: break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your default language')))
+    }
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
