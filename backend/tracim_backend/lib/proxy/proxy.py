@@ -6,6 +6,8 @@ from urllib.parse import urljoin
 import requests
 from pyramid.response import Response as PyramidResponse
 from requests import Response as RequestsResponse
+from requests.auth import HTTPBasicAuth, AuthBase
+
 from tracim_backend.lib.utils.request import TracimRequest
 
 HOP_BY_HOP_HEADER_HTTP = (
@@ -39,8 +41,11 @@ class Proxy(object):
         base_address: str,
         default_request_headers_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
         default_response_headers_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
-        auth: typing.Optional[typing.Tuple[str, str]] = None
+        auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase] = None
     ) -> None:
+        """
+        :param auth: should be a username,password tuple or AuthBase requests lib object
+        """
         self._base_address = base_address
         self.default_request_headers_to_drop = default_request_headers_to_drop
         self.default_response_headers_to_drop = default_response_headers_to_drop
@@ -52,8 +57,11 @@ class Proxy(object):
             headers: dict,
             data: dict,
             url: str,
-            auth: typing.Optional[typing.Tuple[str, str]],
+            auth: typing.Union[typing.Optional[typing.Tuple[str, str]], HTTPBasicAuth],
     ) -> RequestsResponse:
+        """
+        :param auth: should be a username,password tuple or AuthBase requests lib object
+        """
         return requests.request(
             method=method,
             # FIXME BS 2018-11-29: Exclude some headers (like basic auth)
