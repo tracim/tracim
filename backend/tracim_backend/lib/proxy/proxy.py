@@ -57,7 +57,7 @@ class Proxy(object):
             headers: dict,
             data: dict,
             url: str,
-            auth: typing.Union[typing.Optional[typing.Tuple[str, str]], HTTPBasicAuth],
+            auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase],
     ) -> RequestsResponse:
         """
         :param auth: should be a username,password tuple or AuthBase requests lib object
