@@ -19,7 +19,7 @@ from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import CalendarServerConnectionError
+from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
@@ -50,7 +50,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
-from tracim_backend.lib.calendar.calendar import CalendarApi
+from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
@@ -939,19 +939,19 @@ class UserApi(object):
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_user should start hook use by calendar code.
+        # event on_created_user should start hook use by agenda code.
         if self._config.CALDAV_ENABLED:
-            calendar_api = CalendarApi(
+            agenda_api = AgendaApi(
                 current_user = self._user,
                 session = self._session,
                 config = self._config
             )
             try:
-                calendar_already_exist = calendar_api.ensure_user_calendar_exist(user)
-                if calendar_already_exist:
-                    logger.warning(self,'user {} is just created but his own calendar already exist !!'.format(user.user_id))
-            except CalendarServerConnectionError as exc:
-                logger.error(self, 'Cannot connect to calendar server')
+                agenda_already_exist = agenda_api.ensure_user_agenda_exist(user)
+                if agenda_already_exist:
+                    logger.warning(self,'user {} is just created but his own agenda already exist !!'.format(user.user_id))
+            except AgendaServerConnectionError as exc:
+                logger.error(self, 'Cannot connect to agenda server')
                 logger.exception(self, exc)
             except Exception as exc:
                 logger.error(self,'Something goes wrong during calendar create/update')

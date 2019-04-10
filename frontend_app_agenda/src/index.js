@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Calendar from './container/Calendar.jsx'
+import Agenda from './container/Agenda.jsx'
 
 // require('./css/index.styl')
 
@@ -9,7 +9,7 @@ const appInterface = {
   isRendered: false,
   renderAppFullscreen: data => {
     return ReactDOM.render(
-      <Calendar data={data} />
+      <Agenda data={data} />
       , document.getElementById(data.config.domContainer)
     )
   },

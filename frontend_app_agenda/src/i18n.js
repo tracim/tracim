@@ -18,6 +18,6 @@ i18n
     resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
-i18n.idTracim = 'frontend_app_calendar'
+i18n.idTracim = 'frontend_app_agenda'
 
 export default i18n

@@ -1,9 +1,9 @@
 // Values copied from caldavzap config.js file.
 
-var importedConfig = window.parent.document.getElementById('calendarIframe').getAttribute('data-config')
+var importedConfig = window.parent.document.getElementById('agendaIframe').getAttribute('data-config')
 var configObj = JSON.parse(importedConfig)
 
-var globalAccountSettings = configObj.globalAccountSettings.calendarList.map(c => ({
+var globalAccountSettings = configObj.globalAccountSettings.agendaList.map(c => ({
   href: c.href,
   userAuth: {
     userName: 'notaname',

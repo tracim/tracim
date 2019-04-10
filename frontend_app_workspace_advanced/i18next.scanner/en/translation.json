@@ -26,9 +26,10 @@
   "Error while removing member": "Error while removing member",
   "Note, only administrators can send invitational email": "Note, only administrators can send invitational email",
   "This user already is in the shared space": "This user already is in the shared space",
-  "Calendar": "Calendar",
-  "Calendar activated": "Calendar activated",
-  "Calendar deactivated": "Calendar deactivated",
-  "Error while activating calendar": "warning",
-  "Error while deactivating calendar": "warning"
+  "Error while loading app list": "warning",
+  "Agenda activated": "Agenda activated",
+  "Agenda deactivated": "Agenda deactivated",
+  "Error while activating agenda": "Error while activating agenda",
+  "Error while deactivating agenda": "Error while deactivating agenda",
+  "Agenda": "Agenda"
 }

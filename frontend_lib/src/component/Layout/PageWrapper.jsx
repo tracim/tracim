@@ -6,7 +6,7 @@ import PageContent from './PageContent.jsx'
 
 const PageWrapper = props => {
   return (
-    <div className={classnames(props.customeClass, 'pageWrapperGeneric')}>
+    <div className={classnames(props.customClass, 'pageWrapperGeneric')}>
       {props.children}
     </div>
   )
