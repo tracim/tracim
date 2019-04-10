@@ -11,7 +11,8 @@ import {
 import { debug } from '../helper.js'
 import {
   getAgendaList,
-  getWorkspaceDetail
+  getWorkspaceDetail,
+  getWorkspaceMemberList
 } from '../action.async.js'
 
 require('../css/index.styl')
@@ -85,6 +86,12 @@ class Agenda extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
+    document.getElementById('appFullscreenContainer').style.flex = 'none'
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   loadAgendaList = async idWorkspace => {
     const { state } = this
 
@@ -94,10 +101,7 @@ class Agenda extends React.Component {
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
       case 200:
-        this.setState({
-          userWorkspaceList: fetchResultUserWorkspace.body,
-          userWorkspaceListLoaded: true
-        })
+        this.loadUserRoleInWorkspace(fetchResultUserWorkspace.body)
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
@@ -106,6 +110,49 @@ class Agenda extends React.Component {
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
     }
+  }
+
+  // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role
+  // on a workspace is to extract it from the members list that workspace
+  // see https://github.com/tracim/tracim/issues/1581
+  loadUserRoleInWorkspace = async agendaList => {
+    const { state } = this
+    const fetchResultList = await Promise.all(
+      agendaList
+        .filter(a => a.agenda_type === 'workspace')
+        .map(async a => await handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, a.workspace_id)))
+    )
+
+    const fetchResultSuccess = fetchResultList.filter(result => result.apiResponse.status === 200)
+    if (fetchResultSuccess.length < fetchResultList.length) this.sendGlobalFlashMessage(props.t('Some agenda could not be loaded'))
+
+    const workspaceListMemberList = fetchResultSuccess.map(result => ({
+      idWorkspace: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member
+      memberList: result.body || []
+    }))
+
+    const agendaThatCouldGetRoleFrom = agendaList
+      // INFO - CH - 2019-04-09 - remove user's agenda
+      .filter(a => a.agenda_type === 'workspace')
+      // INFO - CH - 2019-04-09 - remove unloaded members list agenda
+      .filter(a => workspaceListMemberList.map(ws => ws.idWorkspace).includes(a.workspace_id))
+
+    const agendaListWithRole = [
+      ...agendaThatCouldGetRoleFrom.map(agenda => ({
+        ...agenda,
+        loggedUserRole: workspaceListMemberList
+          .find(ws => ws.idWorkspace === agenda.workspace_id)
+          .memberList
+          .find(user => user.user_id === state.loggedUser.user_id)
+          .role
+      })),
+      agendaList.find(a => a.agenda_type === 'private') // // INFO - CH - 2019-04-09 - put back the private agenda
+    ]
+
+    this.setState({
+      userWorkspaceList: agendaListWithRole,
+      userWorkspaceListLoaded: true
+    })
   }
 
   loadWorkspaceData = async () => {
@@ -125,12 +172,6 @@ class Agenda extends React.Component {
     }
   }
 
-  componentWillUnmount () {
-    console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.getElementById('appFullscreenContainer').style.flex = 'none'
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
-  }
-
   render () {
     const { props, state } = this
 
@@ -144,7 +185,9 @@ class Agenda extends React.Component {
             ? props.t('User')
             : state.userWorkspaceList.length > 1 ? props.t('Shared spaces') : props.t('Shared space'),
           settingsAccount: a.agenda_type === 'private',
-          withCredentials: a.with_credentials
+          withCredentials: a.with_credentials,
+          loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
+          idWorkspace: a.agenda_type === 'private' ? '' : a.workspace_id
         }))
       },
       userLang: state.loggedUser.lang

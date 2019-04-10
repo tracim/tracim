@@ -19,7 +19,9 @@ var globalAccountSettings = configObj.globalAccountSettings.agendaList.map(c => 
   forceReadOnly: null,
   ignoreAlarms: false,
   backgroundCalendars: [],
-  basehref: c.href.split('/')[2] // const [protocol, empty, hostname, ...path] = c.href.split('/')
+  basehref: c.href.split('/')[2], // const [protocol, empty, hostname, ...path] = c.href.split('/')
+  idWorkspace: c.idWorkspace,
+  loggedUserRole: c.loggedUserRole
 }))
 
 var globalBackgroundSync=true
