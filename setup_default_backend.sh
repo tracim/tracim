@@ -33,53 +33,62 @@ function install_backend_system_dep {
 }
 
 function setup_pyenv {
-   log "setup python3 env.."
-   python3 -m venv env && loggood "setup python3 env successfull" || logerror "problem to setup python3 env"
-   source env/bin/activate && loggood "python3 env activated" || logerror "problem to activate python3 env"
+   log "setup python3 env and activate it.."
+   python3 -m venv env && loggood "setup python3 env successfull" || logerror "failed to setup python3 env"
+   source env/bin/activate && loggood "python3 env activated" || logerror "failed to activate python3 env"
 }
 
 function install_backend_python_packages {
     log "install pip and setuptools"
-    pip install --upgrade pip setuptools && loggood "install success" || logerror "install error"
+    pip install --upgrade pip setuptools && loggood "install pip and setuptools success" || logerror "failed to install pip and setuptools"
     log "install dependencies from requirements.txt"
-    pip install -r "requirements.txt" && loggood "install success" || logerror "install error"
+    pip install -r "requirements.txt" && loggood "install requirements.txt success" || logerror "failed to install requirements.txt"
     log "install tracim-backend (sqlite_backend)..."
-    pip install -e ".[testing]" && loggood "install success" || logerror "install error"
+    pip install -e ".[testing]" && loggood "install tracim-backend (sqlite_backend) success" || logerror "failed to install tracim-backend (sqlite_backend)"
 }
 
 function setup_config_file {
     log "configure tracim with default conf..."
     if [ ! -f development.ini ]; then
-       log "generate missing development.ini ..."
-       cp development.ini.sample development.ini && loggood "copy file success" || logerror "copy file error"
+        log "generate missing development.ini ..."
+        cp development.ini.sample development.ini && loggood "copy default conf file success" || logerror "failed to copy default conf file"
+    else
+        loggood "development.ini exist"
     fi
 
     if [ ! -f ../color.json ]; then
-       log "generate missing color.json ..."
-       cp ../color.json.sample ../color.json && loggood "copy file success" || logerror "copy file error"
+        log "generate missing color.json ..."
+        cp ../color.json.sample ../color.json && loggood "copy default color file success" || logerror "failed to copy default color file"
+    else
+        loggood "color.json exist"
     fi
 
     if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then
         log "remove folder \"sessions_data\" in \"$DEFAULTDIR/backend\" if exist"
-        rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "remove success" || logerror "remove error"
+        rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "remove sessions_data folder success" || logerror "failed to remove sessions_data folder"
+    else
+        loggood "sessions_data folder not exist"
     fi
 
     if [ -d "$DEFAULTDIR/backend/sessions_lock/" ]; then
         log "remove folder \"sessions_lock\" in \"$DEFAULTDIR/backend\" if exist"
-        rm -R $DEFAULTDIR/backend/sessions_lock/ && loggood "remove success" || logerror "remove error"
+        rm -R $DEFAULTDIR/backend/sessions_lock/ && loggood "remove sessions_lock folder success" || logerror "failed to remove sessions_lock folder"
+    else
+        loggood "sessions_lock folder not exist"
     fi
 }
 
 function setup_db {
-    log "check if bdd exist"
+    log "check if database exist"
     result=$(alembic -c development.ini current)
     if [ $? -eq 0 ] && [ ! "$result" == '' ]; then
-       log "check database migration..."
-       alembic -c development.ini upgrade head && loggood "alembic upgrade success" || logerror "alembic upgrade error"
+       loggood "database exist"
+       log "database migration..."
+       alembic -c development.ini upgrade head && loggood "alembic upgrade head success" || logerror "alembic upgrade head failed"
     else
        log "database seems missing, init it..."
        tracimcli db init && loggood "db init success" || logerror "db init error"
-       alembic -c development.ini stamp head && loggood "alembic stamp success" || logerror "alembic stamp error"
+       alembic -c development.ini stamp head && loggood "alembic stamp head success" || logerror "alembic stamp head failed"
     fi
 }
 
@@ -91,10 +100,10 @@ function install_npm_and_nodejs {
     else
         logerror "npm not installed"
         log "install npm with nodejs"
-        $SUDO apt install -y curl && loggood "install curl success" || logerror "error to install curl"
+        $SUDO apt install -y curl && loggood "install curl success" || logerror "failed to install curl"
         curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
         $SUDO apt update
-        $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "error to install nodejs"
+        $SUDO apt install -y nodejs && loggood "install nodejs success" || logerror "failed to install nodejs"
         log "verify if nodejs 8.x is now installed"
         dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
         if [ $? -eq 0 ]; then
@@ -114,9 +123,10 @@ function install_npm_and_nodejs {
 }
 
 function translate_email {
+    log "install i18next-conv to translate email"
+    $SUDO npm install i18next-conv -g && loggood "install i18next-conv success" || logerror "failed to install i18next-conv"
     log "translate email"
-    $SUDO npm install i18next-conv -g && loggood "install i18next-conv success" || logerror "error to install i18next-conv"
-    ./update_i18n_json_file.sh
+    ./update_i18n_json_file.sh && loggood "translate email success" || logerror "failed to translate email"
 }
 
 ############################################
