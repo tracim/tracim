@@ -39,7 +39,7 @@ class Proxy(object):
         base_address: str,
         default_request_headers_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
         default_response_headers_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
-        auth: typing.Optional[tuple] = None
+        auth: typing.Optional[typing.Tuple[str, str]] = None
     ) -> None:
         self._base_address = base_address
         self.default_request_headers_to_drop = default_request_headers_to_drop
@@ -52,7 +52,7 @@ class Proxy(object):
             headers: dict,
             data: dict,
             url: str,
-            auth: typing.Optional[tuple],
+            auth: typing.Optional[typing.Tuple[str, str]],
     ) -> RequestsResponse:
         return requests.request(
             method=method,
