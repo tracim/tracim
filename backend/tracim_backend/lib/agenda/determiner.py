@@ -19,13 +19,16 @@ CALDAV_READ_METHODS = [
 ]
 CALDAV_WRITE_METHODS = [
     'PUT',
-    'DELETE',
     'POST',
     'PROPPATCH',
     'COPY',
     'MOVE',
     'MKCOL',
     'MKAGENDA',
+]
+CALDAV_MANAGER_METHODS = [
+    'DELETE',
+    'MOVE',
 ]
 
 
@@ -35,9 +38,11 @@ class CaldavAuthorizationDeterminer(object):
             return DavAuthorization.READ
         elif request.method in CALDAV_WRITE_METHODS:
             return DavAuthorization.WRITE
+        elif request.method in CALDAV_MANAGER_METHODS:
+            return DavAuthorization.MANAGER
         else:
             logger.warning(
                 self,
-                'Unknown http method "{}" authorization will be WRITE'.format(request.method),
+                'Unknown http method "{}" authorization will be MANAGER'.format(request.method),
             )
-            return DavAuthorization.WRITE
+            return DavAuthorization.MANAGER

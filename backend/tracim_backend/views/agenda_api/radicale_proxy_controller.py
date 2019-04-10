@@ -4,13 +4,13 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.agenda.authorization import \
-    can_access_to_agenda_list
+from tracim_backend.lib.agenda.authorization import can_access_to_agenda_list
 from tracim_backend.lib.agenda.authorization import can_access_user_agenda
 from tracim_backend.lib.agenda.authorization import \
-    can_access_workspace_agenda
-from tracim_backend.lib.agenda.determiner import \
-    CaldavAuthorizationDeterminer
+    can_access_workspace_event_agenda
+from tracim_backend.lib.agenda.authorization import \
+    can_access_workspace_root_agenda
+from tracim_backend.lib.agenda.determiner import CaldavAuthorizationDeterminer
 from tracim_backend.lib.proxy.proxy import HOP_BY_HOP_HEADER_HTTP
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
@@ -95,7 +95,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_workspace_agenda)
+    @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(WorkspaceIdPathSchema())
     def radicale_proxy__workspace(
         self, context, request: TracimRequest, hapic_data: HapicData,
@@ -115,7 +115,7 @@ class RadicaleProxyController(Controller):
 
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_workspace_agenda)
+    @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
     def radicale_proxy__workspace_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData,

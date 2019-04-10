@@ -13,7 +13,8 @@ from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.agenda.determiner import \
     CaldavAuthorizationDeterminer
 from tracim_backend.lib.agenda.utils import DavAuthorization
-from tracim_backend.lib.utils.authorization import AuthorizationChecker
+from tracim_backend.lib.utils.authorization import AuthorizationChecker, \
+    is_content_manager
 from tracim_backend.lib.utils.authorization import SameUserChecker
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -44,11 +45,11 @@ def add_www_authenticate_header_for_caldav_to_response(event):
         )
 
 
-class CanAccessWorkspaceAgendaChecker(AuthorizationChecker):
+class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
     """
     Check current user have write access on current workspace:
         - in reading: must be reader
-        - in writing: must be contributor
+        - in writing or manager actions: must be content_manager
     """
     def __init__(self) -> None:
         self._authorization = CaldavAuthorizationDeterminer()
@@ -64,10 +65,40 @@ class CanAccessWorkspaceAgendaChecker(AuthorizationChecker):
         """
         if not tracim_context.current_workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
-        if self._authorization.determine_requested_mode(tracim_context) == \
-                DavAuthorization.WRITE:
+        if self._authorization.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER \
+                or self._authorization.determine_requested_mode(tracim_context) == DavAuthorization.WRITE:
+            is_content_manager.check(tracim_context)
+        elif self._authorization.determine_requested_mode(tracim_context) == DavAuthorization.READ:
+            is_reader.check(tracim_context)
+
+        return True
+
+class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
+    """
+    Check current user have write access on current workspace:
+        - in reading: must be reader
+        - in writing: must be contributor
+        - in manager action: must be content_manager
+    """
+    def __init__(self) -> None:
+        self._authorization = CaldavAuthorizationDeterminer()
+
+    def check(
+            self,
+            tracim_context: "TracimRequest"
+    ) -> bool:
+        """
+        :param tracim_context: Must be a TracimRequest because this checker only
+        work in pyramid http request context.
+        :return: bool
+        """
+        if not tracim_context.current_workspace.agenda_enabled:
+            raise WorkspaceAgendaDisabledException()
+        if self._authorization.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER:
+            is_content_manager.check(tracim_context)
+        elif self._authorization.determine_requested_mode(tracim_context) == DavAuthorization.WRITE:
             is_contributor.check(tracim_context)
-        else:
+        elif self._authorization.determine_requested_mode(tracim_context) == DavAuthorization.READ:
             is_reader.check(tracim_context)
 
         return True
@@ -92,8 +123,11 @@ class CaldavChecker(AuthorizationChecker):
             raise CaldavNotAuthorized() from exc
 
 
-can_access_workspace_agenda = CaldavChecker(
-    CanAccessWorkspaceAgendaChecker()
+can_access_workspace_root_agenda = CaldavChecker(
+    CanAccessWorkspaceRootAgendaChecker()
+)
+can_access_workspace_event_agenda = CaldavChecker(
+    CanAccessWorkspaceEventAgendaChecker()
 )
 can_access_user_agenda = CaldavChecker(SameUserChecker())
 can_access_to_agenda_list = CaldavChecker(is_user)
