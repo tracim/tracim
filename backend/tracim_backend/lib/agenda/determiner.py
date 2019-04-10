@@ -22,9 +22,8 @@ CALDAV_WRITE_METHODS = [
     'POST',
     'PROPPATCH',
     'COPY',
-    'MOVE',
     'MKCOL',
-    'MKAGENDA',
+    'MKCALENDAR',
 ]
 CALDAV_MANAGER_METHODS = [
     'DELETE',
