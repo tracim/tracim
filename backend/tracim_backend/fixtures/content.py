@@ -146,7 +146,7 @@ class Content(Fixture):
                 new_content='<p>To cook a greet Tiramisu, you need many ingredients.</p>',  # nopep8
                 new_label='Tiramisu Recipes!!!',
             )
-            content_api.save(tiramisu_page)
+            content_api.save(tiramisu_page, do_notify=False)
 
         best_cake_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -194,6 +194,7 @@ class Content(Fixture):
             label='Fruits Desserts',
             parent=dessert_folder,
             do_save=True,
+            do_notify=False,
         )
 
         menu_page = content_api.create(
@@ -202,6 +203,7 @@ class Content(Fixture):
             parent=menu_workspace,
             label='Current Menu',
             do_save=True,
+            do_notify=False
         )
 
         new_fruit_salad = content_api.create(
@@ -210,6 +212,7 @@ class Content(Fixture):
             parent=fruits_desserts_folder,
             label='New Fruit Salad',
             do_save=True,
+            do_notify=False,
         )
         old_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -225,7 +228,7 @@ class Content(Fixture):
                 content=old_fruit_salad,
         ):
             content_api.archive(old_fruit_salad)
-        content_api.save(old_fruit_salad)
+        content_api.save(old_fruit_salad, do_notify=False)
 
         bad_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -241,7 +244,7 @@ class Content(Fixture):
                 content=bad_fruit_salad,
         ):
             content_api.delete(bad_fruit_salad)
-        content_api.save(bad_fruit_salad)
+        content_api.save(bad_fruit_salad, do_notify=False)
 
         # File at the root for test
         new_fruit_salad = content_api.create(
@@ -249,12 +252,14 @@ class Content(Fixture):
             workspace=other_workspace,
             label='New Fruit Salad',
             do_save=True,
+            do_notify=False,
         )
         old_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=other_workspace,
             label='Fruit Salad',
             do_save=True,
+            do_notify=False,
         )
         with new_revision(
                 session=self._session,
@@ -262,13 +267,14 @@ class Content(Fixture):
                 content=old_fruit_salad,
         ):
             content_api.archive(old_fruit_salad)
-        content_api.save(old_fruit_salad)
+        content_api.save(old_fruit_salad, do_notify=False)
 
         bad_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=other_workspace,
             label='Bad Fruit Salad',
             do_save=True,
+            do_notify=False
         )
         with new_revision(
                 session=self._session,
@@ -276,22 +282,25 @@ class Content(Fixture):
                 content=bad_fruit_salad,
         ):
             content_api.delete(bad_fruit_salad)
-        content_api.save(bad_fruit_salad)
+        content_api.save(bad_fruit_salad, do_notify=False)
 
         content_api.create_comment(
             parent=best_cake_thread,
             content='<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>',  # nopep8
             do_save=True,
+            do_notify=False
         )
         bob_content_api.create_comment(
             parent=best_cake_thread,
             content='<p>What about Apple Pie? There are Awesome!</p>',
             do_save=True,
+            do_notify=False
         )
         reader_content_api.create_comment(
             parent=best_cake_thread,
             content='<p>You are right, but Kouign-amann are clearly better.</p>',
             do_save=True,
+            do_notify=False,
         )
         with new_revision(
                 session=self._session,
@@ -303,7 +312,7 @@ class Content(Fixture):
                 new_content='What is the best cake?',
                 new_label='Best Cakes?',
             )
-            bob_content_api.save(best_cake_thread)
+            bob_content_api.save(best_cake_thread, do_notify=False)
 
         with new_revision(
                 session=self._session,
@@ -315,5 +324,5 @@ class Content(Fixture):
                 new_content='<p>To cook a great Tiramisu, you need many ingredients.</p>',  # nopep8
                 new_label='Tiramisu Recipe',
             )
-            bob_content_api.save(tiramisu_page)
+            bob_content_api.save(tiramisu_page, do_notify=False)
         self._session.flush()
