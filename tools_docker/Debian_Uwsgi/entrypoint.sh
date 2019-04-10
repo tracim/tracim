@@ -105,4 +105,9 @@ fi
 set +e
 service uwsgi restart
 set -e
+if [ "$START_CALDAV" = "1" ]; then
+    cd /tracim/backend/
+    tracimcli caldav calendar create
+fi
+
 tail -f /var/log/dpkg.log
