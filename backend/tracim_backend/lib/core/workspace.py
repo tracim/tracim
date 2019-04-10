@@ -262,30 +262,30 @@ class WorkspaceApi(object):
                     logger.error(self, 'Cannot connect to agenda server')
                     logger.exception(self, exc)
                 except Exception as exc:
-                    logger.error(self, 'Something goes wrong during calendar create/update')
+                    logger.error(self, 'Something goes wrong during agenda create/update')
                     logger.exception(self, exc)
 
     def execute_update_workspace_actions(self, workspace: Workspace) -> None:
-        from tracim_backend.lib.calendar.calendar import CalendarApi
+        from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV_ENABLED:
-            calendar_api = CalendarApi(
+            agenda_api = AgendaApi(
                 current_user = self._user,
                 session = self._session,
                 config = self._config
             )
-            if workspace.calendar_enabled:
+            if workspace.agenda_enabled:
                 try:
-                    calendar_already_exist = calendar_api.ensure_workspace_calendar_exist(workspace)
-                    if calendar_already_exist:
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exist(workspace)
+                    if agenda_already_exist:
                         logger.warning(
                             self,
-                            'workspace {} is just created but it own calendar already exist !!'.format(workspace.user_id)
+                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.user_id)
                         )
-                except CalendarServerConnectionError as exc:
-                    logger.error(self, 'Cannot connect to calendar server')
+                except AgendaServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to agenda server')
                     logger.exception(self, exc)
                 except Exception as exc:
-                    logger.error(self, 'Something goes wrong during calendar create/update')
+                    logger.error(self, 'Something goes wrong during agenda create/update')
                     logger.exception(self, exc)
 
 

@@ -94,7 +94,7 @@ class CaldavCreateAgendasCommand(AppContextCommand):
                 logger.exception(self, exc)
             except Exception as exc:
                 nb_error_agenda_access += 1
-                print('Something goes wrong during calendar create/update')
+                print('Something goes wrong during agenda create/update')
                 logger.exception(self, exc)
         nb_user_agendas = len(users)
         nb_verified_user_agenda = len(users) - nb_error_agenda_access
