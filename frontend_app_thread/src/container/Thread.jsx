@@ -217,6 +217,7 @@ class Thread extends React.Component {
         break
       case 400:
         switch (fetchResultSaveThread.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
@@ -263,18 +264,18 @@ class Thread extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveEditStatus = putThreadStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    if (newStatus === state.content.status) return
 
-    handleFetchResult(await fetchResultSaveEditStatus)
-      .then(resSave => {
-        if (resSave.status === 204) { // 204 no content so dont take status from resSave.apiResponse.status
-          this.loadContent()
-        } else {
-          console.warn('Error saving thread comment. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    const fetchResultSaveEditStatus = await handleFetchResult(
+      await putThreadStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+    )
+
+    switch (fetchResultSaveEditStatus.status) {
+      case 204: this.loadContent(); break
+      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
+    }
   }
 
   handleClickArchive = async () => {
