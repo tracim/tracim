@@ -63,6 +63,8 @@ class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
         work in pyramid http request context.
         :return: true or raise Exception according to right.
         """
+        # TODO - G.M - 2019-04-11 - place calendar activation outside of right context
+        # see https://github.com/tracim/tracim/issues/1593
         if not tracim_context.current_workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
         if self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER \
@@ -92,6 +94,8 @@ class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
         work in pyramid http request context.
         :return: true or raise Exception according to right.
         """
+        # TODO - G.M - 2019-04-11 - place calendar activation outside of right context
+        # see https://github.com/tracim/tracim/issues/1593
         if not tracim_context.current_workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
         if self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER:
