@@ -98,10 +98,28 @@ class AgendaApi(object):
                 client=caldav_client,
                 url=agenda_url,
             )
-            agenda.set_properties([
-                caldav.dav.DisplayName(agenda_name),
-                CalendarDescription(agenda_description),
+            props = agenda.get_properties([
+                caldav.dav.DisplayName(),
+                CalendarDescription()
             ])
+            # TODO - G.M - 2019-04-11 - Rewrote this better, we need to verify
+            # if value are same but as props may be None but agenda_description
+            # can be '' we need to convert thing in order that '' is same as None.
+            if agenda_name != str(props.get(caldav.dav.DisplayName().tag) or '') \
+                or agenda_description != str(props.get(CalendarDescription().tag) or ''):
+                agenda.set_properties([
+                    caldav.dav.DisplayName(agenda_name),
+                    CalendarDescription(agenda_description),
+                ])
+                logger.debug(
+                    self,
+                    'props for calendar at url {} updated'.format(agenda_url)
+                )
+            else:
+                logger.debug(
+                    self,
+                    'No props to update for calendar at url {}'.format(agenda_url)
+                )
         except Exception as exc:
             raise AgendaPropsUpdateFailed('Failed to update props of agenda') from exc
 
