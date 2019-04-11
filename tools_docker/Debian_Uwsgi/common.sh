@@ -78,10 +78,7 @@ if [ ! -d /var/tracim/logs ]; then
     chown root:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
-# Create folder radicale_storage
-if [ ! -d /var/tracim/data/radicale_storage ]; then
-    mkdir /var/tracim/data/radicale_storage
-fi
+
 if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
     ln -sf /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
 fi
@@ -103,6 +100,10 @@ if [ ! -d /var/tracim/data ]; then
 fi
 if [ ! -f /var/tracim/assets ]; then
     mkdir /var/tracim/assets -p
+fi
+# Create folder radicale_storage
+if [ ! -d /var/tracim/data/radicale_storage ]; then
+    mkdir /var/tracim/data/radicale_storage
 fi
 
 # Create Webdav file/config if not exist
