@@ -907,10 +907,41 @@ class UserApi(object):
     def save(self, user: User):
         self._session.flush()
 
+    def execute_updated_user_actions(self, user: User) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post-update user actions
+        """
+
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_updated_user should start hook use by agenda  app code.
+
+        if self._config.CALDAV_ENABLED:
+            agenda_api = AgendaApi(
+                current_user = self._user,
+                session = self._session,
+                config = self._config
+            )
+            try:
+                agenda_api.ensure_user_agenda_exists(user)
+            except AgendaServerConnectionError as exc:
+                logger.error(self, 'Cannot connect to agenda server')
+                logger.exception(self, exc)
+            except Exception as exc:
+                logger.error(self, 'Something goes wrong during agenda create/update')
+                logger.exception(self, exc)
+
     def execute_created_user_actions(self, user: User) -> None:
         """
-        Execute actions when user just been created
-        :return:
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post-create user actions
         """
 
         # TODO - G.M - 04-04-2018 - [auth]
@@ -922,7 +953,8 @@ class UserApi(object):
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_user should start hook use by agenda code.
+        # event on_created_user should start hook use by agenda  app code.
+
         if self._config.CALDAV_ENABLED:
             agenda_api = AgendaApi(
                 current_user = self._user,
@@ -930,11 +962,14 @@ class UserApi(object):
                 config = self._config
             )
             try:
-                agenda_already_exist = agenda_api.ensure_user_agenda_exist(user)
+                agenda_already_exist = agenda_api.ensure_user_agenda_exists(user)
                 if agenda_already_exist:
                     logger.warning(self,'user {} is just created but his own agenda already exist !!'.format(user.user_id))
             except AgendaServerConnectionError as exc:
                 logger.error(self, 'Cannot connect to agenda server')
+                logger.exception(self, exc)
+            except Exception as exc:
+                logger.error(self,'Something goes wrong during agenda create/update')
                 logger.exception(self, exc)
 
     def _check_user_auth_validity(self, user:User) -> None:

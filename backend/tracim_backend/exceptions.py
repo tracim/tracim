@@ -69,6 +69,12 @@ class AgendaServerConnectionError(TracimException):
 class CannotCreateAgenda(TracimException):
     pass
 
+class AgendaPropsUpdateFailed(TracimException):
+    pass
+
+class CannotCreateAgenda(TracimException):
+    pass
+
 class AgendaException(TracimException):
     pass
 

@@ -239,27 +239,72 @@ class WorkspaceApi(object):
         return workspace
 
     def execute_created_workspace_actions(self, workspace: Workspace) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post creation workspace actions
+        """
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_user should start hook use by agenda code.
+        # event on_created_workspace should start hook use by agenda app code.
+
+        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+        # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV_ENABLED:
-            agenda_api = AgendaApi(
-                current_user = self._user,
-                session = self._session,
-                config = self._config
-            )
             if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=self._user,
+                    session=self._session,
+                    config=self._config
+                )
                 try:
-                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exist(workspace)
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
                     if agenda_already_exist:
                         logger.warning(
                             self,
-                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.user_id)
+                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.workspace_id)
                         )
                 except AgendaServerConnectionError as exc:
                     logger.error(self, 'Cannot connect to agenda server')
+                    logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, 'Something goes wrong during agenda create/update')
+                    logger.exception(self, exc)
+
+    def execute_update_workspace_actions(self, workspace: Workspace) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post update workspace actions
+        """
+
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_updated_workspace should start hook use by agenda app code.
+
+        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+        # with event refactor, see https://github.com/tracim/tracim/issues/1487
+        from tracim_backend.lib.agenda.agenda import AgendaApi
+        if self._config.CALDAV_ENABLED:
+            if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=self._user,
+                    session=self._session,
+                    config=self._config
+                )
+                try:
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
+                except AgendaServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to agenda server')
+                    logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, 'Something goes wrong during agenda create/update')
                     logger.exception(self, exc)
 
 

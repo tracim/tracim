@@ -1,11 +1,15 @@
 import typing
 
+import caldav
 import requests
+from caldav.elements.base import ValuedBaseElement
+from caldav.lib.namespace import ns
 from colour import Color
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import AgendaServerConnectionError, \
+    AgendaPropsUpdateFailed
 from tracim_backend.exceptions import CannotCreateAgenda
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -36,6 +40,9 @@ CREATE_AGENDA_TEMPLATE = \
   </set>
 </create>
 """
+
+class CalendarDescription(ValuedBaseElement):
+    tag = ns("C", "calendar-description")
 
 class AgendaApi(object):
 
@@ -78,6 +85,45 @@ class AgendaApi(object):
             raise CannotCreateAgenda('Agenda {} cannot be created:{},{}'.format(agenda_url, response.status_code, response.content))
         logger.info(self, 'new caldav agenda created at url {}'.format(agenda_url))
 
+    def _update_agenda_props(self, agenda_url, agenda_name, agenda_description):
+        logger.debug(self, 'update existing caldav agenda props at url {}'.format(agenda_url))
+        # force renaming of agenda to be sure of consistency
+        try:
+            caldav_client = caldav.DAVClient(
+                username='tracim',
+                password='tracim',
+                url=agenda_url
+            )
+            agenda = caldav.objects.Calendar(
+                client=caldav_client,
+                url=agenda_url,
+            )
+            props = agenda.get_properties([
+                caldav.dav.DisplayName(),
+                CalendarDescription()
+            ])
+            # TODO - G.M - 2019-04-11 - Rewrote this better, we need to verify
+            # if value are same but as props may be None but agenda_description
+            # can be '' we need to convert thing in order that '' is same as None.
+            if agenda_name != str(props.get(caldav.dav.DisplayName().tag) or '') \
+                or agenda_description != str(props.get(CalendarDescription().tag) or ''):
+                agenda.set_properties([
+                    caldav.dav.DisplayName(agenda_name),
+                    CalendarDescription(agenda_description),
+                ])
+                logger.debug(
+                    self,
+                    'props for calendar at url {} updated'.format(agenda_url)
+                )
+            else:
+                logger.debug(
+                    self,
+                    'No props to update for calendar at url {}'.format(agenda_url)
+                )
+        except Exception as exc:
+            raise AgendaPropsUpdateFailed('Failed to update props of agenda') from exc
+
+
     def _get_agenda_base_url(self, use_proxy: bool):
         if use_proxy:
             base_url = self._config.WEBSITE_BASE_URL
@@ -93,7 +139,7 @@ class AgendaApi(object):
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
         return '{}{}{}/'.format(base_url, self._config.CALDAV_RADICALE_USER_PATH, user.user_id)
 
-    def ensure_workspace_agenda_exist(self, workspace: Workspace) -> bool:
+    def ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
         """
         Return true if agenda already exist, false if it was just create,
         raise Exception if agenda cannot be created.
@@ -109,9 +155,15 @@ class AgendaApi(object):
                 agenda_description=workspace.description,
             )
             return False
-        return True
+        else:
+            self._update_agenda_props(
+                agenda_url=workspace_agenda_url,
+                agenda_name=workspace.label,
+                agenda_description=workspace.description,
+            )
+            return True
 
-    def ensure_user_agenda_exist(self, user: User) -> bool:
+    def ensure_user_agenda_exists(self, user: User) -> bool:
         """
         Return true if agenda already exist, false if it was just create,
         raise Exception if agenda cannot be created.
@@ -125,7 +177,13 @@ class AgendaApi(object):
                 agenda_description='',
             )
             return False
-        return True
+        else:
+            self._update_agenda_props(
+                agenda_url=user_agenda_url,
+                agenda_name=user.display_name,
+                agenda_description='',
+            )
+            return True
 
     def get_user_agendas(
             self,

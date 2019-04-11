@@ -167,6 +167,7 @@ class WorkspaceController(Controller):
             agenda_enabled=hapic_data.body.agenda_enabled,
             save_now=True,
         )
+        wapi.execute_update_workspace_actions(request.current_workspace)
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
