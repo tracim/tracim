@@ -22,7 +22,7 @@ HOP_BY_HOP_HEADER_HTTP = (
 )
 
 DEFAULT_RESPONSE_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
-    # FIXME - G.M - 2019-03-08 - for unknown reason content_length and
+    # HACK - G.M - 2019-03-08 - for unknown reason content_length and
     # content-encoding
     # differ between radicale_header and proxy response.
     # This make pyramid raise exception, to force renew creation of

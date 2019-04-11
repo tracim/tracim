@@ -24,7 +24,7 @@ from requests.auth import HTTPBasicAuth
 # dumb auth parameter, just to avoid radicale issue with empty
 # auth header
 RADICALE_HTTP_AUTH_USERNAME = 'tracim'
-RADICALE_HTTP_AUTH_PASSWORD = 'tracim'
+RADICALE_HTTP_AUTH_PASSWORD = 'tracimpass'
 
 class RadicaleProxyController(Controller):
     def __init__(
