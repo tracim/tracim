@@ -137,17 +137,18 @@ class Agenda extends React.Component {
       // INFO - CH - 2019-04-09 - remove unloaded members list agenda
       .filter(a => workspaceListMemberList.map(ws => ws.idWorkspace).includes(a.workspace_id))
 
-    const agendaListWithRole = [
-      ...agendaThatCouldGetRoleFrom.map(agenda => ({
-        ...agenda,
-        loggedUserRole: workspaceListMemberList
-          .find(ws => ws.idWorkspace === agenda.workspace_id)
-          .memberList
-          .find(user => user.user_id === state.loggedUser.user_id)
-          .role
-      })),
-      agendaList.find(a => a.agenda_type === 'private') // // INFO - CH - 2019-04-09 - put back the private agenda
-    ]
+    const agendaListWithRole = agendaThatCouldGetRoleFrom.map(agenda => ({
+      ...agenda,
+      loggedUserRole: workspaceListMemberList
+        .find(ws => ws.idWorkspace === agenda.workspace_id)
+        .memberList
+        .find(user => user.user_id === state.loggedUser.user_id)
+        .role
+    }))
+
+    if (state.config.appConfig.idWorkspace === null) {
+      agendaListWithRole.push(agendaList.find(a => a.agenda_type === 'private'))
+    }
 
     this.setState({
       userWorkspaceList: agendaListWithRole,
@@ -176,6 +177,8 @@ class Agenda extends React.Component {
     const { props, state } = this
 
     if (!state.isVisible || !state.userWorkspaceListLoaded) return null
+
+    console.log('state.userWorkspaceList', state.userWorkspaceList)
 
     const config = {
       globalAccountSettings: {
