@@ -9,6 +9,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
+    sed -i "s|basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.sessions_data_root_dir = .*|basic_setup.sessions_data_root_dir = /var/tracim/data|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.api_key =.*|basic_setup.api_key = $KEY|g" /etc/tracim/development.ini
@@ -71,6 +72,7 @@ if [ ! -d /var/tracim/logs ]; then
     mkdir /var/tracim/logs -p
     touch /var/tracim/logs/tracim_web.log
     touch /var/tracim/logs/tracim_webdav.log
+    touch /var/tracim/logs/tracim_caldav.log
     touch /var/tracim/logs/apache2-access.log
     touch /var/tracim/logs/apache2-error.log
     chown root:www-data -R /var/tracim/logs
@@ -81,6 +83,9 @@ if [ ! -L /var/log/uwsgi/app/tracim_web.log ]; then
 fi
 if [ ! -L /var/log/uwsgi/app/tracim_webdav.log ]; then
     ln -sf /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
+fi
+if [ ! -L /var/log/uwsgi/app/tracim_caldav.log ]; then
+    ln -sf /var/tracim/logs/tracim_caldav.log /var/log/uwsgi/app/tracim_caldav.log
 fi
 if [ ! -L /var/log/apache2/tracim-access.log ]; then
     ln -sf /var/tracim/logs/apache2-access.log /var/log/apache2/tracim-access.log
@@ -123,26 +128,14 @@ if [ "$START_CALDAV" = "1" ]; then
         cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_caldav.ini
         sed -i "s|module = .*|module = wsgi.caldav:application|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|http-socket = .*|http-socket = :5232|g" /etc/tracim/tracim_caldav.ini
+        sed -i "s|#threads = .*|threads = 8|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_caldav.log|g" /etc/tracim/tracim_caldav.ini
     fi
     if [ ! -L /etc/uwsgi/apps-available/tracim_caldav.ini ]; then
         ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
     fi
     sed -i "s|caldav.enabled = .*|caldav.enabled = True|g" /etc/tracim/development.ini
-
-    sed -i "s|#<Directory \"/\">|<Directory \"/\">|g" /etc/tracim/apache2.conf
-    sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
-    sed -i "s|#</Directory>|</Directory>|g" /etc/tracim/apache2.conf
-    sed -i "s|#ProxyPass http://127.0.0.1:5232/ retry=0|ProxyPass http://127.0.0.1:5232/ retry=0|g" /etc/tracim/apache2.conf
-    sed -i "s|#ProxyPassReverse http://127.0.0.1:5232/|ProxyPassReverse http://127.0.0.1:5232/|g" /etc/tracim/apache2.conf
-    sed -i "s|#RequestHeader set X-Script-Name /radicale/|RequestHeader set X-Script-Name /radicale/|g" /etc/tracim/apache2.conf
 else
     sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
 
-    sed -i "s|<Directory \"/\">|#<Directory \"/\">|g" /etc/tracim/apache2.conf
-    sed -i "s|    Require all granted|#    Require all granted|g" /etc/tracim/apache2.conf
-    sed -i "s|</Directory>|#</Directory>|g" /etc/tracim/apache2.conf
-    sed -i "s|ProxyPass http://127.0.0.1:5232/ retry=0|#ProxyPass http://127.0.0.1:5232/ retry=0|g" /etc/tracim/apache2.conf
-    sed -i "s|ProxyPassReverse http://127.0.0.1:5232/|#ProxyPassReverse http://127.0.0.1:5232/|g" /etc/tracim/apache2.conf
-    sed -i "s|RequestHeader set X-Script-Name /radicale/|#RequestHeader set X-Script-Name /radicale/|g" /etc/tracim/apache2.conf
 fi
