@@ -239,10 +239,20 @@ class WorkspaceApi(object):
         return workspace
 
     def execute_created_workspace_actions(self, workspace: Workspace) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post creation workspace actions
+        """
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_user should start hook use by agenda code.
+        # event on_created_workspace should start hook use by agenda app code.
+
+        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+        # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV_ENABLED:
             agenda_api = AgendaApi(
@@ -266,6 +276,20 @@ class WorkspaceApi(object):
                     logger.exception(self, exc)
 
     def execute_update_workspace_actions(self, workspace: Workspace) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post update workspace actions
+        """
+
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_updated_workspace should start hook use by agenda app code.
+
+        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+        # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV_ENABLED:
             agenda_api = AgendaApi(
