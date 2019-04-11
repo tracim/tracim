@@ -255,12 +255,12 @@ class WorkspaceApi(object):
         # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV_ENABLED:
-            agenda_api = AgendaApi(
-                current_user = self._user,
-                session = self._session,
-                config = self._config
-            )
             if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=self._user,
+                    session=self._session,
+                    config=self._config
+                )
                 try:
                     agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
                     if agenda_already_exist:
@@ -292,12 +292,12 @@ class WorkspaceApi(object):
         # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV_ENABLED:
-            agenda_api = AgendaApi(
-                current_user = self._user,
-                session = self._session,
-                config = self._config
-            )
             if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=self._user,
+                    session=self._session,
+                    config=self._config
+                )
                 try:
                     agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
                     if agenda_already_exist:
