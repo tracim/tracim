@@ -13,7 +13,8 @@ from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.agenda.determiner import \
     CaldavAuthorizationDeterminer
 from tracim_backend.lib.agenda.utils import DavAuthorization
-from tracim_backend.lib.utils.authorization import AuthorizationChecker
+from tracim_backend.lib.utils.authorization import AuthorizationChecker, \
+    is_content_manager
 from tracim_backend.lib.utils.authorization import SameUserChecker
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -44,14 +45,14 @@ def add_www_authenticate_header_for_caldav_to_response(event):
         )
 
 
-class CanAccessWorkspaceAgendaChecker(AuthorizationChecker):
+class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
     """
     Check current user have write access on current workspace:
         - in reading: must be reader
-        - in writing: must be contributor
+        - in writing or manager actions: must be content_manager
     """
     def __init__(self) -> None:
-        self._authorization = CaldavAuthorizationDeterminer()
+        self.caldav_auth_determiner = CaldavAuthorizationDeterminer()
 
     def check(
             self,
@@ -60,14 +61,48 @@ class CanAccessWorkspaceAgendaChecker(AuthorizationChecker):
         """
         :param tracim_context: Must be a TracimRequest because this checker only
         work in pyramid http request context.
-        :return: bool
+        :return: true or raise Exception according to right.
         """
+        # TODO - G.M - 2019-04-11 - place calendar activation outside of right context
+        # see https://github.com/tracim/tracim/issues/1593
         if not tracim_context.current_workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
-        if self._authorization.determine_requested_mode(tracim_context) == \
-                DavAuthorization.WRITE:
+        if self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER \
+                or self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.WRITE:
+            is_content_manager.check(tracim_context)
+        elif self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.READ:
+            is_reader.check(tracim_context)
+
+        return True
+
+class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
+    """
+    Check current user have write access on current workspace:
+        - in reading: must be reader
+        - in contribution: must be contributor
+        - in managment action: must be content_manager
+    """
+    def __init__(self) -> None:
+        self.caldav_auth_determiner = CaldavAuthorizationDeterminer()
+
+    def check(
+            self,
+            tracim_context: "TracimRequest"
+    ) -> bool:
+        """
+        :param tracim_context: Must be a TracimRequest because this checker only
+        work in pyramid http request context.
+        :return: true or raise Exception according to right.
+        """
+        # TODO - G.M - 2019-04-11 - place calendar activation outside of right context
+        # see https://github.com/tracim/tracim/issues/1593
+        if not tracim_context.current_workspace.agenda_enabled:
+            raise WorkspaceAgendaDisabledException()
+        if self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER:
+            is_content_manager.check(tracim_context)
+        elif self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.WRITE:
             is_contributor.check(tracim_context)
-        else:
+        elif self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.READ:
             is_reader.check(tracim_context)
 
         return True
@@ -92,8 +127,11 @@ class CaldavChecker(AuthorizationChecker):
             raise CaldavNotAuthorized() from exc
 
 
-can_access_workspace_agenda = CaldavChecker(
-    CanAccessWorkspaceAgendaChecker()
+can_access_workspace_root_agenda = CaldavChecker(
+    CanAccessWorkspaceRootAgendaChecker()
+)
+can_access_workspace_event_agenda = CaldavChecker(
+    CanAccessWorkspaceEventAgendaChecker()
 )
 can_access_user_agenda = CaldavChecker(SameUserChecker())
 can_access_to_agenda_list = CaldavChecker(is_user)

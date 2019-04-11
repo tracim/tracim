@@ -183,7 +183,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
         transaction.commit()
         self.testapp.authorization = (
             'Basic',
