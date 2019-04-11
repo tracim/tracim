@@ -21,6 +21,9 @@
     #ProxyPass /webdav http://127.0.0.1:3030/webdav
     #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav
 
+    #ProxyPass /calendar http://127.0.0.1:8080/calendar
+    #ProxyPassReverse /calendar http://127.0.0.1:8080/calendar
+
     ProxyPass /ui http://127.0.0.1:8080/ui
     ProxyPassReverse /ui http://127.0.0.1:8080/ui
 

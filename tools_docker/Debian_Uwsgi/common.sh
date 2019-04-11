@@ -118,13 +118,15 @@ if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
         ln -s /etc/tracim/tracim_webdav.ini /etc/uwsgi/apps-available/tracim_webdav.ini
     fi
-
     sed -i "s|#<Directory \"/\">|<Directory \"/\">|g" /etc/tracim/apache2.conf
     sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
     sed -i "s|#    Dav On|    Dav On|g" /etc/tracim/apache2.conf
     sed -i "s|#</Directory>|</Directory>|g" /etc/tracim/apache2.conf
     sed -i "s|#ProxyPass /webdav http://127.0.0.1:3030/webdav|ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+else
+    sed -i "s|ProxyPass /webdav http://127.0.0.1:3030/webdav|#ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi
 
 # Create Webdav file/config if not exist
@@ -140,7 +142,10 @@ if [ "$START_CALDAV" = "1" ]; then
         ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
     fi
     sed -i "s|caldav.enabled = .*|caldav.enabled = True|g" /etc/tracim/development.ini
+    sed -i "s|#ProxyPass /calendar http://127.0.0.1:8080/calendar|ProxyPass /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
 else
     sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
-
+    sed -i "s|ProxyPass /calendar http://127.0.0.1:8080/calendar|#ProxyPass /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
+    sed -i "s|ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|#ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
 fi
