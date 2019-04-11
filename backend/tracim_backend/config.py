@@ -13,7 +13,7 @@ from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
-from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.exceptions import ConfigurationError, ConfigCodeError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
@@ -862,8 +862,18 @@ class CFG(object):
         a true cfg attribute. Will raise AttributeError if not.
         """
         for config_param in self.config_naming:
-            getattr(self, config_param.config_name)
-
+            try:
+                getattr(self, config_param.config_name)
+            except AttributeError as exc:
+                raise ConfigCodeError(
+                    'config file source code is not correct (see config.py file)'
+                    ' When using self.get_raw_config in CFG, you should use proper'
+                    ' naming between config file param and config param.\n'
+                    'use : self.{} = self.get_raw_config({})'.format(
+                        config_param.config_name,
+                        config_param.config_file_name
+                    )
+                )
 
     def configure_filedepot(self) -> None:
 
