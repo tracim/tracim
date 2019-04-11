@@ -1,7 +1,10 @@
 # coding: utf-8
+from http import HTTPStatus
+
 from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
+from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda.authorization import can_access_to_agenda_list
@@ -99,6 +102,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(WorkspaceIdPathSchema())
     def radicale_proxy__workspace(
@@ -119,6 +123,7 @@ class RadicaleProxyController(Controller):
 
 
     @hapic.with_api_doc(disable_doc=True)
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
     def radicale_proxy__workspace_subitems(
