@@ -1,8 +1,8 @@
 # coding: utf-8
+from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
 
-from hapic import HapicData
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda.authorization import \
     can_access_to_agenda_list
@@ -20,7 +20,11 @@ from tracim_backend.views.core_api.schemas import \
     RadicaleWorkspaceSubItemPathSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
-
+from requests.auth import HTTPBasicAuth
+# dumb auth parameter, just to avoid radicale issue with empty
+# auth header
+RADICALE_HTTP_AUTH_USERNAME = 'tracim'
+RADICALE_HTTP_AUTH_PASSWORD = 'tracimpass'
 
 class RadicaleProxyController(Controller):
     def __init__(
@@ -35,7 +39,8 @@ class RadicaleProxyController(Controller):
         self.radicale_path_user_dir = radicale_user_path
         self.radicale_path_workspace_dir = radicale_workspace_path
         self._proxy = Proxy(
-            base_address=proxy_base_address
+            base_address=proxy_base_address,
+            auth=HTTPBasicAuth('tracim', 'tracim')
         )
 
     @hapic.with_api_doc(disable_doc=True)
