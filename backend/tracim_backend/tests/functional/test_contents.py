@@ -16,7 +16,7 @@ import transaction
 from depot.io.utils import FileIntent
 from PIL import Image
 
-from tracim_backend import error
+from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -155,7 +155,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_folder__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -193,7 +193,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -252,7 +252,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -297,7 +297,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -342,7 +342,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_INVALID_ID
 
     def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -388,7 +388,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.CONTENT_INVALID_ID
 
     def test_api__update_folder__err_400__empty_label(self) -> None:  # nopep8
         """
@@ -443,7 +443,7 @@ class TestFolder(FunctionalTest):
         # INFO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_folder__ok_200__nominal_case(self) -> None:
         """
@@ -605,7 +605,7 @@ class TestFolder(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+        assert res.json_body['code'] == ErrorCode.SAME_VALUE_ERROR
 
     def test_api__update_folder__err_400__allowed_content_changed_only(self) -> None:
         """
@@ -900,7 +900,7 @@ class TestFolder(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body['code'] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
@@ -1206,7 +1206,7 @@ class TestFolder(FunctionalTest):
         # TODO - G.M - 2018-09-10 - handle by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
 
 class TestHtmlDocuments(FunctionalTest):
@@ -1369,7 +1369,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -1388,7 +1388,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -1407,7 +1407,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -1426,7 +1426,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1445,7 +1445,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_INVALID_ID
 
     def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1464,7 +1464,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.CONTENT_INVALID_ID
 
     def test_api__update_html_document__err_400__empty_label(self) -> None:  # nopep8
         """
@@ -1489,7 +1489,7 @@ class TestHtmlDocuments(FunctionalTest):
         # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
@@ -1596,7 +1596,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+        assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_html_document__err_400__not_modified(self) -> None:
         """
@@ -1677,7 +1677,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+        assert res.json_body['code'] == ErrorCode.SAME_VALUE_ERROR
 
     def test_api__get_html_document_revisions__ok_200__nominal_case(
             self
@@ -1832,7 +1832,28 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+
+    def test_api__set_document_status__err_400__same_status(self) -> None:
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'open',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6/status',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE
 
 
 class TestFiles(FunctionalTest):
@@ -2110,7 +2131,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_file__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -2129,7 +2150,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_file__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -2148,7 +2169,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -2167,7 +2188,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -2186,7 +2207,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_INVALID_ID
 
     def test_api__get_file__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -2205,7 +2226,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.CONTENT_INVALID_ID
 
     def test_api__update_file_info_err_400__empty_label(self) -> None:  # nopep8
         """
@@ -2274,7 +2295,7 @@ class TestFiles(FunctionalTest):
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_file_info__ok_200__nominal_case(self) -> None:
         """
@@ -2462,7 +2483,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+        assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_deleted(self) -> None:
         """
@@ -2529,7 +2550,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+        assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_archived(self) -> None:
         """
@@ -2596,7 +2617,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+        assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__not_modified(self) -> None:
         """
@@ -2731,7 +2752,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+        assert res.json_body['code'] == ErrorCode.SAME_VALUE_ERROR
 
     def test_api__update_file_info__err_400__label_already_used(self) -> None:
         """
@@ -2826,7 +2847,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body['code'] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -3070,7 +3091,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__get_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -3326,7 +3347,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert res.json_body['code'] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__create_file__ok__200__in_folder(self) -> None:
         """
@@ -3467,7 +3488,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT
+        assert res.json_body['code'] == ErrorCode.UNALLOWED_SUBCONTENT
 
     def test_api__create_file__err__400__parent_not_found(self) -> None:
         """
@@ -3510,7 +3531,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.PARENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.PARENT_NOT_FOUND
 
     def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -3630,7 +3651,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body['code'] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
 
     def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
@@ -3683,7 +3704,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_IN_NOT_EDITABLE_STATE
+        assert res.json_body['code'] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     @pytest.mark.xfail(
         raises=AssertionError,
@@ -3753,7 +3774,7 @@ class TestFiles(FunctionalTest):
         assert res.status == 400
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body['code'] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3990,7 +4011,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
+        assert res.json_body['code'] == ErrorCode.UNAIVALABLE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
@@ -4106,7 +4127,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
+        assert res.json_body['code'] == ErrorCode.UNAIVALABLE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(self) -> None:
         """
@@ -4344,7 +4365,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.PREVIEW_DIM_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.PREVIEW_DIM_NOT_ALLOWED
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:  # nopep8
         """
@@ -4698,7 +4719,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.UNAVAILABLE_PREVIEW_TYPE
+        assert res.json_body['code'] == ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:  # nopep8
         """
@@ -4756,7 +4777,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
+        assert res.json_body['code'] == ErrorCode.UNAIVALABLE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(self) -> None:
         """
@@ -4881,7 +4902,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
+        assert res.json_body['code'] == ErrorCode.UNAIVALABLE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(self) -> None:
         """
@@ -5016,7 +5037,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.PAGE_OF_PREVIEW_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.PAGE_OF_PREVIEW_NOT_FOUND
 
     def test_api__get_pdf_revision_preview__ok__200__nominal_case(self) -> None:
         """
@@ -5317,6 +5338,68 @@ class TestFiles(FunctionalTest):
         assert res.headers['Content-Disposition'] == 'attachment; filename="{}"; filename*=UTF-8\'\'{};'.format(filename, filename)  # nopep8
         assert res.content_type == 'application/pdf'
 
+    def test_api__set_file_status__err_400__same_status(self) -> None:
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'open',
+        }
+        # set status
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}/status'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE
+
 
 class TestThreads(FunctionalTest):
     """
@@ -5343,7 +5426,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
+        assert res.json_body['code'] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_thread__ok_200__nominal_case(self) -> None:
         """
@@ -5406,7 +5489,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_thread__err_400__content_not_in_workspace(self) -> None:
         """
@@ -5425,7 +5508,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.CONTENT_NOT_FOUND
 
     def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -5444,7 +5527,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -5463,7 +5546,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_INVALID_ID
 
     def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -5482,7 +5565,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.CONTENT_INVALID_ID
+        assert res.json_body['code'] == ErrorCode.CONTENT_INVALID_ID
 
     def test_api__update_thread__ok_200__nominal_case(self) -> None:
         """
@@ -5639,7 +5722,7 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+        assert res.json_body['code'] == ErrorCode.SAME_VALUE_ERROR
 
     def test_api__update_thread__err_400__empty_label(self) -> None:
         """
@@ -5664,7 +5747,7 @@ class TestThreads(FunctionalTest):
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR   # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR   # nopep8
 
     def test_api__get_thread_revisions__ok_200__nominal_case(
             self
@@ -5908,4 +5991,25 @@ class TestThreads(FunctionalTest):
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+
+    def test_api__set_thread_status__err_400__same_status(self) -> None:
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'open',
+        }
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7/status',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ErrorCode.INVALID_STATUS_CHANGE  # nopep8

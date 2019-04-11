@@ -14,10 +14,13 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Sequence
+from sqlalchemy import and_
+from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
@@ -28,6 +31,7 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
 from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
@@ -79,15 +83,6 @@ class Workspace(DeclarativeBase):
 
         return contents
 
-    # TODO - G-M - 27-03-2018 - [Calendar] Replace this in context model object
-    # @property
-    # def calendar_url(self) -> str:
-    #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-    #     from tracim.lib.calendar import CalendarManager
-    #     calendar_manager = CalendarManager(None)
-    #
-    #     return calendar_manager.get_workspace_calendar_url(self.workspace_id)
-
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
             if role.workspace.workspace_id==self.workspace_id:
@@ -98,9 +93,9 @@ class Workspace(DeclarativeBase):
         """ this method is for interoperability with Content class"""
         return self.label
 
-    def get_allowed_content_types(self):
+    def get_allowed_content_types(self) -> typing.List[ContentType]:
         # @see Content.get_allowed_content_types()
-        return content_type_list.endpoint_allowed_types_slug()
+        return content_type_list.endpoint_allowed_types()
 
     def get_valid_children(
             self,
@@ -1138,19 +1133,27 @@ class Content(DeclarativeBase):
     def owner(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.owner
 
-    @hybrid_property
+    @property
     def children(self) -> ['Content']:
         """
         :return: list of children Content
         :rtype Content
         """
-        # Return a list of unique revisions parent content
-        # TODO - G.M - 2018-10-24 - Set is just here to avoid distinct object,
-        # check if possible to do this better, probably using database sorting
-        # and sql distinct.
-        revisions = set([revision.node for revision in self.children_revisions])
-        revisions = sorted(revisions, key=lambda r: r.revision_id)
-        return revisions
+        # TODO - G.M - 2019-02-08 - Refactor this code to be more efficient
+        all_childrens_revisions = object_session(self).query(ContentRevisionRO).filter( ContentRevisionRO.parent_id == self.content_id).all()
+        children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
+        all_up_to_date_revisions_result = object_session(self).query(
+            func.max(ContentRevisionRO.revision_id)
+        ).filter(ContentRevisionRO.content_id.in_(children_content_ids))\
+            .group_by(ContentRevisionRO.content_id).all()
+
+        all_up_to_date_revisions_ids = [value[0] for value in all_up_to_date_revisions_result]
+        valid_children = []
+        for revision in all_childrens_revisions:
+            if revision.revision_id in all_up_to_date_revisions_ids:
+               valid_children.append(revision.node)
+
+        return valid_children
 
     @property
     def revision(self) -> ContentRevisionRO:

@@ -4,6 +4,10 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
+import {
+  Route, withRouter, Redirect
+} from 'react-router-dom'
+import { Switch } from 'react-router'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
@@ -16,9 +20,6 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
-import {
-  Route, withRouter, Redirect
-} from 'react-router-dom'
 import {
   PAGE,
   unLoggedAllowedPageList,
@@ -158,14 +159,7 @@ class Tracim extends React.Component {
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
         <div className='sidebarpagecontainer'>
-          <Route
-            // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
-            // able to access props.match.params.idws
-            // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
-            path='/ui/:first?/:idws?/*' render={() => <Sidebar />}
-            // @FIXME - Côme - 2018/11/02 - upgrade ReactRouter and refactor the route path='/ui' with array of string in this route path
-          />
-          <Route exact strict path='/ui' render={() => <Sidebar />} />
+          <Route render={() => <Sidebar />} />
 
           <Route path={PAGE.LOGIN} component={Login} />
 
@@ -177,30 +171,61 @@ class Tracim extends React.Component {
 
           <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
 
-          <Route path='/ui/workspaces/:idws?' render={() => // Workspace Router
-            <div className='fullWidthFullHeight'>
-              <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
-                <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
-              } />
+          <Route path='/ui/workspaces/:idws?' render={() => [// Workspace Router
+            // @FIXME - CH - 2018-03-26 - the use of array in a render function avoid having to wrap everything into
+            // a wrapper div.
+            // This is required here to avoid having the div.tracim__content in the calendars pages.
+            // To fix this, upgrade React to at least 16.2.0 and use the first class component React.Fragment instead
+            // of the array syntax that is kind of misleading. Also remove the key props
+            <Route exact path={PAGE.WORKSPACE.ROOT} key='workspace_root' render={() =>
+              <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
+            } />,
 
-              <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-                <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
-              } />
+            <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} key='workspace_redirect_to_contentlist' render={props2 => // handle '/workspaces/:id' and add '/contents'
+              <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
+            } />,
 
-              <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
-              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
-              <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
-              <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
-            </div>
-          } />
+            <Switch>
+              <Route
+                path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')}
+                key='workspace_content'
+                render={() =>
+                  <div className='tracim__content fullWidthFullHeight'>
+                    <WorkspaceContent />
+                  </div>
+                }
+              />
+              <Route
+                path={PAGE.WORKSPACE.CONTENT_LIST(':idws')}
+                key='workspace_contentlist'
+                render={() =>
+                  <div className='tracim__content fullWidthFullHeight'>
+                    <WorkspaceContent />
+                  </div>
+                }
+              />
+            </Switch>,
+
+            <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
+              <div className='tracim__content fullWidthFullHeight'>
+                <Dashboard />
+              </div>
+            } />,
+
+            <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} key='workspace_calendar' render={() =>
+              <AppFullscreenRouter />
+            } />
+          ]} />
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
           <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() => <AdminAccount />} />
 
-          <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
-
-          <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
+          <Route exact path={[
+            PAGE.ADMIN.USER,
+            PAGE.ADMIN.WORKSPACE,
+            PAGE.CALENDAR
+          ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 

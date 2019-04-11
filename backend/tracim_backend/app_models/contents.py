@@ -8,6 +8,7 @@ from tracim_backend.extensions import app_list
 ####
 # Content Status
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
@@ -39,11 +40,10 @@ class ContentStatus(object):
     def is_editable(self):
         return self.global_status == GlobalStatus.OPEN.value
 
-
 open_status = ContentStatus(
     slug='open',
     global_status=GlobalStatus.OPEN.value,
-    label='Open',
+    label=_('Open'),
     fa_icon='square-o',
     hexcolor='#3f52e3',
 )
@@ -51,7 +51,7 @@ open_status = ContentStatus(
 closed_validated_status = ContentStatus(
     slug='closed-validated',
     global_status=GlobalStatus.CLOSED.value,
-    label='Validated',
+    label=_('Validated'),
     fa_icon='check-square-o',
     hexcolor='#008000',
 )
@@ -59,7 +59,7 @@ closed_validated_status = ContentStatus(
 closed_unvalidated_status = ContentStatus(
     slug='closed-unvalidated',
     global_status=GlobalStatus.CLOSED.value,
-    label='Cancelled',
+    label=_('Cancelled'),
     fa_icon='close',
     hexcolor='#f63434',
 )
@@ -67,7 +67,7 @@ closed_unvalidated_status = ContentStatus(
 closed_deprecated_status = ContentStatus(
     slug='closed-deprecated',
     global_status=GlobalStatus.CLOSED.value,
-    label='Deprecated',
+    label=_('Deprecated'),
     fa_icon='warning',
     hexcolor='#ababab',
 )
@@ -223,13 +223,22 @@ class ContentTypeList(object):
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
         return allowed_type_slug
 
-    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+    def endpoint_allowed_types(self) -> typing.List[ContentType]:
         """
-        Same as restricted_allowed_types_slug but with special content_type
-        included like comments.
+        Same as restricted_allowed_types_slug but return
+        ContentType instead of str slug
+        and add special content_type included like comments.
         """
         content_types = self._content_types
         content_types.extend(self._special_contents_types)
+        return content_types
+
+    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+        """
+        same as endpoint_allowed_types but return str slug
+        instead of ContentType
+        """
+        content_types = self.endpoint_allowed_types()
         allowed_type_slug = [contents_type.slug for contents_type in content_types]  # nopep8
         return allowed_type_slug
 

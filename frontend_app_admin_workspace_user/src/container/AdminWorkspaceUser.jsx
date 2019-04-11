@@ -12,7 +12,6 @@ import { debug } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
-  // getWorkspaceDetail,
   deleteWorkspace,
   getUserList,
   getUserDetail,
@@ -247,6 +246,7 @@ class AdminWorkspaceUser extends React.Component {
         return true
       case 400:
         switch (newUserResult.body.code) {
+          case 2001: this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning'); break
           case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
           default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
         }
@@ -288,13 +288,8 @@ class AdminWorkspaceUser extends React.Component {
     this.setState({workspaceIdOpened: idWorkspace})
   }
 
-  handleClickUser = idUser => {
-    GLOBAL_dispatchEvent({
-      type: 'redirect',
-      data: {
-        url: `/ui/admin/user/${idUser}`
-      }
-    })
+  handleClickNewWorkspace = () => {
+    GLOBAL_dispatchEvent({type: 'showCreateWorkspacePopup', data: {}})
   }
 
   render () {
@@ -308,6 +303,7 @@ class AdminWorkspaceUser extends React.Component {
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickWorkspace}
+            onClickNewWorkspace={this.handleClickNewWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
           />
         )}
@@ -318,7 +314,6 @@ class AdminWorkspaceUser extends React.Component {
             idLoggedUser={state.loggedUser.user_id}
             profile={state.config.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
-            onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}

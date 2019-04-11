@@ -101,13 +101,14 @@ Cypress.Commands.add('loginAs', (role = 'administrators') => {
     }))
     .then(response => cy.request({
       method: 'PUT',
-      url: '/api/v2/users/'+response.body.user_id,
+      url: '/api/v2/users/' + response.body.user_id,
       body: {
-        "lang": "en",
-        "public_name": response.body.public_name,
-        "timezone": "Europe/Paris"
-        }
-    })).then(response => response.body)
+        lang: 'en',
+        public_name: response.body.public_name,
+        timezone: 'Europe/Paris'
+      }
+    }))
+    .then(response => response.body)
 })
 
 Cypress.Commands.add('logout', () => {
@@ -115,25 +116,23 @@ Cypress.Commands.add('logout', () => {
 })
 
 Cypress.Commands.add('typeInTinyMCE', (content) => {
-  // console.log('TARACE')
-  // activeEditor.setContent(content)
-  // activeEditor.save()
-  // console.log('in typeintinymce, before cy.window')
   cy.window()
     .its('tinyMCE')
     .its('activeEditor')
     .then(activeEditor => {
-      console.log('TARACE')
       activeEditor.setContent(content)
-      activeEditor.save()
     })
-
-  // cy.window()
-  //   .then(win => {
-  //     console.log('typeintinymce, cy.window. win: ', win)
-  //     win.tinyMCE.activeEditor.setContent(content)
-  //     win.save()
-  //   })
+    .then(editor => {
+        cy.window()
+      .its('tinyMCE')
+      .its('activeEditor')
+      .then(activeEditor => {
+        cy.log(activeEditor)
+        activeEditor.save()
+        cy.wait(5000)
+      })
+    })
+    cy.get('#wysiwygNewVersion').trigger('change', { force: true })
 })
 
 Cypress.Commands.add('assertTinyMCEContent', (content) => {
@@ -148,7 +147,9 @@ Cypress.Commands.add('assertTinyMCEContent', (content) => {
 Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
   const assertion = (isActive ? assert.isNotNull : assert.isNull)
   const message = (isActive ? 'tinyMCE is active' : 'tinyMCE is not active')
-  cy.window().then(window => assertion(window.tinyMCE.activeEditor, message))
+  cy.window().then(win => {
+    assertion(win.tinyMCE.activeEditor, message)
+  })
 })
 
 Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector) => {

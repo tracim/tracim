@@ -255,20 +255,27 @@ class File extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { props, state } = this
 
-    const fetchResultSaveFile = putFileContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveFile = await handleFetchResult(
+      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newTitle, state.content.raw_content)
+    )
 
-    handleFetchResult(await fetchResultSaveFile)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.loadContent()
-          this.loadTimeline()
-          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
-        } else {
-          console.warn('Error saving file. Result:', resSave, 'content:', content, 'config:', config)
+    switch (fetchResultSaveFile.apiResponse.status) {
+      case 200:
+        this.loadContent()
+        this.loadTimeline()
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        break
+      case 400:
+        switch (fetchResultSaveFile.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
-      })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+    }
   }
 
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
@@ -330,19 +337,21 @@ class File extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveEditStatus = putFileStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    if (newStatus === state.content.status) return
 
-    handleFetchResult(await fetchResultSaveEditStatus)
-      .then(resSave => {
-        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
-          console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
-        } else {
-          this.loadContent()
-          this.loadTimeline()
-        }
-      })
+    const fetchResultSaveEditStatus = await handleFetchResult(
+      await putFileStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+    )
+
+    switch (fetchResultSaveEditStatus.status) {
+      case 204:
+        this.loadContent()
+        this.loadTimeline()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
+    }
   }
 
   handleClickArchive = async () => {
@@ -420,14 +429,16 @@ class File extends React.Component {
       content: {
         ...prev.content,
         ...revision,
+        workspace_id: state.content.workspace_id, // don't overrides workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
         filenameNoExtension: filenameNoExtension,
         current_revision_id: revision.revision_id,
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
+        // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-          `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
+          `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
         )
       },
       fileCurrentPage: 1, // always set to first page on revision switch
@@ -659,6 +670,7 @@ class File extends React.Component {
             timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

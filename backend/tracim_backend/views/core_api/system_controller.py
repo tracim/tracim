@@ -17,6 +17,7 @@ from tracim_backend.views.core_api.schemas import AboutSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
+from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 
 try:  # Python 3.5+
@@ -89,6 +90,13 @@ class SystemController(Controller):
         system_api = SystemApi(app_config)
         return system_api.get_config()
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @hapic.output_body(ErrorCodeSchema(many=True))
+    def error_codes(self, context, request: TracimRequest, hapic_data=None):
+        app_config = request.registry.settings['CFG']
+        system_api = SystemApi(app_config)
+        return system_api.get_error_codes()
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -102,6 +110,10 @@ class SystemController(Controller):
         # Config
         configurator.add_route('config', '/system/config', request_method='GET')  # nopep8
         configurator.add_view(self.config, route_name='config')
+
+        # Errors codes
+        configurator.add_route('error_codes', '/system/error_codes', request_method='GET')  # nopep8
+        configurator.add_view(self.error_codes, route_name='error_codes')
 
         # Applications
         configurator.add_route('applications', '/system/applications', request_method='GET')  # nopep8

@@ -39,10 +39,11 @@ from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.utils import normpath
+from tracim_backend.lib.utils.utils import add_trailing_slash
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
-from tracim_backend.lib.webdav.design import designPage
-from tracim_backend.lib.webdav.design import designThread
+from tracim_backend.lib.webdav.design import design_page
+from tracim_backend.lib.webdav.design import design_thread
 from tracim_backend.lib.webdav.utils import FakeFileStream
 from tracim_backend.lib.webdav.utils import HistoryType
 from tracim_backend.models.data import ActionDescription
@@ -142,7 +143,10 @@ class RootResource(DAVCollection):
 
         Though for perfomance issue, we're not using this function anymore
         """
-        return [workspace.label for workspace in self.workspace_api.get_all()]
+        return [
+            webdav_convert_file_name_to_display(workspace.label)
+            for workspace in self.workspace_api.get_all()
+        ]
 
     @webdav_check_right(is_user)
     def getMember(self, label: str) -> DAVCollection:
@@ -153,8 +157,9 @@ class RootResource(DAVCollection):
         """
         try:
             workspace = self.workspace_api.get_one_by_label(label)
+            # fix path
             workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(workspace.label))
-
+            # return item
             return WorkspaceResource(
                 workspace_path,
                 self.environ,
@@ -186,14 +191,17 @@ class RootResource(DAVCollection):
         """
         # TODO : remove comment here
         # raise DAVError(HTTP_FORBIDDEN)
-
-        new_workspace = self.workspace_api.create_workspace(name)
+        workspace_name = webdav_convert_file_name_to_bdd(name)
+        new_workspace = self.workspace_api.create_workspace(workspace_name)
         self.workspace_api.save(new_workspace)
-
-        workspace_path = '%s%s%s' % (
-            self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(new_workspace.label))
-
+        self.workspace_api.execute_created_workspace_actions(new_workspace)
         transaction.commit()
+        # fix path
+        workspace_path = '%s%s%s' % (
+            self.path, '' if self.path == '/' else '/', webdav_convert_file_name_to_display(new_workspace.label)
+        )
+
+        # create item
         return WorkspaceResource(
             workspace_path,
             self.environ,
@@ -210,7 +218,11 @@ class RootResource(DAVCollection):
 
         members = []
         for workspace in self.workspace_api.get_all():
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', workspace.label)
+            # fix path
+            workspace_label = webdav_convert_file_name_to_display(workspace.label)
+            path = add_trailing_slash(self.path)
+            # return item
+            workspace_path = '{}{}'.format(path, workspace_label)
             members.append(
                 WorkspaceResource(
                     path=workspace_path,
@@ -284,7 +296,7 @@ class WorkspaceResource(DAVCollection):
             # the purpose is to display .history only if there's at least one content's type that has a history
             if content.type != content_type_list.Folder.slug:
                 self._file_count += 1
-            retlist.append(content.file_name)
+            retlist.append(webdav_convert_file_name_to_display(content.file_name))
 
         return retlist
 
@@ -308,19 +320,22 @@ class WorkspaceResource(DAVCollection):
         content = None
 
         # Note: To prevent bugs, check here again if resource already exist
+        # fixed path
+        fixed_file_name = webdav_convert_file_name_to_display(file_name)
         path = os.path.join(self.path, file_name)
         resource = self.provider.getResourceInst(path, self.environ)
         if resource:
             content = resource.content
 
+        # return item
         return FakeFileStream(
             session=self.session,
-            file_name=file_name,
+            file_name=fixed_file_name,
             content_api=self.content_api,
             workspace=self.workspace,
             content=content,
             parent=self.content,
-            path=self.path + '/' + file_name
+            path=self.path + '/' + fixed_file_name
         )
 
     @webdav_check_right(is_content_manager)
@@ -334,12 +349,12 @@ class WorkspaceResource(DAVCollection):
 
         if '/.deleted/' in self.path or '/.archived/' in self.path:
             raise DAVError(HTTP_FORBIDDEN)
-
+        folder_label = webdav_convert_file_name_to_bdd(label)
         try:
             folder = self.content_api.create(
                 content_type_slug=content_type_list.Folder.slug,
                 workspace=self.workspace,
-                label=label,
+                label=folder_label,
                 parent=self.content
             )
         except TracimException as exc:
@@ -348,13 +363,16 @@ class WorkspaceResource(DAVCollection):
         self.content_api.save(folder)
 
         transaction.commit()
-
-        return FolderResource('%s/%s' % (self.path, webdav_convert_file_name_to_display(label)),
-                              self.environ,
-                              content=folder,
-                              tracim_context=self.tracim_context,
-                              workspace=self.workspace,
-                              )
+        # fixed_path
+        folder_path = '%s/%s' % (self.path, webdav_convert_file_name_to_display(label))
+        # return item
+        return FolderResource(
+            folder_path,
+            self.environ,
+            content=folder,
+            tracim_context=self.tracim_context,
+            workspace=self.workspace,
+        )
 
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
@@ -382,7 +400,7 @@ class WorkspaceResource(DAVCollection):
                 raise DAVError(HTTP_FORBIDDEN)
 
             try:
-                self.workspace.label = basename(normpath(destpath))
+                self.workspace.label = webdav_convert_file_name_to_bdd(basename(normpath(destpath)))
                 self.session.add(self.workspace)
                 self.session.flush()
                 transaction.commit()
@@ -581,14 +599,18 @@ class FolderResource(WorkspaceResource):
                 tm=transaction.manager,
                 session=self.session,
             ):
+                # renaming file if needed
                 if basename(destpath) != self.getDisplayName():
                     self.content_api.update_content(self.content, webdav_convert_file_name_to_bdd(basename(destpath)))
                     self.content_api.save(self.content)
-                else:
-                    if destination_workspace.workspace_id == self.content.workspace.workspace_id:
-                        self.content_api.move(self.content, destination_parent)
-                    else:
-                        self.content_api.move_recursively(self.content, destination_parent, destination_workspace)
+                # move file if needed
+                if destination_workspace != self.content.workspace or destination_parent != self.content.parent :
+                    self.content_api.move(
+                        self.content,
+                        new_parent=destination_parent,
+                        new_workspace=destination_workspace,
+                        must_stay_in_same_workspace=False
+                    )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
@@ -974,11 +996,19 @@ class OtherFileResource(FileResource):
         }
 
     def design(self):
-        if self.content.type == content_type_list.Page.slug:
-            return designPage(self.content, self.content_revision)
-        else:
-            return designThread(
+        if (
+            content_type_list.get_one_by_slug(self.content.type) ==
+            content_type_list.Page
+        ):
+            return design_page(self.content, self.content_revision)
+        if (
+            content_type_list.get_one_by_slug(self.content.type) ==
+            content_type_list.Thread
+        ):
+            return design_thread(
                 self.content,
                 self.content_revision,
-                self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug)
+                self.content_api.get_all(
+                    [self.content.content_id], content_type_list.Comment.slug
+                )
             )

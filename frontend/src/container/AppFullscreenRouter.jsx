@@ -48,6 +48,22 @@ class AppFullscreenRouter extends React.Component {
               props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user'}, props.user, content)
               return null
             }} />
+
+            <Route exact path={PAGE.CALENDAR} render={() => {
+              const calendarConfig = {
+                idWorkspace: null
+              }
+              props.renderAppFullscreen({slug: 'calendar', hexcolor: '#7d4e24', appConfig: calendarConfig}, props.user, {})
+              return null
+            }} />
+
+            <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} render={() => {
+              const calendarConfig = {
+                idWorkspace: props.match.params.idws
+              }
+              props.renderAppFullscreen({slug: 'calendar', hexcolor: '#7d4e24', appConfig: calendarConfig}, props.user, {})
+              return null
+            }} />
           </div>
         )}
       </div>

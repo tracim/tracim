@@ -1,5 +1,8 @@
+import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords } from 'date-fns'
+import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
+
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
   en: require('date-fns/locale/en')
@@ -13,25 +16,33 @@ const generateFetchResponse = async fetchResult => {
   }))
 }
 
-export const handleFetchResult = async fetchResult => {
-  switch (fetchResult.status) {
-    case 204: return fetchResult
-    case 401:
-      GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}})
-      return generateFetchResponse(fetchResult)
-    case 500:
-      GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: i18n.t('Unexpected error, please inform an administrator'),
-          type: 'danger',
-          delay: undefined
-        }
-      })
-      return generateFetchResponse(fetchResult)
-    default:
-      return generateFetchResponse(fetchResult)
+const errorFlashMessageTemplateObject = errorMsg => ({
+  type: 'addFlashMsg',
+  data: {
+    msg: <ErrorFlashMessageTemplateHtml errorMsg={errorMsg} />,
+    type: 'danger',
+    delay: 30000
   }
+})
+
+export const handleFetchResult = async fetchResult => {
+  const status = fetchResult.status
+
+  if (status === 204) return fetchResult // no result
+  if (status >= 200 && status <= 299) return generateFetchResponse(fetchResult)
+  if (status >= 300 && status <= 399) return generateFetchResponse(fetchResult)
+  if (status === 401) { // unauthorized
+    GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}})
+    return generateFetchResponse(fetchResult)
+  }
+  if (status >= 400 && status <= 499) return generateFetchResponse(fetchResult) // let specific handler handle it with fetchResult.body.code
+  if (status >= 500 && status <= 599) {
+    GLOBAL_dispatchEvent(errorFlashMessageTemplateObject(`Unexpected api error with http status ${status}`)) // no need for translation
+    return generateFetchResponse(fetchResult)
+  }
+
+  GLOBAL_dispatchEvent(errorFlashMessageTemplateObject(`Unknown http status ${status}`)) // no need for translation
+  return generateFetchResponse(fetchResult)
 }
 
 export const addAllResourceI18n = (i18nFromApp, translation, activeLang) => {
@@ -74,7 +85,7 @@ export const revisionTypeList = [{
 }, {
   id: 'status-update',
   faIcon: 'random',
-  label: i18n.t('New status')
+  label: statusLabel => i18n.t('Status changed to {{status}}', {status: statusLabel})
 }, {
   id: 'unarchiving',
   faIcon: 'file-archive-o',

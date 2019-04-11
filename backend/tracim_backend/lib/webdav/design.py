@@ -161,7 +161,7 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
     return aff
 
 
-def designPage(
+def design_page(
     content: data.Content,
     content_revision: data.ContentRevisionRO
 ) -> str:
@@ -169,11 +169,15 @@ def designPage(
     return content_revision.description
 
 
-def designThread(
+def design_thread(
     content: data.Content,
     content_revision: data.ContentRevisionRO,
     comments
 ) -> str:
+
+        if len(comments) == 0:
+            return ''
+
         first_comment = comments[0]
         thread = THREAD_MESSAGE.format(
             posting_time=format_datetime(

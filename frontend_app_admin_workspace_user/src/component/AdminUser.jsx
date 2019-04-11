@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import {
   Delimiter,
   PageWrapper,
@@ -113,7 +114,6 @@ export class AdminUser extends React.Component {
         />
 
         <PageContent parentClass='adminUser'>
-
           <div className='adminUser__description'>
             {props.t('On this page you can manage the users of your Tracim instance.')}
           </div>
@@ -128,19 +128,12 @@ export class AdminUser extends React.Component {
             </button>
 
             <div className='adminUser__adduser__emailstate'>
-              {props.emailNotifActivated
-                ? (
-                  <div className=''>
-                    <i className='fa fa-envelope' /> {props.t('Email notification activated')}
-                  </div>
-                )
-                : (
-                  <div>
-                    <i className='primaryColorFont fa fa-fw fa-warning' />
-                    {props.t('Email notification are disabled, please notify users of any change')}
-                  </div>
-                )
-              }
+              {!props.emailNotifActivated && (
+                <div>
+                  <i className='primaryColorFont fa fa-fw fa-warning' />
+                  {props.t('Email notification are disabled, please manually notify users of any change')}
+                </div>
+              )}
             </div>
 
           </div>
@@ -196,9 +189,10 @@ export class AdminUser extends React.Component {
 
                       <td
                         className='adminUser__table__tr__td-link primaryColorFont'
-                        onClick={e => this.handleClickUser(e, u.user_id)}
                       >
-                        {u.public_name}
+                        <Link to={`/ui/admin/user/${u.user_id}`}>
+                          {u.public_name}
+                        </Link>
                       </td>
 
                       <td>{u.email}</td>

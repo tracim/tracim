@@ -71,7 +71,7 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-archive' />
-              {props.t('This content is archived.')}
+              {props.t('This content is archived')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreArchived}>
@@ -85,7 +85,7 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-trash' />
-              {props.t('This content is deleted.')}
+              {props.t('This content is deleted')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreDeleted}>
@@ -119,9 +119,11 @@ class Timeline extends React.Component {
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
                     number={content.number}
-                    key={`revision_${content.revision_id}`}
+                    status={props.availableStatusList.find(status => status.slug === content.status)}
+                    authorPublicName={content.author.public_name}
                     allowClickOnRevision={props.allowClickOnRevision}
                     onClickRevision={() => props.onClickRevisionBtn(content)}
+                    key={`revision_${content.revision_id}`}
                   />
               }
             })}

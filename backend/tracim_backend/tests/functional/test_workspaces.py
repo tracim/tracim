@@ -9,7 +9,7 @@ from depot.io.utils import FileIntent
 
 
 from tracim_backend import AuthType
-from tracim_backend import error
+from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import UserAuthTypeDisabled
@@ -26,6 +26,7 @@ from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests import MailHogFunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
 
 
@@ -198,7 +199,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         params = {
             'label': 'superworkspace',
-            'description': 'mysuperdescription'
+            'description': 'mysuperdescription',
+            'calendar_enabled': False,
         }
         # Before
         res = self.testapp.get(
@@ -213,6 +215,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'All importants documents'
         assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
+        assert workspace['calendar_enabled'] == True
 
         # modify workspace
         res = self.testapp.put_json(
@@ -228,6 +231,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'mysuperdescription'
         assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
+        assert workspace['calendar_enabled'] == False
 
         # after
         res = self.testapp.get(
@@ -242,6 +246,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'mysuperdescription'
         assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
+        assert workspace['calendar_enabled'] == False
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:
         """
@@ -265,7 +270,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__create_workspace__ok_200__nominal_case(self) -> None:
         """
@@ -280,7 +285,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         params = {
             'label': 'superworkspace',
-            'description': 'mysuperdescription'
+            'description': 'mysuperdescription',
+            'calendar_enabled': False,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces',
@@ -289,6 +295,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert res.json_body
         workspace = res.json_body
+        assert workspace['label'] == 'superworkspace'
+        assert workspace['calendar_enabled'] == False
+        assert workspace['description'] == 'mysuperdescription'
         workspace_id = res.json_body['workspace_id']
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
@@ -324,7 +333,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_LABEL_ALREADY_USED
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_LABEL_ALREADY_USED
 
     def test_api__create_workspace__err_400__empty_label(self) -> None:
         """
@@ -348,7 +357,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__delete_workspace__ok_200__admin(self) -> None:
         """
@@ -411,7 +420,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND  # nopep8
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND  # nopep8
         self.testapp.authorization = (
             'Basic',
             (
@@ -543,7 +552,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_PROFILE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -607,7 +616,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -667,7 +676,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__undelete_workspace__ok_200__admin(self) -> None:
         """
@@ -731,7 +740,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND  # nopep8
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND  # nopep8
 
         self.testapp.authorization = (
             'Basic',
@@ -866,7 +875,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_PROFILE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -931,7 +940,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -991,7 +1000,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
 
     def test_api__get_workspace__err_400__unallowed_user(self) -> None:
         """
@@ -1007,7 +1016,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1043,7 +1052,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1126,7 +1135,7 @@ class TestWorkspacesEndpoints(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces', status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_PROFILE
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1257,7 +1266,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/members', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1448,7 +1457,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/members/1', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1485,7 +1494,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5/members', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1760,7 +1769,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_ACTIVE
+        assert res.json_body['code'] == ErrorCode.USER_NOT_ACTIVE
 
     def test_api__create_workspace_member_role__err_400__user_email__user_deleted(self):  # nopep8
         """
@@ -1802,7 +1811,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_DELETED
+        assert res.json_body['code'] == ErrorCode.USER_DELETED
 
     def test_api__create_workspace_member_role__ok_200__user_public_name(self):
         """
@@ -1878,7 +1887,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_ROLE_ALREADY_EXIST
+        assert res.json_body['code'] == ErrorCode.USER_ROLE_ALREADY_EXIST
 
     def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):  # nopep8
         """
@@ -1906,7 +1915,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_NOT_FOUND
 
     def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):  # nopep8
         """
@@ -1934,7 +1943,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_NOT_FOUND
 
     def test_api__create_workspace_member_role__err_400__notification_disabled_user_not_found(self):  # nopep8
         """
@@ -1962,7 +1971,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__nominal_case(self):
         """
@@ -2102,7 +2111,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_ROLE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_ROLE_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__as_admin(self):
         """
@@ -2347,7 +2356,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_ROLE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_ROLE_NOT_FOUND
 
     def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):  # nopep8
         """
@@ -2401,7 +2410,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             ),
             status=400,
         )
-        assert res.json_body['code'] == error.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE  # nopep8
         # after
         roles = self.testapp.get('/api/v2/workspaces/{}/members'.format(workspace.workspace_id), status=200).json_body   # nopep8
         assert user2.user_id in [role['user_id'] for role in roles]
@@ -2460,7 +2469,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         # after
         roles = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/members'.format(
@@ -2471,7 +2480,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
 
 
-class TestUserInvitationWithMailActivatedSync(FunctionalTest):
+
+class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
     config_section = 'functional_test_with_mail_test_sync'
@@ -2512,7 +2522,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -2556,16 +2565,12 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert res['profile'] == 'users'
 
         # check mail received
-        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
-        response = response.json()
+        response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
         assert headers['To'][0] == 'bob <bob@bob.bob>'
         assert headers['Subject'][0] == '[TRACIM] Created account'
-
-        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(self):  # nopep8
         """
@@ -2603,7 +2608,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
 
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
         self.testapp.authorization = (
             'Basic',
             (
@@ -2625,7 +2629,152 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_NOT_FOUND
+
+class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalTest):
+
+    fixtures = [BaseFixture, ContentFixtures]
+    config_section = 'functional_test_with_mail_test_sync_with_auto_notif'
+
+    def test_api__create_workspace_member_role__ok_200__new_user_notif(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        self.cleanup_mailhog()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_public_name': None,
+            'user_email': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{}/members'.format(workspace.workspace_id),
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id']
+        user_id = user_role_found['user_id']
+        assert user_role_found['workspace_id'] == workspace.workspace_id
+        assert user_role_found['newly_created'] is True
+        assert user_role_found['email_sent'] is True
+        assert user_role_found['do_notify'] is True
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['profile'] == 'users'
+
+        # check mail received
+        response = self.get_mailhog_mails()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] Created account'
+        # check for notification to new user, user should not be notified
+        # until it connected to tracim.
+        self.cleanup_mailhog()
+        api = ContentApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config
+        )
+        api.create(
+            content_type_slug='html-document',
+            workspace=workspace,
+            label='test_document',
+            do_save=True,
+        )
+        transaction.commit()
+        response = self.get_mailhog_mails()
+        assert len(response) == 0
+        # check for notification to new connected user, user should not be notified
+        # until it connected to tracim.
+        bob = uapi.get_one_by_email(email='bob@bob.bob')
+        uapi.update(user=bob, password='bob@bob.bob', do_save=True)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@bob.bob',
+                'bob@bob.bob'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/auth/whoami',
+            status=200,
+        )
+        self.cleanup_mailhog()
+        api = ContentApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config
+        )
+        api.create(
+            content_type_slug='html-document',
+            workspace=workspace,
+            label='test_document2',
+            do_save=True,
+        )
+        transaction.commit()
+        response = self.get_mailhog_mails()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Global manager via Tracim <test_user_from+1@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] [test] test_document2 (Open)'
+
 
 class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
 
@@ -2752,7 +2901,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.USER_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.USER_NOT_FOUND
 
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmailDisabled(FunctionalTest):
 
@@ -4329,7 +4478,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -4366,7 +4515,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -4474,7 +4623,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert res.json_body['code'] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:  # nopep8
         """
@@ -4547,7 +4696,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__post_content_create_generic_content__err_400__parent_not_found(self) -> None:  # nopep8
         """
@@ -4572,7 +4721,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.PARENT_NOT_FOUND  # nopep8
+        assert res.json_body['code'] == ErrorCode.PARENT_NOT_FOUND  # nopep8
 
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
         """
@@ -4643,7 +4792,7 @@ class TestWorkspaceContents(FunctionalTest):
             status=400
         )
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8'
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8'
 
     def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
         """
@@ -4665,7 +4814,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_EXIST  # nopep8
+        assert res.json_body['code'] == ErrorCode.CONTENT_TYPE_NOT_EXIST  # nopep8
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
@@ -4719,7 +4868,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT  # nopep8
+        assert res.json_body['code'] == ErrorCode.UNALLOWED_SUBCONTENT  # nopep8
         # allowed_content_type
         params = {
             'label': 'GenericCreatedContent',
@@ -4799,7 +4948,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
     def test_api__post_content_create_generic_content__ok_200__try_creating_folder_as_content_manager(self) -> None:  # nopep8
         """
@@ -4944,7 +5093,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400
         )
-        assert res.json_body['code'] == error.UNALLOWED_SUBCONTENT
+        assert res.json_body['code'] == ErrorCode.UNALLOWED_SUBCONTENT
 
     def test_api_put_move_content__ok_200__unallowed_sub_content_renaming(self):
         """
@@ -5226,6 +5375,142 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['content_id'] == 8
         assert res.json_body['workspace_id'] == 1
 
+    def test_api_put_move_content__ok_200__to_another_workspace_folder_and_subcontents(self):
+        """
+        correctly move content from projectA_workspace to another projectA_workspace recursively
+        move all folder documentation from projectA to projectB projectA_workspace
+        - Workspace projectA
+          - folder: documentation
+            - html-document: report_product_47EA
+            - schemas
+              - readme.txt
+        - Workspace projectB
+        :return:
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User) \
+            .filter(User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        projectA_workspace = workspace_api.create_workspace('projectA', save_now=True)  # nopep8
+        projectB_workspace = workspace_api.create_workspace('projectB', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+
+        documentation_folder = content_api.create(
+            label='documentation',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=projectA_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        report = content_api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=projectA_workspace,
+            parent=documentation_folder,
+            label='report_product_47EA',
+            do_save=True,
+            do_notify=False,
+        )
+        schema_folder = content_api.create(
+            label='schemas',
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=projectA_workspace,
+            parent=documentation_folder,
+            do_save=True,
+            do_notify=False
+        )
+        readme_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=projectA_workspace,
+            parent=schema_folder,
+            filename='readme.txt',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=readme_file,
+        ):
+            content_api.update_file_data(
+                readme_file,
+                'readme.txt',
+                new_mimetype='plain/text',
+                new_content=b'To be completed',
+            )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': None,  # root
+            'new_workspace_id': projectB_workspace.workspace_id,
+        }
+        # verify coherence of workspace content first.
+        projectA_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectA_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectA_workspace_contents) == 4
+        assert not [content for content in projectA_workspace_contents if content['workspace_id'] != projectA_workspace.workspace_id]
+        projectB_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectB_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectB_workspace_contents) == 0
+        assert not [content for content in projectB_workspace_contents if content['workspace_id'] != projectB_workspace.workspace_id]
+
+        params = {
+            'new_parent_id': None,  # root
+            'new_workspace_id': projectB_workspace.workspace_id,
+        }
+        self.testapp.put_json(
+            '/api/v2/workspaces/{}/contents/{}/move'.format(
+                projectA_workspace.workspace_id,
+                documentation_folder.content_id
+            ),
+            params=params,
+            status=200
+        )
+
+        # verify coherence of workspace after
+        projectA_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectA_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectA_workspace_contents) == 0
+        assert not [content for content in projectA_workspace_contents if content['workspace_id'] != projectA_workspace.workspace_id]
+        projectB_workspace_contents = self.testapp.get('/api/v2/workspaces/{}/contents'.format(projectB_workspace.workspace_id), status=200).json_body  # nopep8
+        assert len(projectB_workspace_contents) == 4
+        assert not [content for content in projectB_workspace_contents if content['workspace_id'] != projectB_workspace.workspace_id]
+
+
+
+
     def test_api_put_move_content__ok_200__to_another_workspace_root(self):
         """
         Move content
@@ -5311,7 +5596,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        assert res.json_body['code'] == error.WORKSPACE_DO_NOT_MATCH
+        assert res.json_body['code'] == ErrorCode.WORKSPACE_DO_NOT_MATCH
 
     def test_api_put_delete_content__ok_200__nominal_case(self):
         """

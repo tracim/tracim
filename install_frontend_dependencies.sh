@@ -140,6 +140,15 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 
 
+# install app Folder Advanced
+log "cd $DEFAULTDIR/frontend_app_calendar"
+cd $DEFAULTDIR/frontend_app_calendar  || exit 1
+log "npm i"
+npm i && loggood "success" || logerror "some error"
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+
+
 # install Tracim Frontend
 log "cd $DEFAULTDIR/frontend"
 cd $DEFAULTDIR/frontend  || exit 1

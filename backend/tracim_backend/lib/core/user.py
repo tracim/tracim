@@ -19,7 +19,9 @@ from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import CalendarServerConnectionError
 from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import \
     ExternalAuthUserEmailModificationDisallowed
@@ -48,6 +50,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.lib.calendar.calendar import CalendarApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.lib.utils.logger import logger
@@ -300,7 +303,7 @@ class UserApi(object):
             if self._config.LDAP_NAME_ATTR:
                 name = ldap_data[self._config.LDAP_NAME_ATTR][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
-            self.create_user(
+            user = self.create_user(
                 email=email,
                 name=name,
                 groups=groups,
@@ -308,6 +311,7 @@ class UserApi(object):
                 do_save=True,
                 do_notify=False
             )
+            self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-11-08 - get new created user
             user = self.get_one_by_email(email)
@@ -387,13 +391,14 @@ class UserApi(object):
         # INFO - G.M - 2018-12-12 - Create new user
         if not user:
             groups = None
-            self.create_user(
+            user = self.create_user(
                 email=email,
                 groups=groups,
                 auth_type=AuthType.REMOTE,
                 do_save=True,
                 do_notify=False
             )
+            self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-12-02 - get new created user
             user = self.get_one_by_email(email)
@@ -855,6 +860,9 @@ class UserApi(object):
             email_manager.notify_reset_password(user, token)
         except SMTPException as exc:
             raise NotificationSendingFailed("SMTP error, can't send notification") from exc
+        except EmailTemplateError as exc:
+            raise exc
+
         if do_save:
             self.save(user)
         return token
@@ -864,7 +872,7 @@ class UserApi(object):
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
             token=token,
-            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_VALIDITY,
+            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
@@ -899,40 +907,48 @@ class UserApi(object):
     def save(self, user: User):
         self._session.flush()
 
-    def execute_created_user_actions(self, created_user: User) -> None:
+    def execute_created_user_actions(self, user: User) -> None:
         """
         Execute actions when user just been created
         :return:
         """
-        # NOTE: Cyclic import
-        # TODO - G.M - 28-03-2018 - [Calendar] Reenable Calendar stuff
-        #from tracim.lib.calendar import CalendarManager
-        #from tracim.model.organisational import UserCalendar
 
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with
         # new auth system
-        created_user.ensure_auth_token(
+        user.ensure_auth_token(
             validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY
         )
 
-        # Ensure database is up-to-date
-        self._session.flush()
-        transaction.commit()
-
-        # TODO - G.M - 28-03-2018 - [Calendar] Reenable Calendar stuff
-        # calendar_manager = CalendarManager(created_user)
-        # calendar_manager.create_then_remove_fake_event(
-        #     calendar_class=UserCalendar,
-        #     related_object_id=created_user.user_id,
-        # )
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_created_user should start hook use by calendar code.
+        if self._config.CALDAV_ENABLED:
+            calendar_api = CalendarApi(
+                current_user = self._user,
+                session = self._session,
+                config = self._config
+            )
+            try:
+                calendar_already_exist = calendar_api.ensure_user_calendar_exist(user)
+                if calendar_already_exist:
+                    logger.warning(self,'user {} is just created but his own calendar already exist !!'.format(user.user_id))
+            except CalendarServerConnectionError as exc:
+                logger.error(self, 'Cannot connect to calendar server')
+                logger.exception(self, exc)
 
     def _check_user_auth_validity(self, user:User) -> None:
         if not self._user_can_authenticate(user):
             raise UserAuthTypeDisabled('user {} auth type {} is disabled'.format(user.email, user.auth_type.value))
 
     def _user_can_authenticate(self, user: User) -> bool:
-        return user.auth_type and user.auth_type in self._config.AUTH_TYPES
+        valid_auth_types = list(self._config.AUTH_TYPES)
+        # INFO - G.M - 2019-01-29 - we need to add Unknown as config doesn't
+        # list it for some reason and as unknown is a valid auth method.
+        # this fix issue 1359 :
+        # https://github.com/tracim/tracim/issues/1359
+        valid_auth_types.append(AuthType.UNKNOWN)
+        return user.auth_type and user.auth_type in valid_auth_types
 
     def allowed_to_invite_new_user(self, email: str) -> bool:
         # INFO - G.M - 2018-10-25 - disallow account creation if no

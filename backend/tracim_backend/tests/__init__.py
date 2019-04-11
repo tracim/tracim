@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import multiprocessing
 import typing
 import unittest
 
@@ -8,6 +9,7 @@ import requests
 import transaction
 from depot.manager import DepotManager
 from pyramid import testing
+from requests import Response
 from sqlalchemy.exc import IntegrityError
 
 from tracim_backend.lib.core.content import ContentApi
@@ -24,12 +26,14 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
-from tracim_backend import web
+from tracim_backend import web, CaldavAppFactory
 from tracim_backend import webdav
 from tracim_backend import WebdavAppFactory
+from waitress import serve
 from webtest import TestApp
 from io import BytesIO
 from PIL import Image
+import threading
 
 
 def eq_(a, b, msg=None) -> None:
@@ -67,6 +71,25 @@ def create_1000px_png_test_image() -> None:
     file.seek(0)
     return file
 
+class AbstractMailHogTest(object):
+
+    MAILHOG_BASE_URL = 'http://127.0.0.1:8025'
+    MAILHOG_MESSAGES_ENDPOINT = '/api/v1/messages'
+
+
+    def cleanup_mailhog(self) -> Response:
+        logger.debug(self, 'Cleanup MailHog Mails...')
+        return requests.delete('{}{}'.format(
+            self.MAILHOG_BASE_URL,
+            self.MAILHOG_MESSAGES_ENDPOINT
+        ))
+
+    def get_mailhog_mails(self) -> typing.List[typing.Any]:
+        logger.debug(self, 'gets MailHog messages...')
+        return requests.get('{}{}'.format(
+            self.MAILHOG_BASE_URL,
+            self.MAILHOG_MESSAGES_ENDPOINT
+        )).json()
 
 class FunctionalTest(unittest.TestCase):
 
@@ -93,7 +116,12 @@ class FunctionalTest(unittest.TestCase):
             self.config_section
         )
         self.settings = self.override_settings(settings)
+        # INFO - G.M - 2019-03-19 - Reset all hapic context: PyramidContext
+        # and controllers
         hapic.reset_context()
+        # TODO - G.M - 2019-03-19 - Replace this code by something better, see
+        # https://github.com/algoo/hapic/issues/144
+        hapic._controllers = []
         self.connect_database(create_tables=True)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
@@ -148,6 +176,19 @@ class FunctionalTest(unittest.TestCase):
         self.disconnect_database(remove_tables=True)
         testing.tearDown()
 
+
+class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):
+
+    def setUp(self):
+        self.cleanup_mailhog()
+        super().setUp()
+
+    def tearDown(self):
+       super().tearDown()
+       self.cleanup_mailhog()
+
+
+
 class WebdavFunctionalTest(FunctionalTest):
     config_uri = 'tests_configs.ini'
     config_section = 'functional_webdav_test'
@@ -160,6 +201,38 @@ class WebdavFunctionalTest(FunctionalTest):
         app_factory = WebdavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
         self.testapp = TestApp(app)
+
+class CaldavRadicaleProxyFunctionalTest(FunctionalTest):
+    config_section = 'functional_caldav_radicale_proxy_test'
+    radicale_server = None
+
+    def start_radicale_server(self):
+        settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        app_factory = CaldavAppFactory(**settings)
+        app = app_factory.get_wsgi_app()
+        self.radicale_server = multiprocessing.Process(target=serve, kwargs={
+            'app': app,
+            'listen': 'localhost:5232'
+            }
+        )
+        self.radicale_server.daemon = True
+        self.radicale_server.start()
+
+    def stop_radicale_server(self):
+        if self.radicale_server:
+            self.radicale_server.terminate()
+    def setUp(self):
+        super().setUp()
+        self.start_radicale_server()
+
+
+    def tearDown(self):
+       super().tearDown()
+       self.stop_radicale_server()
+
 
 class FunctionalTestEmptyDB(FunctionalTest):
     fixtures = []
@@ -356,14 +429,16 @@ class DefaultTest(StandardTest):
         return thread
 
 
-class MailHogTest(DefaultTest):
+class MailHogTest(DefaultTest, AbstractMailHogTest):
     """
     Theses test need a working mailhog
     """
-
     config_section = 'mail_test'
+
+    def setUp(self):
+        self.cleanup_mailhog()
+        super().setUp()
 
     def tearDown(self) -> None:
         super().tearDown()
-        logger.debug(self, 'Cleanup MailHog list...')
-        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.cleanup_mailhog()

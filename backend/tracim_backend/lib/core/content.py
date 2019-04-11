@@ -24,6 +24,7 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
@@ -49,7 +50,6 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
@@ -136,7 +136,7 @@ class ContentApi(object):
             self,
             session: Session,
             current_user: typing.Optional[User],
-            config,
+            config: CFG,
             show_archived: bool = False,
             show_deleted: bool = False,
             show_temporary: bool = False,
@@ -160,9 +160,7 @@ class ContentApi(object):
         default_lang = None
         if self._user:
             default_lang = self._user.lang
-        if not default_lang:
-            default_lang = DEFAULT_FALLBACK_LANG
-        self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
+        self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     @contextmanager
     def show(
@@ -1472,13 +1470,35 @@ class ContentApi(object):
              new_parent: Content,
              must_stay_in_same_workspace: bool=True,
              new_workspace: Workspace=None,
-    ):
+    ) -> None:
+        self._move_current(
+            item,
+            new_parent,
+            must_stay_in_same_workspace,
+            new_workspace
+        )
+        self.save(item)
+        self._move_children_content_to_new_workspace(item, new_workspace)
+
+    def _move_current(self,
+             item: Content,
+             new_parent: Content,
+             must_stay_in_same_workspace: bool=True,
+             new_workspace: Workspace=None,
+    ) -> None:
+        """
+        Move only current content, use _move_children_content_to_new_workspace
+        to fix workspace_id of children.
+        """
+
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
 
-        if (new_workspace and new_parent) and \
-            new_parent.workspace_id != new_workspace.workspace_id:
+        if not new_workspace:
+            new_workspace = new_parent.workspace
+
+        if new_parent and new_parent.workspace_id != new_workspace.workspace_id:
             raise WorkspacesDoNotMatch(
                 'new parent workspace and new workspace should be the same.'
             )
@@ -1508,6 +1528,21 @@ class ContentApi(object):
         )
         item.revision_type = ActionDescription.MOVE
 
+
+    def _get_allowed_content_type(
+            self,
+            allowed_content_dict: typing.Dict[str, str]
+    ) -> typing.List[ContentType]:
+        allowed_content_type = [] # type: typing.List[ContentType]
+        for slug, value in allowed_content_dict.items():
+            if value:
+                try:
+                    content_type = content_type_list.get_one_by_slug(slug)
+                    allowed_content_type.append(content_type)
+                except ContentTypeNotExist:
+                    pass
+        return allowed_content_type
+
     def _check_valid_content_type_in_dir(self,
         content_type: ContentType,
         parent: Content,
@@ -1516,16 +1551,17 @@ class ContentApi(object):
         if parent:
             assert workspace == parent.workspace
             if parent.properties and 'allowed_content' in parent.properties:
-                if content_type.slug not in parent.properties[ 'allowed_content'] \
-                    or not parent.properties['allowed_content'][content_type.slug]:
-                        raise UnallowedSubContent(
-                            ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
-                                # nopep8
-                                subcontent_type=content_type.slug,
-                                content_id=parent.content_id,
-                            ))
+                if content_type not in self._get_allowed_content_type(
+                        parent.properties['allowed_content']
+                ):
+                    raise UnallowedSubContent(
+                        ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
+                            # nopep8
+                            subcontent_type=content_type.slug,
+                            content_id=parent.content_id,
+                        ))
         if workspace:
-            if content_type.slug not in workspace.get_allowed_content_types():
+            if content_type not in workspace.get_allowed_content_types():
                 raise UnallowedSubContent(
                     ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
                         subcontent_type=content_type.slug,
@@ -1609,18 +1645,22 @@ class ContentApi(object):
         for child in origin_content.children:
             self.copy(child, new_content)
 
-    def move_recursively(self, item: Content,
-                         new_parent: Content, new_workspace: Workspace):
-        self.move(item, new_parent, False, new_workspace)
-        self.save(item, do_notify=False)
 
+    def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
+        """
+        Change workspace_id of all children of content according to new_workspace
+        given. This is needed for proper move from one workspace to another
+        """
         for child in item.children:
-            with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=child
-            ):
-                self.move_recursively(child, item, new_workspace)
+            if child.workspace_id != new_workspace.workspace_id:
+                with new_revision(
+                    session=self._session,
+                    tm=transaction.manager,
+                    content=child
+                ):
+                    self.move(child, new_parent=item, new_workspace=new_workspace, must_stay_in_same_workspace=False)
+                    self.save(child)
+                self._move_children_content_to_new_workspace(child, new_workspace)
         return
 
     def is_editable(self, item: Content) -> bool:

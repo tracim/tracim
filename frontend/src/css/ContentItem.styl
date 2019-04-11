@@ -19,12 +19,13 @@
   font-weight bold
   &.read
     font-weight normal
-  &:hover > .content__name
-    color offWhite
-  &:hover > .content__status
-    color offWhite
-  &:hover .badgeBackgroundColor
-    background-color inherit
+  &:hover
+    & > .content__name
+      color offWhite
+    & > .content__status
+      color offWhite
+    & .badgeBackgroundColor
+      background-color inherit
   &__type
     padding 0 25px
     font-size 30px
@@ -57,8 +58,9 @@
         margin-top 5px
 
 @media (max-width: max-xs)
-
   .content
+    &__header__status
+      visibility hidden
     &__name__text
       width 200px
     &__status

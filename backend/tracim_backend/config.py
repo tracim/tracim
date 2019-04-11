@@ -13,8 +13,11 @@ from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
+from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.data import ActionDescription
@@ -25,14 +28,11 @@ SECRET_ENDING_STR = ['PASSWORD', 'KEY', 'SECRET']
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
-    def __setattr__(self, key: str, value: typing.Any):
+    def __setattr__(self, key: str, value: typing.Any) -> None:
         """
         Log-ready setter.
 
-        Logs all configuration parameters except password.
-        :param key:
-        :param value:
-        :return:
+        Logs all configuration parameters except secret ones.
         """
         is_value_secret = False
         for secret in SECRET_ENDING_STR:
@@ -52,6 +52,7 @@ class CFG(object):
         ###
         # General
         ###
+        self.DEFAULT_LANG = settings.get('default_lang') or DEFAULT_FALLBACK_LANG
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
         default_color_config_file_path = os.path.join(tracim_v2_folder, 'color.json')  # nopep8
@@ -86,6 +87,7 @@ class CFG(object):
             'contents/file',
             'contents/html-document',
             'contents/folder',
+            'calendar',
         ]
         enabled_app = []
         enabled_app_str = settings.get('app.enabled', None)
@@ -96,7 +98,6 @@ class CFG(object):
         else:
             enabled_app = default_enabled_app
         self.ENABLED_APP = enabled_app
-        self._set_default_app(self.ENABLED_APP)
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
         self.DEPOT_STORAGE_DIR = settings.get(
@@ -228,17 +229,34 @@ class CFG(object):
             'user.auth_token.validity',
             '604800',
         ))
-        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(settings.get(
-            'user.reset_password.validity',
-            '900'
-        ))
+
+        # TODO - G.M - 2019-03-14 - retrocompat code,
+        # will be deleted in the future (https://github.com/tracim/tracim/issues/1483)
+        legacy_reset_password_validity = settings.get('user.reset_password.validity', None)
+        if legacy_reset_password_validity:
+            logger.warning(
+                self,
+                'user.reset_password.validity parameter is deprecated ! '
+                'please use user.reset_password.token_lifetime instead.'
+            )
+        reset_password_token_lifetime = settings.get(
+            'user.reset_password.token_lifetime',
+            None
+        )
+        defaut_reset_password_validity = '900'
+        self.USER_RESET_PASSWORD_TOKEN_LIFETIME = int(reset_password_token_lifetime or \
+                                                      legacy_reset_password_validity or \
+                                                      defaut_reset_password_validity)
 
         self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
         ###
         # EMAIL related stuff (notification, reply)
         ##
-
+        self.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION = asbool(settings.get(
+            'email.notification.enabled_on_invitation',
+            True
+        ))
         self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
@@ -246,20 +264,6 @@ class CFG(object):
             ActionDescription.REVISION,
             ActionDescription.STATUS_UPDATE
         ]
-
-        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-            content_type_list.Page.slug,
-            content_type_list.Thread.slug,
-            content_type_list.File.slug,
-            content_type_list.Comment.slug,
-            # content_type_list.Folder.slug -- Folder is skipped
-        ]
-        if settings.get('email.notification.from'):
-            raise Exception(
-                'email.notification.from configuration is deprecated. '
-                'Use instead email.notification.from.email and '
-                'email.notification.from.default_label.'
-            )
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
@@ -275,46 +279,36 @@ class CFG(object):
             'email.notification.references.email'
         )
         # Content update notification
+
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
             'email.notification.content_update.template.html',
         )
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
-            'email.notification.content_update.template.text',
-        )
+
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
             'email.notification.content_update.subject',
+            _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})")  # nopep8
         )
         # Created account notification
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
             'email.notification.created_account.template.html',
-            './tracim_backend/templates/mail/created_account_body_html.mak',
-        )
-        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = settings.get(
-            'email.notification.created_account.template.text',
-            './tracim_backend/templates/mail/created_account_body_text.mak',
         )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
             'email.notification.created_account.subject',
-            '[{website_title}] Created account',
+            _('[{website_title}] Someone created an account for you'),
         )
 
         # Reset password notification
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = settings.get(
             'email.notification.reset_password_request.template.html',
-            './tracim_backend/templates/mail/reset_password_body_html.mak',
-        )
-        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT = settings.get(
-            'email.notification.reset_password_request.template.text',
-            './tracim_backend/templates/mail/reset_password_body_text.mak',
         )
         self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
             'email.notification.reset_password_request.subject',
-            '[{website_title}] Reset Password Request'
+            _('[{website_title}] A password reset has been requested'),
         )
 
-        self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
-            'email.notification.processing_mode',
-        )
+        # TODO - G.M - 2019-01-22 - add feature to process notification email
+        # asynchronously see issue https://github.com/tracim/tracim/issues/1345
+        self.EMAIL_NOTIFICATION_PROCESSING_MODE = 'sync'
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
@@ -324,6 +318,26 @@ class CFG(object):
                 'Notification by email mecanism is disabled ! '
                 'Notification and mail invitation mecanisms will not work.'
             )
+
+        # INFO - G.M - 2019-02-01 - check if template are available,
+        # do not allow running with email_notification_activated
+        # if templates needed are not available
+        if self.EMAIL_NOTIFICATION_ACTIVATED:
+            templates = {
+                'content_update notification': self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
+                'created account': self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML,
+                'password reset': self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML
+            }
+            for template_description, template_path in templates.items():
+                if not template_path or not os.path.isfile(template_path):
+                    raise ConfigurationError(
+                        'ERROR: email template for {template_description} '
+                        'not found at "{template_path}."'.format(
+                            template_description=template_description,
+                            template_path=template_path
+                        )
+                    )
+
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
             'email.notification.smtp.server',
         )
@@ -335,10 +349,6 @@ class CFG(object):
         )
         self.EMAIL_NOTIFICATION_SMTP_PASSWORD = settings.get(
             'email.notification.smtp.password',
-        )
-        self.EMAIL_NOTIFICATION_LOG_FILE_PATH = settings.get(
-            'email.notification.log_file_path',
-            None,
         )
 
         self.EMAIL_REPLY_ACTIVATED = asbool(settings.get(
@@ -465,74 +475,33 @@ class CFG(object):
         ###
         # RADICALE (Caldav server)
         ###
-        # self.RADICALE_SERVER_HOST = settings.get(
-        #     'radicale.server.host',
-        #     '127.0.0.1',
-        # )
-        # self.RADICALE_SERVER_PORT = int(settings.get(
-        #     'radicale.server.port',
-        #     5232,
-        # ))
-        # # Note: Other parameters needed to work in SSL (cert file, etc)
-        # self.RADICALE_SERVER_SSL = asbool(settings.get(
-        #     'radicale.server.ssl',
-        #     False,
-        # ))
-        # self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = settings.get(
-        #     'radicale.server.filesystem.folder',
-        # )
-        # if not self.RADICALE_SERVER_FILE_SYSTEM_FOLDER:
-        #     raise Exception(
-        #         mandatory_msg.format('radicale.server.filesystem.folder')
-        #     )
-        # self.RADICALE_SERVER_ALLOW_ORIGIN = settings.get(
-        #     'radicale.server.allow_origin',
-        #     None,
-        # )
-        # if not self.RADICALE_SERVER_ALLOW_ORIGIN:
-        #     self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_BASE_URL
-        #     logger.warning(self,
-        #         'NOTE: Generated radicale.server.allow_origin parameter with '
-        #         'followings parameters: website.base_url ({0})'
-        #         .format(self.WEBSITE_BASE_URL)
-        #     )
-        #
-        # self.RADICALE_SERVER_REALM_MESSAGE = settings.get(
-        #     'radicale.server.realm_message',
-        #     'Tracim Calendar - Password Required',
-        # )
-        #
-        # self.RADICALE_CLIENT_BASE_URL_HOST = settings.get(
-        #     'radicale.client.base_url.host',
-        #     'http://{}:{}'.format(
-        #         self.RADICALE_SERVER_HOST,
-        #         self.RADICALE_SERVER_PORT,
-        #     ),
-        # )
-        #
-        # self.RADICALE_CLIENT_BASE_URL_PREFIX = settings.get(
-        #     'radicale.client.base_url.prefix',
-        #     '/',
-        # )
-        # # Ensure finished by '/'
-        # if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[-1]:
-        #     self.RADICALE_CLIENT_BASE_URL_PREFIX += '/'
-        # if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[0]:
-        #     self.RADICALE_CLIENT_BASE_URL_PREFIX \
-        #         = '/' + self.RADICALE_CLIENT_BASE_URL_PREFIX
-        #
-        # if not self.RADICALE_CLIENT_BASE_URL_HOST:
-        #     logger.warning(self,
-        #         'Generated radicale.client.base_url.host parameter with '
-        #         'followings parameters: website.server_name -> {}'
-        #         .format(self.WEBSITE_SERVER_NAME)
-        #     )
-        #     self.RADICALE_CLIENT_BASE_URL_HOST = self.WEBSITE_SERVER_NAME
-        #
-        # self.RADICALE_CLIENT_BASE_URL_TEMPLATE = '{}{}'.format(
-        #     self.RADICALE_CLIENT_BASE_URL_HOST,
-        #     self.RADICALE_CLIENT_BASE_URL_PREFIX,
-        # )
+        self.CALDAV_ENABLED = asbool(settings.get(
+            'caldav.enabled',
+            False
+        ))
+        self.CALDAV_RADICALE_PROXY_BASE_URL = settings.get(
+            'caldav.radicale_proxy.base_url',
+            None
+        )
+        self.CALDAV_RADICALE_CALENDAR_DIR = 'calendar'
+        self.CALDAV_RADICALE_WORKSPACE_SUBDIR = 'workspace'
+        self.CALDAV_RADICALE_USER_SUBDIR = 'user'
+        self.CALDAV_RADICALE_BASE_PATH = '/{}/'.format(self.CALDAV_RADICALE_CALENDAR_DIR)
+        self.CALDAV_RADICALE_USER_PATH = '/{}/{}/'.format(
+            self.CALDAV_RADICALE_CALENDAR_DIR,
+            self.CALDAV_RADICALE_USER_SUBDIR,
+        )
+        self.CALDAV_RADICALE_WORKSPACE_PATH = '/{}/{}/'.format(
+            self.CALDAV_RADICALE_CALENDAR_DIR,
+            self.CALDAV_RADICALE_WORKSPACE_SUBDIR,
+        )
+
+        if self.CALDAV_ENABLED and not self.CALDAV_RADICALE_PROXY_BASE_URL:
+            raise ConfigurationError(
+                'ERROR: Caldav radicale proxy cannot be activated if no radicale'
+                'base url is configured. set "caldav.radicale_proxy.base_url" properly'
+            )
+
         self.PREVIEW_JPG_RESTRICTED_DIMS = asbool(settings.get(
             'preview.jpg.restricted_dims', False
         ))
@@ -587,6 +556,21 @@ class CFG(object):
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
         self.load_ldap_settings(settings)
+        self._set_default_app(self.ENABLED_APP)
+
+        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
+            content_type_list.Page.slug,
+            content_type_list.Thread.slug,
+            content_type_list.File.slug,
+            content_type_list.Comment.slug,
+            # content_type_list.Folder.slug -- Folder is skipped
+        ]
+        if settings.get('email.notification.from'):
+            raise Exception(
+                'email.notification.from configuration is deprecated. '
+                'Use instead email.notification.from.email and '
+                'email.notification.from.default_label.'
+            )
 
     def load_ldap_settings(self, settings: typing.Dict[str, typing.Any]):
         """
@@ -749,7 +733,7 @@ class CFG(object):
             label='Calendar',
             slug='calendar',
             fa_icon='calendar',
-            is_active=False,
+            is_active=self.CALDAV_ENABLED,
             config={},
             main_route='/ui/workspaces/{workspace_id}/calendar',
             app_config=self

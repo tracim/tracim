@@ -164,6 +164,7 @@ class WorkspaceController(Controller):
             request.current_workspace,
             label=hapic_data.body.label,
             description=hapic_data.body.description,
+            calendar_enabled=hapic_data.body.calendar_enabled,
             save_now=True,
         )
         return wapi.get_workspace_with_context(request.current_workspace)
@@ -188,7 +189,9 @@ class WorkspaceController(Controller):
             label=hapic_data.body.label,
             description=hapic_data.body.description,
             save_now=True,
+            calendar_enabled=hapic_data.body.calendar_enabled
         )
+        wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
@@ -403,7 +406,7 @@ class WorkspaceController(Controller):
                 )
                 if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
                     app_config.NEW_USER_INVITATION_DO_NOTIFY and \
-                    app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    app_config.EMAIL_PROCESSING_MODE.lower() == 'sync':
                     email_sent = True
             else:
                 user = uapi.create_user(
@@ -412,14 +415,14 @@ class WorkspaceController(Controller):
                     password=None,
                     do_notify=False
                 )
-
+            uapi.execute_created_user_actions(user)
             newly_created = True
 
         role = rapi.create_one(
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
-            with_notif=False,
+            with_notif=app_config.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION,
             flush=True,
         )
         return rapi.get_user_role_workspace_with_context(

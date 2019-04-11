@@ -10,6 +10,13 @@ if typing.TYPE_CHECKING:
 TRANSLATION_FILENAME = 'backend.json'
 DEFAULT_FALLBACK_LANG = 'en'
 
+def translator_marker(string: str) -> str:
+    """
+    Use this and rename it to _ in order to allow
+    translation of string by external program like gettext.
+    this function does not do any action on string given and return it.
+    """
+    return string
 
 class Translator(object):
     """
@@ -17,9 +24,14 @@ class Translator(object):
     """
 
     def __init__(self, app_config: 'CFG', default_lang: str = None, fallback_lang: str = None):  # nopep8
+        """
+        you should provide either valid fallback_lang(true value) or valid
+        app.config.DEFAULT_LANG (true value).
+        """
         self.config = app_config
         if not fallback_lang:
-            fallback_lang = DEFAULT_FALLBACK_LANG
+            assert app_config.DEFAULT_LANG
+            fallback_lang = app_config.DEFAULT_LANG
         self.fallback_lang = fallback_lang
         if not default_lang:
             default_lang = fallback_lang

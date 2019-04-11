@@ -3,7 +3,7 @@ import datetime
 import transaction
 from freezegun import freeze_time
 from tracim_backend.models.auth import User
-from tracim_backend import error
+from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.setup_models import get_tm_session
@@ -60,7 +60,6 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'internal'
 
@@ -104,7 +103,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.AUTHENTICATION_FAILED
+        assert res.json_body['code'] == ErrorCode.AUTHENTICATION_FAILED
 
     def test_api__try_login_enpoint__err_403__bad_password(self):
         params = {
@@ -118,7 +117,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body['code'] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -134,7 +133,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.AUTHENTICATION_FAILED
+        assert res.json_body['code'] == ErrorCode.AUTHENTICATION_FAILED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -143,7 +142,7 @@ class TestLoginEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -174,7 +173,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -199,7 +197,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -216,7 +213,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body['code'] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -233,7 +230,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body['code'] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -262,7 +259,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -286,7 +282,6 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -342,7 +337,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -367,7 +361,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -391,7 +384,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'internal'
 
@@ -408,7 +400,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body['code'] == error.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body['code'] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -437,7 +429,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -461,7 +452,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body['is_active']
             assert res.json_body['profile']
             assert res.json_body['profile'] == 'users'
-            assert res.json_body['caldav_url'] is None
             assert res.json_body['avatar_url'] is None
             assert res.json_body['auth_type'] == 'ldap'
 
@@ -480,7 +470,6 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
         assert res.json_body['auth_type'] == 'internal'
@@ -515,7 +504,6 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['lang'] is None
         assert res.json_body['auth_type'] == 'internal'
@@ -598,7 +586,6 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'administrators'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'internal'
 
@@ -702,7 +689,6 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'users'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'remote'
         user_id = res.json_body['user_id']
@@ -718,7 +704,6 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert res.json_body['profile'] == 'users'
-        assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
         assert res.json_body['auth_type'] == 'remote'
         assert res.json_body['user_id'] == user_id

@@ -12,7 +12,6 @@ export class OpenContentApp extends React.Component {
       appOpenedType,
       user,
       currentWorkspace,
-      workspaceContentList,
       contentType,
       renderAppFeature,
       dispatchCustomEvent,
@@ -21,7 +20,7 @@ export class OpenContentApp extends React.Component {
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
-    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContentList.length) {
+    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
       const contentToOpen = {
@@ -69,7 +68,7 @@ export class OpenContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, contentType }) => ({
-  user, currentWorkspace, workspaceContentList, contentType
+const mapStateToProps = ({ user, currentWorkspace, contentType }) => ({
+  user, currentWorkspace, contentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   FETCH_CONFIG,
   PAGE,
@@ -40,6 +41,7 @@ import {
   newFlashMessage
 } from './action-creator.sync.js'
 import { history } from './index.js'
+import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
 
 /*
  * fetchWrapper(obj)
@@ -60,57 +62,42 @@ import { history } from './index.js'
  */
 // Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
 // 08/09/2018 - maybe not since this fetchWrapper also dispatch redux actions whether it succeed or failed
-const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
+const fetchWrapper = async ({url, param, actionName, dispatch}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
   try {
     const fetchResult = await fetch(url, param)
-    fetchResult.json = await (async () => {
-      switch (fetchResult.status) {
-        case 200:
-        case 304:
-        case 400: // 400 should return the body in json to handle the backend error code in it
-          return fetchResult.json()
-        case 204:
-          return ''
-        case 401:
-          if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
-            dispatch(setRedirectLogin(document.location.pathname + document.location.search))
-            dispatch(setUserDisconnected())
-            history.push(`${PAGE.LOGIN}${Cookies.get('lastConnection') ? '?dc=1' : ''}`)
-          }
-          return ''
-        case 403:
-        case 404:
-        case 409:
-          return ''
-        case 500:
-        case 501:
-        case 502:
-        case 503:
-        case 504:
-          dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger'))
-          break
+    fetchResult.json = await (async () => { // await for the .json()
+      const status = fetchResult.status
+      if (status === 204) return ''
+      if (status >= 200 && status <= 299) return fetchResult.json()
+      if (status >= 300 && status <= 399) return fetchResult.json()
+      if (status === 401) {
+        if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
+          dispatch(setRedirectLogin(document.location.pathname + document.location.search))
+          dispatch(setUserDisconnected())
+          history.push(`${PAGE.LOGIN}${Cookies.get('lastConnection') ? '?dc=1' : ''}`)
+        }
+        return ''
       }
-    })()
-    if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
+      if (status >= 400 && status <= 499) return ''
+      if (status >= 500 && status <= 599) {
+        dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger', 8000))
+        return
+      }
 
-    // if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-    // else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
-    switch (fetchResult.status) {
-      case 200:
-      case 204:
-      case 304:
-        dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-        break
-      case 400:
-      case 401:
-      case 403:
-      case 404:
-      case 500:
-        dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
-        break
+      dispatch(newFlashMessage(
+        <ErrorFlashMessageTemplateHtml errorMsg={`Unknown http status ${fetchResult.status}`} />, 'danger', 300000
+      ))
+    })()
+
+    const status = fetchResult.status
+    if (status >= 200 && status <= 399) {
+      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+    } else {
+      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
     }
+
     return fetchResult
   } catch (e) {
     if (e instanceof TypeError) {
