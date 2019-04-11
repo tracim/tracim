@@ -10,6 +10,10 @@ from requests.auth import HTTPBasicAuth, AuthBase
 
 from tracim_backend.lib.utils.request import TracimRequest
 
+# INFO - G.M - 2019-04-11 -  Hop-by-hop HTTP headers "are meaningful
+# only for a single transport-level connection,
+# and are not stored by caches or forwarded by proxies."
+# see RFC 2616 : https://tools.ietf.org/html/rfc2616#page-92
 HOP_BY_HOP_HEADER_HTTP = (
     'connection',
     'keep-alive',
