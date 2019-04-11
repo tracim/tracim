@@ -15,8 +15,6 @@ import {
   unLoggedAllowedPageList
 } from '../helper.js'
 
-const qs = require('query-string')
-
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
