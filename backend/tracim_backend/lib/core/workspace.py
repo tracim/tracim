@@ -252,7 +252,7 @@ class WorkspaceApi(object):
             )
             if workspace.agenda_enabled:
                 try:
-                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exist(workspace)
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
                     if agenda_already_exist:
                         logger.warning(
                             self,
@@ -275,7 +275,7 @@ class WorkspaceApi(object):
             )
             if workspace.agenda_enabled:
                 try:
-                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exist(workspace)
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
                     if agenda_already_exist:
                         logger.warning(
                             self,

@@ -915,7 +915,7 @@ class UserApi(object):
                 config = self._config
             )
             try:
-                agenda_api.ensure_user_agenda_exist(user)
+                agenda_api.ensure_user_agenda_exists(user)
             except AgendaServerConnectionError as exc:
                 logger.error(self, 'Cannot connect to agenda server')
                 logger.exception(self, exc)
@@ -946,7 +946,7 @@ class UserApi(object):
                 config = self._config
             )
             try:
-                agenda_already_exist = agenda_api.ensure_user_agenda_exist(user)
+                agenda_already_exist = agenda_api.ensure_user_agenda_exists(user)
                 if agenda_already_exist:
                     logger.warning(self,'user {} is just created but his own agenda already exist !!'.format(user.user_id))
             except AgendaServerConnectionError as exc:

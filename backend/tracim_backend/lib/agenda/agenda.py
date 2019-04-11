@@ -121,7 +121,7 @@ class AgendaApi(object):
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
         return '{}{}{}/'.format(base_url, self._config.CALDAV_RADICALE_USER_PATH, user.user_id)
 
-    def ensure_workspace_agenda_exist(self, workspace: Workspace) -> bool:
+    def ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
         """
         Return true if agenda already exist, false if it was just create,
         raise Exception if agenda cannot be created.
@@ -145,7 +145,7 @@ class AgendaApi(object):
             )
             return True
 
-    def ensure_user_agenda_exist(self, user: User) -> bool:
+    def ensure_user_agenda_exists(self, user: User) -> bool:
         """
         Return true if agenda already exist, false if it was just create,
         raise Exception if agenda cannot be created.
