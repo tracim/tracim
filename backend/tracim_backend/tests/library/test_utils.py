@@ -76,7 +76,7 @@ class TestStringToList(object):
             'one , two,three,fo ur',
             separator=',',
             cast_func=str,
-            stripped=False,
+            do_strip=False,
         ) == [ 'one ', ' two', 'three', 'fo ur']
 
     def test_unit__string_to_list__ok__list_of_string_stripped(self):
@@ -84,7 +84,7 @@ class TestStringToList(object):
             'one , two,three,fo ur',
             separator=',',
             cast_func=str,
-            stripped=True
+            do_strip=True
         ) == ['one', 'two', 'three', 'fo ur']
 
     def test_unit__string_to_list__ok__list_of_int_(self):
@@ -92,5 +92,5 @@ class TestStringToList(object):
             '1,2,3,4',
             separator=',',
             cast_func=int,
-            stripped=True
+            do_strip=True
         ) == [1,2,3,4]

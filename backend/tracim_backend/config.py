@@ -166,7 +166,7 @@ class CFG(object):
             self.get_raw_config('app.enabled', default_enabled_app),
             separator=',',
             cast_func=str,
-            stripped=True,
+            do_strip=True,
         )
 
         self.DEPOT_STORAGE_DIR = self.get_raw_config(
@@ -183,7 +183,7 @@ class CFG(object):
             self.get_raw_config('auth_types', 'internal'),
             separator=',',
             cast_func=AuthType,
-            stripped=True,
+            do_strip=True,
 
         )
         self.REMOTE_USER_HEADER = self.get_raw_config('remote_user_header', None)
@@ -228,7 +228,7 @@ class CFG(object):
             self.get_raw_config('cors.access-control-allowed-origin', default_cors_allowed_origin),
             separator=',',
             cast_func=str,
-            stripped=True,
+            do_strip=True,
 
         )
 
