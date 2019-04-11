@@ -79,7 +79,7 @@ class CaldavCreateAgendasCommand(AppContextCommand):
         nb_error_agenda_access = 0
         for user in users:
             try:
-                already_exist = self._agenda_api.ensure_user_agenda_exist(user)
+                already_exist = self._agenda_api.ensure_user_agenda_exists(user)
                 if not already_exist:
                     print(
                         'New created agenda for user {}'.format(user)
@@ -110,7 +110,7 @@ class CaldavCreateAgendasCommand(AppContextCommand):
             if workspace.agenda_enabled:
                 nb_agenda_enabled_workspace +=1
                 try:
-                    already_exist = self._agenda_api.ensure_workspace_agenda_exist(workspace)
+                    already_exist = self._agenda_api.ensure_workspace_agenda_exists(workspace)
                     if not already_exist:
                         print(
                             'New created agenda for workspace {}'.format(workspace.workspace_id)
