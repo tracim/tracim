@@ -15,33 +15,31 @@ context('Known users as a workspace-manager', function () {
   })
 
 
-  it('Check TinyMCE is active if document is empty when opening', function () {
+  it.only('Check TinyMCE is active if document is empty when opening', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
     cy.contains('Write a document').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
     cy.get('.wsContentGeneric__header__close').click()
     cy.contains(DOCUMENT_TITLE).click()
-    cy.get('#mceu_39').trigger('click')
-    cy.assertTinyMCEIsActive()
-    cy.get('.wsContentGeneric__header__close > .fa').click()
+
+    cy.waitForTinyMCELoaded().then(() => {
+      cy.assertTinyMCEIsActive()
+    })
   })
 
-  it.only('Type into tiny mce and save from dashboard', function () {
-
+  it('Type into tiny mce and save from dashboard', function () {
     cy.visit(`/ui/workspaces/${this.workspace.workspace_id}/dashboard`)
-    cy.contains('Shared space manager')
     cy.get('[data-cy="contentTypeBtn_contents/html-document"]').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
-    cy.get('#mceu_39').trigger('click')
-    cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT).then(content => {
-        cy.get('#mceu_39').trigger('click')
+    cy.waitForTinyMCELoaded()
+      .then(() => cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT))
+      .then(() => {
         cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
         cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
-        cy.get('.wsContentGeneric__header__close > .fa').click()
-    })
+      })
   })
 
   it('Type into tiny mce and save', function () {
@@ -49,12 +47,13 @@ context('Known users as a workspace-manager', function () {
     cy.contains('Write a document').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
-    cy.get('#mceu_39').trigger('click')
-    cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
-    cy.get('#mceu_39').trigger('click')
-    cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
-    cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
-    cy.get('.wsContentGeneric__header__close > .fa').click()
+
+    cy.waitForTinyMCELoaded()
+      .then(() => cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT))
+      .then(() => {
+        cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
+        cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
+      })
   })
 
   it('Check if TinyMCE open content of the document', function () {
@@ -62,13 +61,14 @@ context('Known users as a workspace-manager', function () {
     cy.contains('Write a document').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
-    cy.get('#mceu_39').trigger('click')
-    cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
-    cy.get('#mceu_39').trigger('click')
-    cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
-    cy.get('[data-cy=wsContentGeneric__option__menu__addversion]').should('not.be.disabled').click()
-    cy.assertTinyMCEContent(DOCUMENT_HTML_CONTENT)
-    cy.get('.wsContentGeneric__header__close > .fa').click()
+
+    cy.waitForTinyMCELoaded()
+      .then(() => cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT))
+      .then(() => {
+        cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
+        cy.get('[data-cy=wsContentGeneric__option__menu__addversion]').should('not.be.disabled').click()
+        cy.assertTinyMCEContent(DOCUMENT_HTML_CONTENT)
+      })
   })
 
 
@@ -77,12 +77,15 @@ context('Known users as a workspace-manager', function () {
     cy.contains('Write a document').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
-    cy.get('#mceu_39').trigger('click')
-    cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
-    cy.get('#mceu_39').trigger('click')
-    cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
-    cy.get('.wsContentGeneric__header__close').click()
-    cy.contains(DOCUMENT_TITLE).click()
-    cy.assertTinyMCEIsActive(false)
+
+    cy.waitForTinyMCELoaded().then(() => {
+      cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
+      cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
+      cy.get('[data-cy=popinFixed__header__button__close]').click()
+      cy.get('[data-cy=popinFixed]').should('not.exist')
+
+      cy.contains(DOCUMENT_TITLE).click()
+      cy.assertTinyMCEIsActive(false)
+    })
   })
 })

@@ -47,16 +47,12 @@
       content_style: 'div {height: 100%;}',
       setup: function ($editor) {
         $editor.on('init', function (e) {
-          debugger
           const event = new CustomEvent('tinymceLoaded', {detail: {}, editor: this})
-          console.log('+++++++++++++++++++++++++ tinymce LOADED. e: ', e)
-          console.log('tinymce.init.then window.tinymce', window.tinymce)
           document.dispatchEvent(event)
         })
 
         $editor.on('change keyup', function (e) {
           console.log('editor change or keyup called')
-          debugger
           handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
         })
 
