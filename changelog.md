@@ -1,7 +1,7 @@
 ## Next version x.x.x /xxxx-xx-xx
 
 ### Known issues
-
+- Changing parameter caldav.radicale.server.host in development.ini with specific IP address show wrong url after starting caldav (issue #1535)
 - If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
 
 ### REST API Changes
