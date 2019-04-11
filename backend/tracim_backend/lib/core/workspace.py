@@ -266,7 +266,7 @@ class WorkspaceApi(object):
                     if agenda_already_exist:
                         logger.warning(
                             self,
-                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.user_id)
+                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.workspace_id)
                         )
                 except AgendaServerConnectionError as exc:
                     logger.error(self, 'Cannot connect to agenda server')
@@ -300,11 +300,6 @@ class WorkspaceApi(object):
                 )
                 try:
                     agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
-                    if agenda_already_exist:
-                        logger.warning(
-                            self,
-                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.user_id)
-                        )
                 except AgendaServerConnectionError as exc:
                     logger.error(self, 'Cannot connect to agenda server')
                     logger.exception(self, exc)
