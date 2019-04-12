@@ -39,7 +39,7 @@ If you want to use async for sendinf email:
 
 If you want to use caldav:
 
-* START_CALDAV=1
+* START_CALDAV=1 (to activate agenda in tracim)
 
 #### Example commands
 

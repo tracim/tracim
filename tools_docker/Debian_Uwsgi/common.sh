@@ -118,10 +118,6 @@ if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-available/tracim_webdav.ini ]; then
         ln -s /etc/tracim/tracim_webdav.ini /etc/uwsgi/apps-available/tracim_webdav.ini
     fi
-    sed -i "s|#<Directory \"/\">|<Directory \"/\">|g" /etc/tracim/apache2.conf
-    sed -i "s|#    Require all granted|    Require all granted|g" /etc/tracim/apache2.conf
-    sed -i "s|#    Dav On|    Dav On|g" /etc/tracim/apache2.conf
-    sed -i "s|#</Directory>|</Directory>|g" /etc/tracim/apache2.conf
     sed -i "s|#ProxyPass /webdav http://127.0.0.1:3030/webdav|ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 else
@@ -129,12 +125,12 @@ else
     sed -i "s|ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi
 
-# Create Webdav file/config if not exist
+# Create Caldav file/config if not exist
 if [ "$START_CALDAV" = "1" ]; then
     if [ ! -f /etc/tracim/tracim_caldav.ini ];then
         cp /tracim/tools_docker/Debian_Uwsgi/uwsgi.ini.sample /etc/tracim/tracim_caldav.ini
         sed -i "s|module = .*|module = wsgi.caldav:application|g" /etc/tracim/tracim_caldav.ini
-        sed -i "s|http-socket = .*|http-socket = :5232|g" /etc/tracim/tracim_caldav.ini
+        sed -i "s|http-socket = .*|http-socket = localhost:5232|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|#threads = .*|threads = 8|g" /etc/tracim/tracim_caldav.ini
         sed -i "s|logto = .*|logto = /var/tracim/logs/tracim_caldav.log|g" /etc/tracim/tracim_caldav.ini
     fi
@@ -142,10 +138,10 @@ if [ "$START_CALDAV" = "1" ]; then
         ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
     fi
     sed -i "s|caldav.enabled = .*|caldav.enabled = True|g" /etc/tracim/development.ini
-    sed -i "s|#ProxyPass /calendar http://127.0.0.1:8080/calendar|ProxyPass /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
-    sed -i "s|#ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPass /agenda http://127.0.0.1:8080/agenda|ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|#ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 else
     sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
-    sed -i "s|ProxyPass /calendar http://127.0.0.1:8080/calendar|#ProxyPass /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
-    sed -i "s|ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|#ProxyPassReverse /calendar http://127.0.0.1:8080/calendar|g" /etc/tracim/apache2.conf
+    sed -i "s|ProxyPass /agenda http://127.0.0.1:8080/agenda|#ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|#ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
