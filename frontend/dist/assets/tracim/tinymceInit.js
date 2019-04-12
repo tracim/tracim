@@ -52,7 +52,6 @@
         })
 
         $editor.on('change keyup', function (e) {
-          console.log('editor change or keyup called')
           handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
         })
 
@@ -117,11 +116,6 @@
             base64EncodeAndTinyMceInsert(e.dataTransfer.files)
           })
       }
-    }).then(function(editors) {
-      // const event = new CustomEvent('tinymceLoaded', {detail: {}})
-      // console.log('+++++++++++++++++++++++++ tinymce LOADED')
-      // console.log('tinymce.init.then window.tinymce', window.tinymce)
-      // document.dispatchEvent(event)
     })
   }
 })()
