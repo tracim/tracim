@@ -15,7 +15,6 @@ from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
 
-
 class TestCommentsEndpoint(FunctionalTest):
     """
     Tests for /api/v2/workspaces/{workspace_id}/contents/{content_id}/comments
