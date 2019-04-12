@@ -59,7 +59,7 @@ class TestApplicationApi(DefaultTest):
         )
         workspace = Mock()
         workspace.workspace_id = 12
-        workspace.calendar_enabled = True
+        workspace.agenda_enabled = True
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
@@ -99,61 +99,61 @@ class TestApplicationApi(DefaultTest):
         )
         workspace = Mock()
         workspace.workspace_id = 12
-        workspace.calendar_enabled = True
+        workspace.agenda_enabled = True
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
         assert len(default_workspace_menu_entry) == 2
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
 
-    def test_get_default_workspace_menu_entry__ok__calendar_enabled_workspace_case(self):
+    def test_get_default_workspace_menu_entry__ok__agenda_enabled_workspace_case(self):
         app_config = Mock()
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS['primary'] = "#fff"
 
-        calendar = Application(
-            label='Calendar',
-            slug='calendar',
+        agenda = Application(
+            label='Agenda',
+            slug='agenda',
             fa_icon='calendar',
             is_active=True,
             config={},
-            main_route='/ui/workspaces/{workspace_id}/calendar',
+            main_route='/ui/workspaces/{workspace_id}/agenda',
             app_config=app_config
         )
         app_api = ApplicationApi(
-            app_list= [calendar],
+            app_list= [agenda],
             show_all=False
         )
         workspace = Mock()
         workspace.workspace_id = 12
-        workspace.calendar_enabled = True
+        workspace.agenda_enabled = True
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
         assert len(default_workspace_menu_entry) == 3
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label
         assert default_workspace_menu_entry[1].label == all_content_menu_entry.label
-        assert default_workspace_menu_entry[2].label == calendar.label
+        assert default_workspace_menu_entry[2].label == agenda.label
 
 
-    def test_get_default_workspace_menu_entry__ok__calendar_disabled_workspace_case(self):
+    def test_get_default_workspace_menu_entry__ok__agenda_disabled_workspace_case(self):
         app_config = Mock()
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS['primary'] = "#fff"
 
-        calendar = Application(
-            label='Calendar',
-            slug='calendar',
+        agenda = Application(
+            label='Agenda',
+            slug='agenda',
             fa_icon='calendar',
             is_active=True,
             config={},
-            main_route='/ui/workspaces/{workspace_id}/calendar',
+            main_route='/ui/workspaces/{workspace_id}/agenda',
             app_config=app_config
         )
         app_api = ApplicationApi(
-            app_list= [calendar],
+            app_list= [agenda],
             show_all=False
         )
         workspace = Mock()
         workspace.workspace_id = 12
-        workspace.calendar_enabled = False
+        workspace.agenda_enabled = False
         default_workspace_menu_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)
         assert len(default_workspace_menu_entry) == 2
         assert default_workspace_menu_entry[0].label == dashboard_menu_entry.label

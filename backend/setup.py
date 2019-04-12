@@ -65,6 +65,7 @@ requires = [
     'requests',
     # caldav support
     'radicale',
+    'caldav'
 ]
 
 tests_require = [
@@ -140,7 +141,7 @@ setup(
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav_calendar_create = tracim_backend.command.caldav:CaldavCreateCalendarsCommand'
+            'caldav_agenda_create = tracim_backend.command.caldav:CaldavCreateAgendasCommand'
         ]
     },
     message_extractors={'tracim_backend': [

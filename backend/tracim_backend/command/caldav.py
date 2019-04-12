@@ -5,9 +5,9 @@ import plaster
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.command import AppContextCommand
-from tracim_backend.exceptions import CalendarServerConnectionError
-from tracim_backend.exceptions import CannotCreateCalendar
-from tracim_backend.lib.calendar.calendar import CalendarApi
+from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import CannotCreateAgenda
+from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
@@ -38,11 +38,11 @@ class CaldavRunnerCommand(AppContextCommand):
 
 
 
-class CaldavCreateCalendarsCommand(AppContextCommand):
+class CaldavCreateAgendasCommand(AppContextCommand):
 
 
     def get_description(self) -> str:
-        return "create calendar for all workspaces/user"
+        return "create agenda for all workspaces/user"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
@@ -68,60 +68,64 @@ class CaldavCreateCalendarsCommand(AppContextCommand):
             session=self._session,
             config=self._app_config,
         )
-        self._calendar_api = CalendarApi(
+        self._agenda_api = AgendaApi(
             current_user=None,
             session=self._session,
             config=self._app_config
         )
 
-        # INFO - G.M - 2019-03-13 - check users calendars
+        # INFO - G.M - 2019-03-13 - check users agendas
         users = self._user_api.get_all()
-        nb_error_calendar_access = 0
+        nb_error_agenda_access = 0
         for user in users:
             try:
-                already_exist = self._calendar_api.ensure_user_calendar_exist(user)
+                already_exist = self._agenda_api.ensure_user_agenda_exists(user)
                 if not already_exist:
                     print(
-                        'New created calendar for user {}'.format(user)
+                        'New created agenda for user {}'.format(user)
                     )
-            except CannotCreateCalendar as exc:
-                nb_error_calendar_access += 1
-                print('Cannot create calendar for user {}'.format(user.user_id))
+            except CannotCreateAgenda as exc:
+                nb_error_agenda_access += 1
+                print('Cannot create agenda for user {}'.format(user.user_id))
                 logger.exception(self, exc)
-            except CalendarServerConnectionError as exc:
-                nb_error_calendar_access += 1
-                print('Cannot access to calendar server: connection error.')
+            except AgendaServerConnectionError as exc:
+                nb_error_agenda_access += 1
+                print('Cannot access to agenda server: connection error.')
                 logger.exception(self, exc)
-        nb_user_calendars = len(users)
-        nb_verified_user_calendar = len(users) - nb_error_calendar_access
-        print('{}/{} users calendar verified'.format(nb_verified_user_calendar, nb_user_calendars))
+            except Exception as exc:
+                nb_error_agenda_access += 1
+                print('Something goes wrong during agenda create/update')
+                logger.exception(self, exc)
+        nb_user_agendas = len(users)
+        nb_verified_user_agenda = len(users) - nb_error_agenda_access
+        print('{}/{} users agenda verified'.format(nb_verified_user_agenda, nb_user_agendas))
 
-        # # INFO - G.M - 2019-03-13 - check workspaces calendars
+        # # INFO - G.M - 2019-03-13 - check workspaces agendas
         workspaces = self._workspace_api.get_all()
-        nb_error_calendar_access = 0
+        nb_error_agenda_access = 0
         nb_workspaces = 0
-        nb_calendar_enabled_workspace = 0
+        nb_agenda_enabled_workspace = 0
         for workspace in workspaces:
             nb_workspaces += 1
-            if workspace.calendar_enabled:
-                nb_calendar_enabled_workspace +=1
+            if workspace.agenda_enabled:
+                nb_agenda_enabled_workspace +=1
                 try:
-                    already_exist = self._calendar_api.ensure_workspace_calendar_exist(workspace)
+                    already_exist = self._agenda_api.ensure_workspace_agenda_exists(workspace)
                     if not already_exist:
                         print(
-                            'New created calendar for workspace {}'.format(workspace.workspace_id)
+                            'New created agenda for workspace {}'.format(workspace.workspace_id)
                         )
-                except CannotCreateCalendar as exc:
-                    print('Cannot create calendar for workspace {}'.format(workspace.workspace_id))
+                except CannotCreateAgenda as exc:
+                    print('Cannot create agenda for workspace {}'.format(workspace.workspace_id))
                     logger.exception(self, exc)
-                except CalendarServerConnectionError as exc:
-                    nb_error_calendar_access += 1
-                    print('Cannot access to calendar server: connection error.')
+                except AgendaServerConnectionError as exc:
+                    nb_error_agenda_access += 1
+                    print('Cannot access to agenda server: connection error.')
                     logger.exception(self, exc)
-        nb_verified_workspace_calendar = nb_calendar_enabled_workspace - nb_error_calendar_access
-        nb_workspace_without_calendar_enabled = nb_workspaces - nb_calendar_enabled_workspace
-        print('{}/{} workspace calendar verified ({} workspace without calendar feature enabled)'.format(
-            nb_verified_workspace_calendar,
-            nb_calendar_enabled_workspace,
-            nb_workspace_without_calendar_enabled
+        nb_verified_workspace_agenda = nb_agenda_enabled_workspace - nb_error_agenda_access
+        nb_workspace_without_agenda_enabled = nb_workspaces - nb_agenda_enabled_workspace
+        print('{}/{} workspace agenda verified ({} workspace without agenda feature enabled)'.format(
+            nb_verified_workspace_agenda,
+            nb_agenda_enabled_workspace,
+            nb_workspace_without_agenda_enabled
         ))

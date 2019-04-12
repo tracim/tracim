@@ -171,5 +171,11 @@
   "An error has happened, please try again": "An error has happened, please try again",
   "Click here to unsubscribe": "Click here to unsubscribe",
   "Click here to subscribe": "Click here to subscribe",
-  "Explore contents": "Explore contents"
+  "Explore contents": "Explore contents",
+  "Open the agenda": "Open the agenda",
+  "Agenda": "Agenda",
+  "Error while loading your agenda": "Error while loading your agenda",
+  "Use this link to access your personal agenda from anyhere": "Use this link to access your personal agenda from anyhere",
+  "Use this link to access this shared space agenda from anywhere": "Use this link to access this shared space agenda from anywhere",
+  "agenda details": "agenda details"
 }

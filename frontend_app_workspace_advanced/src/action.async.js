@@ -14,6 +14,14 @@ export const getWorkspaceMember = (apiUrl, idWorkspace) =>
     method: 'GET'
   })
 
+export const getAppList = apiUrl => {
+  return fetch(`${apiUrl}/system/applications`, {
+    credentials: 'include',
+    headers: {...FETCH_CONFIG.headers},
+    method: 'GET'
+  })
+}
+
 export const putLabel = (apiUrl, workspace, newLabel) =>
   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
     credentials: 'include',
@@ -38,14 +46,15 @@ export const putDescription = (apiUrl, workspace, newDescription) =>
     })
   })
 
-export const putCalendarEnabled = (apiUrl, workspace, calendarEnabled) =>
+export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
   fetch(`${apiUrl}/workspaces/${workspace.workspace_id}`, {
     credentials: 'include',
-    headers: {...FETCH_CONFIG.headers},method: 'PUT',
+    headers: {...FETCH_CONFIG.headers},
+    method: 'PUT',
     body: JSON.stringify({
       label: workspace.label,
       description: workspace.description,
-      calendar_enabled: calendarEnabled
+      agenda_enabled: agendaEnabled
     })
   })
 

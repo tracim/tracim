@@ -17,7 +17,7 @@ import {
   postWorkspaceMember,
   putMyselfWorkspaceRead,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -27,7 +27,8 @@ import {
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
   removeWorkspaceMember,
-  updateUserWorkspaceSubscriptionNotif
+  updateUserWorkspaceSubscriptionNotif,
+  setWorkspaceAgendaUrl
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -40,7 +41,7 @@ import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-// import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -60,8 +61,7 @@ class Dashboard extends React.Component {
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
       displayNotifBtn: false,
-      displayWebdavBtn: false,
-      displayCalendarBtn: false
+      displayWebdavBtn: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -113,12 +113,31 @@ class Dashboard extends React.Component {
 
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
-      case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
+          this.loadCalendarDetail()
+        }
+        break
       case 400:
         props.history.push(PAGE.HOME)
         props.dispatch(newFlashMessage('Unknown shared space'))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+    }
+  }
+
+  loadCalendarDetail = async () => {
+    const { props } = this
+
+    const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
+    switch (fetchCalendar.status) {
+      case 200:
+        const idCurrentWorkspace = parseInt(props.match.params.idws)
+        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === idCurrentWorkspace) || {agenda_url: ''}).agenda_url
+        this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
+        break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
     }
   }
 
@@ -159,8 +178,6 @@ class Dashboard extends React.Component {
   handleToggleNotifBtn = () => this.setState(prevState => ({displayNotifBtn: !prevState.displayNotifBtn}))
 
   handleToggleWebdavBtn = () => this.setState(prevState => ({displayWebdavBtn: !prevState.displayWebdavBtn}))
-
-  handleToggleCalendarBtn = () => this.setState(prevState => ({displayCalendarBtn: !prevState.displayCalendarBtn}))
 
   handleClickRecentContent = (idContent, typeContent) => this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.curWs.id, typeContent, idContent))
 
@@ -369,16 +386,16 @@ class Dashboard extends React.Component {
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
-        .filter(app => app.slug === 'calendar' ? props.curWs.calendarEnabled : true)
+        .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-          // INFO - CH - 2019-04-03 - hard coding some calendar properties for now since some end points requires some clarifications
+          // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
           return {
             ...app,
-            creationLabel: app.slug === 'calendar' ? props.t('Open the calendar') : contentType.creationLabel,
-            route: app.slug === 'calendar'
-              ? PAGE.WORKSPACE.CALENDAR(props.curWs.id)
+            creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,
+            route: app.slug === 'agenda'
+              ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
               : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
           }
         })
@@ -388,13 +405,14 @@ class Dashboard extends React.Component {
     contentTypeButtonList.push({
       ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id)
+      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
+      hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper customeClass='dashboard'>
+          <PageWrapper customClass='dashboard'>
             <PageTitle
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
@@ -408,6 +426,7 @@ class Dashboard extends React.Component {
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickOpenAdvancedDashboard}
                   >
+                    <i className='fa fa-fw fa-lock' />
                     {props.t('Open advanced Dashboard')}
                   </button>
                 }
@@ -499,17 +518,13 @@ class Dashboard extends React.Component {
                 />
               </div>
 
-              {/*
-                AC - 11/09/2018 - not included in v2.0 roadmap
-                <MoreInfo
-                  onClickToggleWebdav={this.handleToggleWebdavBtn}
-                  displayWebdavBtn={state.displayWebdavBtn}
-                  onClickToggleCalendar={this.handleToggleCalendarBtn}
-                  displayCalendarBtn={state.displayCalendarBtn}
-                  t={props.t}
+              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled &&
+                <AgendaInfo
+                  customClass='dashboard__agenda'
+                  introText={props.t('Use this link to access this shared space agenda from anywhere')}
+                  agendaUrl={props.curWs.agendaUrl}
                 />
-              */}
-
+              }
             </PageContent>
           </PageWrapper>
         </div>

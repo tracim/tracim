@@ -26,9 +26,10 @@
   "Error while removing member": "Erreur lors de la suppression du membre",
   "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par email",
   "This user already is in the shared space": "Cet utilisateur est déjà dans cet espace partagé",
-  "Calendar": "Calendrier",
-  "Calendar activated": "Calendrier activé",
-  "Calendar deactivated": "Calendrier désactivé",
-  "Error while activating calendar": "Erreur lors de l'activation du calendrier",
-  "Error while deactivating calendar": "Erreur lors de la désactivation du calendrier"
+  "Error while loading app list": "warning",
+  "Agenda activated": "Agenda activé",
+  "Agenda deactivated": "Agenda désactivé",
+  "Error while activating agenda": "Erreur lors de l'activation de l'agenda",
+  "Error while deactivating agenda": "Erreur lors de la désactivation de l'agenda",
+  "Agenda": "Agenda"
 }

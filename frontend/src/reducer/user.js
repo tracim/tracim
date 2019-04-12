@@ -5,7 +5,8 @@ import {
   USER_DISCONNECTED,
   USER_LANG,
   USER_NAME,
-  USER_EMAIL
+  USER_EMAIL,
+  USER_AGENDA_URL
 } from '../action-creator.sync.js'
 import { getBrowserLang } from '../helper.js'
 
@@ -23,7 +24,8 @@ const defaultUser = {
   avatar_url: null,
   created: '',
   public_name: '',
-  lang: getBrowserLang()
+  lang: getBrowserLang(),
+  agendaUrl: ''
 }
 
 export default function user (state = defaultUser, action) {
@@ -46,6 +48,9 @@ export default function user (state = defaultUser, action) {
 
     case `${UPDATE}/${USER_EMAIL}`:
       return {...state, email: action.newEmail}
+
+    case `${SET}/${USER_AGENDA_URL}`:
+      return {...state, agendaUrl: action.newAgendaUrl}
 
     default:
       return state

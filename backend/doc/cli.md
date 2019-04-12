@@ -49,13 +49,13 @@ This will drop all your database, be carefull !
 
     tracimcli caldav start
 
-### Check and recreate calendar for user/workspace ###
+### Check and recreate agenda for user/workspace ###
 
-in some case, calendars of user or workspace can failed to be created,
-to check if all calendars are created and force their creation if they're not,
+in some case, agenda of user or workspace can failed to be created,
+to check if all agenda are created and force their creation if they're not,
 you can do:
 
-    tracimcli caldav calendar create
+    tracimcli caldav agenda create
 
 ## Webdav ##
 
