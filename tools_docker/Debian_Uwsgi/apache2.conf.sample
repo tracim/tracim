@@ -11,15 +11,18 @@
         Require all granted
     </Directory>
 
-    #<Directory "/">
-    #    Require all granted
-    #    Dav On
-    #</Directory>
+    <Directory "/">
+        Require all granted
+        Dav On
+    </Directory>
 
     ProxyPreserveHost On
 
     #ProxyPass /webdav http://127.0.0.1:3030/webdav
     #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav
+
+    #ProxyPass /agenda http://127.0.0.1:8080/agenda
+    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda
 
     ProxyPass /ui http://127.0.0.1:8080/ui
     ProxyPassReverse /ui http://127.0.0.1:8080/ui
