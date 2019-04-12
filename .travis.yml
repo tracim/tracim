@@ -40,20 +40,17 @@ jobs:
       - "3.7"
     script:
     - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
-  - stage: backend-sqlite
-    name: Test Backend with sqlite
+  - stage: backend
     env:
     - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
     script:
     - pytest --cov tracim_backend
-  - stage: backend-postgresql
-    name: Test Backend with postgresql
+  - stage: backend
     env:
     - DB=postgres
     script:
     - pytest tracim_backend
-  - stage: backend-mysql
-    name: Test Backend with mysql
+  - stage: backend
     env:
     - DB=mysql
     script:
@@ -83,9 +80,7 @@ jobs:
 
 stages:
   - quick-tests
-  - backend-sqlite
-  - backend-postgresql
-  - backend-mysql
+  - backend
   - functional
 
 
