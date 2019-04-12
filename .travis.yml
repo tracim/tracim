@@ -30,6 +30,26 @@ jobs:
 #      - pip-compile
 #      - diff -u requirements.txt requirements_from_source.txt
 #    after_success: true
+    - stage: static-tests
+      name: fmt
+      python:
+        - "3.7"
+      before_script:
+        - pip install black isort
+      script:
+        - black --version
+        - echo -n "isort " & isort --version-number
+        - black --diff --check backend/tracim_backend
+        - isort -df -c backend/tracim_backend/**/*.py
+    - stage: static-tests
+      name: flake8
+      python:
+        - "3.7"
+      before_script:
+        - pip install flake8
+      script:
+        - flake8 --version
+        - flake8 backend/tracim_backend
   - stage: quick-tests
     name : Quick Unit-Test for Backend
     env:
