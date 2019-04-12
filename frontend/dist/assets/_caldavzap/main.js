@@ -1992,7 +1992,7 @@ function algoo_replace_regex(href, globalAccountSettings) {
 // @TODO: call the function algooCustomToggleSidebarleft at the right place in the code instead of hacking it with the setTimeout
 // INFO - CH - 2019-04-12 - this test now uses a global variable which value come from app Agenda who is able to
 // tell whether it is a workspace's agenda or all the agendas that are being displayed
-if (!globalShouldDisplaySidebar) setTimeout(algooCustomToggleSidebarleft, 500)
+if (globalShouldHideSidebar) setTimeout(algooCustomToggleSidebarleft, 500)
 
 var isIframeCaldavzapInFullscreen = false
 function setAgendaFullscreen () {
