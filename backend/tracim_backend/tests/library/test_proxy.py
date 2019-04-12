@@ -42,7 +42,7 @@ class TestProxy(object):
         }
 
     def test_drop_request_headers__ok__nominal_case(self):
-        proxy = Proxy('http://localhost:8080', default_request_header_to_drop=('connection'))
+        proxy = Proxy('http://localhost:8080', default_request_headers_to_drop=('connection'))
 
         headers = {
             'Authorization': 'Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=',
@@ -62,7 +62,7 @@ class TestProxy(object):
         }
 
     def test_drop_response_headers__ok__nominal_case(self):
-        proxy = Proxy('http://localhost:8080', default_response_header_to_drop=('connection'))
+        proxy = Proxy('http://localhost:8080', default_response_headers_to_drop=('connection'))
         headers = {
             'Authorization': 'Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=',
             'Content-Length': '0',
@@ -91,7 +91,7 @@ class TestProxy(object):
             response.body =body
             return response
 
-        def mocked_get_behind_response(method, headers, data, url):
+        def mocked_get_behind_response(method, headers, data, url, auth):
             return FakeResponse()
 
         class FakeResponse(object):
@@ -119,6 +119,7 @@ class TestProxy(object):
                 }
                 self.body = b'Nothing'
                 self.method = 'GET'
+                self.auth = None
 
         proxy._generate_proxy_response = mocked_generate_proxy_response
         proxy._get_behind_response = mocked_get_behind_response

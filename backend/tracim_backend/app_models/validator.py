@@ -17,7 +17,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.views.calendar_api.models import CalendarType
+from tracim_backend.views.agenda_api.models import AgendaType
 
 
 class TracimValidator(object):
@@ -94,7 +94,7 @@ action_description_validator = OneOf(ActionDescription.allowed_values())
 content_global_status_validator = OneOf([status.value for status in GlobalStatus])
 content_status_validator = OneOf(content_status_list.get_all_slugs_values())
 user_profile_validator = OneOf(Profile._NAME)
-calendar_type_validator = OneOf([calendar_type.value for calendar_type in CalendarType])
+agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
 user_email_validator = Length(
     min=User.MIN_EMAIL_LENGTH,

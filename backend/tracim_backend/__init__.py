@@ -2,12 +2,12 @@
 from copy import deepcopy
 
 from pyramid_multiauth import MultiAuthenticationPolicy
-from tracim_backend.lib.calendar import CaldavAppFactory
+from tracim_backend.lib.agenda import CaldavAppFactory
 
 from tracim_backend.models.auth import AuthType
-from tracim_backend.lib.calendar.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.views.core_api.account_controller import AccountController
-from tracim_backend.views.calendar_api.radicale_proxy_controller import RadicaleProxyController
+from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -201,10 +201,10 @@ def web(global_config, **local_settings):
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
     if app_config.CALDAV_ENABLED:
         # FIXME - G.M - 2019-03-18 - check if possible to avoid this import here,
-        # import is here because import CalendarController without adding it to
+        # import is here because import AgendaController without adding it to
         # pyramid make trouble in hapic which try to get view related
         # to controller but failed.
-        from tracim_backend.views.calendar_api.calendar_controller import CalendarController
+        from tracim_backend.views.agenda_api.agenda_controller import AgendaController
         configurator.include(add_www_authenticate_header_for_caldav)
         # caldav exception
         context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
@@ -216,8 +216,8 @@ def web(global_config, **local_settings):
             radicale_user_path=app_config.CALDAV_RADICALE_USER_PATH,
             radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
         )
-        calendar_controller = CalendarController()
-        configurator.include(calendar_controller.bind, route_prefix=BASE_API_V2)
+        agenda_controller = AgendaController()
+        configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
         configurator.include(radicale_proxy_controller.bind)
 
     if app_config.FRONTEND_SERVE:

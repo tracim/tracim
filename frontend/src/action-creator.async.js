@@ -38,7 +38,8 @@ import {
   USER_WORKSPACE_LIST,
   CONTENT,
   WORKSPACE_CONTENT_PATH,
-  newFlashMessage
+  newFlashMessage,
+  WORKSPACE_AGENDA_URL
 } from './action-creator.sync.js'
 import { history } from './index.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
@@ -671,6 +672,21 @@ export const putFolderRead = (idUser, idWorkspace, idContent) => dispatch => {
       method: 'PUT'
     },
     actionName: FOLDER_READ,
+    dispatch
+  })
+}
+
+export const getLoggedUserCalendar = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/me/agenda`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_AGENDA_URL,
     dispatch
   })
 }

@@ -336,7 +336,7 @@ class WorkspaceContent extends React.Component {
             } />
           }
 
-          <PageWrapper customeClass='workspace'>
+          <PageWrapper customClass='workspace'>
             <PageTitle
               parentClass='workspace__header'
               customClass='justify-content-between align-items-center'
