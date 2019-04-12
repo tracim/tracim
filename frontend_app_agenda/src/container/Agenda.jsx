@@ -192,7 +192,7 @@ class Agenda extends React.Component {
         }))
       },
       userLang: state.loggedUser.lang,
-      shouldHideCaldavzapSidebar: state.config.appConfig.forceHideSidebar
+      shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
     }
 
     const pageTitle = state.config.appConfig.idWorkspace === null
