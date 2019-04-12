@@ -1990,8 +1990,8 @@ function algoo_replace_regex(href, globalAccountSettings) {
 
 // 2018/05/03 - Côme: the call bellow is to auto hide the sidebarleft on startup
 // @TODO: call the function algooCustomToggleSidebarleft at the right place in the code instead of hacking it with the setTimeout
-// INFO - CH - 2019-04-12 - this test now uses a global variable which value come from app Agenda who is able to
-// tell whether it is a workspace's agenda or all the agendas that are being displayed
+// INFO - CH - 2019-04-12 - this test now uses a global variable which value come from tracim core who is able to
+// tell whether the matching route is to display a workspace's agenda or all the agendas
 if (globalShouldHideSidebar) setTimeout(algooCustomToggleSidebarleft, 500)
 
 var isIframeCaldavzapInFullscreen = false
