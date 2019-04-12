@@ -178,8 +178,6 @@ class Agenda extends React.Component {
 
     if (!state.isVisible || !state.userWorkspaceListLoaded) return null
 
-    console.log('state.userWorkspaceList', state.userWorkspaceList)
-
     const config = {
       globalAccountSettings: {
         agendaList: state.userWorkspaceList.map(a => ({
@@ -193,7 +191,8 @@ class Agenda extends React.Component {
           idWorkspace: a.agenda_type === 'private' ? '' : a.workspace_id
         }))
       },
-      userLang: state.loggedUser.lang
+      userLang: state.loggedUser.lang,
+      shouldDisplayCaldavzapSidebar: !(state.userWorkspaceList.length === 1 && state.userWorkspaceList[0].agenda_type === 'workspace')
     }
 
     const pageTitle = state.config.appConfig.idWorkspace === null
