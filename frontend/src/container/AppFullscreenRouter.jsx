@@ -51,7 +51,8 @@ class AppFullscreenRouter extends React.Component {
 
             <Route exact path={PAGE.AGENDA} render={() => {
               const agendaConfig = {
-                idWorkspace: null
+                idWorkspace: null,
+                forceShowSidebar: true
               }
               props.renderAppFullscreen({slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig}, props.user, {})
               return null
@@ -59,7 +60,8 @@ class AppFullscreenRouter extends React.Component {
 
             <Route path={PAGE.WORKSPACE.AGENDA(':idws')} render={() => {
               const agendaConfig = {
-                idWorkspace: props.match.params.idws
+                idWorkspace: props.match.params.idws,
+                forceShowSidebar: false
               }
               props.renderAppFullscreen({slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig}, props.user, {})
               return null
