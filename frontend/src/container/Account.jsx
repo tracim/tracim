@@ -17,16 +17,22 @@ import {
   setWorkspaceListMemberList,
   updateUserName,
   updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif, updateUserAgendaUrl
+  updateUserWorkspaceSubscriptionNotif,
+  updateUserAgendaUrl,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
   putMyselfPassword,
-  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
+  putMyselfWorkspaceDoNotify,
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
-import { editableUserAuthTypeList } from '../helper.js'
+import {
+  editableUserAuthTypeList,
+  PAGE
+} from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
@@ -68,6 +74,7 @@ class Account extends React.Component {
     const { props } = this
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
     this.loadAgendaUrl()
+    this.buildBreadcrumbs()
   }
 
   loadAgendaUrl = async () => {
@@ -102,6 +109,12 @@ class Account extends React.Component {
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
+
+  buildBreadcrumbs = () => this.props.dispatch(setBreadcrumbs([{
+    url: PAGE.ACCOUNT,
+    label: this.props.t('My account'),
+    type: 'CORE'
+  }]))
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
     subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName}))

@@ -114,10 +114,11 @@ class HtmlDocument extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
-    this.loadContent()
+    await this.loadContent()
+    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -129,6 +130,7 @@ class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
+      this.buildBreadcrumbs()
       tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -183,6 +185,20 @@ class HtmlDocument extends React.Component {
       generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
       value
     )
+  }
+
+  buildBreadcrumbs = () => {
+    const { state } = this
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/${state.config.slug}/${state.content.content_id}`,
+          label: state.content.label,
+          type: 'APPFEATURE'
+        }]
+      }
+    })
   }
 
   loadContent = async () => {

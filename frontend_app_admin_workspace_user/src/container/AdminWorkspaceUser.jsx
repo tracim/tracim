@@ -23,6 +23,7 @@ import {
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
+import { PAGE } from '../../../frontend/src/helper.js'
 
 require('../css/index.styl')
 
@@ -75,14 +76,16 @@ class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
     // FIXME - CH - 2019-04-08 - line below should not exist. See https://github.com/tracim/tracim/issues/1572
     document.getElementById('appFullscreenContainer').style.flex = 'auto'
 
-    if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
-    else if (this.state.config.type === 'user') this.loadUserContent()
+    if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
+    else if (this.state.config.type === 'user') await this.loadUserContent()
+
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -160,6 +163,34 @@ class AdminWorkspaceUser extends React.Component {
         break
       default: this.sendGlobalFlashMsg(props.t('Error while loading users list'), 'warning')
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const getBreadcrumbsFromType = () => {
+      if (state.config.type === 'workspace') {
+        return {
+          url: PAGE.ADMIN.WORKSPACE,
+          label: props.t('Administrate workspaces'),
+          type: 'APPFULLSCREEN'
+        }
+      }
+      if (state.config.type === 'user') {
+        return {
+          url: PAGE.ADMIN.USER,
+          label: props.t('Administrate users'),
+          type: 'APPFULLSCREEN'
+        }
+      }
+    }
+
+    GLOBAL_dispatchEvent({
+      type: 'setBreadcrumbs',
+      data: {
+        breadcrumbs: [getBreadcrumbsFromType()]
+      }
+    })
   }
 
   handleDeleteWorkspace = async () => {

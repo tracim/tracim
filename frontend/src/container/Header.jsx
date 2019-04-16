@@ -14,6 +14,7 @@ import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem
 import MenuActionListItemNotification from '../component/Header/MenuActionListItem/Notification.jsx'
 import MenuActionListAdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
+import Breadcrumbs from '../component/Breadcrumbs/Breadcrumbs.jsx'
 import {
   newFlashMessage,
   setUserLang,
@@ -95,11 +96,11 @@ class Header extends React.Component {
         <nav className='navbar navbar-expand-md navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
-          <div className='header__breadcrumb d-none d-lg-block ml-4' />
-
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
+            <Breadcrumbs />
+
             <MenuLinkList
               onClickFeature={this.handleClickFeature}
               onClickExplore={this.handleClickExplore}

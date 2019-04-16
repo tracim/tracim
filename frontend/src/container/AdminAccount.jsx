@@ -14,7 +14,8 @@ import {
   PageContent
 } from 'tracim_frontend_lib'
 import {
-  newFlashMessage
+  newFlashMessage,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getUser,
@@ -25,7 +26,10 @@ import {
   putUserPassword,
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
-import { editableUserAuthTypeList } from '../helper.js'
+import {
+  editableUserAuthTypeList,
+  PAGE
+} from '../helper.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -57,8 +61,9 @@ class Account extends React.Component {
   }
 
   async componentDidMount () {
-    this.getUserDetail()
+    await this.getUserDetail()
     this.getUserWorkspaceList()
+    this.buildBreadcrumbs()
   }
 
   getUserDetail = async () => {
@@ -87,6 +92,20 @@ class Account extends React.Component {
       case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    props.dispatch(setBreadcrumbs([{
+      url: PAGE.ADMIN.USER,
+      label: props.t('Administrate users'),
+      type: 'CORE'
+    }, {
+      url: PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id),
+      label: state.userToEdit.public_name,
+      type: 'CORE'
+    }]))
   }
 
   getUserWorkspaceListMemberList = async (wsList) => {

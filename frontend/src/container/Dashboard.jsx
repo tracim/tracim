@@ -17,7 +17,8 @@ import {
   postWorkspaceMember,
   putMyselfWorkspaceRead,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
+  putMyselfWorkspaceDoNotify,
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -28,7 +29,8 @@ import {
   setWorkspaceReadStatusList,
   removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
-  setWorkspaceAgendaUrl
+  setWorkspaceAgendaUrl,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -74,10 +76,11 @@ class Dashboard extends React.Component {
     }
   }
 
-  componentDidMount () {
-    this.loadWorkspaceDetail()
+  async componentDidMount () {
+    await this.loadWorkspaceDetail()
     this.loadMemberList()
     this.loadRecentActivity()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -169,6 +172,21 @@ class Dashboard extends React.Component {
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      url: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
+      label: props.curWs.label,
+      type: 'CORE'
+    }, {
+      url: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
+      label: props.t('Dashboard'),
+      type: 'CORE'
+    }]
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
   handleClickAddMemberBtn = () => this.setState({displayNewMemberForm: true})

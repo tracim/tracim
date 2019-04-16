@@ -37,7 +37,8 @@ import {
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
-  setWorkspaceContentRead
+  setWorkspaceContentRead,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -99,6 +100,7 @@ class WorkspaceContent extends React.Component {
     } else wsToLoad = match.params.idws
 
     this.loadContentList(wsToLoad)
+    this.buildBreadcrumbs()
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -117,12 +119,41 @@ class WorkspaceContent extends React.Component {
     if (prevState.idWorkspaceInUrl !== idWorkspace || prevFilter !== currentFilter) {
       this.setState({idWorkspaceInUrl: idWorkspace})
       this.loadContentList(idWorkspace)
+      this.buildBreadcrumbs()
     }
   }
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent('unmount_app')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      url: PAGE.WORKSPACE.DASHBOARD(state.idWorkspaceInUrl),
+      label: props.t(props.workspaceList.find(ws => ws.id === state.idWorkspaceInUrl).label),
+      type: 'CORE'
+    }]
+
+    const urlFilter = qs.parse(props.location.search).type
+
+    if (urlFilter) {
+      breadcrumbsList.push({
+        url: `${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}?type=${urlFilter}`,
+        label: props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label),
+        type: 'CORE'
+      })
+    } else {
+      breadcrumbsList.push({
+        url: `${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}`,
+        label: props.t('All contents'),
+        type: 'CORE'
+      })
+    }
+
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
   loadContentList = async idWorkspace => {

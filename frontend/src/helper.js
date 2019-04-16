@@ -164,10 +164,13 @@ const translationKeyFromBackend = [ // eslint-disable-line no-unused-vars
   i18n.t('Validated'),
   i18n.t('Cancelled'),
   i18n.t('Deprecated'),
+  i18n.t('Text document'),
   i18n.t('text document'),
   i18n.t('text documents'),
+  i18n.t('Thread'),
   i18n.t('thread'),
   i18n.t('threads'),
+  i18n.t('File'),
   i18n.t('file'),
   i18n.t('files')
 ]

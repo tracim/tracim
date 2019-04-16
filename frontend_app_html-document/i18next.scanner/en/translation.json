@@ -19,5 +19,7 @@
   "Restore": "Restore",
   "This content is deleted": "This content is deleted",
   "You have a pending draft": "You have a pending draft",
-  "resume writing": "resume writing"
+  "resume writing": "resume writing",
+  "Error while saving new version": "Error while saving new version",
+  "Error while changing status": "Error while changing status"
 }

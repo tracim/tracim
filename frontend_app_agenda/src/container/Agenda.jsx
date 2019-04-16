@@ -64,7 +64,7 @@ class Agenda extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { state } = this
 
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
@@ -73,7 +73,8 @@ class Agenda extends React.Component {
     document.getElementById('appFullscreenContainer').style.flex = '1'
 
     this.loadAgendaList(state.config.appConfig.idWorkspace)
-    if (state.config.appConfig.idWorkspace !== null) this.loadWorkspaceData()
+    if (state.config.appConfig.idWorkspace !== null) await this.loadWorkspaceData()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -110,6 +111,31 @@ class Agenda extends React.Component {
         break
       default: this.sendGlobalFlashMessage(props.t('Error while loading shared space list'))
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const getBreadcrumbs = () => state.config.appConfig.idWorkspace
+      ? [{
+        url: `/workspaces/${state.config.appConfig.idWorkspace}/dashboard`,
+        label: state.content.workspaceLabel,
+        type: 'APPFULLSCREEN'
+      }, {
+        url: `/workspaces/${state.config.appConfig.idWorkspace}/agenda`,
+        label: props.t('Agenda'),
+        type: 'APPFULLSCREEN'
+      }]
+      : [{
+        url: `/agenda`,
+        label: props.t('All my agendas'),
+        type: 'APPFULLSCREEN'
+      }]
+
+    GLOBAL_dispatchEvent({
+      type: 'setBreadcrumbs',
+      data: {breadcrumbs: getBreadcrumbs()}
+    })
   }
 
   // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role

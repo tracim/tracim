@@ -16,7 +16,8 @@ import {
   setWorkspaceList,
   setContentTypeList,
   setAppList,
-  setConfig
+  setConfig,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getAppList,
@@ -48,6 +49,8 @@ class Login extends React.Component {
 
   async componentDidMount () {
     const { props } = this
+
+    props.dispatch(setBreadcrumbs([]))
 
     const query = qs.parse(props.location.search)
     if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
@@ -243,5 +246,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system }) => ({ user, system })
+const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
 export default withRouter(connect(mapStateToProps)(translate()(Login)))

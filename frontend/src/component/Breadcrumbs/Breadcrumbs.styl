@@ -1,0 +1,26 @@
+@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.breadcrumbs
+  position absolute
+  top 60px
+  left 100px
+  display flex
+  margin 0
+  padding 0
+  list-style none
+  font-size 12px
+  &__item
+    &:first-child
+      font-weight bold
+    &:not(:first-child)::before
+      content '>'
+      margin 0 5px
+      color #252525
+    & > a
+      color inherit !important
+      &:hover
+        border-bottom 1px solid
+
+@media (max-width: max-xs)
+  .breadcrumbs
+    position static

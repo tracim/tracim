@@ -177,5 +177,12 @@
   "Error while loading your agenda": "Error while loading your agenda",
   "Use this link to access your personal agenda from anyhere": "Use this link to access your personal agenda from anyhere",
   "Use this link to access this shared space agenda from anywhere": "Use this link to access this shared space agenda from anywhere",
-  "agenda details": "agenda details"
+  "agenda details": "agenda details",
+  "Text document": "Text document",
+  "Thread": "Thread",
+  "File": "File",
+  "Administrate users": "Administrate users",
+  "Home": "Home",
+  "Error while saving your default language": "Error while saving your default language",
+  "All contents": "All contents"
 }

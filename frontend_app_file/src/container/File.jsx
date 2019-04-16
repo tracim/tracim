@@ -122,7 +122,7 @@ class File extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
     const { appName, content } = this.state
@@ -131,11 +131,12 @@ class File extends React.Component {
     )
     if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
-    this.loadContent()
+    await this.loadContent()
     this.loadTimeline()
+    this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -143,8 +144,9 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      this.loadContent()
+      await this.loadContent()
       this.loadTimeline()
+      this.buildBreadcrumbs()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -239,6 +241,20 @@ class File extends React.Component {
 
     this.setState({
       timeline: revisionWithComment
+    })
+  }
+
+  buildBreadcrumbs = () => {
+    const { state } = this
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/${state.config.slug}/${state.content.content_id}`,
+          label: state.content.label,
+          type: 'APPFEATURE'
+        }]
+      }
     })
   }
 
