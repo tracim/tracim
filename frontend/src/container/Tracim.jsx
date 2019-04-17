@@ -200,10 +200,10 @@ class Tracim extends React.Component {
               <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
             } />,
 
-            <Switch>
+            <Switch key='workspace_content'>
               <Route
                 path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')}
-                key='workspace_content'
+                key='workspace_contentopen'
                 render={() =>
                   <div className='tracim__content fullWidthFullHeight'>
                     <WorkspaceContent />
