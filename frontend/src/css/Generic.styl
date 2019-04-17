@@ -1,3 +1,5 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 a
   color fontColor
   &:hover, &:link, &:visited
@@ -44,7 +46,7 @@ div.mce-fullscreen
     top 88px
 
 .unLoggedPage
-  padding-top 85px // 85 = header height
+  padding-top headerHeight
   min-height 100%
   background-image url('../img/tracimLogoAsBg.png')
   background-repeat no-repeat
@@ -177,7 +179,7 @@ div.mce-fullscreen
     border-color inherit
 
 #appFullscreenContainer
-  height calc(100vh - 90px)
+  height "calc(100vh - %s)" % headerHeight
   overflow hidden
   & > div[data-radium="true"]
     width calc(100% + 20px)
