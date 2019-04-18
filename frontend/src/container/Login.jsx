@@ -16,7 +16,8 @@ import {
   setWorkspaceList,
   setContentTypeList,
   setAppList,
-  setConfig
+  setConfig,
+  setUserLang
 } from '../action-creator.sync.js'
 import {
   getAppList,
@@ -25,7 +26,10 @@ import {
   getMyselfWorkspaceList,
   postUserLogin
 } from '../action-creator.async.js'
-import { PAGE } from '../helper.js'
+import {
+  PAGE,
+  COOKIE_FRONTEND
+} from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
@@ -49,8 +53,19 @@ class Login extends React.Component {
   async componentDidMount () {
     const { props } = this
 
+    const defaultLangCookie = Cookies.get(COOKIE_FRONTEND.DEFAULT_LANGUAGE)
+
+    if (defaultLangCookie) {
+      i18n.changeLanguage(defaultLangCookie)
+      props.dispatch(setUserLang(defaultLangCookie))
+    }
+
     const query = qs.parse(props.location.search)
-    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
+    if (query.dc && query.dc === '1') {
+      props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
+      props.history.push(props.location.pathname)
+      return
+    }
 
     await this.loadConfig()
   }
@@ -82,8 +97,10 @@ class Login extends React.Component {
           logged: true
         }
 
-        Cookies.set('lastConnection', '1', {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: 180})
         props.dispatch(setUserConnected(loggedUser))
+
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, {expires: 180})
         i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppList()

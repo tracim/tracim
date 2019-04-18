@@ -22,6 +22,7 @@ import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   PAGE,
+  COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile
 } from '../helper.js'
@@ -91,7 +92,8 @@ class Tracim extends React.Component {
           logged: true
         }))
 
-        Cookies.set('lastConnection', '1', {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: 180})
 
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 
