@@ -91,8 +91,6 @@ class Header extends React.Component {
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
-
-
             <ul className='header__menu__rightside'>
               {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning'>
