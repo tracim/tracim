@@ -10,7 +10,7 @@ describe('account :: main_page', function () {
   })
   it('', function () {
     cy.get('#dropdownMenuButton').click()
-    cy.get('a.setting__link[href="/ui/account"]').click()
+    cy.get('a.menuprofil__dropdown__setting__link[href="/ui/account"]').click()
     cy.get('.userinfo')
   })
 })
