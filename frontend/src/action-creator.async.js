@@ -78,6 +78,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
           history.push(`${PAGE.LOGIN}${Cookies.get('lastConnection') ? '?dc=1' : ''}`)
+          Cookies.remove('lastConnection')
         }
         return ''
       }
