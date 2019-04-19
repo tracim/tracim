@@ -69,8 +69,6 @@ export class ForgotPassword extends React.Component {
                 icon='fa-envelope-open-o'
                 type='email'
                 placeHolder={props.t('Email')}
-                invalidMsg='Email invalide.'
-                // isInvalid={this.state.inputLogin.isInvalid}
                 value={state.backupEmail.value}
                 onChange={this.handleChangeBackupEmail}
                 onKeyDown={this.handleInputKeyDown}

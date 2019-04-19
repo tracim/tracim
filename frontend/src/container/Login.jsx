@@ -162,7 +162,7 @@ class Login extends React.Component {
                 icon='fa-envelope-open-o'
                 type='email'
                 placeHolder={props.t('Email Address')}
-                invalidMsg='Email invalide.'
+                invalidMsg={props.t('Invalid email')}
                 isInvalid={state.inputLogin.isInvalid}
                 value={state.inputLogin.value}
                 onChange={this.handleChangeLogin}
@@ -176,7 +176,7 @@ class Login extends React.Component {
                 icon='fa-lock'
                 type='password'
                 placeHolder={props.t('Password')}
-                invalidMsg='Mot de passe invalide.'
+                invalidMsg={props.t('Invalid password')}
                 isInvalid={state.inputPassword.isInvalid}
                 value={state.inputPassword.value}
                 onChange={this.handleChangePassword}

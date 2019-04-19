@@ -56,7 +56,6 @@
   "Connection": "Connection",
   "Email Address": "Email Address",
   "Password": "Password",
-  "Remember me": "Remember me",
   "Forgotten password ?": "Forgotten password ?",
   "Error while loading read status list": "Error while loading read status list",
   "Error while archiving document": "Error while archiving document",
@@ -177,5 +176,8 @@
   "Error while loading your agenda": "Error while loading your agenda",
   "Use this link to access your personal agenda from anyhere": "Use this link to access your personal agenda from anyhere",
   "Use this link to access this shared space agenda from anywhere": "Use this link to access this shared space agenda from anywhere",
-  "agenda details": "agenda details"
+  "agenda details": "agenda details",
+  "Invalid email": "Invalid email",
+  "Invalid password": "Invalid password",
+  "Error while saving your default language": "Error while saving your default language"
 }

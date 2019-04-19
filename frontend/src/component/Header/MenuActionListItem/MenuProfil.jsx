@@ -16,8 +16,8 @@ const MenuProfil = props => {
         <button
           className='menuprofil__dropdown__name outlineTextBtn btn nohover dropdown-toggle'
           type='button'
-          id='dropdownMenuButton'
           data-toggle='dropdown'
+          data-cy='menuprofil__dropdown__button'
         >
           <Avatar
             width={'40px'}
@@ -34,7 +34,11 @@ const MenuProfil = props => {
         </button>
 
         <div className='menuprofil__dropdown__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
-          <Link className='menuprofil__dropdown__setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ACCOUNT}>
+          <Link
+            className='menuprofil__dropdown__setting__link primaryColorBgLightenHover dropdown-item'
+            to={PAGE.ACCOUNT}
+            data-cy='menuprofil__dropdown__account__link'
+          >
             <i className='fa fa-fw fa-user-o mr-2' />
             {props.t('My Account')}
           </Link>
