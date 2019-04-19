@@ -1,7 +1,9 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 .tracim
   height 100vh
   &__content
-    height calc(100vh - 90px) // 90px is header height
+    height "calc(100vh - %s)" % headerHeight
     overflow hidden
     &-scrollview
       height 100%

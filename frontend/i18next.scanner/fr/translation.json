@@ -87,7 +87,6 @@
   "Administrator's password": "Mot de passe administrateur",
   "This edition requires your administrator password": "Cette modification demande votre mot passe administrateur",
   "Type your password": "Entrer votre mot de passe",
-  "Remember me": "Se souvenir de moi",
   "Member added": "Membre ajouté",
   "Member removed": "Membre supprimé",
   "All Contents": "Tous les contenus",
@@ -177,5 +176,8 @@
   "Error while loading your agenda": "Erreur lors du chargement de votre agenda",
   "Use this link to access your personal agenda from anyhere": "Utiliser ce lien pour accéder à votre agenda depuis n'importe où",
   "Use this link to access this shared space agenda from anywhere": "Utiliser ce lien pour accéder à l'agenda de cet espace partagé depuis n'importe où",
-  "agenda details": "de l'agenda"
+  "agenda details": "de l'agenda",
+  "Invalid email": "Email invalide",
+  "Invalid password": "Mot de passe invalide",
+  "Error while saving your default language": "Erreur lors de la sauvegarde de la langue par défaut"
 }

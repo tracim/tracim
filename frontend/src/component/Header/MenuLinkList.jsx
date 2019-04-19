@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
+// INFO - CH - 2019-04-17 - Component deprecated because unused
+
 const MenuLinkList = props => {
   return (
     <ul className='header__menu__list text-center navbar-nav mr-auto'>
