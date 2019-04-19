@@ -57,7 +57,7 @@ class Header extends React.Component {
     const { props } = this
 
     if (props.user.user_id === -1) {
-      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: 180})
+      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
       i18n.changeLanguage(idLang)
       props.dispatch(setUserLang(idLang))
       return
@@ -67,7 +67,7 @@ class Header extends React.Component {
     switch (fetchPutUserLang.status) {
       case 200:
         i18n.changeLanguage(idLang)
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserLang(idLang))
         props.dispatchCustomEvent('allApp_changeLang', idLang)
         break
