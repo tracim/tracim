@@ -6,13 +6,11 @@ import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
-import MenuLinkList from '../component/Header/MenuLinkList.jsx'
-import MenuActionListItemSearch from '../component/Header/MenuActionListItem/Search.jsx'
-import MenuActionListItemDropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
-import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
-import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
-import MenuActionListItemNotification from '../component/Header/MenuActionListItem/Notification.jsx'
-import MenuActionListAdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
+import DropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
+import Help from '../component/Header/MenuActionListItem/Help.jsx'
+import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
+import Notification from '../component/Header/MenuActionListItem/Notification.jsx'
+import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
@@ -40,13 +38,6 @@ class Header extends React.Component {
     if (props.user.logged) props.history.push(PAGE.HOME)
     else props.history.push(PAGE.LOGIN)
   }
-
-  handleClickFeature = () => {}
-  handleClickExplore = () => {}
-  handleClickAbout = () => {}
-
-  handleChangeInput = e => this.setState({inputSearchValue: e.target.value})
-  handleClickSubmit = () => {}
 
   handleChangeLang = async idLang => {
     const { props } = this
@@ -100,30 +91,22 @@ class Header extends React.Component {
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
-            <MenuLinkList
-              onClickFeature={this.handleClickFeature}
-              onClickExplore={this.handleClickExplore}
-              onClickAbout={this.handleClickAbout}
-            />
-
-            {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
-              <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                <i className='header__menu__system__icon slowblink fa fa-warning' />
-                <span className='header__menu__system__text d-none d-xl-block'>
-                  {props.t('Email notifications are disabled')}
-                </span>
-              </div>
-            )}
-
             <ul className='header__menu__rightside'>
-              <MenuActionListItemSearch
-                onChangeInput={this.handleChangeInput}
-                onClickSubmit={this.handleClickSubmit}
-              />
+              {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+                <li className='header__menu__rightside__emailwarning'>
+                  <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
+                    <i className='header__menu__system__icon slowblink fa fa-warning' />
+
+                    <span className='header__menu__system__text d-none d-xl-block'>
+                      {props.t('Email notifications are disabled')}
+                    </span>
+                  </div>
+                </li>
+              )}
 
               {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
                 <li className='header__menu__rightside__adminlink'>
-                  <MenuActionListAdminLink />
+                  <AdminLink />
                 </li>
               )}
 
@@ -139,19 +122,19 @@ class Header extends React.Component {
                 </li>
               )}
 
-              <MenuActionListItemDropdownLang
+              <DropdownLang
                 langList={props.lang}
                 idLangActive={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 
-              <MenuActionListItemHelp
+              <Help
                 onClickHelp={this.handleClickHelp}
               />
 
-              <MenuActionListItemNotification />
+              <Notification />
 
-              <MenuActionListItemMenuProfil
+              <MenuProfil
                 user={props.user}
                 onClickLogout={this.handleClickLogout}
               />
