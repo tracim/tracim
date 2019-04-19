@@ -21,7 +21,8 @@ import {
   deleteMember,
   getMyselfKnownMember,
   postWorkspaceMember,
-  deleteWorkspace, getAppList
+  deleteWorkspace,
+  getAppList
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -139,7 +140,7 @@ class WorkspaceAdvanced extends React.Component {
       content: {
         ...resDetail.body,
         memberList: resMember.body,
-        appAgendaAvailable: !!resAppList.body.some(a => a.slug === 'agenda')
+        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda')
       }
     })
   }
