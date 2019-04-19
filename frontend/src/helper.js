@@ -149,7 +149,8 @@ export const PROFILE = {
 
 export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
-  DEFAULT_LANGUAGE: 'defaultLanguage'
+  DEFAULT_LANGUAGE: 'defaultLanguage',
+  DEFAULT_EXPIRE_TIME: 180
 }
 
 export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}

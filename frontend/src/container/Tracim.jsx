@@ -92,8 +92,8 @@ class Tracim extends React.Component {
           logged: true
         }))
 
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: 180})
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
 
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 

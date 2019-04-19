@@ -97,10 +97,10 @@ class Login extends React.Component {
           logged: true
         }
 
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserConnected(loggedUser))
 
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, {expires: 180})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppList()
