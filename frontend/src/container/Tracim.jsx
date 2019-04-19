@@ -138,7 +138,7 @@ class Tracim extends React.Component {
     return false
   }
 
-  setDefaultUserLang = async (loggedUser) => {
+  setDefaultUserLang = async loggedUser => {
     const { props } = this
     const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
     switch (fetchPutUserLang.status) {
