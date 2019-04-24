@@ -17,62 +17,34 @@ class Content(Fixture):
     require = [Test]
 
     def insert(self):
-        admin = self._session.query(User) \
-            .filter(User.email == 'admin@admin.admin') \
-            .one()
-        bob = self._session.query(User) \
-            .filter(User.email == 'bob@fsf.local') \
-            .one()
-        john_the_reader = self._session.query(User) \
-            .filter(User.email == 'john-the-reader@reader.local') \
-            .one()
+        admin = self._session.query(User).filter(User.email == "admin@admin.admin").one()
+        bob = self._session.query(User).filter(User.email == "bob@fsf.local").one()
+        john_the_reader = (
+            self._session.query(User).filter(User.email == "john-the-reader@reader.local").one()
+        )
 
         admin_workspace_api = WorkspaceApi(
-            current_user=admin,
-            session=self._session,
-            config=self._config,
+            current_user=admin, session=self._session, config=self._config
         )
         bob_workspace_api = WorkspaceApi(
-            current_user=bob,
-            session=self._session,
-            config=self._config
+            current_user=bob, session=self._session, config=self._config
         )
-        content_api = ContentApi(
-            current_user=admin,
-            session=self._session,
-            config=self._config
-        )
-        bob_content_api = ContentApi(
-            current_user=bob,
-            session=self._session,
-            config=self._config
-        )
+        content_api = ContentApi(current_user=admin, session=self._session, config=self._config)
+        bob_content_api = ContentApi(current_user=bob, session=self._session, config=self._config)
         reader_content_api = ContentApi(
-            current_user=john_the_reader,
-            session=self._session,
-            config=self._config
+            current_user=john_the_reader, session=self._session, config=self._config
         )
-        role_api = RoleApi(
-            current_user=admin,
-            session=self._session,
-            config=self._config,
-        )
+        role_api = RoleApi(current_user=admin, session=self._session, config=self._config)
 
         # Workspaces
         business_workspace = admin_workspace_api.create_workspace(
-            'Business',
-            description='All importants documents',
-            save_now=True,
+            "Business", description="All importants documents", save_now=True
         )
         recipe_workspace = admin_workspace_api.create_workspace(
-            'Recipes',
-            description='Our best recipes',
-            save_now=True,
+            "Recipes", description="Our best recipes", save_now=True
         )
         other_workspace = bob_workspace_api.create_workspace(
-            'Others',
-            description='Other Workspace',
-            save_now=True,
+            "Others", description="Other Workspace", save_now=True
         )
 
         # Workspaces roles
@@ -93,14 +65,14 @@ class Content(Fixture):
         tool_workspace = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=business_workspace,
-            label='Tools',
+            label="Tools",
             do_save=True,
             do_notify=False,
         )
         menu_workspace = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=business_workspace,
-            label='Menus',
+            label="Menus",
             do_save=True,
             do_notify=False,
         )
@@ -108,21 +80,21 @@ class Content(Fixture):
         dessert_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=recipe_workspace,
-            label='Desserts',
+            label="Desserts",
             do_save=True,
             do_notify=False,
         )
         salads_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=recipe_workspace,
-            label='Salads',
+            label="Salads",
             do_save=True,
             do_notify=False,
         )
         other_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=other_workspace,
-            label='Infos',
+            label="Infos",
             do_save=True,
             do_notify=False,
         )
@@ -132,19 +104,15 @@ class Content(Fixture):
             content_type_slug=content_type_list.Page.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Tiramisu Recipes!!!',
+            label="Tiramisu Recipes!!!",
             do_save=True,
             do_notify=False,
         )
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=tiramisu_page,
-        ):
+        with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
             content_api.update_content(
                 item=tiramisu_page,
-                new_content='<p>To cook a greet Tiramisu, you need many ingredients.</p>',  # nopep8
-                new_label='Tiramisu Recipes!!!',
+                new_content="<p>To cook a greet Tiramisu, you need many ingredients.</p>",  # nopep8
+                new_label="Tiramisu Recipes!!!",
             )
             content_api.save(tiramisu_page, do_notify=False)
 
@@ -152,46 +120,40 @@ class Content(Fixture):
             content_type_slug=content_type_list.Thread.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Best Cake',
+            label="Best Cake",
             do_save=False,
             do_notify=False,
         )
-        best_cake_thread.description = 'Which is the best cake?'
+        best_cake_thread.description = "Which is the best cake?"
         self._session.add(best_cake_thread)
         apple_pie_recipe = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Apple_Pie',
+            label="Apple_Pie",
             do_save=False,
             do_notify=False,
         )
-        apple_pie_recipe.file_extension = '.txt'
-        apple_pie_recipe.depot_file = FileIntent(
-            b'Apple pie Recipe',
-            'apple_Pie.txt',
-            'text/plain',
-        )
+        apple_pie_recipe.file_extension = ".txt"
+        apple_pie_recipe.depot_file = FileIntent(b"Apple pie Recipe", "apple_Pie.txt", "text/plain")
         self._session.add(apple_pie_recipe)
         Brownie_recipe = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Brownie Recipe',
+            label="Brownie Recipe",
             do_save=False,
             do_notify=False,
         )
-        Brownie_recipe.file_extension = '.html'
+        Brownie_recipe.file_extension = ".html"
         Brownie_recipe.depot_file = FileIntent(
-            b'<p>Brownie Recipe</p>',
-            'brownie_recipe.html',
-            'text/html',
+            b"<p>Brownie Recipe</p>", "brownie_recipe.html", "text/html"
         )
         self._session.add(Brownie_recipe)
         fruits_desserts_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=recipe_workspace,
-            label='Fruits Desserts',
+            label="Fruits Desserts",
             parent=dessert_folder,
             do_save=True,
             do_notify=False,
@@ -201,16 +163,16 @@ class Content(Fixture):
             content_type_slug=content_type_list.Page.slug,
             workspace=business_workspace,
             parent=menu_workspace,
-            label='Current Menu',
+            label="Current Menu",
             do_save=True,
-            do_notify=False
+            do_notify=False,
         )
 
         new_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
-            label='New Fruit Salad',
+            label="New Fruit Salad",
             do_save=True,
             do_notify=False,
         )
@@ -218,15 +180,11 @@ class Content(Fixture):
             content_type_slug=content_type_list.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
-            label='Fruit Salad',
+            label="Fruit Salad",
             do_save=True,
             do_notify=False,
         )
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=old_fruit_salad,
-        ):
+        with new_revision(session=self._session, tm=transaction.manager, content=old_fruit_salad):
             content_api.archive(old_fruit_salad)
         content_api.save(old_fruit_salad, do_notify=False)
 
@@ -234,15 +192,11 @@ class Content(Fixture):
             content_type_slug=content_type_list.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
-            label='Bad Fruit Salad',
+            label="Bad Fruit Salad",
             do_save=True,
             do_notify=False,
         )
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=bad_fruit_salad,
-        ):
+        with new_revision(session=self._session, tm=transaction.manager, content=bad_fruit_salad):
             content_api.delete(bad_fruit_salad)
         content_api.save(bad_fruit_salad, do_notify=False)
 
@@ -250,79 +204,61 @@ class Content(Fixture):
         new_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=other_workspace,
-            label='New Fruit Salad',
+            label="New Fruit Salad",
             do_save=True,
             do_notify=False,
         )
         old_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=other_workspace,
-            label='Fruit Salad',
+            label="Fruit Salad",
             do_save=True,
             do_notify=False,
         )
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=old_fruit_salad,
-        ):
+        with new_revision(session=self._session, tm=transaction.manager, content=old_fruit_salad):
             content_api.archive(old_fruit_salad)
         content_api.save(old_fruit_salad, do_notify=False)
 
         bad_fruit_salad = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=other_workspace,
-            label='Bad Fruit Salad',
+            label="Bad Fruit Salad",
             do_save=True,
-            do_notify=False
+            do_notify=False,
         )
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=bad_fruit_salad,
-        ):
+        with new_revision(session=self._session, tm=transaction.manager, content=bad_fruit_salad):
             content_api.delete(bad_fruit_salad)
         content_api.save(bad_fruit_salad, do_notify=False)
 
         content_api.create_comment(
             parent=best_cake_thread,
-            content='<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>',  # nopep8
-            do_save=True,
-            do_notify=False
-        )
-        bob_content_api.create_comment(
-            parent=best_cake_thread,
-            content='<p>What about Apple Pie? There are Awesome!</p>',
-            do_save=True,
-            do_notify=False
-        )
-        reader_content_api.create_comment(
-            parent=best_cake_thread,
-            content='<p>You are right, but Kouign-amann are clearly better.</p>',
+            content="<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>",  # nopep8
             do_save=True,
             do_notify=False,
         )
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=best_cake_thread,
-        ):
+        bob_content_api.create_comment(
+            parent=best_cake_thread,
+            content="<p>What about Apple Pie? There are Awesome!</p>",
+            do_save=True,
+            do_notify=False,
+        )
+        reader_content_api.create_comment(
+            parent=best_cake_thread,
+            content="<p>You are right, but Kouign-amann are clearly better.</p>",
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(session=self._session, tm=transaction.manager, content=best_cake_thread):
             bob_content_api.update_content(
-                item=best_cake_thread,
-                new_content='What is the best cake?',
-                new_label='Best Cakes?',
+                item=best_cake_thread, new_content="What is the best cake?", new_label="Best Cakes?"
             )
             bob_content_api.save(best_cake_thread, do_notify=False)
 
-        with new_revision(
-                session=self._session,
-                tm=transaction.manager,
-                content=tiramisu_page,
-        ):
+        with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
             bob_content_api.update_content(
                 item=tiramisu_page,
-                new_content='<p>To cook a great Tiramisu, you need many ingredients.</p>',  # nopep8
-                new_label='Tiramisu Recipe',
+                new_content="<p>To cook a great Tiramisu, you need many ingredients.</p>",  # nopep8
+                new_label="Tiramisu Recipe",
             )
             bob_content_api.save(tiramisu_page, do_notify=False)
         self._session.flush()

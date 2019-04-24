@@ -26,27 +26,24 @@ except ImportError:
     from http import client as HTTPStatus
 
 
-SWAGGER_TAG_SYSTEM_ENDPOINTS = 'System'
+SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
 
 class SystemController(Controller):
-
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
-    @hapic.output_body(ApplicationSchema(many=True),)
+    @hapic.output_body(ApplicationSchema(many=True))
     def applications(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of alls applications installed in this tracim instance.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
-        app_api = ApplicationApi(
-            app_list=app_list,
-        )
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        app_api = ApplicationApi(app_list=app_list)
         return app_api.get_all()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
-    @hapic.output_body(ContentTypeSchema(many=True), )
+    @hapic.output_body(ContentTypeSchema(many=True))
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of alls content types availables in this tracim instance.
@@ -57,7 +54,7 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
-    @hapic.output_body(TimezoneSchema(many=True),)
+    @hapic.output_body(TimezoneSchema(many=True))
     def timezones_list(self, context, request: TracimRequest, hapic_data=None):
         """
         Get List of timezones
@@ -66,18 +63,18 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
-    @hapic.output_body(AboutSchema(),)
+    @hapic.output_body(AboutSchema())
     def about(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns information about current tracim instance.
         This is the equivalent of classical "help > about" menu in classical software.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         system_api = SystemApi(app_config)
         return system_api.get_about()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @hapic.output_body(ConfigSchema(),)
+    @hapic.output_body(ConfigSchema())
     def config(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns configuration information required for frontend.
@@ -86,14 +83,14 @@ class SystemController(Controller):
         # FIXME - G.M - 2018-12-14 - [config_unauthenticated] #1270
         # do not allow unauthenticated user to
         # get all config info
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         system_api = SystemApi(app_config)
         return system_api.get_config()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         system_api = SystemApi(app_config)
         return system_api.get_error_codes()
 
@@ -104,25 +101,31 @@ class SystemController(Controller):
         """
 
         # About
-        configurator.add_route('about', '/system/about', request_method='GET')  # nopep8
-        configurator.add_view(self.about, route_name='about')
+        configurator.add_route("about", "/system/about", request_method="GET")  # nopep8
+        configurator.add_view(self.about, route_name="about")
 
         # Config
-        configurator.add_route('config', '/system/config', request_method='GET')  # nopep8
-        configurator.add_view(self.config, route_name='config')
+        configurator.add_route("config", "/system/config", request_method="GET")  # nopep8
+        configurator.add_view(self.config, route_name="config")
 
         # Errors codes
-        configurator.add_route('error_codes', '/system/error_codes', request_method='GET')  # nopep8
-        configurator.add_view(self.error_codes, route_name='error_codes')
+        configurator.add_route("error_codes", "/system/error_codes", request_method="GET")  # nopep8
+        configurator.add_view(self.error_codes, route_name="error_codes")
 
         # Applications
-        configurator.add_route('applications', '/system/applications', request_method='GET')  # nopep8
-        configurator.add_view(self.applications, route_name='applications')
+        configurator.add_route(
+            "applications", "/system/applications", request_method="GET"
+        )  # nopep8
+        configurator.add_view(self.applications, route_name="applications")
 
         # Content_types
-        configurator.add_route('content_types', '/system/content_types', request_method='GET')  # nopep8
-        configurator.add_view(self.content_types, route_name='content_types')
+        configurator.add_route(
+            "content_types", "/system/content_types", request_method="GET"
+        )  # nopep8
+        configurator.add_view(self.content_types, route_name="content_types")
 
         # Content_types
-        configurator.add_route('timezones_list', '/system/timezones', request_method='GET')  # nopep8
-        configurator.add_view(self.timezones_list, route_name='timezones_list')
+        configurator.add_route(
+            "timezones_list", "/system/timezones", request_method="GET"
+        )  # nopep8
+        configurator.add_view(self.timezones_list, route_name="timezones_list")

@@ -13,15 +13,16 @@ class Application(object):
     """
     Application class with data needed for frontend
     """
+
     def __init__(
-            self,
-            label: str,
-            slug: str,
-            fa_icon: str,
-            is_active: bool,
-            config: typing.Dict[str, str],
-            main_route: str,
-            app_config: 'CFG',
+        self,
+        label: str,
+        slug: str,
+        fa_icon: str,
+        is_active: bool,
+        config: typing.Dict[str, str],
+        main_route: str,
+        app_config: "CFG",
     ) -> None:
         """
         @param label: public label of application
@@ -47,18 +48,18 @@ class Application(object):
     # we probably should not have 2 kind of slug
     @property
     def minislug(self):
-        return self.slug.replace('contents/', '')
+        return self.slug.replace("contents/", "")
 
     def add_content_type(
-            self,
-            label: str,
-            slug: str,
-            creation_label: str,
-            available_statuses: typing.List['ContentStatus'],
-            slug_alias: typing.List[str] = None,
-            allow_sub_content: bool = False,
-            file_extension: typing.Optional[str] = None,
-            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
+        self,
+        label: str,
+        slug: str,
+        creation_label: str,
+        available_statuses: typing.List["ContentStatus"],
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
     ):
         content_type = ContentType(
             slug=slug,
@@ -74,9 +75,9 @@ class Application(object):
         )
         self.content_types.append(content_type)
 
-    def _get_hexcolor_or_default(self, slug: str, app_config: 'CFG') -> str:
+    def _get_hexcolor_or_default(self, slug: str, app_config: "CFG") -> str:
         assert app_config.APPS_COLORS
-        assert 'primary' in app_config.APPS_COLORS
+        assert "primary" in app_config.APPS_COLORS
         if slug in app_config.APPS_COLORS:
             return app_config.APPS_COLORS[slug]
-        return app_config.APPS_COLORS['primary']
+        return app_config.APPS_COLORS["primary"]

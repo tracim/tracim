@@ -25,5 +25,5 @@ class WebdavRunnerCommand(AppContextCommand):
         server(app)
 
     def _get_server(self, config_uri: str):
-        loader = plaster.get_loader(config_uri, protocols=['wsgi'])
+        loader = plaster.get_loader(config_uri, protocols=["wsgi"])
         return loader.get_wsgi_server(name=WEBDAV_APP_NAME)

@@ -34,7 +34,9 @@ from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.views import BASE_API_V2
-from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
+from tracim_backend.views.contents_api.html_document_controller import (
+    HTMLDocumentController,
+)  # nopep8
 from tracim_backend.views.contents_api.threads_controller import ThreadController  # nopep8
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
@@ -44,7 +46,9 @@ from tracim_backend.views.core_api.workspace_controller import WorkspaceControll
 from tracim_backend.views.contents_api.comment_controller import CommentController  # nopep8
 from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController  # nopep8
-from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController  # nopep8
+from tracim_backend.views.core_api.reset_password_controller import (
+    ResetPasswordController,
+)  # nopep8
 from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
@@ -77,7 +81,7 @@ def web(global_config, **local_settings):
     # set CFG object
     app_config = CFG(settings)
     app_config.configure_filedepot()
-    settings['CFG'] = app_config
+    settings["CFG"] = app_config
     configurator = Configurator(settings=settings, autocommit=True)
     # Add AuthPolicy
     configurator.include("pyramid_beaker")
@@ -86,29 +90,25 @@ def web(global_config, **local_settings):
     if app_config.REMOTE_USER_HEADER:
         policies.append(
             RemoteAuthentificationPolicy(
-                remote_user_email_login_header=app_config.REMOTE_USER_HEADER,
+                remote_user_email_login_header=app_config.REMOTE_USER_HEADER
             )
         )
     policies.append(
-        CookieSessionAuthentificationPolicy(
-            reissue_time=app_config.SESSION__REISSUE_TIME),  # nopep8
+        CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)  # nopep8
     )
     if app_config.API__KEY:
         policies.append(
             ApiTokenAuthentificationPolicy(
                 api_key_header=TRACIM_API_KEY_HEADER,
-                api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
-            ),
+                api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER,
+            )
         )
-    policies.append(
-        TracimBasicAuthAuthenticationPolicy(
-            realm=BASIC_AUTH_WEBUI_REALM
-        ),
-    )
+    policies.append(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3
-        configurator.include('pyramid_ldap3')
+
+        configurator.include("pyramid_ldap3")
         configurator.ldap_setup(
             app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN,
@@ -117,13 +117,13 @@ def web(global_config, **local_settings):
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,
             pool_lifetime=app_config.LDAP_POOL_LIFETIME,
-            get_info=app_config.LDAP_GET_INFO
+            get_info=app_config.LDAP_GET_INFO,
         )
         configurator.ldap_set_login_query(
             base_dn=app_config.LDAP_USER_BASE_DN,
             filter_tmpl=app_config.LDAP_USER_FILTER,
             scope=ldap3.LEVEL,
-            attributes=ldap3.ALL_ATTRIBUTES
+            attributes=ldap3.ALL_ATTRIBUTES,
         )
 
     configurator.include(add_cors_support)
@@ -140,14 +140,12 @@ def web(global_config, **local_settings):
     # Override default request
     configurator.set_request_factory(TracimRequest)
     # Pyramids "plugin" include.
-    configurator.include('pyramid_jinja2')
+    configurator.include("pyramid_jinja2")
     # Add SqlAlchemy DB
-    configurator.include('.models.setup_models')
+    configurator.include(".models.setup_models")
     # set Hapic
     context = PyramidContext(
-        configurator=configurator,
-        default_error_builder=ErrorSchema(),
-        debug=app_config.DEBUG,
+        configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
     )
     hapic.set_context(context)
     # INFO - G.M - 2018-07-04 - global-context exceptions
@@ -205,6 +203,7 @@ def web(global_config, **local_settings):
         # pyramid make trouble in hapic which try to get view related
         # to controller but failed.
         from tracim_backend.views.agenda_api.agenda_controller import AgendaController
+
         configurator.include(add_www_authenticate_header_for_caldav)
         # caldav exception
         context.handle_exception(CaldavNotAuthorized, HTTPStatus.FORBIDDEN)
@@ -221,30 +220,23 @@ def web(global_config, **local_settings):
         configurator.include(radicale_proxy_controller.bind)
 
     if app_config.FRONTEND__SERVE:
-        configurator.include('pyramid_mako')
+        configurator.include("pyramid_mako")
         frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)  # nopep8
         configurator.include(frontend_controller.bind)
 
-    hapic.add_documentation_view(
-        '/api/v2/doc',
-        'Tracim v2 API',
-        'API of Tracim v2',
-    )
+    hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")
     return configurator.make_wsgi_app()
 
 
 def webdav(global_config, **local_settings):
     settings = deepcopy(global_config)
     settings.update(local_settings)
-    app_factory = WebdavAppFactory(
-        **settings
-    )
+    app_factory = WebdavAppFactory(**settings)
     return app_factory.get_wsgi_app()
+
 
 def caldav(global_config, **local_settings):
     settings = deepcopy(global_config)
     settings.update(local_settings)
-    app_factory = CaldavAppFactory(
-        **settings
-    )
+    app_factory = CaldavAppFactory(**settings)
     return app_factory.get_wsgi_app()

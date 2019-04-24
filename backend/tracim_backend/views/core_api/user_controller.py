@@ -24,8 +24,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import \
-    ActiveContentFilterQuerySchema
+from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMemberQuerySchema
@@ -39,18 +38,13 @@ from tracim_backend.views.core_api.schemas import UserCreationSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
-from tracim_backend.views.core_api.schemas import \
-    UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.views.swagger_generic_section import \
-    SWAGGER_TAG__CONTENT_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import \
-    SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
-from tracim_backend.views.swagger_generic_section import \
-    SWAGGER_TAG__NOTIFICATION_SECTION
-from tracim_backend.views.swagger_generic_section import \
-    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -58,48 +52,40 @@ except ImportError:
     from http import client as HTTPStatus
 
 
-SWAGGER_TAG__USER_ENDPOINTS = 'Users'
+SWAGGER_TAG__USER_ENDPOINTS = "Users"
 SWAGGER_TAG__USER_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
-    SWAGGER_TAG__USER_ENDPOINTS,
-    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 )
 
 SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
-    SWAGGER_TAG__USER_ENDPOINTS,
-    SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 )
 SWAGGER_TAG__USER_CONTENT_ENDPOINTS = generate_documentation_swagger_tag(
-    SWAGGER_TAG__USER_ENDPOINTS,
-    SWAGGER_TAG__CONTENT_ENDPOINTS,
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__CONTENT_ENDPOINTS
 )
 SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS = generate_documentation_swagger_tag(
-    SWAGGER_TAG__USER_ENDPOINTS,
-    SWAGGER_TAG__NOTIFICATION_SECTION,
+    SWAGGER_TAG__USER_ENDPOINTS, SWAGGER_TAG__NOTIFICATION_SECTION
 )
 
 
 class UserController(Controller):
-
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(WorkspaceDigestSchema(many=True),)
+    @hapic.output_body(WorkspaceDigestSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        
+
         workspaces = wapi.get_all_for_user(request.candidate_user)
-        return [
-            wapi.get_workspace_with_context(workspace)
-            for workspace in workspaces
-        ]
+        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
@@ -109,11 +95,9 @@ class UserController(Controller):
         """
         Get user infos.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return uapi.get_user_with_context(request.candidate_user)
 
@@ -124,16 +108,12 @@ class UserController(Controller):
         """
         Get all users
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         users = uapi.get_all()
-        context_users = [
-            uapi.get_user_with_context(user) for user in users
-        ]
+        context_users = [uapi.get_user_with_context(user) for user in users]
         return context_users
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -145,7 +125,7 @@ class UserController(Controller):
         """
         Get known users list
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
@@ -157,9 +137,7 @@ class UserController(Controller):
             exclude_user_ids=hapic_data.query.exclude_user_ids,
             exclude_workspace_ids=hapic_data.query.exclude_workspace_ids,
         )
-        context_users = [
-            uapi.get_user_with_context(user) for user in users
-        ]
+        context_users = [uapi.get_user_with_context(user) for user in users]
         return context_users
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -174,17 +152,15 @@ class UserController(Controller):
         """
         Set user Email
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user = uapi.set_email(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
             hapic_data.body.email,
-            do_save=True
+            do_save=True,
         )
         return uapi.get_user_with_context(user)
 
@@ -200,18 +176,16 @@ class UserController(Controller):
         """
         Set user password
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.set_password(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
             hapic_data.body.new_password,
             hapic_data.body.new_password2,
-            do_save=True
+            do_save=True,
         )
         return
 
@@ -224,11 +198,9 @@ class UserController(Controller):
         """
         Set user info data
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user = uapi.update(
             request.candidate_user,
@@ -236,7 +208,7 @@ class UserController(Controller):
             name=hapic_data.body.public_name,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
-            do_save=True
+            do_save=True,
         )
         uapi.execute_updated_user_actions(user)
         return uapi.get_user_with_context(user)
@@ -250,16 +222,12 @@ class UserController(Controller):
         """
         Create new user
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         gapi = GroupApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         groups = [gapi.get_one_with_name(hapic_data.body.profile)]
         password = hapic_data.body.password
@@ -275,7 +243,7 @@ class UserController(Controller):
             name=hapic_data.body.public_name,
             do_notify=hapic_data.body.email_notification,
             groups=groups,
-            do_save=True
+            do_save=True,
         )
         uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)
@@ -288,11 +256,9 @@ class UserController(Controller):
         """
         enable user
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.enable(user=request.candidate_user, do_save=True)
         return
@@ -306,11 +272,9 @@ class UserController(Controller):
         """
         delete user
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.delete(user=request.candidate_user, do_save=True)
         return
@@ -323,7 +287,7 @@ class UserController(Controller):
         """
         undelete user
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -342,11 +306,9 @@ class UserController(Controller):
         """
         disable user
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.disable(user=request.candidate_user, do_save=True)
         return
@@ -361,16 +323,12 @@ class UserController(Controller):
         """
         set user profile
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         gapi = GroupApi(
-            current_user=request.current_user,  # User
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         groups = [gapi.get_one_with_name(hapic_data.body.profile)]
         uapi.update(
@@ -390,7 +348,7 @@ class UserController(Controller):
         """
         Get last_active_content for user
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.candidate_user,  # User
@@ -410,17 +368,12 @@ class UserController(Controller):
             before_content = api.get_one(
                 content_id=content_filter.before_content_id,
                 workspace=workspace,
-                content_type=content_type_list.Any_SLUG
+                content_type=content_type_list.Any_SLUG,
             )
         last_actives = api.get_last_active(
-            workspace=workspace,
-            limit=content_filter.limit or None,
-            before_content=before_content,
+            workspace=workspace, limit=content_filter.limit or None, before_content=before_content
         )
-        return [
-            api.get_content_in_context(content)
-            for content in last_actives
-        ]
+        return [api.get_content_in_context(content) for content in last_actives]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -431,7 +384,7 @@ class UserController(Controller):
         """
         get user_read status of contents
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.candidate_user,  # User
@@ -450,12 +403,9 @@ class UserController(Controller):
             workspace=workspace,
             limit=None,
             before_content=None,
-            content_ids=hapic_data.query.content_ids or None
+            content_ids=hapic_data.query.content_ids or None,
         )
-        return [
-            api.get_content_in_context(content)
-            for content in last_actives
-        ]
+        return [api.get_content_in_context(content) for content in last_actives]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -465,7 +415,7 @@ class UserController(Controller):
         """
         set user_read status of content to read
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -484,7 +434,7 @@ class UserController(Controller):
         """
         set user_read status of content to unread
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -503,7 +453,7 @@ class UserController(Controller):
         """
         set user_read status of all content of workspace to read
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -518,11 +468,13 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def enable_workspace_notification(
+        self, context, request: TracimRequest, hapic_data=None
+    ):  # nopep8
         """
         enable workspace notification
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
@@ -548,11 +500,13 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def disable_workspace_notification(
+        self, context, request: TracimRequest, hapic_data=None
+    ):  # nopep8
         """
         disable workspace notification
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
@@ -575,78 +529,132 @@ class UserController(Controller):
         """
 
         # user workspace
-        configurator.add_route('user_workspace', '/users/{user_id:\d+}/workspaces', request_method='GET')  # nopep8
-        configurator.add_view(self.user_workspace, route_name='user_workspace')
+        configurator.add_route(
+            "user_workspace", "/users/{user_id:\d+}/workspaces", request_method="GET"
+        )  # nopep8
+        configurator.add_view(self.user_workspace, route_name="user_workspace")
 
         # user info
-        configurator.add_route('user', '/users/{user_id:\d+}', request_method='GET')  # nopep8
-        configurator.add_view(self.user, route_name='user')
+        configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # nopep8
+        configurator.add_view(self.user, route_name="user")
 
         # users lists
-        configurator.add_route('users', '/users', request_method='GET')  # nopep8
-        configurator.add_view(self.users, route_name='users')
+        configurator.add_route("users", "/users", request_method="GET")  # nopep8
+        configurator.add_view(self.users, route_name="users")
 
         # known members lists
-        configurator.add_route('known_members', '/users/{user_id:\d+}/known_members', request_method='GET')  # nopep8
-        configurator.add_view(self.known_members, route_name='known_members')
+        configurator.add_route(
+            "known_members", "/users/{user_id:\d+}/known_members", request_method="GET"
+        )  # nopep8
+        configurator.add_view(self.known_members, route_name="known_members")
 
         # set user email
-        configurator.add_route('set_user_email', '/users/{user_id:\d+}/email', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_user_email, route_name='set_user_email')
+        configurator.add_route(
+            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user password
-        configurator.add_route('set_user_password', '/users/{user_id:\d+}/password', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_user_password, route_name='set_user_password')  # nopep8
+        configurator.add_route(
+            "set_user_password", "/users/{user_id:\d+}/password", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.set_user_password, route_name="set_user_password")  # nopep8
 
         # set user_info
-        configurator.add_route('set_user_info', '/users/{user_id:\d+}', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_user_infos, route_name='set_user_info')
+        configurator.add_route(
+            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.set_user_infos, route_name="set_user_info")
 
         # create user
-        configurator.add_route('create_user', '/users', request_method='POST')
-        configurator.add_view(self.create_user, route_name='create_user')
+        configurator.add_route("create_user", "/users", request_method="POST")
+        configurator.add_view(self.create_user, route_name="create_user")
 
         # enable user
-        configurator.add_route('enable_user', '/users/{user_id:\d+}/enabled', request_method='PUT')  # nopep8
-        configurator.add_view(self.enable_user, route_name='enable_user')
+        configurator.add_route(
+            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.enable_user, route_name="enable_user")
 
         # disable user
-        configurator.add_route('disable_user', '/users/{user_id:\d+}/disabled', request_method='PUT')  # nopep8
-        configurator.add_view(self.disable_user, route_name='disable_user')
+        configurator.add_route(
+            "disable_user", "/users/{user_id:\d+}/disabled", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.disable_user, route_name="disable_user")
 
         # delete user
-        configurator.add_route('delete_user', '/users/{user_id:\d+}/trashed', request_method='PUT')  # nopep8
-        configurator.add_view(self.delete_user, route_name='delete_user')
+        configurator.add_route(
+            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.delete_user, route_name="delete_user")
 
         # undelete user
-        configurator.add_route('undelete_user', '/users/{user_id:\d+}/trashed/restore', request_method='PUT')  # nopep8
-        configurator.add_view(self.undelete_user, route_name='undelete_user')
+        configurator.add_route(
+            "undelete_user", "/users/{user_id:\d+}/trashed/restore", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.undelete_user, route_name="undelete_user")
 
         # set user profile
-        configurator.add_route('set_user_profile', '/users/{user_id:\d+}/profile', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_profile, route_name='set_user_profile')
+        configurator.add_route(
+            "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"
+        )  # nopep8
+        configurator.add_view(self.set_profile, route_name="set_user_profile")
 
         # user content
-        configurator.add_route('contents_read_status', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status', request_method='GET')  # nopep8
-        configurator.add_view(self.contents_read_status, route_name='contents_read_status')  # nopep8
+        configurator.add_route(
+            "contents_read_status",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",
+            request_method="GET",
+        )  # nopep8
+        configurator.add_view(
+            self.contents_read_status, route_name="contents_read_status"
+        )  # nopep8
         # last active content for user
-        configurator.add_route('last_active_content', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active', request_method='GET')  # nopep8
-        configurator.add_view(self.last_active_content, route_name='last_active_content')  # nopep8
+        configurator.add_route(
+            "last_active_content",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active",
+            request_method="GET",
+        )  # nopep8
+        configurator.add_view(self.last_active_content, route_name="last_active_content")  # nopep8
 
         # set content as read/unread
-        configurator.add_route('read_content', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_content_as_read, route_name='read_content')  # nopep8
-        configurator.add_route('unread_content', '/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_content_as_unread, route_name='unread_content')  # nopep8
+        configurator.add_route(
+            "read_content",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",
+            request_method="PUT",
+        )  # nopep8
+        configurator.add_view(self.set_content_as_read, route_name="read_content")  # nopep8
+        configurator.add_route(
+            "unread_content",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",
+            request_method="PUT",
+        )  # nopep8
+        configurator.add_view(self.set_content_as_unread, route_name="unread_content")  # nopep8
 
         # set workspace as read
-        configurator.add_route('read_workspace', '/users/{user_id:\d+}/workspaces/{workspace_id}/read', request_method='PUT')  # nopep8
-        configurator.add_view(self.set_workspace_as_read, route_name='read_workspace')  # nopep8
+        configurator.add_route(
+            "read_workspace",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/read",
+            request_method="PUT",
+        )  # nopep8
+        configurator.add_view(self.set_workspace_as_read, route_name="read_workspace")  # nopep8
 
         # enable workspace notification
-        configurator.add_route('enable_workspace_notification', '/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate', request_method='PUT')  # nopep8
-        configurator.add_view(self.enable_workspace_notification, route_name='enable_workspace_notification')  # nopep8
+        configurator.add_route(
+            "enable_workspace_notification",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate",
+            request_method="PUT",
+        )  # nopep8
+        configurator.add_view(
+            self.enable_workspace_notification, route_name="enable_workspace_notification"
+        )  # nopep8
 
         # enable workspace notification
-        configurator.add_route('disable_workspace_notification', '/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate', request_method='PUT')  # nopep8
-        configurator.add_view(self.disable_workspace_notification, route_name='disable_workspace_notification')  # nopep8
+        configurator.add_route(
+            "disable_workspace_notification",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate",
+            request_method="PUT",
+        )  # nopep8
+        configurator.add_view(
+            self.disable_workspace_notification, route_name="disable_workspace_notification"
+        )  # nopep8

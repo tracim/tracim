@@ -6,7 +6,6 @@ from tracim_backend.lib.utils.request import TracimContext
 
 
 class TestTracimContext(object):
-
     def test_unit_test_generate_if_none__ok__nominal_case(self) -> None:
         tracim_context = TracimContext()
 
@@ -16,7 +15,7 @@ class TestTracimContext(object):
             pass
 
         def a_id_fetcher():
-            return '12'
+            return "12"
 
         def a_generator(id_fetcher: Callable):
             try:
@@ -24,20 +23,12 @@ class TestTracimContext(object):
             except ValueError:
                 raise ANotFound()
 
-        a = tracim_context._generate_if_none(
-            a,
-            a_generator,
-            a_id_fetcher
-        )
+        a = tracim_context._generate_if_none(a, a_generator, a_id_fetcher)
         assert isinstance(a, int)
         assert a == 12
 
         # redo
-        a = tracim_context._generate_if_none(
-            a,
-            a_generator,
-            a_id_fetcher
-        )
+        a = tracim_context._generate_if_none(a, a_generator, a_id_fetcher)
         assert isinstance(a, int)
         assert a == 12
 
@@ -46,11 +37,7 @@ class TestTracimContext(object):
 
         a = 12
 
-        a = tracim_context._generate_if_none(
-            a,
-            None,
-            None
-        )
+        a = tracim_context._generate_if_none(a, None, None)
         assert isinstance(a, int)
         assert a == 12
 
@@ -72,8 +59,4 @@ class TestTracimContext(object):
                 raise ANotFound()
 
         with pytest.raises(ANotFound):
-            tracim_context._generate_if_none(
-                a,
-                a_generator,
-                a_id_fetcher
-            )
+            tracim_context._generate_if_none(a, a_generator, a_id_fetcher)

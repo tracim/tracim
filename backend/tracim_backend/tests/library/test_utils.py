@@ -1,7 +1,6 @@
 import pytest
 
-from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR, \
-    string_to_list
+from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR, string_to_list
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.lib.utils.utils import clamp
@@ -9,7 +8,6 @@ from tracim_backend.lib.utils.utils import password_generator
 
 
 class TestPasswordGenerator(object):
-
     def test_password_generator_ok_nominal_case(self):
         password = password_generator()
         assert len(password) == DEFAULT_PASSWORD_GEN_CHAR_LENGTH
@@ -18,7 +16,6 @@ class TestPasswordGenerator(object):
 
 
 class TestClamp(object):
-
     def test_clamp_ok_nominal_case(self):
         # min
         assert clamp(-0.1, 0.0, 255.0) == 0.0
@@ -29,13 +26,12 @@ class TestClamp(object):
 
 
 class TestExtendedColor(object):
-
     def test_extended_color__init__ok_nominal_case(self):
-        color = ExtendedColor('#FFFFFF')
-        assert color.web == 'white'
+        color = ExtendedColor("#FFFFFF")
+        assert color.web == "white"
 
     def test_extended_color__lighten_darken__nominal_case(self):
-        color = ExtendedColor('#9f6644')
+        color = ExtendedColor("#9f6644")
         color_darken = color.darken
         assert isinstance(color_darken, ExtendedColor)
         assert color_darken != color
@@ -50,8 +46,8 @@ class TestExtendedColor(object):
         assert color_lighten.web != color_darken.web
 
     def test_extended_color__lighten_darken__white(self):
-        color = ExtendedColor('#FFFFFF')
-        assert color.web == 'white'
+        color = ExtendedColor("#FFFFFF")
+        assert color.web == "white"
         color_darken = color.darken
         color_lighten = color.lighten
         assert color_lighten == color
@@ -59,8 +55,8 @@ class TestExtendedColor(object):
         assert color_lighten.web == color.web
 
     def test_extended_color__lighten_darken__black(self):
-        color = ExtendedColor('#000000')
-        assert color.web == 'black'
+        color = ExtendedColor("#000000")
+        assert color.web == "black"
         color_darken = color.darken
         color_lighten = color.lighten
         assert color_darken == color
@@ -69,28 +65,22 @@ class TestExtendedColor(object):
         assert color_darken == color_lighten
         assert color_darken.web == color.web
 
-class TestStringToList(object):
 
+class TestStringToList(object):
     def test__unit__string_to_list__ok__list_of_string_unstripped(self):
         assert string_to_list(
-            'one , two,three,fo ur',
-            separator=',',
-            cast_func=str,
-            do_strip=False,
-        ) == [ 'one ', ' two', 'three', 'fo ur']
+            "one , two,three,fo ur", separator=",", cast_func=str, do_strip=False
+        ) == ["one ", " two", "three", "fo ur"]
 
     def test_unit__string_to_list__ok__list_of_string_stripped(self):
         assert string_to_list(
-            'one , two,three,fo ur',
-            separator=',',
-            cast_func=str,
-            do_strip=True
-        ) == ['one', 'two', 'three', 'fo ur']
+            "one , two,three,fo ur", separator=",", cast_func=str, do_strip=True
+        ) == ["one", "two", "three", "fo ur"]
 
     def test_unit__string_to_list__ok__list_of_int_(self):
-        assert string_to_list(
-            '1,2,3,4',
-            separator=',',
-            cast_func=int,
-            do_strip=True
-        ) == [1,2,3,4]
+        assert string_to_list("1,2,3,4", separator=",", cast_func=int, do_strip=True) == [
+            1,
+            2,
+            3,
+            4,
+        ]

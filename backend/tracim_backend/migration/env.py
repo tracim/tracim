@@ -6,6 +6,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from tracim_backend.models.setup_models import *
 from tracim_backend.models.meta import metadata
+
 # from logging.config import fileConfig
 
 # this is the Alembic Config object, which provides
@@ -41,7 +42,7 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, version_table='migrate_version')
+    context.configure(url=url, version_table="migrate_version")
 
     with context.begin_transaction():
         context.run_migrations()
@@ -55,16 +56,13 @@ def run_migrations_online():
 
     """
     engine = engine_from_config(
-                config.get_section(config.config_ini_section),
-                prefix='sqlalchemy.',
-                poolclass=pool.NullPool)
+        config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
+    )
 
     connection = engine.connect()
     context.configure(
-                connection=connection,
-                target_metadata=target_metadata,
-                version_table='migrate_version'
-                )
+        connection=connection, target_metadata=target_metadata, version_table="migrate_version"
+    )
 
     try:
         with context.begin_transaction():

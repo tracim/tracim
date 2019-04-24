@@ -19,7 +19,7 @@ from tracim_backend.models.meta import DeclarativeBase
 configure_mappers()
 
 
-def get_engine(settings, prefix='sqlalchemy.'):
+def get_engine(settings, prefix="sqlalchemy."):
     return engine_from_config(settings, prefix)
 
 
@@ -28,10 +28,12 @@ def get_session_factory(engine):
     factory.configure(bind=engine)
     return factory
 
+
 def get_scoped_session_factory(engine):
     factory = scoped_session(sessionmaker(expire_on_commit=False))
     factory.configure(bind=engine)
     return factory
+
 
 def get_tm_session(session_factory, transaction_manager):
     """
@@ -65,14 +67,10 @@ def get_tm_session(session_factory, transaction_manager):
     # Understand what those params really mean and check if it can cause
     # troubles somewhere else.
     # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc  # nopep8
-    zope.sqlalchemy.register(
-        dbsession,
-        transaction_manager=transaction_manager,
-        keep_session=True,
-    )
-    from tracim_backend.models.revision_protection import \
-        prevent_content_revision_delete
-    listen(dbsession, 'before_flush', prevent_content_revision_delete)
+    zope.sqlalchemy.register(dbsession, transaction_manager=transaction_manager, keep_session=True)
+    from tracim_backend.models.revision_protection import prevent_content_revision_delete
+
+    listen(dbsession, "before_flush", prevent_content_revision_delete)
     return dbsession
 
 
@@ -85,21 +83,21 @@ def includeme(config):
 
     """
     settings = config.get_settings()
-    settings['tm.manager_hook'] = 'pyramid_tm.explicit_manager'
+    settings["tm.manager_hook"] = "pyramid_tm.explicit_manager"
 
     # use pyramid_tm to hook the transaction lifecycle to the request
-    config.include('pyramid_tm')
+    config.include("pyramid_tm")
 
     # use pyramid_retry to retry a request when transient exceptions occur
-    config.include('pyramid_retry')
+    config.include("pyramid_retry")
 
     session_factory = get_session_factory(get_engine(settings))
-    config.registry['dbsession_factory'] = session_factory
+    config.registry["dbsession_factory"] = session_factory
 
     # make request.dbsession available for use in Pyramid
     config.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
         lambda r: get_tm_session(session_factory, r.tm),
-        'dbsession',
-        reify=True
+        "dbsession",
+        reify=True,
     )

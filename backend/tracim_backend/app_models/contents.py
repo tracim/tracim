@@ -5,6 +5,7 @@ from enum import Enum
 from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.extensions import app_list
+
 ####
 # Content Status
 from tracim_backend.lib.core.application import ApplicationApi
@@ -14,23 +15,18 @@ from tracim_backend.models.roles import WorkspaceRoles
 if typing.TYPE_CHECKING:
     from tracim_backend.app_models.applications import Application
 
+
 class GlobalStatus(Enum):
-    OPEN = 'open'
-    CLOSED = 'closed'
+    OPEN = "open"
+    CLOSED = "closed"
 
 
 class ContentStatus(object):
     """
     ContentStatus object class
     """
-    def __init__(
-            self,
-            slug: str,
-            global_status: str,
-            label: str,
-            fa_icon: str,
-            hexcolor: str,
-    ):
+
+    def __init__(self, slug: str, global_status: str, label: str, fa_icon: str, hexcolor: str):
         self.slug = slug
         self.global_status = global_status
         self.label = label
@@ -40,36 +36,37 @@ class ContentStatus(object):
     def is_editable(self):
         return self.global_status == GlobalStatus.OPEN.value
 
+
 open_status = ContentStatus(
-    slug='open',
+    slug="open",
     global_status=GlobalStatus.OPEN.value,
-    label=_('Open'),
-    fa_icon='square-o',
-    hexcolor='#3f52e3',
+    label=_("Open"),
+    fa_icon="square-o",
+    hexcolor="#3f52e3",
 )
 
 closed_validated_status = ContentStatus(
-    slug='closed-validated',
+    slug="closed-validated",
     global_status=GlobalStatus.CLOSED.value,
-    label=_('Validated'),
-    fa_icon='check-square-o',
-    hexcolor='#008000',
+    label=_("Validated"),
+    fa_icon="check-square-o",
+    hexcolor="#008000",
 )
 
 closed_unvalidated_status = ContentStatus(
-    slug='closed-unvalidated',
+    slug="closed-unvalidated",
     global_status=GlobalStatus.CLOSED.value,
-    label=_('Cancelled'),
-    fa_icon='close',
-    hexcolor='#f63434',
+    label=_("Cancelled"),
+    fa_icon="close",
+    hexcolor="#f63434",
 )
 
 closed_deprecated_status = ContentStatus(
-    slug='closed-deprecated',
+    slug="closed-deprecated",
     global_status=GlobalStatus.CLOSED.value,
-    label=_('Deprecated'),
-    fa_icon='warning',
-    hexcolor='#ababab',
+    label=_("Deprecated"),
+    fa_icon="warning",
+    hexcolor="#ababab",
 )
 
 
@@ -100,11 +97,7 @@ class ContentStatusList(object):
 
 
 content_status_list = ContentStatusList(
-    [
-        closed_validated_status,
-        closed_unvalidated_status,
-        closed_deprecated_status,
-    ]
+    [closed_validated_status, closed_unvalidated_status, closed_deprecated_status]
 )
 ####
 # ContentType
@@ -114,18 +107,19 @@ class ContentType(object):
     """
     Future ContentType object class
     """
+
     def __init__(
-            self,
-            slug: str,
-            fa_icon: str,
-            hexcolor: str,
-            label: str,
-            creation_label: str,
-            available_statuses: typing.List[ContentStatus],
-            slug_alias: typing.List[str] = None,
-            allow_sub_content: bool = False,
-            file_extension: typing.Optional[str] = None,
-            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR
+        self,
+        slug: str,
+        fa_icon: str,
+        hexcolor: str,
+        label: str,
+        creation_label: str,
+        available_statuses: typing.List[ContentStatus],
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -139,29 +133,29 @@ class ContentType(object):
         self.minimal_role_content_creation = minimal_role_content_creation
 
 
-THREAD_TYPE = 'thread'
-FILE_TYPE = 'file'
-MARKDOWNPLUSPAGE_TYPE = 'markdownpage'
-HTML_DOCUMENTS_TYPE = 'html-document'
-FOLDER_TYPE = 'folder'
+THREAD_TYPE = "thread"
+FILE_TYPE = "file"
+MARKDOWNPLUSPAGE_TYPE = "markdownpage"
+HTML_DOCUMENTS_TYPE = "html-document"
+FOLDER_TYPE = "folder"
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 event_type = ContentType(
-    slug='event',
-    fa_icon='',
-    hexcolor='',
-    label='Event',
-    creation_label='Event',
+    slug="event",
+    fa_icon="",
+    hexcolor="",
+    label="Event",
+    creation_label="Event",
     available_statuses=content_status_list.get_all(),
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 comment_type = ContentType(
-    slug='comment',
-    fa_icon='',
-    hexcolor='',
-    label='Comment',
-    creation_label='Comment',
+    slug="comment",
+    fa_icon="",
+    hexcolor="",
+    label="Comment",
+    creation_label="Comment",
     available_statuses=content_status_list.get_all(),
 )
 
@@ -170,7 +164,8 @@ class ContentTypeList(object):
     """
     ContentType List
     """
-    Any_SLUG = 'any'
+
+    Any_SLUG = "any"
     Comment = comment_type
     Event = event_type
 
@@ -190,7 +185,7 @@ class ContentTypeList(object):
     def Thread(self):
         return self.get_one_by_slug(THREAD_TYPE)
 
-    def __init__(self, app_list: typing.List['Application']):
+    def __init__(self, app_list: typing.List["Application"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]

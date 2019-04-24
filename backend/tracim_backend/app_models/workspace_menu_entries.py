@@ -2,14 +2,8 @@ class WorkspaceMenuEntry(object):
     """
     Application class with data needed for frontend
     """
-    def __init__(
-            self,
-            label: str,
-            slug: str,
-            fa_icon: str,
-            hexcolor: str,
-            route: str,
-    ) -> None:
+
+    def __init__(self, label: str, slug: str, fa_icon: str, hexcolor: str, route: str) -> None:
         self.slug = slug
         self.label = label
         self.route = route
@@ -18,16 +12,16 @@ class WorkspaceMenuEntry(object):
 
 
 dashboard_menu_entry = WorkspaceMenuEntry(
-  slug='dashboard',
-  label='Dashboard',
-  route='/ui/workspaces/{workspace_id}/dashboard',
-  hexcolor='#fdfdfd',
-  fa_icon="home",
+    slug="dashboard",
+    label="Dashboard",
+    route="/ui/workspaces/{workspace_id}/dashboard",
+    hexcolor="#fdfdfd",
+    fa_icon="home",
 )
 all_content_menu_entry = WorkspaceMenuEntry(
-  slug="contents/all",
-  label="All Contents",
-  route="/ui/workspaces/{workspace_id}/contents",
-  hexcolor="#bbbbbb",
-  fa_icon="th",
+    slug="contents/all",
+    label="All Contents",
+    route="/ui/workspaces/{workspace_id}/contents",
+    hexcolor="#bbbbbb",
+    fa_icon="th",
 )

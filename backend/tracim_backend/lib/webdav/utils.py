@@ -18,16 +18,16 @@ from tracim_backend.models.revision_protection import new_revision
 
 
 class HistoryType(object):
-    Deleted = 'deleted'
-    Archived = 'archived'
-    Standard = 'standard'
-    All = 'all'
+    Deleted = "deleted"
+    Archived = "archived"
+    Standard = "standard"
+    All = "all"
 
 
 class SpecialFolderExtension(object):
-    Deleted = '/.deleted'
-    Archived = '/.archived'
-    History = '/.history'
+    Deleted = "/.deleted"
+    Archived = "/.archived"
+    History = "/.history"
 
 
 class FakeFileStream(object):
@@ -46,14 +46,14 @@ class FakeFileStream(object):
     """
 
     def __init__(
-            self,
-            session: Session,
-            content_api: ContentApi,
-            workspace: Workspace,
-            path: str,
-            file_name: str='',
-            content: Content=None,
-            parent: Content=None
+        self,
+        session: Session,
+        content_api: ContentApi,
+        workspace: Workspace,
+        path: str,
+        file_name: str = "",
+        content: Content = None,
+        parent: Content = None,
     ):
         """
 
@@ -66,7 +66,7 @@ class FakeFileStream(object):
         """
         self._file_stream = compat.BytesIO()
         self._session = session
-        self._file_name = file_name if file_name != '' else self._content.file_name
+        self._file_name = file_name if file_name != "" else self._content.file_name
         self._content = content
         self._api = content_api
         self._workspace = workspace
@@ -80,7 +80,7 @@ class FakeFileStream(object):
         """
         return self._path
 
-    def beginWrite(self, contentType) -> 'FakeFileStream':
+    def beginWrite(self, contentType) -> "FakeFileStream":
         """
         Called by wsgidav, it expect a filestream which possess both 'write' and 'close' operation to write
         the file content.
@@ -121,7 +121,7 @@ class FakeFileStream(object):
         Called when this is a new file; will create a new Content initialized with the correct content
         """
 
-        is_temporary = self._file_name.startswith('.~') or self._file_name.startswith('~')
+        is_temporary = self._file_name.startswith(".~") or self._file_name.startswith("~")
         try:
             with self._session.no_autoflush:
                 file = self._api.create(
@@ -136,7 +136,7 @@ class FakeFileStream(object):
                     file,
                     self._file_name,
                     util.guessMimeType(self._file_name),
-                    self._file_stream.read()
+                    self._file_stream.read(),
                 )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
@@ -147,16 +147,12 @@ class FakeFileStream(object):
         Called when we're updating an existing content; we create a new revision and update the file content
         """
         try:
-            with new_revision(
-                    session=self._session,
-                    content=self._content,
-                    tm=transaction.manager,
-            ):
+            with new_revision(session=self._session, content=self._content, tm=transaction.manager):
                 self._api.update_file_data(
                     self._content,
                     self._file_name,
                     util.guessMimeType(self._content.file_name),
-                    self._file_stream.read()
+                    self._file_stream.read(),
                 )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc

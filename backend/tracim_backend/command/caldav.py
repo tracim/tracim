@@ -33,14 +33,11 @@ class CaldavRunnerCommand(AppContextCommand):
         server(app)
 
     def _get_server(self, config_uri: str):
-        loader = plaster.get_loader(config_uri, protocols=['wsgi'])
+        loader = plaster.get_loader(config_uri, protocols=["wsgi"])
         return loader.get_wsgi_server(name=CALDAV_APP_NAME)
 
 
-
 class CaldavCreateAgendasCommand(AppContextCommand):
-
-
     def get_description(self) -> str:
         return "create agenda for all workspaces/user"
 
@@ -48,30 +45,17 @@ class CaldavCreateAgendasCommand(AppContextCommand):
         parser = super().get_parser(prog_name)
         return parser
 
-    def take_app_action(
-            self,
-            parsed_args: argparse.Namespace,
-            app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
-        self._session = app_context['request'].dbsession
-        self._app_config = app_context['registry'].settings['CFG']
-        self._user_api = UserApi(
-            current_user=None,
-            session=self._session,
-            config=self._app_config,
-        )
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+        self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
         self._workspace_api = WorkspaceApi(
-            current_user=None,
-            force_role=True,
-            session=self._session,
-            config=self._app_config,
+            current_user=None, force_role=True, session=self._session, config=self._app_config
         )
         self._agenda_api = AgendaApi(
-            current_user=None,
-            session=self._session,
-            config=self._app_config
+            current_user=None, session=self._session, config=self._app_config
         )
 
         # INFO - G.M - 2019-03-13 - check users agendas
@@ -81,24 +65,22 @@ class CaldavCreateAgendasCommand(AppContextCommand):
             try:
                 already_exist = self._agenda_api.ensure_user_agenda_exists(user)
                 if not already_exist:
-                    print(
-                        'New created agenda for user {}'.format(user)
-                    )
+                    print("New created agenda for user {}".format(user))
             except CannotCreateAgenda as exc:
                 nb_error_agenda_access += 1
-                print('Cannot create agenda for user {}'.format(user.user_id))
+                print("Cannot create agenda for user {}".format(user.user_id))
                 logger.exception(self, exc)
             except AgendaServerConnectionError as exc:
                 nb_error_agenda_access += 1
-                print('Cannot access to agenda server: connection error.')
+                print("Cannot access to agenda server: connection error.")
                 logger.exception(self, exc)
             except Exception as exc:
                 nb_error_agenda_access += 1
-                print('Something goes wrong during agenda create/update')
+                print("Something goes wrong during agenda create/update")
                 logger.exception(self, exc)
         nb_user_agendas = len(users)
         nb_verified_user_agenda = len(users) - nb_error_agenda_access
-        print('{}/{} users agenda verified'.format(nb_verified_user_agenda, nb_user_agendas))
+        print("{}/{} users agenda verified".format(nb_verified_user_agenda, nb_user_agendas))
 
         # # INFO - G.M - 2019-03-13 - check workspaces agendas
         workspaces = self._workspace_api.get_all()
@@ -108,24 +90,24 @@ class CaldavCreateAgendasCommand(AppContextCommand):
         for workspace in workspaces:
             nb_workspaces += 1
             if workspace.agenda_enabled:
-                nb_agenda_enabled_workspace +=1
+                nb_agenda_enabled_workspace += 1
                 try:
                     already_exist = self._agenda_api.ensure_workspace_agenda_exists(workspace)
                     if not already_exist:
-                        print(
-                            'New created agenda for workspace {}'.format(workspace.workspace_id)
-                        )
+                        print("New created agenda for workspace {}".format(workspace.workspace_id))
                 except CannotCreateAgenda as exc:
-                    print('Cannot create agenda for workspace {}'.format(workspace.workspace_id))
+                    print("Cannot create agenda for workspace {}".format(workspace.workspace_id))
                     logger.exception(self, exc)
                 except AgendaServerConnectionError as exc:
                     nb_error_agenda_access += 1
-                    print('Cannot access to agenda server: connection error.')
+                    print("Cannot access to agenda server: connection error.")
                     logger.exception(self, exc)
         nb_verified_workspace_agenda = nb_agenda_enabled_workspace - nb_error_agenda_access
         nb_workspace_without_agenda_enabled = nb_workspaces - nb_agenda_enabled_workspace
-        print('{}/{} workspace agenda verified ({} workspace without agenda feature enabled)'.format(
-            nb_verified_workspace_agenda,
-            nb_agenda_enabled_workspace,
-            nb_workspace_without_agenda_enabled
-        ))
+        print(
+            "{}/{} workspace agenda verified ({} workspace without agenda feature enabled)".format(
+                nb_verified_workspace_agenda,
+                nb_agenda_enabled_workspace,
+                nb_workspace_without_agenda_enabled,
+            )
+        )

@@ -7,7 +7,7 @@ from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.config import CFG
 
 
-__author__ = 'damien'
+__author__ = "damien"
 
 from tracim_backend.models.auth import Group, User
 from sqlalchemy.orm import Query
@@ -15,13 +15,7 @@ from sqlalchemy.orm import Session
 
 
 class GroupApi(object):
-
-    def __init__(
-            self,
-            session: Session,
-            current_user: typing.Optional[User],
-            config: CFG
-    ):
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG):
         self._user = current_user
         self._session = session
         self._config = config

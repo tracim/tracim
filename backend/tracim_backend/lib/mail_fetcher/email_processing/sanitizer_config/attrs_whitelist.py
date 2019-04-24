@@ -1,1 +1,1 @@
-ATTRS_WHITELIST = ['href']
+ATTRS_WHITELIST = ["href"]

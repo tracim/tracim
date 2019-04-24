@@ -12,7 +12,7 @@ from rq import Worker as BaseRQWorker
 class MailSenderDaemon(FakeDaemon):
     # NOTE: use *args and **kwargs because parent __init__ use strange
     # * parameter
-    def __init__(self, config: 'CFG', burst=True, *args, **kwargs):
+    def __init__(self, config: "CFG", burst=True, *args, **kwargs):
         """
         :param config: tracim config
         :param burst: if true, run one time, if false, run continously
@@ -23,7 +23,7 @@ class MailSenderDaemon(FakeDaemon):
         self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
-        logger.warning('MailSenderDaemon not implement append_thread_callback')
+        logger.warning("MailSenderDaemon not implement append_thread_callback")
         pass
 
     def stop(self) -> None:
@@ -32,13 +32,13 @@ class MailSenderDaemon(FakeDaemon):
         # job.
         self.worker._stop_requested = True
         redis_connection = get_redis_connection(self.config)
-        queue = get_rq_queue(redis_connection, 'mail_sender')
+        queue = get_rq_queue(redis_connection, "mail_sender")
         queue.enqueue(do_nothing)
 
     def run(self) -> None:
 
         with RQConnection(get_redis_connection(self.config)):
-            self.worker = RQWorker(['mail_sender'])
+            self.worker = RQWorker(["mail_sender"])
             self.worker.work(burst=self.burst)
 
 

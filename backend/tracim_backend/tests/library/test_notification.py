@@ -14,7 +14,6 @@ from tracim_backend.tests import eq_
 
 
 class TestDummyNotifier(DefaultTest):
-
     def test_dummy_notifier__notify_content_update(self):
         c = Content()
         notifier = DummyNotifier(self.app_config, self.session)

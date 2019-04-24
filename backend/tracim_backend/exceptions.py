@@ -25,11 +25,14 @@ class ContentRevisionDeleteError(ContentRevisionUpdateError):
 class ConfigurationError(TracimError):
     pass
 
+
 class ConfigCodeError(TracimError):
     pass
 
+
 class EmailTemplateError(TracimException):
     pass
+
 
 class UserAlreadyExistError(TracimError):
     error_code = ErrorCode.USER_ALREADY_EXIST
@@ -62,6 +65,7 @@ class DaemonException(TracimException):
 class AlreadyRunningDaemon(DaemonException):
     pass
 
+
 class WorkspaceAgendaDisabledException(TracimException):
     error_code = ErrorCode.WORKSPACE_AGENDA_DISABLED
 
@@ -69,14 +73,18 @@ class WorkspaceAgendaDisabledException(TracimException):
 class AgendaServerConnectionError(TracimException):
     pass
 
+
 class CannotCreateAgenda(TracimException):
     pass
+
 
 class AgendaPropsUpdateFailed(TracimException):
     pass
 
+
 class CannotCreateAgenda(TracimException):
     pass
+
 
 class AgendaException(TracimException):
     pass
@@ -97,11 +105,14 @@ class SameValueError(ValueError):
 class NotAuthenticated(TracimException):
     pass
 
+
 class CaldavNotAuthenticated(NotAuthenticated):
     error_code = ErrorCode.CALDAV_NOT_AUTHENTICATED
 
+
 class CaldavNotAuthorized(TracimException):
     error_code = ErrorCode.CALDAV_NOT_AUTHORIZED
+
 
 class WorkspaceNotFound(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_FOUND
@@ -110,8 +121,10 @@ class WorkspaceNotFound(NotFound):
 class WorkspaceNotFoundInTracimRequest(NotFound):
     error_code = ErrorCode.WORKSPACE_NOT_IN_TRACIM_REQUEST
 
+
 class ContentTypeNotInTracimRequest(NotFound):
     error_code = ErrorCode.CONTENT_TYPE_NOT_IN_TRACIM_REQUEST
+
 
 class InsufficientUserRoleInWorkspace(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
@@ -209,6 +222,7 @@ class ContentNotFound(TracimException):
 class ContentTypeNotAllowed(TracimException):
     error_code = ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
+
 class WorkspacesDoNotMatch(TracimException):
     error_code = ErrorCode.WORKSPACE_DO_NOT_MATCH
 
@@ -259,6 +273,7 @@ class WrongLDAPCredentials(TracimException):
 
 class RemoteUserAuthDisabled(TracimException):
     pass
+
 
 class UserAuthenticatedIsDeleted(TracimException):
     error_code = ErrorCode.AUTHENTICATION_FAILED
@@ -314,6 +329,7 @@ class UserRoleNotFound(TracimException):
 
 class TracimValidationFailed(TracimException):
     error_code = ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
+
 
 class EmailValidationFailed(TracimValidationFailed):
     error_code = ErrorCode.INTERNAL_TRACIM_VALIDATION_ERROR
@@ -382,23 +398,30 @@ class ContentInNotEditableState(TracimException):
 class UnknownAuthType(TracimException):
     pass
 
+
 class MissingLDAPConnector(TracimException):
     pass
+
 
 class WrongAuthTypeForUser(TracimException):
     pass
 
+
 class UserAuthTypeDisabled(TracimException):
     error_code = ErrorCode.USER_AUTH_TYPE_DISABLED
+
 
 class DisabledFeatureForExternalAuth(TracimException):
     pass
 
+
 class ExternalAuthUserEmailModificationDisallowed(DisabledFeatureForExternalAuth):
     error_code = ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
 
+
 class ExternalAuthUserPasswordModificationDisallowed(DisabledFeatureForExternalAuth):
     error_code = ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
+
 
 class DepotCorrupted(TracimException):
     pass
@@ -419,6 +442,6 @@ class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
 class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
     pass
 
+
 class ContentStatusException(TracimError):
     error_code = ErrorCode.INVALID_STATUS_CHANGE
-

@@ -43,31 +43,28 @@ from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FileRevisionPathSchema
-from tracim_backend.views.core_api.schemas import \
-    FileRevisionPreviewSizedPathSchema
+from tracim_backend.views.core_api.schemas import FileRevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PageQuerySchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import SimpleFileSchema
-from tracim_backend.views.core_api.schemas import \
-    WorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
-from tracim_backend.views.swagger_generic_section import \
-    SWAGGER_TAG__CONTENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-SWAGGER_TAG__CONTENT_FILE_SECTION = 'Files'
+SWAGGER_TAG__CONTENT_FILE_SECTION = "Files"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
-    SWAGGER_TAG__CONTENT_ENDPOINTS,
-    SWAGGER_TAG__CONTENT_FILE_SECTION
+    SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FILE_SECTION
 )
 is_file_content = ContentTypeChecker([FILE_TYPE])
 can_create_file = ContentTypeCreationChecker(content_type_list, FILE_TYPE)
+
 
 class FileController(Controller):
     """
@@ -89,7 +86,7 @@ class FileController(Controller):
         """
         Create a file .This will create 2 new revision.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -100,18 +97,18 @@ class FileController(Controller):
         _file = hapic_data.files.files
         parent_id = hapic_data.forms.parent_id
         api = ContentApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config
+            current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
         parent = None  # type: typing.Optional['Content']
         if parent_id:
             try:
-                parent = api.get_one(content_id=parent_id, content_type=content_type_list.Any_SLUG)  # nopep8
+                parent = api.get_one(
+                    content_id=parent_id, content_type=content_type_list.Any_SLUG
+                )  # nopep8
             except ContentNotFound as exc:
                 raise ParentNotFound(
-                    'Parent with content_id {} not found'.format(parent_id)
+                    "Parent with content_id {} not found".format(parent_id)
                 ) from exc
         content = api.create(
             filename=_file.filename,
@@ -120,11 +117,7 @@ class FileController(Controller):
             parent=parent,
         )
         api.save(content, ActionDescription.CREATION)
-        with new_revision(
-                session=request.dbsession,
-                tm=transaction.manager,
-                content=content
-        ):
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(
                 content,
                 new_filename=_file.filename,
@@ -148,7 +141,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -156,16 +149,9 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         _file = hapic_data.files.files
-        with new_revision(
-                session=request.dbsession,
-                tm=transaction.manager,
-                content=content
-        ):
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(
                 content,
                 new_filename=_file.filename,
@@ -187,7 +173,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -195,27 +181,23 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         try:
             file = DepotManager.get().get(content.depot_file)
         except IOError as exc:
             raise TracimFileNotFound(
-                'file related to revision {} of content {} not found in depot.'.format(
-                    content.revision_id,
-                    content.content_id
+                "file related to revision {} of content {} not found in depot.".format(
+                    content.revision_id, content.content_id
                 )
             ) from exc
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = content.file_name
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -230,7 +212,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_r{revision_id}{file_extension}`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -238,36 +220,29 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id,
-            content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         try:
             file = DepotManager.get().get(revision.depot_file)
         except IOError as exc:
             raise TracimFileNotFound(
-                'file related to revision {} of content {} not found in depot.'.format(
-                    revision.revision_id,
-                    revision.content_id
+                "file related to revision {} of content {} not found in depot.".format(
+                    revision.revision_id, revision.content_id
                 )
             ) from exc
 
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_r{revision_id}{file_extension}".format(
                 label=revision.file_name,
                 revision_id=revision.revision_id,
-                file_extension=revision.file_extension
+                file_extension=revision.file_extension,
             )
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     # preview
@@ -287,7 +262,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -295,10 +270,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
             content.revision_id,
@@ -306,15 +278,14 @@ class FileController(Controller):
             file_extension=content.file_extension,
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_page_{page_number}.pdf".format(
-                label=content.label,
-                page_number=hapic_data.query.page
+                label=content.label, page_number=hapic_data.query.page
             )
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -331,7 +302,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -339,21 +310,17 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         pdf_preview_path = api.get_full_pdf_preview_path(
-            content.revision_id,
-            file_extension=content.file_extension,
+            content.revision_id, file_extension=content.file_extension
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}.pdf".format(label=content.label)
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -370,7 +337,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -378,28 +345,20 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id,
-            content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         pdf_preview_path = api.get_full_pdf_preview_path(
-            revision.revision_id,
-            file_extension=revision.file_extension,
+            revision.revision_id, file_extension=revision.file_extension
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_r{revision_id}.pdf".format(
-                revision_id=revision.revision_id,
-                label=revision.label
+                revision_id=revision.revision_id, label=revision.label
             )
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -416,7 +375,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -424,14 +383,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id,
-            content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         pdf_preview_path = api.get_pdf_preview_path(
             revision.content_id,
             revision.revision_id,
@@ -439,15 +392,14 @@ class FileController(Controller):
             file_extension=revision.file_extension,
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_page_{page_number}.pdf".format(
-                label=content.label,
-                page_number=hapic_data.query.page
+                label=content.label, page_number=hapic_data.query.page
             )
         return HapicFile(
             file_path=pdf_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     # jpg
@@ -465,7 +417,7 @@ class FileController(Controller):
         Good pratice for filename is `filename is {label}_page_{page_number}.jpg`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -473,10 +425,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         allowed_dim = api.get_jpg_preview_allowed_dim()
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
@@ -487,15 +436,14 @@ class FileController(Controller):
             height=allowed_dim.dimensions[0].height,
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_page_{page_number}.jpg".format(
-                label=content.label,
-                page_number=hapic_data.query.page
+                label=content.label, page_number=hapic_data.query.page
             )
         return HapicFile(
             file_path=jpg_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -513,7 +461,7 @@ class FileController(Controller):
         Good pratice for filename is filename is `{label}_page_{page_number}_{width}x{height}.jpg`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -521,10 +469,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
@@ -534,17 +479,17 @@ class FileController(Controller):
             width=hapic_data.path.width,
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
                 label=content.label,
                 page_number=hapic_data.query.page,
                 width=hapic_data.path.width,
-                height=hapic_data.path.height
+                height=hapic_data.path.height,
             )
         return HapicFile(
             file_path=jpg_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -556,13 +501,15 @@ class FileController(Controller):
     @hapic.input_path(FileRevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
-    def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def sized_preview_jpg_revision(
+        self, context, request: TracimRequest, hapic_data=None
+    ):  # nopep8
         """
         Obtain resized jpg preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg`.
         Default filename value is 'raw' (without file extension) or nothing.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -570,14 +517,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id,
-            content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=revision.revision_id,
@@ -587,18 +528,18 @@ class FileController(Controller):
             file_extension=revision.file_extension,
         )
         filename = hapic_data.path.filename
-        if not filename or filename == 'raw':
+        if not filename or filename == "raw":
             filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(  # nopep8
                 revision_id=revision.revision_id,
                 label=revision.label,
                 page_number=hapic_data.query.page,
                 width=hapic_data.path.width,
-                height=hapic_data.path.height
+                height=hapic_data.path.height,
             )
         return HapicFile(
             file_path=jpg_preview_path,
             filename=filename,
-            as_attachment=hapic_data.query.force_download
+            as_attachment=hapic_data.query.force_download,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -611,7 +552,7 @@ class FileController(Controller):
         Get allowed dimensions of jpg preview. If restricted is true,
         only those dimensions are strictly accepted.
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -627,11 +568,13 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileContentSchema())
-    def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
+    def get_file_infos(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:  # nopep8
         """
         Get thread content
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -639,10 +582,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -653,11 +593,13 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FileContentModifySchema())
     @hapic.output_body(FileContentSchema())
-    def update_file_info(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
+    def update_file_info(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:  # nopep8
         """
         update thread
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -665,20 +607,12 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
-        with new_revision(
-                session=request.dbsession,
-                tm=transaction.manager,
-                content=content
-        ):
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
                 new_content=hapic_data.body.raw_content,
-
             )
             api.save(content)
         return api.get_content_in_context(content)
@@ -689,15 +623,12 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileRevisionSchema(many=True))
     def get_file_revisions(
-            self,
-            context,
-            request: TracimRequest,
-            hapic_data=None
+        self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[RevisionInContext]:
         """
         get file revisions
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -705,15 +636,9 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revisions = content.revisions
-        return [
-            api.get_revision_in_context(revision)
-            for revision in revisions
-        ]
+        return [api.get_revision_in_context(revision) for revision in revisions]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -727,7 +652,7 @@ class FileController(Controller):
         """
         set file status
         """
-        app_config = request.registry.settings['CFG']  # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -735,25 +660,13 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG
-        )
-        if content.status == request.json_body.get('status'):
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        if content.status == request.json_body.get("status"):
             raise ContentStatusException(
-                'Content id {} already have status {}'.format(
-                    content.content_id, content.status
-                )
+                "Content id {} already have status {}".format(content.content_id, content.status)
             )
-        with new_revision(
-                session=request.dbsession,
-                tm=transaction.manager,
-                content=content
-        ):
-            api.set_status(
-                content,
-                hapic_data.body.status,
-            )
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+            api.set_status(content, hapic_data.body.status)
             api.save(content)
         return
 
@@ -765,119 +678,125 @@ class FileController(Controller):
         # file info #
         # Get file info
         configurator.add_route(
-            'file_info',
-            '/workspaces/{workspace_id}/files/{content_id}',
-            request_method='GET'
+            "file_info", "/workspaces/{workspace_id}/files/{content_id}", request_method="GET"
         )
-        configurator.add_view(self.get_file_infos, route_name='file_info')  # nopep8
+        configurator.add_view(self.get_file_infos, route_name="file_info")  # nopep8
         # update file
         configurator.add_route(
-            'update_file_info',
-            '/workspaces/{workspace_id}/files/{content_id}',
-            request_method='PUT'
+            "update_file_info",
+            "/workspaces/{workspace_id}/files/{content_id}",
+            request_method="PUT",
         )  # nopep8
-        configurator.add_view(self.update_file_info, route_name='update_file_info')  # nopep8
+        configurator.add_view(self.update_file_info, route_name="update_file_info")  # nopep8
 
         # raw file #
         # create file
         configurator.add_route(
-            'create_file',
-            '/workspaces/{workspace_id}/files',  # nopep8
-            request_method='POST'
+            "create_file", "/workspaces/{workspace_id}/files", request_method="POST"  # nopep8
         )
-        configurator.add_view(self.create_file, route_name='create_file')  # nopep8
+        configurator.add_view(self.create_file, route_name="create_file")  # nopep8
         # upload raw file
         configurator.add_route(
-            'upload_file',
-            '/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}',  # nopep8
-            request_method='PUT'
+            "upload_file",
+            "/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}",  # nopep8
+            request_method="PUT",
         )
-        configurator.add_view(self.upload_file, route_name='upload_file')  # nopep8
+        configurator.add_view(self.upload_file, route_name="upload_file")  # nopep8
         # download raw file
         configurator.add_route(
-            'download_file',
-            '/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "download_file",
+            "/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.download_file, route_name='download_file')  # nopep8
+        configurator.add_view(self.download_file, route_name="download_file")  # nopep8
         # download raw file of revision
         configurator.add_route(
-            'download_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "download_revision",
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.download_revisions_file, route_name='download_revision')  # nopep8
+        configurator.add_view(
+            self.download_revisions_file, route_name="download_revision"
+        )  # nopep8
 
         # previews #
         # get preview pdf full
         configurator.add_route(
-            'preview_pdf_full',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "preview_pdf_full",
+            "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.preview_pdf_full, route_name='preview_pdf_full')  # nopep8
+        configurator.add_view(self.preview_pdf_full, route_name="preview_pdf_full")  # nopep8
         # get preview pdf
         configurator.add_route(
-            'preview_pdf',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "preview_pdf",
+            "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.preview_pdf, route_name='preview_pdf')  # nopep8
+        configurator.add_view(self.preview_pdf, route_name="preview_pdf")  # nopep8
         # get preview jpg allowed dims
         configurator.add_route(
-            'allowed_dim_preview_jpg',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims',  # nopep8
-            request_method='GET'
+            "allowed_dim_preview_jpg",
+            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.allowed_dim_preview_jpg, route_name='allowed_dim_preview_jpg')  # nopep8
+        configurator.add_view(
+            self.allowed_dim_preview_jpg, route_name="allowed_dim_preview_jpg"
+        )  # nopep8
         # get preview jpg
         configurator.add_route(
-            'preview_jpg',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "preview_jpg",
+            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.preview_jpg, route_name='preview_jpg')  # nopep8
+        configurator.add_view(self.preview_jpg, route_name="preview_jpg")  # nopep8
         # get preview jpg with size
         configurator.add_route(
-            'sized_preview_jpg',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "sized_preview_jpg",
+            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.sized_preview_jpg, route_name='sized_preview_jpg')  # nopep8
+        configurator.add_view(self.sized_preview_jpg, route_name="sized_preview_jpg")  # nopep8
         # get jpg preview for revision
         configurator.add_route(
-            'sized_preview_jpg_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "sized_preview_jpg_revision",
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.sized_preview_jpg_revision, route_name='sized_preview_jpg_revision')  # nopep8
+        configurator.add_view(
+            self.sized_preview_jpg_revision, route_name="sized_preview_jpg_revision"
+        )  # nopep8
         # get full pdf preview for revision
         configurator.add_route(
-            'preview_pdf_full_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "preview_pdf_full_revision",
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.preview_pdf_full_revision, route_name='preview_pdf_full_revision')  # nopep8
+        configurator.add_view(
+            self.preview_pdf_full_revision, route_name="preview_pdf_full_revision"
+        )  # nopep8
         # get pdf preview for revision
         configurator.add_route(
-            'preview_pdf_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}',  # nopep8
-            request_method='GET'
+            "preview_pdf_revision",
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.preview_pdf_revision, route_name='preview_pdf_revision')  # nopep8
+        configurator.add_view(
+            self.preview_pdf_revision, route_name="preview_pdf_revision"
+        )  # nopep8
         # others #
         # get file revisions
         configurator.add_route(
-            'file_revisions',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions',  # nopep8
-            request_method='GET'
+            "file_revisions",
+            "/workspaces/{workspace_id}/files/{content_id}/revisions",  # nopep8
+            request_method="GET",
         )
-        configurator.add_view(self.get_file_revisions, route_name='file_revisions')  # nopep8
+        configurator.add_view(self.get_file_revisions, route_name="file_revisions")  # nopep8
 
         # get file status
         configurator.add_route(
-            'set_file_status',
-            '/workspaces/{workspace_id}/files/{content_id}/status',  # nopep8
-            request_method='PUT'
+            "set_file_status",
+            "/workspaces/{workspace_id}/files/{content_id}/status",  # nopep8
+            request_method="PUT",
         )
-        configurator.add_view(self.set_file_status, route_name='set_file_status')  # nopep8
+        configurator.add_view(self.set_file_status, route_name="set_file_status")  # nopep8

@@ -9,6 +9,7 @@ class TestControllerModel(object):
     """
     Test for Controller object
     """
+
     def test_unit__bind__err__not_implemented(self):
         controller = Controller()
         configurator = Configurator()
