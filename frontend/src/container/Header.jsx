@@ -4,6 +4,7 @@ import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
+import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import DropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
@@ -21,7 +22,11 @@ import {
   postUserLogout,
   putUserLang
 } from '../action-creator.async.js'
-import { PAGE, PROFILE } from '../helper.js'
+import {
+  COOKIE_FRONTEND,
+  PAGE,
+  PROFILE
+} from '../helper.js'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -43,6 +48,7 @@ class Header extends React.Component {
     const { props } = this
 
     if (props.user.user_id === -1) {
+      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
       i18n.changeLanguage(idLang)
       props.dispatch(setUserLang(idLang))
       return
@@ -52,6 +58,7 @@ class Header extends React.Component {
     switch (fetchPutUserLang.status) {
       case 200:
         i18n.changeLanguage(idLang)
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserLang(idLang))
         props.dispatchCustomEvent('allApp_changeLang', idLang)
         break
