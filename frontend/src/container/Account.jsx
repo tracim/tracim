@@ -67,7 +67,7 @@ class Account extends React.Component {
   componentDidMount () {
     const { props } = this
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
-    this.loadAgendaUrl()
+    if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
   }
 
   loadAgendaUrl = async () => {
