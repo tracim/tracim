@@ -37,7 +37,7 @@ jobs:
     script:
       - black --version
       - echo -n "isort " & isort --version-number
-      - black --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
+      - black -l 100 --exclude '/(\..*)/' --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
       - isort -df -c $TRAVIS_BUILD_DIR/backend/tracim_backend/**/*.py
   - stage: static-tests
     name: flake8
