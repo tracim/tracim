@@ -529,16 +529,16 @@ class CFG(object):
             'caldav.radicale_proxy.base_url',
             None
         )
-        self.CALDAV__RADICALE__CALENDAR_DIR = 'calendar'
+        self.CALDAV__RADICALE__AGENDA_DIR = 'calendar'
         self.CALDAV__RADICALE__WORKSPACE_SUBDIR = 'workspace'
         self.CALDAV__RADICALE__USER_SUBDIR = 'user'
-        self.CALDAV__RADICALE__BASE_PATH = '/{}/'.format(self.CALDAV__RADICALE__CALENDAR_DIR)
+        self.CALDAV__RADICALE__BASE_PATH = '/{}/'.format(self.CALDAV__RADICALE__AGENDA_DIR)
         self.CALDAV__RADICALE__USER_PATH = '/{}/{}/'.format(
-            self.CALDAV__RADICALE__CALENDAR_DIR,
+            self.CALDAV__RADICALE__AGENDA_DIR,
             self.CALDAV__RADICALE__USER_SUBDIR,
         )
         self.CALDAV_RADICALE_WORKSPACE_PATH = '/{}/{}/'.format(
-            self.CALDAV__RADICALE__CALENDAR_DIR,
+            self.CALDAV__RADICALE__AGENDA_DIR,
             self.CALDAV__RADICALE__WORKSPACE_SUBDIR,
         )
 
