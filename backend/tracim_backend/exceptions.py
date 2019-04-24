@@ -25,6 +25,9 @@ class ContentRevisionDeleteError(ContentRevisionUpdateError):
 class ConfigurationError(TracimError):
     pass
 
+class ConfigCodeError(TracimError):
+    pass
+
 class EmailTemplateError(TracimException):
     pass
 

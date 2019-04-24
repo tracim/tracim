@@ -58,16 +58,16 @@ class EmailNotifier(INotifier):
         self.session = session
         self.config = config
         self._smtp_config = SmtpConfiguration(
-            self.config.EMAIL_NOTIFICATION_SMTP_SERVER,
-            self.config.EMAIL_NOTIFICATION_SMTP_PORT,
-            self.config.EMAIL_NOTIFICATION_SMTP_USER,
-            self.config.EMAIL_NOTIFICATION_SMTP_PASSWORD
+            self.config.EMAIL__NOTIFICATION__SMTP__SERVER,
+            self.config.EMAIL__NOTIFICATION__SMTP__PORT,
+            self.config.EMAIL__NOTIFICATION__SMTP__USER,
+            self.config.EMAIL__NOTIFICATION__SMTP__PASSWORD
         )
 
     def notify_content_update(self, content: Content):
 
         if content.get_last_action().id not \
-                in self.config.EMAIL_NOTIFICATION_NOTIFIED_EVENTS:
+                in self.config.EMAIL__NOTIFICATION__NOTIFIED_EVENTS:
             logger.info(
                 self,
                 'Skip email notification for update of content {}'
@@ -90,7 +90,7 @@ class EmailNotifier(INotifier):
         )
 
         if content.type not \
-                in self.config.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS:
+                in self.config.EMAIL__NOTIFICATION__NOTIFIED_CONTENTS:
             logger.info(
                 self,
                 'Skip email notification for update of content {}'
@@ -119,7 +119,7 @@ class EmailNotifier(INotifier):
         # (SQLA objects are related to a given thread/session)
         #
         try:
-            if self.config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == self.config.CST.ASYNC.lower():
+            if self.config.EMAIL__NOTIFICATION__PROCESSING_MODE.lower() == self.config.CST.ASYNC.lower():
                 logger.info(self, 'Sending email in ASYNC mode')
                 # TODO - D.A - 2014-11-06
                 # This feature must be implemented in order to be able to scale to large communities
@@ -168,8 +168,8 @@ class EmailManager(object):
         :return: sender string
         """
 
-        email_template = self.config.EMAIL_NOTIFICATION_FROM_EMAIL
-        mail_sender_name = self.config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL  # nopep8
+        email_template = self.config.EMAIL__NOTIFICATION__FROM__EMAIL
+        mail_sender_name = self.config.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL  # nopep8
         if user:
             mail_sender_name = '{name} via Tracim'.format(name=user.display_name)
             email_address = email_template.replace('{user_id}', str(user.user_id))
@@ -276,7 +276,7 @@ class EmailManager(object):
         email_sender = EmailSender(
             self.config,
             self._smtp_config,
-            self.config.EMAIL_NOTIFICATION_ACTIVATED
+            self.config.EMAIL__NOTIFICATION__ACTIVATED
         )
         for role in notifiable_roles:
             logger.info(self,
@@ -290,11 +290,11 @@ class EmailManager(object):
             to_addr = formataddr((role.user.display_name, role.user.email))
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
-            replyto_addr = self.config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
+            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace( # nopep8
                 '{content_id}', str(main_content.content_id)
             )
 
-            reference_addr = self.config.EMAIL_NOTIFICATION_REFERENCES_EMAIL.replace( #nopep8
+            reference_addr = self.config.EMAIL__NOTIFICATION__REFERENCES__EMAIL.replace( #nopep8
                 '{content_id}',str(main_content.content_id)
              )
             #
@@ -304,8 +304,8 @@ class EmailManager(object):
             # we do use replace and force the use of .__str__() in order to process LazyString objects
             #
             content_status = translator.get_translation(main_content.get_status().label)
-            translated_subject = translator.get_translation(self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT)
-            subject = translated_subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE_TITLE.__str__())
+            translated_subject = translator.get_translation(self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT)
+            subject = translated_subject.replace(EST.WEBSITE_TITLE, self.config.WEBSITE__TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, content_status)
@@ -330,7 +330,7 @@ class EmailManager(object):
                 parent_in_context = content_api.get_content_in_context(content.parent) # nopep8
 
             body_html = self._build_email_body_for_content(
-                self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
+                self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML,
                 role,
                 content_in_context,
                 parent_in_context,
@@ -378,22 +378,22 @@ class EmailManager(object):
         email_sender = EmailSender(
             self.config,
             self._smtp_config,
-            self.config.EMAIL_NOTIFICATION_ACTIVATED
+            self.config.EMAIL__NOTIFICATION__ACTIVATED
         )
         translator = Translator(self.config, default_lang=user.lang)
         translated_subject = translator.get_translation(
-            self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT
+            self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT
         )
         subject = translated_subject.replace(
             EST.WEBSITE_TITLE,
-            str(self.config.WEBSITE_TITLE)
+            str(self.config.WEBSITE__TITLE)
         )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
         message['From'] = self._get_sender()
         message['To'] = formataddr((user.get_display_name(), user.email))
 
-        html_template_file_path = self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML  # nopep8
 
         context = {
             'user': user,
@@ -440,21 +440,21 @@ class EmailManager(object):
         email_sender = EmailSender(
             self.config,
             self._smtp_config,
-            self.config.EMAIL_NOTIFICATION_ACTIVATED
+            self.config.EMAIL__NOTIFICATION__ACTIVATED
         )
         translated_subject = translator.get_translation(
-            self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT
+            self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT
         )
         subject = translated_subject.replace(
             EST.WEBSITE_TITLE,
-            str(self.config.WEBSITE_TITLE)
+            str(self.config.WEBSITE__TITLE)
         )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
         message['From'] = self._get_sender()
         message['To'] = formataddr((user.get_display_name(), user.email))
 
-        html_template_file_path = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML  # nopep8
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML  # nopep8
         # TODO - G.M - 2018-08-17 - Generate token
         context = {
             'user': user,
@@ -674,10 +674,10 @@ def get_email_manager(config: CFG, session: Session):
     #  TODO: Find a way to import properly without cyclic import
 
     smtp_config = SmtpConfiguration(
-        config.EMAIL_NOTIFICATION_SMTP_SERVER,
-        config.EMAIL_NOTIFICATION_SMTP_PORT,
-        config.EMAIL_NOTIFICATION_SMTP_USER,
-        config.EMAIL_NOTIFICATION_SMTP_PASSWORD
+        config.EMAIL__NOTIFICATION__SMTP__SERVER,
+        config.EMAIL__NOTIFICATION__SMTP__PORT,
+        config.EMAIL__NOTIFICATION__SMTP__USER,
+        config.EMAIL__NOTIFICATION__SMTP__PASSWORD
     )
 
     return EmailManager(config=config, smtp_config=smtp_config, session=session)

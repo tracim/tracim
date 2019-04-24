@@ -123,7 +123,7 @@ class FunctionalTest(unittest.TestCase):
         # https://github.com/algoo/hapic/issues/144
         hapic._controllers = []
         self.connect_database(create_tables=True)
-        self.app_config = CFG(self.settings)
+        self.app_config = CFG(self.settings) # type: CFG
         self.app_config.configure_filedepot()
         self.init_database(self.settings)
         DepotManager._clear()

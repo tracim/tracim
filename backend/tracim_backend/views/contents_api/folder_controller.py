@@ -54,7 +54,7 @@ class FolderController(Controller):
         """
         Get folder info
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -80,7 +80,7 @@ class FolderController(Controller):
         """
         update folder
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -120,7 +120,7 @@ class FolderController(Controller):
         """
         get folder revisions
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -148,7 +148,7 @@ class FolderController(Controller):
         """
         set folder status
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,

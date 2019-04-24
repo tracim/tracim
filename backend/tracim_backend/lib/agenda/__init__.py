@@ -33,9 +33,9 @@ class CaldavAppFactory(object):
             parent_folder
             )
         )
-        user_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_AGENDA_DIR, app_config.CALDAV_RADICALE_USER_SUBDIR)
+        user_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__USER_SUBDIR)
         os.makedirs(user_dir, exist_ok=True)
-        workspace_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV_RADICALE_AGENDA_DIR, app_config.CALDAV_RADICALE_WORKSPACE_SUBDIR)
+        workspace_dir = os.path.join(sub_dir_storage_path, app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR)
         os.makedirs(workspace_dir, exist_ok=True)
 
 

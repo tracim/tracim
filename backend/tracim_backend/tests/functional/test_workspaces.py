@@ -2521,7 +2521,6 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         )
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
         transaction.commit()
-
         self.testapp.authorization = (
             'Basic',
             (

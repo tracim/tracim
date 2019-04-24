@@ -41,7 +41,7 @@ class TracimAuthenticationPolicy(object):
         :param user_id: user_id of the user, optional
         :return: User or None
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         try:
             _, user = uapi.find(user_id=user_id, email=email)
@@ -61,7 +61,7 @@ class TracimAuthenticationPolicy(object):
         :param request: pyramid request
         :return: User or None
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         ldap_connector = None
         if AuthType.LDAP in app_config.AUTH_TYPES:
@@ -81,7 +81,7 @@ class TracimAuthenticationPolicy(object):
         request: Request,
         email: str
     ):
-        app_config = request.registry.settings['CFG'] # type: 'CFG'
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         if not app_config.REMOTE_USER_HEADER:
             return None
@@ -214,8 +214,8 @@ class ApiTokenAuthentificationPolicy(
         self.callback = None
 
     def authenticated_userid(self, request):
-        app_config = request.registry.settings['CFG']  # type:'CFG'
-        valid_api_key = app_config.API_KEY
+        app_config = request.registry.settings['CFG']  # type: CFG
+        valid_api_key = app_config.API__KEY
         api_key = request.headers.get(self.api_key_header)
         if not api_key or not valid_api_key:
             return None

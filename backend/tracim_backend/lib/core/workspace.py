@@ -254,7 +254,7 @@ class WorkspaceApi(object):
         # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
         # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
-        if self._config.CALDAV_ENABLED:
+        if self._config.CALDAV__ENABLED:
             if workspace.agenda_enabled:
                 agenda_api = AgendaApi(
                     current_user=self._user,
@@ -291,7 +291,7 @@ class WorkspaceApi(object):
         # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
         # with event refactor, see https://github.com/tracim/tracim/issues/1487
         from tracim_backend.lib.agenda.agenda import AgendaApi
-        if self._config.CALDAV_ENABLED:
+        if self._config.CALDAV__ENABLED:
             if workspace.agenda_enabled:
                 agenda_api = AgendaApi(
                     current_user=self._user,

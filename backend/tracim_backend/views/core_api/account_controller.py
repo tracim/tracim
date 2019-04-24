@@ -67,7 +67,7 @@ class AccountController(Controller):
         """
         Get user infos.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -83,7 +83,7 @@ class AccountController(Controller):
         """
         Set user info data
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -107,7 +107,7 @@ class AccountController(Controller):
         """
         Get known users list
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -135,7 +135,7 @@ class AccountController(Controller):
         """
         Set user Email
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -160,7 +160,7 @@ class AccountController(Controller):
         """
         Set user password
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -182,7 +182,7 @@ class AccountController(Controller):
         """
         Get list of auth user workspaces
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -204,7 +204,7 @@ class AccountController(Controller):
         """
         Get last_active_content for user
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.current_user,  # User
@@ -245,7 +245,7 @@ class AccountController(Controller):
         """
         get user_read status of contents
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.current_user,  # User
@@ -279,7 +279,7 @@ class AccountController(Controller):
         """
         set user_read status of content to read
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -298,7 +298,7 @@ class AccountController(Controller):
         """
         set user_read status of content to unread
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -317,7 +317,7 @@ class AccountController(Controller):
         """
         set user_read status of all content of workspace to read
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -336,7 +336,7 @@ class AccountController(Controller):
         """
         enable workspace notification
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -366,7 +366,7 @@ class AccountController(Controller):
         """
         disable workspace notification
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             current_user=request.current_user,  # User
             session=request.dbsession,

@@ -27,8 +27,8 @@ class SystemApi(object):
 
     def get_config(self) -> ConfigModel:
         return ConfigModel(
-            email_notification_activated=self._config.EMAIL_NOTIFICATION_ACTIVATED,  # nopep8
-            new_user_invitation_do_notify=self._config.NEW_USER_INVITATION_DO_NOTIFY,  # nopep8
+            email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,  # nopep8
+            new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,  # nopep8
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

@@ -38,7 +38,7 @@ class SystemController(Controller):
         """
         Get list of alls applications installed in this tracim instance.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         app_api = ApplicationApi(
             app_list=app_list,
         )
@@ -72,7 +72,7 @@ class SystemController(Controller):
         Returns information about current tracim instance.
         This is the equivalent of classical "help > about" menu in classical software.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         system_api = SystemApi(app_config)
         return system_api.get_about()
 
@@ -86,14 +86,14 @@ class SystemController(Controller):
         # FIXME - G.M - 2018-12-14 - [config_unauthenticated] #1270
         # do not allow unauthenticated user to
         # get all config info
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         system_api = SystemApi(app_config)
         return system_api.get_config()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         system_api = SystemApi(app_config)
         return system_api.get_error_codes()
 

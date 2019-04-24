@@ -55,7 +55,7 @@ class ThreadController(Controller):
         """
         Get thread content
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -81,7 +81,7 @@ class ThreadController(Controller):
         """
         update thread
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -121,7 +121,7 @@ class ThreadController(Controller):
         """
         get thread revisions
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -150,7 +150,7 @@ class ThreadController(Controller):
         """
         set thread status
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,

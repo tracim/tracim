@@ -49,7 +49,7 @@ class CommentController(Controller):
         """
 
         # login = hapic_data.body
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -78,7 +78,7 @@ class CommentController(Controller):
         Add new comment
         """
         # login = hapic_data.body
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -106,7 +106,7 @@ class CommentController(Controller):
         """
         Delete comment
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,

@@ -35,7 +35,7 @@ class FrontendController(Controller):
         return self.index(context, request)
 
     def index(self, context, request: TracimRequest):
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         # TODO - G.M - 2018-08-07 - Refactor autogen valid app list for frontend
         frontend_apps = []
         app_api = ApplicationApi(

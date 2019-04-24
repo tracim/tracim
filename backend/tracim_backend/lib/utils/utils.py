@@ -42,7 +42,7 @@ def get_root_frontend_url(config: 'CFG') -> str:
     """
     Return website base url with always '/' at the end
     """
-    return as_url_folder(config.WEBSITE_BASE_URL)
+    return as_url_folder(config.WEBSITE__BASE_URL)
 
 
 def get_frontend_ui_base_url(config: 'CFG') -> str:
@@ -95,9 +95,9 @@ def get_redis_connection(config: 'CFG') -> Redis:
     :return: redis connection
     """
     return Redis(
-        host=config.EMAIL_SENDER_REDIS_HOST,
-        port=config.EMAIL_SENDER_REDIS_PORT,
-        db=config.EMAIL_SENDER_REDIS_DB,
+        host=config.EMAIL__ASYNC__REDIS__HOST,
+        port=config.EMAIL__ASYNC__REDIS__PORT,
+        db=config.EMAIL__ASYNC__REDIS__DB,
     )
 
 
@@ -218,7 +218,8 @@ class ExtendedColor(Color):
 def string_to_list(
         base_string: str,
         separator: str,
-        cast_func: typing.Callable
+        cast_func: typing.Callable[[str],typing.Any],
+        do_strip: bool=False,
 ) -> typing.List[typing.Any]:
     """
     Convert a string to a list of separated item of one type according
@@ -228,12 +229,17 @@ def string_to_list(
     :param base_string: entry string which should be converted.
     :param separator: string separator,
     :param cast_func: all item should be casted to this function, this help
+    :param do_strip: if true strip string (remove beginning and ending whitespace)
+    of separated element before casting.
+    if false, do not strip string before casting
     to convert to type like int, str ...
     :return: list of content of type returned by the cast_func.
     """
     if not base_string:
         return []
     string_list = base_string.split(separator)
+    if do_strip:
+        string_list = [item.strip() for item in string_list]
     return [cast_func(item) for item in string_list]
 
 def deprecated(func: typing.Callable):

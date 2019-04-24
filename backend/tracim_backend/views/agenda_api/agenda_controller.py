@@ -34,7 +34,7 @@ class AgendaController(Controller):
     @hapic.input_query(AgendaFilterQuerySchema())
     @hapic.output_body(AgendaSchema(many=True))
     def user_agendas(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         agenda_api = AgendaApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -51,7 +51,7 @@ class AgendaController(Controller):
     @hapic.input_query(AgendaFilterQuerySchema())
     @hapic.output_body(AgendaSchema(many=True))
     def account_agendas(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type : CFG
         agenda_api = AgendaApi(
             current_user=request.current_user,
             session=request.dbsession,

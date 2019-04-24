@@ -45,7 +45,7 @@ class ResetPasswordController(Controller):
         Send a request to reset password. This will result in a new email sent to the user
         with a token to be used for password reset operation.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             None,
             session=request.dbsession,
@@ -67,7 +67,7 @@ class ResetPasswordController(Controller):
         Check reset_password token. The token sent by email has a limited life duration,
         this API allow to check that the token is existing and still valid.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             None,
             session=request.dbsession,
@@ -90,7 +90,7 @@ class ResetPasswordController(Controller):
         Do change the password. This requires the token received by email.
         After this request returns a 200, the user password is effectively changed
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         uapi = UserApi(
             None,
             session=request.dbsession,

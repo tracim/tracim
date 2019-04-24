@@ -26,10 +26,10 @@ class TestEmailSender(MailHogTest):
 
     def test__func__connect_disconnect__ok__nominal_case(self):
         smtp_config = SmtpConfiguration(
-            self.app_config.EMAIL_NOTIFICATION_SMTP_SERVER,
-            self.app_config.EMAIL_NOTIFICATION_SMTP_PORT,
-            self.app_config.EMAIL_NOTIFICATION_SMTP_USER,
-            self.app_config.EMAIL_NOTIFICATION_SMTP_PASSWORD
+            self.app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
+            self.app_config.EMAIL__NOTIFICATION__SMTP__PORT,
+            self.app_config.EMAIL__NOTIFICATION__SMTP__USER,
+            self.app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD
         )
         sender = EmailSender(
             self.app_config,
@@ -41,10 +41,10 @@ class TestEmailSender(MailHogTest):
 
     def test__func__send_email__ok__nominal_case(self):
         smtp_config = SmtpConfiguration(
-            self.app_config.EMAIL_NOTIFICATION_SMTP_SERVER,
-            self.app_config.EMAIL_NOTIFICATION_SMTP_PORT,
-            self.app_config.EMAIL_NOTIFICATION_SMTP_USER,
-            self.app_config.EMAIL_NOTIFICATION_SMTP_PASSWORD
+            self.app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
+            self.app_config.EMAIL__NOTIFICATION__SMTP__PORT,
+            self.app_config.EMAIL__NOTIFICATION__SMTP__USER,
+            self.app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD
         )
         sender = EmailSender(
             self.app_config,

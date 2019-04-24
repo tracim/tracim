@@ -114,7 +114,7 @@ class WorkspaceController(Controller):
         """
         Get workspace informations
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -130,7 +130,7 @@ class WorkspaceController(Controller):
         Returns the list of all workspaces. This route is for admin only.
         Standard users must use their own route: /api/v2/users/me/workspaces
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -154,7 +154,7 @@ class WorkspaceController(Controller):
         Update a workspace. This route is for trusted users and administrators.
         Note : a trusted user can only update spaces on which he/she is space manager
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -180,7 +180,7 @@ class WorkspaceController(Controller):
         """
         Create a workspace. This route is for trusted users and administrators.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -205,7 +205,7 @@ class WorkspaceController(Controller):
         Delete a workspace. This route is for trusted users and administrators.
         Note : a trusted user can only delete spaces on which he/she is space manager
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -224,7 +224,7 @@ class WorkspaceController(Controller):
         Restore a deleted space.
         Note : a trusted user can only restore spaces on which he/she is space manager
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -247,7 +247,7 @@ class WorkspaceController(Controller):
         """
         Returns the list of space members with their role, avatar, etc.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -273,7 +273,7 @@ class WorkspaceController(Controller):
         """
         Returns given space member with its role, avatar, etc.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -302,7 +302,7 @@ class WorkspaceController(Controller):
         Update role of the given space member.
         This feature is for workspace managers, trusted users and administrators.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -337,7 +337,7 @@ class WorkspaceController(Controller):
         This feature is for workspace managers and administrators.
         """
 
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -371,7 +371,7 @@ class WorkspaceController(Controller):
         """
         newly_created = False
         email_sent = False
-        app_config = request.registry.settings['CFG'] # type: CFG
+        app_config = request.registry.settings['CFG']  # type: CFG
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -398,16 +398,16 @@ class WorkspaceController(Controller):
             if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
                 raise exc
 
-            if app_config.NEW_USER_INVITATION_DO_NOTIFY:
+            if app_config.NEW_USER__INVITATION__DO_NOTIFY:
                 user = uapi.create_user(
                     auth_type=AuthType.UNKNOWN,
                     email=hapic_data.body.user_email,
                     password=password_generator(),
                     do_notify=True
                 )
-                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                    app_config.NEW_USER_INVITATION_DO_NOTIFY and \
-                    app_config.EMAIL_PROCESSING_MODE.lower() == 'sync':
+                if app_config.EMAIL__NOTIFICATION__ACTIVATED and \
+                    app_config.NEW_USER__INVITATION__DO_NOTIFY and \
+                    app_config.EMAIL__PROCESSING_MODE.lower() == 'sync':
                     email_sent = True
             else:
                 user = uapi.create_user(
@@ -423,7 +423,7 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
-            with_notif=app_config.EMAIl_NOTIFICATION_ENABLED_ON_INVITATION,
+            with_notif=app_config.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION,
             flush=True,
         )
         return rapi.get_user_role_workspace_with_context(
@@ -449,7 +449,7 @@ class WorkspaceController(Controller):
         In order to get contents in a given folder, then use parent_id query filter.
         You can also show.hide archived/deleted contents.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.current_user,
@@ -493,7 +493,7 @@ class WorkspaceController(Controller):
         For specific contents like files, it is recommended to use the dedicated endpoint.
         This feature is accessible to contributors and higher role only.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         creation_data = hapic_data.body
         api = ContentApi(
             current_user=request.current_user,
@@ -532,7 +532,7 @@ class WorkspaceController(Controller):
         Convenient route allowing to get detail about a content without to known routes associated to its content type.
         This route generate a HTTP 302 with the right url
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         content = request.current_content
         content_type = content_type_list.get_one_by_slug(content.type).slug
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
@@ -558,7 +558,7 @@ class WorkspaceController(Controller):
         Convenient route allowing to get detail about a content without to known routes associated to its content type.
         This route generate a HTTP 302 with the right url
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -597,7 +597,7 @@ class WorkspaceController(Controller):
         Move a content to specified new place.
         This requires to be content manager in both input and output spaces (which may be the same)
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         path_data = hapic_data.path
         move_data = hapic_data.body
 
@@ -650,7 +650,7 @@ class WorkspaceController(Controller):
         This action requires the user to be a content manager.
         Note: the content is still accessible but becomes read-only.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         path_data = hapic_data.path
         api = ContentApi(
             show_archived=True,
@@ -684,7 +684,7 @@ class WorkspaceController(Controller):
         """
         Restore a content from the trash. The content will be visible and editable again.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         path_data = hapic_data.path
         api = ContentApi(
             current_user=request.current_user,
@@ -722,7 +722,7 @@ class WorkspaceController(Controller):
         Note: the content is still accessible but becomes read-only.
         the difference with delete is that optimizing workspace will not delete archived contents
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         path_data = hapic_data.path
         api = ContentApi(
             show_archived=True,
@@ -753,7 +753,7 @@ class WorkspaceController(Controller):
         """
         Restore a content from archive. The content will be visible and editable again.
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings['CFG']  # type: CFG
         path_data = hapic_data.path
         api = ContentApi(
             current_user=request.current_user,
