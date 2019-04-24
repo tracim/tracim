@@ -2,11 +2,11 @@
 """
 Tests for /api/v2/workspaces subpath endpoints.
 """
+from depot.io.utils import FileIntent
 import pytest
 import requests
 import transaction
 
-from depot.io.utils import FileIntent
 from tracim_backend import AuthType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode

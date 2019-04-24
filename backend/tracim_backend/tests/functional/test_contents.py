@@ -3,10 +3,10 @@ import io
 from urllib.parse import quote
 
 from PIL import Image
+from depot.io.utils import FileIntent
 import pytest
 import transaction
 
-from depot.io.utils import FileIntent
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures

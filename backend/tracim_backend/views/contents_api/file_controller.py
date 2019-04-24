@@ -1,12 +1,12 @@
 # coding=utf-8
 import typing
 
+from depot.manager import DepotManager
 from hapic.data import HapicFile
 from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 import transaction
 
-from depot.manager import DepotManager
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder

@@ -6,6 +6,8 @@ import re
 import traceback
 import typing
 
+from depot.io.utils import FileIntent
+from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
@@ -23,8 +25,6 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
 import transaction
 
-from depot.io.utils import FileIntent
-from depot.manager import DepotManager
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType

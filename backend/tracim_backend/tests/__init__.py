@@ -7,6 +7,7 @@ import typing
 import unittest
 
 from PIL import Image
+from depot.manager import DepotManager
 import plaster
 from pyramid import testing
 import requests
@@ -16,7 +17,6 @@ import transaction
 from waitress import serve
 from webtest import TestApp
 
-from depot.manager import DepotManager
 from tracim_backend import CaldavAppFactory
 from tracim_backend import WebdavAppFactory
 from tracim_backend import web

@@ -6,9 +6,9 @@ import os
 import typing
 from urllib.parse import urlparse
 
+from depot.manager import DepotManager
 from paste.deploy.converters import asbool
 
-from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list

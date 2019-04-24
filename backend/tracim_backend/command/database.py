@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import argparse
 
+from depot.manager import DepotManager
 import plaster_pastedeploy
 from pyramid.paster import get_appsettings
 from sqlalchemy.exc import IntegrityError
 import transaction
 
-from depot.manager import DepotManager
 from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import DatabaseInitializationFailed

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from depot.io.utils import FileIntent
 import transaction
 
-from depot.io.utils import FileIntent
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures import Fixture
 from tracim_backend.fixtures.users_and_groups import Test
