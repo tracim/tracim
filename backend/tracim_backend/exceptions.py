@@ -62,21 +62,27 @@ class DaemonException(TracimException):
 class AlreadyRunningDaemon(DaemonException):
     pass
 
-class WorkspaceCalendarDisabledException(TracimException):
-    error_code = ErrorCode.WORKSPACE_CALENDAR_DISABLED
+class WorkspaceAgendaDisabledException(TracimException):
+    error_code = ErrorCode.WORKSPACE_AGENDA_DISABLED
 
 
-class CalendarServerConnectionError(TracimException):
+class AgendaServerConnectionError(TracimException):
     pass
 
-class CannotCreateCalendar(TracimException):
+class CannotCreateAgenda(TracimException):
     pass
 
-class CalendarException(TracimException):
+class AgendaPropsUpdateFailed(TracimException):
+    pass
+
+class CannotCreateAgenda(TracimException):
+    pass
+
+class AgendaException(TracimException):
     pass
 
 
-class UnknownCalendarType(CalendarException):
+class UnknownAgendaType(AgendaException):
     pass
 
 

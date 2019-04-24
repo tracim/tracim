@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import CalendarServerConnectionError
+from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.exceptions import WorkspaceNotFound
@@ -84,7 +84,7 @@ class WorkspaceApi(object):
             self,
             label: str='',
             description: str='',
-            calendar_enabled: bool=True,
+            agenda_enabled: bool=True,
             save_now: bool=False,
     ) -> Workspace:
         if not label:
@@ -97,7 +97,7 @@ class WorkspaceApi(object):
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
-        workspace.calendar_enabled = calendar_enabled
+        workspace.agenda_enabled = agenda_enabled
 
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
@@ -127,7 +127,7 @@ class WorkspaceApi(object):
             label: str,
             description: str,
             save_now: bool=False,
-            calendar_enabled: bool = None
+            agenda_enabled: bool = None
     ) -> Workspace:
         """
         Update workspace
@@ -141,8 +141,8 @@ class WorkspaceApi(object):
             raise EmptyLabelNotAllowed('Workspace label cannot be empty')
         workspace.label = label
         workspace.description = description
-        if calendar_enabled is not None:
-            workspace.calendar_enabled = calendar_enabled
+        if agenda_enabled is not None:
+            workspace.agenda_enabled = agenda_enabled
         if save_now:
             self.save(workspace)
 
@@ -239,27 +239,72 @@ class WorkspaceApi(object):
         return workspace
 
     def execute_created_workspace_actions(self, workspace: Workspace) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post creation workspace actions
+        """
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_user should start hook use by calendar code.
-        from tracim_backend.lib.calendar.calendar import CalendarApi
+        # event on_created_workspace should start hook use by agenda app code.
+
+        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+        # with event refactor, see https://github.com/tracim/tracim/issues/1487
+        from tracim_backend.lib.agenda.agenda import AgendaApi
         if self._config.CALDAV__ENABLED:
-            calendar_api = CalendarApi(
-                current_user = self._user,
-                session = self._session,
-                config = self._config
-            )
-            if workspace.calendar_enabled:
+            if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=self._user,
+                    session=self._session,
+                    config=self._config
+                )
                 try:
-                    calendar_already_exist = calendar_api.ensure_workspace_calendar_exist(workspace)
-                    if calendar_already_exist:
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
+                    if agenda_already_exist:
                         logger.warning(
                             self,
-                            'workspace {} is just created but it own calendar already exist !!'.format(workspace.user_id)
+                            'workspace {} is just created but it own agenda already exist !!'.format(workspace.workspace_id)
                         )
-                except CalendarServerConnectionError as exc:
-                    logger.error(self, 'Cannot connect to calendar server')
+                except AgendaServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to agenda server')
+                    logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, 'Something goes wrong during agenda create/update')
+                    logger.exception(self, exc)
+
+    def execute_update_workspace_actions(self, workspace: Workspace) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post update workspace actions
+        """
+
+        # FIXME - G.M - 2019-03-18 - move this code to another place when
+        # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
+        # event on_updated_workspace should start hook use by agenda app code.
+
+        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
+        # with event refactor, see https://github.com/tracim/tracim/issues/1487
+        from tracim_backend.lib.agenda.agenda import AgendaApi
+        if self._config.CALDAV__ENABLED:
+            if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=self._user,
+                    session=self._session,
+                    config=self._config
+                )
+                try:
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
+                except AgendaServerConnectionError as exc:
+                    logger.error(self, 'Cannot connect to agenda server')
+                    logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, 'Something goes wrong during agenda create/update')
                     logger.exception(self, exc)
 
 

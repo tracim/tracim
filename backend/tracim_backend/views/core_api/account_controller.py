@@ -96,6 +96,7 @@ class AccountController(Controller):
             lang=hapic_data.body.lang,
             do_save=True
         )
+        uapi.execute_updated_user_actions(user)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])

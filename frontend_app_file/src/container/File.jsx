@@ -337,19 +337,21 @@ class File extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveEditStatus = putFileStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    if (newStatus === state.content.status) return
 
-    handleFetchResult(await fetchResultSaveEditStatus)
-      .then(resSave => {
-        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
-          console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
-        } else {
-          this.loadContent()
-          this.loadTimeline()
-        }
-      })
+    const fetchResultSaveEditStatus = await handleFetchResult(
+      await putFileStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+    )
+
+    switch (fetchResultSaveEditStatus.status) {
+      case 204:
+        this.loadContent()
+        this.loadTimeline()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
+    }
   }
 
   handleClickArchive = async () => {

@@ -159,7 +159,7 @@ class CFG(object):
                               'contents/file,' \
                               'contents/html-document,' \
                               'contents/folder,' \
-                              'calendar'
+                              'agenda'
 
 
         self.APP__ENABLED = string_to_list(
@@ -529,7 +529,7 @@ class CFG(object):
             'caldav.radicale_proxy.base_url',
             None
         )
-        self.CALDAV__RADICALE__AGENDA_DIR = 'calendar'
+        self.CALDAV__RADICALE__AGENDA_DIR = 'agenda'
         self.CALDAV__RADICALE__WORKSPACE_SUBDIR = 'workspace'
         self.CALDAV__RADICALE__USER_SUBDIR = 'user'
         self.CALDAV__RADICALE__BASE_PATH = '/{}/'.format(self.CALDAV__RADICALE__AGENDA_DIR)
@@ -826,13 +826,13 @@ class CFG(object):
             available_statuses=content_status_list.get_all(),
         )
 
-        calendar = Application(
-            label='Calendar',
-            slug='calendar',
+        agenda = Application(
+            label='Agenda',
+            slug='agenda',
             fa_icon='calendar',
             is_active=self.CALDAV__ENABLED,
             config={},
-            main_route='/ui/workspaces/{workspace_id}/calendar',
+            main_route='/ui/workspaces/{workspace_id}/agenda',
             app_config=self
         )
 
@@ -843,7 +843,7 @@ class CFG(object):
             (thread.slug, thread),
             (folder.slug, folder),
             (markdownpluspage.slug, markdownpluspage),
-            (calendar.slug, calendar)
+            (agenda.slug, agenda)
         ])
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var

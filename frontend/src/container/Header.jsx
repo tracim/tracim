@@ -6,13 +6,11 @@ import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
-import MenuLinkList from '../component/Header/MenuLinkList.jsx'
-import MenuActionListItemSearch from '../component/Header/MenuActionListItem/Search.jsx'
-import MenuActionListItemDropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
-import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
-import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
-import MenuActionListItemNotification from '../component/Header/MenuActionListItem/Notification.jsx'
-import MenuActionListAdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
+import DropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
+import Help from '../component/Header/MenuActionListItem/Help.jsx'
+import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
+import Notification from '../component/Header/MenuActionListItem/Notification.jsx'
+import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
@@ -41,27 +39,20 @@ class Header extends React.Component {
     else props.history.push(PAGE.LOGIN)
   }
 
-  handleClickFeature = () => {}
-  handleClickExplore = () => {}
-  handleClickAbout = () => {}
-
-  handleChangeInput = e => this.setState({inputSearchValue: e.target.value})
-  handleClickSubmit = () => {}
-
   handleChangeLang = async idLang => {
     const { props } = this
 
     if (props.user.user_id === -1) {
-      props.dispatch(setUserLang(idLang))
       i18n.changeLanguage(idLang)
+      props.dispatch(setUserLang(idLang))
       return
     }
 
     const fetchPutUserLang = await props.dispatch(putUserLang(props.user, idLang))
     switch (fetchPutUserLang.status) {
       case 200:
-        props.dispatch(setUserLang(idLang))
         i18n.changeLanguage(idLang)
+        props.dispatch(setUserLang(idLang))
         props.dispatchCustomEvent('allApp_changeLang', idLang)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
@@ -82,12 +73,13 @@ class Header extends React.Component {
     }
   }
 
-  handleClickCalendarButton = () => {
-    this.props.history.push(PAGE.CALENDAR)
+  handleClickAgendaButton = () => {
+    this.props.history.push(PAGE.AGENDA)
   }
 
   render () {
     const { props } = this
+    const unLoggedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD]
 
     return (
       <header className='header'>
@@ -99,54 +91,50 @@ class Header extends React.Component {
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
-            <MenuLinkList
-              onClickFeature={this.handleClickFeature}
-              onClickExplore={this.handleClickExplore}
-              onClickAbout={this.handleClickAbout}
-            />
-
-            {![PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD].includes(props.location.pathname) && !props.system.config.email_notification_activated && (
-              <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                <i className='header__menu__system__icon slowblink fa fa-warning' />
-                <span className='header__menu__system__text d-none d-xl-block'>
-                  {props.t('Email notifications are disabled')}
-                </span>
-              </div>
-            )}
-
             <ul className='header__menu__rightside'>
-              <MenuActionListItemSearch
-                onChangeInput={this.handleChangeInput}
-                onClickSubmit={this.handleClickSubmit}
-              />
+              {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+                <li className='header__menu__rightside__emailwarning'>
+                  <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
+                    <i className='header__menu__system__icon slowblink fa fa-warning' />
 
-              {props.user.profile === PROFILE.ADMINISTRATOR.slug &&
-                <MenuActionListAdminLink t={this.props.t} />
-              }
+                    <span className='header__menu__system__text d-none d-xl-block'>
+                      {props.t('Email notifications are disabled')}
+                    </span>
+                  </div>
+                </li>
+              )}
 
-              <li className='header__menu__rightside__calendar'>
-                <button
-                  className='btn outlineTextBtn primaryColorBorder nohover'
-                  onClick={this.handleClickCalendarButton}
-                >
-                  <i className='fa fa-fw fa-calendar' />
-                  {props.t('Calendar')}
-                </button>
-              </li>
+              {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
+                <li className='header__menu__rightside__adminlink'>
+                  <AdminLink />
+                </li>
+              )}
 
-              <MenuActionListItemDropdownLang
+              {!unLoggedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
+                <li className='header__menu__rightside__agenda'>
+                  <button
+                    className='btn outlineTextBtn primaryColorBorder nohover'
+                    onClick={this.handleClickAgendaButton}
+                  >
+                    <i className='fa fa-fw fa-calendar' />
+                    {props.t('Agenda')}
+                  </button>
+                </li>
+              )}
+
+              <DropdownLang
                 langList={props.lang}
                 idLangActive={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 
-              <MenuActionListItemHelp
+              <Help
                 onClickHelp={this.handleClickHelp}
               />
 
-              <MenuActionListItemNotification />
+              <Notification />
 
-              <MenuActionListItemMenuProfil
+              <MenuProfil
                 user={props.user}
                 onClickLogout={this.handleClickLogout}
               />
@@ -158,5 +146,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, system }) => ({ lang, user, system })
+const mapStateToProps = ({ lang, user, system, appList }) => ({ lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

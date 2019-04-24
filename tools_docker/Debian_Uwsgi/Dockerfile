@@ -38,6 +38,7 @@ RUN \
     libimage-exiftool-perl \
     libjpeg-dev \
     libmagickwand-dev \
+    libpq-dev \
     libreoffice \
     locales \
     mysql-client \
@@ -79,6 +80,7 @@ RUN \
 # Clean frontend installation
     && rm -rf /tracim/frontend/node_modules \
     && rm -rf /tracim/frontend_app_admin_workspace_user/node_modules \
+    && rm -rf /tracim/frontend_app_calendar/node_modules \
     && rm -rf /tracim/frontend_app_file/node_modules \
     && rm -rf /tracim/frontend_app_folder_advanced/node_modules \
     && rm -rf /tracim/frontend_app_html-document/node_modules \

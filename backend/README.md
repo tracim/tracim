@@ -10,13 +10,24 @@ Installation
 
 on Debian Stretch (9) with sudo:
 
-    sudo apt update
-    sudo apt install git
-    sudo apt install python3 python3-venv python3-dev python3-pip
-    sudo apt install redis-server
-    sudo apt install zlib1g-dev libjpeg-dev
-    sudo apt install imagemagick libmagickwand-dev ghostscript poppler-utils libfile-mimeinfo-perl qpdf
-    sudo apt install libldap2-dev libsasl2-dev
+    sudo apt update && apt install \
+    ghostscript \
+    git \
+    imagemagick \
+    libfile-mimeinfo-perl \
+    libjpeg-dev \
+    libldap2-dev \
+    libmagickwand-dev \
+    libpq-dev \
+    libsasl2-dev
+    poppler-utils \
+    python3 \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    qpdf \
+    redis-server \
+    zlib1g-dev
 
 for better preview support:
 

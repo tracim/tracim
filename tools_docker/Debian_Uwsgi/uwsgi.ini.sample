@@ -6,4 +6,5 @@ env = TRACIM_CONF_PATH=/etc/tracim/development.ini
 http-socket = :8080
 socket-timeout = 360
 #workers = 1
+#threads = 8
 logto = /var/tracim/logs/tracim_web.log
