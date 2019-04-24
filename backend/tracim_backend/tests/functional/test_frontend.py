@@ -11,4 +11,4 @@ class TestFrontendEnabled(FunctionalTest):
 
 class TestFrontendDisabled(FunctionalTest):
     def test_api__check_index_html_generated__ok_200__nominal_case(self):
-        res = self.testapp.get("/", status=404)
+        self.testapp.get("/", status=404)

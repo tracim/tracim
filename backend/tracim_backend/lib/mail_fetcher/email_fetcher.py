@@ -5,8 +5,6 @@ from email.header import decode_header
 from email.header import make_header
 from email.message import Message
 from email.utils import parseaddr
-import json
-import re
 import socket
 import ssl
 import time
@@ -432,7 +430,7 @@ class MailFetcher(object):
                 log = "Failed to create comment request due to missing specialkey in mail {}"
                 logger.error(self, log.format(exc.__str__()))
                 continue
-            except EmptyEmailBody as exc:
+            except EmptyEmailBody:
                 log = "Empty body, skip mail"
                 logger.error(self, log)
                 continue

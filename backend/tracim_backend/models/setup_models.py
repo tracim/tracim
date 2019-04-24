@@ -7,12 +7,12 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 import zope.sqlalchemy
 
-from tracim_backend.models.auth import Group
-from tracim_backend.models.auth import Permission
-from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.auth import Group  # noqa: F401
+from tracim_backend.models.auth import Permission  # noqa: F401
+from tracim_backend.models.auth import User  # noqa: F401
+from tracim_backend.models.data import Content  # noqa: F401
+from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
+from tracim_backend.models.meta import DeclarativeBase  # noqa: F401
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

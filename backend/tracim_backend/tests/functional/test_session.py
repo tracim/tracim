@@ -15,10 +15,10 @@ from tracim_backend.tests import FunctionalTestNoDB
 
 class TestLogoutEndpoint(FunctionalTest):
     def test_api__access_logout_get_enpoint__ok__nominal_case(self):
-        res = self.testapp.post_json("/api/v2/auth/logout", status=204)
+        self.testapp.post_json("/api/v2/auth/logout", status=204)
 
     def test_api__access_logout_post_enpoint__ok__nominal_case(self):
-        res = self.testapp.get("/api/v2/auth/logout", status=204)
+        self.testapp.get("/api/v2/auth/logout", status=204)
 
 
 class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
@@ -201,14 +201,14 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(self):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=401)
+        self.testapp.get("/api/v2/auth/whoami", status=401)
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__unvalid_user(self):
         self.testapp.authorization = (
             "Basic",
             ("unknown@unknown.unknown", "unknown@unknown.unknown"),
         )
-        res = self.testapp.get("/api/v2/auth/whoami", status=401)
+        self.testapp.get("/api/v2/auth/whoami", status=401)
 
 
 class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
@@ -335,7 +335,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             "Basic",
             ("unknown@unknown.unknown", "unknown@unknown.unknown"),
         )
-        res = self.testapp.get("/api/v2/auth/whoami", status=401)
+        self.testapp.get("/api/v2/auth/whoami", status=401)
 
 
 class TestWhoamiEndpoint(FunctionalTest):
@@ -441,7 +441,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
 class TestWhoamiEndpointWithApiKeyNoKey(FunctionalTest):
     def test_api__try_whoami_enpoint_with_api_key__err_401__no_api_key(self):
         headers_auth = {"Tracim-Api-Key": "", "Tracim-Api-Login": "admin@admin.admin"}
-        res = self.testapp.get("/api/v2/auth/whoami", status=401, headers=headers_auth)
+        self.testapp.get("/api/v2/auth/whoami", status=401, headers=headers_auth)
 
 
 class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
@@ -450,7 +450,7 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
     def test_api__try_whoami_enpoint_remote_user__err_401__as_http_header(self):
 
         headers_auth = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
-        res = self.testapp.get("/api/v2/auth/whoami", status=401, headers=headers_auth)
+        self.testapp.get("/api/v2/auth/whoami", status=401, headers=headers_auth)
 
     def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self):
 

@@ -26,7 +26,7 @@ class TestGroupApi(DefaultTest):
         """
         api = GroupApi(current_user=None, session=self.session, config=self.app_config)
         with pytest.raises(GroupDoesNotExist):
-            group = api.get_one(10)
+            api.get_one(10)
 
     def test_unit__get_one_group_with_name__nominal_case(self) -> None:
         """
@@ -43,7 +43,7 @@ class TestGroupApi(DefaultTest):
         """
         api = GroupApi(current_user=None, session=self.session, config=self.app_config)
         with pytest.raises(GroupDoesNotExist):
-            group = api.get_one_with_name("unknown_group")
+            api.get_one_with_name("unknown_group")
 
     def test_unit__get_all__ok__nominal_case(self):
         """

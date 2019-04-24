@@ -5,8 +5,6 @@ Revises: 182b9f7aa837
 Create Date: 2019-01-22 15:27:12.462798
 
 """
-
-# revision identifiers, used by Alembic.
 import json
 
 from alembic import op
@@ -18,6 +16,7 @@ from sqlalchemy import Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
+# revision identifiers, used by Alembic.
 revision = "354d62d490ad"
 down_revision = "182b9f7aa837"
 

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
-import re
 
 from tracim_backend.lib.core.notifications import DummyNotifier
 from tracim_backend.lib.core.notifications import NotifierFactory

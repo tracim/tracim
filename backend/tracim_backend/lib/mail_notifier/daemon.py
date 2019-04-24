@@ -9,6 +9,7 @@ from tracim_backend.lib.utils.daemon import FakeDaemon
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
+from tracim_backend.config import CFG
 
 
 class MailSenderDaemon(FakeDaemon):

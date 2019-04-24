@@ -20,7 +20,6 @@ from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
-from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
@@ -1115,7 +1114,6 @@ class RevisionInContext(object):
         Get next revision (later revision)
         :return: next_revision
         """
-        next_revision = None
         revisions = self.revision.node.revisions
         # INFO - G.M - 2018-06-177 - Get revisions more recent that
         # current one

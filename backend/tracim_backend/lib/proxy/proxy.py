@@ -7,7 +7,6 @@ from pyramid.response import Response as PyramidResponse
 import requests
 from requests import Response as RequestsResponse
 from requests.auth import AuthBase
-from requests.auth import HTTPBasicAuth
 
 from tracim_backend.lib.utils.request import TracimRequest
 

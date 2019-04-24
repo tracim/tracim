@@ -4,6 +4,7 @@ from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
 
+from pyramid_ldap3 import Connector
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
@@ -25,7 +26,6 @@ from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
-from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
@@ -36,7 +36,6 @@ from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
-from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserAuthTypeDisabled
@@ -77,9 +76,9 @@ class UserApi(object):
     def _base_query(self):
         query = self._session.query(User)
         if not self._show_deleted:
-            query = query.filter(User.is_deleted == False)
+            query = query.filter(User.is_deleted == False)  # noqa: E711
         if not self._show_deactivated:
-            query = query.filter(User.is_active == True)
+            query = query.filter(User.is_active == True)  # noqa: E711
         return query
 
     def get_user_with_context(self, user: User) -> UserInContext:
@@ -233,7 +232,7 @@ class UserApi(object):
             self.get_one_by_email(email)
             return True
         # TODO - G.M - 09-04-2018 - Better exception
-        except:
+        except Exception:
             return False
 
     def _ldap_authenticate(
@@ -634,7 +633,7 @@ class UserApi(object):
         if auth_type is not None:
             if (
                 auth_type not in [AuthType.UNKNOWN, AuthType.REMOTE]
-                and not auth_type in self._config.AUTH_TYPES
+                and auth_type not in self._config.AUTH_TYPES
             ):
                 raise UserAuthTypeDisabled(
                     'Can\'t update user "{}" auth_type with unavailable value "{}".'.format(
@@ -727,7 +726,7 @@ class UserApi(object):
             # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
             # this should be fixed to find a solution to allow "fake" email but
             # also have clear error case for valid mail.
-            except SMTPRecipientsRefused as exc:
+            except SMTPRecipientsRefused:
                 logger.warning(
                     self,
                     "Account created for {email} but SMTP server refuse to send notification".format(

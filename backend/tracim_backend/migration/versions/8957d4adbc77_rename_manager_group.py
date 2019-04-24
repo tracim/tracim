@@ -5,13 +5,12 @@ Revises: c223cce1a413
 Create Date: 2018-09-20 10:56:29.173246
 
 """
-
-# revision identifiers, used by Alembic.
 from datetime import datetime
 
 from alembic import op
 import sqlalchemy as sa
 
+# revision identifiers, used by Alembic.
 revision = "8957d4adbc77"
 down_revision = "c223cce1a413"
 

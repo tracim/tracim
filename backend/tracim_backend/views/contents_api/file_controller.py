@@ -3,9 +3,9 @@ import typing
 
 from depot.manager import DepotManager
 from hapic.data import HapicFile
-from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 import transaction
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list

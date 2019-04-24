@@ -1,4 +1,4 @@
-import pytest
+
 
 from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH

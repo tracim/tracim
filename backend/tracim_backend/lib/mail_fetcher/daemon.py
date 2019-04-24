@@ -4,6 +4,7 @@ from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 from tracim_backend.lib.utils.daemon import FakeDaemon
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.views import BASE_API_V2
+from tracim_backend.config import CFG
 
 
 class MailFetcherDaemon(FakeDaemon):

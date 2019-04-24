@@ -14,7 +14,6 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Sequence
-from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -38,7 +37,6 @@ from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
-from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -570,7 +568,7 @@ class ContentChecker(object):
                 for content_slug, value in properties["allowed_content"].items():
                     if not isinstance(value, bool):
                         return False
-                    if not content_slug in content_type_list.endpoint_allowed_types_slug():
+                    if content_slug not in content_type_list.endpoint_allowed_types_slug():
                         return False
             if "origin" in properties.keys():
                 pass
@@ -739,7 +737,7 @@ class ContentRevisionRO(DeclarativeBase):
                 ) from exc
         return copy_rev
 
-    def __setattr__(self, key: str, value: "mixed"):
+    def __setattr__(self, key: str, value: typing.Any):
         """
         ContentRevisionUpdateError is raised if tried to update column and revision own identity
         :param key: attribute name
@@ -777,7 +775,7 @@ class ContentRevisionRO(DeclarativeBase):
     def get_status(self) -> ContentStatus:
         try:
             return content_status_list.get_one_by_slug(self.status)
-        except ContentStatusNotExist as exc:
+        except ContentStatusNotExist:
             return content_status_list.get_default_status()
 
     def get_label(self) -> str:
@@ -1245,7 +1243,7 @@ class Content(DeclarativeBase):
         else:
             properties = json.loads(self._properties)
         if content_type_list.get_one_by_slug(self.type) != content_type_list.Event:
-            if not "allowed_content" in properties:
+            if "allowed_content" not in properties:
                 properties[
                     "allowed_content"
                 ] = content_type_list.default_allowed_content_properties(self.type)
@@ -1388,7 +1386,7 @@ class Content(DeclarativeBase):
         # if we know what to except.
         except Exception as e:
             print(e.__str__())
-            print("----- /*\ *****")
+            print("----- /*\\ *****")
             raise ValueError("Not allowed content property")
 
         return types

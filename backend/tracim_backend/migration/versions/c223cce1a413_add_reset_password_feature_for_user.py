@@ -5,13 +5,12 @@ Revises: a143b60aad61
 Create Date: 2018-08-23 11:57:25.950135
 
 """
+from alembic import op
+import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "c223cce1a413"
 down_revision = "a143b60aad61"
-
-from alembic import op
-import sqlalchemy as sa
 
 
 def upgrade():

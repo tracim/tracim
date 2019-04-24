@@ -1,12 +1,10 @@
 from freezegun import freeze_time
 import pytest as pytest
-import requests
 import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
@@ -47,7 +45,6 @@ class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
         res = self.testapp.post_json("/api/v2/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
-        user_id = res["user_id"]
 
         # make a request of password
         self.testapp.authorization = None
@@ -104,7 +101,6 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         res = self.testapp.post_json("/api/v2/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
-        user_id = res["user_id"]
 
         # make a request of password
         self.testapp.authorization = None
@@ -148,7 +144,6 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
         res = self.testapp.post_json("/api/v2/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
-        user_id = res["user_id"]
 
         # make a check of token
         self.testapp.authorization = None
@@ -164,9 +159,6 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_check_token__err_400__invalid_token(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         reset_password_token = "wrong_token"
         transaction.commit()
         params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
@@ -217,7 +209,6 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         res = self.testapp.post_json("/api/v2/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
-        user_id = res["user_id"]
 
         # make a check of token
         self.testapp.authorization = None
@@ -241,9 +232,6 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_reset__err_400__invalid_token(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         reset_password_token = "wrong_token"
         params = {
             "email": "admin@admin.admin",
@@ -354,7 +342,7 @@ class TestResetPasswordExternalAuthUser(FunctionalTest):
     def test_api__reset_password_request__err__external_auth_ldap_cant_change_password(self):
         # precreate user
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        self.testapp.get("/api/v2/auth/whoami", status=200)
 
         params = {"email": "hubert@planetexpress.com"}
         res = self.testapp.post_json(
@@ -369,7 +357,7 @@ class TestResetPasswordExternalAuthUser(FunctionalTest):
     def test_api__reset_password_check_token__err__external_auth_ldap_cant_change_password(self):
         # precreate user
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        self.testapp.get("/api/v2/auth/whoami", status=200)
 
         params = {"email": "hubert@planetexpress.com", "reset_password_token": "unknown"}
         res = self.testapp.post_json(
@@ -384,7 +372,7 @@ class TestResetPasswordExternalAuthUser(FunctionalTest):
     def test_api__reset_password_modify__err__external_auth_ldap_cant_change_password(self):
         # precreate user
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        self.testapp.get("/api/v2/auth/whoami", status=200)
 
         params = {
             "email": "hubert@planetexpress.com",

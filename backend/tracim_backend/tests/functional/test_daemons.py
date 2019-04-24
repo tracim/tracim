@@ -1,5 +1,3 @@
-import requests
-
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -53,7 +51,7 @@ class TestMailNotifyDaemon(MailHogTest):
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )
-        item2 = api.create(
+        api.create(
             content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
         )
         # Send mail async from redis queue with daemon

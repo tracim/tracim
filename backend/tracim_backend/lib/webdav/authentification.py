@@ -49,7 +49,7 @@ class TracimDomainController(object):
         try:
             api.get_one_by_email(username)
             return True
-        except:
+        except Exception:
             return False
 
     def authDomainUser(

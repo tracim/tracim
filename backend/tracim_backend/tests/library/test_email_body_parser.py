@@ -294,10 +294,9 @@ class TestParsedMail(object):
         assert elements[1].part_type == BodyMailPartType.Quote
 
     def test_other__check_gmail_mail_text_quote_text(self):
-        text_quote_text = """
-              <div dir="ltr">Avant<br>
+        text_quote_text = """<div dir="ltr">Avant<br>
               <div class="gmail_extra"><br>
-              <div class="gmail_quote">Le 28 novembre 2017 à 10:29, John Doe 
+              <div class="gmail_quote">Le 28 novembre 2017 à 10:29, John Doe
               <span dir="ltr">&lt;<a href="mailto:bidule@localhost.fr"
               target="_blank">bidule@localhost.fr</a>&gt;</span>
               a écrit :<br>
@@ -321,8 +320,7 @@ class TestParsedMail(object):
               </div>
               <div class="gmail_extra">Aprés<br>
               </div>
-              </div>
-              """
+              </div>"""
 
         mail = ParsedHTMLMail(text_quote_text)
         elements = mail.get_elements()
@@ -458,8 +456,7 @@ class TestParsedMail(object):
         assert elements[1].part_type == BodyMailPartType.Signature
 
     def test_other__check_thunderbird_mail_text_quote(self):
-        text_and_quote = """
-            <p>Pof<br>
+        text_and_quote = """<p>Pof<br>
             </p>
             <br>
             <div class="moz-cite-prefix">Le 28/11/2017 à 11:21, John Doe a
@@ -467,15 +464,14 @@ class TestParsedMail(object):
             </div>
             <blockquote type="cite"
               cite="mid:658592c1-14de-2958-5187-3571edea0aac@localhost.fr">
-              <meta http-equiv="Context-Type" 
+              <meta http-equiv="Context-Type"
               content="text/html; charset=utf-8">
               <p>Test<br>
               </p>
               <div class="moz-signature">-- <br>
                 TEST DE signature</div>
             </blockquote>
-            <br>
-        """
+            <br>"""
         mail = ParsedHTMLMail(text_and_quote)
         elements = mail.get_elements()
         assert len(elements) == 2
@@ -487,13 +483,13 @@ class TestParsedMail(object):
         <p>Pof<br>
         </p>
         <br>
-        <div class="moz-cite-prefix">Le 28/11/2017 à 11:54, 
+        <div class="moz-cite-prefix">Le 28/11/2017 à 11:54,
          Bidule a
           écrit&nbsp;:<br>
         </div>
         <blockquote type="cite"
           cite="mid:b541b451-bb31-77a4-45b9-ad89969d7962@localhost.fr">
-          <meta http-equiv="Context-Type" 
+          <meta http-equiv="Context-Type"
           content="text/html; charset=utf-8">
           <p>Pof<br>
           </p>
@@ -561,7 +557,7 @@ class TestParsedMail(object):
           écrit&nbsp;:<br>
         </div>
         <blockquote type="cite"
-          cite="mid:635df73c-d3c9-f2e9-2304-24ff536bfa16@localhost.fr">Coucou 
+          cite="mid:635df73c-d3c9-f2e9-2304-24ff536bfa16@localhost.fr">Coucou
           <br><br>
         </blockquote>
         Aprés<br>

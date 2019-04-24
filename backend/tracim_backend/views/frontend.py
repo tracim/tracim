@@ -1,8 +1,8 @@
 import os
-from urllib.parse import urljoin
 
 from pyramid.config import Configurator
 from pyramid.renderers import render_to_response
+from tracim_backend.config import CFG
 
 from tracim_backend.exceptions import PageNotFound
 from tracim_backend.extensions import app_list
@@ -10,7 +10,6 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.lib.utils.utils import ExtendedColor
-from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = "index.mak"

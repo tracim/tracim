@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from marshmallow import ValidationError
 import pytest
 import transaction
 
@@ -10,7 +9,6 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
-from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.group import GroupApi
@@ -46,13 +44,13 @@ class TestUserApi(DefaultTest):
     def test_unit__create_minimal_user__err__too_short_email(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         with pytest.raises(TracimValidationFailed):
-            u = api.create_minimal_user("b@")
+            api.create_minimal_user("b@")
 
     def test_unit__create_minimal_user__err__too_long_email(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         with pytest.raises(TracimValidationFailed):
             email = "b{}b@bob".format("o" * 255)
-            u = api.create_minimal_user(email)
+            api.create_minimal_user(email)
 
     # email
     def test_unit__update_user_email__ok__nominal_case(self):
@@ -68,7 +66,7 @@ class TestUserApi(DefaultTest):
 
         # 2 char
         with pytest.raises(EmailValidationFailed):
-            u = api.update(user=u, email="b+b")
+            api.update(user=u, email="b+b")
 
     def test_unit__update_user_email__err__too_short_email(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
@@ -116,9 +114,9 @@ class TestUserApi(DefaultTest):
         u = api.create_minimal_user("bob@bob")
         # 5 char
         with pytest.raises(TracimValidationFailed):
-            u = api.update(user=u, password="passw")
+            api.update(user=u, password="passw")
         # 6 char
-        u = api.update(user=u, password="passwo")
+        api.update(user=u, password="passwo")
 
     def test_unit__update_user_password__err__too_long_password(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
@@ -127,7 +125,7 @@ class TestUserApi(DefaultTest):
             password = "p" * 513
             u = api.update(user=u, password=password)
         password = "p" * 512
-        u = api.update(user=u, password=password)
+        api.update(user=u, password=password)
 
     # public_name
     def test_unit__update_user_public_name__ok__nominal_case(self):
@@ -158,7 +156,7 @@ class TestUserApi(DefaultTest):
             name = "n" * 256
             u = api.update(user=u, name=name)
         name = "n" * 255
-        u = api.update(user=u, name=name)
+        api.update(user=u, name=name)
 
     # lang
     def test_unit__update_user_lang_name__ok__nominal_case(self):
@@ -189,7 +187,7 @@ class TestUserApi(DefaultTest):
             lang = "n" * 4
             u = api.update(user=u, lang=lang)
         lang = "n" * 3
-        u = api.update(user=u, lang=lang)
+        api.update(user=u, lang=lang)
 
     # timezone
     def test_unit__update_timezone__ok__nominal_case(self):
@@ -206,7 +204,7 @@ class TestUserApi(DefaultTest):
             timezone = "t" * 33
             u = api.update(user=u, timezone=timezone)
         timezone = "t" * 32
-        u = api.update(user=u, timezone=timezone)
+        api.update(user=u, timezone=timezone)
 
     @pytest.mark.ldap
     def test_unit__create_minimal_user_and_update__err__set_unaivalable_auth_type(self):
@@ -232,7 +230,7 @@ class TestUserApi(DefaultTest):
         assert not u.validate_password("pass")
 
     @pytest.mark.internal_auth
-    def test_unit__create_minimal_user_and_set_password__ok__nominal_case(self):
+    def test_unit__create_minimal_user_and_set_email__ok__nominal_case(self):
         u = User()
         u.email = "bob@bob"
         u.password = "pass"
@@ -289,7 +287,7 @@ class TestUserApi(DefaultTest):
 
     def test_unit__get_all__ok__nominal_case(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        u1 = api.create_minimal_user("bibi@bibi")
+        api.create_minimal_user("bibi@bibi")
 
         users = api.get_all()
         # u1 + Admin user from BaseFixture
@@ -297,7 +295,7 @@ class TestUserApi(DefaultTest):
 
     def test_unit__get_known__user__admin__too_short_acp_str(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
+        api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         with pytest.raises(TooShortAutocompleteString):
             api.get_known_user("e")
 
@@ -553,11 +551,10 @@ class TestUserApi(DefaultTest):
         )
 
         api2 = UserApi(current_user=user, session=self.session, config=self.app_config)
-        from tracim_backend.exceptions import UserCantDisableHimself
 
         api2.disable(user2)
         updated_user2 = api.get_one(user2.user_id)
-        assert updated_user2.is_active == False
+        assert updated_user2.is_active is False
         assert updated_user2.user_id == user2.user_id
         assert updated_user2.email == user2.email
 
@@ -589,7 +586,7 @@ class TestFakeLDAPUserApi(DefaultTest):
     def test_unit__authenticate_user___err__no_ldap_connector(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         with pytest.raises(MissingLDAPConnector):
-            user = api.authenticate("hubert@planetexpress.com", "professor")
+            api.authenticate("hubert@planetexpress.com", "professor")
 
     @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
     @pytest.mark.ldap
@@ -638,7 +635,7 @@ class TestFakeLDAPUserApi(DefaultTest):
     def test__unit__create_user__err__external_auth_ldap_with_password(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
-            u = api.create_user(
+            api.create_user(
                 email="bob@bob",
                 password="password",
                 name="bob",

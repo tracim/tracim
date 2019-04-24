@@ -3,14 +3,10 @@
 Tests for /api/v2/workspaces subpath endpoints.
 """
 from depot.io.utils import FileIntent
-import pytest
-import requests
 import transaction
 
-from tracim_backend import AuthType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -88,9 +84,6 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("users")]
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
@@ -151,7 +144,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace["description"] == "All importants documents"
         assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
         assert workspace["is_deleted"] is False
-        assert workspace["agenda_enabled"] == True
+        assert workspace["agenda_enabled"] is True
 
         # modify workspace
         res = self.testapp.put_json("/api/v2/workspaces/1", status=200, params=params)
@@ -163,7 +156,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace["description"] == "mysuperdescription"
         assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
         assert workspace["is_deleted"] is False
-        assert workspace["agenda_enabled"] == False
+        assert workspace["agenda_enabled"] is False
 
         # after
         res = self.testapp.get("/api/v2/workspaces/1", status=200)
@@ -175,7 +168,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace["description"] == "mysuperdescription"
         assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
         assert workspace["is_deleted"] is False
-        assert workspace["agenda_enabled"] == False
+        assert workspace["agenda_enabled"] is False
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:
         """
@@ -202,7 +195,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert res.json_body
         workspace = res.json_body
         assert workspace["label"] == "superworkspace"
-        assert workspace["agenda_enabled"] == False
+        assert workspace["agenda_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         workspace_id = res.json_body["workspace_id"]
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
@@ -215,7 +208,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "superworkspace", "description": "mysuperdescription"}
-        res = self.testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        self.testapp.post_json("/api/v2/workspaces", status=200, params=params)
         res = self.testapp.post_json("/api/v2/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -242,7 +235,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("trusted-users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -257,7 +250,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # delete
-        res = self.testapp.put("/api/v2/workspaces/{}/trashed".format(workspace_id), status=204)
+        self.testapp.put("/api/v2/workspaces/{}/trashed".format(workspace_id), status=204)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=400)
         assert isinstance(res.json, dict)
@@ -295,7 +288,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = self.testapp.put("/api/v2/workspaces/{}/trashed".format(workspace_id), status=204)
+        self.testapp.put("/api/v2/workspaces/{}/trashed".format(workspace_id), status=204)
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is True
@@ -343,8 +336,6 @@ class TestWorkspaceEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
         )
@@ -375,14 +366,14 @@ class TestWorkspaceEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
         )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -402,7 +393,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("trusted-users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -418,7 +409,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_id = int(workspace.workspace_id)
         # undelete
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.put(
+        self.testapp.put(
             "/api/v2/workspaces/{}/trashed/restore".format(workspace_id), status=204
         )
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -460,7 +451,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = self.testapp.put(
+        self.testapp.put(
             "/api/v2/workspaces/{}/trashed/restore".format(workspace_id), status=204
         )
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
@@ -513,8 +504,6 @@ class TestWorkspaceEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
         )
@@ -548,7 +537,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
         )
         workspace_api = WorkspaceApi(
@@ -556,7 +545,6 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -648,7 +636,7 @@ class TestWorkspacesEndpoints(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -732,7 +720,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        admin_id = admin.user_id
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace_id, user_id), status=200
@@ -815,7 +802,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        admin_id = admin.user_id
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/{}/members/{}".format(workspace_id, user_id), status=200
@@ -951,16 +937,12 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
         workspace_id = workspace.workspace_id
-        admin_id = admin.user_id
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # create workspace role
         params = {
@@ -1014,7 +996,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        admin_id = admin.user_id
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # create workspace role
         params = {
@@ -1180,7 +1161,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             "user_public_name": "Lawrence L.",
             "role": "content-manager",
         }
-        res = self.testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
+        self.testapp.post_json("/api/v2/workspaces/1/members", status=200, params=params)
         res = self.testapp.post_json("/api/v2/workspaces/1/members", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -1315,7 +1296,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("trusted-users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -1441,7 +1422,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.delete(
+        self.testapp.delete(
             "/api/v2/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user.user_id
             ),
@@ -1487,7 +1468,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.delete(
+        self.testapp.delete(
             "/api/v2/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
             ),
@@ -1509,7 +1490,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("trusted-users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -1527,7 +1508,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1830,7 +1810,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         uapi.update(user=bob, password="bob@bob.bob", do_save=True)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("bob@bob.bob", "bob@bob.bob"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        self.testapp.get("/api/v2/auth/whoami", status=200)
         self.cleanup_mailhog()
         api = ContentApi(session=dbsession, current_user=admin, config=self.app_config)
         api.create(
@@ -1869,8 +1849,6 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
         )
         uapi.save(user)
         transaction.commit()
-        gapi = GroupApi(current_user=user, session=self.session, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         workspace_api = WorkspaceApi(
             current_user=user, session=dbsession, config=self.app_config, show_deleted=True
         )
@@ -1914,8 +1892,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        gapi = GroupApi(current_user=admin, session=self.session, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
@@ -1956,8 +1932,6 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        gapi = GroupApi(current_user=admin, session=self.session, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
@@ -1999,8 +1973,6 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        gapi = GroupApi(current_user=admin, session=self.session, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
@@ -3463,7 +3435,7 @@ class TestWorkspaceContents(FunctionalTest):
             "content_type": content_type_list.Folder.slug,
             "parent_id": folder.content_id,
         }
-        res = self.testapp.post_json(
+        self.testapp.post_json(
             "/api/v2/workspaces/{workspace_id}/contents".format(
                 workspace_id=workspace.workspace_id
             ),
@@ -3576,7 +3548,7 @@ class TestWorkspaceContents(FunctionalTest):
             "new_parent_id": "{}".format(folder_id),
             "new_workspace_id": "{}".format(workspace_id),
         }
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             "/api/v2/workspaces/{}/contents/{}/move".format(workspace_id, thread_id),
             params=params,
             status=200,
@@ -3767,7 +3739,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        report = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=projectA_workspace,
             parent=documentation_folder,
@@ -3798,10 +3770,6 @@ class TestWorkspaceContents(FunctionalTest):
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {
-            "new_parent_id": None,  # root
-            "new_workspace_id": projectB_workspace.workspace_id,
-        }
         # verify coherence of workspace content first.
         projectA_workspace_contents = self.testapp.get(
             "/api/v2/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
@@ -3900,8 +3868,6 @@ class TestWorkspaceContents(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"new_parent_id": "4", "new_workspace_id": "1"}  # Salads
-        params_folder1 = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         res = self.testapp.put_json(
             "/api/v2/workspaces/2/contents/8/move", params=params, status=400
         )
@@ -3924,7 +3890,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert [content for content in active_contents if content["content_id"] == 8]
         assert not [content for content in deleted_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
             "/api/v2/workspaces/2/contents/8/trashed",
             status=204,
@@ -3954,7 +3920,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body
         assert [content for content in active_contents if content["content_id"] == 8]
         assert not [content for content in archived_contents if content["content_id"] == 8]
-        res = self.testapp.put_json("/api/v2/workspaces/2/contents/8/archived", status=204)
+        self.testapp.put_json("/api/v2/workspaces/2/contents/8/archived", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
         ).json_body
@@ -3980,7 +3946,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body
         assert not [content for content in active_contents if content["content_id"] == 14]
         assert [content for content in deleted_contents if content["content_id"] == 14]
-        res = self.testapp.put_json("/api/v2/workspaces/2/contents/14/trashed/restore", status=204)
+        self.testapp.put_json("/api/v2/workspaces/2/contents/14/trashed/restore", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
         ).json_body
@@ -4011,7 +3977,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body
         assert not [content for content in active_contents if content["content_id"] == 13]
         assert [content for content in archived_contents if content["content_id"] == 13]
-        res = self.testapp.put_json("/api/v2/workspaces/2/contents/13/archived/restore", status=204)
+        self.testapp.put_json("/api/v2/workspaces/2/contents/13/archived/restore", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
         ).json_body

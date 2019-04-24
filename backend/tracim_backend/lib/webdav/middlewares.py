@@ -6,7 +6,6 @@ import time
 from xml.etree import ElementTree
 
 import ldap3
-from pyramid.paster import get_appsettings
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid_ldap3 import ConnectionManager
@@ -19,12 +18,10 @@ from wsgidav.middleware import BaseMiddleware
 import yaml
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_scoped_session_factory
-from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 
 

@@ -12,7 +12,7 @@ from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.app_models.applications import Application
+    from tracim_backend.app_models.applications import Application  # noqa: F401
 
 
 class GlobalStatus(Enum):

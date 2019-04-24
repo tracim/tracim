@@ -5,7 +5,6 @@ import pytest
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -27,7 +26,7 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "remoteuser@emoteuser.remoteuser",
             password=None,
             do_save=True,
@@ -72,7 +71,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -88,7 +87,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
     def test_functional__webdav_access_to_root__user_not_exist(self) -> None:
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of root using webdav
-        res = self.testapp.get("/", status=401)
+        self.testapp.get("/", status=401)
 
     @parameterized.expand(
         [
@@ -125,7 +124,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         # check availability of new created content using webdav
-        res = self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -133,7 +132,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -143,12 +142,12 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)
+        workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of new created content using webdav
-        res = self.testapp.get("/test", status=404)
+        self.testapp.get("/test", status=404)
 
     def test_functional__webdav_access_to_workspace__workspace_not_exist(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -156,7 +155,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -167,7 +166,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of new created content using webdav
-        res = self.testapp.get("/test", status=404)
+        self.testapp.get("/test", status=404)
 
     @parameterized.expand(
         [
@@ -218,8 +217,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("workspace1", save_now=True)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api.create_workspace("workspace1", save_now=True)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -304,7 +302,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         )
         workspace = workspace_api.create_workspace("workspace1", save_now=True)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        folder = api.create(
+        api.create(
             content_type_list.Folder.slug,
             workspace,
             None,
@@ -422,7 +420,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dir2_folder = api.create(
+        api.create(
             content_type_list.Folder.slug,
             workspace,
             None,
@@ -612,7 +610,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        product_folder = api.create(
+        api.create(
             content_type_list.Folder.slug,
             workspace2,
             None,
@@ -771,7 +769,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        dir1_folder = api.create(
+        api.create(
             content_type_list.Folder.slug,
             workspace,
             None,
@@ -937,7 +935,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        product_folder = api.create(
+        api.create(
             content_type_list.Folder.slug,
             workspace2,
             None,
@@ -962,7 +960,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-        urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
+        urlencoded_webdav_dir1_label = quote(webdav_dir1_label)  # noqa: F841
         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)

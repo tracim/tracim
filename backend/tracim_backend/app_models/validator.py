@@ -81,9 +81,9 @@ positive_int_validator = Range(min=0, error="Value must be positive or 0")
 
 # String
 # string matching list of int separated by ','
-regex_string_as_list_of_int = Regexp(regex=(re.compile("^(\d+(,\d+)*)?$")))
+regex_string_as_list_of_int = Regexp(regex=(re.compile("^(\d+(,\d+)*)?$")))  # noqa: W605
 # string matching list of string (without',') separated by ','
-regex_string_as_list_of_string = Regexp(regex=(re.compile("^([^,]+(,[^,]+)*)?$")))
+regex_string_as_list_of_string = Regexp(regex=(re.compile("^([^,]+(,[^,]+)*)?$")))  # noqa: W605
 
 acp_validator = Length(min=2)
 not_empty_string_validator = Length(min=1)

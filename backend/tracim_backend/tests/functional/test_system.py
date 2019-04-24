@@ -1,13 +1,11 @@
 # coding=utf-8
 import pytest
-import transaction
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_timezones_list
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 
 
@@ -28,7 +26,6 @@ class TestApplicationEndpoint(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/system/applications", status=200)
         res = res.json_body
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
         app_api = ApplicationApi(app_list=app_list)
         applications = app_api.get_all()
         assert len(res) == len(applications)

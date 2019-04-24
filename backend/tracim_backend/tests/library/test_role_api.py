@@ -1,6 +1,5 @@
 # coding=utf-8
 import pytest
-from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.fixtures.content import Content as ContentFixture

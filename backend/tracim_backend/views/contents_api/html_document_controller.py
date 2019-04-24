@@ -3,6 +3,7 @@ import typing
 
 from pyramid.config import Configurator
 import transaction
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import content_type_list

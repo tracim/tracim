@@ -1,7 +1,7 @@
 # coding=utf-8
-import datetime
 
 from pyramid.config import Configurator
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.extensions import app_list
@@ -20,12 +20,6 @@ from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
-
 SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
 
@@ -37,7 +31,6 @@ class SystemController(Controller):
         """
         Get list of alls applications installed in this tracim instance.
         """
-        app_config = request.registry.settings["CFG"]  # type: CFG
         app_api = ApplicationApi(app_list=app_list)
         return app_api.get_all()
 

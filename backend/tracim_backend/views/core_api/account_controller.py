@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import EmailAlreadyExistInDb
@@ -8,7 +9,6 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -26,9 +26,7 @@ from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
-from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
-from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
@@ -213,7 +211,6 @@ class AccountController(Controller):
         get user_read status of contents
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
@@ -299,9 +296,6 @@ class AccountController(Controller):
         enable workspace notification
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
-        )
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
@@ -310,7 +304,7 @@ class AccountController(Controller):
         rapi = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        role = rapi.get_one(request.current_user.user_id, workspace.workspace_id)
+        rapi.get_one(request.current_user.user_id, workspace.workspace_id)
         wapi.save(workspace)
         return
 
@@ -325,9 +319,6 @@ class AccountController(Controller):
         disable workspace notification
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
-        )
         wapi = WorkspaceApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
