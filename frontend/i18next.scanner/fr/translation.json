@@ -183,6 +183,8 @@
   "File": "Fichier",
   "Administrate users": "Administrer les utilisateurs",
   "Home": "Accueil",
-  "Error while saving your default language": "Erreur lors de la sauvegarde de la langue par défaut",
-  "All contents": "Tous les contenus"
+  "All contents": "Tous les contenus",
+  "Invalid email": "Email invalide",
+  "Invalid password": "Mot de passe invalide",
+  "Error while saving your default language": "Erreur lors de la sauvegarde de la langue par défaut"
 }

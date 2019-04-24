@@ -2,6 +2,7 @@ import React from 'react'
 import {
   FETCH_CONFIG,
   PAGE,
+  COOKIE_FRONTEND,
   unLoggedAllowedPageList
 } from './helper.js'
 import i18n from './i18n.js'
@@ -77,7 +78,8 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
         if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
-          history.push(`${PAGE.LOGIN}${Cookies.get('lastConnection') ? '?dc=1' : ''}`)
+          history.push(`${PAGE.LOGIN}${Cookies.get(COOKIE_FRONTEND.LAST_CONNECTION) ? '?dc=1' : ''}`)
+          Cookies.remove(COOKIE_FRONTEND.LAST_CONNECTION)
         }
         return ''
       }

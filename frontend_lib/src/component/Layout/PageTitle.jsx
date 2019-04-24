@@ -5,8 +5,8 @@ import classnames from 'classnames'
 const PageTitle = props => {
   return (
     <div className={classnames(props.parentClass, props.customClass, 'pageTitleGeneric')}>
-      <div className={classnames(`${props.parentClass}__title`, 'pageTitleGeneric__title d-flex align-items-center')}>
-        <div className='pageTitleGeneric__title__icon mr-3'>
+      <div className={classnames(`${props.parentClass}__title`, 'pageTitleGeneric__title')}>
+        <div className='pageTitleGeneric__title__icon'>
           <i className={`fa fa-fw fa-${props.icon} mr-3`} />
           {props.title}
         </div>

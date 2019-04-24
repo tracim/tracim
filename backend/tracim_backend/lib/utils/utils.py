@@ -170,7 +170,7 @@ def get_timezones_list() -> typing.List[Timezone]:
 
 ALLOWED_AUTOGEN_PASSWORD_CHAR = string.ascii_letters + \
                                 string.digits + \
-                                string.punctuation
+                                """!#$%&()*+,-./:;=?@[]_{}"""
 
 DEFAULT_PASSWORD_GEN_CHAR_LENGTH = 12
 

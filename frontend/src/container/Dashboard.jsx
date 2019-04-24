@@ -421,6 +421,7 @@ class Dashboard extends React.Component {
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
+      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overriden but it avoid a unique key warning
       ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
       route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
@@ -444,7 +445,7 @@ class Dashboard extends React.Component {
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickOpenAdvancedDashboard}
                   >
-                    <i className='fa fa-fw fa-lock' />
+                    <i className='fa fa-fw fa-cog' />
                     {props.t('Open advanced Dashboard')}
                   </button>
                 }
