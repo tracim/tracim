@@ -3,8 +3,9 @@ from datetime import datetime
 
 from freezegun import freeze_time
 import transaction
-from tracim_backend.tests import BaseTest
+
 from tracim_backend.models.auth import User
+from tracim_backend.tests import BaseTest
 
 
 class TestUserModel(BaseTest):

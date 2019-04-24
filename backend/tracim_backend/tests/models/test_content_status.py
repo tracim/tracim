@@ -1,4 +1,5 @@
-from tracim_backend.app_models.contents import ContentStatus, GlobalStatus
+from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import GlobalStatus
 
 
 class TestContentStatus(object):

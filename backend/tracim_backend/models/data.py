@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime as datetime_root
+from datetime import datetime
 import json
 import os
 import typing
-from datetime import datetime
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from depot.fields.sqlalchemy import UploadedFileField
-from depot.fields.upload import UploadedFile
-from depot.io.utils import FileIntent
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
@@ -30,6 +27,9 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
+from depot.fields.sqlalchemy import UploadedFileField
+from depot.fields.upload import UploadedFile
+from depot.io.utils import FileIntent
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list

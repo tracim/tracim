@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
+from email import message_from_bytes
+from email.header import decode_header
+from email.header import make_header
+from email.message import Message
+from email.utils import parseaddr
 import json
 import re
 import socket
 import ssl
 import time
 import typing
-from email import message_from_bytes
-from email.header import decode_header
-from email.header import make_header
-from email.message import Message
-from email.utils import parseaddr
 
+from email_reply_parser import EmailReplyParser
 import filelock
 import imapclient
 import markdown
 import requests
-from email_reply_parser import EmailReplyParser
 
 from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.exceptions import EmptyEmailBody

@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+from collections import namedtuple
 import json
 import os
 import typing
-from collections import OrderedDict
-from collections import namedtuple
 from urllib.parse import urlparse
 
-from depot.manager import DepotManager
 from paste.deploy.converters import asbool
 
+from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import update_validators
-from tracim_backend.exceptions import ConfigurationError, ConfigCodeError
+from tracim_backend.exceptions import ConfigCodeError
+from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG

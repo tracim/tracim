@@ -3,10 +3,10 @@ from pyramid.config import Configurator
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UnvalidResetPasswordToken
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest

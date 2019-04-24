@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
+import argparse
 import logging
 import sys
-import argparse
 
 from cliff.app import App
 from cliff.command import Command
 from cliff.commandmanager import CommandManager
-
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
+
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 

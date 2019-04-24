@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from depot.io.utils import FileIntent
 import transaction
 
-from tracim_backend.models.auth import User
+from depot.io.utils import FileIntent
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures import Fixture
 from tracim_backend.fixtures.users_and_groups import Test
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 

@@ -1,5 +1,5 @@
-import typing
 from enum import Enum
+import typing
 
 from tracim_backend.exceptions import RoleDoesNotExist
 

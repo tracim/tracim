@@ -10,12 +10,12 @@ from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
 from zope.interface import implementer
 
-from tracim_backend.models.auth import AuthType
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
-from tracim_backend.config import CFG
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"

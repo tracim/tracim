@@ -1,4 +1,5 @@
 from mock import patch
+
 from tracim_backend.config import CFG
 from tracim_backend.config import ConfigParam
 

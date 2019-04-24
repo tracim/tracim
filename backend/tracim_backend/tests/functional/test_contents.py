@@ -1,30 +1,21 @@
 # -*- coding: utf-8 -*-
+import io
 from urllib.parse import quote
 
-import transaction
-
-
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.setup_models import get_tm_session
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.revision_protection import new_revision
-import io
-
+from PIL import Image
 import pytest
 import transaction
-from depot.io.utils import FileIntent
-from PIL import Image
 
-from tracim_backend.error import ErrorCode
-from tracim_backend.models.auth import User
+from depot.io.utils import FileIntent
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import create_1000px_png_test_image
 from tracim_backend.tests import set_html_document_slug_to_legacy

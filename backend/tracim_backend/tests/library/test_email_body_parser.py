@@ -1,12 +1,12 @@
-import pytest
 from bs4 import BeautifulSoup
+import pytest
 
 from tracim_backend.lib.mail_fetcher.email_processing.checkers import HtmlMailQuoteChecker
 from tracim_backend.lib.mail_fetcher.email_processing.checkers import HtmlMailSignatureChecker
-from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
-from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPartType
 from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPart
 from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailParts
+from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPartType
+from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
 
 
 class TestHtmlMailQuoteChecker(object):

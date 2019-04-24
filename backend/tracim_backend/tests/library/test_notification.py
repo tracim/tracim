@@ -2,9 +2,7 @@
 import os
 import re
 
-
 from tracim_backend.lib.core.notifications import DummyNotifier
-
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.mail_notifier.notifier import EmailNotifier
 from tracim_backend.models.auth import User

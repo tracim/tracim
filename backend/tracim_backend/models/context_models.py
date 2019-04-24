@@ -1,9 +1,9 @@
 # coding=utf-8
 import cgi
-import traceback
-import typing
 from datetime import datetime
 from enum import Enum
+import traceback
+import typing
 
 from slugify import slugify
 from sqlalchemy.orm import Session

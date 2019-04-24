@@ -2,8 +2,9 @@
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy.types import Unicode, UnicodeText, Float
-
+from sqlalchemy.types import Float
+from sqlalchemy.types import Unicode
+from sqlalchemy.types import UnicodeText
 from wsgidav.compat import to_unicode
 
 

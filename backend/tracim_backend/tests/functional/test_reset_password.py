@@ -1,15 +1,16 @@
+from freezegun import freeze_time
 import pytest as pytest
 import requests
 import transaction
-from freezegun import freeze_time
-from tracim_backend.models.auth import User
-from tracim_backend.models.auth import AuthType
+
 from tracim_backend.error import ErrorCode
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import MailHogFunctionalTest
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.user import UserApi
 
 
 class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):

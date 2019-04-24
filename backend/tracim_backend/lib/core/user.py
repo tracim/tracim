@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 import datetime
-import typing as typing
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
+import typing as typing
 
-import transaction
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import transaction
 
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
@@ -18,8 +18,8 @@ from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import AgendaServerConnectionError
+from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed

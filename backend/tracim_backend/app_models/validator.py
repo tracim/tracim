@@ -3,16 +3,15 @@ import typing
 
 from marshmallow import ValidationError
 from marshmallow.validate import Length
-from marshmallow.validate import Regexp
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
-
-from tracim_backend.app_models.contents import GlobalStatus
-from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.app_models.contents import content_type_list
+from marshmallow.validate import Regexp
 
 # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
 # of tracim_backend, Be careful all_content_types_validator is a global_var !
+from tracim_backend.app_models.contents import GlobalStatus
+from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User

@@ -1,10 +1,11 @@
 import pytest
 
-from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR, string_to_list
+from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.lib.utils.utils import clamp
 from tracim_backend.lib.utils.utils import password_generator
+from tracim_backend.lib.utils.utils import string_to_list
 
 
 class TestPasswordGenerator(object):

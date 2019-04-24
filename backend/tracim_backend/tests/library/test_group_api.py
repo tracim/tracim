@@ -2,10 +2,10 @@
 import pytest
 
 from tracim_backend.exceptions import GroupDoesNotExist
+from tracim_backend.fixtures.content import Content as ContentFixture
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.tests import DefaultTest
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.fixtures.content import Content as ContentFixture
 
 
 class TestGroupApi(DefaultTest):

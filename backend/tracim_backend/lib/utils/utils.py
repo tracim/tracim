@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import datetime
+from os.path import normpath as base_normpath
 import random
 import string
-from os.path import normpath as base_normpath
-from urllib.parse import urljoin
+import typing
 from urllib.parse import urlencode
+from urllib.parse import urljoin
 
 from colour import Color
 import pytz
 from redis import Redis
 from rq import Queue
-import typing
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG

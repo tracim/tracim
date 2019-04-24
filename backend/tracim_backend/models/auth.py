@@ -7,17 +7,16 @@ This is where the models used by the authentication stack are defined.
 It's perfectly fine to re-use this definition in the tracim application,
 though.
 """
-import os
-import time
-import uuid
-
 from datetime import datetime
 import enum
 from hashlib import sha256
+import os
+import time
+import typing
 from typing import TYPE_CHECKING
+import uuid
 
 import sqlalchemy
-import typing
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -28,12 +27,12 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
+from sqlalchemy.types import Enum
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
-from sqlalchemy.types import Enum
+
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import UnvalidResetPasswordToken
-
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.meta import metadata
 

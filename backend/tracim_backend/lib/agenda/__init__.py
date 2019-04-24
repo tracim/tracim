@@ -1,13 +1,14 @@
 # coding: utf-8
-import logging
-import typing
-import os
 from configparser import ConfigParser
+import logging
+import os
+import typing
 
 from radicale.config import load as load_radicale_config
+
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.logger import logger
 from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.lib.utils.logger import logger
 
 RADICALE_MAIN_SECTION = "caldav"
 RADICALE_SUBMAIN_SECTION = "radicale"

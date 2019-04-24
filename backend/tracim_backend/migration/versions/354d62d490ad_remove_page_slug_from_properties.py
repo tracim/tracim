@@ -8,8 +8,13 @@ Create Date: 2019-01-22 15:27:12.462798
 
 # revision identifiers, used by Alembic.
 import json
+
 from alembic import op
-from sqlalchemy import MetaData, Text, Unicode, Column, Integer
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import MetaData
+from sqlalchemy import Text
+from sqlalchemy import Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 

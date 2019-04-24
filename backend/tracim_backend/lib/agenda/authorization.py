@@ -12,8 +12,9 @@ from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.agenda.determiner import CaldavAuthorizationDeterminer
 from tracim_backend.lib.agenda.utils import DavAuthorization
-from tracim_backend.lib.utils.authorization import AuthorizationChecker, is_content_manager
+from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import SameUserChecker
+from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_user

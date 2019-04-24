@@ -1,11 +1,12 @@
 # coding: utf8
 from datetime import datetime
 
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.data import VirtualEvent
-from tracim_backend.models import data
-from tracim_backend.lib.utils.translation import get_locale
 from babel.dates import format_datetime
+
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.lib.utils.translation import get_locale
+from tracim_backend.models import data
+from tracim_backend.models.data import VirtualEvent
 
 # FIXME: fix temporaire ...
 style = """

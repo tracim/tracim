@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 import datetime
 import os
 import re
 import traceback
 import typing
-from contextlib import contextmanager
 
-import sqlalchemy
-import transaction
-from depot.io.utils import FileIntent
-from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
+import sqlalchemy
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
@@ -24,14 +21,17 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
-from tracim_backend.config import CFG
+import transaction
 
+from depot.io.utils import FileIntent
+from depot.manager import DepotManager
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNotFound

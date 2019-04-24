@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from tracim_backend.models.auth import User
-from tracim_backend.models.auth import Group
 from tracim_backend.fixtures import Fixture
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
 
 
 class Base(Fixture):

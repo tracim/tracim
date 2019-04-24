@@ -1,6 +1,6 @@
 # coding=utf-8
-import transaction
 from pyramid.config import Configurator
+import transaction
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed

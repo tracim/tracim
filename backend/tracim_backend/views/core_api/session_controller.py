@@ -3,11 +3,11 @@ from pyramid.config import Configurator
 from pyramid.security import remember
 from pyramid_ldap3 import get_ldap_connector
 
-from tracim_backend.models.auth import AuthType
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.models.auth import AuthType
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import BasicAuthSchema
 from tracim_backend.views.core_api.schemas import LoginOutputHeaders

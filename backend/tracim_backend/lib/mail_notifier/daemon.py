@@ -1,12 +1,14 @@
 import typing
-from tracim_backend.lib.utils.daemon import FakeDaemon
-from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.utils import get_rq_queue
-from tracim_backend.lib.utils.utils import get_redis_connection
-from rq.dummy import do_nothing
-from rq.worker import StopRequested
+
 from rq import Connection as RQConnection
 from rq import Worker as BaseRQWorker
+from rq.dummy import do_nothing
+from rq.worker import StopRequested
+
+from tracim_backend.lib.utils.daemon import FakeDaemon
+from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import get_redis_connection
+from tracim_backend.lib.utils.utils import get_rq_queue
 
 
 class MailSenderDaemon(FakeDaemon):

@@ -11,7 +11,8 @@ revision = "2b4043fa2502"
 down_revision = None
 
 from alembic import op
-from sqlalchemy import Column, Unicode
+from sqlalchemy import Column
+from sqlalchemy import Unicode
 
 
 def upgrade():

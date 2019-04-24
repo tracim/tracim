@@ -1,11 +1,11 @@
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-import zope.sqlalchemy
 from sqlalchemy import engine_from_config
 from sqlalchemy.event import listen
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+import zope.sqlalchemy
 
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Permission

@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
+from marshmallow import ValidationError
 import pytest
 import transaction
-from marshmallow import ValidationError
-
 
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import UserAuthTypeDisabled
+from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import MissingLDAPConnector
-from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext

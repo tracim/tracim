@@ -2,13 +2,13 @@
 import argparse
 
 import plaster_pastedeploy
-import transaction
-from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
 from sqlalchemy.exc import IntegrityError
+import transaction
 
-from tracim_backend.config import CFG
+from depot.manager import DepotManager
 from tracim_backend.command import AppContextCommand
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import InvalidSettingFile

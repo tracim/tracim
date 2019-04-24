@@ -1,10 +1,10 @@
-import typing
 from copy import copy
+import typing
 
-from tracim_backend.exceptions import AppDoesNotExist
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
+from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
+from tracim_backend.exceptions import AppDoesNotExist
 
 
 class ApplicationApi(object):

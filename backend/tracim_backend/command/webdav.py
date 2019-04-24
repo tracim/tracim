@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import argparse
+
 import plaster
+
 from tracim_backend.command import AppContextCommand
-from wsgi import webdav_app
 from wsgi import WEBDAV_APP_NAME
+from wsgi import webdav_app
 
 
 class WebdavRunnerCommand(AppContextCommand):

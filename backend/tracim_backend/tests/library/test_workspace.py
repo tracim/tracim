@@ -5,10 +5,10 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.data import Content
-from tracim_backend.models.auth import User
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests import DefaultTest

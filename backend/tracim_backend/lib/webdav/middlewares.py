@@ -1,22 +1,22 @@
+from datetime import datetime
 import os
 import sys
 import threading
 import time
-from datetime import datetime
 from xml.etree import ElementTree
 
 import ldap3
-import transaction
-import yaml
 from pyramid.paster import get_appsettings
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid_ldap3 import ConnectionManager
 from pyramid_ldap3 import Connector
 from pyramid_ldap3 import _LDAPQuery
+import transaction
 from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
+import yaml
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.user import UserApi

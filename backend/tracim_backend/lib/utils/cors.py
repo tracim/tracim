@@ -3,8 +3,9 @@
 # original code from https://gist.github.com/mmerickel/1afaf64154b335b596e4
 # see also
 # here : https://groups.google.com/forum/#!topic/pylons-discuss/2Sw4OkOnZcE
-from tracim_backend.config import CFG
 from pyramid.events import NewResponse
+
+from tracim_backend.config import CFG
 
 
 def add_cors_support(config):

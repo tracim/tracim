@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 import time
 
-from depot.fields.upload import UploadedFile
+import pytest
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
 import transaction
-import pytest
 
 # from tracim.lib.content import ContentApi
+from depot.fields.upload import UploadedFile
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.models.data import Content
-from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import StandardTest
 
 

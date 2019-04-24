@@ -1,13 +1,12 @@
 import requests
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 
 from tracim_backend.app_models.contents import content_type_list
-
+from tracim_backend.fixtures.content import Content as ContentFixture
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 from tracim_backend.tests import MailHogTest
 
 

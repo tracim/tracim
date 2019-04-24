@@ -1,18 +1,18 @@
 # coding: utf8
+from datetime import datetime
 import functools
 import logging
 import os
-import re
-import typing
-from datetime import datetime
 from os.path import basename
 from os.path import dirname
+import re
 from time import mktime
+import typing
 
-import transaction
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import MultipleResultsFound
 from sqlalchemy.orm.exc import NoResultFound
+import transaction
 from wsgidav import compat
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import DAVError
@@ -37,8 +37,8 @@ from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.authorization import is_user
-from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import add_trailing_slash
+from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
 from tracim_backend.lib.webdav.design import design_page

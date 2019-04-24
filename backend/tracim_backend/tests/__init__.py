@@ -1,38 +1,41 @@
 # -*- coding: utf-8 -*-
+from io import BytesIO
 import logging
 import multiprocessing
+import threading
 import typing
 import unittest
 
+from PIL import Image
 import plaster
-import requests
-import transaction
-from depot.manager import DepotManager
 from pyramid import testing
+import requests
 from requests import Response
 from sqlalchemy.exc import IntegrityError
-
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.setup_models import get_engine, get_session_factory, get_tm_session
-from tracim_backend.models.meta import DeclarativeBase
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import Content
-from tracim_backend.lib.utils.logger import logger
-from tracim_backend.fixtures import FixturesLoader
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.config import CFG
-from tracim_backend.extensions import hapic
-from tracim_backend import web, CaldavAppFactory
-from tracim_backend import webdav
-from tracim_backend import WebdavAppFactory
+import transaction
 from waitress import serve
 from webtest import TestApp
-from io import BytesIO
-from PIL import Image
-import threading
+
+from depot.manager import DepotManager
+from tracim_backend import CaldavAppFactory
+from tracim_backend import WebdavAppFactory
+from tracim_backend import web
+from tracim_backend import webdav
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
+from tracim_backend.extensions import hapic
+from tracim_backend.fixtures import FixturesLoader
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.logger import logger
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import Workspace
+from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import get_tm_session
 
 
 def eq_(a, b, msg=None) -> None:

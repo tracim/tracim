@@ -1,5 +1,5 @@
-import typing
 from enum import Enum
+import typing
 
 import marshmallow
 from marshmallow import post_load

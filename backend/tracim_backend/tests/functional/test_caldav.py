@@ -3,8 +3,8 @@ from time import sleep
 from parameterized import parameterized
 import pytest
 import requests
-import transaction
 from requests.exceptions import ConnectionError
+import transaction
 
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi

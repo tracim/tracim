@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-import typing
 from enum import Enum
-
-from tracim_backend.exceptions import ContentStatusNotExist
-from tracim_backend.exceptions import ContentTypeNotExist
-from tracim_backend.extensions import app_list
+import typing
 
 ####
 # Content Status
+from tracim_backend.exceptions import ContentStatusNotExist
+from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles

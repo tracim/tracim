@@ -1,12 +1,11 @@
 import typing
 
-import transaction
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
+import transaction
 
-from tracim_backend.models.auth import AuthType
-from tracim_backend.config import CFG
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
@@ -41,6 +40,7 @@ from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription

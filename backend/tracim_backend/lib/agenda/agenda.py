@@ -1,14 +1,15 @@
 import typing
 
 import caldav
-import requests
 from caldav.elements.base import ValuedBaseElement
 from caldav.lib.namespace import ns
 from colour import Color
+import requests
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AgendaServerConnectionError, AgendaPropsUpdateFailed
+from tracim_backend.exceptions import AgendaPropsUpdateFailed
+from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import CannotCreateAgenda
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.lib.core.workspace import WorkspaceApi

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 import typing
 
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.config import CFG
-
+from tracim_backend.exceptions import GroupDoesNotExist
+from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
 
 __author__ = "damien"
 
-from tracim_backend.models.auth import Group, User
-from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
 
 
 class GroupApi(object):

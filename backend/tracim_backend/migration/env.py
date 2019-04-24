@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import with_statement
+
 from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from tracim_backend.models.setup_models import *
+
 from tracim_backend.models.meta import metadata
+from tracim_backend.models.setup_models import *
 
 # from logging.config import fileConfig
 

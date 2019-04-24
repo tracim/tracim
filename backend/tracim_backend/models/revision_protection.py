@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 import typing
 
-from sqlalchemy.orm import Session
 from sqlalchemy import inspect
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.unitofwork import UOWTransaction
 from transaction import TransactionManager
-from contextlib import contextmanager
 
 from tracim_backend.exceptions import ContentRevisionDeleteError
 from tracim_backend.exceptions import ContentRevisionUpdateError
-
-
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.meta import DeclarativeBase
 
 

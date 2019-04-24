@@ -4,24 +4,22 @@ import typing
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import content_status_list
+# TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
+# TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
+# TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
+from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name  # nopep8
-
-# TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-
-# TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
-# TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.lib.core.workspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import Group

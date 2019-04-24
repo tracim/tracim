@@ -4,8 +4,9 @@ from http import HTTPStatus
 from hapic import HapicData
 from pyramid.config import Configurator
 from pyramid.response import Response
-from tracim_backend.exceptions import WorkspaceAgendaDisabledException
+from requests.auth import HTTPBasicAuth
 
+from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda.authorization import can_access_to_agenda_list
 from tracim_backend.lib.agenda.authorization import can_access_user_agenda
@@ -21,7 +22,6 @@ from tracim_backend.views.core_api.schemas import RadicaleUserSubItemPathSchema
 from tracim_backend.views.core_api.schemas import RadicaleWorkspaceSubItemPathSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
-from requests.auth import HTTPBasicAuth
 
 # dumb auth parameter, just to avoid radicale issue with empty
 # auth header

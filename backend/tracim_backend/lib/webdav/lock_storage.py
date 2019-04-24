@@ -1,9 +1,14 @@
 import time
 
-from tracim_backend.lib.webdav.model import Lock, Url2Token
 from wsgidav import util
-from wsgidav.lock_manager import normalizeLockRoot, lockString, generateLockToken, validateLock
+from wsgidav.lock_manager import generateLockToken
+from wsgidav.lock_manager import lockString
+from wsgidav.lock_manager import normalizeLockRoot
+from wsgidav.lock_manager import validateLock
 from wsgidav.rw_lock import ReadWriteLock
+
+from tracim_backend.lib.webdav.model import Lock
+from tracim_backend.lib.webdav.model import Url2Token
 
 _logger = util.getModuleLogger(__name__)
 

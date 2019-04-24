@@ -1,9 +1,9 @@
 # coding: utf8
 import functools
-import re
-import typing
 from os.path import basename
 from os.path import dirname
+import re
+import typing
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound

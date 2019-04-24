@@ -3,10 +3,11 @@ import copy
 import typing
 from urllib.parse import urljoin
 
-import requests
 from pyramid.response import Response as PyramidResponse
+import requests
 from requests import Response as RequestsResponse
-from requests.auth import HTTPBasicAuth, AuthBase
+from requests.auth import AuthBase
+from requests.auth import HTTPBasicAuth
 
 from tracim_backend.lib.utils.request import TracimRequest
 

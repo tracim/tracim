@@ -1,10 +1,9 @@
 # coding=utf-8
 import typing
 
-import transaction
 from pyramid.config import Configurator
+import transaction
 
-from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -15,6 +14,7 @@ from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext

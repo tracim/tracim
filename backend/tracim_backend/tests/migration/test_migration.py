@@ -1,15 +1,15 @@
-import transaction
 from alembic import command
+from alembic.config import Config
 from alembic.runtime.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
-from alembic.config import Config
-from depot.manager import DepotManager
 from pyramid import testing
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
+import transaction
 
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from depot.manager import DepotManager
 from tracim_backend.fixtures.content import Content as ContentFixture
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.setup_models import *
 from tracim_backend.tests import BaseTest

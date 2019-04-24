@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import transaction
-
 from sqlalchemy.orm import Session
-from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
+import transaction
+from wsgidav import compat
+from wsgidav import util
+from wsgidav.dav_error import HTTP_FORBIDDEN
+from wsgidav.dav_error import DAVError
 
 from tracim_backend.app_models.contents import content_type_list
-from wsgidav import util
-from wsgidav import compat
-
 from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import Content
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
 

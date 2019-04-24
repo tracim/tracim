@@ -1,76 +1,74 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 
+from hapic.ext.pyramid import PyramidContext
+from pyramid.config import Configurator
 from pyramid_multiauth import MultiAuthenticationPolicy
-from tracim_backend.lib.agenda import CaldavAppFactory
+from sqlalchemy.exc import OperationalError
 
-from tracim_backend.models.auth import AuthType
+from tracim_backend.config import CFG
+from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import CaldavNotAuthenticated
+from tracim_backend.exceptions import CaldavNotAuthorized
+from tracim_backend.exceptions import ContentInNotEditableState
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import ContentNotFoundInTracimRequest
+from tracim_backend.exceptions import ContentTypeNotAllowed
+from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.exceptions import InsufficientUserProfile
+from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.exceptions import InvalidId
+from tracim_backend.exceptions import NotAuthenticated
+from tracim_backend.exceptions import PageNotFound
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
+from tracim_backend.exceptions import UserNotFoundInTracimRequest
+from tracim_backend.exceptions import WorkspaceNotFound
+from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.agenda import CaldavAppFactory
 from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
-from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
+from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
+from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
+from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
+from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.webdav import WebdavAppFactory
+from tracim_backend.models.auth import AuthType
+from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
+from tracim_backend.views.contents_api.comment_controller import CommentController  # nopep8
+from tracim_backend.views.contents_api.file_controller import FileController
+from tracim_backend.views.contents_api.folder_controller import FolderController  # nopep8
+from tracim_backend.views.contents_api.html_document_controller import (
+    HTMLDocumentController  # nopep8,
+)
+from tracim_backend.views.contents_api.threads_controller import ThreadController  # nopep8
+from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.core_api.reset_password_controller import (
+    ResetPasswordController  # nopep8,
+)
+from tracim_backend.views.core_api.session_controller import SessionController
+from tracim_backend.views.core_api.system_controller import SystemController
+from tracim_backend.views.core_api.user_controller import UserController
+from tracim_backend.views.core_api.workspace_controller import WorkspaceController  # nopep8
+from tracim_backend.views.errors import ErrorSchema
+from tracim_backend.views.frontend import FrontendController
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from pyramid.config import Configurator
-from hapic.ext.pyramid import PyramidContext
-from sqlalchemy.exc import OperationalError
 
-from tracim_backend.extensions import hapic
-from tracim_backend.config import CFG
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
-from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
-from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
-from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
-from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
-from tracim_backend.lib.utils.cors import add_cors_support
-from tracim_backend.lib.webdav import WebdavAppFactory
-from tracim_backend.views import BASE_API_V2
-from tracim_backend.views.contents_api.html_document_controller import (
-    HTMLDocumentController,
-)  # nopep8
-from tracim_backend.views.contents_api.threads_controller import ThreadController  # nopep8
-from tracim_backend.views.core_api.session_controller import SessionController
-from tracim_backend.views.core_api.system_controller import SystemController
-from tracim_backend.views.core_api.user_controller import UserController
-from tracim_backend.views.core_api.account_controller import AccountController
-from tracim_backend.views.core_api.workspace_controller import WorkspaceController  # nopep8
-from tracim_backend.views.contents_api.comment_controller import CommentController  # nopep8
-from tracim_backend.views.contents_api.file_controller import FileController
-from tracim_backend.views.contents_api.folder_controller import FolderController  # nopep8
-from tracim_backend.views.core_api.reset_password_controller import (
-    ResetPasswordController,
-)  # nopep8
-from tracim_backend.views.frontend import FrontendController
-from tracim_backend.views.errors import ErrorSchema
-from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
-from tracim_backend.exceptions import CaldavNotAuthorized
-from tracim_backend.exceptions import CaldavNotAuthenticated
-from tracim_backend.exceptions import ContentTypeNotExist
-from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import ContentInNotEditableState
-from tracim_backend.exceptions import PageNotFound
-from tracim_backend.exceptions import UserAuthenticatedIsNotActive
-from tracim_backend.exceptions import InvalidId
-from tracim_backend.exceptions import InsufficientUserProfile
-from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
-from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
-from tracim_backend.exceptions import UserNotFoundInTracimRequest
-from tracim_backend.exceptions import ContentNotFoundInTracimRequest
-from tracim_backend.exceptions import WorkspaceNotFound
-from tracim_backend.exceptions import ContentNotFound
-from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import ContentTypeNotAllowed
 
 
 def web(global_config, **local_settings):

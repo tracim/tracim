@@ -1,9 +1,12 @@
+from mock import MagicMock
+from mock import Mock
 import pytest
-from mock import Mock, MagicMock
-from tracim_backend.exceptions import BadStatusCode
-from tracim_backend.lib.mail_fetcher.email_fetcher import DecodedMail, MailFetcher
-import responses
 import requests
+import responses
+
+from tracim_backend.exceptions import BadStatusCode
+from tracim_backend.lib.mail_fetcher.email_fetcher import DecodedMail
+from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 
 
 class TestDecodedMail(object):

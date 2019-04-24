@@ -1,5 +1,6 @@
 from hapic.error.marshmallow import MarshmallowDefaultErrorBuilder
 from hapic.processor.main import ProcessValidationError
+
 from tracim_backend.error import ErrorCode
 
 

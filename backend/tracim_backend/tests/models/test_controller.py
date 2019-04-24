@@ -1,6 +1,6 @@
 # coding=utf-8
-import pytest
 from pyramid.config import Configurator
+import pytest
 
 from tracim_backend.views.controllers import Controller
 

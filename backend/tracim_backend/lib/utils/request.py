@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from json import JSONDecodeError
+from os.path import basename
+from os.path import dirname
 import re
 import typing
-from json import JSONDecodeError
-from os.path import dirname, basename
 
 from pyramid.request import Request
 from sqlalchemy.orm import Session

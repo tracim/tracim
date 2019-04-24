@@ -1,8 +1,9 @@
 # coding=utf-8
 import transaction
-from tracim_backend.tests import eq_
-from tracim_backend.tests import BaseTest
+
 from tracim_backend.models.auth import Permission
+from tracim_backend.tests import BaseTest
+from tracim_backend.tests import eq_
 
 
 class TestPermissionModel(BaseTest):

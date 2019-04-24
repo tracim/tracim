@@ -1,8 +1,8 @@
 # coding: utf8
 import typing
 
-import transaction
 from sqlalchemy.orm import Session
+import transaction
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed

@@ -1,6 +1,8 @@
 # coding=utf-8
 import unittest
+
 import pytest
+
 from tracim_backend.exceptions import RoleDoesNotExist
 from tracim_backend.models.roles import WorkspaceRoles
 

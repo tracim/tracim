@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import typing
 
 from babel.core import default_locale
-import typing
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
