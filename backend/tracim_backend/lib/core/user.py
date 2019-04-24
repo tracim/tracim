@@ -920,7 +920,7 @@ class UserApi(object):
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487
         # event on_updated_user should start hook use by agenda  app code.
 
-        if self._config.CALDAV_ENABLED:
+        if self._config.CALDAV__ENABLED:
             agenda_api = AgendaApi(
                 current_user = self._user,
                 session = self._session,

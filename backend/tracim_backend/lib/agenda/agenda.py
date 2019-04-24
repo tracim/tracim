@@ -126,9 +126,9 @@ class AgendaApi(object):
 
     def _get_agenda_base_url(self, use_proxy: bool):
         if use_proxy:
-            base_url = self._config.WEBSITE_BASE_URL
+            base_url = self._config.WEBSITE__BASE_URL
         else:
-            base_url = self._config.CALDAV_RADICALE_PROXY_BASE_URL
+            base_url = self._config.CALDAV__RADICALE_PROXY__BASE_URL
         return base_url
 
     def get_workspace_agenda_url(self, workspace: Workspace, use_proxy: bool) -> str:
@@ -137,7 +137,7 @@ class AgendaApi(object):
 
     def get_user_agenda_url(self, user: User, use_proxy: bool) -> str:
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return '{}{}{}/'.format(base_url, self._config.CALDAV_RADICALE_USER_PATH, user.user_id)
+        return '{}{}{}/'.format(base_url, self._config.CALDAV__RADICALE__USER_PATH, user.user_id)
 
     def ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
         """
