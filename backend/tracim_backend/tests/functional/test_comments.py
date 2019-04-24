@@ -162,9 +162,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(
-        self
-    ) -> None:
+    def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:
         """
         delete comment (user is workspace_manager and owner)
         """
@@ -215,9 +213,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content["content_id"] == 19]
 
-    def test_api__delete_content_comment__ok_200__user_is_owner_and_content_manager(
-        self
-    ) -> None:
+    def test_api__delete_content_comment__ok_200__user_is_owner_and_content_manager(self) -> None:
         """
         delete comment (user is content-manager and owner)
         """

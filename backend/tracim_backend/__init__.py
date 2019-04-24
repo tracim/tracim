@@ -48,14 +48,10 @@ from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicalePr
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
-from tracim_backend.views.contents_api.html_document_controller import (
-    HTMLDocumentController
-)
+from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController
 from tracim_backend.views.contents_api.threads_controller import ThreadController
 from tracim_backend.views.core_api.account_controller import AccountController
-from tracim_backend.views.core_api.reset_password_controller import (
-    ResetPasswordController
-)
+from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
 from tracim_backend.views.core_api.user_controller import UserController

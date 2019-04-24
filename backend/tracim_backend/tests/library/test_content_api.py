@@ -491,9 +491,7 @@ class TestContentApi(DefaultTest):
         assert "allowed_content" in folder.properties
         assert folder.properties[
             "allowed_content"
-        ] == content_type_list.default_allowed_content_properties(
-            folder.type
-        )
+        ] == content_type_list.default_allowed_content_properties(folder.type)
 
     def test_unit__get_allowed_content_type__ok__html_document(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -2430,9 +2428,7 @@ class TestContentApi(DefaultTest):
         with new_revision(session=self.session, tm=transaction.manager, content=deleted):
             api.delete(deleted)
             api.save(deleted)
-        normal = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "normal", "", True
-        )
+        normal = api.create(content_type_list.Page.slug, workspace, main_folder, "normal", "", True)
         comment_normal = api.create_comment(
             workspace, parent=normal, content="just a comment", do_save=True
         )
@@ -2644,9 +2640,7 @@ class TestContentApi(DefaultTest):
         # folder subcontent modification does not change folder order
         assert last_actives[3] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(
-        self
-    ):
+    def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
         groups = [

@@ -83,9 +83,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
                     res[counter]["available_statuses"][status_counter]["global_status"]
                     == status.global_status
                 )
-                assert (
-                    res[counter]["available_statuses"][status_counter]["slug"] == status.slug
-                )
+                assert res[counter]["available_statuses"][status_counter]["slug"] == status.slug
                 assert (
                     res[counter]["available_statuses"][status_counter]["hexcolor"]
                     == status.hexcolor

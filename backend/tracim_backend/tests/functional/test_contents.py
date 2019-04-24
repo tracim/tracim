@@ -178,9 +178,7 @@ class TestFolder(FunctionalTest):
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/40/folders/{content_id}".format(
-                content_id=folder.content_id
-            ),
+            "/api/v2/workspaces/40/folders/{content_id}".format(content_id=folder.content_id),
             status=400,
         )
         assert res.json_body
@@ -206,9 +204,7 @@ class TestFolder(FunctionalTest):
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/coucou/folders/{content_id}".format(
-                content_id=folder.content_id
-            ),
+            "/api/v2/workspaces/coucou/folders/{content_id}".format(content_id=folder.content_id),
             status=400,
         )
         assert res.json_body
@@ -787,9 +783,7 @@ class TestFolder(FunctionalTest):
         # before
         res = self.testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
-
-                workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
             status=200,
         )
@@ -1987,8 +1981,7 @@ class TestFiles(FunctionalTest):
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/revisions".format(test_file.content_id),
-            status=200,
+            "/api/v2/workspaces/1/files/{}/revisions".format(test_file.content_id), status=200
         )
         revisions = res.json_body
         assert len(revisions) == 1
@@ -2191,9 +2184,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.body == b"Test file"
         assert res.content_type == "text/plain"
         assert res.content_length == len(b"Test file")
@@ -2594,8 +2585,7 @@ class TestFiles(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         content_id = int(test_file.content_id)
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id),
-            status=200,
+            "/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id), status=200
         )
         res = res.json_body
         assert res["restricted"] is True
@@ -2679,9 +2669,7 @@ class TestFiles(FunctionalTest):
         filename = "test_image_page_1.jpg"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
 
@@ -2753,9 +2741,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
-                content_id, image.name
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, image.name),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -2835,18 +2821,14 @@ class TestFiles(FunctionalTest):
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
-                content_id, dl_filename
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, dl_filename),
             status=200,
             params=params,
         )
         assert res.body != image.getvalue()
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            dl_filename, dl_filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(dl_filename, dl_filename)
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2889,9 +2871,7 @@ class TestFiles(FunctionalTest):
         assert res.body != image.getvalue()
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            dl_filename, dl_filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(dl_filename, dl_filename)
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2936,9 +2916,7 @@ class TestFiles(FunctionalTest):
         assert res.body != image.getvalue()
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            dl_filename, dl_filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(dl_filename, dl_filename)
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2973,9 +2951,7 @@ class TestFiles(FunctionalTest):
         )
         filename = "test_image_512x512.jpg"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/512x512/{}".format(
-                content_id, filename
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/jpg/512x512/{}".format(content_id, filename),
             status=400,
         )
         assert res.json_body
@@ -3033,9 +3009,7 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(
-        self
-    ) -> None:
+    def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(self) -> None:
         """
         get 256x256 revision preview of a txt file
         """
@@ -3126,9 +3100,7 @@ class TestFiles(FunctionalTest):
         )
         filename = "test_image.pdf"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
-                content_id, filename
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
             status=200,
         )
         assert res.content_type == "application/pdf"
@@ -3167,37 +3139,27 @@ class TestFiles(FunctionalTest):
         )
         params = {"force_download": 1}
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
-                content_id, filename
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
             status=200,
             params=params,
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
-                content_id, "Test_file.pdf"
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, "Test_file.pdf"),
             status=200,
             params=params,
         )
         filename = "Test_file.pdf"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
-    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(
-        self
-    ) -> None:
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
@@ -3226,9 +3188,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
-                content_id, image.name
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, image.name),
             status=400,
         )
         assert res.json_body
@@ -3266,9 +3226,7 @@ class TestFiles(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         filename = "Test_file.bin"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
-                content_id, filename
-            ),
+            "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
             status=400,
         )
         assert isinstance(res.json, dict)
@@ -3396,9 +3354,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == "application/pdf"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:
         """
@@ -3586,9 +3542,7 @@ class TestFiles(FunctionalTest):
 
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
@@ -3640,9 +3594,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            filename, filename
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
     def test_api__set_file_status__err_400__same_status(self) -> None:
@@ -4017,8 +3969,7 @@ class TestThreads(FunctionalTest):
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/1/threads/{}/revisions".format(test_thread.content_id),
-            status=200,
+            "/api/v2/workspaces/1/threads/{}/revisions".format(test_thread.content_id), status=200
         )
         revisions = res.json_body
         assert len(revisions) == 6

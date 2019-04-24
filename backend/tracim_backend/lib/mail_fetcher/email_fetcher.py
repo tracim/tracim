@@ -429,9 +429,7 @@ class MailFetcher(object):
             try:
                 method, endpoint, json_body_dict = self._create_comment_request(mail)
             except NoSpecialKeyFound as exc:
-                log = (
-                    "Failed to create comment request due to missing specialkey in mail {}"
-                )
+                log = "Failed to create comment request due to missing specialkey in mail {}"
                 logger.error(self, log.format(exc.__str__()))
                 continue
             except EmptyEmailBody as exc:

@@ -604,9 +604,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            path_data.content_id, content_type=content_type_list.Any_SLUG
-        )
+        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.archive(content)
         return
@@ -643,9 +641,7 @@ class WorkspaceController(Controller):
         configurator.add_route("workspaces", "/workspaces", request_method="GET")
         configurator.add_view(self.workspaces, route_name="workspaces")
         # Workspace
-        configurator.add_route(
-            "workspace", "/workspaces/{workspace_id}", request_method="GET"
-        )
+        configurator.add_route("workspace", "/workspaces/{workspace_id}", request_method="GET")
         configurator.add_view(self.workspace, route_name="workspace")
         # Create workspace
         configurator.add_route("create_workspace", "/workspaces", request_method="POST")
@@ -675,9 +671,7 @@ class WorkspaceController(Controller):
             "/workspaces/{workspace_id}/members/{user_id}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.workspaces_member_role, route_name="workspace_member_role"
-        )
+        configurator.add_view(self.workspaces_member_role, route_name="workspace_member_role")
         # Update Workspace Members roles
         configurator.add_route(
             "update_workspace_member",
@@ -716,9 +710,7 @@ class WorkspaceController(Controller):
             self.create_generic_empty_content, route_name="create_generic_content"
         )
         # Get Content
-        configurator.add_route(
-            "get_content", "/contents/{content_id}", request_method="GET"
-        )
+        configurator.add_route("get_content", "/contents/{content_id}", request_method="GET")
         configurator.add_view(self.get_content, route_name="get_content")
         # Get Content From workspace
         configurator.add_route(

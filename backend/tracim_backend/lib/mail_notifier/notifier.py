@@ -217,7 +217,8 @@ class EmailManager(object):
         content_api = ContentApi(current_user=user, session=self.session, config=self.config)
         content = ContentApi(
             session=self.session,
-            current_user=user,   TODO - use a system user instead of the user that has triggered the event
+            current_user=user,
+            # TODO - G.M - 2019-04-24 - use a system user instead of the user that has triggered the event
             config=self.config,
             show_archived=True,
             show_deleted=True,
@@ -226,9 +227,7 @@ class EmailManager(object):
         workpace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content.workspace_id)
         )
-        main_content = (
-            content.parent if content.type == content_type_list.Comment.slug else content
-        )
+        main_content = content.parent if content.type == content_type_list.Comment.slug else content
         notifiable_roles = WorkspaceApi(
             current_user=user, session=self.session, config=self.config
         ).get_notifiable_roles(content.workspace)
@@ -360,9 +359,7 @@ class EmailManager(object):
         message["From"] = self._get_sender()
         message["To"] = formataddr((user.get_display_name(), user.email))
 
-        html_template_file_path = (
-            self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
-        )
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
 
         context = {
             "user": user,

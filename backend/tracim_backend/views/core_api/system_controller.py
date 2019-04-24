@@ -113,19 +113,13 @@ class SystemController(Controller):
         configurator.add_view(self.error_codes, route_name="error_codes")
 
         # Applications
-        configurator.add_route(
-            "applications", "/system/applications", request_method="GET"
-        )
+        configurator.add_route("applications", "/system/applications", request_method="GET")
         configurator.add_view(self.applications, route_name="applications")
 
         # Content_types
-        configurator.add_route(
-            "content_types", "/system/content_types", request_method="GET"
-        )
+        configurator.add_route("content_types", "/system/content_types", request_method="GET")
         configurator.add_view(self.content_types, route_name="content_types")
 
         # Content_types
-        configurator.add_route(
-            "timezones_list", "/system/timezones", request_method="GET"
-        )
+        configurator.add_route("timezones_list", "/system/timezones", request_method="GET")
         configurator.add_view(self.timezones_list, route_name="timezones_list")

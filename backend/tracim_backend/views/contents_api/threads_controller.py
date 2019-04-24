@@ -48,9 +48,7 @@ class ThreadController(Controller):
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedContentSchema())
-    def get_thread(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:
+    def get_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get thread content
         """
@@ -73,9 +71,7 @@ class ThreadController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(TextBasedContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
-    def update_thread(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:
+    def update_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         update thread
         """

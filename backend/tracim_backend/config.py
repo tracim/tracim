@@ -333,9 +333,7 @@ class CFG(object):
 
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT = self.get_raw_config(
             "email.notification.content_update.subject",
-            _(
-                "[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"
-            ),
+            _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"),
         )
         # Created account notification
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
@@ -530,18 +528,14 @@ class CFG(object):
                 self.APPS_COLORS = json.load(json_file)
         except Exception as e:
             raise Exception(
-                "Error: {} file could not be load as json".format(
-                    self.COLOR__CONFIG_FILE_PATH
-                )
+                "Error: {} file could not be load as json".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
         try:
             self.APPS_COLORS["primary"]
         except KeyError as e:
             raise Exception(
-                "Error: primary color is required in {} file".format(
-                    self.COLOR__CONFIG_FILE_PATH
-                )
+                "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
         # INFO - G.M - 2019-04-03 - depot dir validity
@@ -718,7 +712,6 @@ class CFG(object):
             is_active=False,
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
-
             app_config=self,
         )
         markdownpluspage.add_content_type(

@@ -278,10 +278,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
         assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
 
-        params = {
-            "limit": 2,
-            "before_content_id": secondly_created_but_not_commented.content_id,
-        }
+        params = {"limit": 2, "before_content_id": secondly_created_but_not_commented.content_id}
         res = self.testapp.get(
             "/api/v2/users/me/workspaces/{}/contents/recently_active".format(
                 workspace.workspace_id
@@ -771,9 +768,7 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
             do_notify=False,
         )
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(
-            test_user, workspace, UserRoleInWorkspace.READER, with_notif=False
-        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False

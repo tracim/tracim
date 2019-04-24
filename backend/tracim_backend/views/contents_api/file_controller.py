@@ -103,9 +103,7 @@ class FileController(Controller):
         parent = None  # type: typing.Optional['Content']
         if parent_id:
             try:
-                parent = api.get_one(
-                    content_id=parent_id, content_type=content_type_list.Any_SLUG
-                )
+                parent = api.get_one(content_id=parent_id, content_type=content_type_list.Any_SLUG)
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(parent_id)
@@ -501,9 +499,7 @@ class FileController(Controller):
     @hapic.input_path(FileRevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
-    def sized_preview_jpg_revision(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain resized jpg preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg`.
@@ -568,9 +564,7 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileContentSchema())
-    def get_file_infos(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:
+    def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get thread content
         """
@@ -715,9 +709,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.download_revisions_file, route_name="download_revision"
-        )
+        configurator.add_view(self.download_revisions_file, route_name="download_revision")
 
         # previews #
         # get preview pdf full
@@ -740,9 +732,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims",
             request_method="GET",
         )
-        configurator.add_view(
-            self.allowed_dim_preview_jpg, route_name="allowed_dim_preview_jpg"
-        )
+        configurator.add_view(self.allowed_dim_preview_jpg, route_name="allowed_dim_preview_jpg")
         # get preview jpg
         configurator.add_route(
             "preview_jpg",
@@ -781,9 +771,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.preview_pdf_revision, route_name="preview_pdf_revision"
-        )
+        configurator.add_view(self.preview_pdf_revision, route_name="preview_pdf_revision")
         # others #
         # get file revisions
         configurator.add_route(

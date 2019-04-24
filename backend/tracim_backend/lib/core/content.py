@@ -152,9 +152,7 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
-        self.preview_manager = PreviewManager(
-            self._config.PREVIEW_CACHE_DIR, create_folder=True
-        )
+        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)
         default_lang = None
         if self._user:
             default_lang = self._user.lang
@@ -551,9 +549,7 @@ class ContentApi(object):
                 content.label = ""
             else:
                 raise EmptyLabelNotAllowed(
-                    "Content of type {} should have a valid label".format(
-                        content_type_slug
-                    )
+                    "Content of type {} should have a valid label".format(content_type_slug)
                 )
 
         content.owner = self._user
@@ -660,9 +656,7 @@ class ContentApi(object):
             # like content doesn't exist, wrong parent, wrong content_type, wrong workspace,
             # wrong access to this workspace, wrong base filter according
             # to content_status.
-            raise ContentNotFound(
-                'Content "{}" not found in database'.format(content_id)
-            ) from exc
+            raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc
         return content
 
     def get_one_revision(
@@ -878,9 +872,7 @@ class ContentApi(object):
         try:
             file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(
-                file_path, file_ext=file_extension
-            ):
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):
                 raise PageOfPreviewNotFound(
                     "page_number {page_number} of content {content_id} does not exist".format(
                         page_number=page_number, content_id=content_id
@@ -897,9 +889,7 @@ class ContentApi(object):
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                "No preview available for content {}, revision {}".format(
-                    content_id, revision_id
-                )
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
@@ -907,9 +897,7 @@ class ContentApi(object):
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                "No preview available for content {}, revision {}".format(
-                    content_id, revision_id
-                )
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except Exception as exc:
             logger.warning(
@@ -917,9 +905,7 @@ class ContentApi(object):
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                "No preview available for content {}, revision {}".format(
-                    content_id, revision_id
-                )
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         return pdf_preview_path
 
@@ -990,9 +976,7 @@ class ContentApi(object):
         try:
             file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(
-                file_path, file_ext=file_extension
-            ):
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):
                 raise PageOfPreviewNotFound(
                     "page {page_number} of revision {revision_id} of content {content_id} does not exist".format(
                         page_number=page_number, revision_id=revision_id, content_id=content_id
@@ -1023,9 +1007,7 @@ class ContentApi(object):
             raise exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                "No preview available for content {}, revision {}".format(
-                    content_id, revision_id
-                )
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
@@ -1033,9 +1015,7 @@ class ContentApi(object):
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                "No preview available for content {}, revision {}".format(
-                    content_id, revision_id
-                )
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except Exception as exc:
             logger.warning(
@@ -1043,9 +1023,7 @@ class ContentApi(object):
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                "No preview available for content {}, revision {}".format(
-                    content_id, revision_id
-                )
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         return jpg_preview_path
 
@@ -1377,9 +1355,7 @@ class ContentApi(object):
     #
     #     return result
 
-    def _set_allowed_content(
-        self, content: Content, allowed_content_dict: dict
-    ) -> Content:
+    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:
         """
         :param content: the given content instance
         :param allowed_content_dict: must be something like this:
@@ -1510,9 +1486,7 @@ class ContentApi(object):
                 ):
                     raise UnallowedSubContent(
                         " SubContent of type {subcontent_type}  not allowed in content {content_id}".format(
-
-                            subcontent_type=content_type.slug,
-                            content_id=parent.content_id,
+                            subcontent_type=content_type.slug, content_id=parent.content_id
                         )
                     )
         if workspace:
@@ -1753,9 +1727,7 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def get_preview_page_nb(
-        self, revision_id: int, file_extension: str
-    ) -> typing.Optional[int]:
+    def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:
         try:
             file_path = self.get_one_revision_filepath(revision_id)
             nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)

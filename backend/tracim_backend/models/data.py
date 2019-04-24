@@ -570,9 +570,7 @@ class ContentChecker(object):
                 for content_slug, value in properties["allowed_content"].items():
                     if not isinstance(value, bool):
                         return False
-                    if (
-                        not content_slug in content_type_list.endpoint_allowed_types_slug()
-                    ):
+                    if not content_slug in content_type_list.endpoint_allowed_types_slug():
                         return False
             if "origin" in properties.keys():
                 pass
@@ -1250,9 +1248,7 @@ class Content(DeclarativeBase):
             if not "allowed_content" in properties:
                 properties[
                     "allowed_content"
-                ] = content_type_list.default_allowed_content_properties(
-                    self.type
-                )
+                ] = content_type_list.default_allowed_content_properties(self.type)
         return properties
 
     @properties.setter

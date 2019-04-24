@@ -130,9 +130,7 @@ class TestContent(StandardTest):
         )
         revision_3 = (
             self.session.query(ContentRevisionRO)
-            .filter(
-                ContentRevisionRO.description == "TEST_CONTENT_DESCRIPTION_1_UPDATED_2"
-            )
+            .filter(ContentRevisionRO.description == "TEST_CONTENT_DESCRIPTION_1_UPDATED_2")
             .one()
         )
 

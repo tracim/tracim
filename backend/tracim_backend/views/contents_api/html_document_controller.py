@@ -164,9 +164,7 @@ class HTMLDocumentController(Controller):
             "/workspaces/{workspace_id}/html-documents/{content_id}",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.update_html_document, route_name="update_html_document"
-        )
+        configurator.add_view(self.update_html_document, route_name="update_html_document")
 
         # get html document revisions
         configurator.add_route(
@@ -184,6 +182,4 @@ class HTMLDocumentController(Controller):
             "/workspaces/{workspace_id}/html-documents/{content_id}/status",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.set_html_document_status, route_name="set_html_document_status"
-        )
+        configurator.add_view(self.set_html_document_status, route_name="set_html_document_status")

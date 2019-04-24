@@ -79,9 +79,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             workspace_dict["sidebar_entries"][counter]["slug"] = sidebar_entry.slug
             workspace_dict["sidebar_entries"][counter]["label"] = sidebar_entry.label
             workspace_dict["sidebar_entries"][counter]["route"] = sidebar_entry.route
-            workspace_dict["sidebar_entries"][counter][
-                "hexcolor"
-            ] = sidebar_entry.hexcolor
+            workspace_dict["sidebar_entries"][counter]["hexcolor"] = sidebar_entry.hexcolor
             workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__get_workspace__ok_200__admin_and_not_in_workspace(self) -> None:
@@ -120,9 +118,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             workspace_dict["sidebar_entries"][counter]["slug"] = sidebar_entry.slug
             workspace_dict["sidebar_entries"][counter]["label"] = sidebar_entry.label
             workspace_dict["sidebar_entries"][counter]["route"] = sidebar_entry.route
-            workspace_dict["sidebar_entries"][counter][
-                "hexcolor"
-            ] = sidebar_entry.hexcolor
+            workspace_dict["sidebar_entries"][counter]["hexcolor"] = sidebar_entry.hexcolor
             workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__update_workspace__ok_200__nominal_case(self) -> None:
@@ -993,9 +989,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found["user_id"] == user_role["user_id"]
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
-    def test_api__create_workspace_members_role_ok_200__user_email_as_workspace_manager(
-        self
-    ):
+    def test_api__create_workspace_members_role_ok_200__user_email_as_workspace_manager(self):
         """
         Check obtain workspace members list of a workspace where admin doesn't
         have any right
@@ -1086,9 +1080,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found["user_id"] == user_role["user_id"]
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
-    def test_api__create_workspace_member_role__err_400__user_email__user_deactivated(
-        self
-    ):
+    def test_api__create_workspace_member_role__err_400__user_email__user_deactivated(self):
         """
         Create workspace member role
         :return:
@@ -1194,9 +1186,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_ROLE_ALREADY_EXIST
 
-    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(
-        self
-    ):
+    def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(self):
         """
         Create workspace member role
         :return:
@@ -1214,9 +1204,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
-    def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(
-        self
-    ):
+    def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):
         """
         Create workspace member role
         :return:
@@ -1234,9 +1222,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
-    def test_api__create_workspace_member_role__err_400__notification_disabled_user_not_found(
-        self
-    ):
+    def test_api__create_workspace_member_role__err_400__notification_disabled_user_not_found(self):
         """
         Create workspace member role
         :return:
@@ -1595,9 +1581,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             ),
             status=400,
         )
-        assert (
-            res.json_body["code"] == ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
-        )
+        assert res.json_body["code"] == ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
         # after
         roles = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace.workspace_id), status=200
@@ -1719,9 +1703,7 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
-    def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(
-        self
-    ):
+    def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(self):
         """
         Create workspace member role
         :return:
@@ -1861,9 +1843,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert (
-            headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
-        )
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Open)"
 
@@ -1873,9 +1853,7 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
     fixtures = [BaseFixture, ContentFixtures]
     config_section = "functional_test_with_mail_test_sync_ldap_auth_only"
 
-    def test_api__create_workspace_member_role__ok_200__new_user_but_internal_auth_disabled(
-        self
-    ):
+    def test_api__create_workspace_member_role__ok_200__new_user_but_internal_auth_disabled(self):
         """
         Create workspace member role
         :return:
@@ -2141,9 +2119,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"content_type": "html-document"}
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         assert len(res) == 1
         content = res[0]
         assert content
@@ -2161,18 +2137,14 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(
-        self
-    ):
+    def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):
         """
         Check obtain workspace all root contents
         """
         set_html_document_slug_to_legacy(self.session_factory)
         params = {"parent_id": 0, "show_archived": 1, "show_deleted": 1, "show_active": 1}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -2224,9 +2196,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         params = {"parent_id": 0, "show_archived": 1, "show_deleted": 1, "show_active": 1}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -2278,9 +2248,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         params = {"parent_ids": "0,3", "show_archived": 1, "show_deleted": 1, "show_active": 1}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/2/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -2308,9 +2276,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.post_json("/api/v2/workspaces/1/contents", params=params, status=200)
         content_id = res.json_body["content_id"]
         params = {"parent_ids": "1,2", "show_archived": 1, "show_deleted": 1, "show_active": 1}
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         assert [
@@ -2330,9 +2296,7 @@ class TestWorkspaceContents(FunctionalTest):
             and content["content_id"] == content_id
         ]
 
-    def test_api__get_workspace_content__ok_200__get_folder_content_with_path_of_content(
-        self
-    ):
+    def test_api__get_workspace_content__ok_200__get_folder_content_with_path_of_content(self):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2364,9 +2328,7 @@ class TestWorkspaceContents(FunctionalTest):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -2441,9 +2403,7 @@ class TestWorkspaceContents(FunctionalTest):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -2479,9 +2439,7 @@ class TestWorkspaceContents(FunctionalTest):
             and content["content_id"] == subfolder_content_id
         ]
 
-    def test_api__get_workspace_content__ok_200__get_path_of_content_deleted_content(
-        self
-    ):
+    def test_api__get_workspace_content__ok_200__get_path_of_content_deleted_content(self):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2516,9 +2474,7 @@ class TestWorkspaceContents(FunctionalTest):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -2561,9 +2517,7 @@ class TestWorkspaceContents(FunctionalTest):
             "show_deleted": 0,
             "show_active": 1,
         }
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         assert len(res) == 5
         assert [
             content
@@ -2599,9 +2553,7 @@ class TestWorkspaceContents(FunctionalTest):
             and content["content_id"] == subfolder_content_id
         ]
 
-    def test_api__get_workspace_content__ok_200__get_path_of_content_archived_content(
-        self
-    ):
+    def test_api__get_workspace_content__ok_200__get_path_of_content_archived_content(self):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2636,9 +2588,7 @@ class TestWorkspaceContents(FunctionalTest):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -2681,9 +2631,7 @@ class TestWorkspaceContents(FunctionalTest):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = self.testapp.get(
-            "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200, params=params).json_body
         assert len(res) == 5
         assert [
             content
@@ -2719,9 +2667,7 @@ class TestWorkspaceContents(FunctionalTest):
             and content["content_id"] == subfolder_content_id
         ]
 
-    def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(
-        self
-    ):
+    def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):
         """
         Check obtain workspace all root contents
         """
@@ -2733,9 +2679,7 @@ class TestWorkspaceContents(FunctionalTest):
             "label": "ew",
         }
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 1
         content = res[0]
@@ -2759,9 +2703,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         content = res[1]
@@ -2785,9 +2727,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         params = {"parent_id": 0, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -2810,9 +2750,7 @@ class TestWorkspaceContents(FunctionalTest):
          """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
 
         assert len(res) == 1
@@ -2838,9 +2776,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 0, "show_active": 0}
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/3/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
@@ -2891,9 +2827,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_html_document):
-            content_api.update_content(
-                test_html_document, "test_page", "<p>HTML_DOCUMENT</p>"
-            )
+            content_api.update_content(test_html_document, "test_page", "<p>HTML_DOCUMENT</p>")
         dbsession.flush()
         transaction.commit()
         # test-itself
@@ -2922,9 +2856,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(
-        self
-    ):
+    def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -2972,9 +2904,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_html_document):
-            content_api.update_content(
-                test_html_document, "test_html_page", "<p>HTML_DOCUMENT</p>"
-            )
+            content_api.update_content(test_html_document, "test_html_page", "<p>HTML_DOCUMENT</p>")
             dbsession.flush()
         transaction.commit()
         # test-itself
@@ -3030,9 +2960,7 @@ class TestWorkspaceContents(FunctionalTest):
             #   'content_type': 'any'
         }
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/2/contents", status=200, params=params).json_body
         assert len(res) == 3
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3083,9 +3011,7 @@ class TestWorkspaceContents(FunctionalTest):
          """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/2/contents", status=200, params=params).json_body
         assert len(res) == 1
         content = res[0]
         assert content["content_type"]
@@ -3108,9 +3034,7 @@ class TestWorkspaceContents(FunctionalTest):
          """
         params = {"parent_ids": 10, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/2/contents", status=200, params=params).json_body
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3133,9 +3057,7 @@ class TestWorkspaceContents(FunctionalTest):
          """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/2/contents", status=200, params=params).json_body
 
         assert len(res) == 1
         content = res[0]
@@ -3160,9 +3082,7 @@ class TestWorkspaceContents(FunctionalTest):
         """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 0}
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
-            "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body
+        res = self.testapp.get("/api/v2/workspaces/2/contents", status=200, params=params).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
@@ -3241,9 +3161,7 @@ class TestWorkspaceContents(FunctionalTest):
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
-    def test_api__post_content_create_generic_content__err_400__filename_already_used(
-        self
-    ) -> None:
+    def test_api__post_content_create_generic_content__err_400__filename_already_used(self) -> None:
         """
         Create generic content but filename is already used here
         """
@@ -3284,9 +3202,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
-    def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(
-        self
-    ) -> None:
+    def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:
         """
         Create generic content without provided parent_id param
         """
@@ -3333,9 +3249,7 @@ class TestWorkspaceContents(FunctionalTest):
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__post_content_create_generic_content__err_400__parent_not_found(
-        self
-    ) -> None:
+    def test_api__post_content_create_generic_content__err_400__parent_not_found(self) -> None:
         """
         Create generic content but parent id is not valable
         """
@@ -3393,11 +3307,9 @@ class TestWorkspaceContents(FunctionalTest):
         params = {"label": "", "content_type": content_type_list.Page.slug}
         res = self.testapp.post_json("/api/v2/workspaces/1/contents", params=params, status=400)
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  '
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__post_content_create_generic_content__err_400__wrong_content_type(
-        self
-    ) -> None:
+    def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:
         """
         Create generic content but content type is uncorrect
         """
@@ -3699,9 +3611,7 @@ class TestWorkspaceContents(FunctionalTest):
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
         ).json_body
-        assert not [
-            content for content in new_folder1_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] == 4
@@ -3737,9 +3647,7 @@ class TestWorkspaceContents(FunctionalTest):
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
         ).json_body
-        assert not [
-            content for content in new_folder1_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] is None
@@ -3775,9 +3683,7 @@ class TestWorkspaceContents(FunctionalTest):
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
         ).json_body
-        assert not [
-            content for content in new_folder1_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] == 4
@@ -3813,9 +3719,7 @@ class TestWorkspaceContents(FunctionalTest):
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_folder2, status=200
         ).json_body
-        assert not [
-            content for content in new_folder1_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] == 2
@@ -3852,12 +3756,8 @@ class TestWorkspaceContents(FunctionalTest):
         projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)
         projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(
-            user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
-        )
-        rapi.create_one(
-            user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
-        )
+        rapi.create_one(user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        rapi.create_one(user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
 
         documentation_folder = content_api.create(
@@ -3983,9 +3883,7 @@ class TestWorkspaceContents(FunctionalTest):
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_folder2, status=200
         ).json_body
-        assert not [
-            content for content in new_folder1_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
         assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] is None
@@ -4037,9 +3935,7 @@ class TestWorkspaceContents(FunctionalTest):
         new_deleted_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_deleted, status=200
         ).json_body
-        assert not [
-            content for content in new_active_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_active_contents if content["content_id"] == 8]
         assert [content for content in new_deleted_contents if content["content_id"] == 8]
 
     def test_api_put_archive_content__ok_200__nominal_case(self):
@@ -4057,9 +3953,7 @@ class TestWorkspaceContents(FunctionalTest):
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
         ).json_body
         assert [content for content in active_contents if content["content_id"] == 8]
-        assert not [
-            content for content in archived_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in archived_contents if content["content_id"] == 8]
         res = self.testapp.put_json("/api/v2/workspaces/2/contents/8/archived", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
@@ -4067,12 +3961,8 @@ class TestWorkspaceContents(FunctionalTest):
         new_archived_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
         ).json_body
-        assert not [
-            content for content in new_active_contents if content["content_id"] == 8
-        ]
-        assert [
-            content for content in new_archived_contents if content["content_id"] == 8
-        ]
+        assert not [content for content in new_active_contents if content["content_id"] == 8]
+        assert [content for content in new_archived_contents if content["content_id"] == 8]
 
     def test_api_put_undelete_content__ok_200__nominal_case(self):
         """
@@ -4098,9 +3988,7 @@ class TestWorkspaceContents(FunctionalTest):
             "/api/v2/workspaces/2/contents", params=params_deleted, status=200
         ).json_body
         assert [content for content in new_active_contents if content["content_id"] == 14]
-        assert not [
-            content for content in new_deleted_contents if content["content_id"] == 14
-        ]
+        assert not [content for content in new_deleted_contents if content["content_id"] == 14]
 
     def test_api_put_unarchive_content__ok_200__nominal_case(self):
         """
@@ -4131,6 +4019,4 @@ class TestWorkspaceContents(FunctionalTest):
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
         ).json_body
         assert [content for content in new_active_contents if content["content_id"] == 13]
-        assert not [
-            content for content in new_archived_contents if content["content_id"] == 13
-        ]
+        assert not [content for content in new_archived_contents if content["content_id"] == 13]

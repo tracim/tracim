@@ -19,9 +19,7 @@ revisions = sa.Table(
     sa.MetaData(),
     sa.Column("revision_id", sa.Integer, primary_key=True),
     sa.Column("type", sa.Unicode(32), unique=False, nullable=False),
-    sa.Column(
-        "file_extension", sa.Unicode(255), unique=False, nullable=False, server_default=""
-    ),
+    sa.Column("file_extension", sa.Unicode(255), unique=False, nullable=False, server_default=""),
 )
 
 

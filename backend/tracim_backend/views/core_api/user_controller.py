@@ -468,9 +468,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def enable_workspace_notification(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
         """
         enable workspace notification
         """
@@ -500,9 +498,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def disable_workspace_notification(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
         """
         disable workspace notification
         """
@@ -549,9 +545,7 @@ class UserController(Controller):
         configurator.add_view(self.known_members, route_name="known_members")
 
         # set user email
-        configurator.add_route(
-            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
-        )
+        configurator.add_route("set_user_email", "/users/{user_id:\d+}/email", request_method="PUT")
         configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user password
@@ -561,9 +555,7 @@ class UserController(Controller):
         configurator.add_view(self.set_user_password, route_name="set_user_password")
 
         # set user_info
-        configurator.add_route(
-            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"
-        )
+        configurator.add_route("set_user_info", "/users/{user_id:\d+}", request_method="PUT")
         configurator.add_view(self.set_user_infos, route_name="set_user_info")
 
         # create user
@@ -571,9 +563,7 @@ class UserController(Controller):
         configurator.add_view(self.create_user, route_name="create_user")
 
         # enable user
-        configurator.add_route(
-            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"
-        )
+        configurator.add_route("enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT")
         configurator.add_view(self.enable_user, route_name="enable_user")
 
         # disable user
@@ -583,9 +573,7 @@ class UserController(Controller):
         configurator.add_view(self.disable_user, route_name="disable_user")
 
         # delete user
-        configurator.add_route(
-            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"
-        )
+        configurator.add_route("delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT")
         configurator.add_view(self.delete_user, route_name="delete_user")
 
         # undelete user
@@ -606,9 +594,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",
             request_method="GET",
         )
-        configurator.add_view(
-            self.contents_read_status, route_name="contents_read_status"
-        )
+        configurator.add_view(self.contents_read_status, route_name="contents_read_status")
         # last active content for user
         configurator.add_route(
             "last_active_content",

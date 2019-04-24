@@ -112,9 +112,7 @@ class AccountController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(is_user)
     @hapic.input_body(SetEmailSchema())
     @hapic.output_body(UserSchema())
@@ -137,9 +135,7 @@ class AccountController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__ACCOUNT_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(is_user)
     @hapic.input_body(SetPasswordSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
@@ -180,9 +176,7 @@ class AccountController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(ActiveContentFilterQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True))
-    def account_last_active_content(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def account_last_active_content(self, context, request: TracimRequest, hapic_data=None):
         """
         Get last_active_content for user
         """
@@ -214,9 +208,7 @@ class AccountController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(ContentIdsQuerySchema())
     @hapic.output_body(ReadStatusSchema(many=True))
-    def account_contents_read_status(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def account_contents_read_status(self, context, request: TracimRequest, hapic_data=None):
         """
         get user_read status of contents
         """
@@ -243,9 +235,7 @@ class AccountController(Controller):
     @check_right(is_user)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_account_content_as_read(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def set_account_content_as_read(self, context, request: TracimRequest, hapic_data=None):
         """
         set user_read status of content to read
         """
@@ -264,9 +254,7 @@ class AccountController(Controller):
     @check_right(is_user)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_account_content_as_unread(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def set_account_content_as_unread(self, context, request: TracimRequest, hapic_data=None):
         """
         set user_read status of content to unread
         """
@@ -285,9 +273,7 @@ class AccountController(Controller):
     @check_right(is_user)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_account_workspace_as_read(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def set_account_workspace_as_read(self, context, request: TracimRequest, hapic_data=None):
         """
         set user_read status of all content of workspace to read
         """
@@ -357,9 +343,7 @@ class AccountController(Controller):
         """
 
         # account workspace
-        configurator.add_route(
-            "account_workspace", "/users/me/workspaces", request_method="GET"
-        )
+        configurator.add_route("account_workspace", "/users/me/workspaces", request_method="GET")
         configurator.add_view(self.account_workspace, route_name="account_workspace")
 
         # account info
@@ -374,18 +358,12 @@ class AccountController(Controller):
         configurator.add_view(self.account_known_members, route_name="account_known_members")
         #
         # set account email
-        configurator.add_route(
-            "set_account_email", "/users/me/email", request_method="PUT"
-        )
+        configurator.add_route("set_account_email", "/users/me/email", request_method="PUT")
         configurator.add_view(self.set_account_email, route_name="set_account_email")
 
         # set account password
-        configurator.add_route(
-            "set_account_password", "/users/me/password", request_method="PUT"
-        )
-        configurator.add_view(
-            self.set_account_password, route_name="set_account_password"
-        )
+        configurator.add_route("set_account_password", "/users/me/password", request_method="PUT")
+        configurator.add_view(self.set_account_password, route_name="set_account_password")
 
         # set account_infos
         configurator.add_route("set_account_info", "/users/me", request_method="PUT")
@@ -416,9 +394,7 @@ class AccountController(Controller):
             "/users/me/workspaces/{workspace_id}/contents/{content_id}/read",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.set_account_content_as_read, route_name="account_read_content"
-        )
+        configurator.add_view(self.set_account_content_as_read, route_name="account_read_content")
 
         configurator.add_route(
             "account_unread_content",

@@ -98,9 +98,7 @@ class UserApi(object):
         try:
             user = self._base_query().filter(User.user_id == user_id).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist(
-                'User "{}" not found in database'.format(user_id)
-            ) from exc
+            raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
     def get_one_by_email(self, email: str) -> User:
@@ -112,9 +110,7 @@ class UserApi(object):
         try:
             user = self._base_query().filter(User.email == email).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist(
-                'User "{}" not found in database'.format(email)
-            ) from exc
+            raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
 
     def get_one_by_public_name(self, public_name: str) -> User:
@@ -124,9 +120,7 @@ class UserApi(object):
         try:
             user = self._base_query().filter(User.display_name == public_name).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist(
-                'User "{}" not found in database'.format(public_name)
-            ) from exc
+            raise UserDoesNotExist('User "{}" not found in database'.format(public_name)) from exc
         return user
 
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
@@ -434,9 +428,7 @@ class UserApi(object):
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
         ) as exc:
-            raise AuthenticationFailed(
-                'User "{}" authentication failed'.format(email)
-            ) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
 
     def authenticate(self, email: str, password: str, ldap_connector: "Connector" = None) -> User:
         """
@@ -500,9 +492,7 @@ class UserApi(object):
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
         ) as exc:
-            raise AuthenticationFailed(
-                'User "{}" authentication failed'.format(email)
-            ) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc
 
     # Actions
     def set_password(

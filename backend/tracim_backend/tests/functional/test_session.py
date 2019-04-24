@@ -199,9 +199,7 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body["avatar_url"] is None
             assert res.json_body["auth_type"] == "ldap"
 
-    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(
-        self
-    ):
+    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(self):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/auth/whoami", status=401)
 
@@ -255,9 +253,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body["avatar_url"] is None
             assert res.json_body["auth_type"] == "ldap"
 
-    def test_api__try_login_enpoint_ldap_internal_auth__ok__200__valid_internal_db_user(
-        self
-    ):
+    def test_api__try_login_enpoint_ldap_internal_auth__ok__200__valid_internal_db_user(self):
         params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
         res = self.testapp.post_json("/api/v2/auth/login", params=params, status=200)
         assert res.json_body["created"]
@@ -280,9 +276,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_ldap_user(
-        self
-    ):
+    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_ldap_user(self):
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -336,9 +330,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body["lang"] is None
         assert res.json_body["auth_type"] == "internal"
 
-    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__err__403__unvalid_user(
-        self
-    ):
+    def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__err__403__unvalid_user(self):
         self.testapp.authorization = (
             "Basic",
             ("unknown@unknown.unknown", "unknown@unknown.unknown"),

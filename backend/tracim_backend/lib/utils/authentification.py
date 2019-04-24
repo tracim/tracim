@@ -140,12 +140,8 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAut
         # recreate session if need renew
         if not request.session.new:
             now = datetime.datetime.now()
-            last_access_datetime = datetime.datetime.utcfromtimestamp(
-                request.session.last_accessed
-            )
-            reissue_limit = last_access_datetime + datetime.timedelta(
-                seconds=self._reissue_time
-            )
+            last_access_datetime = datetime.datetime.utcfromtimestamp(request.session.last_accessed)
+            reissue_limit = last_access_datetime + datetime.timedelta(seconds=self._reissue_time)
             if now > reissue_limit:
                 request.session.regenerate_id()
         return user.user_id

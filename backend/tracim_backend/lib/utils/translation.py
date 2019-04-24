@@ -26,9 +26,7 @@ class Translator(object):
     Get translation from json file
     """
 
-    def __init__(
-        self, app_config: "CFG", default_lang: str = None, fallback_lang: str = None
-    ):
+    def __init__(self, app_config: "CFG", default_lang: str = None, fallback_lang: str = None):
         """
         you should provide either valid fallback_lang(true value) or valid
         app.config.DEFAULT_LANG (true value).
@@ -50,9 +48,7 @@ class Translator(object):
         else:
             return lang_filepath
 
-    def _get_translation_from_file(
-        self, filepath: str
-    ) -> typing.Optional[typing.Dict[str, str]]:
+    def _get_translation_from_file(self, filepath: str) -> typing.Optional[typing.Dict[str, str]]:
         try:
             with open(filepath) as file:
                 trads = json.load(file)

@@ -742,9 +742,7 @@ class TimezoneSchema(marshmallow.Schema):
 
 class AboutSchema(marshmallow.Schema):
     name = StrippedString(example="Tracim", description="Software name")
-    version = StrippedString(
-        example="2.0", allow_none=True, description="Version of Tracim"
-    )
+    version = StrippedString(example="2.0", allow_none=True, description="Version of Tracim")
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL(allow_none=True)
 
@@ -1012,9 +1010,7 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
     )
 
 
-class TextBasedContentModifySchema(
-    ContentModifyAbstractSchema, TextBasedDataAbstractSchema
-):
+class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return TextBasedContentUpdate(**data)

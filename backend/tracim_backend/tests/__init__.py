@@ -159,7 +159,7 @@ class FunctionalTest(unittest.TestCase):
             except IntegrityError:
                 logger.error(
                     self,
-                    "Warning, there was a problem when adding default data"  
+                    "Warning, there was a problem when adding default data"
                     ", it may have already been added:",
                 )
                 import traceback
@@ -299,7 +299,7 @@ class BaseTest(unittest.TestCase):
             except IntegrityError:
                 logger.error(
                     self,
-                    "Warning, there was a problem when adding default data"  
+                    "Warning, there was a problem when adding default data"
                     ", it may have already been added:",
                 )
                 import traceback

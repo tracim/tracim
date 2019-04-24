@@ -86,9 +86,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert (
-            res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
-        )
+        assert res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
     @pytest.mark.unknown_auth
     def test_api__reset_password_request__ok__unknown_auth(self):
@@ -116,9 +114,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert (
-            res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
-        )
+        assert res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):

@@ -32,9 +32,7 @@ SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_sw
 
 class ResetPasswordController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
-    @hapic.handle_exception(
-        NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(
         ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST
     )
@@ -61,9 +59,7 @@ class ResetPasswordController(Controller):
     @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.input_body(ResetPasswordCheckTokenSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def reset_password_check_token(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def reset_password_check_token(self, context, request: TracimRequest, hapic_data=None):
         """
         Check reset_password token. The token sent by email has a limited life duration,
         this API allow to check that the token is existing and still valid.
@@ -106,9 +102,7 @@ class ResetPasswordController(Controller):
         configurator.add_route(
             "reset_password_request", "/auth/password/reset/request", request_method="POST"
         )
-        configurator.add_view(
-            self.reset_password_request, route_name="reset_password_request"
-        )
+        configurator.add_view(self.reset_password_request, route_name="reset_password_request")
         # check reset password token
         configurator.add_route(
             "reset_password_check_token", "/auth/password/reset/token/check", request_method="POST"
@@ -120,6 +114,4 @@ class ResetPasswordController(Controller):
         configurator.add_route(
             "reset_password_modify", "/auth/password/reset/modify", request_method="POST"
         )
-        configurator.add_view(
-            self.reset_password_modify, route_name="reset_password_modify"
-        )
+        configurator.add_view(self.reset_password_modify, route_name="reset_password_modify")

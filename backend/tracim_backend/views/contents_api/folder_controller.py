@@ -47,9 +47,7 @@ class FolderController(Controller):
     @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedContentSchema())
-    def get_folder(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:
+    def get_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get folder info
         """
@@ -72,9 +70,7 @@ class FolderController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FolderContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
-    def update_folder(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:
+    def update_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         update folder
         """
