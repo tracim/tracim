@@ -6,13 +6,25 @@ from marshmallow import post_load
 from marshmallow.fields import String
 from marshmallow.validate import OneOf
 
-from tracim_backend.app_models.contents import open_status, content_type_list
-from tracim_backend.app_models.validator import positive_int_validator, user_timezone_validator, \
-    user_profile_validator, user_lang_validator, user_password_validator, user_email_validator, \
-    user_public_name_validator, strictly_positive_int_validator, acp_validator, \
-    regex_string_as_list_of_int, bool_as_int_validator, all_content_types_validator, \
-    user_role_validator, not_empty_string_validator, content_global_status_validator, \
-    content_status_validator, action_description_validator
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import open_status
+from tracim_backend.app_models.validator import acp_validator
+from tracim_backend.app_models.validator import action_description_validator
+from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.app_models.validator import bool_as_int_validator
+from tracim_backend.app_models.validator import content_global_status_validator
+from tracim_backend.app_models.validator import content_status_validator
+from tracim_backend.app_models.validator import not_empty_string_validator
+from tracim_backend.app_models.validator import positive_int_validator
+from tracim_backend.app_models.validator import regex_string_as_list_of_int
+from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.app_models.validator import user_email_validator
+from tracim_backend.app_models.validator import user_lang_validator
+from tracim_backend.app_models.validator import user_password_validator
+from tracim_backend.app_models.validator import user_profile_validator
+from tracim_backend.app_models.validator import user_public_name_validator
+from tracim_backend.app_models.validator import user_role_validator
+from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group

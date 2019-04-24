@@ -49,7 +49,7 @@ class WorkspaceApi(object):
     def _base_query_without_roles(self):
         query = self._session.query(Workspace)
         if not self.show_deleted:
-            query = query.filter(Workspace.is_deleted == False)   # noqa: E712
+            query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         return query
 
     def _base_query(self):
@@ -316,4 +316,4 @@ class WorkspaceApi(object):
 
 class UnsafeWorkspaceApi(WorkspaceApi):
     def _base_query(self):
-        return self.session.query(Workspace).filter(Workspace.is_deleted == False)   # noqa: E712
+        return self.session.query(Workspace).filter(Workspace.is_deleted == False)  # noqa: E712

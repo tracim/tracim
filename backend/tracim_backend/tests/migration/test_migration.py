@@ -11,8 +11,8 @@ import transaction
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.models.setup_models import *  # noqa: F403,F401
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.setup_models import *  # noqa: F403,F401
 from tracim_backend.tests import BaseTest
 
 

@@ -1,6 +1,6 @@
 from pyramid.config import Configurator
-from tracim_backend.config import CFG
 
+from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -59,7 +59,9 @@ class AgendaController(Controller):
         """
 
         # INFO - G.M - 2019-04-01 - user agenda
-        configurator.add_route("user_agendas", "/users/{user_id:\d+}/agenda", request_method="GET")  # noqa: W605
+        configurator.add_route(
+            "user_agendas", "/users/{user_id:\d+}/agenda", request_method="GET"
+        )  # noqa: W605
         configurator.add_view(self.user_agendas, route_name="user_agendas")
 
         # INFO - G.M - 2019-04-01 - own user agenda

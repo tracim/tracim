@@ -1,9 +1,9 @@
 # coding=utf-8
 
 from pyramid.config import Configurator
-from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi

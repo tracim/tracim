@@ -94,9 +94,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        self.testapp.get(
-            "/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=404
-        )
+        self.testapp.get("/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
         self.testapp.put(
             "/agenda/user/{}/".format(user.user_id), event, content_type="text/calendar", status=201
@@ -107,15 +105,11 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             content_type="text/calendar",
             status="*",
         )
-        self.testapp.get(
-            "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
-        )
+        self.testapp.get("/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200)
         self.testapp.delete(
             "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
         )
-        self.testapp.delete(
-            "/agenda/user/{}/".format(user.user_id, sub_item_label), status=200
-        )
+        self.testapp.delete("/agenda/user/{}/".format(user.user_id, sub_item_label), status=200)
 
     def test_proxy_user_agenda__err__other_user_agenda(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -164,9 +158,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        self.testapp.get(
-            "/agenda/workspace/{}/".format(workspace.workspace_id), status=404
-        )
+        self.testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
         self.testapp.put(
             "/agenda/workspace/{}/".format(workspace.workspace_id),
@@ -174,12 +166,8 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             content_type="text/agenda",
             status=201,
         )
-        self.testapp.get(
-            "/agenda/workspace/{}/".format(workspace.workspace_id), status=200
-        )
-        self.testapp.delete(
-            "/agenda/workspace/{}/".format(workspace.workspace_id), status=200
-        )
+        self.testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
+        self.testapp.delete("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)

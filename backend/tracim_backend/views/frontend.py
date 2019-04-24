@@ -2,8 +2,8 @@ import os
 
 from pyramid.config import Configurator
 from pyramid.renderers import render_to_response
-from tracim_backend.config import CFG
 
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import PageNotFound
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi

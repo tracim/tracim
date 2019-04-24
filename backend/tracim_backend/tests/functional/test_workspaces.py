@@ -366,9 +366,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        uapi.create_user(
-            "test@test.test", password="test@test.test", do_save=True, do_notify=False
-        )
+        uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
@@ -409,9 +407,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_id = int(workspace.workspace_id)
         # undelete
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
-            "/api/v2/workspaces/{}/trashed/restore".format(workspace_id), status=204
-        )
+        self.testapp.put("/api/v2/workspaces/{}/trashed/restore".format(workspace_id), status=204)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=400)
         assert isinstance(res.json, dict)
@@ -451,9 +447,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        self.testapp.put(
-            "/api/v2/workspaces/{}/trashed/restore".format(workspace_id), status=204
-        )
+        self.testapp.put("/api/v2/workspaces/{}/trashed/restore".format(workspace_id), status=204)
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is False
@@ -537,9 +531,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        uapi.create_user(
-            "test@test.test", password="test@test.test", do_save=True, do_notify=False
-        )
+        uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )

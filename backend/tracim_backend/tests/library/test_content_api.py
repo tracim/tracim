@@ -2364,12 +2364,8 @@ class TestContentApi(DefaultTest):
         deleted = api.create(
             content_type_list.Page.slug, workspace, main_folder, "deleted", "", True
         )
-        api.create_comment(
-            workspace, parent=archived, content="just a comment", do_save=True
-        )
-        api.create_comment(
-            workspace, parent=deleted, content="just a comment", do_save=True
-        )
+        api.create_comment(workspace, parent=archived, content="just a comment", do_save=True)
+        api.create_comment(workspace, parent=deleted, content="just a comment", do_save=True)
         with new_revision(session=self.session, tm=transaction.manager, content=archived):
             api.archive(archived)
             api.save(archived)
@@ -2378,9 +2374,7 @@ class TestContentApi(DefaultTest):
             api.delete(deleted)
             api.save(deleted)
         normal = api.create(content_type_list.Page.slug, workspace, main_folder, "normal", "", True)
-        api.create_comment(
-            workspace, parent=normal, content="just a comment", do_save=True
-        )
+        api.create_comment(workspace, parent=normal, content="just a comment", do_save=True)
 
         last_actives = api.get_last_active()
         assert len(last_actives) == 2
@@ -2995,18 +2989,14 @@ class TestContentApiSecurity(DefaultTest):
             current_user=admin, session=self.session, config=self.app_config
         ).create_workspace("admin_workspace", save_now=True)
 
-        ContentApi(
-            current_user=bob, session=self.session, config=self.app_config
-        ).create(
+        ContentApi(current_user=bob, session=self.session, config=self.app_config).create(
             content_type_slug=content_type_list.Page.slug,
             workspace=bob_workspace,
             label="bob_page",
             do_save=True,
         )
 
-        ContentApi(
-            current_user=admin, session=self.session, config=self.app_config
-        ).create(
+        ContentApi(current_user=admin, session=self.session, config=self.app_config).create(
             content_type_slug=content_type_list.Page.slug,
             workspace=admin_workspace,
             label="admin_page",

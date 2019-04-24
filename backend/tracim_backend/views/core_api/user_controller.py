@@ -1,7 +1,7 @@
 from pyramid.config import Configurator
-from tracim_backend.config import CFG
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
@@ -522,12 +522,16 @@ class UserController(Controller):
 
         # known members lists
         configurator.add_route(
-            "known_members", "/users/{user_id:\d+}/known_members", request_method="GET"  # noqa: W605
+            "known_members",
+            "/users/{user_id:\d+}/known_members",
+            request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.known_members, route_name="known_members")
 
         # set user email
-        configurator.add_route("set_user_email", "/users/{user_id:\d+}/email", request_method="PUT")  # noqa: W605
+        configurator.add_route(
+            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user password
@@ -537,7 +541,9 @@ class UserController(Controller):
         configurator.add_view(self.set_user_password, route_name="set_user_password")
 
         # set user_info
-        configurator.add_route("set_user_info", "/users/{user_id:\d+}", request_method="PUT")  # noqa: W605
+        configurator.add_route(
+            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.set_user_infos, route_name="set_user_info")
 
         # create user
@@ -545,7 +551,9 @@ class UserController(Controller):
         configurator.add_view(self.create_user, route_name="create_user")
 
         # enable user
-        configurator.add_route("enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT")  # noqa: W605
+        configurator.add_route(
+            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.enable_user, route_name="enable_user")
 
         # disable user
@@ -555,12 +563,16 @@ class UserController(Controller):
         configurator.add_view(self.disable_user, route_name="disable_user")
 
         # delete user
-        configurator.add_route("delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT")  # noqa: W605
+        configurator.add_route(
+            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.delete_user, route_name="delete_user")
 
         # undelete user
         configurator.add_route(
-            "undelete_user", "/users/{user_id:\d+}/trashed/restore", request_method="PUT"  # noqa: W605
+            "undelete_user",
+            "/users/{user_id:\d+}/trashed/restore",
+            request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.undelete_user, route_name="undelete_user")
 

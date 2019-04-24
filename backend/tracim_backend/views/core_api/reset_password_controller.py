@@ -1,7 +1,7 @@
 # coding=utf-8
 from pyramid.config import Configurator
-from tracim_backend.config import CFG
 
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword

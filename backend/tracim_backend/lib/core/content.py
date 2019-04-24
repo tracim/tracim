@@ -249,7 +249,9 @@ class ContentApi(object):
                 or_(
                     Content.workspace_id.in_(workspace_ids),
                     # And allow access to non workspace document when he is owner
-                    and_(Content.workspace_id == None, Content.owner_id == self._user_id),  # noqa: E711
+                    and_(
+                        Content.workspace_id == None, Content.owner_id == self._user_id
+                    ),  # noqa: E711
                 )
             )
 
@@ -259,7 +261,9 @@ class ContentApi(object):
         result = self.__real_base_query(workspace)
 
         if not self._show_active:
-            result = result.filter(or_(Content.is_deleted == True, Content.is_archived == True))  # noqa: E711
+            result = result.filter(
+                or_(Content.is_deleted == True, Content.is_archived == True)
+            )  # noqa: E711
         if not self._show_deleted:
             result = result.filter(Content.is_deleted == False)  # noqa: E711
 
@@ -785,7 +789,7 @@ class ContentApi(object):
         if parent_folder:
             content_query = content_query.filter(Content.parent_id == parent_folder.content_id)
         else:
-            content_query = content_query.filter(Content.parent_id == None)   # noqa: E711
+            content_query = content_query.filter(Content.parent_id == None)  # noqa: E711
 
         # Filter with workspace
         content_query = content_query.filter(Content.workspace_id == workspace.workspace_id)
@@ -1094,7 +1098,9 @@ class ContentApi(object):
                     allowed_parent_ids.append(parent_id)
             if allow_root:
                 resultset = resultset.filter(
-                    or_(Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None)  # noqa: E711
+                    or_(
+                        Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None
+                    )  # noqa: E711
                 )
             else:
                 resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))
