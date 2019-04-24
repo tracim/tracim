@@ -45,7 +45,7 @@ class SessionController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_ENDPOINTS])
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs out current logged in user. This also trashes the associated session
@@ -69,13 +69,13 @@ class SessionController(Controller):
     def bind(self, configurator: Configurator):
 
         # Login
-        configurator.add_route("login", "/auth/login", request_method="POST")  # nopep8
+        configurator.add_route("login", "/auth/login", request_method="POST")
         configurator.add_view(self.login, route_name="login")
         # Logout
-        configurator.add_route("logout", "/auth/logout", request_method="POST")  # nopep8
+        configurator.add_route("logout", "/auth/logout", request_method="POST")
         configurator.add_view(self.logout, route_name="logout")
-        configurator.add_route("logout_get", "/auth/logout", request_method="GET")  # nopep8
+        configurator.add_route("logout_get", "/auth/logout", request_method="GET")
         configurator.add_view(self.logout, route_name="logout_get")
         # Whoami
-        configurator.add_route("whoami", "/auth/whoami", request_method="GET")  # nopep8
+        configurator.add_route("whoami", "/auth/whoami", request_method="GET")
         configurator.add_view(self.whoami, route_name="whoami")

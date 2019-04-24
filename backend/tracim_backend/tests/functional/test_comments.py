@@ -26,7 +26,7 @@ class TestCommentsEndpoint(FunctionalTest):
         Get alls comments of a content
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[0]
         assert comment["content_id"] == 18
@@ -34,7 +34,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert (
             comment["raw_content"]
             == "<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>"
-        )  # nopep8
+        )
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -44,7 +44,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[1]
         assert comment["content_id"] == 19
         assert comment["parent_id"] == 7
-        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"  # nopep8
+        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -58,7 +58,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == 7
         assert (
             comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )  # nopep8
+        )
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -160,11 +160,11 @@ class TestCommentsEndpoint(FunctionalTest):
         # INFO - G.M - 2018-09-10 - error handle by marshmallow validator.
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         delete comment (user is workspace_manager and owner)
         """
@@ -177,7 +177,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert (
             comment["raw_content"]
             == "<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>"
-        )  # nopep8
+        )
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -189,9 +189,9 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/18", status=204)
         res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content["content_id"] == 18]  # nopep8
+        assert not [content for content in res.json_body if content["content_id"] == 18]
 
-    def test_api__delete_content_comment__ok_200__user_is_workspace_manager(self) -> None:  # nopep8
+    def test_api__delete_content_comment__ok_200__user_is_workspace_manager(self) -> None:
         """
         delete comment (user is workspace_manager)
         """
@@ -201,7 +201,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[1]
         assert comment["content_id"] == 19
         assert comment["parent_id"] == 7
-        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"  # nopep8
+        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -213,11 +213,11 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/19", status=204)
         res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content["content_id"] == 19]  # nopep8
+        assert not [content for content in res.json_body if content["content_id"] == 19]
 
     def test_api__delete_content_comment__ok_200__user_is_owner_and_content_manager(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         delete comment (user is content-manager and owner)
         """
@@ -227,7 +227,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[1]
         assert comment["content_id"] == 19
         assert comment["parent_id"] == 7
-        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"  # nopep8
+        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -239,9 +239,9 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/19", status=204)
         res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content["content_id"] == 19]  # nopep8
+        assert not [content for content in res.json_body if content["content_id"] == 19]
 
-    def test_api__delete_content_comment__err_403__user_is_content_manager(self) -> None:  # nopep8
+    def test_api__delete_content_comment__err_403__user_is_content_manager(self) -> None:
         """
         delete comment (user is content-manager)
         """
@@ -253,7 +253,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == 7
         assert (
             comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )  # nopep8
+        )
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -265,7 +265,7 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
 
     def test_api__delete_content_comment__err_403__user_is_owner_and_reader(self) -> None:
         """
@@ -279,7 +279,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == 7
         assert (
             comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )  # nopep8
+        )
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -291,7 +291,7 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
 
     def test_api__delete_content_comment__err_403__user_is_reader(self) -> None:
         """
@@ -305,7 +305,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == 7
         assert (
             comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )  # nopep8
+        )
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -317,4 +317,4 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE

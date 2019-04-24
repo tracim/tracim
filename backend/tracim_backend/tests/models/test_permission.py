@@ -27,7 +27,7 @@ class TestPermissionModel(BaseTest):
 
         new_permission = (
             self.session.query(Permission).filter(permission.permission_name == name).one()
-        )  # nopep8
+        )
 
         assert new_permission.permission_name == name
         assert new_permission.description == description

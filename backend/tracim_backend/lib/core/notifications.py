@@ -42,5 +42,5 @@ class DummyNotifier(INotifier):
             self,
             "Fake notifier, do not send notification for update of content {}".format(
                 content.content_id
-            ),  # nopep8
+            ),
         )

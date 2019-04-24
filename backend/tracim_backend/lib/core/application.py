@@ -16,7 +16,7 @@ class ApplicationApi(object):
         for app in self.apps:
             if app.slug == slug:
                 return app
-        raise AppDoesNotExist("Application {app} does not exist".format(app=slug))  # nopep8
+        raise AppDoesNotExist("Application {app} does not exist".format(app=slug))
 
     def get_all(self):
         active_apps = []

@@ -50,11 +50,11 @@ def set_cors_headers(request, response):
     if (
         "Origin" in request.headers
         and request.headers["Origin"] in app_config.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN
-    ):  # nopep8
+    ):
         response.headers[
             "Access-Control-Expose-Headers"
         ] = "Content-Type,Date,Content-Length,Authorization,X-Request-ID"
-        response.headers["Access-Control-Allow-Origin"] = request.headers["Origin"]  # nopep8
+        response.headers["Access-Control-Allow-Origin"] = request.headers["Origin"]
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Vary"] = "Origin"
 

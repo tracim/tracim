@@ -65,12 +65,12 @@ class TestHtmlMailSignatureChecker(object):
     def test_unit__is_thunderbird_signature_ok(self):
         soup = BeautifulSoup('<div class="moz-signature"></div>', "html.parser")
         main_elem = soup.find()
-        assert HtmlMailSignatureChecker._is_thunderbird_signature(main_elem) is True  # nopep8
+        assert HtmlMailSignatureChecker._is_thunderbird_signature(main_elem) is True
 
     def test_unit__is_thunderbird_signature_no(self):
         soup = BeautifulSoup('<div class="other"></div>', "html.parser")
         main_elem = soup.find()
-        assert HtmlMailSignatureChecker._is_thunderbird_signature(main_elem) is False  # nopep8
+        assert HtmlMailSignatureChecker._is_thunderbird_signature(main_elem) is False
 
     def test_unit__is_gmail_signature_ok(self):
         html = '<div class="gmail_extra">' + '<a></a><div class="gmail_quote"></div>' + "</div>"

@@ -26,7 +26,7 @@ class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
         response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] A password reset has been requested"
 
@@ -56,7 +56,7 @@ class TestResetPasswordRequestEndpointMailSync(MailHogFunctionalTest):
         response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "test user <test@test.test>"
         assert headers["Subject"][0] == "[TRACIM] A password reset has been requested"
 
@@ -88,7 +88,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         assert "code" in res.json.keys()
         assert (
             res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
-        )  # nopep8
+        )
 
     @pytest.mark.unknown_auth
     def test_api__reset_password_request__ok__unknown_auth(self):
@@ -118,7 +118,7 @@ class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
         assert "code" in res.json.keys()
         assert (
             res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
-        )  # nopep8
+        )
 
 
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
@@ -130,7 +130,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        reset_password_token = uapi.reset_password_notification(admin, do_save=True)  # nopep8
+        reset_password_token = uapi.reset_password_notification(admin, do_save=True)
         transaction.commit()
         params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
         self.testapp.post_json("/api/v2/auth/password/reset/token/check", status=204, params=params)
@@ -160,7 +160,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         user = uapi.get_one_by_email("test@test.test")
-        reset_password_token = uapi.reset_password_notification(user, do_save=True)  # nopep8
+        reset_password_token = uapi.reset_password_notification(user, do_save=True)
         transaction.commit()
         params = {"email": "test@test.test", "reset_password_token": reset_password_token}
         self.testapp.post_json("/api/v2/auth/password/reset/token/check", status=204, params=params)
@@ -191,7 +191,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        reset_password_token = uapi.reset_password_notification(admin, do_save=True)  # nopep8
+        reset_password_token = uapi.reset_password_notification(admin, do_save=True)
         transaction.commit()
         params = {
             "email": "admin@admin.admin",
@@ -229,7 +229,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         user = uapi.get_one_by_email("test@test.test")
-        reset_password_token = uapi.reset_password_notification(user, do_save=True)  # nopep8
+        reset_password_token = uapi.reset_password_notification(user, do_save=True)
         transaction.commit()
         params = {
             "email": "test@test.test",
@@ -283,7 +283,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             )
             assert isinstance(res.json, dict)
             assert "code" in res.json.keys()
-            assert res.json_body["code"] == ErrorCode.EXPIRED_RESET_PASSWORD_TOKEN  # nopep8
+            assert res.json_body["code"] == ErrorCode.EXPIRED_RESET_PASSWORD_TOKEN
 
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -291,7 +291,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        reset_password_token = uapi.reset_password_notification(admin, do_save=True)  # nopep8
+        reset_password_token = uapi.reset_password_notification(admin, do_save=True)
         transaction.commit()
         params = {
             "email": "admin@admin.admin",

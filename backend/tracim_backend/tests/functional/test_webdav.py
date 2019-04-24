@@ -34,7 +34,7 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
             auth_type=AuthType.REMOTE,
-        )  # nopep8
+        )
         transaction.commit()
         headers_auth = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
         res = self.testapp.get("/", status=401, headers=headers_auth)
@@ -78,7 +78,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of root using webdav
@@ -112,13 +112,13 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -139,11 +139,11 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -162,7 +162,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -186,7 +186,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         with dbsession.no_autoflush:
             file = api.create(
@@ -218,7 +218,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("workspace1", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("workspace1", save_now=True)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
 
@@ -258,7 +258,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         folder = api.create(
             content_type_list.Folder.slug, workspace, None, dir_label, do_save=True, do_notify=False
@@ -302,7 +302,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("workspace1", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("workspace1", save_now=True)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         folder = api.create(
             content_type_list.Folder.slug,
@@ -406,13 +406,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         dir1_folder = api.create(
             content_type_list.Folder.slug,
@@ -594,15 +594,15 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
-        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
+        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         example_folder = api.create(
             content_type_list.Folder.slug,
@@ -763,13 +763,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         dir1_folder = api.create(
             content_type_list.Folder.slug,
@@ -927,15 +927,15 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
-        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
+        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         product_folder = api.create(
             content_type_list.Folder.slug,
@@ -1071,13 +1071,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         example_folder = api.create(
             content_type_list.Folder.slug,
@@ -1231,15 +1231,15 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
-        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
+        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         example_folder = api.create(
             content_type_list.Folder.slug,
@@ -1373,13 +1373,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         with dbsession.no_autoflush:
             file = api.create(
@@ -1498,15 +1498,15 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
-        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace(workspace_label, save_now=True)
+        workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         with dbsession.no_autoflush:
             file = api.create(
@@ -1658,21 +1658,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -1851,7 +1851,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -1859,9 +1859,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label,
-#                                                    save_now=True)  # nopep8
+#                                                    save_now=True)
 #         workspace2 = workspace_api.create_workspace(workspace2_label,
-#                                                     save_now=True)  # nopep8
+#                                                     save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -1869,10 +1869,10 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         )
 #         rapi.create_one(user, workspace,
 #                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         rapi.create_one(user, workspace2,
 #                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2090,21 +2090,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2263,7 +2263,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2271,9 +2271,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label,
-#                                                    save_now=True)  # nopep8
+#                                                    save_now=True)
 #         workspace2 = workspace_api.create_workspace(workspace2_label,
-#                                                     save_now=True)  # nopep8
+#                                                     save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2281,10 +2281,10 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         )
 #         rapi.create_one(user, workspace,
 #                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         rapi.create_one(user, workspace2,
 #                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2475,21 +2475,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2648,7 +2648,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2656,9 +2656,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label,
-#                                                    save_now=True)  # nopep8
+#                                                    save_now=True)
 #         workspace2 = workspace_api.create_workspace(workspace2_label,
-#                                                     save_now=True)  # nopep8
+#                                                     save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2666,10 +2666,10 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         )
 #         rapi.create_one(user, workspace,
 #                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         rapi.create_one(user, workspace2,
 #                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -2856,21 +2856,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
+#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)  # nopep8
+#                         False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,
@@ -3022,22 +3022,22 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         groups = [gapi.get_one_with_name('users')]
 #         user = uapi.create_user('test@test.test', password='test@test.test',
 #                                 do_save=True, do_notify=False,
-#                                 groups=groups)  # nopep8
+#                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)  # nopep8
-#         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)  # nopep8
+#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
+#         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
 #             session=dbsession,
 #             config=self.app_config,
 #         )
-#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
-#         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+#         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
 #         api = ContentApi(
 #             current_user=admin,
 #             session=dbsession,

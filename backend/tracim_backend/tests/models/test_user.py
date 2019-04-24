@@ -27,7 +27,7 @@ class TestUserModel(BaseTest):
         self.session.flush()
         transaction.commit()
 
-        new_user = self.session.query(User).filter(User.display_name == name).one()  # nopep8
+        new_user = self.session.query(User).filter(User.display_name == name).one()
 
         assert new_user.display_name == name
         assert new_user.email == email
@@ -122,7 +122,7 @@ class TestUserModel(BaseTest):
         user.display_name = name
         user.email = email
 
-        assert user.__repr__() == "<User: email='tracim@trac.im', display='Damien'>"  # nopep8
+        assert user.__repr__() == "<User: email='tracim@trac.im', display='Damien'>"
 
     def test_unit__unicode__ok__nominal_case(self):
         name = "Damien"

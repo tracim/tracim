@@ -49,7 +49,7 @@ class HtmlChecker(object):
         if isinstance(elem, Tag) and attribute_name in elem.attrs:
             # INFO - G.M - 2017-12-01 - attrs[value}] can be string or list
             # use get_attribute_list to always check in a list
-            # see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#multi-valued-attributes # nopep8
+            # see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#multi-valued-attributes
             values_lower = [value.lower() for value in elem.get_attribute_list(attribute_name)]
             return attribute_value.lower() in values_lower
         return False

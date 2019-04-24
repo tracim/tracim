@@ -111,7 +111,7 @@ class Content(Fixture):
         with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
             content_api.update_content(
                 item=tiramisu_page,
-                new_content="<p>To cook a greet Tiramisu, you need many ingredients.</p>",  # nopep8
+                new_content="<p>To cook a greet Tiramisu, you need many ingredients.</p>",
                 new_label="Tiramisu Recipes!!!",
             )
             content_api.save(tiramisu_page, do_notify=False)
@@ -232,7 +232,7 @@ class Content(Fixture):
 
         content_api.create_comment(
             parent=best_cake_thread,
-            content="<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>",  # nopep8
+            content="<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>",
             do_save=True,
             do_notify=False,
         )
@@ -257,7 +257,7 @@ class Content(Fixture):
         with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
             bob_content_api.update_content(
                 item=tiramisu_page,
-                new_content="<p>To cook a great Tiramisu, you need many ingredients.</p>",  # nopep8
+                new_content="<p>To cook a great Tiramisu, you need many ingredients.</p>",
                 new_label="Tiramisu Recipe",
             )
             bob_content_api.save(tiramisu_page, do_notify=False)

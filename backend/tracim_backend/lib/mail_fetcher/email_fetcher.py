@@ -22,10 +22,10 @@ from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.exceptions import EmptyEmailBody
 from tracim_backend.exceptions import NoSpecialKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
-from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer  # nopep8
+from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER  # nopep8
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.logger import logger
 
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
@@ -427,11 +427,11 @@ class MailFetcher(object):
         while mails:
             mail = mails.pop()
             try:
-                method, endpoint, json_body_dict = self._create_comment_request(mail)  # nopep8
+                method, endpoint, json_body_dict = self._create_comment_request(mail)
             except NoSpecialKeyFound as exc:
                 log = (
                     "Failed to create comment request due to missing specialkey in mail {}"
-                )  # nopep8
+                )
                 logger.error(self, log.format(exc.__str__()))
                 continue
             except EmptyEmailBody as exc:
@@ -439,7 +439,7 @@ class MailFetcher(object):
                 logger.error(self, log)
                 continue
             except Exception as exc:
-                log = "Failed to create comment request in mail fetcher error : {}"  # nopep8
+                log = "Failed to create comment request in mail fetcher error : {}"
                 logger.error(self, log.format(exc.__str__()))
                 continue
 
@@ -468,18 +468,18 @@ class MailFetcher(object):
         result = requests.get(endpoint, headers=self._get_auth_headers(user_email))
         if result.status_code not in [200, 204]:
             details = str(result.content)
-            msg = "bad status code {}(200 is valid) response when trying to get info about a content: {}"  # nopep8
+            msg = "bad status code {}(200 is valid) response when trying to get info about a content: {}"
             msg = msg.format(str(result.status_code), details)
             raise BadStatusCode(msg)
         return result.json()
 
-    def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:  # nopep8
+    def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:
         content_id = mail.get_key()
-        content_info = self._get_content_info(content_id, mail.get_from_address())  # nopep8
+        content_info = self._get_content_info(content_id, mail.get_from_address())
         mail_body = mail.get_body(
             use_html_parsing=self.use_html_parsing, use_txt_parsing=self.use_txt_parsing
         )
-        endpoint = "{api_base_url}workspaces/{workspace_id}/contents/{content_id}/comments".format(  # nopep8
+        endpoint = "{api_base_url}workspaces/{workspace_id}/contents/{content_id}/comments".format(
             api_base_url=self.api_base_url,
             content_id=content_id,
             workspace_id=content_info["workspace_id"],
@@ -498,7 +498,7 @@ class MailFetcher(object):
     ):
         logger.debug(
             self,
-            "Contact API on {endpoint} with method {method} with body {body}".format(  # nopep8
+            "Contact API on {endpoint} with method {method} with body {body}".format(
                 endpoint=endpoint, method=method, body=str(json_body_dict)
             ),
         )
@@ -515,7 +515,7 @@ class MailFetcher(object):
         )
         if r.status_code not in [200, 204]:
             details = r.json().get("message")
-            msg = "bad status code {} (200 and 204 are valid) response when sending mail to tracim: {}"  # nopep8
+            msg = "bad status code {} (200 and 204 are valid) response when sending mail to tracim: {}"
             msg = msg.format(str(r.status_code), details)
             raise BadStatusCode(msg)
         # Flag all correctly checked mail

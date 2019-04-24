@@ -28,7 +28,7 @@ class TracimValidator(object):
     def __init__(self):
         self.validators = (
             {}
-        )  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]  # nopep8
+        )  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]
         self.values = {}  # type: typing.Dict[str, str]
 
     def add_validator(
@@ -108,4 +108,4 @@ all_content_types_validator = OneOf(choices=[])
 
 
 def update_validators():
-    all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()  # nopep8
+    all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()

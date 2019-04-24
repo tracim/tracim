@@ -151,9 +151,9 @@ class CFG(object):
         # General
         ###
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
-        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_v2_folder, "color.json")  # nopep8
+        default_color_config_file_path = os.path.join(tracim_v2_folder, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
@@ -259,15 +259,15 @@ class CFG(object):
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
         # of tracim_v2 parent of both backend and frontend
-        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
-        backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")  # nopep8
+        backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
         )
 
-        frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")  # nopep8
+        frontend_dist_folder = os.path.join(tracim_v2_folder, "frontend", "dist")
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
@@ -335,7 +335,7 @@ class CFG(object):
             "email.notification.content_update.subject",
             _(
                 "[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"
-            ),  # nopep8
+            ),
         )
         # Created account notification
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
@@ -496,7 +496,7 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_LOGIN_ATTRIBUTE)  # nopep8
+        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_LOGIN_ATTRIBUTE)
         self.LDAP_USE_POOL = True
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
@@ -532,7 +532,7 @@ class CFG(object):
             raise Exception(
                 "Error: {} file could not be load as json".format(
                     self.COLOR__CONFIG_FILE_PATH
-                )  # nopep8
+                )
             ) from e
 
         try:
@@ -541,7 +541,7 @@ class CFG(object):
             raise Exception(
                 "Error: primary color is required in {} file".format(
                     self.COLOR__CONFIG_FILE_PATH
-                )  # nopep8
+                )
             ) from e
 
         # INFO - G.M - 2019-04-03 - depot dir validity
@@ -576,7 +576,7 @@ class CFG(object):
             )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
-        if self.FRONTEND__SERVE and not os.path.isdir(self.FRONTEND__DIST_FOLDER_PATH):  # nopep8
+        if self.FRONTEND__SERVE and not os.path.isdir(self.FRONTEND__DIST_FOLDER_PATH):
             raise Exception(
                 "ERROR: {} folder does not exist as folder. "
                 "please set frontend.dist_folder.path"
@@ -718,7 +718,7 @@ class CFG(object):
             is_active=False,
             config={},
             main_route="/ui/workspaces/{workspace_id}/contents?type=markdownpluspage",
-            # nopep8
+
             app_config=self,
         )
         markdownpluspage.add_content_type(

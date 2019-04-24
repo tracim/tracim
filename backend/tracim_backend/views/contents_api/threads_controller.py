@@ -50,7 +50,7 @@ class ThreadController(Controller):
     @hapic.output_body(TextBasedContentSchema())
     def get_thread(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         Get thread content
         """
@@ -75,7 +75,7 @@ class ThreadController(Controller):
     @hapic.output_body(TextBasedContentSchema())
     def update_thread(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         update thread
         """
@@ -125,9 +125,9 @@ class ThreadController(Controller):
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     @hapic.handle_exception(ContentStatusException, HTTPStatus.BAD_REQUEST)
-    def set_thread_status(self, context, request: TracimRequest, hapic_data=None) -> None:  # nopep8
+    def set_thread_status(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         set thread status
         """
@@ -154,26 +154,26 @@ class ThreadController(Controller):
         configurator.add_route(
             "thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="GET"
         )
-        configurator.add_view(self.get_thread, route_name="thread")  # nopep8
+        configurator.add_view(self.get_thread, route_name="thread")
 
         # update thread
         configurator.add_route(
             "update_thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="PUT"
-        )  # nopep8
-        configurator.add_view(self.update_thread, route_name="update_thread")  # nopep8
+        )
+        configurator.add_view(self.update_thread, route_name="update_thread")
 
         # get thread revisions
         configurator.add_route(
             "thread_revisions",
-            "/workspaces/{workspace_id}/threads/{content_id}/revisions",  # nopep8
+            "/workspaces/{workspace_id}/threads/{content_id}/revisions",
             request_method="GET",
         )
-        configurator.add_view(self.get_thread_revisions, route_name="thread_revisions")  # nopep8
+        configurator.add_view(self.get_thread_revisions, route_name="thread_revisions")
 
         # get thread revisions
         configurator.add_route(
             "set_thread_status",
-            "/workspaces/{workspace_id}/threads/{content_id}/status",  # nopep8
+            "/workspaces/{workspace_id}/threads/{content_id}/status",
             request_method="PUT",
         )
-        configurator.add_view(self.set_thread_status, route_name="set_thread_status")  # nopep8
+        configurator.add_view(self.set_thread_status, route_name="set_thread_status")

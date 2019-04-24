@@ -108,7 +108,7 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_folder__err_400__content_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_folder__err_400__content_does_not_exist(self) -> None:
         """
         Get one folder content (content 170 does not exist in db)
         """
@@ -122,14 +122,14 @@ class TestFolder(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/170".format(
                 workspace_id=test_workspace.workspace_id
-            ),  # nopep8
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:  # nopep8
+    def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:
         """
         Get one folders of a content (content is in another workspace)
         """
@@ -159,7 +159,7 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:
         """
         Get one folder content (Workspace 40 does not exist)
         """
@@ -180,14 +180,14 @@ class TestFolder(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/40/folders/{content_id}".format(
                 content_id=folder.content_id
-            ),  # nopep8
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:
         """
         Get one folder content, workspace id is not int
         """
@@ -208,14 +208,14 @@ class TestFolder(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/coucou/folders/{content_id}".format(
                 content_id=folder.content_id
-            ),  # nopep8
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:
         """
         Get one folder content, content_id is not int
         """
@@ -237,14 +237,14 @@ class TestFolder(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/coucou".format(
                 workspace_id=test_workspace.workspace_id
-            ),  # nopep8
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_folder__err_400__empty_label(self) -> None:  # nopep8
+    def test_api__update_folder__err_400__empty_label(self) -> None:
         """
         Update(put) one folder content
         """
@@ -277,7 +277,7 @@ class TestFolder(FunctionalTest):
         # INFO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__update_folder__ok_200__nominal_case(self) -> None:
         """
@@ -586,7 +586,7 @@ class TestFolder(FunctionalTest):
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
-        assert set(content["sub_content_types"]) == set([content_type_list.Folder.slug])  # nopep8
+        assert set(content["sub_content_types"]) == set([content_type_list.Folder.slug])
 
     def test_api__update_folder__err_400__label_already_used(self) -> None:
         """
@@ -627,7 +627,7 @@ class TestFolder(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__get_folder_revisions__ok_200__nominal_case(self) -> None:
         """
@@ -659,7 +659,7 @@ class TestFolder(FunctionalTest):
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/{workspace_id}/folders/{content_id}/revisions".format(  # nopep8
+            "/api/v2/workspaces/{workspace_id}/folders/{content_id}/revisions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
             status=200,
@@ -786,8 +786,8 @@ class TestFolder(FunctionalTest):
 
         # before
         res = self.testapp.get(
-            "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(  # nopep8
-                # nopep8
+            "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
+
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
             ),
@@ -800,7 +800,7 @@ class TestFolder(FunctionalTest):
 
         # set status
         self.testapp.put_json(
-            "/api/v2/workspaces/{workspace_id}/folders/{content_id}/status".format(  # nopep8
+            "/api/v2/workspaces/{workspace_id}/folders/{content_id}/status".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
             params=params,
@@ -839,7 +839,7 @@ class TestFolder(FunctionalTest):
         )
         transaction.commit()
         res = self.testapp.put_json(
-            "/api/v2/workspaces/{workspace_id}/folders/{content_id}/status".format(  # nopep8
+            "/api/v2/workspaces/{workspace_id}/folders/{content_id}/status".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
             params=params,
@@ -848,7 +848,7 @@ class TestFolder(FunctionalTest):
         # TODO - G.M - 2018-09-10 - handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
 
 class TestHtmlDocuments(FunctionalTest):
@@ -893,7 +893,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content["last_modifier"]["avatar_url"] is None
         assert (
             content["raw_content"] == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
-        )  # nopep8
+        )
         assert content["file_extension"] == ".document.html"
 
     def test_api__get_html_document__ok_200__nominal_case(self) -> None:
@@ -929,7 +929,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content["last_modifier"]["avatar_url"] is None
         assert (
             content["raw_content"] == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
-        )  # nopep8
+        )
         assert content["file_extension"] == ".document.html"
 
     def test_api__get_html_document__ok_200__archived_content(self) -> None:
@@ -966,7 +966,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:
         """
         Get one html document of a content (content 170 does not exist in db
         """
@@ -976,7 +976,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:  # nopep8
+    def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:
         """
         Get one html document of a content (content 6 is in workspace 2)
         """
@@ -986,7 +986,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:
         """
         Get one html document of a content (Workspace 40 does not exist)
         """
@@ -996,7 +996,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:
         """
         Get one html document of a content, workspace id is not int
         """
@@ -1006,7 +1006,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:
         """
         Get one html document of a content, content_id is not int
         """
@@ -1016,7 +1016,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_html_document__err_400__empty_label(self) -> None:  # nopep8
+    def test_api__update_html_document__err_400__empty_label(self) -> None:
         """
         Update(put) one html document of a content
         """
@@ -1028,7 +1028,7 @@ class TestHtmlDocuments(FunctionalTest):
         # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
@@ -1289,7 +1289,7 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__set_document_status__err_400__same_status(self) -> None:
 
@@ -1334,7 +1334,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
             dbsession.flush()
         transaction.commit()
 
@@ -1364,7 +1364,7 @@ class TestFiles(FunctionalTest):
         # TODO - G.M - 2018-06-173 - check date format
         assert content["modified"]
         assert content["last_modifier"] == content["author"]
-        assert content["raw_content"] == "<p>description</p>"  # nopep8
+        assert content["raw_content"] == "<p>description</p>"
         assert content["mimetype"] == "plain/text"
         assert content["size"] == len(b"Test file")
         assert content["file_extension"] == ".txt"
@@ -1503,7 +1503,7 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_file__err_400__content_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_file__err_400__content_does_not_exist(self) -> None:
         """
         Get one file (content 170 does not exist in db
         """
@@ -1513,7 +1513,7 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_file__err_400__content_not_in_workspace(self) -> None:  # nopep8
+    def test_api__get_file__err_400__content_not_in_workspace(self) -> None:
         """
         Get one file (content 9 is in workspace 2)
         """
@@ -1523,7 +1523,7 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:
         """
         Get one file (Workspace 40 does not exist)
         """
@@ -1533,7 +1533,7 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:
         """
         Get one file, workspace id is not int
         """
@@ -1543,7 +1543,7 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_file__err_400__content_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_file__err_400__content_id_is_not_int(self) -> None:
         """
         Get one file, content_id is not int
         """
@@ -1553,7 +1553,7 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_file_info_err_400__empty_label(self) -> None:  # nopep8
+    def test_api__update_file_info_err_400__empty_label(self) -> None:
         """
         Update(put) one file
         """
@@ -1576,7 +1576,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
             dbsession.flush()
         transaction.commit()
 
@@ -1588,7 +1588,7 @@ class TestFiles(FunctionalTest):
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__update_file_info__ok_200__nominal_case(self) -> None:
         """
@@ -1613,7 +1613,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
 
@@ -1706,7 +1706,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         test_file.status = "closed-validated"
         content_api.save(test_file)
         dbsession.flush()
@@ -1746,7 +1746,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
             test_file.is_deleted = True
         content_api.save(test_file)
         dbsession.flush()
@@ -1786,7 +1786,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
             test_file.is_archived = True
         content_api.save(test_file)
         dbsession.flush()
@@ -1824,7 +1824,7 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
 
@@ -1941,7 +1941,7 @@ class TestFiles(FunctionalTest):
         test_file2.file_extension = ".txt"
         test_file2.depot_file = FileIntent(b"Test file", "already_used.txt", "text/plain")
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
 
@@ -1956,7 +1956,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__get_file_revisions__ok_200__nominal_case(self) -> None:
         """
@@ -1981,13 +1981,13 @@ class TestFiles(FunctionalTest):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
             dbsession.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/revisions".format(test_file.content_id),  # nopep8
+            "/api/v2/workspaces/1/files/{}/revisions".format(test_file.content_id),
             status=200,
         )
         revisions = res.json_body
@@ -2040,7 +2040,7 @@ class TestFiles(FunctionalTest):
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
 
@@ -2093,7 +2093,7 @@ class TestFiles(FunctionalTest):
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2116,7 +2116,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__get_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -2139,7 +2139,7 @@ class TestFiles(FunctionalTest):
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
             dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -2177,7 +2177,7 @@ class TestFiles(FunctionalTest):
                 new_filename="Test_file.txt",
                 new_mimetype="text/plain",
             )
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -2193,7 +2193,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
         assert res.body == b"Test file"
         assert res.content_type == "text/plain"
         assert res.content_length == len(b"Test file")
@@ -2490,7 +2490,7 @@ class TestFiles(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
         """
@@ -2570,7 +2570,7 @@ class TestFiles(FunctionalTest):
         assert res.status == 400
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER  # nopep8
+        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2594,7 +2594,7 @@ class TestFiles(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         content_id = int(test_file.content_id)
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id),  # nopep8
+            "/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id),
             status=200,
         )
         res = res.json_body
@@ -2681,7 +2681,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
 
@@ -2755,7 +2755,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
                 content_id, image.name
-            ),  # nopep8
+            ),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -2796,7 +2796,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
                 content_id, "Test_file.bin"
-            ),  # nopep8
+            ),
             status=400,
             params=params,
         )
@@ -2837,7 +2837,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
                 content_id, dl_filename
-            ),  # nopep8
+            ),
             status=200,
             params=params,
         )
@@ -2846,7 +2846,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             dl_filename, dl_filename
-        )  # nopep8
+        )
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2882,7 +2882,7 @@ class TestFiles(FunctionalTest):
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/".format(content_id),  # nopep8
+            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/".format(content_id),
             status=200,
             params=params,
         )
@@ -2891,7 +2891,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             dl_filename, dl_filename
-        )  # nopep8
+        )
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2929,7 +2929,7 @@ class TestFiles(FunctionalTest):
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/raw".format(content_id),  # nopep8
+            "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/raw".format(content_id),
             status=200,
             params=params,
         )
@@ -2938,12 +2938,12 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             dl_filename, dl_filename
-        )  # nopep8
+        )
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(self) -> None:  # nopep8
+    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(self) -> None:
         """
         get 256x256 preview of a txt file
         """
@@ -2975,14 +2975,14 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/512x512/{}".format(
                 content_id, filename
-            ),  # nopep8
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.PREVIEW_DIM_NOT_ALLOWED
 
-    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:  # nopep8
+    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:
         """
         get 256x256 revision preview of a txt file
         """
@@ -3015,7 +3015,7 @@ class TestFiles(FunctionalTest):
         )
         filename = "test_file.txt"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
             status=200,
@@ -3023,7 +3023,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == "text/plain"
         filename = "test_image_256x256.jpg"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
             status=200,
@@ -3035,7 +3035,7 @@ class TestFiles(FunctionalTest):
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         get 256x256 revision preview of a txt file
         """
@@ -3067,7 +3067,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=image.name
             ),
             status=200,
@@ -3075,7 +3075,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == "text/plain"
         params = {"force_download": 1}
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/".format(
                 content_id=content_id, revision_id=revision_id
             ),
             status=200,
@@ -3087,7 +3087,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, urlencoded_filename
-        )  # nopep8
+        )
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
@@ -3114,7 +3114,7 @@ class TestFiles(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3128,7 +3128,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
                 content_id, filename
-            ),  # nopep8
+            ),
             status=200,
         )
         assert res.content_type == "application/pdf"
@@ -3154,7 +3154,7 @@ class TestFiles(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3169,7 +3169,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
                 content_id, filename
-            ),  # nopep8
+            ),
             status=200,
             params=params,
         )
@@ -3177,13 +3177,13 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
         assert res.content_type == "application/pdf"
 
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
                 content_id, "Test_file.pdf"
-            ),  # nopep8
+            ),
             status=200,
             params=params,
         )
@@ -3192,12 +3192,12 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
@@ -3228,14 +3228,14 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
                 content_id, image.name
-            ),  # nopep8
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
-    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:  # nopep8
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
@@ -3268,7 +3268,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(
                 content_id, filename
-            ),  # nopep8
+            ),
             status=400,
         )
         assert isinstance(res.json, dict)
@@ -3296,7 +3296,7 @@ class TestFiles(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3375,7 +3375,7 @@ class TestFiles(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3398,9 +3398,9 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
 
-    def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
+    def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:
         """
         get full pdf preview of a txt file
         """
@@ -3421,7 +3421,7 @@ class TestFiles(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3474,7 +3474,7 @@ class TestFiles(FunctionalTest):
         )
         filename = image.name
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
             status=200,
@@ -3483,7 +3483,7 @@ class TestFiles(FunctionalTest):
         params = {"page": 1}
         filename = "test_image__page_1.pdf"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(
                 content_id=content_id, revision_id=revision_id, params=params, filename=filename
             ),
             status=200,
@@ -3522,14 +3522,14 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/".format(
                 content_id=content_id, revision_id=revision_id
             ),
             status=200,
         )
         assert res.content_type == "text/plain"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/".format(
                 content_id=content_id, revision_id=revision_id
             ),
             status=200,
@@ -3568,7 +3568,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=image.name
             ),
             status=200,
@@ -3577,7 +3577,7 @@ class TestFiles(FunctionalTest):
         params = {"force_download": 1}
         filename = "Test_file.pdf"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename="Test_file.pdf"
             ),
             status=200,
@@ -3588,7 +3588,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
@@ -3623,7 +3623,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=image.name
             ),
             status=200,
@@ -3632,7 +3632,7 @@ class TestFiles(FunctionalTest):
         params = {"page": 1, "force_download": 1}
         filename = "test_image_page_1.pdf"
         res = self.testapp.get(
-            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(  # nopep8
+            "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
             status=200,
@@ -3642,7 +3642,7 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
             filename, filename
-        )  # nopep8
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__set_file_status__err_400__same_status(self) -> None:
@@ -3664,7 +3664,7 @@ class TestFiles(FunctionalTest):
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
         with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
-            content_api.update_content(test_file, "Test_file", "<p>description</p>")  # nopep8
+            content_api.update_content(test_file, "Test_file", "<p>description</p>")
         dbsession.flush()
         transaction.commit()
 
@@ -3705,7 +3705,7 @@ class TestThreads(FunctionalTest):
         Get one html document of a content
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3731,7 +3731,7 @@ class TestThreads(FunctionalTest):
         assert content["last_modifier"]["user_id"] == 3
         assert content["last_modifier"]["public_name"] == "Bob i."
         assert content["last_modifier"]["avatar_url"] is None
-        assert content["raw_content"] == "What is the best cake?"  # nopep8
+        assert content["raw_content"] == "What is the best cake?"
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "Best Cakes?.thread.html"
 
@@ -3755,7 +3755,7 @@ class TestThreads(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:
         """
         Get one thread (Workspace 40 does not exist)
         """
@@ -3765,7 +3765,7 @@ class TestThreads(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:
         """
         Get one thread, workspace id is not int
         """
@@ -3775,7 +3775,7 @@ class TestThreads(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:  # nopep8
+    def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:
         """
         Get one thread, content id is not int
         """
@@ -3818,7 +3818,7 @@ class TestThreads(FunctionalTest):
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
 
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3876,7 +3876,7 @@ class TestThreads(FunctionalTest):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3916,7 +3916,7 @@ class TestThreads(FunctionalTest):
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__get_thread_revisions__ok_200__nominal_case(self) -> None:
         """
@@ -4017,7 +4017,7 @@ class TestThreads(FunctionalTest):
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
-            "/api/v2/workspaces/1/threads/{}/revisions".format(test_thread.content_id),  # nopep8
+            "/api/v2/workspaces/1/threads/{}/revisions".format(test_thread.content_id),
             status=200,
         )
         revisions = res.json_body
@@ -4053,7 +4053,7 @@ class TestThreads(FunctionalTest):
         params = {"status": "closed-deprecated"}
 
         # before
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -4063,7 +4063,7 @@ class TestThreads(FunctionalTest):
         self.testapp.put_json("/api/v2/workspaces/2/threads/7/status", params=params, status=204)
 
         # after
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -4083,7 +4083,7 @@ class TestThreads(FunctionalTest):
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__set_thread_status__err_400__same_status(self) -> None:
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -4094,4 +4094,4 @@ class TestThreads(FunctionalTest):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE  # nopep8
+        assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE

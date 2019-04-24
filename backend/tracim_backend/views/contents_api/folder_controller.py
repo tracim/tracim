@@ -25,7 +25,7 @@ from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import TextBasedContentSchema
 from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema  # nopep8
+from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
 try:  # Python 3.5+
@@ -35,7 +35,7 @@ except ImportError:
 
 
 SWAGGER_TAG__CONTENT_FOLDER_SECTION = "Folders"
-SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FOLDER_SECTION
 )
 is_folder_content = ContentTypeChecker([FOLDER_TYPE])
@@ -49,7 +49,7 @@ class FolderController(Controller):
     @hapic.output_body(TextBasedContentSchema())
     def get_folder(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         Get folder info
         """
@@ -74,7 +74,7 @@ class FolderController(Controller):
     @hapic.output_body(TextBasedContentSchema())
     def update_folder(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         update folder
         """
@@ -125,8 +125,8 @@ class FolderController(Controller):
     @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def set_folder_status(self, context, request: TracimRequest, hapic_data=None) -> None:  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_folder_status(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         set folder status
         """
@@ -149,26 +149,26 @@ class FolderController(Controller):
         configurator.add_route(
             "folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="GET"
         )
-        configurator.add_view(self.get_folder, route_name="folder")  # nopep8
+        configurator.add_view(self.get_folder, route_name="folder")
 
         # update folder
         configurator.add_route(
             "update_folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="PUT"
-        )  # nopep8
-        configurator.add_view(self.update_folder, route_name="update_folder")  # nopep8
+        )
+        configurator.add_view(self.update_folder, route_name="update_folder")
 
         # get folder revisions
         configurator.add_route(
             "folder_revisions",
-            "/workspaces/{workspace_id}/folders/{content_id}/revisions",  # nopep8
+            "/workspaces/{workspace_id}/folders/{content_id}/revisions",
             request_method="GET",
         )
-        configurator.add_view(self.get_folder_revisions, route_name="folder_revisions")  # nopep8
+        configurator.add_view(self.get_folder_revisions, route_name="folder_revisions")
 
         # get folder revisions
         configurator.add_route(
             "set_folder_status",
-            "/workspaces/{workspace_id}/folders/{content_id}/status",  # nopep8
+            "/workspaces/{workspace_id}/folders/{content_id}/status",
             request_method="PUT",
         )
-        configurator.add_view(self.set_folder_status, route_name="set_folder_status")  # nopep8
+        configurator.add_view(self.set_folder_status, route_name="set_folder_status")

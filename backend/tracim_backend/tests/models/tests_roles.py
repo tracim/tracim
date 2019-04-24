@@ -74,10 +74,10 @@ class TestWorkspacesRoles(unittest.TestCase):
         assert role.label
         assert isinstance(role.slug, str)
 
-    def test_workspace_roles__ok__get_role__from_level__err__role_does_not_exist(self):  # nopep8
+    def test_workspace_roles__ok__get_role__from_level__err__role_does_not_exist(self):
         with pytest.raises(RoleDoesNotExist):
             WorkspaceRoles.get_role_from_level(-1000)
 
-    def test_workspace_roles__ok__get_role__from_slug__err__role_does_not_exist(self):  # nopep8
+    def test_workspace_roles__ok__get_role__from_slug__err__role_does_not_exist(self):
         with pytest.raises(RoleDoesNotExist):
             WorkspaceRoles.get_role_from_slug("this slug does not exist")

@@ -67,7 +67,7 @@ class MoveParams(object):
     Json body params for move action model
     """
 
-    def __init__(self, new_parent_id: str, new_workspace_id: str = None) -> None:  # nopep8
+    def __init__(self, new_parent_id: str, new_workspace_id: str = None) -> None:
         self.new_parent_id = new_parent_id
         self.new_workspace_id = new_workspace_id
 
@@ -239,7 +239,7 @@ class FilePreviewSizedPath(object):
 
     def __init__(
         self, workspace_id: int, content_id: int, width: int, height: int, filename: str
-    ) -> None:  # nopep8
+    ) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.width = width
@@ -260,7 +260,7 @@ class RevisionPreviewSizedPath(object):
         width: int,
         height: int,
         filename: str,
-    ) -> None:  # nopep8
+    ) -> None:
         self.content_id = content_id
         self.revision_id = revision_id
         self.workspace_id = workspace_id
@@ -313,7 +313,7 @@ class UserWorkspaceAndContentPath(object):
     Paths params with user_id, workspace id and content_id model
     """
 
-    def __init__(self, user_id: int, workspace_id: int, content_id: int) -> None:  # nopep8
+    def __init__(self, user_id: int, workspace_id: int, content_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.user_id = user_id
@@ -340,7 +340,7 @@ class KnownMemberQuery(object):
     ) -> None:
         self.acp = acp
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
-        self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)  # nopep8
+        self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
 
 
 class AgendaFilterQuery(object):
@@ -594,7 +594,7 @@ class WorkspaceInContext(object):
     Interface to get Workspace data and Workspace data related to context.
     """
 
-    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:  # nopep8
+    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
@@ -763,7 +763,7 @@ class ContentInContext(object):
 
     def __init__(
         self, content: Content, dbsession: Session, config: CFG, user: User = None
-    ) -> None:  # nopep8
+    ) -> None:
         self.content = content
         self.dbsession = dbsession
         self.config = config
@@ -796,7 +796,7 @@ class ContentInContext(object):
 
     @property
     def sub_content_types(self) -> typing.List[str]:
-        return [_type.slug for _type in self.content.get_allowed_content_types()]  # nopep8
+        return [_type.slug for _type in self.content.get_allowed_content_types()]
 
     @property
     def status(self) -> str:
@@ -1011,7 +1011,7 @@ class RevisionInContext(object):
         dbsession: Session,
         config: CFG,
         user: User = None,
-    ) -> None:  # nopep8
+    ) -> None:
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession

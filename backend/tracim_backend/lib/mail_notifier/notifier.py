@@ -162,7 +162,7 @@ class EmailManager(object):
         """
 
         email_template = self.config.EMAIL__NOTIFICATION__FROM__EMAIL
-        mail_sender_name = self.config.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL  # nopep8
+        mail_sender_name = self.config.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL
         if user:
             mail_sender_name = "{name} via Tracim".format(name=user.display_name)
             email_address = email_template.replace("{user_id}", str(user.user_id))
@@ -217,7 +217,7 @@ class EmailManager(object):
         content_api = ContentApi(current_user=user, session=self.session, config=self.config)
         content = ContentApi(
             session=self.session,
-            current_user=user,  # nopep8 TODO - use a system user instead of the user that has triggered the event
+            current_user=user,   TODO - use a system user instead of the user that has triggered the event
             config=self.config,
             show_archived=True,
             show_deleted=True,
@@ -225,10 +225,10 @@ class EmailManager(object):
         workspace_api = WorkspaceApi(session=self.session, current_user=user, config=self.config)
         workpace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content.workspace_id)
-        )  # nopep8
+        )
         main_content = (
             content.parent if content.type == content_type_list.Comment.slug else content
-        )  # nopep8
+        )
         notifiable_roles = WorkspaceApi(
             current_user=user, session=self.session, config=self.config
         ).get_notifiable_roles(content.workspace)
@@ -264,16 +264,16 @@ class EmailManager(object):
                     content.content_id, role.user.email
                 ),
             )
-            translator = Translator(app_config=self.config, default_lang=role.user.lang)  # nopep8
+            translator = Translator(app_config=self.config, default_lang=role.user.lang)
             _ = translator.get_translation
             to_addr = formataddr((role.user.display_name, role.user.email))
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
-            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(  # nopep8
+            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(
                 "{content_id}", str(main_content.content_id)
             )
 
-            reference_addr = self.config.EMAIL__NOTIFICATION__REFERENCES__EMAIL.replace(  # nopep8
+            reference_addr = self.config.EMAIL__NOTIFICATION__REFERENCES__EMAIL.replace(
                 "{content_id}", str(main_content.content_id)
             )
             #
@@ -292,7 +292,7 @@ class EmailManager(object):
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, content_status)
-            reply_to_label = _("{username} & all members of {workspace}").format(  # nopep8
+            reply_to_label = _("{username} & all members of {workspace}").format(
                 username=user.display_name, workspace=main_content.workspace.label
             )
 
@@ -310,7 +310,7 @@ class EmailManager(object):
             content_in_context = content_api.get_content_in_context(content)
             parent_in_context = None
             if content.parent_id:
-                parent_in_context = content_api.get_content_in_context(content.parent)  # nopep8
+                parent_in_context = content_api.get_content_in_context(content.parent)
 
             body_html = self._build_email_body_for_content(
                 self.config.EMAIL__NOTIFICATION__CONTENT_UPDATE__TEMPLATE__HTML,
@@ -362,7 +362,7 @@ class EmailManager(object):
 
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
-        )  # nopep8
+        )
 
         context = {
             "user": user,
@@ -409,7 +409,7 @@ class EmailManager(object):
 
         html_template_file_path = (
             self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML
-        )  # nopep8
+        )
         # TODO - G.M - 2018-08-17 - Generate token
         context = {
             "user": user,
@@ -471,12 +471,12 @@ class EmailManager(object):
         workspace_url = workspace_in_context.frontend_url
         main_title = content.label
         status_label = content.get_status().label
-        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for status_icon_url  # nopep8
+        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for status_icon_url
         status_icon_url = ""
         role_label = role.role_as_label()
         content_intro = '<span id="content-intro-username">{}</span> did something.'.format(
             actor.display_name
-        )  # nopep8
+        )
         content_text = content.description
         call_to_action_url = content_in_context.frontend_url
         logo_url = get_email_logo_frontend_url(self.config)
@@ -593,7 +593,7 @@ class EmailManager(object):
         """
         logger.debug(
             self, "Building email content from MAKO template {}".format(mako_template_filepath)
-        )  # nopep8
+        )
         context = self._build_context_for_content_update(
             role=role,
             content_in_context=content_in_context,

@@ -78,18 +78,18 @@ class TestContentsTypesEndpoint(FunctionalTest):
             for status_counter, status in enumerate(content_type.available_statuses):
                 assert (
                     res[counter]["available_statuses"][status_counter]["fa_icon"] == status.fa_icon
-                )  # nopep8
+                )
                 assert (
                     res[counter]["available_statuses"][status_counter]["global_status"]
                     == status.global_status
-                )  # nopep8
+                )
                 assert (
                     res[counter]["available_statuses"][status_counter]["slug"] == status.slug
-                )  # nopep8
+                )
                 assert (
                     res[counter]["available_statuses"][status_counter]["hexcolor"]
                     == status.hexcolor
-                )  # nopep8
+                )
 
     def test_api__get_content_types__err_401__unregistered_user(self):
         """

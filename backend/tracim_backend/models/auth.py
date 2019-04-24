@@ -203,7 +203,7 @@ class User(DeclarativeBase):
     auth_token_created = Column(DateTime)
     reset_password_token_hash = Column(
         Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None
-    )  # nopep8
+    )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
 
     @hybrid_property
@@ -320,15 +320,15 @@ class User(DeclarativeBase):
     def generate_reset_password_token(self) -> str:
         reset_password_token, self.reset_password_token_created, self.reset_password_token_hash = self._generate_token(
             create_hash=True
-        )  # nopep8
+        )
         return reset_password_token
 
     def validate_reset_password_token(self, token, validity_seconds) -> bool:
         if not self.reset_password_token_created:
             raise UnvalidResetPasswordToken(
                 "reset password token is unvalid due to unknown creation date"
-            )  # nopep8
-        if not self._validate_date(self.reset_password_token_created, validity_seconds):  # nopep8
+            )
+        if not self._validate_date(self.reset_password_token_created, validity_seconds):
             raise ExpiredResetPasswordToken("reset password token has expired")
         if not self._validate_hash(self.reset_password_token_hash, token):
             raise UnvalidResetPasswordToken("reset password token is unvalid")
@@ -386,7 +386,7 @@ class User(DeclarativeBase):
         return ciphertext_password
 
     @classmethod
-    def _validate_hash(cls, hashed: str, cleartext_password_or_token: str) -> bool:  # nopep8
+    def _validate_hash(cls, hashed: str, cleartext_password_or_token: str) -> bool:
         result = False
         if hashed:
             new_hash = sha256()
@@ -397,7 +397,7 @@ class User(DeclarativeBase):
     @classmethod
     def _generate_token(
         cls, create_hash=False
-    ) -> typing.Union[str, datetime, typing.Optional[str]]:  # nopep8
+    ) -> typing.Union[str, datetime, typing.Optional[str]]:
         token = str(uuid.uuid4())
         creation_datetime = datetime.utcnow()
         hashed_token = None

@@ -23,7 +23,7 @@ class MailFetcherDaemon(FakeDaemon):
         self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
-        logger.warning("MailFetcherrDaemon not implement append_thread_callback")  # nopep8
+        logger.warning("MailFetcherrDaemon not implement append_thread_callback")
         pass
 
     def stop(self) -> None:
@@ -40,7 +40,7 @@ class MailFetcherDaemon(FakeDaemon):
             folder=self.config.EMAIL_REPLY_IMAP_FOLDER,
             heartbeat=self.config.EMAIL_REPLY_CHECK_HEARTBEAT,
             use_idle=self.config.EMAIL_REPLY_IMAP_USE_IDLE,
-            connection_max_lifetime=self.config.EMAIL_REPLY_CONNECTION_MAX_LIFETIME,  # nopep8
+            connection_max_lifetime=self.config.EMAIL_REPLY_CONNECTION_MAX_LIFETIME,
             api_base_url=self.config.WEBSITE_BASE_URL + BASE_API_V2,
             api_key=self.config.API_KEY,
             reply_to_pattern=self.config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL,

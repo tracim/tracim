@@ -59,7 +59,7 @@ class CommentController(Controller):
         return [api.get_content_in_context(comment) for comment in comments]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
-    @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
@@ -86,7 +86,7 @@ class CommentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @check_right(can_delete_comment)
     @hapic.input_path(CommentsPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_comment(self, context, request: TracimRequest, hapic_data=None):
         """
         Delete comment
@@ -130,13 +130,13 @@ class CommentController(Controller):
             "add_comment",
             "/workspaces/{workspace_id}/contents/{content_id}/comments",
             request_method="POST",
-        )  # nopep8
+        )
         configurator.add_view(self.add_comment, route_name="add_comment")
 
         # delete comments
         configurator.add_route(
             "delete_comment",
-            "/workspaces/{workspace_id}/contents/{content_id}/comments/{comment_id}",  # nopep8
+            "/workspaces/{workspace_id}/contents/{content_id}/comments/{comment_id}",
             request_method="DELETE",
         )
         configurator.add_view(self.delete_comment, route_name="delete_comment")

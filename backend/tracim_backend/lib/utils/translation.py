@@ -28,7 +28,7 @@ class Translator(object):
 
     def __init__(
         self, app_config: "CFG", default_lang: str = None, fallback_lang: str = None
-    ):  # nopep8
+    ):
         """
         you should provide either valid fallback_lang(true value) or valid
         app.config.DEFAULT_LANG (true value).
@@ -42,7 +42,7 @@ class Translator(object):
             default_lang = fallback_lang
         self.default_lang = default_lang
 
-    def _get_json_translation_lang_filepath(self, lang: str) -> typing.Optional[str]:  # nopep8
+    def _get_json_translation_lang_filepath(self, lang: str) -> typing.Optional[str]:
         i18n_folder = self.config.BACKEND__I18N_FOLDER_PATH
         lang_filepath = os.path.join(i18n_folder, lang, TRANSLATION_FILENAME)
         if not os.path.isdir(self.config.BACKEND__I18N_FOLDER_PATH):
@@ -52,7 +52,7 @@ class Translator(object):
 
     def _get_translation_from_file(
         self, filepath: str
-    ) -> typing.Optional[typing.Dict[str, str]]:  # nopep8
+    ) -> typing.Optional[typing.Dict[str, str]]:
         try:
             with open(filepath) as file:
                 trads = json.load(file)
@@ -62,7 +62,7 @@ class Translator(object):
 
     def _get_translation(self, lang: str, message: str) -> typing.Tuple[str, bool]:
         try:
-            translation_filepath = self._get_json_translation_lang_filepath(lang)  # nopep8
+            translation_filepath = self._get_json_translation_lang_filepath(lang)
             translation = self._get_translation_from_file(translation_filepath)
             if message in translation and translation[message]:
                 return translation[message], True

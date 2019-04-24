@@ -47,7 +47,7 @@ class RevisionsIntegrity(object):
         if inspect(revision).has_identity:
             raise ContentRevisionUpdateError(
                 "ContentRevision is not updatable. %s already have identity." % revision
-            )  # nopep8
+            )
 
         if revision not in cls._updatable_revisions:
             cls._updatable_revisions.append(revision)

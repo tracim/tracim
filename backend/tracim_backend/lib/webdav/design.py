@@ -185,7 +185,7 @@ def design_thread(content: data.Content, content_revision: data.ContentRevisionR
     for comment in comments[1:]:
         thread += (
             '<blockquote style="border-left: solid 2px #999; margin-left: 1em; padding-left: 1em;">'
-        )  # nopep8
+        )
         thread += THREAD_MESSAGE.format(
             posting_time=format_datetime(comment.created, locale=get_locale()),
             comment_owner=comment.owner.display_name,

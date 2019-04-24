@@ -204,7 +204,7 @@ class ContentTypeList(object):
         content_types.extend(self._special_contents_types)
         content_types.append(self.Event)
         for item in content_types:
-            if item.slug == slug or (item.slug_alias and slug in item.slug_alias):  # nopep8
+            if item.slug == slug or (item.slug_alias and slug in item.slug_alias):
                 return item
         raise ContentTypeNotExist()
 
@@ -214,7 +214,7 @@ class ContentTypeList(object):
         "any" slug, dont return content type slug alias , don't return event.
         Useful to restrict slug param in schema.
         """
-        allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
+        allowed_type_slug = [contents_type.slug for contents_type in self._content_types]
         return allowed_type_slug
 
     def endpoint_allowed_types(self) -> typing.List[ContentType]:
@@ -233,7 +233,7 @@ class ContentTypeList(object):
         instead of ContentType
         """
         content_types = self.endpoint_allowed_types()
-        allowed_type_slug = [contents_type.slug for contents_type in content_types]  # nopep8
+        allowed_type_slug = [contents_type.slug for contents_type in content_types]
         return allowed_type_slug
 
     def query_allowed_types_slugs(self) -> typing.List[str]:

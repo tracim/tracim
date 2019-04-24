@@ -76,7 +76,7 @@ class UserCommand(AppContextCommand):
     def _get_group(self, name: str) -> Group:
         groups_availables = [group.group_name for group in self._group_api.get_all()]
         if name not in groups_availables:
-            msg = "Group '{}' does not exist, choose a group name in : ".format(name)  # nopep8
+            msg = "Group '{}' does not exist, choose a group name in : ".format(name)
             for group in groups_availables:
                 msg += "'{}',".format(group)
             self._session.rollback()
@@ -157,15 +157,15 @@ class UserCommand(AppContextCommand):
             except UserAlreadyExistError as exc:
                 raise UserAlreadyExistError(
                     "Error: User already exist (use `user update` command instead)"
-                ) from exc  # nopep8
+                ) from exc
             except NotificationSendingFailed as exc:
                 raise NotificationSendingFailed(
                     "Error: Cannot send email notification due to error, user not created."
-                ) from exc  # nopep8
+                ) from exc
             except NotificationDisabledCantCreateUserWithInvitation as exc:
                 raise NotificationDisabledCantCreateUserWithInvitation(
                     "Error: Email notification disabled but notification required, user not created."
-                ) from exc  # nopep8
+                ) from exc
         else:
             if parsed_args.password:
                 self._update_password_for_login(

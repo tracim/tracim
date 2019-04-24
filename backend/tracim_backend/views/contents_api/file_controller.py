@@ -59,7 +59,7 @@ except ImportError:
     from http import client as HTTPStatus
 
 SWAGGER_TAG__CONTENT_FILE_SECTION = "Files"
-SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FILE_SECTION
 )
 is_file_content = ContentTypeChecker([FILE_TYPE])
@@ -75,7 +75,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_file)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -105,7 +105,7 @@ class FileController(Controller):
             try:
                 parent = api.get_one(
                     content_id=parent_id, content_type=content_type_list.Any_SLUG
-                )  # nopep8
+                )
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(parent_id)
@@ -130,10 +130,10 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_contributor)
     @check_right(is_file_content)
-    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
         """
         Upload a new version of raw file of content. This will create a new
@@ -206,7 +206,7 @@ class FileController(Controller):
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])
-    def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):
         """
         Download raw file for specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}{file_extension}`.
@@ -296,7 +296,7 @@ class FileController(Controller):
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
-    def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain a full pdf preview (all page) of last revision of content.
         Good pratice for filename is filename is `{label}.pdf`.
@@ -331,7 +331,7 @@ class FileController(Controller):
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
-    def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain full pdf preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
@@ -369,7 +369,7 @@ class FileController(Controller):
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
-    def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain a specific page pdf preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_page_{page_number}.pdf`.
@@ -455,7 +455,7 @@ class FileController(Controller):
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(FilePreviewSizedPathSchema())
     @hapic.output_file([])
-    def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain resized jpg preview of last revision of content.
         Good pratice for filename is filename is `{label}_page_{page_number}_{width}x{height}.jpg`.
@@ -503,7 +503,7 @@ class FileController(Controller):
     @hapic.output_file([])
     def sized_preview_jpg_revision(
         self, context, request: TracimRequest, hapic_data=None
-    ):  # nopep8
+    ):
         """
         Obtain resized jpg preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg`.
@@ -529,7 +529,7 @@ class FileController(Controller):
         )
         filename = hapic_data.path.filename
         if not filename or filename == "raw":
-            filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(  # nopep8
+            filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
                 revision_id=revision.revision_id,
                 label=revision.label,
                 page_number=hapic_data.query.page,
@@ -547,7 +547,7 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(AllowedJpgPreviewDimSchema())
-    def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
         """
         Get allowed dimensions of jpg preview. If restricted is true,
         only those dimensions are strictly accepted.
@@ -570,7 +570,7 @@ class FileController(Controller):
     @hapic.output_body(FileContentSchema())
     def get_file_infos(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         Get thread content
         """
@@ -595,7 +595,7 @@ class FileController(Controller):
     @hapic.output_body(FileContentSchema())
     def update_file_info(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         update thread
         """
@@ -646,9 +646,9 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     @hapic.handle_exception(ContentStatusException, HTTPStatus.BAD_REQUEST)
-    def set_file_status(self, context, request: TracimRequest, hapic_data=None) -> None:  # nopep8
+    def set_file_status(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         set file status
         """
@@ -680,123 +680,123 @@ class FileController(Controller):
         configurator.add_route(
             "file_info", "/workspaces/{workspace_id}/files/{content_id}", request_method="GET"
         )
-        configurator.add_view(self.get_file_infos, route_name="file_info")  # nopep8
+        configurator.add_view(self.get_file_infos, route_name="file_info")
         # update file
         configurator.add_route(
             "update_file_info",
             "/workspaces/{workspace_id}/files/{content_id}",
             request_method="PUT",
-        )  # nopep8
-        configurator.add_view(self.update_file_info, route_name="update_file_info")  # nopep8
+        )
+        configurator.add_view(self.update_file_info, route_name="update_file_info")
 
         # raw file #
         # create file
         configurator.add_route(
-            "create_file", "/workspaces/{workspace_id}/files", request_method="POST"  # nopep8
+            "create_file", "/workspaces/{workspace_id}/files", request_method="POST"
         )
-        configurator.add_view(self.create_file, route_name="create_file")  # nopep8
+        configurator.add_view(self.create_file, route_name="create_file")
         # upload raw file
         configurator.add_route(
             "upload_file",
-            "/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}",
             request_method="PUT",
         )
-        configurator.add_view(self.upload_file, route_name="upload_file")  # nopep8
+        configurator.add_view(self.upload_file, route_name="upload_file")
         # download raw file
         configurator.add_route(
             "download_file",
-            "/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/raw/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.download_file, route_name="download_file")  # nopep8
+        configurator.add_view(self.download_file, route_name="download_file")
         # download raw file of revision
         configurator.add_route(
             "download_revision",
-            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}",
             request_method="GET",
         )
         configurator.add_view(
             self.download_revisions_file, route_name="download_revision"
-        )  # nopep8
+        )
 
         # previews #
         # get preview pdf full
         configurator.add_route(
             "preview_pdf_full",
-            "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.preview_pdf_full, route_name="preview_pdf_full")  # nopep8
+        configurator.add_view(self.preview_pdf_full, route_name="preview_pdf_full")
         # get preview pdf
         configurator.add_route(
             "preview_pdf",
-            "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.preview_pdf, route_name="preview_pdf")  # nopep8
+        configurator.add_view(self.preview_pdf, route_name="preview_pdf")
         # get preview jpg allowed dims
         configurator.add_route(
             "allowed_dim_preview_jpg",
-            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims",
             request_method="GET",
         )
         configurator.add_view(
             self.allowed_dim_preview_jpg, route_name="allowed_dim_preview_jpg"
-        )  # nopep8
+        )
         # get preview jpg
         configurator.add_route(
             "preview_jpg",
-            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.preview_jpg, route_name="preview_jpg")  # nopep8
+        configurator.add_view(self.preview_jpg, route_name="preview_jpg")
         # get preview jpg with size
         configurator.add_route(
             "sized_preview_jpg",
-            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.sized_preview_jpg, route_name="sized_preview_jpg")  # nopep8
+        configurator.add_view(self.sized_preview_jpg, route_name="sized_preview_jpg")
         # get jpg preview for revision
         configurator.add_route(
             "sized_preview_jpg_revision",
-            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",
             request_method="GET",
         )
         configurator.add_view(
             self.sized_preview_jpg_revision, route_name="sized_preview_jpg_revision"
-        )  # nopep8
+        )
         # get full pdf preview for revision
         configurator.add_route(
             "preview_pdf_full_revision",
-            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}",
             request_method="GET",
         )
         configurator.add_view(
             self.preview_pdf_full_revision, route_name="preview_pdf_full_revision"
-        )  # nopep8
+        )
         # get pdf preview for revision
         configurator.add_route(
             "preview_pdf_revision",
-            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}",
             request_method="GET",
         )
         configurator.add_view(
             self.preview_pdf_revision, route_name="preview_pdf_revision"
-        )  # nopep8
+        )
         # others #
         # get file revisions
         configurator.add_route(
             "file_revisions",
-            "/workspaces/{workspace_id}/files/{content_id}/revisions",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/revisions",
             request_method="GET",
         )
-        configurator.add_view(self.get_file_revisions, route_name="file_revisions")  # nopep8
+        configurator.add_view(self.get_file_revisions, route_name="file_revisions")
 
         # get file status
         configurator.add_route(
             "set_file_status",
-            "/workspaces/{workspace_id}/files/{content_id}/status",  # nopep8
+            "/workspaces/{workspace_id}/files/{content_id}/status",
             request_method="PUT",
         )
-        configurator.add_view(self.set_file_status, route_name="set_file_status")  # nopep8
+        configurator.add_view(self.set_file_status, route_name="set_file_status")

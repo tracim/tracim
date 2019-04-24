@@ -132,7 +132,7 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAut
         if not isinstance(request.unauthenticated_userid, int):
             request.session.delete()
             return None
-        user = self._get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)  # nopep8
+        user = self._get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:
             request.session.delete()
@@ -142,11 +142,11 @@ class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAut
             now = datetime.datetime.now()
             last_access_datetime = datetime.datetime.utcfromtimestamp(
                 request.session.last_accessed
-            )  # nopep8
+            )
             reissue_limit = last_access_datetime + datetime.timedelta(
                 seconds=self._reissue_time
-            )  # nopep8
-            if now > reissue_limit:  # nopep8
+            )
+            if now > reissue_limit:
                 request.session.regenerate_id()
         return user.user_id
 

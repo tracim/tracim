@@ -36,7 +36,7 @@ class TestMailNotifyDaemon(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -62,11 +62,11 @@ class TestMailNotifyDaemon(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
+        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Open)"
         assert headers["References"][0] == "test_user_refs+22@localhost"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
-        )  # nopep8
+        )

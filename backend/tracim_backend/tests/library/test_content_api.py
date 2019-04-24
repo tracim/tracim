@@ -17,7 +17,7 @@ from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name  # nopep8
+from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import RoleApi
@@ -175,7 +175,7 @@ class TestContentApi(DefaultTest):
         allowed_content_dict = {
             content_type_list.Folder.slug: True,
             content_type_list.File.slug: False,
-        }  # nopep8
+        }
         api._set_allowed_content(folder, allowed_content_dict=allowed_content_dict)
         api.save(content=folder)
         # not in list -> do not allow
@@ -272,7 +272,7 @@ class TestContentApi(DefaultTest):
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        assert api._is_filename_available("test", workspace, parent=None) == True  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -282,7 +282,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is False  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) is False
         content = Content()
         content.label = "test"
         content.owner = user
@@ -292,7 +292,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) is False  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) is False
 
     def test_unit__is_filename_available__ok__different_workspace(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -311,7 +311,7 @@ class TestContentApi(DefaultTest):
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace2", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        assert api._is_filename_available("test", workspace, parent=None) == True  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -321,7 +321,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == True  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == True
 
     def test_unit__is_filename_available__ok__different_parent(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -356,7 +356,7 @@ class TestContentApi(DefaultTest):
         folder2.type = content_type_list.Folder.slug
         folder2.revision_type = ActionDescription.CREATION
         self.session.add(folder)
-        assert api._is_filename_available("test", workspace, parent=None) == True  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -366,7 +366,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == True  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -376,7 +376,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == True  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -386,7 +386,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == False  # nopep8
+        assert api._is_filename_available("test", workspace, parent=None) == False
 
     def test_unit__set_allowed_content__ok__private_method(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -412,7 +412,7 @@ class TestContentApi(DefaultTest):
         allowed_content_dict = {
             content_type_list.Folder.slug: True,
             content_type_list.File.slug: False,
-        }  # nopep8
+        }
         api._set_allowed_content(folder, allowed_content_dict=allowed_content_dict)
         assert "allowed_content" in folder.properties
         assert folder.properties["allowed_content"] == {
@@ -444,7 +444,7 @@ class TestContentApi(DefaultTest):
         allowed_content_type_slug_list = [
             content_type_list.Folder.slug,
             content_type_list.File.slug,
-        ]  # nopep8
+        ]
         api.set_allowed_content(
             folder, allowed_content_type_slug_list=allowed_content_type_slug_list
         )
@@ -478,7 +478,7 @@ class TestContentApi(DefaultTest):
         allowed_content_type_slug_list = [
             content_type_list.Folder.slug,
             content_type_list.File.slug,
-        ]  # nopep8
+        ]
         api.set_allowed_content(
             folder, allowed_content_type_slug_list=allowed_content_type_slug_list
         )
@@ -486,14 +486,14 @@ class TestContentApi(DefaultTest):
         assert folder.properties["allowed_content"] == {
             content_type_list.Folder.slug: True,
             content_type_list.File.slug: True,
-        }  # nopep8
+        }
         api.restore_content_default_allowed_content(folder)
         assert "allowed_content" in folder.properties
         assert folder.properties[
             "allowed_content"
         ] == content_type_list.default_allowed_content_properties(
             folder.type
-        )  # nopep8
+        )
 
     def test_unit__get_allowed_content_type__ok__html_document(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -554,7 +554,7 @@ class TestContentApi(DefaultTest):
             label="plop",
             do_save=False,
         )
-        allowed_content_type_slug_list = [content_type_list.Folder.slug]  # nopep8
+        allowed_content_type_slug_list = [content_type_list.Folder.slug]
         api.set_allowed_content(
             folder, allowed_content_type_slug_list=allowed_content_type_slug_list
         )
@@ -583,7 +583,7 @@ class TestContentApi(DefaultTest):
             label="plop",
             do_save=False,
         )
-        allowed_content_type_slug_list = [content_type_list.Folder.slug]  # nopep8
+        allowed_content_type_slug_list = [content_type_list.Folder.slug]
         api.set_allowed_content(
             folder, allowed_content_type_slug_list=allowed_content_type_slug_list
         )
@@ -977,7 +977,7 @@ class TestContentApi(DefaultTest):
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace2.workspace_id
-        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
         assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
@@ -1075,7 +1075,7 @@ class TestContentApi(DefaultTest):
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace2.workspace_id
-        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
         assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == text_file.label
         assert text_file_copy.type == text_file.type
@@ -1127,7 +1127,7 @@ class TestContentApi(DefaultTest):
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace.workspace_id
-        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
         assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
@@ -2300,14 +2300,14 @@ class TestContentApi(DefaultTest):
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
-        )  # nopep8
+        )
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )  # nopep8
+        )
         # creation order test
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )  # nopep8
+        )
         secondly_created = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2315,11 +2315,11 @@ class TestContentApi(DefaultTest):
             "another creation_order_test",
             "",
             True,
-        )  # nopep8
+        )
         # update order test
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )  # nopep8
+        )
         secondly_created_but_not_updated = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2327,7 +2327,7 @@ class TestContentApi(DefaultTest):
             "another update_order_test",
             "",
             True,
-        )  # nopep8
+        )
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2343,7 +2343,7 @@ class TestContentApi(DefaultTest):
             "this is randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         secondly_created_but_not_commented = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2351,10 +2351,10 @@ class TestContentApi(DefaultTest):
             "this is another randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         comments = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )  # nopep8
+        )
 
         content_workspace_2 = api.create(
             content_type_list.Page.slug,
@@ -2363,7 +2363,7 @@ class TestContentApi(DefaultTest):
             "content_workspace_2",
             "",
             True,
-        )  # nopep8
+        )
         last_actives = api.get_last_active()
         assert len(last_actives) == 9
         # workspace_2 content
@@ -2410,19 +2410,19 @@ class TestContentApi(DefaultTest):
         )
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )  # nopep8
+        )
         archived = api.create(
             content_type_list.Page.slug, workspace, main_folder, "archived", "", True
-        )  # nopep8
+        )
         deleted = api.create(
             content_type_list.Page.slug, workspace, main_folder, "deleted", "", True
-        )  # nopep8
+        )
         comment_archived = api.create_comment(
             workspace, parent=archived, content="just a comment", do_save=True
-        )  # nopep8
+        )
         comment_deleted = api.create_comment(
             workspace, parent=deleted, content="just a comment", do_save=True
-        )  # nopep8
+        )
         with new_revision(session=self.session, tm=transaction.manager, content=archived):
             api.archive(archived)
             api.save(archived)
@@ -2432,10 +2432,10 @@ class TestContentApi(DefaultTest):
             api.save(deleted)
         normal = api.create(
             content_type_list.Page.slug, workspace, main_folder, "normal", "", True
-        )  # nopep8
+        )
         comment_normal = api.create_comment(
             workspace, parent=normal, content="just a comment", do_save=True
-        )  # nopep8
+        )
 
         last_actives = api.get_last_active()
         assert len(last_actives) == 2
@@ -2484,11 +2484,11 @@ class TestContentApi(DefaultTest):
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )  # nopep8
+        )
         # creation order test
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )  # nopep8
+        )
         secondly_created = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2496,11 +2496,11 @@ class TestContentApi(DefaultTest):
             "another creation_order_test",
             "",
             True,
-        )  # nopep8
+        )
         # update order test
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )  # nopep8
+        )
         secondly_created_but_not_updated = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2508,7 +2508,7 @@ class TestContentApi(DefaultTest):
             "another update_order_test",
             "",
             True,
-        )  # nopep8
+        )
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2524,7 +2524,7 @@ class TestContentApi(DefaultTest):
             "this is randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         secondly_created_but_not_commented = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2532,10 +2532,10 @@ class TestContentApi(DefaultTest):
             "this is another randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         comments = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )  # nopep8
+        )
 
         last_actives = api.get_last_active(workspace=workspace)
         assert len(last_actives) == 7
@@ -2569,11 +2569,11 @@ class TestContentApi(DefaultTest):
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )  # nopep8
+        )
         # creation order test
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )  # nopep8
+        )
         secondly_created = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2581,11 +2581,11 @@ class TestContentApi(DefaultTest):
             "another creation_order_test",
             "",
             True,
-        )  # nopep8
+        )
         # update order test
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )  # nopep8
+        )
         secondly_created_but_not_updated = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2593,7 +2593,7 @@ class TestContentApi(DefaultTest):
             "another update_order_test",
             "",
             True,
-        )  # nopep8
+        )
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2609,7 +2609,7 @@ class TestContentApi(DefaultTest):
             "this is randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         secondly_created_but_not_commented = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2617,10 +2617,10 @@ class TestContentApi(DefaultTest):
             "this is another randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         comments = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )  # nopep8
+        )
 
         selected_contents = [
             firstly_created_but_recently_commented,
@@ -2646,7 +2646,7 @@ class TestContentApi(DefaultTest):
 
     def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(
         self
-    ):  # nopep8
+    ):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
         groups = [
@@ -2663,11 +2663,11 @@ class TestContentApi(DefaultTest):
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )  # nopep8
+        )
         # creation order test
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )  # nopep8
+        )
         secondly_created = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2675,11 +2675,11 @@ class TestContentApi(DefaultTest):
             "another creation_order_test",
             "",
             True,
-        )  # nopep8
+        )
         # update order test
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )  # nopep8
+        )
         secondly_created_but_not_updated = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2687,7 +2687,7 @@ class TestContentApi(DefaultTest):
             "another update_order_test",
             "",
             True,
-        )  # nopep8
+        )
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2703,7 +2703,7 @@ class TestContentApi(DefaultTest):
             "this is randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         secondly_created_but_not_commented = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2711,12 +2711,12 @@ class TestContentApi(DefaultTest):
             "this is another randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         comments = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )  # nopep8
+        )
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2)  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2)
         assert len(last_actives) == 2
         # comment is newest than page2
         assert last_actives[0] == firstly_created_but_recently_commented
@@ -2724,7 +2724,7 @@ class TestContentApi(DefaultTest):
 
         last_actives = api.get_last_active(
             workspace=workspace, limit=2, before_content=last_actives[1]
-        )  # nopep8
+        )
         assert len(last_actives) == 2
         # last updated content is newer than other one despite creation
         # of the other is more recent
@@ -2733,7 +2733,7 @@ class TestContentApi(DefaultTest):
 
         last_actives = api.get_last_active(
             workspace=workspace, limit=2, before_content=last_actives[1]
-        )  # nopep8
+        )
         assert len(last_actives) == 2
         # creation order is inverted here as last created is last active
         assert last_actives[0] == secondly_created
@@ -2741,7 +2741,7 @@ class TestContentApi(DefaultTest):
 
         last_actives = api.get_last_active(
             workspace=workspace, limit=2, before_content=last_actives[1]
-        )  # nopep8
+        )
         assert len(last_actives) == 1
         # folder subcontent modification does not change folder order
         assert last_actives[0] == main_folder
@@ -2765,11 +2765,11 @@ class TestContentApi(DefaultTest):
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )  # nopep8
+        )
         # creation order test
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )  # nopep8
+        )
         secondly_created = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2777,11 +2777,11 @@ class TestContentApi(DefaultTest):
             "another creation_order_test",
             "",
             True,
-        )  # nopep8
+        )
         # update order test
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )  # nopep8
+        )
         secondly_created_but_not_updated = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2789,7 +2789,7 @@ class TestContentApi(DefaultTest):
             "another update_order_test",
             "",
             True,
-        )  # nopep8
+        )
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2805,7 +2805,7 @@ class TestContentApi(DefaultTest):
             "this is randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         secondly_created_but_not_commented = api.create(
             content_type_list.Page.slug,
             workspace,
@@ -2813,10 +2813,10 @@ class TestContentApi(DefaultTest):
             "this is another randomized label content",
             "",
             True,
-        )  # nopep8
+        )
         comments = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )  # nopep8
+        )
 
         last_actives = api.get_last_active(workspace=workspace2)
         assert len(last_actives) == 0
@@ -2988,7 +2988,7 @@ class TestContentApi(DefaultTest):
         eq_(True, id1 in [o.content_id for o in res.all()])
         eq_(True, id2 in [o.content_id for o in res.all()])
 
-    def test_unit__search_exclude_content_under_deleted_or_archived_parents__ok(self):  # nopep8
+    def test_unit__search_exclude_content_under_deleted_or_archived_parents__ok(self):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         workspace = self._create_workspace_and_test("workspace_1", admin)
         folder_1 = self._create_content_and_test(

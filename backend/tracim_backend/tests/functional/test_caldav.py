@@ -61,7 +61,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get("/agenda/user/{}/".format(user.user_id), status=404)
@@ -91,7 +91,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get(
@@ -129,14 +129,14 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test@test.test",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get("/agenda/user/{}/".format(user2.user_id), status=403)
@@ -154,14 +154,14 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get(
@@ -193,11 +193,11 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get(
@@ -221,22 +221,22 @@ class TestAgendaApi(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("wp1", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        workspace2 = workspace_api.create_workspace("wp2", save_now=True)  # nopep8
+        workspace2 = workspace_api.create_workspace("wp2", save_now=True)
         workspace2.agenda_enabled = True
-        workspace3 = workspace_api.create_workspace("wp3", save_now=True)  # nopep8
+        workspace3 = workspace_api.create_workspace("wp3", save_now=True)
         workspace3.agenda_enabled = False
-        secret_workspace = workspace_api.create_workspace("secret", save_now=True)  # nopep8
+        secret_workspace = workspace_api.create_workspace("secret", save_now=True)
         secret_workspace.agenda_enabled = True
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)  # nopep8
-        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)
+        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get("/api/v2/users/{}/agenda".format(user.user_id), status=200)
@@ -268,20 +268,20 @@ class TestAgendaApi(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("wp1", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        workspace2 = workspace_api.create_workspace("wp2", save_now=True)  # nopep8
+        workspace2 = workspace_api.create_workspace("wp2", save_now=True)
         workspace2.agenda_enabled = True
-        workspace3 = workspace_api.create_workspace("wp3", save_now=True)  # nopep8
+        workspace3 = workspace_api.create_workspace("wp3", save_now=True)
         workspace3.agenda_enabled = True
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)  # nopep8
-        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)
+        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {

@@ -158,7 +158,7 @@ class TestCommands(CommandFunctionalTest):
 
     def test_func__user_create_command__err__with_email_notification_disabled(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Test User creation with email with notification disable
         """

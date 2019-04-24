@@ -87,7 +87,7 @@ class FileCreationFormSchema(marshmallow.Schema):
     )
 
     @post_load
-    def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return FileCreation(**data)
 
 
@@ -164,7 +164,7 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
     )
 
     @post_load
-    def create_set_email_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def create_set_email_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetEmail(**data)
 
 
@@ -173,7 +173,7 @@ class SetPasswordSchema(LoggedInUserPasswordSchema):
     new_password2 = String(example="8QLa$<w", required=True, validate=user_password_validator)
 
     @post_load
-    def create_set_password_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def create_set_password_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetPassword(**data)
 
 
@@ -199,7 +199,7 @@ class SetUserInfoSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_user_info_object(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def create_user_info_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return UserInfos(**data)
 
 
@@ -426,7 +426,7 @@ class KnownMemberQuerySchema(marshmallow.Schema):
     exclude_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,4",
-        description="comma separated list of excluded workspace: user of this workspace are excluded from result",  # nopep8
+        description="comma separated list of excluded workspace: user of this workspace are excluded from result",
     )
 
     @post_load
@@ -654,7 +654,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
         return WorkspaceUpdate(**data)
 
 
@@ -681,7 +681,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
     )
     fa_icon = StrippedString(
         example="file-text-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon",  # nopep8
+        description="CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon",
     )
     hexcolor = StrippedString(example="#F0F9DC", description="Hexadecimal color of the entry.")
 
@@ -741,10 +741,10 @@ class TimezoneSchema(marshmallow.Schema):
 
 
 class AboutSchema(marshmallow.Schema):
-    name = StrippedString(example="Tracim", description="Software name")  # nopep8
+    name = StrippedString(example="Tracim", description="Software name")
     version = StrippedString(
         example="2.0", allow_none=True, description="Version of Tracim"
-    )  # nopep8
+    )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL(allow_none=True)
 
@@ -764,11 +764,11 @@ class ApplicationSchema(marshmallow.Schema):
     slug = StrippedString(example="agenda")
     fa_icon = StrippedString(
         example="file-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",  # nopep8
+        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",
     )
     hexcolor = StrippedString(
         example="#FF0000",
-        description="HTML encoded color associated to the application. Example:#FF0000 for red",  # nopep8
+        description="HTML encoded color associated to the application. Example:#FF0000 for red",
     )
     is_active = marshmallow.fields.Boolean(
         example=True, description="if true, the application is in use in the context"
@@ -783,7 +783,7 @@ class StatusSchema(marshmallow.Schema):
     slug = StrippedString(
         example="open",
         description="the slug represents the type of status. "
-        "Statuses are open, closed-validated, closed-invalidated, closed-deprecated",  # nopep8
+        "Statuses are open, closed-validated, closed-invalidated, closed-deprecated",
     )
     global_status = StrippedString(
         example="open",
@@ -799,11 +799,11 @@ class ContentTypeSchema(marshmallow.Schema):
     slug = StrippedString(example="pagehtml", validate=all_content_types_validator)
     fa_icon = StrippedString(
         example="fa-file-text-o",
-        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",  # nopep8
+        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",
     )
     hexcolor = StrippedString(
         example="#FF0000",
-        description="HTML encoded color associated to the application. Example:#FF0000 for red",  # nopep8
+        description="HTML encoded color associated to the application. Example:#FF0000 for red",
     )
     label = StrippedString(example="Text Documents")
     creation_label = StrippedString(example="Write a document")
@@ -855,7 +855,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentCreation(**data)
 
 
@@ -921,7 +921,7 @@ class ContentSchema(ContentDigestSchema):
 class TextBasedDataAbstractSchema(marshmallow.Schema):
     raw_content = StrippedString(
         required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",  # nopep8
+        description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
 
@@ -1014,13 +1014,13 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
 
 class TextBasedContentModifySchema(
     ContentModifyAbstractSchema, TextBasedDataAbstractSchema
-):  # nopep8
+):
     @post_load
-    def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return TextBasedContentUpdate(**data)
 
 
-class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep8
+class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
         description="list of content types allowed as sub contents. "
@@ -1030,7 +1030,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
     )
 
     @post_load
-    def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:  # nopep8
+    def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return FolderContentUpdate(**data)
 
 

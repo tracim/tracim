@@ -45,21 +45,21 @@ from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
-from tracim_backend.views.contents_api.comment_controller import CommentController  # nopep8
+from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
-from tracim_backend.views.contents_api.folder_controller import FolderController  # nopep8
+from tracim_backend.views.contents_api.folder_controller import FolderController
 from tracim_backend.views.contents_api.html_document_controller import (
-    HTMLDocumentController  # nopep8,
+    HTMLDocumentController
 )
-from tracim_backend.views.contents_api.threads_controller import ThreadController  # nopep8
+from tracim_backend.views.contents_api.threads_controller import ThreadController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import (
-    ResetPasswordController  # nopep8,
+    ResetPasswordController
 )
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
 from tracim_backend.views.core_api.user_controller import UserController
-from tracim_backend.views.core_api.workspace_controller import WorkspaceController  # nopep8
+from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
 
@@ -67,8 +67,6 @@ try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
-
-
 
 
 def web(global_config, **local_settings):
@@ -92,7 +90,7 @@ def web(global_config, **local_settings):
             )
         )
     policies.append(
-        CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)  # nopep8
+        CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
     )
     if app_config.API__KEY:
         policies.append(
@@ -150,9 +148,9 @@ def web(global_config, **local_settings):
     # Not found
     context.handle_exception(PageNotFound, HTTPStatus.NOT_FOUND)
     # Bad request
-    context.handle_exception(WorkspaceNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
-    context.handle_exception(UserNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
-    context.handle_exception(ContentNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
+    context.handle_exception(WorkspaceNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(UserNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ContentNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)
     context.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
@@ -166,7 +164,7 @@ def web(global_config, **local_settings):
     context.handle_exception(UserGivenIsNotTheSameAsAuthenticated, HTTPStatus.FORBIDDEN)
     context.handle_exception(UserAuthenticatedIsNotActive, HTTPStatus.FORBIDDEN)
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
-    context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
+    context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     context.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     # Internal server error
     context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
@@ -188,10 +186,10 @@ def web(global_config, **local_settings):
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(account_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)  # nopep8
+    configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8
+    configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
@@ -219,7 +217,7 @@ def web(global_config, **local_settings):
 
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
-        frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)  # nopep8
+        frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
         configurator.include(frontend_controller.bind)
 
     hapic.add_documentation_view("/api/v2/doc", "Tracim v2 API", "API of Tracim v2")

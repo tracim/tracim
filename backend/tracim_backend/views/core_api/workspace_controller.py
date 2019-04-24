@@ -81,13 +81,13 @@ SWAGGER_TAG__WORKSPACE_ENDPOINTS = "Workspaces"
 SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__WORKSPACE_MEMBERS_SECTION
 )
-SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 )
-SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__ALL_SECTION, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 )
-SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS,
     SWAGGER_TAG__ALL_SECTION,
     SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION,
@@ -131,7 +131,7 @@ class WorkspaceController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
     @hapic.output_body(WorkspaceSchema())
-    def update_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def update_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Update a workspace. This route is for trusted users and administrators.
         Note : a trusted user can only update spaces on which he/she is space manager
@@ -156,7 +156,7 @@ class WorkspaceController(Controller):
     @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())
     @hapic.output_body(WorkspaceSchema())
-    def create_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def create_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Create a workspace. This route is for trusted users and administrators.
         """
@@ -177,8 +177,8 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @check_right(can_delete_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def delete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def delete_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Delete a workspace. This route is for trusted users and administrators.
         Note : a trusted user can only delete spaces on which he/she is space manager
@@ -194,8 +194,8 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @check_right(can_delete_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def undelete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def undelete_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Restore a deleted space.
         Note : a trusted user can only restore spaces on which he/she is space manager
@@ -276,9 +276,9 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_modify_workspace)
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(UserCantRemoveHisOwnRoleInWorkspace, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_workspaces_members_role(
         self, context, request: TracimRequest, hapic_data=None
     ) -> None:
@@ -331,9 +331,9 @@ class WorkspaceController(Controller):
                 public_name=hapic_data.body.user_public_name,
             )
             if user.is_deleted:
-                raise UserIsDeleted("This user has been deleted. Unable to invite him.")  # nopep8
+                raise UserIsDeleted("This user has been deleted. Unable to invite him.")
             if not user.is_active:
-                raise UserIsNotActive("This user is not activated. Unable to invite him")  # nopep8
+                raise UserIsNotActive("This user is not activated. Unable to invite him")
         except UserDoesNotExist as exc:
             if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
                 raise exc
@@ -364,7 +364,7 @@ class WorkspaceController(Controller):
         role = rapi.create_one(
             user=user,
             workspace=request.current_workspace,
-            role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
+            role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
             with_notif=app_config.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION,
             flush=True,
         )
@@ -435,7 +435,7 @@ class WorkspaceController(Controller):
             try:
                 parent = api.get_one(
                     content_id=creation_data.parent_id, content_type=content_type_list.Any_SLUG
-                )  # nopep8
+                )
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(creation_data.parent_id)
@@ -453,7 +453,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
     def get_content_from_workspace(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Convenient route allowing to get detail about a content without to known routes associated to its content type.
@@ -474,7 +474,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.input_path(ContentIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
     def get_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Convenient route allowing to get detail about a content without to known routes associated to its content type.
@@ -537,10 +537,10 @@ class WorkspaceController(Controller):
         updated_content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         return api.get_content_in_context(updated_content)
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])  # nopep8
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])
     @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Move a content to the trash. After that, the content will be invisible by default.
@@ -561,10 +561,10 @@ class WorkspaceController(Controller):
             api.delete(content)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])  # nopep8
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])
     @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def undelete_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Restore a content from the trash. The content will be visible and editable again.
@@ -583,10 +583,10 @@ class WorkspaceController(Controller):
             api.undelete(content)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])  # nopep8
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])
     @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def archive_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Archives a content. The content will be invisible but still available.
@@ -606,15 +606,15 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(
             path_data.content_id, content_type=content_type_list.Any_SLUG
-        )  # nopep8
+        )
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.archive(content)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])  # nopep8
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])
     @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def unarchive_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Restore a content from archive. The content will be visible and editable again.
@@ -640,125 +640,125 @@ class WorkspaceController(Controller):
         """
 
         # Workspaces
-        configurator.add_route("workspaces", "/workspaces", request_method="GET")  # nopep8
+        configurator.add_route("workspaces", "/workspaces", request_method="GET")
         configurator.add_view(self.workspaces, route_name="workspaces")
         # Workspace
         configurator.add_route(
             "workspace", "/workspaces/{workspace_id}", request_method="GET"
-        )  # nopep8
+        )
         configurator.add_view(self.workspace, route_name="workspace")
         # Create workspace
-        configurator.add_route("create_workspace", "/workspaces", request_method="POST")  # nopep8
-        configurator.add_view(self.create_workspace, route_name="create_workspace")  # nopep8
+        configurator.add_route("create_workspace", "/workspaces", request_method="POST")
+        configurator.add_view(self.create_workspace, route_name="create_workspace")
         # Delete/Undelete workpace
         configurator.add_route(
             "delete_workspace", "/workspaces/{workspace_id}/trashed", request_method="PUT"
-        )  # nopep8
-        configurator.add_view(self.delete_workspace, route_name="delete_workspace")  # nopep8
+        )
+        configurator.add_view(self.delete_workspace, route_name="delete_workspace")
         configurator.add_route(
             "undelete_workspace", "/workspaces/{workspace_id}/trashed/restore", request_method="PUT"
-        )  # nopep8
-        configurator.add_view(self.undelete_workspace, route_name="undelete_workspace")  # nopep8
+        )
+        configurator.add_view(self.undelete_workspace, route_name="undelete_workspace")
         # Update Workspace
         configurator.add_route(
             "update_workspace", "/workspaces/{workspace_id}", request_method="PUT"
-        )  # nopep8
-        configurator.add_view(self.update_workspace, route_name="update_workspace")  # nopep8
+        )
+        configurator.add_view(self.update_workspace, route_name="update_workspace")
         # Workspace Members (Roles)
         configurator.add_route(
             "workspace_members", "/workspaces/{workspace_id}/members", request_method="GET"
-        )  # nopep8
-        configurator.add_view(self.workspaces_members, route_name="workspace_members")  # nopep8
+        )
+        configurator.add_view(self.workspaces_members, route_name="workspace_members")
         # Workspace Members (Role) Individual
         configurator.add_route(
             "workspace_member_role",
             "/workspaces/{workspace_id}/members/{user_id}",
             request_method="GET",
-        )  # nopep8
+        )
         configurator.add_view(
             self.workspaces_member_role, route_name="workspace_member_role"
-        )  # nopep8
+        )
         # Update Workspace Members roles
         configurator.add_route(
             "update_workspace_member",
             "/workspaces/{workspace_id}/members/{user_id}",
             request_method="PUT",
-        )  # nopep8
+        )
         configurator.add_view(
             self.update_workspaces_members_role, route_name="update_workspace_member"
-        )  # nopep8
+        )
         # Create Workspace Members roles
         configurator.add_route(
             "create_workspace_member", "/workspaces/{workspace_id}/members", request_method="POST"
-        )  # nopep8
+        )
         configurator.add_view(
             self.create_workspaces_members_role, route_name="create_workspace_member"
-        )  # nopep8
+        )
         # Delete Workspace Members roles
         configurator.add_route(
             "delete_workspace_member",
             "/workspaces/{workspace_id}/members/{user_id}",
             request_method="DELETE",
-        )  # nopep8
+        )
         configurator.add_view(
             self.delete_workspaces_members_role, route_name="delete_workspace_member"
-        )  # nopep8
+        )
         # Workspace Content
         configurator.add_route(
             "workspace_content", "/workspaces/{workspace_id}/contents", request_method="GET"
-        )  # nopep8
-        configurator.add_view(self.workspace_content, route_name="workspace_content")  # nopep8
+        )
+        configurator.add_view(self.workspace_content, route_name="workspace_content")
         # Create Generic Content
         configurator.add_route(
             "create_generic_content", "/workspaces/{workspace_id}/contents", request_method="POST"
-        )  # nopep8
+        )
         configurator.add_view(
             self.create_generic_empty_content, route_name="create_generic_content"
-        )  # nopep8
+        )
         # Get Content
         configurator.add_route(
             "get_content", "/contents/{content_id}", request_method="GET"
-        )  # nopep8
+        )
         configurator.add_view(self.get_content, route_name="get_content")
         # Get Content From workspace
         configurator.add_route(
             "get_content_from_workspace",
             "/workspaces/{workspace_id}/contents/{content_id}",
             request_method="GET",
-        )  # nopep8
+        )
         configurator.add_view(
             self.get_content_from_workspace, route_name="get_content_from_workspace"
-        )  # nopep8
+        )
         # Move Content
         configurator.add_route(
             "move_content",
             "/workspaces/{workspace_id}/contents/{content_id}/move",
             request_method="PUT",
-        )  # nopep8
-        configurator.add_view(self.move_content, route_name="move_content")  # nopep8
+        )
+        configurator.add_view(self.move_content, route_name="move_content")
         # Delete/Undelete Content
         configurator.add_route(
             "delete_content",
             "/workspaces/{workspace_id}/contents/{content_id}/trashed",
             request_method="PUT",
-        )  # nopep8
-        configurator.add_view(self.delete_content, route_name="delete_content")  # nopep8
+        )
+        configurator.add_view(self.delete_content, route_name="delete_content")
         configurator.add_route(
             "undelete_content",
             "/workspaces/{workspace_id}/contents/{content_id}/trashed/restore",
             request_method="PUT",
-        )  # nopep8
-        configurator.add_view(self.undelete_content, route_name="undelete_content")  # nopep8
+        )
+        configurator.add_view(self.undelete_content, route_name="undelete_content")
         # # Archive/Unarchive Content
         configurator.add_route(
             "archive_content",
             "/workspaces/{workspace_id}/contents/{content_id}/archived",
             request_method="PUT",
-        )  # nopep8
-        configurator.add_view(self.archive_content, route_name="archive_content")  # nopep8
+        )
+        configurator.add_view(self.archive_content, route_name="archive_content")
         configurator.add_route(
             "unarchive_content",
             "/workspaces/{workspace_id}/contents/{content_id}/archived/restore",
             request_method="PUT",
-        )  # nopep8
-        configurator.add_view(self.unarchive_content, route_name="unarchive_content")  # nopep8
+        )
+        configurator.add_view(self.unarchive_content, route_name="unarchive_content")

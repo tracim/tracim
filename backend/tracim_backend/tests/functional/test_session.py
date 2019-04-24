@@ -75,7 +75,7 @@ class TestLoginEndpoint(FunctionalTest):
         res = self.testapp.post_json("/api/v2/auth/login", status=403, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
@@ -93,7 +93,7 @@ class TestLoginEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
@@ -140,27 +140,27 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
             assert res.json_body["avatar_url"] is None
             assert res.json_body["auth_type"] == "ldap"
 
-    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self):  # nopep8
+    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self):
         params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
         res = self.testapp.post_json("/api/v2/auth/login", params=params, status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__try_login_enpoint_ldap_auth__err_403__unvalid_user(self):  # nopep8
+    def test_api__try_login_enpoint_ldap_auth__err_403__unvalid_user(self):
         params = {"email": "unknown@unknown.unknown", "password": "unknown@unknown.unknown"}
         res = self.testapp.post_json("/api/v2/auth/login", params=params, status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__ok__200__valid_ldap_user(self):  # nopep8
+    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__ok__200__valid_ldap_user(self):
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -201,11 +201,11 @@ class TestLDAPAuthOnlyEndpoint(FunctionalTest):
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(
         self
-    ):  # nopep8
+    ):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/auth/whoami", status=401)
 
-    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__unvalid_user(self):  # nopep8
+    def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__unvalid_user(self):
         self.testapp.authorization = (
             "Basic",
             ("unknown@unknown.unknown", "unknown@unknown.unknown"),
@@ -257,7 +257,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
 
     def test_api__try_login_enpoint_ldap_internal_auth__ok__200__valid_internal_db_user(
         self
-    ):  # nopep8
+    ):
         params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
         res = self.testapp.post_json("/api/v2/auth/login", params=params, status=200)
         assert res.json_body["created"]
@@ -270,19 +270,19 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
         assert res.json_body["avatar_url"] is None
         assert res.json_body["auth_type"] == "internal"
 
-    def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(self):  # nopep8
+    def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(self):
         params = {"email": "unknown@unknown.unknown", "password": "unknown@unknown.unknown"}
         res = self.testapp.post_json("/api/v2/auth/login", params=params, status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body["code"] == ErrorCode.AUTHENTICATION_FAILED
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_ldap_user(
         self
-    ):  # nopep8
+    ):
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -323,7 +323,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_internal_db_user(
         self
-    ):  # nopep8
+    ):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/auth/whoami", status=200)
         assert res.json_body["public_name"] == "Global manager"
@@ -338,7 +338,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(FunctionalTest):
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__err__403__unvalid_user(
         self
-    ):  # nopep8
+    ):
         self.testapp.authorization = (
             "Basic",
             ("unknown@unknown.unknown", "unknown@unknown.unknown"),
@@ -559,7 +559,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             res = self.testapp.get("/api/v2/auth/whoami", params=params, status=401)
             assert "Set-Cookie" in res.headers
 
-    def test_api__test_cookie_auth_token__ok__change_email_dont_break_cookie(self):  # nopep8
+    def test_api__test_cookie_auth_token__ok__change_email_dont_break_cookie(self):
         """
         Test if email change doesn't break cookie auth
         :return:

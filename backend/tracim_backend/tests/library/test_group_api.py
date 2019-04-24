@@ -53,4 +53,4 @@ class TestGroupApi(DefaultTest):
         groups = api.get_all()
         assert ["users", "trusted-users", "administrators"] == [
             group.group_name for group in groups
-        ]  # nopep8
+        ]

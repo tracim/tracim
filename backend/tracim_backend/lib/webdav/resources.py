@@ -855,8 +855,8 @@ class FileResource(DAVNonCollection):
                     destination_parent = self.tracim_context.candidate_parent_content
                 except ContentNotFound:
                     destination_parent = None
-                if destination_parent != parent or destination_workspace != workspace:  # nopep8
-                    #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
+                if destination_parent != parent or destination_workspace != workspace:
+                    #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"
                     #  if the request does not result in a real move.
                     self.content_api.move(
                         item=self.content,

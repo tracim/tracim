@@ -44,7 +44,7 @@ class WorkspaceApi(object):
         default_lang = None
         if self._user:
             default_lang = self._user.lang
-        self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
+        self.translator = Translator(app_config=self._config, default_lang=default_lang)
 
     def _base_query_without_roles(self):
         query = self._session.query(Workspace)
@@ -84,7 +84,7 @@ class WorkspaceApi(object):
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
 
-        if self._session.query(Workspace).filter(Workspace.label == label).count() > 0:  # nopep8
+        if self._session.query(Workspace).filter(Workspace.label == label).count() > 0:
             raise WorkspaceLabelAlreadyUsed(
                 "A workspace with label {} already exist.".format(label)
             )
@@ -141,7 +141,7 @@ class WorkspaceApi(object):
         except NoResultFound as exc:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
-            ) from exc  # nopep8
+            ) from exc
 
     def get_one_by_label(self, label: str) -> Workspace:
         try:
@@ -149,7 +149,7 @@ class WorkspaceApi(object):
         except NoResultFound as exc:
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(id)
-            ) from exc  # nopep8
+            ) from exc
 
     """
     def get_one_for_current_user(self, id):

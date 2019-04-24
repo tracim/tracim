@@ -101,31 +101,31 @@ class SystemController(Controller):
         """
 
         # About
-        configurator.add_route("about", "/system/about", request_method="GET")  # nopep8
+        configurator.add_route("about", "/system/about", request_method="GET")
         configurator.add_view(self.about, route_name="about")
 
         # Config
-        configurator.add_route("config", "/system/config", request_method="GET")  # nopep8
+        configurator.add_route("config", "/system/config", request_method="GET")
         configurator.add_view(self.config, route_name="config")
 
         # Errors codes
-        configurator.add_route("error_codes", "/system/error_codes", request_method="GET")  # nopep8
+        configurator.add_route("error_codes", "/system/error_codes", request_method="GET")
         configurator.add_view(self.error_codes, route_name="error_codes")
 
         # Applications
         configurator.add_route(
             "applications", "/system/applications", request_method="GET"
-        )  # nopep8
+        )
         configurator.add_view(self.applications, route_name="applications")
 
         # Content_types
         configurator.add_route(
             "content_types", "/system/content_types", request_method="GET"
-        )  # nopep8
+        )
         configurator.add_view(self.content_types, route_name="content_types")
 
         # Content_types
         configurator.add_route(
             "timezones_list", "/system/timezones", request_method="GET"
-        )  # nopep8
+        )
         configurator.add_view(self.timezones_list, route_name="timezones_list")

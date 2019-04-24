@@ -51,13 +51,13 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = ApplicationApi(app_list)
@@ -81,8 +81,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             workspace_dict["sidebar_entries"][counter]["route"] = sidebar_entry.route
             workspace_dict["sidebar_entries"][counter][
                 "hexcolor"
-            ] = sidebar_entry.hexcolor  # nopep8
-            workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon  # nopep8
+            ] = sidebar_entry.hexcolor
+            workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__get_workspace__ok_200__admin_and_not_in_workspace(self) -> None:
         """
@@ -96,7 +96,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
@@ -122,8 +122,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
             workspace_dict["sidebar_entries"][counter]["route"] = sidebar_entry.route
             workspace_dict["sidebar_entries"][counter][
                 "hexcolor"
-            ] = sidebar_entry.hexcolor  # nopep8
-            workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon  # nopep8
+            ] = sidebar_entry.hexcolor
+            workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
     def test_api__update_workspace__ok_200__nominal_case(self) -> None:
         """
@@ -190,7 +190,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.put_json("/api/v2/workspaces/1", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__create_workspace__ok_200__nominal_case(self) -> None:
         """
@@ -234,7 +234,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.post_json("/api/v2/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__delete_workspace__ok_200__admin(self) -> None:
         """
@@ -252,11 +252,11 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -266,7 +266,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND  # nopep8
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
@@ -288,13 +288,13 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -320,13 +320,13 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -351,13 +351,13 @@ class TestWorkspaceEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -381,11 +381,11 @@ class TestWorkspaceEndpoint(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -412,11 +412,11 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -429,7 +429,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND  # nopep8
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
@@ -452,14 +452,14 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -487,14 +487,14 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -521,14 +521,14 @@ class TestWorkspaceEndpoint(FunctionalTest):
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -554,11 +554,11 @@ class TestWorkspaceEndpoint(FunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
@@ -596,7 +596,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__get_workspace__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_workspace__err_400__workspace_does_not_exist(self) -> None:
         """
         Check obtain workspace who does not exist with an existing user.
         """
@@ -624,9 +624,9 @@ class TestWorkspacesEndpoints(FunctionalTest):
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
         workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
-        workspace_api.create_workspace("test", save_now=True)  # nopep8
-        workspace_api.create_workspace("test2", save_now=True)  # nopep8
-        workspace_api.create_workspace("test3", save_now=True)  # nopep8
+        workspace_api.create_workspace("test", save_now=True)
+        workspace_api.create_workspace("test2", save_now=True)
+        workspace_api.create_workspace("test3", save_now=True)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/workspaces", status=200)
@@ -658,7 +658,7 @@ class TestWorkspacesEndpoints(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = self.testapp.get("/api/v2/workspaces", status=403)
@@ -694,7 +694,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list with a reachable workspace for user
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 1
         user_role = res[0]
         assert user_role["role"] == "workspace-manager"
@@ -727,11 +727,11 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        workspace = workspace_api.create_workspace("test_2", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
@@ -779,7 +779,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list with a reachable workspace for user
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/members/1", status=200).json_body  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/1/members/1", status=200).json_body
         user_role = res
         assert user_role["role"] == "workspace-manager"
         assert user_role["user_id"] == 1
@@ -810,11 +810,11 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        workspace = workspace_api.create_workspace("test_2", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
@@ -846,11 +846,11 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        workspace = workspace_api.create_workspace("test_2", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -902,7 +902,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__get_workspace_members__err_400__workspace_does_not_exist(self):  # nopep8
+    def test_api__get_workspace_members__err_400__workspace_does_not_exist(self):
         """
         Check obtain workspace members list with an existing user but
         an unexisting workspace
@@ -937,7 +937,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found["email_sent"] is False
         assert user_role_found["do_notify"] is False
 
-        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 2
         user_role = res[0]
         assert user_role["role"] == "workspace-manager"
@@ -959,7 +959,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("trusted-users")]
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        workspace = workspace_api.create_workspace("test_2", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
@@ -986,7 +986,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 1
         user_role = res[0]
         assert user_role_found["role"] == user_role["role"]
@@ -995,7 +995,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
     def test_api__create_workspace_members_role_ok_200__user_email_as_workspace_manager(
         self
-    ):  # nopep8
+    ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
         have any right
@@ -1011,11 +1011,11 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        workspace = workspace_api.create_workspace("test_2", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
@@ -1042,7 +1042,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 2
         user_role = res[0]
         assert user_role_found["role"] == user_role["role"]
@@ -1075,7 +1075,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found["email_sent"] is False
         assert user_role_found["do_notify"] is False
 
-        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 2
         user_role = res[0]
         assert user_role["role"] == "workspace-manager"
@@ -1088,7 +1088,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
     def test_api__create_workspace_member_role__err_400__user_email__user_deactivated(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1114,7 +1114,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_ACTIVE
 
-    def test_api__create_workspace_member_role__err_400__user_email__user_deleted(self):  # nopep8
+    def test_api__create_workspace_member_role__err_400__user_email__user_deleted(self):
         """
         Create workspace member role
         :return:
@@ -1162,7 +1162,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found["email_sent"] is False
         assert user_role_found["do_notify"] is False
 
-        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/1/members", status=200).json_body
         assert len(res) == 2
         user_role = res[0]
         assert user_role["role"] == "workspace-manager"
@@ -1196,7 +1196,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
     def test_api__create_workspace_member_role__err_400__nothing_and_no_notification(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1216,7 +1216,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
     def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1236,7 +1236,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
 
     def test_api__create_workspace_member_role__err_400__notification_disabled_user_not_found(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1269,21 +1269,21 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
         # before
@@ -1313,7 +1313,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
             ),
             status=200,
-        ).json_body  # nopep8
+        ).json_body
         user_role = res
         assert user_role["role"] == "content-manager"
         assert user_role["do_notify"] is False
@@ -1335,18 +1335,18 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
@@ -1379,21 +1379,21 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
         rapi.delete_one(admin.user_id, workspace.workspace_id)
         transaction.commit()
         # before
@@ -1423,7 +1423,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
             ),
             status=200,
-        ).json_body  # nopep8
+        ).json_body
         user_role = res
         assert user_role["role"] == "content-manager"
         assert user_role["do_notify"] is False
@@ -1445,13 +1445,13 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1464,7 +1464,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # after
         roles = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         for role in roles:
             assert role["user_id"] != user.user_id
 
@@ -1483,21 +1483,21 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1510,7 +1510,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # after
         roles = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         for role in roles:
             assert role["user_id"] != user2.user_id
 
@@ -1529,18 +1529,18 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         transaction.commit()
 
@@ -1555,7 +1555,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
-    def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):  # nopep8
+    def test_api__delete_workspace_member_role__err_400__workspace_manager_itself(self):
         """
         Delete worskpace member role.
         Unallow to delete himself as workspace_manager
@@ -1571,21 +1571,21 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         user2 = uapi.create_user(
             "test2@test2.test2",
             password="test2@test2.test2",
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -1597,11 +1597,11 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert (
             res.json_body["code"] == ErrorCode.USER_CANT_REMOVE_IS_OWN_ROLE_IN_WORKSPACE
-        )  # nopep8
+        )
         # after
         roles = self.testapp.get(
             "/api/v2/workspaces/{}/members".format(workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert user2.user_id in [role["user_id"] for role in roles]
 
     def test_api__delete_workspace_member_role__err_400__simple_user(self):
@@ -1619,7 +1619,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1627,14 +1627,14 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -1652,7 +1652,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             "/api/v2/workspaces/{workspace_id}/members".format(workspace_id=workspace.workspace_id),
             status=200,
         ).json_body
-        assert len([role for role in roles if role["user_id"] == user.user_id]) == 1  # nopep8
+        assert len([role for role in roles if role["user_id"] == user.user_id]) == 1
 
 
 class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
@@ -1660,7 +1660,7 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
     fixtures = [BaseFixture, ContentFixtures]
     config_section = "functional_test_with_mail_test_sync"
 
-    def test_api__create_workspace_member_role__ok_200__new_user(self):  # nopep8
+    def test_api__create_workspace_member_role__ok_200__new_user(self):
         """
         Create workspace member role
         :return:
@@ -1676,13 +1676,13 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # create workspace role
@@ -1715,13 +1715,13 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1737,13 +1737,13 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1769,7 +1769,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
     fixtures = [BaseFixture, ContentFixtures]
     config_section = "functional_test_with_mail_test_sync_with_auto_notif"
 
-    def test_api__create_workspace_member_role__ok_200__new_user_notif(self):  # nopep8
+    def test_api__create_workspace_member_role__ok_200__new_user_notif(self):
         """
         Create workspace member role
         :return:
@@ -1785,13 +1785,13 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
         self.cleanup_mailhog()
@@ -1826,7 +1826,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         response = self.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
         # check for notification to new user, user should not be notified
@@ -1863,7 +1863,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         headers = response[0]["Content"]["Headers"]
         assert (
             headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
-        )  # nopep8
+        )
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Open)"
 
@@ -1875,7 +1875,7 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
 
     def test_api__create_workspace_member_role__ok_200__new_user_but_internal_auth_disabled(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1896,7 +1896,7 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
         workspace_api = WorkspaceApi(
             current_user=user, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
         # create workspace role
@@ -1928,7 +1928,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
 
     def test_api__create_workspace_member_role__err_400__email_notif_disabe_but_invitation_notif_enabled(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1941,7 +1941,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
         # create workspace role
@@ -1970,7 +1970,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
 
     def test_api__create_workspace_member_role__ok_200__email_notif_disabe_but_invitation_notif_enabled(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -1983,7 +1983,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
         # create workspace role
@@ -2013,7 +2013,7 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
 
     def test_api__create_workspace_member_role__ok_200__email_notif_disabe_but_invitation_notif_enabled(
         self
-    ):  # nopep8
+    ):
         """
         Create workspace member role
         :return:
@@ -2026,7 +2026,7 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
         # create workspace role
@@ -2054,7 +2054,7 @@ class TestUserInvitationWithMailActivatedASync(FunctionalTest):
     fixtures = [BaseFixture, ContentFixtures]
     config_section = "functional_test_with_mail_test_async"
 
-    def test_api__create_workspace_member_role__ok_200__new_user(self):  # nopep8
+    def test_api__create_workspace_member_role__ok_200__new_user(self):
         """
         Create workspace member role
         :return:
@@ -2085,7 +2085,7 @@ class TestWorkspaceContents(FunctionalTest):
         Check obtain workspace contents with defaults filters
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200).json_body  # nopep8
+        res = self.testapp.get("/api/v2/workspaces/1/contents", status=200).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 3
         content = res[0]
@@ -2143,7 +2143,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {"content_type": "html-document"}
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 1
         content = res[0]
         assert content
@@ -2163,7 +2163,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(
         self
-    ):  # nopep8
+    ):
         """
         Check obtain workspace all root contents
         """
@@ -2172,7 +2172,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -2226,7 +2226,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -2272,7 +2272,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_all_root_and_folder_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_all_root_and_folder_content(self):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2280,7 +2280,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -2299,7 +2299,7 @@ class TestWorkspaceContents(FunctionalTest):
             and content["parent_id"] == 3
         ]
 
-    def test_api__get_workspace_content__ok_200__get_multiple_folder_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_multiple_folder_content(self):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2310,7 +2310,7 @@ class TestWorkspaceContents(FunctionalTest):
         params = {"parent_ids": "1,2", "show_archived": 1, "show_deleted": 1, "show_active": 1}
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         assert [
@@ -2332,7 +2332,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_folder_content_with_path_of_content(
         self
-    ):  # nopep8
+    ):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2366,7 +2366,7 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -2410,7 +2410,7 @@ class TestWorkspaceContents(FunctionalTest):
             and content["content_id"] == subfolder_content_id
         ]
 
-    def test_api__get_workspace_content__ok_200__get_path_of_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_path_of_content(self):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2443,7 +2443,7 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -2481,7 +2481,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_path_of_content_deleted_content(
         self
-    ):  # nopep8
+    ):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2518,7 +2518,7 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -2563,7 +2563,7 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 5
         assert [
             content
@@ -2601,7 +2601,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_path_of_content_archived_content(
         self
-    ):  # nopep8
+    ):
         """
         Check obtain workspace all root contents and all subcontent content
         """
@@ -2638,7 +2638,7 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -2683,7 +2683,7 @@ class TestWorkspaceContents(FunctionalTest):
         }
         res = self.testapp.get(
             "/api/v2/workspaces/1/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 5
         assert [
             content
@@ -2721,7 +2721,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(
         self
-    ):  # nopep8
+    ):
         """
         Check obtain workspace all root contents
         """
@@ -2735,7 +2735,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 1
         content = res[0]
@@ -2753,7 +2753,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):
         """
         Check obtain workspace root active contents
         """
@@ -2761,7 +2761,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         content = res[1]
@@ -2779,7 +2779,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):
         """
         Check obtain workspace root archived contents
         """
@@ -2787,7 +2787,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -2804,7 +2804,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):
         """
          Check obtain workspace root deleted contents
          """
@@ -2812,7 +2812,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
 
         assert len(res) == 1
@@ -2840,7 +2840,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = self.testapp.get(
             "/api/v2/workspaces/3/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
@@ -2893,7 +2893,7 @@ class TestWorkspaceContents(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_html_document):
             content_api.update_content(
                 test_html_document, "test_page", "<p>HTML_DOCUMENT</p>"
-            )  # nopep8
+            )
         dbsession.flush()
         transaction.commit()
         # test-itself
@@ -2924,7 +2924,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(
         self
-    ):  # nopep8
+    ):
         # prepare data
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -2974,7 +2974,7 @@ class TestWorkspaceContents(FunctionalTest):
         with new_revision(session=dbsession, tm=transaction.manager, content=test_html_document):
             content_api.update_content(
                 test_html_document, "test_html_page", "<p>HTML_DOCUMENT</p>"
-            )  # nopep8
+            )
             dbsession.flush()
         transaction.commit()
         # test-itself
@@ -2998,7 +2998,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"] == "test-html-page"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 1
         assert res[0]["content_id"] != res[1]["content_id"]
         assert content["modified"]
@@ -3013,7 +3013,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"] == "test-page"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 1
         assert content["modified"]
         assert content["created"]
@@ -3032,7 +3032,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 3
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3044,7 +3044,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("bad-fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 2
         assert content["modified"]
         assert content["created"]
@@ -3058,7 +3058,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 2
         assert content["modified"]
         assert content["created"]
@@ -3072,12 +3072,12 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"] == "new-fruit-salad"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 2
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):
         """
          Check obtain workspace folder active contents
          """
@@ -3085,7 +3085,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 1
         content = res[0]
         assert content["content_type"]
@@ -3097,12 +3097,12 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"] == "new-fruit-salad"
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 2
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):
         """
          Check obtain workspace folder archived contents
          """
@@ -3110,7 +3110,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -3122,12 +3122,12 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 2
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):
         """
          Check obtain workspace folder deleted contents
          """
@@ -3135,7 +3135,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
 
         assert len(res) == 1
         content = res[0]
@@ -3148,12 +3148,12 @@ class TestWorkspaceContents(FunctionalTest):
         assert content["show_in_ui"] is True
         assert content["slug"].startswith("bad-fruit-salad")
         assert content["status"] == "open"
-        assert set(content["sub_content_types"]) == {"comment"}  # nopep8
+        assert set(content["sub_content_types"]) == {"comment"}
         assert content["workspace_id"] == 2
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):  # nopep8
+    def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):
         """
         Check obtain workspace folder content who does not match any type
         (archived, deleted, active) result should be empty list.
@@ -3162,7 +3162,7 @@ class TestWorkspaceContents(FunctionalTest):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/2/contents", status=200, params=params
-        ).json_body  # nopep8
+        ).json_body
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
@@ -3193,7 +3193,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__get_workspace_content__err_400__workspace_does_not_exist(self):  # nopep8
+    def test_api__get_workspace_content__err_400__workspace_does_not_exist(self):
         """
         Check obtain workspace contents list with an existing user but
         an unexisting workspace
@@ -3206,7 +3206,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:  # nopep8
+    def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:
         """
         Create generic content as workspace root
         """
@@ -3232,18 +3232,18 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body["modified"]
         assert res.json_body["created"]
         assert res.json_body["file_extension"] == ".document.html"
-        assert res.json_body["filename"] == "GenericCreatedContent.document.html"  # nopep8
+        assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         params_active = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
     def test_api__post_content_create_generic_content__err_400__filename_already_used(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content but filename is already used here
         """
@@ -3267,14 +3267,14 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body["show_in_ui"] is True
         assert res.json_body["sub_content_types"]
         assert res.json_body["file_extension"] == ".document.html"
-        assert res.json_body["filename"] == "GenericCreatedContent.document.html"  # nopep8
+        assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         assert res.json_body["modified"]
         assert res.json_body["created"]
         params_active = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
@@ -3286,7 +3286,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content without provided parent_id param
         """
@@ -3306,18 +3306,18 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body["show_in_ui"] is True
         assert res.json_body["sub_content_types"]
         assert res.json_body["file_extension"] == ".document.html"
-        assert res.json_body["filename"] == "GenericCreatedContent.document.html"  # nopep8
+        assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         assert res.json_body["modified"]
         assert res.json_body["created"]
         params_active = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
-    def test_api__post_content_create_generic_content__err_400__parent_id_0(self) -> None:  # nopep8
+    def test_api__post_content_create_generic_content__err_400__parent_id_0(self) -> None:
         """
         Create generic content but parent_id=0
         """
@@ -3331,11 +3331,11 @@ class TestWorkspaceContents(FunctionalTest):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__post_content_create_generic_content__err_400__parent_not_found(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content but parent id is not valable
         """
@@ -3348,9 +3348,9 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.post_json("/api/v2/workspaces/1/contents", params=params, status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.PARENT_NOT_FOUND  # nopep8
+        assert res.json_body["code"] == ErrorCode.PARENT_NOT_FOUND
 
-    def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
+    def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:
         """
         Create generic content in folder
         """
@@ -3374,18 +3374,18 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body["show_in_ui"] is True
         assert res.json_body["sub_content_types"]
         assert res.json_body["file_extension"] == ".document.html"
-        assert res.json_body["filename"] == "GenericCreatedContent.document.html"  # nopep8
+        assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         assert res.json_body["modified"]
         assert res.json_body["created"]
         params_active = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         content_ids = [content["content_id"] for content in active_contents]
         assert res.json_body["content_id"] in content_ids
 
-    def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
+    def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:
         """
         Create generic content but label provided is empty
         """
@@ -3393,22 +3393,22 @@ class TestWorkspaceContents(FunctionalTest):
         params = {"label": "", "content_type": content_type_list.Page.slug}
         res = self.testapp.post_json("/api/v2/workspaces/1/contents", params=params, status=400)
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8'
+        assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR  '
 
     def test_api__post_content_create_generic_content__err_400__wrong_content_type(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content but content type is uncorrect
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "GenericCreatedContent", "content_type": "unexistent-content-type"}
         res = self.testapp.post_json("/api/v2/workspaces/1/contents", params=params, status=400)
-        assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_EXIST  # nopep8
+        assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_EXIST
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content but content_type is not allowed in this folder
         """
@@ -3443,7 +3443,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.UNALLOWED_SUBCONTENT  # nopep8
+        assert res.json_body["code"] == ErrorCode.UNALLOWED_SUBCONTENT
         # allowed_content_type
         params = {
             "label": "GenericCreatedContent",
@@ -3460,7 +3460,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__post_content_create_generic_content__err_403__try_creating_folder_as_simple_contributor(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content but content_type is not allowed in this folder
         """
@@ -3475,13 +3475,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         folder = content_api.create(
             label="test-folder",
@@ -3508,11 +3508,11 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
 
     def test_api__post_content_create_generic_content__ok_200__try_creating_folder_as_content_manager(
         self
-    ) -> None:  # nopep8
+    ) -> None:
         """
         Create generic content but content_type is not allowed in this folder
         """
@@ -3527,13 +3527,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         folder = content_api.create(
             label="test-folder",
@@ -3574,13 +3574,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         thread = content_api.create(
             label="test-thread",
@@ -3629,13 +3629,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        workspace = workspace_api.create_workspace("test", save_now=True)  # nopep8
+        workspace = workspace_api.create_workspace("test", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)  # nopep8
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         folder = content_api.create(
             label="test-folder",
@@ -3683,26 +3683,26 @@ class TestWorkspaceContents(FunctionalTest):
         params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
-        assert [content for content in folder1_contents if content["content_id"] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in folder1_contents if content["content_id"] == 8]
+        assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             "/api/v2/workspaces/2/contents/8/move", params=params, status=200
         )
         new_folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_folder1_contents if content["content_id"] == 8
-        ]  # nopep8
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]  # nopep8
+        ]
+        assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] == 4
         assert res.json_body["content_id"] == 8
@@ -3721,26 +3721,26 @@ class TestWorkspaceContents(FunctionalTest):
         params_folder2 = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
-        assert [content for content in folder1_contents if content["content_id"] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in folder1_contents if content["content_id"] == 8]
+        assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             "/api/v2/workspaces/2/contents/8/move", params=params, status=200
         )
         new_folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_folder1_contents if content["content_id"] == 8
-        ]  # nopep8
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]  # nopep8
+        ]
+        assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] is None
         assert res.json_body["content_id"] == 8
@@ -3759,26 +3759,26 @@ class TestWorkspaceContents(FunctionalTest):
         params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
-        assert [content for content in folder1_contents if content["content_id"] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in folder1_contents if content["content_id"] == 8]
+        assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             "/api/v2/workspaces/2/contents/8/move", params=params, status=200
         )
         new_folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_folder1_contents if content["content_id"] == 8
-        ]  # nopep8
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]  # nopep8
+        ]
+        assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] == 4
         assert res.json_body["content_id"] == 8
@@ -3797,26 +3797,26 @@ class TestWorkspaceContents(FunctionalTest):
         params_folder2 = {"parent_ids": 2, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         folder2_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
-        assert [content for content in folder1_contents if content["content_id"] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in folder1_contents if content["content_id"] == 8]
+        assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             "/api/v2/workspaces/2/contents/8/move", params=params, status=200
         )
         new_folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_folder1_contents if content["content_id"] == 8
-        ]  # nopep8
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]  # nopep8
+        ]
+        assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] == 2
         assert res.json_body["content_id"] == 8
@@ -3845,19 +3845,19 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
             groups=groups,
-        )  # nopep8
+        )
         workspace_api = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
         )
-        projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)  # nopep8
-        projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)  # nopep8
+        projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)
+        projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         rapi.create_one(
             user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
-        )  # nopep8
+        )
         rapi.create_one(
             user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
-        )  # nopep8
+        )
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
 
         documentation_folder = content_api.create(
@@ -3905,7 +3905,7 @@ class TestWorkspaceContents(FunctionalTest):
         # verify coherence of workspace content first.
         projectA_workspace_contents = self.testapp.get(
             "/api/v2/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert len(projectA_workspace_contents) == 4
         assert not [
             content
@@ -3914,7 +3914,7 @@ class TestWorkspaceContents(FunctionalTest):
         ]
         projectB_workspace_contents = self.testapp.get(
             "/api/v2/workspaces/{}/contents".format(projectB_workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert len(projectB_workspace_contents) == 0
         assert not [
             content
@@ -3937,7 +3937,7 @@ class TestWorkspaceContents(FunctionalTest):
         # verify coherence of workspace after
         projectA_workspace_contents = self.testapp.get(
             "/api/v2/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert len(projectA_workspace_contents) == 0
         assert not [
             content
@@ -3946,7 +3946,7 @@ class TestWorkspaceContents(FunctionalTest):
         ]
         projectB_workspace_contents = self.testapp.get(
             "/api/v2/workspaces/{}/contents".format(projectB_workspace.workspace_id), status=200
-        ).json_body  # nopep8
+        ).json_body
         assert len(projectB_workspace_contents) == 4
         assert not [
             content
@@ -3967,26 +3967,26 @@ class TestWorkspaceContents(FunctionalTest):
         params_folder2 = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         folder2_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
-        assert [content for content in folder1_contents if content["content_id"] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in folder1_contents if content["content_id"] == 8]
+        assert not [content for content in folder2_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             "/api/v2/workspaces/2/contents/8/move", params=params, status=200
         )
         new_folder1_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_folder1, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_folder2_contents = self.testapp.get(
             "/api/v2/workspaces/1/contents", params=params_folder2, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_folder1_contents if content["content_id"] == 8
-        ]  # nopep8
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]  # nopep8
+        ]
+        assert [content for content in new_folder2_contents if content["content_id"] == 8]
         assert res.json_body
         assert res.json_body["parent_id"] is None
         assert res.json_body["content_id"] == 8
@@ -4019,12 +4019,12 @@ class TestWorkspaceContents(FunctionalTest):
         params_deleted = {"parent_ids": 3, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         deleted_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body  # nopep8
-        assert [content for content in active_contents if content["content_id"] == 8]  # nopep8
-        assert not [content for content in deleted_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in active_contents if content["content_id"] == 8]
+        assert not [content for content in deleted_contents if content["content_id"] == 8]
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
@@ -4033,14 +4033,14 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_deleted_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_active_contents if content["content_id"] == 8
-        ]  # nopep8
-        assert [content for content in new_deleted_contents if content["content_id"] == 8]  # nopep8
+        ]
+        assert [content for content in new_deleted_contents if content["content_id"] == 8]
 
     def test_api_put_archive_content__ok_200__nominal_case(self):
         """
@@ -4052,27 +4052,27 @@ class TestWorkspaceContents(FunctionalTest):
         params_archived = {"parent_ids": 3, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         archived_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
-        ).json_body  # nopep8
-        assert [content for content in active_contents if content["content_id"] == 8]  # nopep8
+        ).json_body
+        assert [content for content in active_contents if content["content_id"] == 8]
         assert not [
             content for content in archived_contents if content["content_id"] == 8
-        ]  # nopep8
+        ]
         res = self.testapp.put_json("/api/v2/workspaces/2/contents/8/archived", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_archived_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
-        ).json_body  # nopep8
+        ).json_body
         assert not [
             content for content in new_active_contents if content["content_id"] == 8
-        ]  # nopep8
+        ]
         assert [
             content for content in new_archived_contents if content["content_id"] == 8
-        ]  # nopep8
+        ]
 
     def test_api_put_undelete_content__ok_200__nominal_case(self):
         """
@@ -4084,23 +4084,23 @@ class TestWorkspaceContents(FunctionalTest):
         params_deleted = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         deleted_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body  # nopep8
-        assert not [content for content in active_contents if content["content_id"] == 14]  # nopep8
-        assert [content for content in deleted_contents if content["content_id"] == 14]  # nopep8
+        ).json_body
+        assert not [content for content in active_contents if content["content_id"] == 14]
+        assert [content for content in deleted_contents if content["content_id"] == 14]
         res = self.testapp.put_json("/api/v2/workspaces/2/contents/14/trashed/restore", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_deleted_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_deleted, status=200
-        ).json_body  # nopep8
-        assert [content for content in new_active_contents if content["content_id"] == 14]  # nopep8
+        ).json_body
+        assert [content for content in new_active_contents if content["content_id"] == 14]
         assert not [
             content for content in new_deleted_contents if content["content_id"] == 14
-        ]  # nopep8
+        ]
 
     def test_api_put_unarchive_content__ok_200__nominal_case(self):
         """
@@ -4117,20 +4117,20 @@ class TestWorkspaceContents(FunctionalTest):
         }
         active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         archived_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
-        ).json_body  # nopep8
-        assert not [content for content in active_contents if content["content_id"] == 13]  # nopep8
-        assert [content for content in archived_contents if content["content_id"] == 13]  # nopep8
+        ).json_body
+        assert not [content for content in active_contents if content["content_id"] == 13]
+        assert [content for content in archived_contents if content["content_id"] == 13]
         res = self.testapp.put_json("/api/v2/workspaces/2/contents/13/archived/restore", status=204)
         new_active_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_active, status=200
-        ).json_body  # nopep8
+        ).json_body
         new_archived_contents = self.testapp.get(
             "/api/v2/workspaces/2/contents", params=params_archived, status=200
-        ).json_body  # nopep8
-        assert [content for content in new_active_contents if content["content_id"] == 13]  # nopep8
+        ).json_body
+        assert [content for content in new_active_contents if content["content_id"] == 13]
         assert not [
             content for content in new_archived_contents if content["content_id"] == 13
-        ]  # nopep8
+        ]

@@ -73,7 +73,7 @@ class TestEmailSender(MailHogTest):
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "test_send_mail@localhost"
         assert headers["To"][0] == "receiver_test_send_mail@localhost"
-        assert headers["Subject"][0] == "test__func__send_email__ok__nominal_case"  # nopep8
+        assert headers["Subject"][0] == "test__func__send_email__ok__nominal_case"
         assert response[0]["MIME"]["Parts"][0]["Body"] == text
         assert response[0]["MIME"]["Parts"][1]["Body"] == html
 
@@ -102,7 +102,7 @@ class TestNotificationsSync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -128,14 +128,14 @@ class TestNotificationsSync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
+        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Open)"
         assert headers["References"][0] == "test_user_refs+22@localhost"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
-        )  # nopep8
+        )
 
     def test_func__create_comment_with_notification__ok__nominal_case(self):
         uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
@@ -161,14 +161,14 @@ class TestNotificationsSync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
+        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Open)"
         assert headers["References"][0] == "test_user_refs+22@localhost"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
-        )  # nopep8
+        )
 
     def test_func__reset_password__ok__nominal_case(self):
         uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
@@ -178,7 +178,7 @@ class TestNotificationsSync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] A password reset has been requested"
 
@@ -211,7 +211,7 @@ class TestNotificationsAsync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
@@ -239,14 +239,14 @@ class TestNotificationsAsync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
+        assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] [Recipes] file1 (Open)"
         assert headers["References"][0] == "test_user_refs+22@localhost"
         assert (
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
-        )  # nopep8
+        )
 
     def test_func__reset_password__ok__nominal_case(self):
         uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
@@ -261,6 +261,6 @@ class TestNotificationsAsync(MailHogTest):
         # check mail received
         response = self.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"  # nopep8
+        assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[TRACIM] A password reset has been requested"

@@ -613,7 +613,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         user = api.authenticate(
             "hubert@planetexpress.com", "professor", fake_ldap_connector()
-        )  # nopep8
+        )
         assert isinstance(user, User)
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP
@@ -631,7 +631,7 @@ class TestFakeLDAPUserApi(DefaultTest):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         user = api.authenticate(
             "hubert@planetexpress.com", "professor", fake_ldap_connector()
-        )  # nopep8
+        )
         assert isinstance(user, User)
         assert user.email == "hubert@planetexpress.com"
         assert user.auth_type == AuthType.LDAP

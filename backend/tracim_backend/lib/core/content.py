@@ -154,7 +154,7 @@ class ContentApi(object):
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
         self.preview_manager = PreviewManager(
             self._config.PREVIEW_CACHE_DIR, create_folder=True
-        )  # nopep8
+        )
         default_lang = None
         if self._user:
             default_lang = self._user.lang
@@ -186,11 +186,11 @@ class ContentApi(object):
             self._show_temporary = previous_show_temporary
 
     def get_content_in_context(self, content: Content) -> ContentInContext:
-        return ContentInContext(content, self._session, self._config, self._user)  # nopep8
+        return ContentInContext(content, self._session, self._config, self._user)
 
-    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
+    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:
         # TODO - G.M - 2018-06-173 - create revision in context object
-        return RevisionInContext(revision, self._session, self._config, self._user)  # nopep8
+        return RevisionInContext(revision, self._session, self._config, self._user)
 
     def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
@@ -455,7 +455,7 @@ class ContentApi(object):
                 workspace_id=workspace.workspace_id,
             )
             if parent:
-                critical_error_text = "{text} and parent as content {parent_id}".format(  # nopep8
+                critical_error_text = "{text} and parent as content {parent_id}".format(
                     text=critical_error_text, parent_id=parent.parent_id
                 )
             logger.critical(self, critical_error_text)
@@ -553,7 +553,7 @@ class ContentApi(object):
                 raise EmptyLabelNotAllowed(
                     "Content of type {} should have a valid label".format(
                         content_type_slug
-                    )  # nopep8
+                    )
                 )
 
         content.owner = self._user
@@ -650,7 +650,7 @@ class ContentApi(object):
             base_request = base_request.filter(Content.type == content_type)
 
         if parent:
-            base_request = base_request.filter(Content.parent_id == parent.content_id)  # nopep8
+            base_request = base_request.filter(Content.parent_id == parent.content_id)
 
         try:
             content = base_request.one()
@@ -662,12 +662,12 @@ class ContentApi(object):
             # to content_status.
             raise ContentNotFound(
                 'Content "{}" not found in database'.format(content_id)
-            ) from exc  # nopep8
+            ) from exc
         return content
 
     def get_one_revision(
         self, revision_id: int = None, content: Content = None
-    ) -> ContentRevisionRO:  # nopep8
+    ) -> ContentRevisionRO:
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
@@ -684,7 +684,7 @@ class ContentApi(object):
         )
         if content and revision.content_id != content.content_id:
             raise RevisionDoesNotMatchThisContent(
-                "revision {revision_id} is not a revision of content {content_id}".format(  # nopep8
+                "revision {revision_id} is not a revision of content {content_id}".format(
                     revision_id=revision.revision_id, content_id=content.content_id
                 )
             )
@@ -760,7 +760,7 @@ class ContentApi(object):
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content "{}" not found in database'.format(content_label)
-            ) from exc  # nopep8
+            ) from exc
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_filename_and_parent_labels(
@@ -804,7 +804,7 @@ class ContentApi(object):
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content "{}" not found in database'.format(content_label)
-            ) from exc  # nopep8
+            ) from exc
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
@@ -880,9 +880,9 @@ class ContentApi(object):
             page_number = preview_manager_page_format(page_number)
             if page_number >= self.preview_manager.get_page_nb(
                 file_path, file_ext=file_extension
-            ):  # nopep8
+            ):
                 raise PageOfPreviewNotFound(
-                    "page_number {page_number} of content {content_id} does not exist".format(  # nopep8
+                    "page_number {page_number} of content {content_id} does not exist".format(
                         page_number=page_number, content_id=content_id
                     )
                 )
@@ -899,7 +899,7 @@ class ContentApi(object):
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(
                     content_id, revision_id
-                )  # nopep8
+                )
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
@@ -909,7 +909,7 @@ class ContentApi(object):
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(
                     content_id, revision_id
-                )  # nopep8
+                )
             ) from exc
         except Exception as exc:
             logger.warning(
@@ -919,7 +919,7 @@ class ContentApi(object):
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(
                     content_id, revision_id
-                )  # nopep8
+                )
             ) from exc
         return pdf_preview_path
 
@@ -934,7 +934,7 @@ class ContentApi(object):
             file_path = self.get_one_revision_filepath(revision_id)
             pdf_preview_path = self.preview_manager.get_pdf_preview(
                 file_path, file_ext=file_extension
-            )  # nopep8
+            )
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
@@ -947,7 +947,7 @@ class ContentApi(object):
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                "No preview available for revision {}".format(revision_id)  # nopep8
+                "No preview available for revision {}".format(revision_id)
             ) from exc
         except Exception as exc:
             logger.warning(
@@ -992,9 +992,9 @@ class ContentApi(object):
             page_number = preview_manager_page_format(page_number)
             if page_number >= self.preview_manager.get_page_nb(
                 file_path, file_ext=file_extension
-            ):  # nopep8
+            ):
                 raise PageOfPreviewNotFound(
-                    "page {page_number} of revision {revision_id} of content {content_id} does not exist".format(  # nopep8
+                    "page {page_number} of revision {revision_id} of content {content_id} does not exist".format(
                         page_number=page_number, revision_id=revision_id, content_id=content_id
                     )
                 )
@@ -1025,7 +1025,7 @@ class ContentApi(object):
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(
                     content_id, revision_id
-                )  # nopep8
+                )
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
@@ -1035,7 +1035,7 @@ class ContentApi(object):
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(
                     content_id, revision_id
-                )  # nopep8
+                )
             ) from exc
         except Exception as exc:
             logger.warning(
@@ -1045,7 +1045,7 @@ class ContentApi(object):
             raise UnavailablePreview(
                 "No preview available for content {}, revision {}".format(
                     content_id, revision_id
-                )  # nopep8
+                )
             ) from exc
         return jpg_preview_path
 
@@ -1057,7 +1057,7 @@ class ContentApi(object):
         label: str = None,
         order_by_properties: typing.Optional[
             typing.List[typing.Union[str, QueryableAttribute]]
-        ] = None,  # nopep8
+        ] = None,
         complete_path_to_id: int = None,
     ) -> Query:
         """
@@ -1119,11 +1119,11 @@ class ContentApi(object):
             if allow_root:
                 resultset = resultset.filter(
                     or_(Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None)
-                )  # nopep8
+                )
             else:
-                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))  # nopep8
+                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))
         if label:
-            resultset = resultset.filter(Content.label.ilike("%{}%".format(label)))  # nopep8
+            resultset = resultset.filter(Content.label.ilike("%{}%".format(label)))
 
         for _property in order_by_properties:
             resultset = resultset.order_by(_property)
@@ -1138,7 +1138,7 @@ class ContentApi(object):
         label: str = None,
         order_by_properties: typing.Optional[
             typing.List[typing.Union[str, QueryableAttribute]]
-        ] = None,  # nopep8
+        ] = None,
         complete_path_to_id: int = None,
     ) -> typing.List[Content]:
         """
@@ -1302,7 +1302,7 @@ class ContentApi(object):
             if (
                 related_active_content not in active_contents
                 and related_active_content not in too_recent_content
-            ):  # nopep8
+            ):
 
                 if not before_content or before_content_find:
                     active_contents.append(related_active_content)
@@ -1379,7 +1379,7 @@ class ContentApi(object):
 
     def _set_allowed_content(
         self, content: Content, allowed_content_dict: dict
-    ) -> Content:  # nopep8
+    ) -> Content:
         """
         :param content: the given content instance
         :param allowed_content_dict: must be something like this:
@@ -1400,7 +1400,7 @@ class ContentApi(object):
 
     def set_allowed_content(
         self, content: Content, allowed_content_type_slug_list: typing.List[str]
-    ) -> Content:  # nopep8
+    ) -> Content:
         """
         :param content: the given content instance
         :param allowed_content_type_slug_list: list of content_type_slug to
@@ -1412,7 +1412,7 @@ class ContentApi(object):
             if allowed_content_type_slug not in content_type_list.endpoint_allowed_types_slug():
                 raise ContentTypeNotExist(
                     "Content_type {} does not exist".format(allowed_content_type_slug)
-                )  # nopep8
+                )
             allowed_content_dict[allowed_content_type_slug] = True
 
         return self._set_allowed_content(content, allowed_content_dict)
@@ -1510,7 +1510,7 @@ class ContentApi(object):
                 ):
                     raise UnallowedSubContent(
                         " SubContent of type {subcontent_type}  not allowed in content {content_id}".format(
-                            # nopep8
+
                             subcontent_type=content_type.slug,
                             content_id=parent.content_id,
                         )
@@ -1518,7 +1518,7 @@ class ContentApi(object):
         if workspace:
             if content_type not in workspace.get_allowed_content_types():
                 raise UnallowedSubContent(
-                    " SubContent of type {subcontent_type}  not allowed in workspace {content_id}".format(  # nopep8
+                    " SubContent of type {subcontent_type}  not allowed in workspace {content_id}".format(
                         subcontent_type=content_type.slug, content_id=workspace.workspace_id
                     )
                 )
@@ -1662,7 +1662,7 @@ class ContentApi(object):
         if not self.is_editable(item):
             raise ContentInNotEditableState(
                 "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
-            )  # nopep8
+            )
         if not force_update:
             if item.label == new_label and item.description == new_content:
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
@@ -1691,7 +1691,7 @@ class ContentApi(object):
         if not self.is_editable(item):
             raise ContentInNotEditableState(
                 "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
-            )  # nopep8
+            )
         # FIXME - G.M - 2018-09-25 - Repair and do a better same content check,
         # as pyramid behaviour use buffered object
         # new_content == item.depot_file.file.read() case cannot happened using
@@ -1755,7 +1755,7 @@ class ContentApi(object):
 
     def get_preview_page_nb(
         self, revision_id: int, file_extension: str
-    ) -> typing.Optional[int]:  # nopep8
+    ) -> typing.Optional[int]:
         try:
             file_path = self.get_one_revision_filepath(revision_id)
             nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
@@ -1817,7 +1817,7 @@ class ContentApi(object):
         :param recursive: mark read subcontent too
         :return: nothing
         """
-        return self.mark_read__workspace(None, read_datetime, do_flush, recursive)  # nopep8
+        return self.mark_read__workspace(None, read_datetime, do_flush, recursive)
 
     def mark_read__workspace(
         self,

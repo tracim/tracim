@@ -28,7 +28,7 @@ class FrontendController(Controller):
         return index_file_path
 
     def not_found_view(self, context, request: TracimRequest):
-        raise PageNotFound("{} is not a valid path".format(request.path)) from context  # nopep8
+        raise PageNotFound("{} is not a valid path".format(request.path)) from context
 
     def ui(self, context, request: TracimRequest):
         return self.index(context, request)
@@ -40,8 +40,8 @@ class FrontendController(Controller):
         app_api = ApplicationApi(app_list=app_list)
         applications = app_api.get_all()
         for app in applications:
-            app_frontend_path = APP_FRONTEND_PATH.replace("{minislug}", app.minislug)  # nopep8
-            app_path = os.path.join(self.dist_folder_path, app_frontend_path)  # nopep8
+            app_frontend_path = APP_FRONTEND_PATH.replace("{minislug}", app.minislug)
+            app_path = os.path.join(self.dist_folder_path, app_frontend_path)
             if os.path.exists(app_path):
                 frontend_apps.append(app)
 

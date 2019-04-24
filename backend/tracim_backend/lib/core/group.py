@@ -13,7 +13,6 @@ from tracim_backend.models.auth import User
 __author__ = "damien"
 
 
-
 class GroupApi(object):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG):
         self._user = current_user

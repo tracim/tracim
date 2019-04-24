@@ -173,7 +173,7 @@ class TestMailFetcher(object):
         mf._get_auth_headers = mock
 
         with pytest.raises(BadStatusCode):
-            mf._get_content_info(1, user_email="useremailaddrees@mydomain.com")  # nopep8
+            mf._get_content_info(1, user_email="useremailaddrees@mydomain.com")
 
     @responses.activate
     def test_unit___get_content_info__ok__nominal_test(self):
@@ -223,7 +223,7 @@ class TestMailFetcher(object):
         mock = Mock()
         mock.return_value = auth_headers
         mf._get_auth_headers = mock
-        content_info = mf._get_content_info(1, user_email="useremailaddress@mydomain.com")  # nopep8
+        content_info = mf._get_content_info(1, user_email="useremailaddress@mydomain.com")
         assert content_info == content_json
 
     def test_unit__create_comment_request__ok__nominal_test(self):
@@ -275,7 +275,7 @@ class TestMailFetcher(object):
         mf._get_content_info.return_value = content_info
         method, endpoint, body = mf._create_comment_request(mail)
         assert method == "POST"
-        assert endpoint == "http://127.0.0.1:6543/api/workspaces/4/contents/1/comments"  # nopep8
+        assert endpoint == "http://127.0.0.1:6543/api/workspaces/4/contents/1/comments"
         assert body == {"raw_content": "CONTENT"}
 
     @responses.activate
@@ -321,7 +321,7 @@ class TestMailFetcher(object):
         header_mock.return_value = auth_headers
         mf._get_auth_headers = header_mock
         mf._send_request(
-            endpoint="http://127.0.0.1:6543/api/workspaces/4/contents/1/comments",  # nopep8
+            endpoint="http://127.0.0.1:6543/api/workspaces/4/contents/1/comments",
             json_body_dict={"raw_content": "CONTENT"},
             method="POST",
             imapc=imapc_mock,
@@ -380,14 +380,14 @@ class TestMailFetcher(object):
         args = {
             "mail": mail,
             "imapc": imapc_mock,
-            "endpoint": "http://127.0.0.1:6543/api/workspaces/4/contents/1/comments",  # nopep8
+            "endpoint": "http://127.0.0.1:6543/api/workspaces/4/contents/1/comments",
             "json_body_dict": {"raw_content": "CONTENT"},
             "method": "POST",
         }
         args2 = {
             "mail": mail,
             "imapc": imapc_mock,
-            "endpoint": "http://127.0.0.1:6543/api/workspaces/4/contents/2/comments",  # nopep8
+            "endpoint": "http://127.0.0.1:6543/api/workspaces/4/contents/2/comments",
             "json_body_dict": {"raw_content": "CONTENT2"},
             "method": "POST",
         }

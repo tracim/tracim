@@ -59,11 +59,11 @@ def set_html_document_slug_to_legacy(session_factory) -> None:
         dbsession.query(ContentRevisionRO)
         .filter(ContentRevisionRO.type == "page")
         .filter(ContentRevisionRO.content_id == 6)
-    )  # nopep8
+    )
     assert content_query.count() == 0
     html_documents_query = dbsession.query(ContentRevisionRO).filter(
         ContentRevisionRO.type == "html-document"
-    )  # nopep8
+    )
     html_documents_query.update({ContentRevisionRO.type: "page"})
     transaction.commit()
     assert content_query.count() > 0
@@ -138,7 +138,7 @@ class FunctionalTest(unittest.TestCase):
 
     def override_settings(
         self, settings: typing.Dict[str, typing.Any]
-    ) -> typing.Dict[str, typing.Any]:  # nopep8
+    ) -> typing.Dict[str, typing.Any]:
         """
         Allow to override some setting by code.
         by default : do nothing.
@@ -159,7 +159,7 @@ class FunctionalTest(unittest.TestCase):
             except IntegrityError:
                 logger.error(
                     self,
-                    "Warning, there was a problem when adding default data"  # nopep8
+                    "Warning, there was a problem when adding default data"  
                     ", it may have already been added:",
                 )
                 import traceback
@@ -244,7 +244,7 @@ class FunctionalTestNoDB(FunctionalTest):
 
     def override_settings(
         self, settings: typing.Dict[str, typing.Any]
-    ) -> typing.Dict[str, typing.Any]:  # nopep8
+    ) -> typing.Dict[str, typing.Any]:
         """
         Disable sqlalchemy.url with wrong value
         :return new settings dict
@@ -299,7 +299,7 @@ class BaseTest(unittest.TestCase):
             except IntegrityError:
                 logger.error(
                     self,
-                    "Warning, there was a problem when adding default data"  # nopep8
+                    "Warning, there was a problem when adding default data"  
                     ", it may have already been added:",
                 )
                 import traceback

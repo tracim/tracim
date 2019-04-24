@@ -36,7 +36,7 @@ except ImportError:
 
 
 SWAGGER_TAG__CONTENT_HTML_DOCUMENT_SECTION = "HTML documents"
-SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS = generate_documentation_swagger_tag(  # nopep8
+SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_HTML_DOCUMENT_SECTION
 )
 is_html_document_content = ContentTypeChecker([HTML_DOCUMENTS_TYPE])
@@ -50,7 +50,7 @@ class HTMLDocumentController(Controller):
     @hapic.output_body(TextBasedContentSchema())
     def get_html_document(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         Get html document content
         """
@@ -75,7 +75,7 @@ class HTMLDocumentController(Controller):
     @hapic.output_body(TextBasedContentSchema())
     def update_html_document(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:  # nopep8
+    ) -> ContentInContext:
         """
         update_html_document
         """
@@ -125,7 +125,7 @@ class HTMLDocumentController(Controller):
     @check_right(is_html_document_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     @hapic.handle_exception(ContentStatusException, HTTPStatus.BAD_REQUEST)
     def set_html_document_status(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
@@ -156,34 +156,34 @@ class HTMLDocumentController(Controller):
             "/workspaces/{workspace_id}/html-documents/{content_id}",
             request_method="GET",
         )
-        configurator.add_view(self.get_html_document, route_name="html_document")  # nopep8
+        configurator.add_view(self.get_html_document, route_name="html_document")
 
         # update html-document
         configurator.add_route(
             "update_html_document",
             "/workspaces/{workspace_id}/html-documents/{content_id}",
             request_method="PUT",
-        )  # nopep8
+        )
         configurator.add_view(
             self.update_html_document, route_name="update_html_document"
-        )  # nopep8
+        )
 
         # get html document revisions
         configurator.add_route(
             "html_document_revisions",
-            "/workspaces/{workspace_id}/html-documents/{content_id}/revisions",  # nopep8
+            "/workspaces/{workspace_id}/html-documents/{content_id}/revisions",
             request_method="GET",
         )
         configurator.add_view(
             self.get_html_document_revisions, route_name="html_document_revisions"
-        )  # nopep8
+        )
 
         # get html document revisions
         configurator.add_route(
             "set_html_document_status",
-            "/workspaces/{workspace_id}/html-documents/{content_id}/status",  # nopep8
+            "/workspaces/{workspace_id}/html-documents/{content_id}/status",
             request_method="PUT",
         )
         configurator.add_view(
             self.set_html_document_status, route_name="set_html_document_status"
-        )  # nopep8
+        )

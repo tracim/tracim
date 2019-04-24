@@ -27,7 +27,7 @@ from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowe
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import MissingLDAPConnector
-from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation  # nopep8
+from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import NoUserSetted
@@ -100,7 +100,7 @@ class UserApi(object):
         except NoResultFound as exc:
             raise UserDoesNotExist(
                 'User "{}" not found in database'.format(user_id)
-            ) from exc  # nopep8
+            ) from exc
         return user
 
     def get_one_by_email(self, email: str) -> User:
@@ -114,7 +114,7 @@ class UserApi(object):
         except NoResultFound as exc:
             raise UserDoesNotExist(
                 'User "{}" not found in database'.format(email)
-            ) from exc  # nopep8
+            ) from exc
         return user
 
     def get_one_by_public_name(self, public_name: str) -> User:
@@ -126,7 +126,7 @@ class UserApi(object):
         except NoResultFound as exc:
             raise UserDoesNotExist(
                 'User "{}" not found in database'.format(public_name)
-            ) from exc  # nopep8
+            ) from exc
         return user
 
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
@@ -165,7 +165,7 @@ class UserApi(object):
             raise TooShortAutocompleteString(
                 '"{acp}" is a too short string, acp string need to have more than one character'.format(
                     acp=acp
-                )  # nopep8
+                )
             )
         exclude_workspace_ids = exclude_workspace_ids or []  # DFV
         exclude_user_ids = exclude_user_ids or []  # DFV
@@ -181,7 +181,7 @@ class UserApi(object):
         query = self._base_query().order_by(User.display_name)
         query = query.filter(
             or_(User.display_name.ilike("%{}%".format(acp)), User.email.ilike("%{}%".format(acp)))
-        )  # nopep8
+        )
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
         # should show only user in same workspace as user
         if self._user and self._user.profile.id <= Group.TIM_USER:
@@ -195,7 +195,7 @@ class UserApi(object):
                 .distinct(UserRoleInWorkspace.user_id)
                 .filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery()))
                 .subquery()
-            )  # nopep8
+            )
             query = query.filter(User.user_id.in_(users_in_workspaces))
         if exclude_user_ids:
             query = query.filter(~User.user_id.in_(exclude_user_ids))
@@ -286,7 +286,7 @@ class UserApi(object):
             #             session=self._session,
             #             config=self._config,
             #         )
-            #         groups = [gapi.get_one_with_name(ldap_profile)] # nopep8
+            #         groups = [gapi.get_one_with_name(ldap_profile)]
             #     except GroupDoesNotExist:
             #         logger.warning(self,
             #             'Profile {} does not exist, create ldap user'
@@ -312,10 +312,10 @@ class UserApi(object):
             user = self.get_one_by_email(email)
 
         if user.is_deleted:
-            raise UserDoesNotExist("This user has been deleted")  # nopep8
+            raise UserDoesNotExist("This user has been deleted")
 
         if not user.is_active:
-            raise UserAuthenticatedIsNotActive("This user is not activated")  # nopep8
+            raise UserAuthenticatedIsNotActive("This user is not activated")
 
         if user.auth_type == AuthType.UNKNOWN:
             user.auth_type = auth_type
@@ -336,7 +336,7 @@ class UserApi(object):
         auth_type = AuthType.INTERNAL
 
         if not user:
-            raise UserDoesNotExist("User {} not found in database".format(email))  # nopep8
+            raise UserDoesNotExist("User {} not found in database".format(email))
 
         if user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
@@ -345,13 +345,13 @@ class UserApi(object):
                 )
             )
         if not user.validate_password(password):
-            raise WrongUserPassword('User "{}" password is incorrect'.format(email))  # nopep8
+            raise WrongUserPassword('User "{}" password is incorrect'.format(email))
 
         if user.is_deleted:
-            raise UserDoesNotExist("This user has been deleted")  # nopep8
+            raise UserDoesNotExist("This user has been deleted")
 
         if not user.is_active:
-            raise UserAuthenticatedIsNotActive("This user is not activated")  # nopep8
+            raise UserAuthenticatedIsNotActive("This user is not activated")
 
         if user.auth_type == AuthType.UNKNOWN:
             user.auth_type = auth_type
@@ -389,10 +389,10 @@ class UserApi(object):
             user = self.get_one_by_email(email)
 
         if user.is_deleted:
-            raise UserDoesNotExist("This user has been deleted")  # nopep8
+            raise UserDoesNotExist("This user has been deleted")
 
         if not user.is_active:
-            raise UserAuthenticatedIsNotActive("This user is not activated")  # nopep8
+            raise UserAuthenticatedIsNotActive("This user is not activated")
 
         if user.auth_type == AuthType.UNKNOWN:
             user.auth_type = auth_type
@@ -436,7 +436,7 @@ class UserApi(object):
         ) as exc:
             raise AuthenticationFailed(
                 'User "{}" authentication failed'.format(email)
-            ) from exc  # nopep8
+            ) from exc
 
     def authenticate(self, email: str, password: str, ldap_connector: "Connector" = None) -> User:
         """
@@ -502,7 +502,7 @@ class UserApi(object):
         ) as exc:
             raise AuthenticationFailed(
                 'User "{}" authentication failed'.format(email)
-            ) from exc  # nopep8
+            ) from exc
 
     # Actions
     def set_password(
@@ -526,12 +526,12 @@ class UserApi(object):
         """
 
         if not self._user:
-            raise NoUserSetted("Current User should be set in UserApi to use this method")  # nopep8
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
 
         self._check_password_modification_allowed(self._user)
-        if not self._user.validate_password(loggedin_user_password):  # nopep8
+        if not self._user.validate_password(loggedin_user_password):
             raise WrongUserPassword(
-                "Wrong password for authenticated user {}".format(self._user.user_id)  # nopep8
+                "Wrong password for authenticated user {}".format(self._user.user_id)
             )
         if new_password != new_password2:
             raise PasswordDoNotMatch("Passwords given are different")
@@ -553,13 +553,13 @@ class UserApi(object):
         :return:
         """
         if not self._user:
-            raise NoUserSetted("Current User should be set in UserApi to use this method")  # nopep8
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
 
         self._check_email_modification_allowed(user)
 
-        if not self._user.validate_password(loggedin_user_password):  # nopep8
+        if not self._user.validate_password(loggedin_user_password):
             raise WrongUserPassword(
-                "Wrong password for authenticated user {}".format(self._user.user_id)  # nopep8
+                "Wrong password for authenticated user {}".format(self._user.user_id)
             )
         self.update(user=user, email=email, do_save=do_save)
         return user
@@ -590,11 +590,11 @@ class UserApi(object):
         """
         is_email_correct = self._check_email_correctness(email)
         if not is_email_correct:
-            raise EmailValidationFailed("Email given form {} is uncorrect".format(email))  # nopep8
+            raise EmailValidationFailed("Email given form {} is uncorrect".format(email))
         email_already_exist_in_db = self.check_email_already_in_db(email)
         if email_already_exist_in_db:
             raise EmailAlreadyExistInDb(
-                "Email given {} already exist, please choose something else".format(email)  # nopep8
+                "Email given {} already exist, please choose something else".format(email)
             )
         return True
 
@@ -602,7 +602,7 @@ class UserApi(object):
         """
         Verify if given email does not already exist in db
         """
-        return self._session.query(User.email).filter(User.email == email).count() != 0  # nopep8
+        return self._session.query(User.email).filter(User.email == email).count() != 0
 
     def _check_email_correctness(self, email: str) -> bool:
         """
@@ -740,7 +740,7 @@ class UserApi(object):
             except SMTPRecipientsRefused as exc:
                 logger.warning(
                     self,
-                    "Account created for {email} but SMTP server refuse to send notification".format(  # nopep8
+                    "Account created for {email} but SMTP server refuse to send notification".format(
                         email=email
                     ),
                 )
@@ -780,7 +780,7 @@ class UserApi(object):
 
         return user
 
-    def reset_password_notification(self, user: User, do_save: bool = False) -> str:  # nopep8
+    def reset_password_notification(self, user: User, do_save: bool = False) -> str:
         """
         Reset password notification
         :param user: User who want is password resetted
@@ -792,7 +792,7 @@ class UserApi(object):
         if not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantResetPassword(
                 "cant reset password with notification disabled"
-            )  # nopep8
+            )
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
@@ -934,7 +934,7 @@ class UserApi(object):
         gapi = GroupApi(self._session, self._user, self._config)
         invite_minimal_profile = gapi.get_one_with_name(
             group_name=self._config.NEW_USER__INVITATION__MINIMAL_PROFILE
-        )  # nopep8
+        )
 
         if not self._user.profile.id >= invite_minimal_profile.group_id:
             return False

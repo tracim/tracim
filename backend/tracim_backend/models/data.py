@@ -567,12 +567,12 @@ class ContentChecker(object):
             return True
         else:
             if "allowed_content" in properties.keys():
-                for content_slug, value in properties["allowed_content"].items():  # nopep8
+                for content_slug, value in properties["allowed_content"].items():
                     if not isinstance(value, bool):
                         return False
                     if (
                         not content_slug in content_type_list.endpoint_allowed_types_slug()
-                    ):  # nopep8
+                    ):
                         return False
             if "origin" in properties.keys():
                 pass
@@ -1252,7 +1252,7 @@ class Content(DeclarativeBase):
                     "allowed_content"
                 ] = content_type_list.default_allowed_content_properties(
                     self.type
-                )  # nopep8
+                )
         return properties
 
     @properties.setter
@@ -1409,7 +1409,7 @@ class Content(DeclarativeBase):
             # Some webdav client create empty file before uploading, we must
             # have possibility to not show the related revision
             if drop_empty_revision:
-                if revision.depot_file and revision.depot_file.file.content_length == 0:  # nopep8
+                if revision.depot_file and revision.depot_file.file.content_length == 0:
                     # INFO - G.M - 12-03-2018 -Always show the last and
                     # first revision.
                     if revision != revisions[-1] and revision != revisions[0]:

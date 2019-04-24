@@ -66,7 +66,7 @@ def get_tm_session(session_factory, transaction_manager):
     # These problem happened because we use "commit" in our current code.
     # Understand what those params really mean and check if it can cause
     # troubles somewhere else.
-    # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc  # nopep8
+    # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc
     zope.sqlalchemy.register(dbsession, transaction_manager=transaction_manager, keep_session=True)
     from tracim_backend.models.revision_protection import prevent_content_revision_delete
 
