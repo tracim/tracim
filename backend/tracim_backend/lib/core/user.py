@@ -231,7 +231,8 @@ class UserApi(object):
         try:
             self.get_one_by_email(email)
             return True
-        # TODO - G.M - 09-04-2018 - Better exception
+        # TODO - G.M - 09-04-2018 - Better exception (more strict, not catch all),
+        # see https://github.com/tracim/tracim/issues/1635
         except Exception:
             return False
 
