@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from tracim_backend.fixtures import Fixture
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 
@@ -14,7 +13,6 @@ class Base(Fixture):
         u.email = "admin@admin.admin"
         u.password = "admin@admin.admin"
         self._session.add(u)
-        uapi = UserApi(session=self._session, config=self._config, current_user=u)
 
         g1 = Group()
         g1.group_id = 1

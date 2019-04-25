@@ -7,7 +7,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from tracim_backend.models.meta import metadata
-from tracim_backend.models.setup_models import *
+from tracim_backend.models.setup_models import *  # noqa: F403,F401
 
 # from logging.config import fileConfig
 

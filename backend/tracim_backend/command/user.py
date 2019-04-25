@@ -3,12 +3,10 @@ import argparse
 
 from pyramid.scripting import AppEnvironment
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 from tracim_backend.command import AppContextCommand
 from tracim_backend.command import Extender
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import BadCommandError
 from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation

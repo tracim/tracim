@@ -5,13 +5,11 @@ Revises: f889c2b59759
 Create Date: 2019-04-04 17:39:54.241996
 
 """
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "32e629b17e2e"
 down_revision = "f889c2b59759"
-
-from alembic import op
-import sqlalchemy as sa
 
 
 def upgrade():

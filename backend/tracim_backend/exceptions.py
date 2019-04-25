@@ -82,10 +82,6 @@ class AgendaPropsUpdateFailed(TracimException):
     pass
 
 
-class CannotCreateAgenda(TracimException):
-    pass
-
-
 class AgendaException(TracimException):
     pass
 

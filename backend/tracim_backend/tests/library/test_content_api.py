@@ -8,7 +8,6 @@ import transaction
 # TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
 # TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
@@ -272,7 +271,7 @@ class TestContentApi(DefaultTest):
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        assert api._is_filename_available("test", workspace, parent=None) == True
+        assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -311,7 +310,7 @@ class TestContentApi(DefaultTest):
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace2", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        assert api._is_filename_available("test", workspace, parent=None) == True
+        assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -321,7 +320,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == True
+        assert api._is_filename_available("test", workspace, parent=None) is True
 
     def test_unit__is_filename_available__ok__different_parent(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -356,7 +355,7 @@ class TestContentApi(DefaultTest):
         folder2.type = content_type_list.Folder.slug
         folder2.revision_type = ActionDescription.CREATION
         self.session.add(folder)
-        assert api._is_filename_available("test", workspace, parent=None) == True
+        assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -366,7 +365,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == True
+        assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -376,7 +375,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == True
+        assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
         content.owner = user
@@ -386,7 +385,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_filename_available("test", workspace, parent=None) == False
+        assert api._is_filename_available("test", workspace, parent=None) is False
 
     def test_unit__set_allowed_content__ok__private_method(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -503,7 +502,7 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
+        WorkspaceApi(
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
@@ -522,7 +521,7 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
+        WorkspaceApi(
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
@@ -635,14 +634,14 @@ class TestContentApi(DefaultTest):
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        item = api.create(
+        api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
             parent=None,
             label="not_deleted",
             do_save=True,
         )
-        item2 = api.create(
+        api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
             parent=None,
@@ -706,14 +705,14 @@ class TestContentApi(DefaultTest):
         )
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        item = api.create(
+        api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
             parent=None,
             label="not_archived",
             do_save=True,
         )
-        item2 = api.create(
+        api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
             parent=None,
@@ -780,14 +779,14 @@ class TestContentApi(DefaultTest):
         ).create_workspace("test workspace", save_now=True)
 
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        item = api.create(
+        api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
             parent=None,
             label="thefolder",
             do_save=True,
         )
-        item2 = api.create(
+        api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
             parent=None,
@@ -833,7 +832,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
         item = api.create(content_type_list.Folder.slug, workspace, None, "parent", do_save=True)
         item2 = api.create(content_type_list.File.slug, workspace, item, "file1", do_save=True)
-        item3 = api.create(content_type_list.File.slug, workspace, None, "file2", do_save=True)
+        api.create(content_type_list.File.slug, workspace, None, "file2", do_save=True)
         parent_id = item.content_id
         child_id = item2.content_id
         uid = user.user_id
@@ -1312,9 +1311,6 @@ class TestContentApi(DefaultTest):
         )
 
         wapi = WorkspaceApi(current_user=user_a, session=self.session, config=self.app_config)
-        workspace_api = WorkspaceApi(
-            current_user=user_a, session=self.session, config=self.app_config
-        )
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
         role_api = RoleApi(current_user=user_a, session=self.session, config=self.app_config)
@@ -1569,7 +1565,7 @@ class TestContentApi(DefaultTest):
             label="this_is_a_page",
             do_save=True,
         )
-        p2 = api.create(
+        api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=None,
@@ -1642,7 +1638,7 @@ class TestContentApi(DefaultTest):
             label="this_is_a_page",
             do_save=True,
         )
-        p2 = api.create(
+        api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=None,
@@ -1677,53 +1673,6 @@ class TestContentApi(DefaultTest):
         api2.save(content2)
         content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         assert content3.label == "this_is_a_page"
-        assert content2_nb_rev == len(content3.revisions)
-
-    def test_update_no_change(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
-
-        user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-
-        user2 = uapi.create_minimal_user("this.is@another.user")
-        uapi.save(user2)
-
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
-        )
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
-        with self.session.no_autoflush:
-            page = api.create(
-                content_type_slug=content_type_list.Page.slug,
-                workspace=workspace,
-                label="same_content",
-                do_save=False,
-            )
-            page.description = "Same_content_here"
-        api.save(page, ActionDescription.CREATION, do_notify=True)
-        transaction.commit()
-
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
-        content2 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
-        content2_nb_rev = len(content2.revisions)
-        with new_revision(session=self.session, tm=transaction.manager, content=content2):
-            with pytest.raises(SameValueError):
-                api2.update_content(
-                    item=content2, new_label="same_content", new_content="Same_content_here"
-                )
-        api2.save(content2)
-        transaction.commit()
-        content3 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
-        assert content3.label == "same_content"
         assert content2_nb_rev == len(content3.revisions)
 
     def test_update_file_data__ok_nominal(self):
@@ -2350,7 +2299,7 @@ class TestContentApi(DefaultTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
@@ -2395,7 +2344,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
+        WorkspaceApi(
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace2", save_now=True)
 
@@ -2415,12 +2364,8 @@ class TestContentApi(DefaultTest):
         deleted = api.create(
             content_type_list.Page.slug, workspace, main_folder, "deleted", "", True
         )
-        comment_archived = api.create_comment(
-            workspace, parent=archived, content="just a comment", do_save=True
-        )
-        comment_deleted = api.create_comment(
-            workspace, parent=deleted, content="just a comment", do_save=True
-        )
+        api.create_comment(workspace, parent=archived, content="just a comment", do_save=True)
+        api.create_comment(workspace, parent=deleted, content="just a comment", do_save=True)
         with new_revision(session=self.session, tm=transaction.manager, content=archived):
             api.archive(archived)
             api.save(archived)
@@ -2429,9 +2374,7 @@ class TestContentApi(DefaultTest):
             api.delete(deleted)
             api.save(deleted)
         normal = api.create(content_type_list.Page.slug, workspace, main_folder, "normal", "", True)
-        comment_normal = api.create_comment(
-            workspace, parent=normal, content="just a comment", do_save=True
-        )
+        api.create_comment(workspace, parent=normal, content="just a comment", do_save=True)
 
         last_actives = api.get_last_active()
         assert len(last_actives) == 2
@@ -2529,7 +2472,7 @@ class TestContentApi(DefaultTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
@@ -2614,7 +2557,7 @@ class TestContentApi(DefaultTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
@@ -2706,7 +2649,7 @@ class TestContentApi(DefaultTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
@@ -2761,10 +2704,10 @@ class TestContentApi(DefaultTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -2776,7 +2719,7 @@ class TestContentApi(DefaultTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -2800,7 +2743,7 @@ class TestContentApi(DefaultTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -2808,7 +2751,7 @@ class TestContentApi(DefaultTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
@@ -3046,18 +2989,14 @@ class TestContentApiSecurity(DefaultTest):
             current_user=admin, session=self.session, config=self.app_config
         ).create_workspace("admin_workspace", save_now=True)
 
-        bob_page = ContentApi(
-            current_user=bob, session=self.session, config=self.app_config
-        ).create(
+        ContentApi(current_user=bob, session=self.session, config=self.app_config).create(
             content_type_slug=content_type_list.Page.slug,
             workspace=bob_workspace,
             label="bob_page",
             do_save=True,
         )
 
-        admin_page = ContentApi(
-            current_user=admin, session=self.session, config=self.app_config
-        ).create(
+        ContentApi(current_user=admin, session=self.session, config=self.app_config).create(
             content_type_slug=content_type_list.Page.slug,
             workspace=admin_workspace,
             label="admin_page",

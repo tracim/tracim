@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from html import escape
 import logging
-from smtplib import SMTPRecipientsRefused
 import typing
 
 from lxml.html.diff import htmldiff
@@ -15,7 +13,6 @@ from sqlalchemy.orm import Session
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailTemplateError
-from tracim_backend.exceptions import EmptyNotificationError
 from tracim_backend.lib.core.notifications import INotifier
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender

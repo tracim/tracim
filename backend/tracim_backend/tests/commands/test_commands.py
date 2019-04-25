@@ -18,9 +18,6 @@ from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.setup_models import get_engine
-from tracim_backend.models.setup_models import get_session_factory
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import CommandFunctionalTest
 
 
@@ -250,7 +247,7 @@ class TestCommands(CommandFunctionalTest):
         self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
-            result = app.run(
+            app.run(
                 [
                     "user",
                     "update",

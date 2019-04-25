@@ -2,7 +2,6 @@
 from io import BytesIO
 import logging
 import multiprocessing
-import threading
 import typing
 import unittest
 
@@ -20,7 +19,6 @@ from webtest import TestApp
 from tracim_backend import CaldavAppFactory
 from tracim_backend import WebdavAppFactory
 from tracim_backend import web
-from tracim_backend import webdav
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic

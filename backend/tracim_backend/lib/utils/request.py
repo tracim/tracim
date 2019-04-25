@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 from json import JSONDecodeError
-from os.path import basename
-from os.path import dirname
-import re
 import typing
 
 from pyramid.request import Request
@@ -184,37 +181,37 @@ class TracimContext(object):
         """
         Current session available
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @property
     def app_config(self) -> CFG:
         """
         Current config available
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     # IDs fetchers
 
     def _get_current_user_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_current_workspace_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_current_content_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_current_comment_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_candidate_user_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_candidate_workspace_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_candidate_content_type_slug(self) -> str:
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class TracimRequest(TracimContext, Request):

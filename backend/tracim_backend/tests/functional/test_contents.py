@@ -116,7 +116,6 @@ class TestFolder(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         transaction.commit()
         res = self.testapp.get(
@@ -220,7 +219,7 @@ class TestFolder(FunctionalTest):
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        folder = content_api.create(
+        content_api.create(
             label="test_folder",
             content_type_slug=content_type_list.Folder.slug,
             workspace=test_workspace,
@@ -931,7 +930,7 @@ class TestHtmlDocuments(FunctionalTest):
         Get one html document of a content
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.put_json("/api/v2/workspaces/2/contents/6/archived", status=204)
+        self.testapp.put_json("/api/v2/workspaces/2/contents/6/archived", status=204)
         res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
@@ -943,7 +942,7 @@ class TestHtmlDocuments(FunctionalTest):
         Get one html document of a content
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.put_json("/api/v2/workspaces/2/contents/6/trashed", status=204)
+        self.testapp.put_json("/api/v2/workspaces/2/contents/6/trashed", status=204)
         res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
@@ -1941,7 +1940,7 @@ class TestFiles(FunctionalTest):
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "folder_used", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
         )
         params = {"label": "already_used", "raw_content": "<p> Le nouveau contenu </p>"}
@@ -2197,7 +2196,6 @@ class TestFiles(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
         business_workspace = workspace_api.get_one(1)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2235,7 +2233,6 @@ class TestFiles(FunctionalTest):
         assert res["is_editable"] is True
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
-        content_id = res["content_id"]
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
@@ -2251,7 +2248,7 @@ class TestFiles(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
         business_workspace = workspace_api.get_one(1)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2269,7 +2266,6 @@ class TestFiles(FunctionalTest):
         assert res["is_editable"] is True
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
-        content_id = res["content_id"]
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
@@ -2338,7 +2334,6 @@ class TestFiles(FunctionalTest):
         assert res["is_editable"] is True
         assert res["workspace_id"] == business_workspace.workspace_id
         assert isinstance(res["content_id"], int)
-        content_id = res["content_id"]
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
@@ -2386,7 +2381,7 @@ class TestFiles(FunctionalTest):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
         business_workspace = workspace_api.get_one(1)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

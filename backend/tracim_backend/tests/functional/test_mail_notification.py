@@ -4,7 +4,6 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import requests
 from rq import SimpleWorker
 import transaction
 
@@ -121,7 +120,7 @@ class TestNotificationsSync(MailHogTest):
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )
-        item2 = api.create(
+        api.create(
             content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
         )
 
@@ -228,7 +227,7 @@ class TestNotificationsAsync(MailHogTest):
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )
-        item2 = api.create(
+        api.create(
             content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
         )
         # Send mail async from redis queue

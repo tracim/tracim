@@ -42,7 +42,7 @@ class TestThread(DefaultTest):
         role_1 = rapi.create_one(user_1, workspace, UserRoleInWorkspace.READER, with_notif=True)
         role_2 = rapi.create_one(user_2, workspace, UserRoleInWorkspace.READER, with_notif=False)
         assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
-        assert not role_2 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_2 not in wapi.get_notifiable_roles(workspace=workspace)
 
     def test__unit__get_notifiable_roles__ok__do_not_show_inactive(self):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
@@ -65,7 +65,7 @@ class TestThread(DefaultTest):
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
         user_1.is_active = False
-        assert not role_1 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_1 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
     def test__unit__get_notifiable_roles__ok__do_not_show_deleted(self):
@@ -89,7 +89,7 @@ class TestThread(DefaultTest):
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
         user_1.is_deleted = True
-        assert not role_1 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_1 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
     def test__unit__get_notifiable_roles__ok__do_not_show_unknown_auth(self):
@@ -115,7 +115,7 @@ class TestThread(DefaultTest):
         role_3 = rapi.create_one(user_3, workspace, UserRoleInWorkspace.READER, with_notif=True)
 
         assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
-        assert not role_2 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_2 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_3 in wapi.get_notifiable_roles(workspace=workspace)
 
     def test_unit__get_all_manageable(self):

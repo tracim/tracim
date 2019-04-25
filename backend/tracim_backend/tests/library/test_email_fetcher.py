@@ -1,7 +1,6 @@
 from mock import MagicMock
 from mock import Mock
 import pytest
-import requests
 import responses
 
 from tracim_backend.exceptions import BadStatusCode
@@ -377,18 +376,4 @@ class TestMailFetcher(object):
             ),
         ]
         mf._notify_tracim(mails=mails, imapc=imapc_mock)
-        args = {
-            "mail": mail,
-            "imapc": imapc_mock,
-            "endpoint": "http://127.0.0.1:6543/api/workspaces/4/contents/1/comments",
-            "json_body_dict": {"raw_content": "CONTENT"},
-            "method": "POST",
-        }
-        args2 = {
-            "mail": mail,
-            "imapc": imapc_mock,
-            "endpoint": "http://127.0.0.1:6543/api/workspaces/4/contents/2/comments",
-            "json_body_dict": {"raw_content": "CONTENT2"},
-            "method": "POST",
-        }
         assert mf._send_request.call_count == 2

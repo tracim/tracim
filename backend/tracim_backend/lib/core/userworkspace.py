@@ -13,7 +13,6 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.roles import WorkspaceRoles
 
 __author__ = "damien"
 
@@ -96,7 +95,7 @@ class RoleApi(object):
     def get_one(self, user_id: int, workspace_id: int) -> UserRoleInWorkspace:
         try:
             user_role = self._get_one_rsc(user_id, workspace_id).one()
-        except NoResultFound as exc:
+        except NoResultFound:
             raise UserRoleNotFound(
                 "Role for user {user_id} "
                 "in workspace {workspace_id} was not found.".format(

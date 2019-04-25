@@ -5,8 +5,8 @@ from tracim_backend.app_models.contents import ContentType
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.config import CFG
-    from tracim_backend.app_models.contents import ContentStatus
+    from tracim_backend.config import CFG  # noqa: F401
+    from tracim_backend.app_models.contents import ContentStatus  # noqa: F401
 
 
 class Application(object):

@@ -13,7 +13,6 @@ from tracim_backend.lib.agenda.authorization import can_access_user_agenda
 from tracim_backend.lib.agenda.authorization import can_access_workspace_event_agenda
 from tracim_backend.lib.agenda.authorization import can_access_workspace_root_agenda
 from tracim_backend.lib.agenda.determiner import CaldavAuthorizationDeterminer
-from tracim_backend.lib.proxy.proxy import HOP_BY_HOP_HEADER_HTTP
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.request import TracimRequest
@@ -74,7 +73,6 @@ class RadicaleProxyController(Controller):
         proxy users agendas list
         example: /agenda/user/ to radicale path /agenda/user/
         """
-        path = self.radicale_path_user_dir
         return self._proxy.get_response_for_request(request, self.radicale_path_user_dir)
 
     @hapic.with_api_doc(disable_doc=True)
@@ -139,7 +137,7 @@ class RadicaleProxyController(Controller):
         configurator.add_route(
             "radicale_proxy__user_x",
             self.radicale_path_user_dir
-            + "{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}{trailing_slash:[/]?}",
+            + "{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}{trailing_slash:[/]?}",  # noqa: W605
         )
         configurator.add_view(
             self.radicale_proxy__user_subitems, route_name="radicale_proxy__user_x"

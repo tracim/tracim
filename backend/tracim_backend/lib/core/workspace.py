@@ -49,7 +49,7 @@ class WorkspaceApi(object):
     def _base_query_without_roles(self):
         query = self._session.query(Workspace)
         if not self.show_deleted:
-            query = query.filter(Workspace.is_deleted == False)
+            query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         return query
 
     def _base_query(self):
@@ -204,7 +204,7 @@ class WorkspaceApi(object):
         roles = []
         for role in workspace.roles:
             if (
-                role.do_notify == True
+                role.do_notify is True
                 and role.user != self._user
                 and role.user.is_active
                 and not role.user.is_deleted
@@ -291,7 +291,7 @@ class WorkspaceApi(object):
                     current_user=self._user, session=self._session, config=self._config
                 )
                 try:
-                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
+                    agenda_api.ensure_workspace_agenda_exists(workspace)
                 except AgendaServerConnectionError as exc:
                     logger.error(self, "Cannot connect to agenda server")
                     logger.exception(self, exc)
@@ -316,4 +316,4 @@ class WorkspaceApi(object):
 
 class UnsafeWorkspaceApi(WorkspaceApi):
     def _base_query(self):
-        return self.session.query(Workspace).filter(Workspace.is_deleted == False)
+        return self.session.query(Workspace).filter(Workspace.is_deleted == False)  # noqa: E712

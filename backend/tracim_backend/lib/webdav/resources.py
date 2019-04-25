@@ -1,5 +1,4 @@
 # coding: utf8
-from datetime import datetime
 import functools
 import logging
 import os
@@ -10,8 +9,6 @@ from time import mktime
 import typing
 
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.exc import MultipleResultsFound
-from sqlalchemy.orm.exc import NoResultFound
 import transaction
 from wsgidav import compat
 from wsgidav.dav_error import HTTP_FORBIDDEN
@@ -21,17 +18,14 @@ from wsgidav.dav_provider import DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import can_delete_workspace
 from tracim_backend.lib.utils.authorization import can_modify_workspace
 from tracim_backend.lib.utils.authorization import can_move_content
-from tracim_backend.lib.utils.authorization import can_see_workspace_information
 from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -44,11 +38,8 @@ from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_display
 from tracim_backend.lib.webdav.design import design_page
 from tracim_backend.lib.webdav.design import design_thread
 from tracim_backend.lib.webdav.utils import FakeFileStream
-from tracim_backend.lib.webdav.utils import HistoryType
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import User
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
@@ -62,7 +53,6 @@ def webdav_check_right(authorization_checker: AuthorizationChecker):
     def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
         def wrapper(self: "_DAVResource", *arg, **kwarg) -> typing.Callable:
-            tracim_context = self.tracim_context  # type: WebdavTracimContext
             try:
                 authorization_checker.check(tracim_context=self.tracim_context)
             except TracimException as exc:
@@ -366,7 +356,7 @@ class WorkspaceResource(DAVCollection):
         self.tracim_context._current_workspace = self.workspace
         try:
             can_delete_workspace.check(self.tracim_context)
-        except TracimException as exc:
+        except TracimException:
             raise DAVError(HTTP_FORBIDDEN)
         raise DAVError(HTTP_FORBIDDEN)
 
@@ -381,7 +371,7 @@ class WorkspaceResource(DAVCollection):
             self.tracim_context._current_workspace = self.workspace
             try:
                 can_modify_workspace.check(self.tracim_context)
-            except TracimException as exc:
+            except TracimException:
                 raise DAVError(HTTP_FORBIDDEN)
 
             try:
@@ -397,7 +387,7 @@ class WorkspaceResource(DAVCollection):
                 self.session.flush()
                 workspace_api.execute_update_workspace_actions(self.workspace)
                 transaction.commit()
-            except TracimException as exc:
+            except TracimException:
                 raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
@@ -508,7 +498,7 @@ class FolderResource(WorkspaceResource):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException as exc:
+        except TracimException:
             raise DAVError(HTTP_FORBIDDEN)
 
         # if content is either deleted or archived, we'll check that we try moving it to the parent
@@ -564,9 +554,6 @@ class FolderResource(WorkspaceResource):
 
     def move_folder(self, destpath):
 
-        workspace_api = WorkspaceApi(
-            current_user=self.user, session=self.session, config=self.provider.app_config
-        )
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
         if normpath(dirname(destpath)) == normpath(dirname(self.path)):
@@ -578,13 +565,13 @@ class FolderResource(WorkspaceResource):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException as exc:
+        except TracimException:
             raise DAVError(HTTP_FORBIDDEN)
 
         destination_workspace = self.tracim_context.candidate_workspace
         try:
             destination_parent = self.tracim_context.candidate_parent_content
-        except ContentNotFound as e:
+        except ContentNotFound:
             destination_parent = None
         try:
             with new_revision(content=self.content, tm=transaction.manager, session=self.session):
@@ -657,7 +644,7 @@ class FolderResource(WorkspaceResource):
                             tracim_context=self.tracim_context,
                         )
                     )
-            except NotImplementedError as exc:
+            except NotImplementedError:
                 pass
 
         return members
@@ -743,7 +730,7 @@ class FileResource(DAVNonCollection):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException as exc:
+        except TracimException:
             raise DAVError(HTTP_FORBIDDEN)
 
         invalid_path = False
@@ -826,7 +813,7 @@ class FileResource(DAVNonCollection):
 
         try:
             checker.check(self.tracim_context)
-        except TracimException as exc:
+        except TracimException:
             raise DAVError(HTTP_FORBIDDEN)
 
         try:
@@ -878,13 +865,13 @@ class FileResource(DAVNonCollection):
             # self.move_file(destpath)
             # return
             ####
-            raise NotImplemented("Feature not available")
+            raise NotImplementedError("Feature not available")
 
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
         try:
             can_move_content.check(self.tracim_context)
-        except TracimException as exc:
+        except TracimException:
             raise DAVError(HTTP_FORBIDDEN)
 
         new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
@@ -902,10 +889,8 @@ class FileResource(DAVNonCollection):
         destination_workspace = self.tracim_context.candidate_workspace
         try:
             destination_parent = self.tracim_context.candidate_parent_content
-        except ContentNotFound as e:
+        except ContentNotFound:
             destination_parent = None
-        workspace = self.content.workspace
-        parent = self.content.parent
         try:
             new_content = self.content_api.copy(
                 item=self.content,

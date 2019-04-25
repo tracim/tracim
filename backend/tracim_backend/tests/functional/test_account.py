@@ -2,10 +2,8 @@
 """
 Tests for /api/v2/users subpath endpoints.
 """
-from time import sleep
 
 import pytest
-import requests
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
@@ -19,7 +17,6 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
@@ -39,7 +36,6 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -115,10 +111,10 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -173,7 +169,6 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -189,10 +184,10 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -234,10 +229,10 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -300,7 +295,6 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -316,10 +310,10 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -331,7 +325,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -353,7 +347,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -361,10 +355,10 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -399,7 +393,6 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -432,7 +425,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -444,7 +437,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -466,7 +459,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -474,10 +467,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -532,7 +525,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -604,7 +596,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -676,7 +667,6 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -750,7 +740,6 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -795,7 +784,6 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -945,7 +933,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
@@ -990,7 +978,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
@@ -1027,7 +1015,6 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1040,7 +1027,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_workspace_ids": str(workspace2.workspace_id)}
@@ -1087,7 +1074,6 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1101,7 +1087,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
@@ -1146,7 +1132,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
@@ -1186,7 +1172,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "test"}
@@ -1217,7 +1203,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        test_user2 = uapi.create_user(
+        uapi.create_user(
             email="test2@test2.test2",
             password="password",
             name="bob2",
@@ -1229,7 +1215,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(admin.user_id)
+        int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "t"}
@@ -1277,7 +1263,6 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         uapi.save(test_user3)
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1285,7 +1270,7 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
-        user_id = int(test_user.user_id)
+        int(test_user.user_id)
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
@@ -1380,7 +1365,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(test_user.user_id)
+        int(test_user.user_id)
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
@@ -1417,7 +1402,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(test_user.user_id)
+        int(test_user.user_id)
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
@@ -1454,7 +1439,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(test_user.user_id)
+        int(test_user.user_id)
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before

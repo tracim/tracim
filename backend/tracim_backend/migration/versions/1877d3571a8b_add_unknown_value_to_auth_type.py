@@ -5,13 +5,12 @@ Revises: ab7c7f4bcbc5
 Create Date: 2018-11-27 12:01:24.143020
 
 """
+from alembic import op
+import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "1877d3571a8b"
 down_revision = "ab7c7f4bcbc5"
-
-from alembic import op
-import sqlalchemy as sa
 
 previous_auth_type_list = ["INTERNAL", "LDAP"]
 new_elements = ["UNKNOWN"]

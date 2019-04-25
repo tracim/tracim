@@ -75,11 +75,11 @@ class TestContent(StandardTest):
         eq_(content1.id, content1_from_query.id)
         eq_("TEST_CONTENT_DESCRIPTION_1_UPDATED", content1_from_query.description)
 
-        user_admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        self.session.query(User).filter(User.email == "admin@admin.admin").one()
 
         api = ContentApi(current_user=None, session=self.session, config=self.app_config)
 
-        content1_from_api = api.get_one(content1.id, content_type_list.Page.slug, workspace1)
+        api.get_one(content1.id, content_type_list.Page.slug, workspace1)
 
     def test_update(self):
         created_content = self.test_create()

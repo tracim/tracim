@@ -62,7 +62,7 @@ class AuthorizationChecker(object):
 
     def check(self, tracim_context: TracimContext) -> bool:
         """Return true or raise TracimException error if check doesnt pass"""
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class SameUserChecker(AuthorizationChecker):

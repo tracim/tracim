@@ -13,7 +13,6 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
@@ -34,7 +33,6 @@ from tracim_backend.lib.utils.authorization import can_see_workspace_information
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import is_content_manager
-from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.request import TracimRequest
@@ -459,7 +457,6 @@ class WorkspaceController(Controller):
         Convenient route allowing to get detail about a content without to known routes associated to its content type.
         This route generate a HTTP 302 with the right url
         """
-        app_config = request.registry.settings["CFG"]  # type: CFG
         content = request.current_content
         content_type = content_type_list.get_one_by_slug(content.type).slug
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?

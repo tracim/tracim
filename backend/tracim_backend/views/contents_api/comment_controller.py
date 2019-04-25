@@ -3,6 +3,7 @@ from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi

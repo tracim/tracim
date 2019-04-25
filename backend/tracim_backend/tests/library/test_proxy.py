@@ -1,4 +1,3 @@
-from tracim_backend import TracimRequest
 from tracim_backend.lib.proxy.proxy import Proxy
 
 

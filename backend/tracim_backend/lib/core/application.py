@@ -6,6 +6,9 @@ from tracim_backend.app_models.workspace_menu_entries import all_content_menu_en
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.exceptions import AppDoesNotExist
 
+if typing.TYPE_CHECKING:
+    from tracim_backend.models.data import Workspace
+
 
 class ApplicationApi(object):
     def __init__(self, app_list, show_all: bool = False) -> None:

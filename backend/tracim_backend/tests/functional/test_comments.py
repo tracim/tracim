@@ -38,7 +38,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] == None
+        assert comment["author"]["avatar_url"] is None
         assert comment["author"]["public_name"] == "Global manager"
 
         comment = res.json_body[1]
@@ -48,7 +48,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["author"]
         assert comment["author"]["user_id"] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] == None
+        assert comment["author"]["avatar_url"] is None
         assert comment["author"]["public_name"] == "Bob i."
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
@@ -62,7 +62,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["author"]
         assert comment["author"]["user_id"] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["avatar_url"] == None
+        assert comment["author"]["avatar_url"] is None
         assert comment["author"]["public_name"] == "John Reader"
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
@@ -242,7 +242,7 @@ class TestCommentsEndpoint(FunctionalTest):
         delete comment (user is content-manager)
         """
         self.testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)  #  nopep8
+        res = self.testapp.get("/api/v2/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body) == 3
         comment = res.json_body[2]
         assert comment["content_id"] == 20

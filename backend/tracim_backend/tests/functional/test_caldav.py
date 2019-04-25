@@ -42,7 +42,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
     def test_radicale_available(self) -> None:
         try:
             result = requests.get(CALDAV_URL_FOR_TEST, timeout=3)
-        except ConnectionError as exc:
+        except ConnectionError:
             # we do retry just one time in order to be sure server was
             # correctly setup
             sleep(0.1)
@@ -64,13 +64,13 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        result = self.testapp.get("/agenda/user/{}/".format(user.user_id), status=404)
+        self.testapp.get("/agenda/user/{}/".format(user.user_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
-        result = self.testapp.put(
+        self.testapp.put(
             "/agenda/user/{}/".format(user.user_id), event, content_type="text/calendar", status=201
         )
-        result = self.testapp.get("/agenda/user/{}/".format(user.user_id), status=200)
-        result = self.testapp.delete("/agenda/user/{}/".format(user.user_id), status=200)
+        self.testapp.get("/agenda/user/{}/".format(user.user_id), status=200)
+        self.testapp.delete("/agenda/user/{}/".format(user.user_id), status=200)
 
     @parameterized.expand(
         [
@@ -94,28 +94,22 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         )
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        result = self.testapp.get(
-            "/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=404
-        )
+        self.testapp.get("/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
-        result = self.testapp.put(
+        self.testapp.put(
             "/agenda/user/{}/".format(user.user_id), event, content_type="text/calendar", status=201
         )
-        result = self.testapp.put(
+        self.testapp.put(
             "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
             event,
             content_type="text/calendar",
             status="*",
         )
-        result = self.testapp.get(
+        self.testapp.get("/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200)
+        self.testapp.delete(
             "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
         )
-        result = self.testapp.delete(
-            "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
-        )
-        result = self.testapp.delete(
-            "/agenda/user/{}/".format(user.user_id, sub_item_label), status=200
-        )
+        self.testapp.delete("/agenda/user/{}/".format(user.user_id, sub_item_label), status=200)
 
     def test_proxy_user_agenda__err__other_user_agenda(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -123,7 +117,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -164,22 +158,16 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        result = self.testapp.get(
-            "/agenda/workspace/{}/".format(workspace.workspace_id), status=404
-        )
+        self.testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
-        result = self.testapp.put(
+        self.testapp.put(
             "/agenda/workspace/{}/".format(workspace.workspace_id),
             event,
             content_type="text/agenda",
             status=201,
         )
-        result = self.testapp.get(
-            "/agenda/workspace/{}/".format(workspace.workspace_id), status=200
-        )
-        result = self.testapp.delete(
-            "/agenda/workspace/{}/".format(workspace.workspace_id), status=200
-        )
+        self.testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
+        self.testapp.delete("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -187,7 +175,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
         gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
         groups = [gapi.get_one_with_name("users")]
-        user = uapi.create_user(
+        uapi.create_user(
             "test@test.test",
             password="test@test.test",
             do_save=True,
@@ -240,21 +228,21 @@ class TestAgendaApi(FunctionalTest):
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = self.testapp.get("/api/v2/users/{}/agenda".format(user.user_id), status=200)
-        agendas = result.json_body
+
         assert len(result.json_body) == 3
         agenda = result.json_body[0]
         assert agenda["agenda_url"] == "http://localhost:6543/agenda/user/{}/".format(user.user_id)
-        assert agenda["with_credentials"] == True
+        assert agenda["with_credentials"] is True
         agenda = result.json_body[1]
         assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
             workspace.workspace_id
         )
-        assert agenda["with_credentials"] == True
+        assert agenda["with_credentials"] is True
         agenda = result.json_body[2]
         assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
             workspace2.workspace_id
         )
-        assert agenda["with_credentials"] == True
+        assert agenda["with_credentials"] is True
 
     def test_proxy_user_agenda__ok__workspace_filter(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -291,15 +279,14 @@ class TestAgendaApi(FunctionalTest):
         result = self.testapp.get(
             "/api/v2/users/{}/agenda".format(user.user_id), params=params, status=200
         )
-        agendas = result.json_body
         assert len(result.json_body) == 2
         agenda = result.json_body[0]
         assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
             workspace.workspace_id
         )
-        assert agenda["with_credentials"] == True
+        assert agenda["with_credentials"] is True
         agenda = result.json_body[1]
         assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
             workspace3.workspace_id
         )
-        assert agenda["with_credentials"] == True
+        assert agenda["with_credentials"] is True

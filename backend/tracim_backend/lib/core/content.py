@@ -6,6 +6,7 @@ import re
 import traceback
 import typing
 
+from depot.io.interfaces import StoredFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
@@ -26,9 +27,7 @@ from sqlalchemy.sql.elements import and_
 import transaction
 
 from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -61,7 +60,6 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
-from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
@@ -251,7 +249,9 @@ class ContentApi(object):
                 or_(
                     Content.workspace_id.in_(workspace_ids),
                     # And allow access to non workspace document when he is owner
-                    and_(Content.workspace_id == None, Content.owner_id == self._user_id),
+                    and_(
+                        Content.workspace_id == None, Content.owner_id == self._user_id
+                    ),  # noqa: E711
                 )
             )
 
@@ -261,15 +261,17 @@ class ContentApi(object):
         result = self.__real_base_query(workspace)
 
         if not self._show_active:
-            result = result.filter(or_(Content.is_deleted == True, Content.is_archived == True))
+            result = result.filter(
+                or_(Content.is_deleted == True, Content.is_archived == True)
+            )  # noqa: E711
         if not self._show_deleted:
-            result = result.filter(Content.is_deleted == False)
+            result = result.filter(Content.is_deleted == False)  # noqa: E711
 
         if not self._show_archived:
-            result = result.filter(Content.is_archived == False)
+            result = result.filter(Content.is_archived == False)  # noqa: E711
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary == False)
+            result = result.filter(Content.is_temporary == False)  # noqa: E711
 
         return result
 
@@ -297,13 +299,13 @@ class ContentApi(object):
         result = self.__revisions_real_base_query(workspace)
 
         if not self._show_deleted:
-            result = result.filter(ContentRevisionRO.is_deleted == False)
+            result = result.filter(ContentRevisionRO.is_deleted == False)  # noqa: E711
 
         if not self._show_archived:
-            result = result.filter(ContentRevisionRO.is_archived == False)
+            result = result.filter(ContentRevisionRO.is_archived == False)  # noqa: E711
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary == False)
+            result = result.filter(Content.is_temporary == False)  # noqa: E711
 
         return result
 
@@ -323,24 +325,24 @@ class ContentApi(object):
             parent = aliased(Content)
             result = (
                 result.join(parent, Content.parent)
-                .filter(Content.is_deleted == False)
-                .filter(parent.is_deleted == False)
+                .filter(Content.is_deleted == False)  # noqa: E711
+                .filter(parent.is_deleted == False)  # noqa: E711
             )
 
         if not self._show_archived:
             parent = aliased(Content)
             result = (
                 result.join(parent, Content.parent)
-                .filter(Content.is_archived == False)
-                .filter(parent.is_archived == False)
+                .filter(Content.is_archived == False)  # noqa: E711
+                .filter(parent.is_archived == False)  # noqa: E711
             )
 
         if not self._show_temporary:
             parent = aliased(Content)
             result = (
                 result.join(parent, Content.parent)
-                .filter(Content.is_temporary == False)
-                .filter(parent.is_temporary == False)
+                .filter(Content.is_temporary == False)  # noqa: E711
+                .filter(parent.is_temporary == False)  # noqa: E711
             )
 
         return result
@@ -426,7 +428,7 @@ class ContentApi(object):
         if parent:
             query = query.filter(Content.parent_id == parent.content_id)
         else:
-            query = query.filter(Content.parent_id == None)
+            query = query.filter(Content.parent_id == None)  # noqa: E711
 
         if exclude_content_id:
             query = query.filter(Content.content_id != exclude_content_id)
@@ -787,7 +789,7 @@ class ContentApi(object):
         if parent_folder:
             content_query = content_query.filter(Content.parent_id == parent_folder.content_id)
         else:
-            content_query = content_query.filter(Content.parent_id == None)
+            content_query = content_query.filter(Content.parent_id == None)  # noqa: E711
 
         # Filter with workspace
         content_query = content_query.filter(Content.workspace_id == workspace.workspace_id)
@@ -828,12 +830,12 @@ class ContentApi(object):
             if folder:
                 folder_query = folder_query.filter(Content.parent_id == folder.content_id)
             else:
-                folder_query = folder_query.filter(Content.parent_id == None)
+                folder_query = folder_query.filter(Content.parent_id == None)  # noqa: E711
 
             # Get thirst corresponding folder
             try:
                 folder = folder_query.order_by(Content.revision_id.desc()).one()
-            except NoResultFound as exc:
+            except NoResultFound:
                 raise ContentNotFound("Folder not found")
 
         return folder
@@ -1082,7 +1084,7 @@ class ContentApi(object):
             resultset = resultset.filter(Content.type.in_(all_slug_alias))
 
         if parent_ids is False:
-            resultset = resultset.filter(Content.parent_id == None)
+            resultset = resultset.filter(Content.parent_id == None)  # noqa: E711
 
         if parent_ids:
             # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
@@ -1096,7 +1098,9 @@ class ContentApi(object):
                     allowed_parent_ids.append(parent_id)
             if allow_root:
                 resultset = resultset.filter(
-                    or_(Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None)
+                    or_(
+                        Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None
+                    )  # noqa: E711
                 )
             else:
                 resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))
@@ -1193,24 +1197,24 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_last_unread(
-        self, parent_id: int, content_type: str, workspace: Workspace = None, limit=10
-    ) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int)  # DYN_REMOVE
-        assert content_type is not None  # DYN_REMOVE
-        assert isinstance(content_type, str)  # DYN_REMOVE
-
-        read_revision_ids = self._session.query(RevisionReadStatus.revision_id).filter(
-            RevisionReadStatus.user_id == self._user_id
-        )
-
-        not_read_revisions = (
-            self._revisions_base_query(workspace)
-            .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids))
-            .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id)
-            .filter(Workspace.is_deleted.is_(False))
-            .subquery()
-        )
+    # def get_last_unread(
+    #     self, parent_id: int, content_type: str, workspace: Workspace = None, limit=10
+    # ) -> typing.List[Content]:
+    #     assert parent_id is None or isinstance(parent_id, int)  # DYN_REMOVE
+    #     assert content_type is not None  # DYN_REMOVE
+    #     assert isinstance(content_type, str)  # DYN_REMOVE
+    #
+    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id).filter(
+    #         RevisionReadStatus.user_id == self._user_id
+    #     )
+    #
+    #     not_read_revisions = (
+    #         self._revisions_base_query(workspace)
+    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids))
+    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id)
+    #         .filter(Workspace.is_deleted.is_(False))
+    #         .subquery()
+    #     )
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
@@ -1294,66 +1298,6 @@ class ContentApi(object):
                 break
 
         return active_contents
-
-    # TODO - G.M - 2018-07-19 - Find a way to update this method to something
-    # usable and efficient for tracim v2 to get content with read/unread status
-    # instead of relying on has_new_information_for()
-    # def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
-    #                     workspace: Workspace=None, limit=10) -> typing.List[Content]:
-    #     assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-    #     assert content_type is not None# DYN_REMOVE
-    #     assert isinstance(content_type, str) # DYN_REMOVE
-    #
-    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
-    #         .filter(RevisionReadStatus.user_id==self._user_id)
-    #
-    #     not_read_revisions = self._revisions_base_query(workspace) \
-    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
-    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
-    #         .filter(Workspace.is_deleted.is_(False)) \
-    #         .subquery()
-    #
-    #     not_read_content_ids_query = self._session.query(
-    #         distinct(not_read_revisions.c.content_id)
-    #     )
-    #     not_read_content_ids = list(map(
-    #         itemgetter(0),
-    #         not_read_content_ids_query,
-    #     ))
-    #
-    #     not_read_contents = self._base_query(workspace) \
-    #         .filter(Content.content_id.in_(not_read_content_ids)) \
-    #         .order_by(desc(Content.updated))
-    #
-    #     if content_type != content_type_list.Any_SLUG:
-    #         not_read_contents = not_read_contents.filter(
-    #             Content.type==content_type)
-    #     else:
-    #         not_read_contents = not_read_contents.filter(
-    #             Content.type!=content_type_list.Folder.slug)
-    #
-    #     if parent_id:
-    #         not_read_contents = not_read_contents.filter(
-    #             Content.parent_id==parent_id)
-    #
-    #     result = []
-    #     for item in not_read_contents:
-    #         new_item = None
-    #         if content_type_list.Comment.slug == item.type:
-    #             new_item = item.parent
-    #         else:
-    #             new_item = item
-    #
-    #         # INFO - D.A. - 2015-05-20
-    #         # We do not want to show only one item if the last 10 items are
-    #         # comments about one thread for example
-    #         if new_item not in result:
-    #             result.append(new_item)
-    #
-    #         if len(result) >= limit:
-    #             break
-    #
-    #     return result
 
     def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:
         """
@@ -1910,7 +1854,7 @@ class ContentApi(object):
         if not action_description:
             # See if the last action has been modified
             if (
-                content.revision_type == None
+                content.revision_type is None
                 or len(get_history(content.revision, "revision_type")) <= 0
             ):
                 # The action has not been modified, so we set it to default edition

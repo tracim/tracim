@@ -1,5 +1,4 @@
 # coding: utf8
-import functools
 from os.path import basename
 from os.path import dirname
 import re
@@ -7,8 +6,6 @@ import typing
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
-from wsgidav.dav_error import HTTP_FORBIDDEN
-from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
 
@@ -16,7 +13,6 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.content import ContentApi
@@ -28,8 +24,6 @@ from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
-from tracim_backend.lib.webdav.utils import HistoryType
-from tracim_backend.lib.webdav.utils import SpecialFolderExtension
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 
@@ -254,7 +248,7 @@ class Provider(DAVProvider):
 
         # And now we'll work on the path to establish which type or resource is requested
 
-        content_api = ContentApi(
+        ContentApi(
             current_user=user,
             session=session,
             config=self.app_config,

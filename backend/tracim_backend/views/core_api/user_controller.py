@@ -1,11 +1,11 @@
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import PasswordDoNotMatch
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
@@ -14,7 +14,6 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -385,7 +384,6 @@ class UserController(Controller):
         get user_read status of contents
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
@@ -473,11 +471,6 @@ class UserController(Controller):
         enable workspace notification
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
         wapi = WorkspaceApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
@@ -485,12 +478,6 @@ class UserController(Controller):
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         wapi.enable_notifications(request.candidate_user, workspace)
-        rapi = RoleApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        role = rapi.get_one(request.candidate_user.user_id, workspace.workspace_id)
         wapi.save(workspace)
         return
 
@@ -503,11 +490,6 @@ class UserController(Controller):
         disable workspace notification
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
         wapi = WorkspaceApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
@@ -526,12 +508,12 @@ class UserController(Controller):
 
         # user workspace
         configurator.add_route(
-            "user_workspace", "/users/{user_id:\d+}/workspaces", request_method="GET"
+            "user_workspace", "/users/{user_id:\d+}/workspaces", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.user_workspace, route_name="user_workspace")
 
         # user info
-        configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")
+        configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
         configurator.add_view(self.user, route_name="user")
 
         # users lists
@@ -540,22 +522,28 @@ class UserController(Controller):
 
         # known members lists
         configurator.add_route(
-            "known_members", "/users/{user_id:\d+}/known_members", request_method="GET"
+            "known_members",
+            "/users/{user_id:\d+}/known_members",
+            request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.known_members, route_name="known_members")
 
         # set user email
-        configurator.add_route("set_user_email", "/users/{user_id:\d+}/email", request_method="PUT")
+        configurator.add_route(
+            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user password
         configurator.add_route(
-            "set_user_password", "/users/{user_id:\d+}/password", request_method="PUT"
+            "set_user_password", "/users/{user_id:\d+}/password", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_password, route_name="set_user_password")
 
         # set user_info
-        configurator.add_route("set_user_info", "/users/{user_id:\d+}", request_method="PUT")
+        configurator.add_route(
+            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.set_user_infos, route_name="set_user_info")
 
         # create user
@@ -563,42 +551,48 @@ class UserController(Controller):
         configurator.add_view(self.create_user, route_name="create_user")
 
         # enable user
-        configurator.add_route("enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT")
+        configurator.add_route(
+            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.enable_user, route_name="enable_user")
 
         # disable user
         configurator.add_route(
-            "disable_user", "/users/{user_id:\d+}/disabled", request_method="PUT"
+            "disable_user", "/users/{user_id:\d+}/disabled", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.disable_user, route_name="disable_user")
 
         # delete user
-        configurator.add_route("delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT")
+        configurator.add_route(
+            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"
+        )  # noqa: W605
         configurator.add_view(self.delete_user, route_name="delete_user")
 
         # undelete user
         configurator.add_route(
-            "undelete_user", "/users/{user_id:\d+}/trashed/restore", request_method="PUT"
+            "undelete_user",
+            "/users/{user_id:\d+}/trashed/restore",
+            request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.undelete_user, route_name="undelete_user")
 
         # set user profile
         configurator.add_route(
-            "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"
+            "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_profile, route_name="set_user_profile")
 
         # user content
         configurator.add_route(
             "contents_read_status",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",  # noqa: W605
             request_method="GET",
         )
         configurator.add_view(self.contents_read_status, route_name="contents_read_status")
         # last active content for user
         configurator.add_route(
             "last_active_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active",  # noqa: W605
             request_method="GET",
         )
         configurator.add_view(self.last_active_content, route_name="last_active_content")
@@ -606,13 +600,13 @@ class UserController(Controller):
         # set content as read/unread
         configurator.add_route(
             "read_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_read, route_name="read_content")
         configurator.add_route(
             "unread_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_unread, route_name="unread_content")
@@ -620,7 +614,7 @@ class UserController(Controller):
         # set workspace as read
         configurator.add_route(
             "read_workspace",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/read",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/read",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_workspace_as_read, route_name="read_workspace")
@@ -628,7 +622,7 @@ class UserController(Controller):
         # enable workspace notification
         configurator.add_route(
             "enable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(
@@ -638,7 +632,7 @@ class UserController(Controller):
         # enable workspace notification
         configurator.add_route(
             "disable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(

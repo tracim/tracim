@@ -62,7 +62,7 @@ class Content(Fixture):
         )
         # Folders
 
-        tool_workspace = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=business_workspace,
             label="Tools",
@@ -84,14 +84,14 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        salads_folder = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=recipe_workspace,
             label="Salads",
             do_save=True,
             do_notify=False,
         )
-        other_folder = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=other_workspace,
             label="Infos",
@@ -137,7 +137,7 @@ class Content(Fixture):
         apple_pie_recipe.file_extension = ".txt"
         apple_pie_recipe.depot_file = FileIntent(b"Apple pie Recipe", "apple_Pie.txt", "text/plain")
         self._session.add(apple_pie_recipe)
-        Brownie_recipe = content_api.create(
+        brownie_recipe = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
@@ -145,11 +145,11 @@ class Content(Fixture):
             do_save=False,
             do_notify=False,
         )
-        Brownie_recipe.file_extension = ".html"
-        Brownie_recipe.depot_file = FileIntent(
+        brownie_recipe.file_extension = ".html"
+        brownie_recipe.depot_file = FileIntent(
             b"<p>Brownie Recipe</p>", "brownie_recipe.html", "text/html"
         )
-        self._session.add(Brownie_recipe)
+        self._session.add(brownie_recipe)
         fruits_desserts_folder = content_api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=recipe_workspace,
@@ -159,7 +159,7 @@ class Content(Fixture):
             do_notify=False,
         )
 
-        menu_page = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=business_workspace,
             parent=menu_workspace,
@@ -168,7 +168,7 @@ class Content(Fixture):
             do_notify=False,
         )
 
-        new_fruit_salad = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
@@ -201,7 +201,7 @@ class Content(Fixture):
         content_api.save(bad_fruit_salad, do_notify=False)
 
         # File at the root for test
-        new_fruit_salad = content_api.create(
+        content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=other_workspace,
             label="New Fruit Salad",

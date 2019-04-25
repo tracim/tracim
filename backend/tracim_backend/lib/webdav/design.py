@@ -3,112 +3,110 @@ from datetime import datetime
 
 from babel.dates import format_datetime
 
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models import data
-from tracim_backend.models.data import VirtualEvent
 
 # FIXME: fix temporaire ...
 style = """
 .title {
-	background:#F5F5F5;
-	padding-right:15px;
-	padding-left:15px;
-	padding-top:10px;
-	border-bottom:1px solid #CCCCCC;
-	overflow:auto;
+    background:#F5F5F5;
+    padding-right:15px;
+    padding-left:15px;
+    padding-top:10px;
+    border-bottom:1px solid #CCCCCC;
+    overflow:auto;
 } .title h1 { margin-top:0; }
 
 .content {
-	padding: 15px;
+    padding: 15px;
 }
 
 #left{ padding:0; }
 
 #right {
-	background:#F5F5F5;
-	border-left:1px solid #CCCCCC;
-	border-bottom: 1px solid #CCCCCC;
-	padding-top:15px;
+    background:#F5F5F5;
+    border-left:1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    padding-top:15px;
 }
 @media (max-width: 1200px) {
-	#right {
-		border-top:1px solid #CCCCCC;
-		border-left: none;
-		border-bottom: none;
-	}
+    #right {
+        border-top:1px solid #CCCCCC;
+        border-left: none;
+        border-bottom: none;
+    }
 }
 
 body { overflow:auto; }
 
 .btn {
-	text-align: left;
+    text-align: left;
 }
 
 .table tbody tr .my-align {
-	vertical-align:middle;
+    vertical-align:middle;
 }
 
 .title-icon {
-	font-size:2.5em;
-	float:left;
-	margin-right:10px;
+    font-size:2.5em;
+    float:left;
+    margin-right:10px;
 }
 .title.page, .title-icon.page { color:#00CC00; }
 .title.thread, .title-icon.thread { color:#428BCA; }
 
 /* ****************************** */
 .description-icon {
-	color:#999;
-	font-size:3em;
+    color:#999;
+    font-size:3em;
 }
 
 .description {
-	border-left: 5px solid #999;
-	padding-left: 10px;
-	margin-left: 10px;
-	margin-bottom:10px;
+    border-left: 5px solid #999;
+    padding-left: 10px;
+    margin-left: 10px;
+    margin-bottom:10px;
 }
 
 .description-text {
-	display:block;
-	overflow:hidden;
-	color:#999;
+    display:block;
+    overflow:hidden;
+    color:#999;
 }
 
 .comment-row:nth-child(2n) {
-	background-color:#F5F5F5;
+    background-color:#F5F5F5;
 }
 
 .comment-row:nth-child(2n+1) {
-	background-color:#FFF;
+    background-color:#FFF;
 }
 
 .comment-icon {
-	color:#CCC;
-	font-size:3em;
-	display:inline-block;
-	margin-right: 10px;
-	float:left;
+    color:#CCC;
+    font-size:3em;
+    display:inline-block;
+    margin-right: 10px;
+    float:left;
 }
 
 .comment-content {
-	display:block;
-	overflow:hidden;
+    display:block;
+    overflow:hidden;
 }
 
 .comment, .comment-revision {
-	padding:10px;
-	border-top: 1px solid #999;
+    padding:10px;
+    border-top: 1px solid #999;
 }
 
 .comment-revision-icon {
-	color:#777;
-	margin-right: 10px;
+    color:#777;
+    margin-right: 10px;
 }
 
 .title-text {
-	display: inline-block;
+    display: inline-block;
 }
 """
 

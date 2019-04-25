@@ -2,10 +2,8 @@
 """
 Tests for /api/v2/users subpath endpoints.
 """
-from time import sleep
 
 import pytest
-import requests
 import transaction
 
 from tracim_backend import AuthType
@@ -40,7 +38,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -115,10 +112,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -171,7 +168,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -199,10 +195,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -214,7 +210,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -237,7 +233,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -245,10 +241,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -275,7 +271,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -351,10 +346,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -407,7 +402,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -438,10 +432,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -453,7 +447,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -475,7 +469,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -483,10 +477,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -515,7 +509,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -531,10 +524,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -576,10 +569,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -638,7 +631,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -654,10 +646,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
         # creation order test
-        firstly_created = api.create(
+        api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -669,7 +661,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -691,7 +683,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -699,10 +691,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -735,7 +727,6 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -810,10 +801,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -854,7 +845,6 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -887,7 +877,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -899,7 +889,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -921,7 +911,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -929,10 +919,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -982,7 +972,6 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1015,7 +1004,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         firstly_created = api.create(
             content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
         )
-        secondly_created = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -1027,7 +1016,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         firstly_created_but_recently_updated = api.create(
             content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -1049,7 +1038,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace,
             main_folder,
@@ -1057,10 +1046,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        comments = api.create_comment(
+        api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
-        content_workspace_2 = api.create(
+        api.create(
             content_type_list.Page.slug,
             workspace2,
             main_folder_workspace2,
@@ -1089,7 +1078,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         url = "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
             workspace_id=workspace.workspace_id, user_id=admin.user_id
         )
-        res = self.testapp.get(url=url, status=403)
+        res = self.testapp.get(url=url, status=403, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -1104,7 +1093,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1186,7 +1174,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1235,7 +1222,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1284,7 +1270,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1350,7 +1335,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1401,7 +1385,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1421,7 +1404,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1484,7 +1466,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1504,7 +1485,6 @@ class TestUserSetContentAsRead(FunctionalTest):
         rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1573,7 +1553,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1657,7 +1636,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1706,7 +1684,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1756,7 +1733,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1822,7 +1798,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1874,7 +1849,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1917,7 +1891,6 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -1966,7 +1939,6 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2034,7 +2006,6 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2102,7 +2073,6 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2160,7 +2130,6 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2198,7 +2167,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2237,7 +2206,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2291,7 +2260,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2330,7 +2299,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2368,7 +2337,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -2777,7 +2746,7 @@ class TestUserWithNotificationEndpoint(MailHogFunctionalTest):
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test"
         assert res["timezone"] == ""
-        assert res["lang"] == None
+        assert res["lang"] is None
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -2856,7 +2825,6 @@ class TestUsersEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(test_user.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get("/api/v2/users", status=200)
@@ -2888,7 +2856,6 @@ class TestUsersEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(test_user.user_id)
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = self.testapp.get("/api/v2/users", status=403)
@@ -3023,7 +2990,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -3087,7 +3054,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -3229,7 +3196,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        test_user2 = uapi.create_user(
+        uapi.create_user(
             email="test2@test2.test2",
             password="password",
             name="bob2",
@@ -3293,7 +3260,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         uapi.save(test_user3)
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
         workspace = WorkspaceApi(
             current_user=admin, session=dbsession, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
@@ -4189,9 +4156,6 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
     def test_api_disable_user__err_400__cant_disable_myself_admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("users")]
         user_id = int(admin.user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -4369,7 +4333,7 @@ class TestUserEnpointsLDAPAuth(FunctionalTest):
     @pytest.mark.ldap
     def test_api__create_user__ok_200__full_admin(self):
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        self.testapp.get("/api/v2/auth/whoami", status=200)
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         user = api.get_one_by_email("hubert@planetexpress.com")
         gapi = GroupApi(session=self.session, config=self.app_config, current_user=user)

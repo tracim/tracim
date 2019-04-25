@@ -49,7 +49,9 @@ class TracimDomainController(object):
         try:
             api.get_one_by_email(username)
             return True
-        except:
+        # TODO - G.M - 2019-04-25 - do better exception handling here,
+        # see https://github.com/tracim/tracim/issues/1636
+        except Exception:
             return False
 
     def authDomainUser(

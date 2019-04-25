@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
-import typing
 
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
