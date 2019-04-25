@@ -1,3 +1,5 @@
+import React from 'react'
+import { Link } from 'react-router-dom'
 import {
   SET,
   PREPEND,
@@ -5,13 +7,6 @@ import {
   BREADCRUMBS
 } from '../action-creator.sync.js'
 
-/*
-Breadcrumbs item:
-{
-  url: '/home',
-  label: props.t('Home'),
-  type: [CORE, APPFEATURE, APPFULLSCREEN]
-*/
 const BREADCRUMBS_TYPE_ORDER = [{
   id: 'CORE',
   order: 1
@@ -44,7 +39,10 @@ export function breadcrumbs (state = [], action) {
       return orderBreadcrumbs([
         // INFO - CH - 2019-04-16 - app features cannot set breadcrums from root so it needs to overrides itself every time
         ...state.filter(bc => bc.type !== 'APPFEATURE'),
-        ...action.appendBreadcrumbs
+        ...action.appendBreadcrumbs.map(bc => ({
+          link: bc.link ? bc.link : <Link to={bc.url}>{bc.label}</Link>,
+          type: 'APPFEATURE'
+        }))
       ])
 
     default:

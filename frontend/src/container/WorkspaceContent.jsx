@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route } from 'react-router-dom'
+import { Link, withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
 import {
@@ -84,6 +84,8 @@ class WorkspaceContent extends React.Component {
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
         this.setState({appOpenedType: false})
         break
+
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
@@ -132,8 +134,14 @@ class WorkspaceContent extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      url: PAGE.WORKSPACE.DASHBOARD(state.idWorkspaceInUrl),
-      label: props.t(props.workspaceList.find(ws => ws.id === state.idWorkspaceInUrl).label),
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: 'CORE'
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.idWorkspaceInUrl)}>
+          {props.t(props.workspaceList.find(ws => ws.id === state.idWorkspaceInUrl).label)}
+        </Link>
+      ),
       type: 'CORE'
     }]
 
@@ -141,14 +149,20 @@ class WorkspaceContent extends React.Component {
 
     if (urlFilter) {
       breadcrumbsList.push({
-        url: `${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}?type=${urlFilter}`,
-        label: props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label),
+        link: (
+          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}?type=${urlFilter}`}>
+            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label)}
+          </Link>
+        ),
         type: 'CORE'
       })
     } else {
       breadcrumbsList.push({
-        url: `${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}`,
-        label: props.t('All contents'),
+        link: (
+          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}`}>
+            {props.t('All contents')}
+          </Link>
+        ),
         type: 'CORE'
       })
     }
@@ -328,7 +342,7 @@ class WorkspaceContent extends React.Component {
     : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
 
   render () {
-    const { user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
     const { state } = this
 
     const urlFilter = qs.parse(location.search).type
@@ -373,6 +387,7 @@ class WorkspaceContent extends React.Component {
               customClass='justify-content-between align-items-center'
               title={this.getTitle(urlFilter)}
               icon={this.getIcon(urlFilter)}
+              breadcrumbsList={breadcrumbs}
             >
               {idRoleUserWorkspace >= 2 &&
                 <DropdownCreateButton
@@ -468,7 +483,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
-  user, currentWorkspace, workspaceContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

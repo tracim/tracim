@@ -1,11 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import {
   Delimiter,
   PageWrapper,
@@ -33,7 +35,6 @@ import {
   editableUserAuthTypeList,
   PAGE
 } from '../helper.js'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
   constructor (props) {
@@ -67,6 +68,14 @@ class Account extends React.Component {
 
     this.state = {
       subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
+    }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
@@ -110,11 +119,21 @@ class Account extends React.Component {
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
-  buildBreadcrumbs = () => this.props.dispatch(setBreadcrumbs([{
-    url: PAGE.ACCOUNT,
-    label: this.props.t('My account'),
-    type: 'CORE'
-  }]))
+  buildBreadcrumbs = () => {
+    const { props } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: 'CORE'
+    }, {
+      link: <span className='nolink'>{props.t('Administrate')}</span>,
+      type: 'CORE',
+      notALink: true
+    }, {
+      link: <Link to={PAGE.ACCOUNT}>{props.t('My account')}</Link>,
+      type: 'CORE'
+    }]))
+  }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
     subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName}))
@@ -193,6 +212,7 @@ class Account extends React.Component {
               parentClass={'account'}
               title={props.t('My account')}
               icon='user-o'
+              breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='account'>
@@ -250,5 +270,7 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, timezone, system, appList }) => ({ user, workspaceList, timezone, system, appList })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
+  breadcrumbs, user, workspaceList, timezone, system, appList
+})
 export default connect(mapStateToProps)(translate()(Account))

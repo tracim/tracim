@@ -6,5 +6,6 @@
   "All my agendas": "Tous mes agendas",
   "Agenda of shared space {{workspaceLabel}}": "Agenda de l'espace partagé {{workspaceLabel}}",
   "Agenda": "Agenda",
-  "Some agenda could not be loaded": "Certains agendas n'ont pas pu être chargés"
+  "Some agenda could not be loaded": "Certains agendas n'ont pas pu être chargés",
+  "Home": "Accueil"
 }

@@ -56,7 +56,6 @@
   "Connection": "Connection",
   "Email Address": "Email Address",
   "Password": "Password",
-  "Remember me": "Remember me",
   "Forgotten password ?": "Forgotten password ?",
   "Error while loading read status list": "Error while loading read status list",
   "Error while archiving document": "Error while archiving document",
@@ -181,10 +180,10 @@
   "Text document": "Text document",
   "Thread": "Thread",
   "File": "File",
-  "Administrate users": "Administrate users",
   "Home": "Home",
   "All contents": "All contents",
   "Invalid email": "Invalid email",
   "Invalid password": "Invalid password",
-  "Error while saving your default language": "Error while saving your default language"
+  "Error while saving your default language": "Error while saving your default language",
+  "Administrate": "Administrate"
 }

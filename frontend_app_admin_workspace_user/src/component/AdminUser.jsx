@@ -95,13 +95,6 @@ export class AdminUser extends React.Component {
     if (resultSuccess) this.handleToggleAddUser()
   }
 
-  handleClickUser = (e, idUser) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    this.props.onClickUser(idUser)
-  }
-
   render () {
     const { props, state } = this
 
@@ -111,6 +104,7 @@ export class AdminUser extends React.Component {
           parentClass={'adminUser'}
           title={props.t('User account management')}
           icon='users'
+          breadcrumbsList={props.breadcrumbsList}
         />
 
         <PageContent parentClass='adminUser'>

@@ -13,7 +13,6 @@ import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import Notification from '../component/Header/MenuActionListItem/Notification.jsx'
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
-import Breadcrumbs from '../component/Breadcrumbs/Breadcrumbs.jsx'
 import {
   newFlashMessage,
   setUserLang,
@@ -97,8 +96,6 @@ class Header extends React.Component {
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
-            <Breadcrumbs />
-
             <ul className='header__menu__rightside'>
               {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning'>

@@ -246,12 +246,14 @@ class File extends React.Component {
 
   buildBreadcrumbs = () => {
     const { state } = this
+
     GLOBAL_dispatchEvent({
       type: 'appendBreadcrumbs',
       data: {
         breadcrumbs: [{
-          url: `/${state.config.slug}/${state.content.content_id}`,
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
           label: state.content.label,
+          link: null,
           type: 'APPFEATURE'
         }]
       }

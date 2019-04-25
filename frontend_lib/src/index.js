@@ -8,6 +8,8 @@ import {
   generateLocalStorageContentId
 } from './helper.js'
 
+import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
+
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
@@ -57,6 +59,7 @@ export {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,

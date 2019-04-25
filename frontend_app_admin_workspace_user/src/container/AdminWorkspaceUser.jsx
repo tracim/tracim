@@ -1,29 +1,29 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  handleFetchResult,
-  CardPopup
+  CardPopup,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
+  deleteWorkspace,
+  getUserDetail,
+  getUserList,
   getWorkspaceList,
   getWorkspaceMemberList,
-  deleteWorkspace,
-  getUserList,
-  getUserDetail,
+  postAddUser,
+  putMyselfProfile,
   putUserDisable,
   putUserEnable,
-  putUserProfile,
-  putMyselfProfile,
-  postAddUser
+  putUserProfile
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
-import { PAGE } from '../../../frontend/src/helper.js'
 
 require('../css/index.styl')
 
@@ -39,7 +39,8 @@ class AdminWorkspaceUser extends React.Component {
       content: props.data ? props.data.content : debug.content,
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
-      workspaceIdOpened: null
+      workspaceIdOpened: null,
+      breadcrumbsList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -70,6 +71,7 @@ class AdminWorkspaceUser extends React.Component {
         i18n.changeLanguage(data)
         if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
         else if (this.state.config.type === 'user') this.loadUserContent()
+        this.buildBreadcrumbs()
         break
       default:
         break
@@ -95,6 +97,7 @@ class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
+      this.buildBreadcrumbs()
     }
   }
 
@@ -168,29 +171,32 @@ class AdminWorkspaceUser extends React.Component {
   buildBreadcrumbs = () => {
     const { props, state } = this
 
-    const getBreadcrumbsFromType = () => {
-      if (state.config.type === 'workspace') {
-        return {
-          url: PAGE.ADMIN.WORKSPACE,
-          label: props.t('Administrate workspaces'),
-          type: 'APPFULLSCREEN'
-        }
-      }
-      if (state.config.type === 'user') {
-        return {
-          url: PAGE.ADMIN.USER,
-          label: props.t('Administrate users'),
-          type: 'APPFULLSCREEN'
-        }
-      }
+    const breadcrumbsList = [{
+      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: 'CORE'
+    }, {
+      link: <span>{props.t('Administrate')}</span>,
+      type: 'CORE',
+      notALink: true
+    }]
+
+    if (state.config.type === 'workspace') {
+      breadcrumbsList.push({
+        link: <Link to={'/ui/admin/workspace'}>{props.t('Shared space')}</Link>,
+        type: 'APPFULLSCREEN'
+      })
+    } else if (state.config.type === 'user') {
+      breadcrumbsList.push({
+        link: <Link to={'/ui/admin/user'}>{props.t('Users')}</Link>,
+        type: 'APPFULLSCREEN'
+      })
     }
 
-    GLOBAL_dispatchEvent({
-      type: 'setBreadcrumbs',
-      data: {
-        breadcrumbs: [getBreadcrumbsFromType()]
-      }
-    })
+    // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
+    // app crash telling it cannot render a Link outside a router
+    // see https://github.com/tracim/tracim/issues/1637
+    // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
+    this.setState({breadcrumbsList: breadcrumbsList})
   }
 
   handleDeleteWorkspace = async () => {
@@ -340,6 +346,7 @@ class AdminWorkspaceUser extends React.Component {
             onClickWorkspace={this.handleClickWorkspace}
             onClickNewWorkspace={this.handleClickNewWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
+            breadcrumbsList={state.breadcrumbsList}
           />
         )}
 
@@ -352,6 +359,7 @@ class AdminWorkspaceUser extends React.Component {
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
+            breadcrumbsList={state.breadcrumbsList}
           />
         )}
 

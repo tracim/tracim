@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -15,8 +16,6 @@ import {
   getWorkspaceMemberList
 } from '../action.async.js'
 
-require('../css/index.styl')
-
 class Agenda extends React.Component {
   constructor (props) {
     super(props)
@@ -28,7 +27,9 @@ class Agenda extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       userWorkspaceList: [],
-      userWorkspaceListLoaded: false
+      userWorkspaceListLoaded: false,
+      breadcrumbsList: [],
+      appMounted: false
     }
 
     // i18n has been init, add resources from frontend
@@ -57,6 +58,7 @@ class Agenda extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.buildBreadcrumbs()
         this.agendaIframe.contentWindow.location.reload()
         break
       default:
@@ -113,31 +115,6 @@ class Agenda extends React.Component {
     }
   }
 
-  buildBreadcrumbs = () => {
-    const { props, state } = this
-
-    const getBreadcrumbs = () => state.config.appConfig.idWorkspace
-      ? [{
-        url: `/workspaces/${state.config.appConfig.idWorkspace}/dashboard`,
-        label: state.content.workspaceLabel,
-        type: 'APPFULLSCREEN'
-      }, {
-        url: `/workspaces/${state.config.appConfig.idWorkspace}/agenda`,
-        label: props.t('Agenda'),
-        type: 'APPFULLSCREEN'
-      }]
-      : [{
-        url: `/agenda`,
-        label: props.t('All my agendas'),
-        type: 'APPFULLSCREEN'
-      }]
-
-    GLOBAL_dispatchEvent({
-      type: 'setBreadcrumbs',
-      data: {breadcrumbs: getBreadcrumbs()}
-    })
-  }
-
   // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role
   // on a workspace is to extract it from the members list that workspace
   // see https://github.com/tracim/tracim/issues/1581
@@ -180,6 +157,34 @@ class Agenda extends React.Component {
       userWorkspaceList: agendaListWithRole,
       userWorkspaceListLoaded: true
     })
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: 'CORE'
+    },
+      ...(state.config.appConfig.idWorkspace
+          ? [{
+            link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/dashboard`}>{state.content.workspaceLabel}</Link>,
+            type: 'APPFULLSCREEN'
+          }, {
+            link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/agenda`}>{props.t('Agenda')}</Link>,
+            type: 'APPFULLSCREEN'
+          }]
+          : [{
+            link: <Link to={`/ui/agenda`}>{props.t('All my agendas')}</Link>,
+            type: 'APPFULLSCREEN'
+          }]
+      )]
+
+    // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
+    // app crash telling it cannot render a Link outside a router
+    // see https://github.com/tracim/tracim/issues/1637
+    // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
+    this.setState({breadcrumbsList: breadcrumbsList})
   }
 
   loadWorkspaceData = async () => {
@@ -231,6 +236,7 @@ class Agenda extends React.Component {
           parentClass='agendaPage'
           title={pageTitle}
           icon={'calendar'}
+          breadcrumbsList={state.breadcrumbsList}
         />
 
         <PageContent parentClass='agendaPage'>

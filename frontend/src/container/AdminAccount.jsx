@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
@@ -58,6 +58,14 @@ class Account extends React.Component {
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+    }
   }
 
   async componentDidMount () {
@@ -98,12 +106,18 @@ class Account extends React.Component {
     const { props, state } = this
 
     props.dispatch(setBreadcrumbs([{
-      url: PAGE.ADMIN.USER,
-      label: props.t('Administrate users'),
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: 'CORE'
     }, {
-      url: PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id),
-      label: state.userToEdit.public_name,
+      link: <span>{props.t('Administrate')}</span>,
+      type: 'CORE',
+      notALink: true
+    }, {
+      link: (
+        <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id)}>
+          {state.userToEdit.public_name}
+        </Link>
+      ),
       type: 'CORE'
     }]))
   }
@@ -215,6 +229,7 @@ class Account extends React.Component {
               parentClass={'account'}
               title={props.t('{{userName}} account edition', {userName: state.userToEdit.public_name})}
               icon='user-o'
+              breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='account'>
@@ -260,5 +275,5 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, timezone, system }) => ({ user, workspaceList, timezone, system })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system }) => ({ breadcrumbs, user, workspaceList, timezone, system })
 export default withRouter(connect(mapStateToProps)(translate()(Account)))

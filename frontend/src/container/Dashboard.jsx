@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
@@ -73,6 +73,7 @@ class Dashboard extends React.Component {
     switch (type) {
       case 'refreshDashboardMemberList': this.loadMemberList(); break
       case 'refreshWorkspaceList': this.loadWorkspaceDetail(); break
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
@@ -178,14 +179,24 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     const breadcrumbsList = [{
-      url: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
-      label: props.curWs.label,
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: 'CORE'
     }, {
-      url: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
-      label: props.t('Dashboard'),
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+          {props.curWs.label}
+        </Link>
+      ),
+      type: 'CORE'
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+          {props.t('Dashboard')}
+        </Link>
+      ),
       type: 'CORE'
     }]
+
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
@@ -437,8 +448,9 @@ class Dashboard extends React.Component {
               title={props.t('Dashboard')}
               subtitle={''}
               icon='home'
+              breadcrumbsList={props.breadcrumbs}
             >
-              <div className='dashboard__header__advancedmode ml-3'>
+              <div className='dashboard__header__advancedmode'>
                 {idRoleUserWorkspace >= 8 &&
                   <button
                     type='button'
@@ -552,5 +564,7 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType, appList, currentWorkspace, system }) => ({ user, contentType, appList, curWs: currentWorkspace, system })
+const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
+  breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
+})
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

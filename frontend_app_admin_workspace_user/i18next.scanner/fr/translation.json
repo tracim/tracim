@@ -43,6 +43,7 @@
   "Email notification are disabled, please manually notify users of any change": "Les notifications par email sont désactivées, veuillez informer manuellement les utilisateurs des changements",
   "Error, invalid email address": "Erreur, email invalide",
   "Create a shared space": "Créer un espace de travail",
-  "Administrate workspaces": "Administrer les espaces de travail",
-  "Administrate users": "Administrer les utilisateurs"
+  "Home": "Accueil",
+  "Administrate": "Administrer",
+  "Users": "Utilisateurs"
 }
