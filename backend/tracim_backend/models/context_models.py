@@ -47,7 +47,7 @@ class ConfigModel(object):
         email_notification_activated: bool,
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
-        webdav_url: str
+        webdav_url: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
