@@ -764,6 +764,7 @@ class AboutSchema(marshmallow.Schema):
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
+    webdav_enabled = marshmallow.fields.Bool()
 
 
 class ErrorCodeSchema(marshmallow.Schema):
