@@ -1,10 +1,12 @@
 import copy
+
 import transaction
 
 
 class Fixture(object):
 
     """ Fixture classes (list) required for this fixtures"""
+
     require = NotImplemented
 
     def __init__(self, session, config):
@@ -38,10 +40,7 @@ class FixturesLoader(object):
 
     def _load(self, fixture_class: Fixture):
         if fixture_class not in self._loaded:
-            fixture = fixture_class(
-                session=self._session,
-                config=self._config,
-            )
+            fixture = fixture_class(session=self._session, config=self._config)
             fixture.insert()
             self._loaded.append(fixture_class)
             self._session.flush()

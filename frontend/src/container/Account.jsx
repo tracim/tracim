@@ -7,7 +7,6 @@ import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import {
   Delimiter,
   PageWrapper,
@@ -35,6 +34,7 @@ import {
   editableUserAuthTypeList,
   PAGE
 } from '../helper.js'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
   constructor (props) {
@@ -82,7 +82,7 @@ class Account extends React.Component {
   componentDidMount () {
     const { props } = this
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
-    this.loadAgendaUrl()
+    if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
   }
 

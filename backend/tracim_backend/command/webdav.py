@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import argparse
+
 import plaster
+
 from tracim_backend.command import AppContextCommand
-from wsgi import webdav_app
 from wsgi import WEBDAV_APP_NAME
+from wsgi import webdav_app
 
 
 class WebdavRunnerCommand(AppContextCommand):
@@ -25,5 +27,5 @@ class WebdavRunnerCommand(AppContextCommand):
         server(app)
 
     def _get_server(self, config_uri: str):
-        loader = plaster.get_loader(config_uri, protocols=['wsgi'])
+        loader = plaster.get_loader(config_uri, protocols=["wsgi"])
         return loader.get_wsgi_server(name=WEBDAV_APP_NAME)

@@ -7,11 +7,8 @@ Create Date: 2018-03-29 17:05:41.735260
 """
 
 # revision identifiers, used by Alembic.
-revision = 'ad79f58ec2bf'
-down_revision = '2b4043fa2502'
-
-from alembic import op
-import sqlalchemy as sa
+revision = "ad79f58ec2bf"
+down_revision = "2b4043fa2502"
 
 
 def upgrade():

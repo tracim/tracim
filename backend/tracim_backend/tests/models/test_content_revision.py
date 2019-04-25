@@ -3,25 +3,25 @@ from collections import OrderedDict
 
 from sqlalchemy import inspect
 
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.models.auth import User
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
 
 
 class TestContentRevision(DefaultTest):
-
     def _new_from(self, revision):
         excluded_columns = (
-            'revision_id',
-            '_sa_instance_state',
-            'depot_file',
-            'node',
-            'revision_read_statuses',
+            "revision_id",
+            "_sa_instance_state",
+            "depot_file",
+            "node",
+            "revision_read_statuses",
         )
-        revision_columns = [attr.key for attr in inspect(revision).attrs
-                            if attr.key not in excluded_columns]
+        revision_columns = [
+            attr.key for attr in inspect(revision).attrs if attr.key not in excluded_columns
+        ]
         new_revision = ContentRevisionRO()
 
         for revision_column in revision_columns:
@@ -31,32 +31,25 @@ class TestContentRevision(DefaultTest):
         return new_revision
 
     def _get_dict_representation(self, revision):
-        keys_to_remove = ('updated', '_sa_instance_state')
+        keys_to_remove = ("updated", "_sa_instance_state")
         dict_repr = OrderedDict(sorted(revision.__dict__.items()))
         for key_to_remove in keys_to_remove:
             dict_repr.pop(key_to_remove, None)
         return dict_repr
 
     def test_new_revision(self):
-        admin = self.session.query(User).filter(
-            User.email == 'admin@admin.admin'
-        ).one()
-        workspace = self._create_workspace_and_test(
-            name='workspace_1',
-            user=admin
-        )
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace = self._create_workspace_and_test(name="workspace_1", user=admin)
         folder = self._create_content_and_test(
-            name='folder_1',
-            workspace=workspace,
-            type=content_type_list.Folder.slug
+            name="folder_1", workspace=workspace, type=content_type_list.Folder.slug
         )
         page = self._create_content_and_test(
             workspace=workspace,
             parent=folder,
-            name='file_1',
-            description='content of file_1',
+            name="file_1",
+            description="content of file_1",
             type=content_type_list.Page.slug,
-            owner=admin
+            owner=admin,
         )
 
         self.session.flush()
@@ -67,12 +60,8 @@ class TestContentRevision(DefaultTest):
         # columns mapping
         new_revision_by_test = self._new_from(page.revision)
 
-        new_revision_by_model_dict = self._get_dict_representation(
-            new_revision_by_model
-        )
-        new_revision_by_test_dict = self._get_dict_representation(
-            new_revision_by_test
-        )
+        new_revision_by_model_dict = self._get_dict_representation(new_revision_by_model)
+        new_revision_by_test_dict = self._get_dict_representation(new_revision_by_test)
 
         # They must be identical
         eq_(new_revision_by_model_dict, new_revision_by_test_dict)

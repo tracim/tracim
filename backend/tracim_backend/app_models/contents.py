@@ -1,36 +1,31 @@
 # -*- coding: utf-8 -*-
-import typing
 from enum import Enum
+import typing
 
+####
+# Content Status
 from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.extensions import app_list
-####
-# Content Status
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.app_models.applications import Application
+    from tracim_backend.app_models.applications import Application  # noqa: F401
+
 
 class GlobalStatus(Enum):
-    OPEN = 'open'
-    CLOSED = 'closed'
+    OPEN = "open"
+    CLOSED = "closed"
 
 
 class ContentStatus(object):
     """
     ContentStatus object class
     """
-    def __init__(
-            self,
-            slug: str,
-            global_status: str,
-            label: str,
-            fa_icon: str,
-            hexcolor: str,
-    ):
+
+    def __init__(self, slug: str, global_status: str, label: str, fa_icon: str, hexcolor: str):
         self.slug = slug
         self.global_status = global_status
         self.label = label
@@ -40,36 +35,37 @@ class ContentStatus(object):
     def is_editable(self):
         return self.global_status == GlobalStatus.OPEN.value
 
+
 open_status = ContentStatus(
-    slug='open',
+    slug="open",
     global_status=GlobalStatus.OPEN.value,
-    label=_('Open'),
-    fa_icon='square-o',
-    hexcolor='#3f52e3',
+    label=_("Open"),
+    fa_icon="square-o",
+    hexcolor="#3f52e3",
 )
 
 closed_validated_status = ContentStatus(
-    slug='closed-validated',
+    slug="closed-validated",
     global_status=GlobalStatus.CLOSED.value,
-    label=_('Validated'),
-    fa_icon='check-square-o',
-    hexcolor='#008000',
+    label=_("Validated"),
+    fa_icon="check-square-o",
+    hexcolor="#008000",
 )
 
 closed_unvalidated_status = ContentStatus(
-    slug='closed-unvalidated',
+    slug="closed-unvalidated",
     global_status=GlobalStatus.CLOSED.value,
-    label=_('Cancelled'),
-    fa_icon='close',
-    hexcolor='#f63434',
+    label=_("Cancelled"),
+    fa_icon="close",
+    hexcolor="#f63434",
 )
 
 closed_deprecated_status = ContentStatus(
-    slug='closed-deprecated',
+    slug="closed-deprecated",
     global_status=GlobalStatus.CLOSED.value,
-    label=_('Deprecated'),
-    fa_icon='warning',
-    hexcolor='#ababab',
+    label=_("Deprecated"),
+    fa_icon="warning",
+    hexcolor="#ababab",
 )
 
 
@@ -100,11 +96,7 @@ class ContentStatusList(object):
 
 
 content_status_list = ContentStatusList(
-    [
-        closed_validated_status,
-        closed_unvalidated_status,
-        closed_deprecated_status,
-    ]
+    [closed_validated_status, closed_unvalidated_status, closed_deprecated_status]
 )
 ####
 # ContentType
@@ -114,18 +106,19 @@ class ContentType(object):
     """
     Future ContentType object class
     """
+
     def __init__(
-            self,
-            slug: str,
-            fa_icon: str,
-            hexcolor: str,
-            label: str,
-            creation_label: str,
-            available_statuses: typing.List[ContentStatus],
-            slug_alias: typing.List[str] = None,
-            allow_sub_content: bool = False,
-            file_extension: typing.Optional[str] = None,
-            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR
+        self,
+        slug: str,
+        fa_icon: str,
+        hexcolor: str,
+        label: str,
+        creation_label: str,
+        available_statuses: typing.List[ContentStatus],
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -139,29 +132,29 @@ class ContentType(object):
         self.minimal_role_content_creation = minimal_role_content_creation
 
 
-THREAD_TYPE = 'thread'
-FILE_TYPE = 'file'
-MARKDOWNPLUSPAGE_TYPE = 'markdownpage'
-HTML_DOCUMENTS_TYPE = 'html-document'
-FOLDER_TYPE = 'folder'
+THREAD_TYPE = "thread"
+FILE_TYPE = "file"
+MARKDOWNPLUSPAGE_TYPE = "markdownpage"
+HTML_DOCUMENTS_TYPE = "html-document"
+FOLDER_TYPE = "folder"
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 event_type = ContentType(
-    slug='event',
-    fa_icon='',
-    hexcolor='',
-    label='Event',
-    creation_label='Event',
+    slug="event",
+    fa_icon="",
+    hexcolor="",
+    label="Event",
+    creation_label="Event",
     available_statuses=content_status_list.get_all(),
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 comment_type = ContentType(
-    slug='comment',
-    fa_icon='',
-    hexcolor='',
-    label='Comment',
-    creation_label='Comment',
+    slug="comment",
+    fa_icon="",
+    hexcolor="",
+    label="Comment",
+    creation_label="Comment",
     available_statuses=content_status_list.get_all(),
 )
 
@@ -170,7 +163,8 @@ class ContentTypeList(object):
     """
     ContentType List
     """
-    Any_SLUG = 'any'
+
+    Any_SLUG = "any"
     Comment = comment_type
     Event = event_type
 
@@ -190,7 +184,7 @@ class ContentTypeList(object):
     def Thread(self):
         return self.get_one_by_slug(THREAD_TYPE)
 
-    def __init__(self, app_list: typing.List['Application']):
+    def __init__(self, app_list: typing.List["Application"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]
@@ -210,7 +204,7 @@ class ContentTypeList(object):
         content_types.extend(self._special_contents_types)
         content_types.append(self.Event)
         for item in content_types:
-            if item.slug == slug or (item.slug_alias and slug in item.slug_alias):  # nopep8
+            if item.slug == slug or (item.slug_alias and slug in item.slug_alias):
                 return item
         raise ContentTypeNotExist()
 
@@ -220,7 +214,7 @@ class ContentTypeList(object):
         "any" slug, dont return content type slug alias , don't return event.
         Useful to restrict slug param in schema.
         """
-        allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
+        allowed_type_slug = [contents_type.slug for contents_type in self._content_types]
         return allowed_type_slug
 
     def endpoint_allowed_types(self) -> typing.List[ContentType]:
@@ -239,7 +233,7 @@ class ContentTypeList(object):
         instead of ContentType
         """
         content_types = self.endpoint_allowed_types()
-        allowed_type_slug = [contents_type.slug for contents_type in content_types]  # nopep8
+        allowed_type_slug = [contents_type.slug for contents_type in content_types]
         return allowed_type_slug
 
     def query_allowed_types_slugs(self) -> typing.List[str]:

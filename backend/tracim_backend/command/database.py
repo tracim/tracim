@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import argparse
 
-import plaster_pastedeploy
-import transaction
 from depot.manager import DepotManager
+import plaster_pastedeploy
 from pyramid.paster import get_appsettings
 from sqlalchemy.exc import IntegrityError
+import transaction
 
-from tracim_backend.config import CFG
 from tracim_backend.command import AppContextCommand
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import InvalidSettingFile
@@ -31,10 +31,10 @@ class InitializeDBCommand(AppContextCommand):
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "--test-data",
-            help='Add some default data to database to make test',
-            dest='test_data',
+            help="Add some default data to database to make test",
+            dest="test_data",
             required=False,
-            action='store_true',
+            action="store_true",
             default=False,
         )
         return parser
@@ -47,26 +47,20 @@ class InitializeDBCommand(AppContextCommand):
         # section of config file in order to have both global and
         # web app specific param.
         settings.update(settings.global_conf)
-        if 'sqlalchemy.url' not in settings or not settings['sqlalchemy.url']:
-            raise InvalidSettingFile('Wrong or empty sqlalchemy database url,'
-                                     'check config file')
+        if "sqlalchemy.url" not in settings or not settings["sqlalchemy.url"]:
+            raise InvalidSettingFile("Wrong or empty sqlalchemy database url," "check config file")
         self._create_schema(settings)
         self._populate_database(settings, add_test_data=parsed_args.test_data)
 
     @classmethod
-    def _create_schema(
-            cls,
-            settings: plaster_pastedeploy.ConfigDict
-    ) -> None:
+    def _create_schema(cls, settings: plaster_pastedeploy.ConfigDict) -> None:
         print("- Create Schemas of databases -")
         engine = get_engine(settings)
         DeclarativeBase.metadata.create_all(engine)
 
     @classmethod
     def _populate_database(
-            cls,
-            settings: plaster_pastedeploy.ConfigDict,
-            add_test_data: bool
+        cls, settings: plaster_pastedeploy.ConfigDict, add_test_data: bool
     ) -> None:
         engine = get_engine(settings)
         session_factory = get_session_factory(engine)
@@ -87,10 +81,10 @@ class InitializeDBCommand(AppContextCommand):
                 print("Database initialized.")
             except IntegrityError as exc:
                 transaction.abort()
-                print('Database initialization failed')
+                print("Database initialization failed")
                 raise DatabaseInitializationFailed(
-                    'Warning, there was a problem when adding default data'
-                    ', it may have already been added.'
+                    "Warning, there was a problem when adding default data"
+                    ", it may have already been added."
                 ) from exc
 
 
@@ -104,10 +98,10 @@ class DeleteDBCommand(AppContextCommand):
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "--force",
-            help='force delete of database',
-            dest='force',
+            help="force delete of database",
+            dest="force",
             required=False,
-            action='store_true',
+            action="store_true",
             default=False,
         )
         return parser
@@ -118,31 +112,26 @@ class DeleteDBCommand(AppContextCommand):
         # setup_logging(config_uri)
         settings = get_appsettings(config_uri)
         settings.update(settings.global_conf)
-        if 'sqlalchemy.url' not in settings or not settings['sqlalchemy.url']:
-            raise InvalidSettingFile('Wrong or empty sqlalchemy database url,'
-                                     'check config file')
+        if "sqlalchemy.url" not in settings or not settings["sqlalchemy.url"]:
+            raise InvalidSettingFile("Wrong or empty sqlalchemy database url," "check config file")
         engine = get_engine(settings)
         app_config = CFG(settings)
         app_config.configure_filedepot()
 
         if parsed_args.force:
-            print('Database deletion begin.')
+            print("Database deletion begin.")
             DeclarativeBase.metadata.drop_all(engine)
-            print('Database deletion done.')
+            print("Database deletion done.")
             try:
-                print('Cleaning depot begin.')
+                print("Cleaning depot begin.")
                 depot = DepotManager.get()
                 depot_files = depot.list()
                 for file_ in depot_files:
                     depot.delete(file_)
-                print('Cleaning depot done.')
+                print("Cleaning depot done.")
             except FileNotFoundError:
-                print(
-                    'Warning! Can delete depots file, is depot path correctly'
-                    ' configured?'
-                )
+                print("Warning! Can delete depots file, is depot path correctly" " configured?")
         else:
             raise ForceArgumentNeeded(
-                'Warning, You should use --force if you really want to'
-                ' delete database.'
+                "Warning, You should use --force if you really want to" " delete database."
             )

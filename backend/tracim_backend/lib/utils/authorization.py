@@ -8,10 +8,10 @@ from zope.interface import implementer
 
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.lib.utils.request import TracimContext
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 # INFO - G.M - 12-04-2018 - Setiing a Default permission on view is
 #  needed to activate AuthentificationPolicy and
 # AuthorizationPolicy on pyramid request
-TRACIM_DEFAULT_PERM = 'tracim'
+TRACIM_DEFAULT_PERM = "tracim"
 
 
 @implementer(IAuthorizationPolicy)
@@ -42,6 +42,7 @@ class AcceptAllAuthorizationPolicy(object):
     class permit use to disable pyramid authorization mecanism with
     working a AuthentificationPolicy.
     """
+
     def permits(self, context, principals, permision):
         return True
 
@@ -58,24 +59,19 @@ class AuthorizationChecker(object):
     AndAuthorizationChecker and OrAuthorizationChecker for checker combination
     )
     """
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
+
+    def check(self, tracim_context: TracimContext) -> bool:
         """Return true or raise TracimException error if check doesnt pass"""
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class SameUserChecker(AuthorizationChecker):
     """
     Check if candidate_user is same as current_user
     """
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
-        if tracim_context.current_user.user_id == \
-                tracim_context.candidate_user.user_id:
+
+    def check(self, tracim_context: TracimContext) -> bool:
+        if tracim_context.current_user.user_id == tracim_context.candidate_user.user_id:
             return True
         raise UserGivenIsNotTheSameAsAuthenticated()
 
@@ -89,10 +85,7 @@ class ProfileChecker(AuthorizationChecker):
     def __init__(self, profile_level: int):
         self.profile_level = profile_level
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
+    def check(self, tracim_context: TracimContext) -> bool:
         if tracim_context.current_user.profile.id >= self.profile_level:
             return True
         raise InsufficientUserProfile()
@@ -107,10 +100,7 @@ class CandidateUserProfileChecker(AuthorizationChecker):
     def __init__(self, profile_level: int):
         self.profile_level = profile_level
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
+    def check(self, tracim_context: TracimContext) -> bool:
         if tracim_context.candidate_user.profile.id >= self.profile_level:
             return True
         raise InsufficientUserProfile()
@@ -121,15 +111,15 @@ class RoleChecker(AuthorizationChecker):
     Check if current_user in current_workspace role
     is as high as role level given
     """
+
     def __init__(self, role_level: int):
         self.role_level = role_level
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
-        if tracim_context.current_workspace\
-                .get_user_role(tracim_context.current_user) >= self.role_level:
+    def check(self, tracim_context: TracimContext) -> bool:
+        if (
+            tracim_context.current_workspace.get_user_role(tracim_context.current_user)
+            >= self.role_level
+        ):
             return True
         raise InsufficientUserRoleInWorkspace()
 
@@ -139,15 +129,15 @@ class CandidateWorkspaceRoleChecker(AuthorizationChecker):
     Check if current_user in candidate_workspace role
     is as high as role level given
     """
+
     def __init__(self, role_level: int):
         self.role_level = role_level
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
-        if tracim_context.candidate_workspace\
-                .get_user_role(tracim_context.current_user) >= self.role_level:
+    def check(self, tracim_context: TracimContext) -> bool:
+        if (
+            tracim_context.candidate_workspace.get_user_role(tracim_context.current_user)
+            >= self.role_level
+        ):
             return True
         raise InsufficientUserRoleInWorkspace()
 
@@ -156,28 +146,25 @@ class ContentTypeChecker(AuthorizationChecker):
     """
     Check if current_content match content_types given
     """
+
     def __init__(self, allowed_content_type_list: typing.List[str]):
         self.allowed_content_type_list = allowed_content_type_list
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
+    def check(self, tracim_context: TracimContext) -> bool:
         content = tracim_context.current_content
-        current_content_type_slug = content_type_list\
-            .get_one_by_slug(content.type).slug
+        current_content_type_slug = content_type_list.get_one_by_slug(content.type).slug
         if current_content_type_slug in self.allowed_content_type_list:
             return True
         raise ContentTypeNotAllowed()
+
 
 class ContentTypeCreationChecker(AuthorizationChecker):
     """
     Check if user can create content of this type
     """
+
     def __init__(
-            self,
-            content_type_list: ContentTypeList,
-            content_type_slug: typing.Optional[str] = None,
+        self, content_type_list: ContentTypeList, content_type_slug: typing.Optional[str] = None
     ):
         """
         :param content_type_slug: force to check a content_type, if not provided,
@@ -189,17 +176,10 @@ class ContentTypeCreationChecker(AuthorizationChecker):
         self.content_type_slug = content_type_slug
         self.content_type_list = content_type_list
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
-        user_role = tracim_context.current_workspace.get_user_role(
-            tracim_context.current_user
-        )
+    def check(self, tracim_context: TracimContext) -> bool:
+        user_role = tracim_context.current_workspace.get_user_role(tracim_context.current_user)
         if self.content_type_slug:
-            content_type = self.content_type_list.get_one_by_slug(
-                self.content_type_slug
-            )
+            content_type = self.content_type_list.get_one_by_slug(self.content_type_slug)
         else:
             content_type = tracim_context.candidate_content_type
         if user_role >= content_type.minimal_role_content_creation.level:
@@ -211,18 +191,14 @@ class CommentOwnerChecker(AuthorizationChecker):
     """
     Check if current_user is owner of current_comment
     """
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
 
-        if tracim_context.current_comment.owner.user_id\
-                == tracim_context.current_user.user_id:
+    def check(self, tracim_context: TracimContext) -> bool:
+
+        if tracim_context.current_comment.owner.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
-            'user {} is not owner of comment  {}'.format(
-                tracim_context.current_user.user_id,
-                tracim_context.current_comment.content_id
+            "user {} is not owner of comment  {}".format(
+                tracim_context.current_user.user_id, tracim_context.current_comment.content_id
             )
         )
 
@@ -232,19 +208,15 @@ class OrAuthorizationChecker(AuthorizationChecker):
     Check multiple auth_checker with a logical operator "or"
     return last exception found in list of checker
     """
+
     def __init__(self, *authorization_checkers):
         self.authorization_checkers = authorization_checkers
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ) -> bool:
+    def check(self, tracim_context: TracimContext) -> bool:
         exception_to_raise = None
         for authorization_checker in self.authorization_checkers:
             try:
-                authorization_checker.check(
-                    tracim_context=tracim_context,
-                )
+                authorization_checker.check(tracim_context=tracim_context)
                 return True
             except TracimException as e:
                 exception_to_raise = e
@@ -261,15 +233,11 @@ class AndAuthorizationChecker(AuthorizationChecker):
     def __init__(self, *authorization_checkers):
         self.authorization_checkers = authorization_checkers
 
-    def check(
-            self,
-            tracim_context: TracimContext
-    ) -> bool:
+    def check(self, tracim_context: TracimContext) -> bool:
         for authorization_checker in self.authorization_checkers:
-            authorization_checker.check(
-                tracim_context=tracim_context,
-            )
+            authorization_checker.check(tracim_context=tracim_context)
         return True
+
 
 # Useful Authorization Checker
 # profile
@@ -282,34 +250,26 @@ is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
 is_reader = RoleChecker(WorkspaceRoles.READER.level)
 is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
-has_personal_access = OrAuthorizationChecker(
-    SameUserChecker(),
-    is_administrator
-)
+has_personal_access = OrAuthorizationChecker(SameUserChecker(), is_administrator)
 # workspace
 can_see_workspace_information = OrAuthorizationChecker(
-    is_administrator,
-    AndAuthorizationChecker(is_reader, is_user)
+    is_administrator, AndAuthorizationChecker(is_reader, is_user)
 )
 can_modify_workspace = OrAuthorizationChecker(
-    is_administrator,
-    AndAuthorizationChecker(is_workspace_manager, is_user)
+    is_administrator, AndAuthorizationChecker(is_workspace_manager, is_user)
 )
 can_delete_workspace = OrAuthorizationChecker(
-    is_administrator,
-    AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
+    is_administrator, AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
 )
 # content
 can_move_content = AndAuthorizationChecker(
-    is_content_manager,
-    CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
+    is_content_manager, CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
 )
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
 can_delete_comment = OrAuthorizationChecker(
-    AndAuthorizationChecker(is_contributor, is_comment_owner),
-    is_workspace_manager
+    AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
 )
 
 ###
@@ -321,13 +281,12 @@ can_delete_comment = OrAuthorizationChecker(
 
 
 def check_right(authorization_checker: AuthorizationChecker):
-
     def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
-            authorization_checker.check(
-                tracim_context=request,
-            )
+        def wrapper(self, context, request: "TracimRequest") -> typing.Callable:
+            authorization_checker.check(tracim_context=request)
             return func(self, context, request)
+
         return wrapper
+
     return decorator

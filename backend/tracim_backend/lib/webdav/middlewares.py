@@ -1,30 +1,27 @@
+from datetime import datetime
 import os
 import sys
 import threading
 import time
-from datetime import datetime
 from xml.etree import ElementTree
 
 import ldap3
-import transaction
-import yaml
-from pyramid.paster import get_appsettings
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid_ldap3 import ConnectionManager
 from pyramid_ldap3 import Connector
 from pyramid_ldap3 import _LDAPQuery
+import transaction
 from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
+import yaml
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_scoped_session_factory
-from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 
 
@@ -33,6 +30,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
     COPY PASTE OF wsgidav.debug_filter.WsgiDavDebugFilter
     WITH ADD OF DUMP RESPONSE & REQUEST
     """
+
     def __init__(self, application, config):
         self._application = application
         self._config = config
@@ -48,7 +46,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
             #                                   "locks: 15",
         ]
 
-        self.last_request_time = '__NOT_SET__'
+        self.last_request_time = "__NOT_SET__"
 
         # We disable request content dump for moment
         # if self._config.get('dump_requests'):
@@ -63,9 +61,8 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
     def __call__(self, environ, start_response):
         """"""
         verbose = self._config.get("verbose", 2)
-        self.last_request_time = '{0}_{1}'.format(
-            datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
-            int(round(time.time() * 1000)),
+        self.last_request_time = "{0}_{1}".format(
+            datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S"), int(round(time.time() * 1000))
         )
 
         method = environ["REQUEST_METHOD"]
@@ -86,11 +83,9 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                 dav.propManager._dump()
 
         # Turn on max. debugging for selected litmus tests
-        litmusTag = environ.get("HTTP_X_LITMUS",
-                                environ.get("HTTP_X_LITMUS_SECOND"))
+        litmusTag = environ.get("HTTP_X_LITMUS", environ.get("HTTP_X_LITMUS_SECOND"))
         if litmusTag and verbose >= 2:
-            print("----\nRunning litmus test '%s'..." % litmusTag,
-                  file=self.out)
+            print("----\nRunning litmus test '%s'..." % litmusTag, file=self.out)
             for litmusSubstring in self.debug_litmus:
                 if litmusSubstring in litmusTag:
                     verbose = 3
@@ -100,8 +95,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                     break
             for litmusSubstring in self.break_after_litmus:
                 if litmusSubstring in self.passedLitmus and litmusSubstring not in litmusTag:
-                    print(" *** break after litmus %s" % litmusTag,
-                          file=self.out)
+                    print(" *** break after litmus %s" % litmusTag, file=self.out)
                     sys.exit(-1)
                 if litmusSubstring in litmusTag:
                     self.passedLitmus[litmusSubstring] = True
@@ -122,8 +116,9 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
         # Dump request headers
         if dumpRequest:
-            print("<%s> --- %s Request ---" % (
-            threading.currentThread().ident, method), file=self.out)
+            print(
+                "<%s> --- %s Request ---" % (threading.currentThread().ident, method), file=self.out
+            )
             for k, v in environ.items():
                 if k == k.upper():
                     print("%20s: '%s'" % (k, v), file=self.out)
@@ -142,21 +137,22 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
             # Start response (the first time)
             if first_yield:
                 # Success!
-                start_response(sub_app_start_response.status,
-                               sub_app_start_response.response_headers,
-                               sub_app_start_response.exc_info)
+                start_response(
+                    sub_app_start_response.status,
+                    sub_app_start_response.response_headers,
+                    sub_app_start_response.exc_info,
+                )
 
             # Dump response headers
             if first_yield and dumpResponse:
-                print("<%s> --- %s Response(%s): ---" % (
-                threading.currentThread().ident,
-                method,
-                sub_app_start_response.status),
-                      file=self.out)
+                print(
+                    "<%s> --- %s Response(%s): ---"
+                    % (threading.currentThread().ident, method, sub_app_start_response.status),
+                    file=self.out,
+                )
                 headersdict = dict(sub_app_start_response.response_headers)
                 for envitem in headersdict.keys():
-                    print("%s: %s" % (envitem, repr(headersdict[envitem])),
-                          file=self.out)
+                    print("%s: %s" % (envitem, repr(headersdict[envitem])), file=self.out)
                 print("", file=self.out)
 
             # Check, if response is a binary string, otherwise we probably have
@@ -190,60 +186,54 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
         # Start response (if it hasn't been done yet)
         if first_yield:
             # Success!
-            start_response(sub_app_start_response.status,
-                           sub_app_start_response.response_headers,
-                           sub_app_start_response.exc_info)
+            start_response(
+                sub_app_start_response.status,
+                sub_app_start_response.response_headers,
+                sub_app_start_response.exc_info,
+            )
 
         if dumpResponse:
-            print("\n<%s> --- End of %s Response (%i bytes) ---" % (
-            threading.currentThread().ident, method, nbytes), file=self.out)
+            print(
+                "\n<%s> --- End of %s Response (%i bytes) ---"
+                % (threading.currentThread().ident, method, nbytes),
+                file=self.out,
+            )
         return
 
     def _dump_response(self, sub_app_start_response, drb):
-        dump_to_path = self._config.get(
-            'dump_requests_path',
-            '/tmp/wsgidav_dumps',
-        )
+        dump_to_path = self._config.get("dump_requests_path", "/tmp/wsgidav_dumps")
         os.makedirs(dump_to_path, exist_ok=True)
-        dump_file = '{0}/{1}_RESPONSE_{2}.yml'.format(
-            dump_to_path,
-            self.last_request_time,
-            sub_app_start_response.status[0:3],
+        dump_file = "{0}/{1}_RESPONSE_{2}.yml".format(
+            dump_to_path, self.last_request_time, sub_app_start_response.status[0:3]
         )
-        with open(dump_file, 'w+') as f:
+        with open(dump_file, "w+") as f:
             dump_content = dict()
             headers = {}
             for header_tuple in sub_app_start_response.response_headers:
                 headers[header_tuple[0]] = header_tuple[1]
-            dump_content['headers'] = headers
+            dump_content["headers"] = headers
             if isinstance(drb, str):
-                dump_content['content'] = drb.replace('PROPFIND XML response body:\n', '')
+                dump_content["content"] = drb.replace("PROPFIND XML response body:\n", "")
 
             f.write(yaml.dump(dump_content, default_flow_style=False))
 
     def _dump_request(self, environ, xml):
-        dump_to_path = self._config.get(
-            'dump_requests_path',
-            '/tmp/wsgidav_dumps',
-        )
+        dump_to_path = self._config.get("dump_requests_path", "/tmp/wsgidav_dumps")
         os.makedirs(dump_to_path, exist_ok=True)
-        dump_file = '{0}/{1}_REQUEST_{2}.yml'.format(
-            dump_to_path,
-            self.last_request_time,
-            environ['REQUEST_METHOD'],
+        dump_file = "{0}/{1}_REQUEST_{2}.yml".format(
+            dump_to_path, self.last_request_time, environ["REQUEST_METHOD"]
         )
-        with open(dump_file, 'w+') as f:
+        with open(dump_file, "w+") as f:
             dump_content = dict()
-            dump_content['path'] = environ.get('PATH_INFO', '')
-            dump_content['Authorization'] = environ.get('HTTP_AUTHORIZATION', '')
+            dump_content["path"] = environ.get("PATH_INFO", "")
+            dump_content["Authorization"] = environ.get("HTTP_AUTHORIZATION", "")
             if xml:
-                dump_content['content'] = ElementTree.tostring(xml, 'utf-8')
+                dump_content["content"] = ElementTree.tostring(xml, "utf-8")
 
             f.write(yaml.dump(dump_content, default_flow_style=False))
 
 
 class TracimEnforceHTTPS(BaseMiddleware):
-
     def __init__(self, application, config):
         super().__init__(application, config)
         self._application = application
@@ -262,11 +252,10 @@ class TracimEnforceHTTPS(BaseMiddleware):
 
 
 class TracimEnv(BaseMiddleware):
-
     def __init__(self, application, config):
         super().__init__(application, config)
         self._application = application
-        self.settings = config['tracim_settings']
+        self.settings = config["tracim_settings"]
         self.engine = get_engine(self.settings)
         self.session_factory = get_scoped_session_factory(self.engine)
         self.app_config = CFG(self.settings)
@@ -282,8 +271,8 @@ class TracimEnv(BaseMiddleware):
         registry.ldap_connector = None
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
-        environ['tracim_registry'] =  registry
-        environ['tracim_context'] = WebdavTracimContext(environ, self.app_config, session)
+        environ["tracim_registry"] = registry
+        environ["tracim_context"] = WebdavTracimContext(environ, self.app_config, session)
         try:
             app = self._application(environ, start_response)
         except Exception as exc:
@@ -303,14 +292,14 @@ class TracimEnv(BaseMiddleware):
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,
             pool_lifetime=app_config.LDAP_POOL_LIFETIME,
-            get_info=app_config.LDAP_GET_INFO
+            get_info=app_config.LDAP_GET_INFO,
         )
         registry.ldap_login_query = _LDAPQuery(
             base_dn=app_config.LDAP_USER_BASE_DN,
             filter_tmpl=app_config.LDAP_USER_FILTER,
             scope=ldap3.LEVEL,
             attributes=ldap3.ALL_ATTRIBUTES,
-            cache_period=0
+            cache_period=0,
         )
         registry.ldap_connector = Connector(registry, manager)
         return registry

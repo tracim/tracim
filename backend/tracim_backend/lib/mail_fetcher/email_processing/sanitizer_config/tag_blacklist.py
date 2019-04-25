@@ -1,1 +1,1 @@
-TAG_BLACKLIST = ['script', 'style']
+TAG_BLACKLIST = ["script", "style"]

@@ -1,14 +1,11 @@
 # coding: utf8
-import functools
-import re
-import typing
 from os.path import basename
 from os.path import dirname
+import re
+import typing
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
-from wsgidav.dav_error import HTTP_FORBIDDEN
-from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
 
@@ -16,7 +13,6 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.content import ContentApi
@@ -28,27 +24,24 @@ from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.lock_storage import LockStorage
-from tracim_backend.lib.webdav.utils import HistoryType
-from tracim_backend.lib.webdav.utils import SpecialFolderExtension
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 
 
 class WebdavTracimContext(TracimContext):
-
     def __init__(self, environ: typing.Dict[str, typing.Any], app_config: CFG, session: Session):
         super().__init__()
         self.environ = environ
         self._candidate_parent_content = None
         self._app_config = app_config
-        self._session  = session
+        self._session = session
 
     def set_path(self, path: str):
         self.path = path
 
     @property
     def root_path(self) -> str:
-        return self.environ['http_authenticator.realm']
+        return self.environ["http_authenticator.realm"]
 
     @property
     def dbsession(self) -> Session:
@@ -56,7 +49,7 @@ class WebdavTracimContext(TracimContext):
 
     @property
     def app_config(self) -> CFG:
-       return self._app_config
+        return self._app_config
 
     @property
     def current_user(self):
@@ -64,32 +57,23 @@ class WebdavTracimContext(TracimContext):
         Current authenticated user if exist
         """
         return self._generate_if_none(
-            self._current_user,
-            self._get_user,
-            self._get_current_user_email
+            self._current_user, self._get_user, self._get_current_user_email
         )
 
     def _get_user(self, user_email: typing.Callable):
         user_email = user_email()
-        uapi = UserApi(
-            None,
-            show_deleted=True,
-            session=self.dbsession,
-            config=self.app_config
-        )
+        uapi = UserApi(None, show_deleted=True, session=self.dbsession, config=self.app_config)
         return uapi.get_one_by_email(user_email)
 
     def _get_current_user_email(self) -> str:
         try:
-            if not self.environ['http_authenticator.username']:
+            if not self.environ["http_authenticator.username"]:
                 raise UserNotFoundInTracimRequest(
-                    'You request a current user '
-                    'but the context not permit to found one'
+                    "You request a current user " "but the context not permit to found one"
                 )
         except UserNotFoundInTracimRequest as exc:
-            raise NotAuthenticated('User not found') from exc
-        return self.environ['http_authenticator.username']
-
+            raise NotAuthenticated("User not found") from exc
+        return self.environ["http_authenticator.username"]
 
     @property
     def current_workspace(self):
@@ -99,9 +83,7 @@ class WebdavTracimContext(TracimContext):
         current_workspace will be 3.
         """
         return self._generate_if_none(
-            self._current_workspace,
-            self._get_workspace,
-            self._get_current_workspace_label
+            self._current_workspace, self._get_workspace, self._get_current_workspace_label
         )
 
     def _get_workspace(self, workspace_id_fetcher):
@@ -115,7 +97,7 @@ class WebdavTracimContext(TracimContext):
         return wapi.get_one_by_label(workspace_id)
 
     def _get_current_workspace_label(self) -> str:
-        return webdav_convert_file_name_to_bdd(self.path.split('/')[1])
+        return webdav_convert_file_name_to_bdd(self.path.split("/")[1])
 
     @property
     def current_content(self):
@@ -124,20 +106,16 @@ class WebdavTracimContext(TracimContext):
         will be content 21.
         """
         return self._generate_if_none(
-            self._current_content,
-            self._get_content,
-            self._get_content_path
+            self._current_content, self._get_content, self._get_content_path
         )
 
     def _get_content(self, content_path_fetcher):
         path = content_path_fetcher()
         content_path = self.reduce_path(path)
-        splited_local_path = content_path.strip('/').split('/')
+        splited_local_path = content_path.strip("/").split("/")
         workspace_name = webdav_convert_file_name_to_bdd(splited_local_path[0])
         wapi = WorkspaceApi(
-            current_user=self.current_user,
-            session=self.dbsession,
-            config=self.app_config,
+            current_user=self.current_user, session=self.dbsession, config=self.app_config
         )
         workspace = wapi.get_one_by_label(workspace_name)
         parents = []
@@ -146,9 +124,7 @@ class WebdavTracimContext(TracimContext):
             parents = [webdav_convert_file_name_to_bdd(x) for x in parent_string]
 
         content_api = ContentApi(
-            config=self.app_config,
-            current_user=self.current_user,
-            session=self.dbsession
+            config=self.app_config, current_user=self.current_user, session=self.dbsession
         )
         return content_api.get_one_by_filename_and_parent_labels(
             content_label=webdav_convert_file_name_to_bdd(basename(path)),
@@ -166,22 +142,20 @@ class WebdavTracimContext(TracimContext):
         self._destpath = destpath
 
     def _get_candidate_workspace_path(self):
-        return webdav_convert_file_name_to_bdd(self._destpath.split('/')[1])
+        return webdav_convert_file_name_to_bdd(self._destpath.split("/")[1])
 
     @property
     def candidate_parent_content(self) -> Content:
         return self._generate_if_none(
             self._candidate_parent_content,
             self._get_content,
-            self._get_candidate_parent_content_path
+            self._get_candidate_parent_content_path,
         )
 
     @property
     def candidate_workspace(self) -> Workspace:
         return self._generate_if_none(
-            self._candidate_workspace,
-            self._get_workspace,
-            self._get_candidate_workspace_path
+            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_path
         )
 
     def reduce_path(self, path: str) -> str:
@@ -197,11 +171,11 @@ class WebdavTracimContext(TracimContext):
         ex: if the path is /a/b/.history/my_file/(1985 - edition) my_old_name, we're looking for,
         thus we remove all useless information
         """
-        path = re.sub(r'/\.archived', r'', path)
-        path = re.sub(r'/\.deleted', r'', path)
-        path = re.sub(r'/\.history/[^/]+/(\d+)-.+', r'/\1', path)
-        path = re.sub(r'/\.history/([^/]+)', r'/\1', path)
-        path = re.sub(r'/\.history', r'', path)
+        path = re.sub(r"/\.archived", r"", path)
+        path = re.sub(r"/\.deleted", r"", path)
+        path = re.sub(r"/\.history/[^/]+/(\d+)-.+", r"/\1", path)
+        path = re.sub(r"/\.history/([^/]+)", r"/\1", path)
+        path = re.sub(r"/\.history", r"", path)
 
         return path
 
@@ -213,12 +187,12 @@ class Provider(DAVProvider):
     """
 
     def __init__(
-            self,
-            app_config: CFG,
-            show_history=True,
-            show_deleted=True,
-            show_archived=True,
-            manage_locks=True,
+        self,
+        app_config: CFG,
+        show_history=True,
+        show_deleted=True,
+        show_archived=True,
+        manage_locks=True,
     ):
         super(Provider, self).__init__()
 
@@ -245,7 +219,7 @@ class Provider(DAVProvider):
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
-        tracim_context = environ['tracim_context']
+        tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
         user = tracim_context.current_user
         session = tracim_context.dbsession
@@ -256,11 +230,7 @@ class Provider(DAVProvider):
 
         # If the requested path is the root, then we return a RootResource resource
         if path == root_path:
-            return resources.RootResource(
-                path=path,
-                environ=environ,
-                tracim_context=tracim_context
-            )
+            return resources.RootResource(path=path, environ=environ, tracim_context=tracim_context)
 
         try:
             workspace = tracim_context.current_workspace
@@ -273,15 +243,12 @@ class Provider(DAVProvider):
             if not workspace:
                 return None
             return resources.WorkspaceResource(
-                path=path,
-                environ=environ,
-                workspace=workspace,
-                tracim_context=tracim_context
+                path=path, environ=environ, workspace=workspace, tracim_context=tracim_context
             )
 
         # And now we'll work on the path to establish which type or resource is requested
 
-        content_api = ContentApi(
+        ContentApi(
             current_user=user,
             session=session,
             config=self.app_config,
@@ -309,17 +276,11 @@ class Provider(DAVProvider):
             )
         elif content.type == content_type_list.File.slug:
             return resources.FileResource(
-                path=path,
-                environ=environ,
-                content=content,
-                tracim_context=tracim_context,
+                path=path, environ=environ, content=content, tracim_context=tracim_context
             )
         else:
             return resources.OtherFileResource(
-                path=path,
-                environ=environ,
-                content=content,
-                tracim_context=tracim_context,
+                path=path, environ=environ, content=content, tracim_context=tracim_context
             )
 
     def exists(self, path, environ) -> bool:
@@ -327,11 +288,11 @@ class Provider(DAVProvider):
         Called by wsgidav to check if a certain path is linked to a _DAVResource
         """
 
-        tracim_context = environ['tracim_context']
+        tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
         path = normpath(path)
         working_path = tracim_context.reduce_path(path)
-        root_path = environ['http_authenticator.realm']
+        root_path = environ["http_authenticator.realm"]
         parent_path = dirname(working_path)
         user = tracim_context.current_user
         session = tracim_context.dbsession
@@ -353,10 +314,10 @@ class Provider(DAVProvider):
             session=session,
             config=self.app_config,
             show_archived=False,
-            show_deleted=False
+            show_deleted=False,
         )
 
-        revision_id = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$', path)
+        revision_id = re.search(r"/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$", path)
 
         is_archived = self.is_path_archive(path)
 
@@ -371,9 +332,11 @@ class Provider(DAVProvider):
             except ContentNotFound:
                 content = None
 
-        return content is not None \
-            and content.is_deleted == is_deleted \
+        return (
+            content is not None
+            and content.is_deleted == is_deleted
             and content.is_archived == is_archived
+        )
 
     def is_path_archive(self, path):
         """
@@ -386,10 +349,13 @@ class Provider(DAVProvider):
             - /a/b/.archived/.history/my_file/(3615 - edition) my_file
         """
 
-        return re.search(
-            r'/\.archived/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$',
-            path
-        ) is not None
+        return (
+            re.search(
+                r"/\.archived/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$",
+                path,
+            )
+            is not None
+        )
 
     def is_path_delete(self, path):
         """
@@ -402,10 +368,13 @@ class Provider(DAVProvider):
             - /a/b/.deleted/.history/my_file/(3615 - edition) my_file
         """
 
-        return re.search(
-            r'/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$',
-            path
-        ) is not None
+        return (
+            re.search(
+                r"/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$",
+                path,
+            )
+            is not None
+        )
 
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:

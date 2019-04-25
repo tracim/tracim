@@ -1,9 +1,9 @@
 # coding=utf-8
 import cgi
-import traceback
-import typing
 from datetime import datetime
 from enum import Enum
+import traceback
+import typing
 
 from slugify import slugify
 from sqlalchemy.orm import Session
@@ -20,7 +20,6 @@ from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
-from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
@@ -33,13 +32,8 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 
 class AboutModel(object):
-
     def __init__(
-        self,
-        name: str,
-        version: typing.Optional[str],
-        datetime: datetime,
-        website: str,
+        self, name: str, version: typing.Optional[str], datetime: datetime, website: str
     ) -> None:
         self.name = name
         self.version = version
@@ -48,31 +42,21 @@ class AboutModel(object):
 
 
 class ConfigModel(object):
-
     def __init__(
-        self,
-        email_notification_activated: bool,
-        new_user_invitation_do_notify: bool,
+        self, email_notification_activated: bool, new_user_invitation_do_notify: bool
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
 
+
 class ErrorCodeModel(object):
-    def __init__(
-        self,
-        error_code: ErrorCode
-    ) -> None:
+    def __init__(self, error_code: ErrorCode) -> None:
         self.name = error_code.name
         self.code = error_code.value
 
 
 class PreviewAllowedDim(object):
-
-    def __init__(
-            self,
-            restricted: bool,
-            dimensions: typing.List[PreviewDim]
-    ) -> None:
+    def __init__(self, restricted: bool, dimensions: typing.List[PreviewDim]) -> None:
         self.restricted = restricted
         self.dimensions = dimensions
 
@@ -81,7 +65,8 @@ class MoveParams(object):
     """
     Json body params for move action model
     """
-    def __init__(self, new_parent_id: str, new_workspace_id: str = None) -> None:  # nopep8
+
+    def __init__(self, new_parent_id: str, new_workspace_id: str = None) -> None:
         self.new_parent_id = new_parent_id
         self.new_workspace_id = new_workspace_id
 
@@ -100,6 +85,7 @@ class ResetPasswordRequest(object):
     """
     Reset password : request to reset password of user
     """
+
     def __init__(self, email: str) -> None:
         self.email = email
 
@@ -108,11 +94,8 @@ class ResetPasswordCheckToken(object):
     """
     Reset password : check reset password token
     """
-    def __init__(
-        self,
-        reset_password_token: str,
-        email: str,
-    ) -> None:
+
+    def __init__(self, reset_password_token: str, email: str) -> None:
         self.email = email
         self.reset_password_token = reset_password_token
 
@@ -121,12 +104,9 @@ class ResetPasswordModify(object):
     """
     Reset password : modification step
     """
+
     def __init__(
-        self,
-        reset_password_token: str,
-        email: str,
-        new_password: str,
-        new_password2: str
+        self, reset_password_token: str, email: str, new_password: str, new_password2: str
     ) -> None:
         self.email = email
         self.reset_password_token = reset_password_token
@@ -138,6 +118,7 @@ class SetEmail(object):
     """
     Just an email and password
     """
+
     def __init__(self, loggedin_user_password: str, email: str) -> None:
         self.loggedin_user_password = loggedin_user_password
         self.email = email
@@ -152,19 +133,17 @@ class FileCreation(object):
     """
     Simple parent_id object
     """
+
     def __init__(self, parent_id: int = 0) -> None:
         self.parent_id = parent_id
+
 
 class SetPassword(object):
     """
     Just an password
     """
-    def __init__(
-        self,
-        loggedin_user_password: str,
-        new_password: str,
-        new_password2: str
-    ) -> None:
+
+    def __init__(self, loggedin_user_password: str, new_password: str, new_password2: str) -> None:
         self.loggedin_user_password = loggedin_user_password
         self.new_password = new_password
         self.new_password2 = new_password2
@@ -174,6 +153,7 @@ class UserInfos(object):
     """
     Just some user infos
     """
+
     def __init__(self, timezone: str, public_name: str, lang: str) -> None:
         self.timezone = timezone
         self.public_name = public_name
@@ -184,6 +164,7 @@ class UserProfile(object):
     """
     Just some user infos
     """
+
     def __init__(self, profile: str) -> None:
         self.profile = profile
 
@@ -192,22 +173,23 @@ class UserCreation(object):
     """
     Just some user infos
     """
+
     def __init__(
-            self,
-            email: str,
-            password: str = None,
-            public_name: str = None,
-            timezone: str = None,
-            profile: str = None,
-            lang: str = None,
-            email_notification: bool = True,
+        self,
+        email: str,
+        password: str = None,
+        public_name: str = None,
+        timezone: str = None,
+        profile: str = None,
+        lang: str = None,
+        email_notification: bool = True,
     ) -> None:
         self.email = email
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
         self.password = password or None
         self.public_name = public_name or None
-        self.timezone = timezone or ''
+        self.timezone = timezone or ""
         self.lang = lang or None
         self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
@@ -217,6 +199,7 @@ class WorkspaceAndContentPath(object):
     """
     Paths params with workspace id and content_id model
     """
+
     def __init__(self, workspace_id: int, content_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
@@ -226,6 +209,7 @@ class WorkspaceAndContentRevisionPath(object):
     """
     Paths params with workspace id and content_id model
     """
+
     def __init__(self, workspace_id: int, content_id: int, revision_id: int) -> None:
         self.content_id = content_id
         self.revision_id = revision_id
@@ -251,7 +235,10 @@ class FilePreviewSizedPath(object):
     """
     Paths params with workspace id and content_id, width, heigth
     """
-    def __init__(self, workspace_id: int, content_id: int, width: int, height: int, filename: str) -> None:  # nopep8
+
+    def __init__(
+        self, workspace_id: int, content_id: int, width: int, height: int, filename: str
+    ) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.width = width
@@ -263,7 +250,16 @@ class RevisionPreviewSizedPath(object):
     """
     Paths params with workspace id and content_id, revision_id width, heigth
     """
-    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int, filename: str) -> None:  # nopep8
+
+    def __init__(
+        self,
+        workspace_id: int,
+        content_id: int,
+        revision_id: int,
+        width: int,
+        height: int,
+        filename: str,
+    ) -> None:
         self.content_id = content_id
         self.revision_id = revision_id
         self.workspace_id = workspace_id
@@ -276,6 +272,7 @@ class WorkspacePath(object):
     """
     Paths params with workspace id and user_id
     """
+
     def __init__(self, workspace_id: int) -> None:
         self.workspace_id = workspace_id
 
@@ -284,22 +281,27 @@ class WorkspaceAndUserPath(object):
     """
     Paths params with workspace id and user_id
     """
+
     def __init__(self, workspace_id: int, user_id: int) -> None:
         self.workspace_id = workspace_id
         self.user_id = user_id
+
 
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
     """
+
     def __init__(self, user_id: int, sub_item: str) -> None:
         self.user_id = user_id
         self.sub_item = sub_item
+
 
 class RadicaleWorkspaceSubitemsPath(object):
     """
     Paths params with workspace id and subitem
     """
+
     def __init__(self, workspace_id: int, sub_item: str) -> None:
         self.workspace_id = workspace_id
         self.sub_item = sub_item
@@ -309,7 +311,8 @@ class UserWorkspaceAndContentPath(object):
     """
     Paths params with user_id, workspace id and content_id model
     """
-    def __init__(self, user_id: int, workspace_id: int, content_id: int) -> None:  # nopep8
+
+    def __init__(self, user_id: int, workspace_id: int, content_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.user_id = user_id
@@ -319,12 +322,8 @@ class CommentPath(object):
     """
     Paths params with workspace id and content_id and comment_id model
     """
-    def __init__(
-        self,
-        workspace_id: int,
-        content_id: int,
-        comment_id: int
-    ) -> None:
+
+    def __init__(self, workspace_id: int, content_id: int, comment_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
@@ -334,32 +333,31 @@ class KnownMemberQuery(object):
     """
     Autocomplete query model
     """
+
     def __init__(
-            self,
-            acp: str,
-            exclude_user_ids: str = None,
-            exclude_workspace_ids: str = None
+        self, acp: str, exclude_user_ids: str = None, exclude_workspace_ids: str = None
     ) -> None:
         self.acp = acp
-        self.exclude_user_ids = string_to_list(exclude_user_ids, ',', int)
-        self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ',', int)  # nopep8
+        self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
+        self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
+
 
 class AgendaFilterQuery(object):
     """
     Agenda filter query model
     """
-    def __init__(self, workspace_ids: str = '', agenda_types: str = ''):
-        self.workspace_ids = string_to_list(workspace_ids, ',', int) or None
-        self.agenda_types = string_to_list(agenda_types, ',', str) or None
+
+    def __init__(self, workspace_ids: str = "", agenda_types: str = ""):
+        self.workspace_ids = string_to_list(workspace_ids, ",", int) or None
+        self.agenda_types = string_to_list(agenda_types, ",", str) or None
+
 
 class FileQuery(object):
     """
     File query model
     """
-    def __init__(
-        self,
-        force_download: int = 0,
-    ) -> None:
+
+    def __init__(self, force_download: int = 0) -> None:
         self.force_download = force_download
 
 
@@ -367,11 +365,8 @@ class PageQuery(object):
     """
     Page query model
     """
-    def __init__(
-            self,
-            force_download: int = 0,
-            page: int = 1
-    ) -> None:
+
+    def __init__(self, force_download: int = 0, page: int = 1) -> None:
         self.force_download = force_download
         self.page = page
 
@@ -380,20 +375,21 @@ class ContentFilter(object):
     """
     Content filter model
     """
+
     def __init__(
-            self,
-            workspace_id: int = None,
-            complete_path_to_id: int = None,
-            parent_ids: str = None,
-            show_archived: int = 0,
-            show_deleted: int = 0,
-            show_active: int = 1,
-            content_type: str = None,
-            label: str = None,
-            offset: int = None,
-            limit: int = None,
+        self,
+        workspace_id: int = None,
+        complete_path_to_id: int = None,
+        parent_ids: str = None,
+        show_archived: int = 0,
+        show_deleted: int = 0,
+        show_active: int = 1,
+        content_type: str = None,
+        label: str = None,
+        offset: int = None,
+        limit: int = None,
     ) -> None:
-        self.parent_ids = string_to_list(parent_ids, ',', int)
+        self.parent_ids = string_to_list(parent_ids, ",", int)
         self.complete_path_to_id = complete_path_to_id
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
@@ -406,31 +402,22 @@ class ContentFilter(object):
 
 
 class ActiveContentFilter(object):
-    def __init__(
-            self,
-            limit: int = None,
-            before_content_id: datetime = None,
-    ) -> None:
+    def __init__(self, limit: int = None, before_content_id: datetime = None) -> None:
         self.limit = limit
         self.before_content_id = before_content_id
 
 
 class ContentIdsQuery(object):
-    def __init__(
-            self,
-            content_ids: str = None,
-    ) -> None:
-        self.content_ids = string_to_list(content_ids, ',', int)
+    def __init__(self, content_ids: str = None) -> None:
+        self.content_ids = string_to_list(content_ids, ",", int)
 
 
 class RoleUpdate(object):
     """
     Update role
     """
-    def __init__(
-        self,
-        role: str,
-    ) -> None:
+
+    def __init__(self, role: str) -> None:
         self.role = role
 
 
@@ -438,6 +425,7 @@ class WorkspaceMemberInvitation(object):
     """
     Workspace Member Invitation
     """
+
     def __init__(
         self,
         user_id: int = None,
@@ -455,12 +443,8 @@ class WorkspaceUpdate(object):
     """
     Update workspace
     """
-    def __init__(
-        self,
-        label: str,
-        description: str,
-        agenda_enabled: bool = True
-    ) -> None:
+
+    def __init__(self, label: str, description: str, agenda_enabled: bool = True) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled
@@ -470,11 +454,9 @@ class ContentCreation(object):
     """
     Content creation model
     """
+
     def __init__(
-        self,
-        label: str,
-        content_type: str,
-        parent_id: typing.Optional[int] = None,
+        self, label: str, content_type: str, parent_id: typing.Optional[int] = None
     ) -> None:
         self.label = label
         self.content_type = content_type
@@ -485,10 +467,8 @@ class CommentCreation(object):
     """
     Comment creation model
     """
-    def __init__(
-        self,
-        raw_content: str,
-    ) -> None:
+
+    def __init__(self, raw_content: str) -> None:
         self.raw_content = raw_content
 
 
@@ -496,10 +476,8 @@ class SetContentStatus(object):
     """
     Set content status
     """
-    def __init__(
-        self,
-        status: str,
-    ) -> None:
+
+    def __init__(self, status: str) -> None:
         self.status = status
 
 
@@ -507,11 +485,8 @@ class TextBasedContentUpdate(object):
     """
     TextBasedContent update model
     """
-    def __init__(
-        self,
-        label: str,
-        raw_content: str,
-    ) -> None:
+
+    def __init__(self, label: str, raw_content: str) -> None:
         self.label = label
         self.raw_content = raw_content
 
@@ -520,12 +495,8 @@ class FolderContentUpdate(object):
     """
     Folder Content update model
     """
-    def __init__(
-        self,
-        label: str,
-        raw_content: str,
-        sub_content_types: typing.List[str],
-    ) -> None:
+
+    def __init__(self, label: str, raw_content: str, sub_content_types: typing.List[str]) -> None:
         self.label = label
         self.raw_content = raw_content
         self.sub_content_types = sub_content_types
@@ -533,23 +504,25 @@ class FolderContentUpdate(object):
 
 class TypeUser(Enum):
     """Params used to find user"""
-    USER_ID = 'found_id'
-    EMAIL = 'found_email'
-    PUBLIC_NAME = 'found_public_name'
+
+    USER_ID = "found_id"
+    EMAIL = "found_email"
+    PUBLIC_NAME = "found_public_name"
+
 
 class Agenda(object):
-
     def __init__(
-            self,
-            agenda_url: str,
-            with_credentials: bool,
-            workspace_id: typing.Optional[int],
-            agenda_type: str,
+        self,
+        agenda_url: str,
+        with_credentials: bool,
+        workspace_id: typing.Optional[int],
+        agenda_type: str,
     ) -> None:
         self.agenda_url = agenda_url
         self.with_credentials = with_credentials
         self.workspace_id = workspace_id
         self.agenda_type = agenda_type
+
 
 class UserInContext(object):
     """
@@ -620,7 +593,7 @@ class WorkspaceInContext(object):
     Interface to get Workspace data and Workspace data related to context.
     """
 
-    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:  # nopep8
+    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
@@ -683,16 +656,14 @@ class WorkspaceInContext(object):
         # order to not use hardcoded list
         # list should be able to change (depending on activated/disabled
         # apps)
-        app_api = ApplicationApi(
-            app_list
-        )
+        app_api = ApplicationApi(app_list)
         return app_api.get_default_workspace_menu_entry(self.workspace)
 
     @property
     def frontend_url(self):
         root_frontend_url = get_frontend_ui_base_url(self.config)
         workspace_frontend_url = WORKSPACE_FRONTEND_URL_SCHEMA.format(
-            workspace_id=self.workspace_id,
+            workspace_id=self.workspace_id
         )
         return root_frontend_url + workspace_frontend_url
 
@@ -702,15 +673,16 @@ class UserRoleWorkspaceInContext(object):
     Interface to get UserRoleInWorkspace data and related content
 
     """
+
     def __init__(
-            self,
-            user_role: UserRoleInWorkspace,
-            dbsession: Session,
-            config: CFG,
-            # Extended params
-            newly_created: bool = None,
-            email_sent: bool = None
-    )-> None:
+        self,
+        user_role: UserRoleInWorkspace,
+        dbsession: Session,
+        config: CFG,
+        # Extended params
+        newly_created: bool = None,
+        email_sent: bool = None,
+    ) -> None:
         self.user_role = user_role
         self.dbsession = dbsession
         self.config = config
@@ -772,11 +744,7 @@ class UserRoleWorkspaceInContext(object):
         User who has this role, with context data
         :return: UserInContext object
         """
-        return UserInContext(
-            self.user_role.user,
-            self.dbsession,
-            self.config
-        )
+        return UserInContext(self.user_role.user, self.dbsession, self.config)
 
     @property
     def workspace(self) -> WorkspaceInContext:
@@ -784,11 +752,7 @@ class UserRoleWorkspaceInContext(object):
         Workspace related to this role, with his context data
         :return: WorkspaceInContext object
         """
-        return WorkspaceInContext(
-            self.user_role.workspace,
-            self.dbsession,
-            self.config
-        )
+        return WorkspaceInContext(self.user_role.workspace, self.dbsession, self.config)
 
 
 class ContentInContext(object):
@@ -796,7 +760,9 @@ class ContentInContext(object):
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content: Content, dbsession: Session, config: CFG, user: User=None) -> None:  # nopep8
+    def __init__(
+        self, content: Content, dbsession: Session, config: CFG, user: User = None
+    ) -> None:
         self.content = content
         self.dbsession = dbsession
         self.config = config
@@ -829,7 +795,7 @@ class ContentInContext(object):
 
     @property
     def sub_content_types(self) -> typing.List[str]:
-        return [_type.slug for _type in self.content.get_allowed_content_types()]  # nopep8
+        return [_type.slug for _type in self.content.get_allowed_content_types()]
 
     @property
     def status(self) -> str:
@@ -846,6 +812,7 @@ class ContentInContext(object):
     @property
     def is_editable(self) -> bool:
         from tracim_backend.lib.core.content import ContentApi
+
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
@@ -864,9 +831,7 @@ class ContentInContext(object):
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession,
-            config=self.config,
-            user=self.content.first_revision.owner
+            dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner
         )
 
     @property
@@ -888,9 +853,7 @@ class ContentInContext(object):
     @property
     def last_modifier(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession,
-            config=self.config,
-            user=self.content.last_revision.owner
+            dbsession=self.dbsession, config=self.config, user=self.content.last_revision.owner
         )
 
     # Context-related
@@ -930,6 +893,7 @@ class ContentInContext(object):
         """
         if self.content.depot_file:
             from tracim_backend.lib.core.content import ContentApi
+
             content_api = ContentApi(
                 current_user=self._user,
                 session=self.dbsession,
@@ -940,8 +904,7 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_preview_page_nb(
-                self.content.revision_id,
-                file_extension=self.content.file_extension
+                self.content.revision_id, file_extension=self.content.file_extension
             )
         else:
             return None
@@ -964,18 +927,16 @@ class ContentInContext(object):
             return self.content.depot_file.file.content_length
         except IOError as e:
             logger.warning(
-                self,
-                "IO Exception Occured when trying to get content size  : {}".format(str(e))
+                self, "IO Exception Occured when trying to get content size  : {}".format(str(e))
             )
             logger.warning(self, traceback.format_exc())
         except Exception as e:
             logger.warning(
                 self,
-                "Unknown Exception Occured when trying to get content size  : {}".format(str(e))
+                "Unknown Exception Occured when trying to get content size  : {}".format(str(e)),
             )
             logger.warning(self, traceback.format_exc())
         return None
-
 
     @property
     def has_pdf_preview(self) -> bool:
@@ -986,6 +947,7 @@ class ContentInContext(object):
             return False
 
         from tracim_backend.lib.core.content import ContentApi
+
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
@@ -996,9 +958,8 @@ class ContentInContext(object):
             show_temporary=True,
         )
         return content_api.has_pdf_preview(
-            self.content.revision_id,
-            file_extension=self.content.file_extension
-            )
+            self.content.revision_id, file_extension=self.content.file_extension
+        )
 
     @property
     def has_jpeg_preview(self) -> bool:
@@ -1009,6 +970,7 @@ class ContentInContext(object):
             return False
 
         from tracim_backend.lib.core.content import ContentApi
+
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
@@ -1019,10 +981,8 @@ class ContentInContext(object):
             show_temporary=True,
         )
         return content_api.has_jpeg_preview(
-            self.content.revision_id,
-            file_extension=self.content.file_extension
+            self.content.revision_id, file_extension=self.content.file_extension
         )
-
 
     @property
     def file_extension(self) -> str:
@@ -1044,7 +1004,13 @@ class RevisionInContext(object):
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG,  user: User=None) -> None:  # nopep8
+    def __init__(
+        self,
+        content_revision: ContentRevisionRO,
+        dbsession: Session,
+        config: CFG,
+        user: User = None,
+    ) -> None:
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession
@@ -1081,8 +1047,7 @@ class RevisionInContext(object):
 
     @property
     def sub_content_types(self) -> typing.List[str]:
-        return [_type.slug for _type
-                in self.revision.node.get_allowed_content_types()]
+        return [_type.slug for _type in self.revision.node.get_allowed_content_types()]
 
     @property
     def status(self) -> str:
@@ -1099,6 +1064,7 @@ class RevisionInContext(object):
     @property
     def is_editable(self) -> bool:
         from tracim_backend.lib.core.content import ContentApi
+
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
@@ -1111,8 +1077,7 @@ class RevisionInContext(object):
         # INFO - G.M - 2018-11-02 - check if revision is last one and if it is,
         # return editability of content.
         content = content_api.get_one(
-            content_id=self.revision.content_id,
-            content_type=content_type_list.Any_SLUG
+            content_id=self.revision.content_id, content_type=content_type_list.Any_SLUG
         )
         if content.revision_id == self.revision_id:
             return content_api.is_editable(content)
@@ -1125,11 +1090,7 @@ class RevisionInContext(object):
 
     @property
     def author(self) -> UserInContext:
-        return UserInContext(
-            dbsession=self.dbsession,
-            config=self.config,
-            user=self.revision.owner
-        )
+        return UserInContext(dbsession=self.dbsession, config=self.config, user=self.revision.owner)
 
     @property
     def revision_id(self) -> int:
@@ -1153,20 +1114,15 @@ class RevisionInContext(object):
         Get next revision (later revision)
         :return: next_revision
         """
-        next_revision = None
         revisions = self.revision.node.revisions
         # INFO - G.M - 2018-06-177 - Get revisions more recent that
         # current one
         next_revisions = [
-            revision for revision in revisions
-            if revision.revision_id > self.revision.revision_id
+            revision for revision in revisions if revision.revision_id > self.revision.revision_id
         ]
         if next_revisions:
             # INFO - G.M - 2018-06-177 -sort revisions by date
-            sorted_next_revisions = sorted(
-                next_revisions,
-                key=lambda revision: revision.updated
-            )
+            sorted_next_revisions = sorted(next_revisions, key=lambda revision: revision.updated)
             # INFO - G.M - 2018-06-177 - return only next revision
             return sorted_next_revisions[0]
         else:
@@ -1181,22 +1137,23 @@ class RevisionInContext(object):
         comments = self.revision.node.get_comments()
         # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
         revision_comments = [
-            comment for comment in comments
-            if comment.created > self.revision.updated or
-               comment.revision_id > self.revision.revision_id
+            comment
+            for comment in comments
+            if comment.created > self.revision.updated
+            or comment.revision_id > self.revision.revision_id
         ]
         if self.next_revision:
             # INFO - G.M - 2018-06-177 - if there is a revision more recent
             # than current remove comments from theses rev (comments older
             # than next_revision.)
             revision_comments = [
-                comment for comment in revision_comments
-                if comment.created < self.next_revision.updated or
-                   comment.revision_id < self.next_revision.revision_id
+                comment
+                for comment in revision_comments
+                if comment.created < self.next_revision.updated
+                or comment.revision_id < self.next_revision.revision_id
             ]
         sorted_revision_comments = sorted(
-            revision_comments,
-            key=lambda revision: revision.revision_id
+            revision_comments, key=lambda revision: revision.revision_id
         )
         comment_ids = []
         for comment in sorted_revision_comments:
@@ -1226,6 +1183,7 @@ class RevisionInContext(object):
         if self.revision.depot_file:
             # TODO - G.M - 2018-09-05 - Fix circular import better
             from tracim_backend.lib.core.content import ContentApi
+
             content_api = ContentApi(
                 current_user=self._user,
                 session=self.dbsession,
@@ -1236,8 +1194,7 @@ class RevisionInContext(object):
                 show_temporary=True,
             )
             return content_api.get_preview_page_nb(
-                self.revision.revision_id,
-                file_extension=self.revision.file_extension
+                self.revision.revision_id, file_extension=self.revision.file_extension
             )
         else:
             return None
@@ -1260,14 +1217,13 @@ class RevisionInContext(object):
             return self.revision.depot_file.file.content_length
         except IOError as e:
             logger.warning(
-                self,
-                "IO Exception Occured when trying to get content size  : {}".format(str(e))
+                self, "IO Exception Occured when trying to get content size  : {}".format(str(e))
             )
             logger.warning(self, traceback.format_exc())
         except Exception as e:
             logger.warning(
                 self,
-                "Unknown Exception Occured when trying to get content size  : {}".format(str(e))
+                "Unknown Exception Occured when trying to get content size  : {}".format(str(e)),
             )
             logger.warning(self, traceback.format_exc())
         return None
@@ -1281,6 +1237,7 @@ class RevisionInContext(object):
             return False
 
         from tracim_backend.lib.core.content import ContentApi
+
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
@@ -1291,8 +1248,7 @@ class RevisionInContext(object):
             show_temporary=True,
         )
         return content_api.has_pdf_preview(
-            self.revision.revision_id,
-            file_extension=self.revision.file_extension,
+            self.revision.revision_id, file_extension=self.revision.file_extension
         )
 
     @property
@@ -1304,6 +1260,7 @@ class RevisionInContext(object):
             return False
 
         from tracim_backend.lib.core.content import ContentApi
+
         content_api = ContentApi(
             current_user=self._user,
             session=self.dbsession,
@@ -1314,8 +1271,7 @@ class RevisionInContext(object):
             show_temporary=True,
         )
         return content_api.has_jpeg_preview(
-            self.revision.revision_id,
-            file_extension=self.revision.file_extension
+            self.revision.revision_id, file_extension=self.revision.file_extension
         )
 
     @property
