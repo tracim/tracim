@@ -22,7 +22,7 @@
         </div>
     %elif action == ActionDescription.STATUS_UPDATE:
         <p>
-            ${_( "I modified the status of {content_name}. The new status is <i>{new_status}</i>" ).format(content_name=html_escape(content_name), new_status=html_escape(new_status))| n}
+            ${_( "I modified the status of {content_name}. The new status is <i>{new_status}</i>" ).format(content_name=content_name, new_status=html_escape(new_status))| n}
         </p>
     %elif action == ActionDescription.CREATION:
         <p>
