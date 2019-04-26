@@ -440,8 +440,11 @@ class EmailManager(object):
         try:
             template = Template(
                 filename=mako_template_filepath,
-                default_filters=['html_escape'],
-                imports=['from mako.filters import html_escape', 'from lxml.html.diff import htmldiff'],
+                default_filters=["html_escape"],
+                imports=[
+                    "from mako.filters import html_escape",
+                    "from lxml.html.diff import htmldiff",
+                ],
             )
             return template.render(_=translator.get_translation, config=self.config, **context)
         except Exception as exc:
@@ -480,17 +483,17 @@ class EmailManager(object):
 
         return {
             "user": role.user,
-            'actor': actor,
-            'action': action,
+            "actor": actor,
+            "action": action,
             "workspace": role.workspace,
-            'ActionDescription': ActionDescription,
-            'parent_in_context': parent_in_context,
-            'content_in_context': content_in_context,
+            "ActionDescription": ActionDescription,
+            "parent_in_context": parent_in_context,
+            "content_in_context": content_in_context,
             "workspace_url": workspace_url,
             "previous_revision": previous_revision,
             "new_status": new_status,
             "role_label": role_label,
-            "logo_url": logo_url
+            "logo_url": logo_url,
         }
 
     def _build_email_body_for_content(
