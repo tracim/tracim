@@ -439,7 +439,11 @@ class EmailManager(object):
         :return: template rendered string
         """
         try:
-            template = Template(filename=mako_template_filepath)
+            template = Template(
+                filename=mako_template_filepath,
+                default_filters=['html_escape'],
+                imports=['from mako.filters import html_escape'],
+            )
             return template.render(_=translator.get_translation, config=self.config, **context)
         except Exception as exc:
             logger.exception(self, "Failed to render email template: {}".format(exc.__str__()))
