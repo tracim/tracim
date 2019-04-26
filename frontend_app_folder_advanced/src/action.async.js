@@ -9,8 +9,8 @@ export const getFolder = (apiUrl, idWorkspace, idFolder) =>
     method: 'GET'
   })
 
-export const getAppList = apiUrl =>
-  fetch(`${apiUrl}/system/applications`, {
+export const getContentTypeList = apiUrl =>
+  fetch(`${apiUrl}/system/content_types`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
