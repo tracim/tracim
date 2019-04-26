@@ -14,10 +14,10 @@
 <pre>
 --
 % if config.EMAIL__REPLY__ACTIVATED:
-${_('Reply to this email directly or <a href="{call_to_action_url}">view it on tracim</a>').format(call_to_action_url=call_to_action_url)}
+${_('Reply to this email directly or <a href="{call_to_action_url}">view it on tracim</a>').format(call_to_action_url=html_escape(call_to_action_url))|n}
 % else:
-${_('<a href="{call_to_action_url}">view it on tracim</a>').format(call_to_action_url=call_to_action_url)}
+${_('<a href="{call_to_action_url}">view it on tracim</a>').format(call_to_action_url=html_escape(call_to_action_url))|n}
 %endif
 ${_("You're receiving this email because of your account on {website_title}.").format(website_title=config.WEBSITE__TITLE)}
-${_("If you'd like to receive fewer emails, you can <a href=\"{website_title}/ui/account\">unsubscribe from notifications</a>.").format(website_title=config.WEBSITE__BASE_URL)}
+${_("If you'd like to receive fewer emails, you can <a href=\"{website_title}/ui/account\">unsubscribe from notifications</a>.").format(website_title=html_escape(config.WEBSITE__BASE_URL))|n}
 </pre>
