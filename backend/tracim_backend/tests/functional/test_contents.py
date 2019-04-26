@@ -2143,6 +2143,12 @@ class TestFiles(FunctionalTest):
         assert res.body == b"Test file"
         assert res.content_type == "text/plain"
         assert res.content_length == len(b"Test file")
+        assert int(res.headers["Content-Length"]) == res.content_length
+        assert res.last_modified.second == test_file.updated.second
+        assert res.last_modified.minute == test_file.updated.minute
+        assert res.last_modified.day == test_file.updated.day
+        assert res.last_modified.month == test_file.updated.month
+        assert res.last_modified.year == test_file.updated.year
 
     def test_api__get_file_raw__ok_200__force_download_case(self) -> None:
         """
@@ -2187,6 +2193,12 @@ class TestFiles(FunctionalTest):
         assert res.body == b"Test file"
         assert res.content_type == "text/plain"
         assert res.content_length == len(b"Test file")
+        assert int(res.headers["Content-Length"]) == res.content_length
+        assert res.last_modified.second == test_file.updated.second
+        assert res.last_modified.minute == test_file.updated.minute
+        assert res.last_modified.day == test_file.updated.day
+        assert res.last_modified.month == test_file.updated.month
+        assert res.last_modified.year == test_file.updated.year
 
     def test_api__create_file__ok__200__nominal_case(self) -> None:
         """
