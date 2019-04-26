@@ -197,7 +197,7 @@ class FileController(Controller):
             filename=filename,
             as_attachment=hapic_data.query.force_download,
             content_length=file.content_length,
-            last_modified=content.updated
+            last_modified=content.updated,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -244,7 +244,7 @@ class FileController(Controller):
             filename=filename,
             as_attachment=hapic_data.query.force_download,
             content_length=file.content_length,
-            last_modified=revision.updated
+            last_modified=revision.updated,
         )
 
     # preview
