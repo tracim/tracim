@@ -9,7 +9,7 @@ dist: trusty
 python:
   - "3.6"
 
-_install_with_pip: &_install_with_pip
+_install_backend: &_install_backend
   addons:
     postgresql: "9.3"
     apt:
@@ -63,22 +63,33 @@ _install_with_pip: &_install_with_pip
   after_success:
     - coveralls
 
-_install_with_script: &_install_with_script
-  <<: *_install_with_pip
-  addons:
-    postgresql: "9.3"
-    apt:
-      packages:
-        - docker-ce
+_install_full_tracim: &_install_full_tracim
+  <<: *_install_backend
   install:
+    - cd $TRAVIS_BUILD_DIR/backend
     - pip install --upgrade pip setuptools
-    - ./setup_default_backend.sh root
+    # using old version of pytest-cov to avoid
+    # version conflict with python-coveralls
+    # see https://github.com/z4r/python-coveralls/issues/66
+    - pip install 'pytest-cov<2.6'
+    - pip install python-coveralls
+    - pip install -r "requirements.txt"
+    # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
+    # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
+    # sqlite
+    - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    - cp ../color.json.sample ../color.json
+    - tracimcli db init -c $TRACIM_BACKEND_TEST_CONFIG_FILE
+    - alembic -c $TRACIM_BACKEND_TEST_CONFIG_FILE stamp head
+    - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh root
     - ./build_full_frontend.sh root
     - ./setup_functionnal_tests.sh root
 
 _backend_quick_test: &_backend_quick_test
-  <<: *_install_with_pip
+  <<: *_install_backend
   # INFO - G.M - 2019-04-25 - override docker usage by overriding
   addons:
     apt:
@@ -92,7 +103,7 @@ _backend_quick_test: &_backend_quick_test
     - cd $TRAVIS_BUILD_DIR
 
 _backend_test: &_backend_test
-  <<: *_install_with_pip
+  <<: *_install_backend
   script:
     - cd $TRAVIS_BUILD_DIR/backend/
     - pytest --cov tracim_backend
@@ -179,19 +190,17 @@ jobs:
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: functional
       name: Functional tests using Cypress
-      <<: *_install_with_script
+      <<: *_install_full_tracim
       env:
         - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
         - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
-      before_script:
-        - cd $TRAVIS_BUILD_DIR/backend
-        - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-        - nohup pserve cypress_test.ini&
-        - cd $TRAVIS_BUILD_DIR
-        - cd ./functionnal_tests
       script:
+        - cd $TRAVIS_BUILD_DIR/backend
+        - nohup pserve $TRACIM_BACKEND_TEST_CONFIG_FILE&
+        - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - $(npm bin)/cypress run
+        - cd $TRAVIS_BUILD_DIR
 
 stages:
   - static-tests
