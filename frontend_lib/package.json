@@ -13,7 +13,7 @@
     "buildtracimlib-dev": "NODE_ENV=production webpack && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
     "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
     "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha"
   },
   "author": "",
   "license": "ISC",
@@ -48,7 +48,14 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "@babel/register": "^7.4.0",
+    "chai": "^4.2.0",
+    "chai-enzyme": "^1.0.0-beta.1",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16.1": "^1.6.0",
     "i18next-scanner": "^2.6.1",
+    "ignore-styles": "^5.0.1",
+    "mocha": "^6.1.4",
     "webpack-dev-server": "^3.1.10"
   },
   "standard": {
@@ -56,5 +63,20 @@
     "parser": "babel-eslint",
     "ignore": []
   },
-  "description": ""
+  "description": "",
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@babel/preset-env",
+          "@babel/preset-react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-proposal-object-rest-spread",
+          "@babel/plugin-transform-object-assign"
+        ]
+      }
+    }
+  }
 }
