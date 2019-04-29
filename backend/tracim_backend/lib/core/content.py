@@ -1538,7 +1538,7 @@ class ContentApi(object):
 
         filename = self._prepare_filename(label, file_extension)
         content_type_slug = item.type
-        if item.file_name:
+        if filename:
             self._is_filename_available_or_raise(filename, workspace, parent)
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
@@ -1650,9 +1650,9 @@ class ContentApi(object):
         label = new_label or item.label
         filename = self._prepare_filename(label, item.file_extension)
         content_type_slug = item.type
-        if item.file_name:
+        if filename:
             self._is_filename_available_or_raise(
-                item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
+                filename, item.workspace, item.parent, exclude_content_id=item.content_id
             )
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
