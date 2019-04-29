@@ -1413,8 +1413,8 @@ class ContentApi(object):
         else:
             # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
             raise EmptyLabelNotAllowed(
-                'content {} of type {} should always have a label '
-                'and a valid filename'.format(item.content_id, content_type_slug)
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
             )
         item.revision_type = ActionDescription.MOVE
 
@@ -1483,16 +1483,15 @@ class ContentApi(object):
         )
         self._copy_children(item, new_content)
 
-
     def _copy_current(
-            self,
-            item: Content,
-            new_parent: Content = None,
-            new_label: str = None,
-            new_workspace: Workspace = None,
-            new_file_extension: str = None,
-            do_save: bool = True,
-            do_notify: bool = True,
+        self,
+        item: Content,
+        new_parent: Content = None,
+        new_label: str = None,
+        new_workspace: Workspace = None,
+        new_file_extension: str = None,
+        do_save: bool = True,
+        do_notify: bool = True,
     ) -> Content:
         """
         Copy nearly all content, revision included. Children not included, see
@@ -1548,8 +1547,8 @@ class ContentApi(object):
         else:
             # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
             raise EmptyLabelNotAllowed(
-                'content {} of type {} should always have a label '
-                'and a valid filename'.format(item.content_id, content_type_slug)
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
             )
 
         content = item.copy(parent)
@@ -1662,8 +1661,8 @@ class ContentApi(object):
         else:
             # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
             raise EmptyLabelNotAllowed(
-                'content {} of type {} should always have a label '
-                'and a valid filename'.format(item.content_id, content_type_slug)
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
             )
 
         item.owner = self._user
@@ -1704,8 +1703,8 @@ class ContentApi(object):
         else:
             # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
             raise EmptyLabelNotAllowed(
-                'content {} of type {} should always have a label '
-                'and a valid filename'.format(item.content_id, content_type_slug)
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
             )
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
@@ -2101,6 +2100,9 @@ class ContentApi(object):
         return _("New folder {0}").format(query.count() + 1)
 
     def _allow_empty_label(self, content_type_slug):
-        if content_type_list.get_one_by_slug(content_type_slug).slug == content_type_list.Comment.slug:
+        if (
+            content_type_list.get_one_by_slug(content_type_slug).slug
+            == content_type_list.Comment.slug
+        ):
             return True
         return False

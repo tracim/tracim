@@ -892,7 +892,7 @@ class FileResource(DAVNonCollection):
         except ContentNotFound:
             destination_parent = None
         try:
-            new_content = self.content_api.copy(
+            self.content_api.copy(
                 item=self.content,
                 new_label=new_label,
                 new_file_extension=new_file_extension,

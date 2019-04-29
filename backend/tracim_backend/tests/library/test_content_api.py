@@ -930,7 +930,6 @@ class TestContentApi(DefaultTest):
         eq_("", c.label)
         eq_(ActionDescription.COMMENT, c.revision_type)
 
-
     def test_unit_move_file_with_comments__different_parent_same_workspace(self):
         """
         Check if move of content does proper copy of subcontent.
@@ -963,7 +962,9 @@ class TestContentApi(DefaultTest):
             )
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
-        api.create_comment(workspace, parent=text_file, content= 'just a comment', do_save=True, do_notify=False)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
         folderb = api.create(content_type_list.Folder.slug, workspace, None, "folder b", "", True)
         comment_before_move_id = text_file.children[0].id
         with new_revision(content=text_file, tm=transaction.manager, session=self.session):
@@ -1008,21 +1009,28 @@ class TestContentApi(DefaultTest):
             )
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
-        api.create_comment(workspace, parent=text_file, content= 'just a comment', do_save=True, do_notify=False)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
         comment_before_move_id = text_file.children[0].id
         comment_before_move_workspace_id = text_file.children[0].workspace_id
-        assert text_file.children[0].description == 'just a comment'
+        assert text_file.children[0].description == "just a comment"
         workspace2 = WorkspaceApi(
             current_user=user, session=self.session, config=self.app_config
         ).create_workspace("test workspace2", save_now=True)
         folderb = api.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
         with new_revision(content=text_file, tm=transaction.manager, session=self.session):
-            api.move(item=text_file, new_parent=folderb, new_workspace=workspace2, must_stay_in_same_workspace=False)
+            api.move(
+                item=text_file,
+                new_parent=folderb,
+                new_workspace=workspace2,
+                must_stay_in_same_workspace=False,
+            )
             api.save(text_file)
         transaction.commit()
         api2 = ContentApi(current_user=user, session=self.session, config=self.app_config)
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
-        assert text_file_after_move.children[0].description == 'just a comment'
+        assert text_file_after_move.children[0].description == "just a comment"
         assert text_file_after_move.children[0].id == comment_before_move_id
         assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
 
@@ -1114,7 +1122,9 @@ class TestContentApi(DefaultTest):
             )
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
-        api.create_comment(workspace, parent=text_file, content= 'just a comment', do_save=True, do_notify=False)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
         api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
         workspace2 = WorkspaceApi(
             current_user=user2, session=self.session, config=self.app_config
@@ -1128,7 +1138,7 @@ class TestContentApi(DefaultTest):
 
         assert len(text_file.children) == 1
         assert len(text_file_copy.children) == 1
-        assert text_file.children[0].description == 'just a comment'
+        assert text_file.children[0].description == "just a comment"
         assert text_file_copy.children[0].description == text_file.children[0].description
         assert text_file_copy.children[0].id != text_file.children[0].id
         assert text_file_copy.children[0].created == text_file.children[0].created
