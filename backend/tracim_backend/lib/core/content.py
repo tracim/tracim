@@ -1472,6 +1472,37 @@ class ContentApi(object):
         :param do_notify: notify copy or not
         :return: Newly copied item
         """
+        new_content = self._copy_current(
+            item=item,
+            new_label=new_label,
+            new_file_extension=new_file_extension,
+            new_parent=new_parent,
+            new_workspace=new_workspace,
+            do_notify=do_notify,
+            do_save=do_save,
+        )
+        self._copy_children(item, new_content)
+
+
+    def _copy_current(
+            self,
+            item: Content,
+            new_parent: Content = None,
+            new_label: str = None,
+            new_workspace: Workspace = None,
+            new_file_extension: str = None,
+            do_save: bool = True,
+            do_notify: bool = True,
+    ) -> Content:
+        """
+        Copy nearly all content, revision included. Children not included, see
+        "copy_children" for this.
+        :param item: Item to copy
+        :param new_parent: new parent of the new copied item
+        :param new_label: new label of the new copied item
+        :param do_notify: notify copy or not
+        :return: Newly copied item
+        """
         if (not new_parent and not new_label and not new_file_extension and not new_workspace) or (
             new_parent == item.parent
             and new_label == item.label
@@ -1542,9 +1573,9 @@ class ContentApi(object):
             self.save(content, ActionDescription.COPY, do_notify=do_notify)
         return content
 
-    def copy_children(self, origin_content: Content, new_content: Content):
+    def _copy_children(self, origin_content: Content, new_content: Content):
         for child in origin_content.children:
-            self.copy(child, new_content)
+            self._copy_current(child, new_content, do_notify=False)
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """

@@ -899,7 +899,6 @@ class FileResource(DAVNonCollection):
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
             )
-            self.content_api.copy_children(self.content, new_content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
         transaction.commit()

@@ -986,6 +986,57 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
+    def test_unit_copy_file_with_comments_different_label_different_parent_ok(self):
+        """
+        Check if copy of content does proper copy of subcontent.
+        """
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+        )
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        with self.session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=foldera,
+                label="test_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
+        api.save(text_file, ActionDescription.CREATION)
+        api.create_comment(workspace, parent=text_file, content= 'just a comment', do_save=True, do_notify=False)
+        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        workspace2 = WorkspaceApi(
+            current_user=user2, session=self.session, config=self.app_config
+        ).create_workspace("test workspace2", save_now=True)
+        folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+
+        api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
+
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
+
+        assert len(text_file.children) == 1
+        assert len(text_file_copy.children) == 1
+        assert text_file.children[0].description == 'just a comment'
+        assert text_file_copy.children[0].description == text_file.children[0].description
+        assert text_file_copy.children[0].id != text_file.children[0].id
+        assert text_file_copy.children[0].created == text_file.children[0].created
+
     def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
