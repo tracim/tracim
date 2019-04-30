@@ -1174,6 +1174,18 @@ class Content(DeclarativeBase):
         return valid_children
 
     @property
+    def recursive_children(self) -> ["Content"]:
+        """
+        Get all children recursively (including children of children...)
+        """
+        children = []
+        for child in self.children:
+            children.append(child)
+            for sub_child in child.recursive_children:
+                children.append(sub_child)
+        return children
+
+    @property
     def revision(self) -> ContentRevisionRO:
         return self.get_current_revision()
 
