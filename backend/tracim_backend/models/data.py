@@ -1434,12 +1434,32 @@ class Content(DeclarativeBase):
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
-    def copy(self, parent):
-        cpy_content = Content()
-        for rev in self.revisions:
-            cpy_rev = ContentRevisionRO.copy(rev, parent)
-            cpy_content.revisions.append(cpy_rev)
-        return cpy_content
+    def copy(self, parent: "Content"):
+        # INFO - G.M - 2019-04-30 - get all content and children revisions sorted by id
+        revisions = []  # type: typing.List[ContentRevisionRO]
+        for revision in self.revisions:
+            revisions.append(revision)
+        for children in self.recursive_children:
+            for revision in children.revisions:
+                revisions.append(revision)
+        revisions = sorted(revisions, key=lambda revision: revision.revision_id)
+        # INFO - G.M - 2019-04-30 - we stored old content id and new content related in order
+        # to be able to retrieve new content when applying all revision in order to correct
+        # new content
+        new_content_sorted_by_old_content_id = {self.parent_id: parent}
+        for rev in revisions:
+            # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+            # we create it.
+            if rev.content_id not in new_content_sorted_by_old_content_id:
+                new_content_sorted_by_old_content_id[rev.content_id] = Content()
+            # INFO - G.M - 2019-04-30 - copy of revision itself.
+            related_content = new_content_sorted_by_old_content_id[rev.content_id]  # type: Content
+            cpy_rev = ContentRevisionRO.copy(
+                rev, new_content_sorted_by_old_content_id[rev.parent_id]
+            )
+            related_content.revisions.append(cpy_rev)
+
+        return new_content_sorted_by_old_content_id[self.content_id]
 
 
 class RevisionReadStatus(DeclarativeBase):
