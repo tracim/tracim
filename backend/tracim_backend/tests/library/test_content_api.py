@@ -1125,6 +1125,18 @@ class TestContentApi(DefaultTest):
         api.create_comment(
             workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
         )
+        with new_revision(self.session, transaction.manager, content=text_file):
+            api.update_content(text_file, text_file.label, new_content="just a description")
+            api.save(
+                content=text_file, action_description=ActionDescription.EDITION, do_notify=False
+            )
+        api.create_comment(
+            workspace,
+            parent=text_file,
+            content="just another comment",
+            do_save=True,
+            do_notify=False,
+        )
         api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
         workspace2 = WorkspaceApi(
             current_user=user2, session=self.session, config=self.app_config
@@ -1136,12 +1148,31 @@ class TestContentApi(DefaultTest):
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
 
-        assert len(text_file.children) == 1
-        assert len(text_file_copy.children) == 1
+        assert len(text_file.children) == 2
+        assert len(text_file_copy.children) == 2
         assert text_file.children[0].description == "just a comment"
         assert text_file_copy.children[0].description == text_file.children[0].description
         assert text_file_copy.children[0].id != text_file.children[0].id
         assert text_file_copy.children[0].created == text_file.children[0].created
+
+        assert text_file.children[1].description == "just another comment"
+        assert text_file_copy.children[1].description == text_file.children[1].description
+        assert text_file_copy.children[1].id != text_file.children[1].id
+        assert text_file_copy.children[1].created == text_file.children[1].created
+        # INFO - G.M - 2019-04-30 - check if both recursive
+        # revision tree of content and copy are similar
+        assert (
+            len(text_file_copy.recursive_tree_revision)
+            == len(text_file.recursive_tree_revision) + 3
+        )
+        for num, revision in enumerate(text_file_copy.recursive_tree_revision[:-3]):
+            assert (
+                text_file.recursive_tree_revision[num].revision_type
+                == text_file_copy.recursive_tree_revision[num].revision_type
+            )
+        # INFO - G.M - 2019-04-30 - check if all supplementary revision are copy one.
+        for revision in text_file_copy.recursive_tree_revision[-3:]:
+            assert revision.revision_type == ActionDescription.COPY
 
     def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
