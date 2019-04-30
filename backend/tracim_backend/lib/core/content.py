@@ -1644,10 +1644,12 @@ class ContentApi(object):
             ) as rev:
                 rev.workspace = new_workspace
                 rev.revision_type = ActionDescription.COPY
-                rev.properties["origin"] = {
+                properties = rev.properties.copy()
+                properties["origin"] = {
                     "content": original_child.id,
                     "revision": original_child.last_revision.revision_id,
                 }
+                rev.properties = properties
             self.save(new_child, ActionDescription.COPY, do_notify=False)
         with new_revision(
             session=self._session,
@@ -1660,10 +1662,12 @@ class ContentApi(object):
             rev.label = new_label
             rev.file_extension = new_file_extension
             rev.revision_type = ActionDescription.COPY
-            rev.properties["origin"] = {
+            properties = rev.properties.copy()
+            properties["origin"] = {
                 "content": original_content.id,
                 "revision": original_content.last_revision.revision_id,
             }
+            rev.properties = properties
         if do_save:
             self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
         return new_content, children_new_content, children_original_content
