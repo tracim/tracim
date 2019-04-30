@@ -2000,13 +2000,11 @@ function setAgendaFullscreen () {
 
   if (isIframeCaldavzapInFullscreen) {
     iframeElement.style.position = 'static'
-    document.getElementById('caldavzap__fullscreenbtn__icon').setAttribute('class', 'fa fa-expand')
   } else {
     iframeElement.style.position = 'fixed'
     iframeElement.style.top = '0px'
     iframeElement.style.left = '0px'
     iframeElement.style.zIndex = '20'
-    document.getElementById('caldavzap__fullscreenbtn__icon').setAttribute('class', 'fa fa-compress')
   }
   isIframeCaldavzapInFullscreen = !isIframeCaldavzapInFullscreen
 }

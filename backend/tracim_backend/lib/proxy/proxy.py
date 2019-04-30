@@ -3,10 +3,10 @@ import copy
 import typing
 from urllib.parse import urljoin
 
-import requests
 from pyramid.response import Response as PyramidResponse
+import requests
 from requests import Response as RequestsResponse
-from requests.auth import HTTPBasicAuth, AuthBase
+from requests.auth import AuthBase
 
 from tracim_backend.lib.utils.request import TracimRequest
 
@@ -15,14 +15,14 @@ from tracim_backend.lib.utils.request import TracimRequest
 # and are not stored by caches or forwarded by proxies."
 # see RFC 2616 : https://tools.ietf.org/html/rfc2616#page-92
 HOP_BY_HOP_HEADER_HTTP = (
-    'connection',
-    'keep-alive',
-    'proxy-authenticate',
-    'proxy-authorization',
-    'te',
-    'trailers',
-    'transfer-encoding',
-    'upgrade',
+    "connection",
+    "keep-alive",
+    "proxy-authenticate",
+    "proxy-authorization",
+    "te",
+    "trailers",
+    "transfer-encoding",
+    "upgrade",
 )
 
 DEFAULT_RESPONSE_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
@@ -32,12 +32,11 @@ DEFAULT_RESPONSE_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
     # This make pyramid raise exception, to force renew creation of
     # content_length, we can disable content_length header and
     # content-encoding header
-    'content-length',
-    'content-encoding'
+    "content-length",
+    "content-encoding",
 )
-DEFAULT_REQUEST_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + (
-    'authorization',
-)
+DEFAULT_REQUEST_HEADER_TO_DROP = HOP_BY_HOP_HEADER_HTTP + ("authorization",)
+
 
 class Proxy(object):
     def __init__(
@@ -45,7 +44,7 @@ class Proxy(object):
         base_address: str,
         default_request_headers_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
         default_response_headers_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
-        auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase] = None
+        auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase] = None,
     ) -> None:
         """
         :param auth: should be a username,password tuple or AuthBase requests lib object
@@ -56,12 +55,12 @@ class Proxy(object):
         self.auth = auth
 
     def _get_behind_response(
-            self,
-            method: str,
-            headers: dict,
-            data: dict,
-            url: str,
-            auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase],
+        self,
+        method: str,
+        headers: dict,
+        data: dict,
+        url: str,
+        auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase],
     ) -> RequestsResponse:
         """
         :param auth: should be a username,password tuple or AuthBase requests lib object
@@ -76,11 +75,8 @@ class Proxy(object):
         )
 
     def _generate_proxy_response(self, status, headers: dict, body):
-        return PyramidResponse(
-            status=status,
-            headers=headers,
-            body=body,
-        )
+        return PyramidResponse(status=status, headers=headers, body=body)
+
     def _add_extra_headers(self, headers: dict, extra_headers: dict):
         extra_headers = copy.deepcopy(extra_headers)
         new_headers = copy.deepcopy(headers)
@@ -107,8 +103,8 @@ class Proxy(object):
         self,
         request: TracimRequest,
         path: str,
-        extra_request_headers: typing.Optional[dict]=None,
-        extra_response_headers: typing.Optional[dict]=None,
+        extra_request_headers: typing.Optional[dict] = None,
+        extra_response_headers: typing.Optional[dict] = None,
     ) -> PyramidResponse:
         # INFO - G.M - 2019-03-08 - Prepare behind request
         request_headers = dict(request.headers)
@@ -117,7 +113,6 @@ class Proxy(object):
         if extra_request_headers:
             request_headers = self._add_extra_headers(request_headers, extra_request_headers)
         behind_url = urljoin(self._base_address, path)
-
 
         behind_response = self._get_behind_response(
             method=request.method,
@@ -136,5 +131,5 @@ class Proxy(object):
         return self._generate_proxy_response(
             status=behind_response.status_code,
             headers=response_headers,
-            body=behind_response.content
+            body=behind_response.content,
         )

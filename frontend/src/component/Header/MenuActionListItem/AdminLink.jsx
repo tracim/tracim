@@ -9,7 +9,7 @@ const AdminLink = props => {
   return (
     <div className='adminlink dropdown'>
       <button className='adminlink__btn btn outlineTextBtn nohover primaryColorBorder dropdown-toggle' type='button' data-toggle='dropdown'>
-        <i className='fa fa-fw fa-lock' />
+        <i className='fa fa-fw fa-cog' />
         Administration
       </button>
 

@@ -1,25 +1,25 @@
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-import zope.sqlalchemy
 from sqlalchemy import engine_from_config
 from sqlalchemy.event import listen
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+import zope.sqlalchemy
 
-from tracim_backend.models.auth import Group
-from tracim_backend.models.auth import Permission
-from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.auth import Group  # noqa: F401
+from tracim_backend.models.auth import Permission  # noqa: F401
+from tracim_backend.models.auth import User  # noqa: F401
+from tracim_backend.models.data import Content  # noqa: F401
+from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
+from tracim_backend.models.meta import DeclarativeBase  # noqa: F401
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()
 
 
-def get_engine(settings, prefix='sqlalchemy.'):
+def get_engine(settings, prefix="sqlalchemy."):
     return engine_from_config(settings, prefix)
 
 
@@ -28,10 +28,12 @@ def get_session_factory(engine):
     factory.configure(bind=engine)
     return factory
 
+
 def get_scoped_session_factory(engine):
     factory = scoped_session(sessionmaker(expire_on_commit=False))
     factory.configure(bind=engine)
     return factory
+
 
 def get_tm_session(session_factory, transaction_manager):
     """
@@ -64,15 +66,11 @@ def get_tm_session(session_factory, transaction_manager):
     # These problem happened because we use "commit" in our current code.
     # Understand what those params really mean and check if it can cause
     # troubles somewhere else.
-    # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc  # nopep8
-    zope.sqlalchemy.register(
-        dbsession,
-        transaction_manager=transaction_manager,
-        keep_session=True,
-    )
-    from tracim_backend.models.revision_protection import \
-        prevent_content_revision_delete
-    listen(dbsession, 'before_flush', prevent_content_revision_delete)
+    # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc
+    zope.sqlalchemy.register(dbsession, transaction_manager=transaction_manager, keep_session=True)
+    from tracim_backend.models.revision_protection import prevent_content_revision_delete
+
+    listen(dbsession, "before_flush", prevent_content_revision_delete)
     return dbsession
 
 
@@ -85,21 +83,21 @@ def includeme(config):
 
     """
     settings = config.get_settings()
-    settings['tm.manager_hook'] = 'pyramid_tm.explicit_manager'
+    settings["tm.manager_hook"] = "pyramid_tm.explicit_manager"
 
     # use pyramid_tm to hook the transaction lifecycle to the request
-    config.include('pyramid_tm')
+    config.include("pyramid_tm")
 
     # use pyramid_retry to retry a request when transient exceptions occur
-    config.include('pyramid_retry')
+    config.include("pyramid_retry")
 
     session_factory = get_session_factory(get_engine(settings))
-    config.registry['dbsession_factory'] = session_factory
+    config.registry["dbsession_factory"] = session_factory
 
     # make request.dbsession available for use in Pyramid
     config.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
         lambda r: get_tm_session(session_factory, r.tm),
-        'dbsession',
-        reify=True
+        "dbsession",
+        reify=True,
     )

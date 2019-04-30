@@ -10,12 +10,11 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.exceptions import WorkspaceNotFound
-from tracim_backend.lib.agenda.determiner import \
-    CaldavAuthorizationDeterminer
+from tracim_backend.lib.agenda.determiner import CaldavAuthorizationDeterminer
 from tracim_backend.lib.agenda.utils import DavAuthorization
-from tracim_backend.lib.utils.authorization import AuthorizationChecker, \
-    is_content_manager
+from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import SameUserChecker
+from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_user
@@ -24,10 +23,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 
 
 def add_www_authenticate_header_for_caldav(config):
-    config.add_subscriber(
-        add_www_authenticate_header_for_caldav_to_response,
-        NewResponse
-    )
+    config.add_subscriber(add_www_authenticate_header_for_caldav_to_response, NewResponse)
 
 
 def add_www_authenticate_header_for_caldav_to_response(event):
@@ -37,12 +33,12 @@ def add_www_authenticate_header_for_caldav_to_response(event):
     """
     request = event.request
     response = event.response
-    if request.exception and \
-        hasattr(request.exception, 'error_code') and \
-        request.exception.error_code == ErrorCode.CALDAV_NOT_AUTHENTICATED:
-        response.headerlist.append(
-            ('WWW-Authenticate', 'Basic realm="Tracim credentials"')
-        )
+    if (
+        request.exception
+        and hasattr(request.exception, "error_code")
+        and request.exception.error_code == ErrorCode.CALDAV_NOT_AUTHENTICATED
+    ):
+        response.headerlist.append(("WWW-Authenticate", 'Basic realm="Tracim credentials"'))
 
 
 class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
@@ -51,13 +47,11 @@ class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
         - in reading: must be reader
         - in writing or manager actions: must be content_manager
     """
+
     def __init__(self) -> None:
         self.caldav_auth_determiner = CaldavAuthorizationDeterminer()
 
-    def check(
-            self,
-            tracim_context: "TracimRequest"
-    ) -> bool:
+    def check(self, tracim_context: "TracimRequest") -> bool:
         """
         :param tracim_context: Must be a TracimRequest because this checker only
         work in pyramid http request context.
@@ -67,13 +61,21 @@ class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
         # see https://github.com/tracim/tracim/issues/1593
         if not tracim_context.current_workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
-        if self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER \
-                or self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.WRITE:
+        if (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.MANAGER
+            or self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.WRITE
+        ):
             is_content_manager.check(tracim_context)
-        elif self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.READ:
+        elif (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.READ
+        ):
             is_reader.check(tracim_context)
 
         return True
+
 
 class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
     """
@@ -82,13 +84,11 @@ class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
         - in contribution: must be contributor
         - in managment action: must be content_manager
     """
+
     def __init__(self) -> None:
         self.caldav_auth_determiner = CaldavAuthorizationDeterminer()
 
-    def check(
-            self,
-            tracim_context: "TracimRequest"
-    ) -> bool:
+    def check(self, tracim_context: "TracimRequest") -> bool:
         """
         :param tracim_context: Must be a TracimRequest because this checker only
         work in pyramid http request context.
@@ -98,11 +98,20 @@ class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
         # see https://github.com/tracim/tracim/issues/1593
         if not tracim_context.current_workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
-        if self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.MANAGER:
+        if (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.MANAGER
+        ):
             is_content_manager.check(tracim_context)
-        elif self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.WRITE:
+        elif (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.WRITE
+        ):
             is_contributor.check(tracim_context)
-        elif self.caldav_auth_determiner.determine_requested_mode(tracim_context) == DavAuthorization.READ:
+        elif (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.READ
+        ):
             is_reader.check(tracim_context)
 
         return True
@@ -112,13 +121,11 @@ class CaldavChecker(AuthorizationChecker):
     """
     Wrapper for NotAuthenticated case
     """
+
     def __init__(self, checker: AuthorizationChecker) -> None:
         self.checker = checker
 
-    def check(
-        self,
-        tracim_context: TracimContext
-    ):
+    def check(self, tracim_context: TracimContext):
         try:
             return self.checker.check(tracim_context)
         except NotAuthenticated as exc:
@@ -127,11 +134,7 @@ class CaldavChecker(AuthorizationChecker):
             raise CaldavNotAuthorized() from exc
 
 
-can_access_workspace_root_agenda = CaldavChecker(
-    CanAccessWorkspaceRootAgendaChecker()
-)
-can_access_workspace_event_agenda = CaldavChecker(
-    CanAccessWorkspaceEventAgendaChecker()
-)
+can_access_workspace_root_agenda = CaldavChecker(CanAccessWorkspaceRootAgendaChecker())
+can_access_workspace_event_agenda = CaldavChecker(CanAccessWorkspaceEventAgendaChecker())
 can_access_user_agenda = CaldavChecker(SameUserChecker())
 can_access_to_agenda_list = CaldavChecker(is_user)

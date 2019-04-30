@@ -1,4 +1,5 @@
 from enum import IntEnum
+
 # Error code format
 # 1xxx: not found error
 # 2xxx: validation error

@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
+from email.message import Message
+from email.mime.multipart import MIMEMultipart
 import smtplib
 import traceback
 import typing
-from email.message import Message
-from email.mime.multipart import MIMEMultipart
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.utils.utils import get_rq_queue
-from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import get_redis_connection
+from tracim_backend.lib.utils.utils import get_rq_queue
+
 
 def send_email_through(
-        config: CFG,
-        sendmail_callable: typing.Callable[[Message], None],
-        message: Message,
+    config: CFG, sendmail_callable: typing.Callable[[Message], None], message: Message
 ) -> None:
     """
     Send mail encapsulation to send it in async or sync mode.
@@ -25,30 +24,23 @@ def send_email_through(
     :param sendmail_callable: A callable who get message on first parameter
     :param message: The message who have to be sent
     """
-    if config.EMAIL_PROCESSING_MODE == config.CST.SYNC:
-        logger.info(
-            send_email_through,
-            'send email to {} synchronously'.format(
-                message['To']
-            )
-        )
+    if config.EMAIL__PROCESSING_MODE == config.CST.SYNC:
+        logger.info(send_email_through, "send email to {} synchronously".format(message["To"]))
         sendmail_callable(message)
-    elif config.EMAIL_PROCESSING_MODE == config.CST.ASYNC:
+    elif config.EMAIL__PROCESSING_MODE == config.CST.ASYNC:
         logger.info(
             send_email_through,
-            'send email to {} asynchronously:'
-            'mail stored in queue in wait for a'
-            'mail_notifier daemon'.format(
-                message['To']
-            )
+            "send email to {} asynchronously:"
+            "mail stored in queue in wait for a"
+            "mail_notifier daemon".format(message["To"]),
         )
         redis_connection = get_redis_connection(config)
-        queue = get_rq_queue(redis_connection, 'mail_sender')
+        queue = get_rq_queue(redis_connection, "mail_sender")
         queue.enqueue(sendmail_callable, message)
     else:
         raise NotImplementedError(
-            'Mail sender processing mode {} is not implemented'.format(
-                config.EMAIL_PROCESSING_MODE,
+            "Mail sender processing mode {} is not implemented".format(
+                config.EMAIL__PROCESSING_MODE
             )
         )
 
@@ -61,12 +53,7 @@ class EmailSender(object):
     example, it has no dependencies on SQLAlchemy nor tg HTTP request.
     """
 
-    def __init__(
-            self,
-            config: CFG,
-            smtp_config: SmtpConfiguration,
-            really_send_messages
-    ) -> None:
+    def __init__(self, config: CFG, smtp_config: SmtpConfiguration, really_send_messages) -> None:
         self._smtp_config = smtp_config
         self.config = config
         self._smtp_connection = None
@@ -74,14 +61,11 @@ class EmailSender(object):
 
     def connect(self):
         if not self._smtp_connection:
-            log = 'Connecting to SMTP server {}'
+            log = "Connecting to SMTP server {}"
             logger.info(self, log.format(self._smtp_config.server))
             # TODO - G.M - 2019-01-29 - Support for SMTP SSL-only port connection
             # using smtplib.SMTP_SSL
-            self._smtp_connection = smtplib.SMTP(
-                self._smtp_config.server,
-                self._smtp_config.port
-            )
+            self._smtp_connection = smtplib.SMTP(self._smtp_config.server, self._smtp_config.port)
             self._smtp_connection.ehlo()
 
             if self._smtp_config.login:
@@ -89,98 +73,66 @@ class EmailSender(object):
                     starttls_result = self._smtp_connection.starttls()
 
                     if starttls_result[0] == 220:
-                        logger.info(self, 'SMTP Start TLS OK')
+                        logger.info(self, "SMTP Start TLS OK")
 
-                    log = 'SMTP Start TLS return code: {} with message: {}'
+                    log = "SMTP Start TLS return code: {} with message: {}"
                     logger.debug(
-                        self,
-                        log.format(
-                            starttls_result[0],
-                            starttls_result[1].decode('utf-8')
-                        )
+                        self, log.format(starttls_result[0], starttls_result[1].decode("utf-8"))
                     )
                 except smtplib.SMTPResponseException as exc:
-                    log = 'SMTP start TLS return error code: {} with message: {}'
-                    logger.error(
-                        self,
-                        log.format(
-                            exc.smtp_code,
-                            exc.smtp_error.decode('utf-8')
-                        )
-                    )
+                    log = "SMTP start TLS return error code: {} with message: {}"
+                    logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                 except Exception as exc:
-                    log = 'Unexpected exception during SMTP start TLS process: {}'
+                    log = "Unexpected exception during SMTP start TLS process: {}"
                     logger.error(self, log.format(exc.__str__()))
                     logger.error(self, traceback.format_exc())
-
 
             if self._smtp_config.login:
                 try:
                     login_res = self._smtp_connection.login(
-                        self._smtp_config.login,
-                        self._smtp_config.password
+                        self._smtp_config.login, self._smtp_config.password
                     )
 
                     if login_res[0] == 235:
-                        logger.info(self, 'SMTP Authentication Successful')
+                        logger.info(self, "SMTP Authentication Successful")
                     if login_res[0] == 503:
-                        logger.info(self, 'SMTP Already Authenticated')
+                        logger.info(self, "SMTP Already Authenticated")
 
-                    log = 'SMTP login return code: {} with message: {}'
-                    logger.debug(
-                        self,
-                        log.format(
-                            login_res[0],
-                            login_res[1].decode('utf-8')
-                        )
-                    )
+                    log = "SMTP login return code: {} with message: {}"
+                    logger.debug(self, log.format(login_res[0], login_res[1].decode("utf-8")))
                 except smtplib.SMTPAuthenticationError as exc:
 
-                    log = 'SMTP auth return error code: {} with message: {}'
+                    log = "SMTP auth return error code: {} with message: {}"
+                    logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                     logger.error(
-                        self,
-                        log.format(
-                            exc.smtp_code,
-                            exc.smtp_error.decode('utf-8')
-                        )
-                    )
-                    logger.error(self,
-                                 'check your auth params combinaison '
-                                 '(login/password) for SMTP'
+                        self, "check your auth params combinaison " "(login/password) for SMTP"
                     )
                 except smtplib.SMTPResponseException as exc:
-                    log = 'SMTP login return error code: {} with message: {}'
-                    logger.error(
-                        self,
-                        log.format(
-                            exc.smtp_code,
-                            exc.smtp_error.decode('utf-8')
-                        )
-                    )
+                    log = "SMTP login return error code: {} with message: {}"
+                    logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                 except Exception as exc:
-                    log = 'Unexpected exception during SMTP login {}'
+                    log = "Unexpected exception during SMTP login {}"
                     logger.error(self, log.format(exc.__str__()))
                     logger.error(self, traceback.format_exc())
 
-
     def disconnect(self):
         if self._smtp_connection:
-            log = 'Disconnecting from SMTP server {}'
+            log = "Disconnecting from SMTP server {}"
             logger.info(self, log.format(self._smtp_config.server))
             self._smtp_connection.quit()
-            logger.info(self, 'Connection closed.')
+            logger.info(self, "Connection closed.")
 
     def send_mail(self, message: MIMEMultipart):
         if not self._is_active:
-            log = 'Not sending email to {} (service disabled)'
-            logger.info(self, log.format(message['To']))
+            log = "Not sending email to {} (service disabled)"
+            logger.info(self, log.format(message["To"]))
         else:
             self.connect()  # Actually, this connects to SMTP only if required
-            logger.info(self, 'Sending email to {}'.format(message['To']))
+            logger.info(self, "Sending email to {}".format(message["To"]))
             # TODO - G.M - 2019-01-29 - optimisize this code, we should not send
             # email if connection has failed.
-            send_action = '{:8s}'.format('SENT')
-            failed_action = '{:8s}'.format('SENDFAIL')
+            send_action = "{:8s}".format("SENT")
+            failed_action = "{:8s}".format("SENDFAIL")
             action = send_action
             try:
                 send_message_result = self._smtp_connection.send_message(message)
@@ -188,7 +140,7 @@ class EmailSender(object):
                 # dict of refused recipients.
 
                 if send_message_result == {}:
-                    logger.debug(self, 'One mail correctly sent using SMTP.')
+                    logger.debug(self, "One mail correctly sent using SMTP.")
                 else:
                     # INFO - G.M - 2019-01-29 - send_message_result != {}
                     # case should not happened
@@ -196,32 +148,31 @@ class EmailSender(object):
                     # time. send_message will not raise exception
                     # just if some recipient work and some other failed.
                     # TODO - G.M - 2019-01-29 - better support for multirecipient email
-                    log = 'Mail could not be send to some recipient: {}'
+                    log = "Mail could not be send to some recipient: {}"
                     logger.debug(self, log.format(send_message_result))
                     action = failed_action
 
             except smtplib.SMTPException as exc:
-                log = 'SMTP sending message return error: {}'
+                log = "SMTP sending message return error: {}"
                 logger.error(self, log.format(str(exc)))
                 action = failed_action
             except Exception as exc:
-                log = 'Unexpected exception during sending email message using SMTP: {}'
+                log = "Unexpected exception during sending email message using SMTP: {}"
                 logger.error(self, log.format(exc.__str__()))
                 logger.error(self, traceback.format_exc())
                 action = failed_action
 
             from tracim_backend.lib.mail_notifier.notifier import EmailManager
+
             if action == send_action:
-                msg = 'an email was sended to {}'.format(message['To'])
+                msg = "an email was sended to {}".format(message["To"])
             else:
-                msg = 'fail to send email to {}'.format(message['To'])
+                msg = "fail to send email to {}".format(message["To"])
 
             EmailManager.log_email_notification(
                 msg=msg,
                 action=action,
-                email_recipient=message['To'],
-                email_subject=message['Subject'],
+                email_recipient=message["To"],
+                email_subject=message["Subject"],
                 config=self.config,
             )
-
-

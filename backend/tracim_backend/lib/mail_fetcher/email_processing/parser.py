@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 
-from tracim_backend.lib.mail_fetcher.email_processing.checkers import ProprietaryHTMLAttrValues
 from tracim_backend.lib.mail_fetcher.email_processing.checkers import HtmlMailQuoteChecker
 from tracim_backend.lib.mail_fetcher.email_processing.checkers import HtmlMailSignatureChecker
-from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPartType
+from tracim_backend.lib.mail_fetcher.email_processing.checkers import ProprietaryHTMLAttrValues
 from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPart
+from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPartType
 from tracim_backend.lib.mail_fetcher.email_processing.models import HtmlBodyMailParts
 
 
@@ -14,7 +14,8 @@ class PreSanitizeConfig(object):
     To avoid problems, html need to be sanitize a bit during parsing to distinct
     Main,Quote and Signature elements
     """
-    meta_tag = ['body', 'div']
+
+    meta_tag = ["body", "div"]
 
 
 class ParsedHTMLMail(object):
@@ -44,25 +45,26 @@ class ParsedHTMLMail(object):
         Get html body tree without some kind of wrapper.
         We need to have text, quote and signature parts at the same tree level
         """
-        tree = BeautifulSoup(self.src_html_body, 'html.parser')
+        tree = BeautifulSoup(self.src_html_body, "html.parser")
 
         # Only parse body part of html if available
-        subtree = tree.find('body')
+        subtree = tree.find("body")
         if subtree:
-            tree = BeautifulSoup(str(subtree), 'html.parser')
+            tree = BeautifulSoup(str(subtree), "html.parser")
 
         # if some kind of "meta_div", unwrap it
-        while len(tree.findAll(recursive=None)) == 1 and \
-                tree.find().name.lower() in PreSanitizeConfig.meta_tag:
+        while (
+            len(tree.findAll(recursive=None)) == 1
+            and tree.find().name.lower() in PreSanitizeConfig.meta_tag
+        ):
             tree.find().unwrap()
 
         for tag in tree.findAll():
             # HACK - G.M - 2017-11-28 - Unwrap outlook.com mail
             # if Text -> Signature -> Quote Mail
             # Text and signature are wrapped into divtagdefaultwrapper
-            if tag.attrs.get('id'):
-                if ProprietaryHTMLAttrValues.Outlook_com_wrapper_id\
-                        in tag.attrs['id']:
+            if tag.attrs.get("id"):
+                if ProprietaryHTMLAttrValues.Outlook_com_wrapper_id in tag.attrs["id"]:
                     tag.unwrap()
         return tree
 
@@ -87,14 +89,10 @@ class ParsedHTMLMail(object):
         return parts
 
     @classmethod
-    def _process_elements(
-            cls,
-            elements: HtmlBodyMailParts,
-    ) -> HtmlBodyMailParts:
+    def _process_elements(cls, elements: HtmlBodyMailParts) -> HtmlBodyMailParts:
         if len(elements) >= 2:
             # Case 1 and 2, only one main and one quote
-            if elements.get_nb_part_type('main') == 1 and \
-                            elements.get_nb_part_type('quote') == 1:
+            if elements.get_nb_part_type("main") == 1 and elements.get_nb_part_type("quote") == 1:
                 # Case 1 : Main first
                 if elements[0].part_type == BodyMailPartType.Main:
                     cls._process_main_first_case(elements)

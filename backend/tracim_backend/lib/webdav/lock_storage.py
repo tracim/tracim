@@ -1,9 +1,14 @@
 import time
 
-from tracim_backend.lib.webdav.model import Lock, Url2Token
 from wsgidav import util
-from wsgidav.lock_manager import normalizeLockRoot, lockString, generateLockToken, validateLock
+from wsgidav.lock_manager import generateLockToken
+from wsgidav.lock_manager import lockString
+from wsgidav.lock_manager import normalizeLockRoot
+from wsgidav.lock_manager import validateLock
 from wsgidav.rw_lock import ReadWriteLock
+
+from tracim_backend.lib.webdav.model import Lock
+from tracim_backend.lib.webdav.model import Url2Token
 
 _logger = util.getModuleLogger(__name__)
 
@@ -18,21 +23,21 @@ def from_dict_to_base(lock):
         owner=lock["owner"],
         timeout=lock["timeout"],
         principal=lock["principal"],
-        expire=lock["expire"]
+        expire=lock["expire"],
     )
 
 
 def from_base_to_dict(lock):
     return {
-        'token': lock.token,
-        'depth': lock.depth,
-        'root': lock.root,
-        'type': lock.type,
-        'scope': lock.scope,
-        'owner': lock.owner,
-        'timeout': lock.timeout,
-        'principal': lock.principal,
-        'expire': lock.expire
+        "token": lock.token,
+        "depth": lock.depth,
+        "root": lock.root,
+        "type": lock.type,
+        "scope": lock.scope,
+        "owner": lock.owner,
+        "timeout": lock.timeout,
+        "principal": lock.principal,
+        "expire": lock.expire,
     }
 
 
@@ -41,7 +46,7 @@ class LockStorage(object):
     LOCK_TIME_OUT_MAX = 4 * 604800  # 1 month, in seconds
 
     def __init__(self):
-        self._session = None# todo Session()
+        self._session = None  # todo Session()
         self._lock = ReadWriteLock()
 
     def __repr__(self):
@@ -99,7 +104,9 @@ class LockStorage(object):
                 return None
             expire = float(lock_base.expire)
             if 0 <= expire < time.time():
-                _logger.debug("Lock timed-out(%s): %s" % (expire, lockString(from_base_to_dict(lock_base))))
+                _logger.debug(
+                    "Lock timed-out(%s): %s" % (expire, lockString(from_base_to_dict(lock_base)))
+                )
                 self.delete(token)
                 return None
             return from_base_to_dict(lock_base)
@@ -155,10 +162,7 @@ class LockStorage(object):
             self._session.add(lock_db)
 
             # Store locked path reference
-            url2token = Url2Token(
-                path=path,
-                token=token
-            )
+            url2token = Url2Token(path=path, token=token)
 
             self._session.add(url2token)
             self._session.commit()
@@ -211,9 +215,11 @@ class LockStorage(object):
             if lock_db is None:
                 return False
             # Remove url to lock mapping
-            url2token = self._session.query(Url2Token).filter(
-                Url2Token.path == lock_db.root,
-                Url2Token.token == token).one_or_none()
+            url2token = (
+                self._session.query(Url2Token)
+                .filter(Url2Token.path == lock_db.root, Url2Token.token == token)
+                .one_or_none()
+            )
             if url2token is not None:
                 self._session.delete(url2token)
             # Remove the lock
@@ -266,9 +272,11 @@ class LockStorage(object):
                 __appendLocks(tokList)
 
             if includeChildren:
-                for url, in self._session.query(Url2Token.path).group_by(Url2Token.path):
+                for (url,) in self._session.query(Url2Token.path).group_by(Url2Token.path):
                     if util.isChildUri(path, url):
-                        __appendLocks(self._session.query(Url2Token.token).filter(Url2Token.path == url))
+                        __appendLocks(
+                            self._session.query(Url2Token.token).filter(Url2Token.path == url)
+                        )
 
             return lockList
         finally:
