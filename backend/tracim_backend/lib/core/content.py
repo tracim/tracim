@@ -1551,18 +1551,32 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        content = item.copy(parent)
-        # INFO - GM - 15-03-2018 - add "copy" revision
+        content = self._copy(item, parent, label, workspace, file_extension, do_save, do_notify)
+
+        return content
+
+    def _copy(
+        self,
+        item: Content,
+        new_parent: Content = None,
+        new_label: str = None,
+        new_workspace: Workspace = None,
+        new_file_extension: str = None,
+        do_save: bool = True,
+        do_notify: bool = True,
+    ) -> Content:
+        # INFO - GM - 15-03-2018 - add "copy" revision for all content
+        content, children_new_content, children_original_content = item.copy(new_parent)
         with new_revision(
             session=self._session,
             tm=transaction.manager,
             content=content,
             force_create_new_revision=True,
         ) as rev:
-            rev.parent = parent
-            rev.workspace = workspace
-            rev.label = label
-            rev.file_extension = file_extension
+            rev.parent = new_parent
+            rev.workspace = new_workspace
+            rev.label = new_label
+            rev.file_extension = new_file_extension
             rev.revision_type = ActionDescription.COPY
             rev.properties["origin"] = {
                 "content": item.id,
@@ -1570,6 +1584,23 @@ class ContentApi(object):
             }
         if do_save:
             self.save(content, ActionDescription.COPY, do_notify=do_notify)
+
+        for original_content_id, new_child in children_new_content.items():
+            original_child = children_original_content[original_content_id]
+            with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=new_child,
+                force_create_new_revision=True,
+            ) as rev:
+                rev.workspace = new_workspace
+                rev.revision_type = ActionDescription.COPY
+                rev.properties["origin"] = {
+                    "content": original_child.id,
+                    "revision": original_child.last_revision.revision_id,
+                }
+            self.save(new_child, ActionDescription.COPY, do_notify=False)
+
         return content
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
