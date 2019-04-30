@@ -11,7 +11,8 @@ import {
   Delimiter,
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -107,10 +108,10 @@ class Account extends React.Component {
 
     props.dispatch(setBreadcrumbs([{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <span>{props.t('Administrate')}</span>,
-      type: 'CORE',
+      link: <span>{props.t('Manage')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }, {
       link: (
@@ -118,7 +119,7 @@ class Account extends React.Component {
           {state.userToEdit.public_name}
         </Link>
       ),
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }]))
   }
 

@@ -11,7 +11,7 @@ import Button from '../component/common/Input/Button.jsx'
 import { postResetPassword } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setBreadcrumbs
+  resetBreadcrumbs
 } from '../action-creator.sync.js'
 import { PAGE } from '../helper.js'
 
@@ -30,7 +30,7 @@ export class ResetPassword extends React.Component {
   }
 
   componentDidMount () {
-    this.props.dispatch(setBreadcrumbs([]))
+    this.props.dispatch(resetBreadcrumbs())
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()

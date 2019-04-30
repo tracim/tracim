@@ -6,11 +6,11 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { PAGE } from '../helper.js'
-import { setBreadcrumbs } from '../action-creator.sync.js'
+import { resetBreadcrumbs } from '../action-creator.sync.js'
 
 export class ForgotPasswordNoEmailNotif extends React.Component {
   componentDidMount () {
-    this.props.dispatch(setBreadcrumbs([]))
+    this.props.dispatch(resetBreadcrumbs())
   }
 
   handleClickBack = () => this.props.history.push(PAGE.LOGIN)

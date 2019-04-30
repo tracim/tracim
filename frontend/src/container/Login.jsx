@@ -17,7 +17,7 @@ import {
   setContentTypeList,
   setAppList,
   setConfig,
-  setBreadcrumbs,
+  resetBreadcrumbs,
   setUserLang
 } from '../action-creator.sync.js'
 import {
@@ -53,7 +53,7 @@ class Login extends React.Component {
   async componentDidMount () {
     const { props } = this
 
-    props.dispatch(setBreadcrumbs([]))
+    props.dispatch(resetBreadcrumbs())
 
     const defaultLangCookie = Cookies.get(COOKIE_FRONTEND.DEFAULT_LANGUAGE)
 

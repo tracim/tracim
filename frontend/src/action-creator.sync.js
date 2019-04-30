@@ -5,6 +5,7 @@ export const ADD = 'Add'
 export const REMOVE = 'Remove'
 export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
+export const RESET = 'Reset'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -113,5 +114,6 @@ export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList
 
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
+export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
 export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${BREADCRUMBS}`, prependBreadcrumbs })
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })

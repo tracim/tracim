@@ -6,7 +6,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -180,21 +181,21 @@ class Dashboard extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }, {
       link: (
         <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
           {props.curWs.label}
         </Link>
       ),
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }, {
       link: (
         <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
           {props.t('Dashboard')}
         </Link>
       ),
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }]
 
     props.dispatch(setBreadcrumbs(breadcrumbsList))

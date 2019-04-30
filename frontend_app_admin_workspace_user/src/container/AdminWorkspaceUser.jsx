@@ -7,7 +7,8 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   CardPopup,
-  handleFetchResult
+  handleFetchResult,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -173,22 +174,22 @@ class AdminWorkspaceUser extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <span>{props.t('Administrate')}</span>,
-      type: 'CORE',
+      link: <span>{props.t('Manage')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }]
 
     if (state.config.type === 'workspace') {
       breadcrumbsList.push({
         link: <Link to={'/ui/admin/workspace'}>{props.t('Shared space')}</Link>,
-        type: 'APPFULLSCREEN'
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     } else if (state.config.type === 'user') {
       breadcrumbsList.push({
         link: <Link to={'/ui/admin/user'}>{props.t('Users')}</Link>,
-        type: 'APPFULLSCREEN'
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
 

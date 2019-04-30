@@ -14,7 +14,8 @@ import {
   ArchiveDeleteContent,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -212,7 +213,7 @@ class Thread extends React.Component {
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
           label: state.content.label,
           link: null,
-          type: 'APPFEATURE'
+          type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
       }
     })

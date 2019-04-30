@@ -17,7 +17,8 @@ import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.js
 import {
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -135,14 +136,14 @@ class WorkspaceContent extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }, {
       link: (
         <Link to={PAGE.WORKSPACE.DASHBOARD(state.idWorkspaceInUrl)}>
           {props.t(props.workspaceList.find(ws => ws.id === state.idWorkspaceInUrl).label)}
         </Link>
       ),
-      type: 'CORE'
+      type: BREADCRUMBS_TYPE.CORE
     }]
 
     const urlFilter = qs.parse(props.location.search).type
@@ -154,7 +155,7 @@ class WorkspaceContent extends React.Component {
             {props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label)}
           </Link>
         ),
-        type: 'CORE'
+        type: BREADCRUMBS_TYPE.CORE
       })
     } else {
       breadcrumbsList.push({
@@ -163,7 +164,7 @@ class WorkspaceContent extends React.Component {
             {props.t('All contents')}
           </Link>
         ),
-        type: 'CORE'
+        type: BREADCRUMBS_TYPE.CORE
       })
     }
 

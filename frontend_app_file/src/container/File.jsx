@@ -16,7 +16,8 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
-  Badge
+  Badge,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -254,7 +255,7 @@ class File extends React.Component {
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
           label: state.content.label,
           link: null,
-          type: 'APPFEATURE'
+          type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
       }
     })

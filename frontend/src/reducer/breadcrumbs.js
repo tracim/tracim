@@ -6,25 +6,26 @@ import {
   APPEND,
   BREADCRUMBS
 } from '../action-creator.sync.js'
+import { BREADCRUMBS_TYPE } from 'tracim_frontend_lib'
 
 const BREADCRUMBS_TYPE_ORDER = [{
-  id: 'CORE',
+  id: BREADCRUMBS_TYPE.CORE,
   order: 1
 }, {
-  id: 'APPFULLSCREEN',
+  id: BREADCRUMBS_TYPE.APP_FULLSCREEN,
   order: 2
 }, {
-  id: 'APPFEATURE',
+  id: BREADCRUMBS_TYPE.APP_FEATURE,
   order: 4
 }]
 
-const orderBreadcrumbs = breadcrumbsList => {
-  if (breadcrumbsList.some(bc => !BREADCRUMBS_TYPE_ORDER.map(bc => bc.id).includes(bc.type))) {
-    console.warn('Error, encountered an invalid breadcrumbs element. Breadcrumbs list: ', breadcrumbsList)
-    return breadcrumbsList
+const orderBreadcrumbs = crumbList => {
+  if (crumbList.some(crumb => !BREADCRUMBS_TYPE_ORDER.map(crumb => crumb.id).includes(crumb.type))) {
+    console.warn('Error, encountered an invalid breadcrumbs element. Breadcrumbs list: ', crumbList)
+    return crumbList
   }
 
-  return breadcrumbsList.sort((a, b) => a.order < b.order)
+  return crumbList.sort((a, b) => a.order < b.order)
 }
 
 export function breadcrumbs (state = [], action) {
@@ -38,10 +39,10 @@ export function breadcrumbs (state = [], action) {
     case `${APPEND}/${BREADCRUMBS}`:
       return orderBreadcrumbs([
         // INFO - CH - 2019-04-16 - app features cannot set breadcrums from root so it needs to overrides itself every time
-        ...state.filter(bc => bc.type !== 'APPFEATURE'),
-        ...action.appendBreadcrumbs.map(bc => ({
-          link: bc.link ? bc.link : <Link to={bc.url}>{bc.label}</Link>,
-          type: 'APPFEATURE'
+        ...state.filter(crumb => crumb.type !== BREADCRUMBS_TYPE.APP_FEATURE),
+        ...action.appendBreadcrumbs.map(crumb => ({
+          link: crumb.link ? crumb.link : <Link to={crumb.url}>{crumb.label}</Link>,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
         }))
       ])
 

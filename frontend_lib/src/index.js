@@ -5,7 +5,8 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  BREADCRUMBS_TYPE
 } from './helper.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
@@ -80,5 +81,6 @@ export {
   ArchiveDeleteContent,
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
-  NewMemberForm
+  NewMemberForm,
+  BREADCRUMBS_TYPE
 }

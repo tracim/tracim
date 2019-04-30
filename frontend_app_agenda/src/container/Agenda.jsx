@@ -7,7 +7,8 @@ import {
   handleFetchResult,
   PageContent,
   PageTitle,
-  PageWrapper
+  PageWrapper,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -164,21 +165,23 @@ class Agenda extends React.Component {
 
     const breadcrumbsList = [{
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
-      type: 'CORE'
-    },
-      ...(state.config.appConfig.idWorkspace
-          ? [{
-            link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/dashboard`}>{state.content.workspaceLabel}</Link>,
-            type: 'APPFULLSCREEN'
-          }, {
-            link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/agenda`}>{props.t('Agenda')}</Link>,
-            type: 'APPFULLSCREEN'
-          }]
-          : [{
-            link: <Link to={`/ui/agenda`}>{props.t('All my agendas')}</Link>,
-            type: 'APPFULLSCREEN'
-          }]
-      )]
+      type: BREADCRUMBS_TYPE.CORE
+    }]
+
+    if (state.config.appConfig.idWorkspace) {
+      breadcrumbsList.push({
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/dashboard`}>{state.content.workspaceLabel}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      }, {
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/agenda`}>{props.t('Agenda')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    } else {
+      breadcrumbsList.push({
+        link: <Link to={`/ui/agenda`}>{props.t('All my agendas')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    }
 
     // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
     // app crash telling it cannot render a Link outside a router
