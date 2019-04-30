@@ -1,7 +1,8 @@
 ---
 env:
   global:
-    - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
+    - BACKEND_TEST_CONFIG_FILE=tests_configs.ini
+
 
 sudo: false
 language: python
@@ -53,12 +54,12 @@ _install_backend: &_install_backend
     - cd $TRAVIS_BUILD_DIR/backend
     # postgresql
     - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-    - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+    - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${BACKEND_TEST_CONFIG_FILE}; fi"
     # mysql
     - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-    - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+    - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${BACKEND_TEST_CONFIG_FILE}; fi"
     # sqlite : do nothing, default config is sqlite based.
-    - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+    - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${BACKEND_TEST_CONFIG_FILE}; fi"
     - cd $TRAVIS_BUILD_DIR
   after_success:
     - coveralls
@@ -81,8 +82,8 @@ _install_full_tracim: &_install_full_tracim
     # sqlite
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
     - cp ../color.json.sample ../color.json
-    - tracimcli db init -c $TRACIM_BACKEND_TEST_CONFIG_FILE
-    - alembic -c $TRACIM_BACKEND_TEST_CONFIG_FILE stamp head
+    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE
+    - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
     - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh root
     - ./build_full_frontend.sh root
@@ -193,11 +194,11 @@ jobs:
       <<: *_install_full_tracim
       env:
         - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
-        - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
+        - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
-        - nohup pserve $TRACIM_BACKEND_TEST_CONFIG_FILE&
+        - nohup pserve $BACKEND_TEST_CONFIG_FILE&
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR
