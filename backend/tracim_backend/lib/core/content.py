@@ -1572,10 +1572,6 @@ class ContentApi(object):
             self.save(content, ActionDescription.COPY, do_notify=do_notify)
         return content
 
-    def _copy_children(self, origin_content: Content, new_content: Content):
-        for child in origin_content.children:
-            self._copy_current(child, new_content, do_notify=False)
-
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
         Change workspace_id of all children of content according to new_workspace
