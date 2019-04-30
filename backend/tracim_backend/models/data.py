@@ -1446,34 +1446,6 @@ class Content(DeclarativeBase):
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
 
-    def copy(self, parent: "Content"):
-        # INFO - G.M - 2019-04-30 - we stored old content and new content related in order
-        # to be able to retrieve new content when applying all revision in order to correct
-        # new content
-        root_new_content = Content()
-        children_new_content = {}
-        children_original_content = {}
-        for rev in self.recursive_tree_revision:
-            if rev.content_id == self.content_id:
-                related_content = root_new_content
-                related_parent = parent
-            else:
-                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
-                # we create it.
-                if rev.content_id not in children_new_content:
-                    children_new_content[rev.content_id] = Content()
-                    children_original_content[rev.content_id] = rev.node
-                related_content = children_new_content[rev.content_id]  # type: Content
-                if rev.parent_id == self.content_id:
-                    related_parent = root_new_content
-                else:
-                    related_parent = children_new_content[rev.parent_id]
-            # INFO - G.M - 2019-04-30 - copy of revision itself.
-            cpy_rev = ContentRevisionRO.copy(rev, related_parent)
-            related_content.revisions.append(cpy_rev)
-
-        return root_new_content, children_new_content, children_original_content
-
 
 class RevisionReadStatus(DeclarativeBase):
 

@@ -1551,40 +1551,89 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        content = self._copy(item, parent, label, workspace, file_extension, do_save, do_notify)
-
+        content, children_new_content, children_original_content = self._copy(item, parent)
+        content, _, _ = self._add_copy_revision(
+            item,
+            content,
+            children_original_content,
+            children_new_content,
+            parent,
+            label,
+            workspace,
+            file_extension,
+            do_save,
+            do_notify,
+        )
         return content
 
     def _copy(
+        self, content: Content, new_parent: Content = None
+    ) -> typing.Tuple[Content, typing.Dict[int, Content], typing.Dict[int, Content]]:
+        """
+        Create new content for content and his children, recreate all revision in order and
+        return all these new content
+        :param content: root content of copy
+        :param new_parent: new parent of root content
+        :return: new content created based on root content,
+        dict of new children content and original children content with original content id as key.
+        """
+        root_new_content = Content()
+        # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
+        # to be able to retrieve them for applying new revisions on them easily. key of dict is
+        # original content_id.
+        children_new_content = {}  # type: typing.Dict[int,Content]
+        # INFO - G.M - 2019-04-30 - we store alse old content of children to allow applying new
+        # revision related to old data. key of dict is original content id.
+        children_original_content = {}  # type: typing.Dict[int,Content]
+
+        for rev in content.recursive_tree_revision:
+            if rev.content_id == content.content_id:
+                related_content = root_new_content
+                related_parent = new_parent
+            else:
+                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                # we create it.
+                if rev.content_id not in children_new_content:
+                    children_new_content[rev.content_id] = Content()
+                    children_original_content[rev.content_id] = rev.node
+                related_content = children_new_content[rev.content_id]  # type: Content
+                if rev.parent_id == content.content_id:
+                    related_parent = root_new_content
+                else:
+                    related_parent = children_new_content[rev.parent_id]
+            # INFO - G.M - 2019-04-30 - copy of revision itself.
+            cpy_rev = ContentRevisionRO.copy(rev, related_parent)
+            related_content.revisions.append(cpy_rev)
+            self._session.add(related_content)
+            self._session.flush()
+        return root_new_content, children_new_content, children_original_content
+
+    def _add_copy_revision(
         self,
-        item: Content,
+        original_content: Content,
+        new_content: Content,
+        children_original_content,
+        children_new_content,
         new_parent: Content = None,
         new_label: str = None,
         new_workspace: Workspace = None,
         new_file_extension: str = None,
         do_save: bool = True,
         do_notify: bool = True,
-    ) -> Content:
-        # INFO - GM - 15-03-2018 - add "copy" revision for all content
-        content, children_new_content, children_original_content = item.copy(new_parent)
-        with new_revision(
-            session=self._session,
-            tm=transaction.manager,
-            content=content,
-            force_create_new_revision=True,
-        ) as rev:
-            rev.parent = new_parent
-            rev.workspace = new_workspace
-            rev.label = new_label
-            rev.file_extension = new_file_extension
-            rev.revision_type = ActionDescription.COPY
-            rev.properties["origin"] = {
-                "content": item.id,
-                "revision": item.last_revision.revision_id,
-            }
-        if do_save:
-            self.save(content, ActionDescription.COPY, do_notify=do_notify)
-
+    ) -> typing.Tuple[Content, typing.Dict[int, Content], typing.Dict[int, Content]]:
+        """
+        Add copy revision for all new content
+        :param original_content: original content of root file in copy
+        :param new_content: new content of new root file in copy
+        :param children_original_content: original contents of children of root file in copy
+        :param children_new_content: new contents of children of root file in copy
+        :param new_parent: new parent of root file
+        :param new_label: new label of root file
+        :param new_workspace: new workspace all new content
+        :param new_file_extension: new file_extension for root file
+        :return: new content created based on root content,
+        dict of new children content and original children content with original content id as key.
+        """
         for original_content_id, new_child in children_new_content.items():
             original_child = children_original_content[original_content_id]
             with new_revision(
@@ -1600,8 +1649,24 @@ class ContentApi(object):
                     "revision": original_child.last_revision.revision_id,
                 }
             self.save(new_child, ActionDescription.COPY, do_notify=False)
-
-        return content
+        with new_revision(
+            session=self._session,
+            tm=transaction.manager,
+            content=new_content,
+            force_create_new_revision=True,
+        ) as rev:
+            rev.parent = new_parent
+            rev.workspace = new_workspace
+            rev.label = new_label
+            rev.file_extension = new_file_extension
+            rev.revision_type = ActionDescription.COPY
+            rev.properties["origin"] = {
+                "content": original_content.id,
+                "revision": original_content.last_revision.revision_id,
+            }
+        if do_save:
+            self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
+        return new_content, children_new_content, children_original_content
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
