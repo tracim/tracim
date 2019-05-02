@@ -1173,15 +1173,15 @@ class Content(DeclarativeBase):
 
         return valid_children
 
-    def get_children_recursively(self) -> ["Content"]:
+    def get_children(self, recursively=False) -> ["Content"]:
         """
-        Get all children recursively (including children of children...)
+        Get all children of content recursively or not (including children of children...)
         """
         children = []
         for child in self.children:
             children.append(child)
-            for sub_child in child.get_children_recursively():
-                children.append(sub_child)
+            if recursively:
+                children.extend(child.get_children(recursively=recursively))
         return children
 
     @property
@@ -1438,9 +1438,8 @@ class Content(DeclarativeBase):
         revisions = []  # type: typing.List[ContentRevisionRO]
         for revision in self.revisions:
             revisions.append(revision)
-        for children in self.get_children_recursively():
-            for revision in children.revisions:
-                revisions.append(revision)
+            for child in self.get_children(recursively=True):
+                revisions.extend(child.revisions)
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
 
