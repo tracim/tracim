@@ -43,6 +43,7 @@ from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
 from tracim_backend.views.contents_api.comment_controller import CommentController
@@ -134,7 +135,7 @@ def web(global_config, **local_settings):
     # Pyramids "plugin" include.
     configurator.include("pyramid_jinja2")
     # Add SqlAlchemy DB
-    configurator.include(".models.setup_models")
+    init_models(configurator, app_config)
     # set Hapic
     context = PyramidContext(
         configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG

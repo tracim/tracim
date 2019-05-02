@@ -3,6 +3,7 @@ import os
 import subprocess
 
 import pytest
+import sqlalchemy
 import transaction
 
 import tracim_backend
@@ -12,7 +13,6 @@ from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
-from tracim_backend.exceptions import InvalidSettingFile
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
@@ -355,7 +355,7 @@ class TestCommands(CommandFunctionalTest):
         assert not user.validate_password("new_password")
         self.disconnect_database()
         app = TracimCLI()
-        with pytest.raises(InvalidSettingFile):
+        with pytest.raises(sqlalchemy.exc.ArgumentError):
             app.run(
                 ["db", "init", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url", "--debug"]
             )
@@ -421,7 +421,7 @@ class TestCommands(CommandFunctionalTest):
         assert not user.validate_password("new_password")
         self.disconnect_database()
         app = TracimCLI()
-        with pytest.raises(InvalidSettingFile):
+        with pytest.raises(sqlalchemy.exc.ArgumentError):
             app.run(
                 [
                     "db",

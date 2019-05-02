@@ -256,10 +256,10 @@ class TracimEnv(BaseMiddleware):
         super().__init__(application, config)
         self._application = application
         self.settings = config["tracim_settings"]
-        self.engine = get_engine(self.settings)
-        self.session_factory = get_scoped_session_factory(self.engine)
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
+        self.engine = get_engine(self.app_config)
+        self.session_factory = get_scoped_session_factory(self.engine)
 
     def __call__(self, environ, start_response):
         # TODO - G.M - 18-05-2018 - This code should not create trouble

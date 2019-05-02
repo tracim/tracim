@@ -148,6 +148,7 @@ class CFG(object):
         ###
         # General
         ###
+        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", "")
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
