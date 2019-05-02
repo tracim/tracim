@@ -1161,10 +1161,7 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.children[1].created == text_file.children[1].created
         # INFO - G.M - 2019-04-30 - check if both recursive
         # revision tree of content and copy are similar
-        assert (
-                len(text_file_copy.get_tree_revisions())
-                == len(text_file.get_tree_revisions()) + 3
-        )
+        assert len(text_file_copy.get_tree_revisions()) == len(text_file.get_tree_revisions()) + 3
         for num, revision in enumerate(text_file_copy.get_tree_revisions()[:-3]):
             assert (
                 text_file.get_tree_revisions()[num].revision_type
