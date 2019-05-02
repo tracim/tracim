@@ -159,7 +159,7 @@ class Login extends React.Component {
     const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
     switch (fetchPutUserLang.status) {
       case 200: break
-      default: props.dispatch(newFlashMessage(props.t('Error while saving your default language')))
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
     }
   }
 
