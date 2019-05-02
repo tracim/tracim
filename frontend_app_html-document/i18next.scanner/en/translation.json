@@ -21,5 +21,9 @@
   "You have a pending draft": "You have a pending draft",
   "resume writing": "resume writing",
   "Error while saving new version": "Error while saving new version",
-  "Error while changing status": "Error while changing status"
+  "Error while changing status": "Error while changing status",
+  "Text Document": "Text Document",
+  "Text document": "Text document",
+  "text document": "text document",
+  "text documents": "text documents"
 }

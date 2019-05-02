@@ -487,7 +487,7 @@ class Dashboard extends React.Component {
                           faIcon={app.faIcon}
                           // TODO - Côme - 2018/09/12 - translation key below is a little hacky:
                           // The creation label comes from api but since there is no translation in backend
-                          // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                          // every files has a 'externalTranslationList' array just to generate the translation key in the json files through i18n.scanner
                           creationLabel={props.t(app.creationLabel)}
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}

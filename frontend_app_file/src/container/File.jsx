@@ -49,9 +49,12 @@ class File extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
-      externalTradList: [
+      externalTranslationList: [
+        props.t('File'),
+        props.t('Files'),
+        props.t('file'),
+        props.t('files'),
         props.t('Upload a file'),
-        props.t('Files')
       ],
       newComment: '',
       newFile: '',

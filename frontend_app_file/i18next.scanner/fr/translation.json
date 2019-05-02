@@ -43,5 +43,8 @@
   "Error while saving new title": "Erreur lors de la sauvegarde du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
-  "Error while changing status": "Erreur lors du changement de statut"
+  "Error while changing status": "Erreur lors du changement de statut",
+  "File": "Fichier",
+  "file": "fichier",
+  "files": "fichiers"
 }

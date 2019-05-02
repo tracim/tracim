@@ -43,9 +43,12 @@ class Thread extends React.Component {
       listMessage: props.data ? [] : [], // debug.listMessage,
       newComment: '',
       timelineWysiwyg: false,
-      externalTradList: [
-        i18n.t('Start a topic'),
-        i18n.t('Threads')
+      externalTranslationList: [
+        props.t('Thread'),
+        props.t('Threads'),
+        props.t('thread'),
+        props.t('threads'),
+        props.t('Start a topic')
       ]
     }
 

@@ -43,9 +43,13 @@ class HtmlDocument extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
-      externalTradList: [
-        props.t('Write a document'),
-        props.t('Text Documents')
+      externalTranslationList: [
+        props.t('Text Document'),
+        props.t('Text Documents'),
+        props.t('Text document'),
+        props.t('text document'),
+        props.t('text documents'),
+        props.t('Write a document')
       ],
       rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,

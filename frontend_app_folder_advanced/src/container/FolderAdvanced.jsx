@@ -33,7 +33,7 @@ class FolderAdvanced extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
-      externalTradList: [
+      externalTranslationList: [
         props.t('Create a folder'),
         props.t('Folder')
       ],

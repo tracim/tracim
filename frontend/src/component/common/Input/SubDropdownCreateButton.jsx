@@ -26,7 +26,7 @@ const SubDropdownCreateButton = props => {
             </div>
 
             <div className={`subdropdown__link__${app.slug}__text`}>
-              {props.t(app.creationLabel) /* these keys come from each apps that have in state a property externalTradList */}
+              {props.t(app.creationLabel)}
             </div>
           </div>
         </div>
