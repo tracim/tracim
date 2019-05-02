@@ -152,7 +152,7 @@ class WorkspaceContent extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}?type=${urlFilter}`}>
-            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label)}
+            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label + 's')}
           </Link>
         ),
         type: BREADCRUMBS_TYPE.CORE
