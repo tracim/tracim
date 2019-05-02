@@ -191,6 +191,8 @@ class CFG(object):
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
+        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir")
+        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir")
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "TRACIM")
 
         # base url of the frontend

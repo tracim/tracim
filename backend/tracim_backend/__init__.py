@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
+import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 
@@ -41,6 +42,7 @@ from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
@@ -76,8 +78,14 @@ def web(global_config, **local_settings):
     app_config.configure_filedepot()
     settings["CFG"] = app_config
     configurator = Configurator(settings=settings, autocommit=True)
+    # Add beaker session cookie
+    tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
+    tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
+    tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
+    session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
+    configurator.set_session_factory(session_factory)
+    pyramid_beaker.set_cache_regions_from_settings(tracim_setting_for_beaker)
     # Add AuthPolicy
-    configurator.include("pyramid_beaker")
     configurator.include("pyramid_multiauth")
     policies = []
     if app_config.REMOTE_USER_HEADER:
