@@ -1623,12 +1623,12 @@ class ContentApi(object):
     ) -> typing.Tuple[Content, typing.Dict[int, Content], typing.Dict[int, Content]]:
         """
         Add copy revision for all new content
-        :param original_content: original content of root file in copy
-        :param new_content: new content of new root file in copy
-        :param children_original_content: original contents of children of root file in copy
-        :param children_new_content: new contents of children of root file in copy
-        :param new_parent: new parent of root file
-        :param new_label: new label of root file
+        :param original_content: original content of root content in copy
+        :param new_content: new content of new root content in copy
+        :param original_content_children: original contents of children of root content in copy
+        :param new_content_children: new contents of children of root content in copy
+        :param new_parent: new parent of root content
+        :param new_label: new label of root content
         :param new_workspace: new workspace all new content
         :param new_file_extension: new file_extension for root file
         :return: new content created based on root content,
