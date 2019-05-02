@@ -1278,7 +1278,7 @@ class Content(DeclarativeBase):
             delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - datetime_object, locale=get_locale())
 
-    def get_child_nb(self, content_type: str, content_status="") -> int:
+    def get_child_nb(self, content_type: str, content_status: str = "") -> int:
         child_nb = 0
         for child in self.get_valid_children():
             if child.type == content_type or content_type.slug == content_type_list.Any_SLUG:
