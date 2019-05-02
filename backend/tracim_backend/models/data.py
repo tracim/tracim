@@ -1173,15 +1173,14 @@ class Content(DeclarativeBase):
 
         return valid_children
 
-    @property
-    def recursive_children(self) -> ["Content"]:
+    def get_children_recursively(self) -> ["Content"]:
         """
         Get all children recursively (including children of children...)
         """
         children = []
         for child in self.children:
             children.append(child)
-            for sub_child in child.recursive_children:
+            for sub_child in child.get_children_recursively():
                 children.append(sub_child)
         return children
 
@@ -1434,13 +1433,12 @@ class Content(DeclarativeBase):
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
-    @property
-    def recursive_tree_revision(self):
+    def get_tree_revisions(self):
         """Get all revision sorted by id of content and all his children recursively"""
         revisions = []  # type: typing.List[ContentRevisionRO]
         for revision in self.revisions:
             revisions.append(revision)
-        for children in self.recursive_children:
+        for children in self.get_children_recursively():
             for revision in children.revisions:
                 revisions.append(revision)
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)

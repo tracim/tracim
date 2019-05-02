@@ -1551,12 +1551,12 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        content, children_new_content, children_original_content = self._copy(item, parent)
-        content, _, _ = self._add_copy_revision(
+        content, new_content_children, original_content_children = self._copy(item, parent)
+        content, _, _ = self._add_copy_revisions(
             item,
             content,
-            children_original_content,
-            children_new_content,
+            original_content_children,
+            new_content_children,
             parent,
             label,
             workspace,
@@ -1572,48 +1572,48 @@ class ContentApi(object):
         """
         Create new content for content and his children, recreate all revision in order and
         return all these new content
-        :param content: root content of copy
-        :param new_parent: new parent of root content
-        :return: new content created based on root content,
+        :param content: original root content of copy
+        :param new_parent: new parent of root content of copy
+        :return: new content created based on original root content,
         dict of new children content and original children content with original content id as key.
         """
-        root_new_content = Content()
+        new_content = Content()
         # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
         # to be able to retrieve them for applying new revisions on them easily. key of dict is
         # original content_id.
-        children_new_content = {}  # type: typing.Dict[int,Content]
+        new_content_children = {}  # type: typing.Dict[int,Content]
         # INFO - G.M - 2019-04-30 - we store alse old content of children to allow applying new
         # revision related to old data. key of dict is original content id.
-        children_original_content = {}  # type: typing.Dict[int,Content]
+        original_content_children = {}  # type: typing.Dict[int,Content]
 
-        for rev in content.recursive_tree_revision:
+        for rev in content.get_tree_revisions():
             if rev.content_id == content.content_id:
-                related_content = root_new_content
+                related_content = new_content
                 related_parent = new_parent
             else:
                 # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
                 # we create it.
-                if rev.content_id not in children_new_content:
-                    children_new_content[rev.content_id] = Content()
-                    children_original_content[rev.content_id] = rev.node
-                related_content = children_new_content[rev.content_id]  # type: Content
+                if rev.content_id not in new_content_children:
+                    new_content_children[rev.content_id] = Content()
+                    original_content_children[rev.content_id] = rev.node
+                related_content = new_content_children[rev.content_id]  # type: Content
                 if rev.parent_id == content.content_id:
-                    related_parent = root_new_content
+                    related_parent = new_content
                 else:
-                    related_parent = children_new_content[rev.parent_id]
+                    related_parent = new_content_children[rev.parent_id]
             # INFO - G.M - 2019-04-30 - copy of revision itself.
             cpy_rev = ContentRevisionRO.copy(rev, related_parent)
             related_content.revisions.append(cpy_rev)
             self._session.add(related_content)
             self._session.flush()
-        return root_new_content, children_new_content, children_original_content
+        return new_content, new_content_children, original_content_children
 
-    def _add_copy_revision(
+    def _add_copy_revisions(
         self,
         original_content: Content,
         new_content: Content,
-        children_original_content,
-        children_new_content,
+        original_content_children,
+        new_content_children,
         new_parent: Content = None,
         new_label: str = None,
         new_workspace: Workspace = None,
@@ -1630,12 +1630,12 @@ class ContentApi(object):
         :param new_parent: new parent of root content
         :param new_label: new label of root content
         :param new_workspace: new workspace all new content
-        :param new_file_extension: new file_extension for root file
+        :param new_file_extension: new file_extension for root content
         :return: new content created based on root content,
         dict of new children content and original children content with original content id as key.
         """
-        for original_content_id, new_child in children_new_content.items():
-            original_child = children_original_content[original_content_id]
+        for original_content_id, new_child in new_content_children.items():
+            original_child = original_content_children[original_content_id]
             with new_revision(
                 session=self._session,
                 tm=transaction.manager,
@@ -1670,7 +1670,7 @@ class ContentApi(object):
             rev.properties = properties
         if do_save:
             self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
-        return new_content, children_new_content, children_original_content
+        return new_content, new_content_children, original_content_children
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
