@@ -111,6 +111,18 @@ def compare_tree_items_for_sorting_by_type_and_name(
     return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
 
 
+class AddCopyRevisionsResult(object):
+    def __init__(
+        self,
+        new_content: Content,
+        new_children_dict: typing.Dict[int, Content],
+        original_children_dict: typing.Dict[int, Content],
+    ) -> None:
+        self.new_content = new_content
+        self.new_children_dict = new_children_dict  # dict key is original content id
+        self.original_children_dict = original_children_dict  # dict key is original content id
+
+
 class ContentApi(object):
 
     SEARCH_SEPARATORS = ",| "
@@ -1521,12 +1533,12 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        content, new_content_children, original_content_children = self._copy(item, parent)
-        content, _, _ = self._add_copy_revisions(
+        copy_result = self._copy(item, parent)
+        copy_result = self._add_copy_revisions(
             item,
-            content,
-            original_content_children,
-            new_content_children,
+            copy_result.new_content,
+            copy_result.original_children_dict,
+            copy_result.new_children_dict,
             parent,
             label,
             workspace,
@@ -1534,11 +1546,9 @@ class ContentApi(object):
             do_save,
             do_notify,
         )
-        return content
+        return copy_result.new_content
 
-    def _copy(
-        self, content: Content, new_parent: Content = None
-    ) -> typing.Tuple[Content, typing.Dict[int, Content], typing.Dict[int, Content]]:
+    def _copy(self, content: Content, new_parent: Content = None) -> AddCopyRevisionsResult:
         """
         Create new content for content and his children, recreate all revision in order and
         return all these new content
@@ -1576,7 +1586,11 @@ class ContentApi(object):
             related_content.revisions.append(cpy_rev)
             self._session.add(related_content)
             self._session.flush()
-        return new_content, new_content_children, original_content_children
+        return AddCopyRevisionsResult(
+            new_content=new_content,
+            new_children_dict=new_content_children,
+            original_children_dict=original_content_children,
+        )
 
     def _add_copy_revisions(
         self,
@@ -1590,7 +1604,7 @@ class ContentApi(object):
         new_file_extension: str = None,
         do_save: bool = True,
         do_notify: bool = True,
-    ) -> typing.Tuple[Content, typing.Dict[int, Content], typing.Dict[int, Content]]:
+    ) -> AddCopyRevisionsResult:
         """
         Add copy revision for all new content
         :param original_content: original content of root content in copy
@@ -1640,7 +1654,11 @@ class ContentApi(object):
             rev.properties = properties
         if do_save:
             self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
-        return new_content, new_content_children, original_content_children
+        return AddCopyRevisionsResult(
+            new_content=new_content,
+            new_children_dict=new_content_children,
+            original_children_dict=original_content_children,
+        )
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
