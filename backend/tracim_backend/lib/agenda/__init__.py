@@ -2,13 +2,13 @@
 from configparser import ConfigParser
 import logging
 import os
-import typing
 
 from radicale.config import load as load_radicale_config
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import sliced_dict
 
 RADICALE_MAIN_SECTION = "caldav"
 RADICALE_SUBMAIN_SECTION = "radicale"
@@ -49,19 +49,6 @@ class CaldavAppFactory(object):
         )
         os.makedirs(workspace_dir, exist_ok=True)
 
-    def _sliced_dict(self, data: typing.Dict[str, any], beginning_key_string: str):
-        """
-        Get dict of all item beginning with beginning_key_string
-        :param data:
-        :param beginning_key_string:
-        :return:
-        """
-        sliced_dict = {}
-        for key, value in data.items():
-            if key.startswith(beginning_key_string):
-                sliced_dict[key] = value
-        return sliced_dict
-
     def _parse_additional_radicale_config(
         self, config: ConfigParser, settings: dict
     ) -> ConfigParser:
@@ -69,7 +56,7 @@ class CaldavAppFactory(object):
         Add settings params beginning with
         "RADICALE_MAIN_SECTION.RADICALE_SUBMAIN_SECTION." to radicale config.
         """
-        radicales_params = self._sliced_dict(
+        radicales_params = sliced_dict(
             data=settings,
             beginning_key_string="{}.{}.".format(RADICALE_MAIN_SECTION, RADICALE_SUBMAIN_SECTION),
         )

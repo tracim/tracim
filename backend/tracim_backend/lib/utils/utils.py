@@ -299,3 +299,17 @@ def normpath(path):
     elif path == "":
         path = "/"
     return base_normpath(path)
+
+
+def sliced_dict(data: typing.Dict[str, any], beginning_key_string: str):
+    """
+    Get dict of all item beginning with beginning_key_string
+    :param data:
+    :param beginning_key_string:
+    :return:
+    """
+    sliced_dict = {}
+    for key, value in data.items():
+        if key.startswith(beginning_key_string):
+            sliced_dict[key] = value
+    return sliced_dict
