@@ -3,7 +3,6 @@ import os
 import subprocess
 
 import pytest
-import sqlalchemy
 import transaction
 
 import tracim_backend
@@ -344,24 +343,6 @@ class TestCommands(CommandFunctionalTest):
         result = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test"])
         assert result == 1
 
-    def test__init__db__no_sqlalchemy_url(self):
-        """
-        Test database initialisation
-        """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        user = api.get_one_by_email("admin@admin.admin")
-        assert user.email == "admin@admin.admin"
-        assert user.validate_password("admin@admin.admin")
-        assert not user.validate_password("new_password")
-        self.disconnect_database()
-        app = TracimCLI()
-        with pytest.raises(sqlalchemy.exc.ArgumentError):
-            app.run(
-                ["db", "init", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url", "--debug"]
-            )
-        result = app.run(["db", "init", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url"])
-        assert result == 1
-
     def test__delete__db__ok_nominal_case(self):
         """
         Test database deletion
@@ -408,28 +389,4 @@ class TestCommands(CommandFunctionalTest):
         with pytest.raises(FileNotFoundError):
             app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])
         result = app.run(["db", "delete", "-c", "donotexist.ini#command_test"])
-        assert result == 1
-
-    def test__delete__db__err_no_sqlalchemy_url(self):
-        """
-        Test database deletion
-        """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        user = api.get_one_by_email("admin@admin.admin")
-        assert user.email == "admin@admin.admin"
-        assert user.validate_password("admin@admin.admin")
-        assert not user.validate_password("new_password")
-        self.disconnect_database()
-        app = TracimCLI()
-        with pytest.raises(sqlalchemy.exc.ArgumentError):
-            app.run(
-                [
-                    "db",
-                    "delete",
-                    "-c",
-                    "tests_configs.ini#command_test_no_sqlalchemy_url",
-                    "--debug",
-                ]
-            )
-        result = app.run(["db", "delete", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url"])
         assert result == 1
