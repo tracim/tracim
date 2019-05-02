@@ -1464,8 +1464,8 @@ class ContentApi(object):
         do_notify: bool = True,
     ) -> Content:
         """
-        Copy nearly all content, revision included. Children not included, see
-        "copy_children" for this.
+        Copy all content, revision and children included (children are included
+        recursively).
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
         :param new_label: new label of the new copied item
@@ -2099,7 +2099,7 @@ class ContentApi(object):
 
         return _("New folder {0}").format(query.count() + 1)
 
-    def _allow_empty_label(self, content_type_slug):
+    def _allow_empty_label(self, content_type_slug: str):
         if (
             content_type_list.get_one_by_slug(content_type_slug).slug
             == content_type_list.Comment.slug
