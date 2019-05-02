@@ -60,7 +60,7 @@ class TestMigration(BaseTest):
         Tests that we can apply all migrations from a brand new empty
         database, and also that we can remove them all.
         """
-        uri = self.settings["sqlalchemy.url"]
+        uri = self.app_config.SQLALCHEMY__URL
         folder = self.settings["script_location"]
 
         alembic_config = Config()
