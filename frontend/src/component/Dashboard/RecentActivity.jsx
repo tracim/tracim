@@ -43,27 +43,31 @@ export const RecentActivity = props =>
             </div>
           )
 
-          if (content.type === 'folder' && props.roleIdForLoggedUser < 4) return (
-            <div
-              className={classnames('recentactivity__list__item nolink primaryColorBgLightenHover')}
-              title={content.label}
-              key={content.id}
-            >
-              {recentActivityItemIcon}
-              {recentActivityItemName}
-            </div>
-          )
-          else return (
-            <Link
-              className={classnames('recentactivity__list__item primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
-              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
-              title={content.label}
-              key={content.id}
-            >
-              {recentActivityItemIcon}
-              {recentActivityItemName}
-            </Link>
-          )
+          if (content.type === 'folder' && props.roleIdForLoggedUser < 4) {
+            return (
+              <div
+                className={classnames('recentactivity__list__item nolink primaryColorBgLightenHover')}
+                title={content.label}
+                key={content.id}
+              >
+                {recentActivityItemIcon}
+                {recentActivityItemName}
+              </div>
+            )
+          }
+          else {
+            return (
+              <Link
+                className={classnames('recentactivity__list__item primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
+                to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
+                title={content.label}
+                key={content.id}
+              >
+                {recentActivityItemIcon}
+                {recentActivityItemName}
+              </Link>
+            )
+          }
         })
         : <div className='recentactivity__empty'>{props.t('No recent activity')}</div>
       }

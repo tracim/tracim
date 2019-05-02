@@ -54,7 +54,7 @@ class Login extends React.Component {
 
     const defaultLangCookie = Cookies.get(COOKIE_FRONTEND.DEFAULT_LANGUAGE)
 
-    if (defaultLangCookie) {
+    if (defaultLangCookie !== 'null') {
       i18n.changeLanguage(defaultLangCookie)
       props.dispatch(setUserLang(defaultLangCookie))
     }
