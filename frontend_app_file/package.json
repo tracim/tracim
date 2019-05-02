@@ -64,7 +64,8 @@
       "localStorage",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
-      "GLOBAL_dispatchEvent"
+      "GLOBAL_dispatchEvent",
+      "CustomEvent"
     ],
     "parser": "babel-eslint",
     "ignore": []

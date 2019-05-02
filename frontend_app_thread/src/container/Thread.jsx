@@ -60,8 +60,14 @@ class Thread extends React.Component {
     switch (type) {
       case 'thread_showApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
+        if (data.content.content_id !== state.content.content_id) {
+          const event = new CustomEvent('appCustomEvent', {detail: {type: 'thread_reloadContent',data: data.content}})
+          document.dispatchEvent(event)
+          return
+        }
         this.setState({isVisible: true})
         break
+
       case 'thread_hideApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -70,6 +76,7 @@ class Thread extends React.Component {
           timelineWysiwyg: false
         })
         break
+
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -85,6 +92,7 @@ class Thread extends React.Component {
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
 

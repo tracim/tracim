@@ -65,6 +65,11 @@ class HtmlDocument extends React.Component {
     switch (type) {
       case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+        if (data.content.content_id !== state.content.content_id) {
+          const event = new CustomEvent('appCustomEvent', {detail: {type: 'html-document_reloadContent',data: data.content}})
+          document.dispatchEvent(event)
+          return
+        }
         this.setState({isVisible: true})
         break
 

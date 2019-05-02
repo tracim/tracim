@@ -104,15 +104,17 @@ class WorkspaceContent extends React.Component {
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
   // and add process that always keep url and folders open sync
   async componentDidUpdate (prevProps, prevState) {
-    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838')
+    const { props, state } = this
 
-    if (this.state.idWorkspaceInUrl === null) return
+    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
 
-    const idWorkspace = parseInt(this.props.match.params.idws)
+    if (state.idWorkspaceInUrl === null) return
+
+    const idWorkspace = parseInt(props.match.params.idws)
     if (isNaN(idWorkspace)) return
 
     const prevFilter = qs.parse(prevProps.location.search).type
-    const currentFilter = qs.parse(this.props.location.search).type
+    const currentFilter = qs.parse(props.location.search).type
 
     if (prevState.idWorkspaceInUrl !== idWorkspace || prevFilter !== currentFilter) {
       this.setState({idWorkspaceInUrl: idWorkspace})

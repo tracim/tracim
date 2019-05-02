@@ -77,8 +77,14 @@ class File extends React.Component {
     switch (type) {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
+        if (data.content.content_id !== state.content.content_id) {
+          const event = new CustomEvent('appCustomEvent', {detail: {type: 'file_reloadContent',data: data.content}})
+          document.dispatchEvent(event)
+          return
+        }
         this.setState({isVisible: true})
         break
+
       case 'file_hideApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -87,6 +93,7 @@ class File extends React.Component {
           timelineWysiwyg: false
         })
         break
+
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -102,6 +109,7 @@ class File extends React.Component {
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
 
