@@ -131,7 +131,7 @@ class Header extends React.Component {
 
               <DropdownLang
                 langList={props.lang}
-                idLangActive={props.user.logged ? props.user.lang : 'en'}
+                idLangActive={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 
