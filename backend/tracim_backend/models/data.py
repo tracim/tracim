@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime as datetime_root
 from datetime import datetime
+from datetime import timedelta
 import json
 import os
 import typing
@@ -1173,7 +1174,7 @@ class Content(DeclarativeBase):
 
         return valid_children
 
-    def get_children(self, recursively=False) -> ["Content"]:
+    def get_children(self, recursively: bool = False) -> ["Content"]:
         """
         Get all children of content recursively or not (including children of children...)
         """
@@ -1266,18 +1267,18 @@ class Content(DeclarativeBase):
         self._properties = json.dumps(properties_struct)
         ContentChecker.check_properties(self)
 
-    def created_as_delta(self, delta_from_datetime: datetime = None):
+    def created_as_delta(self, delta_from_datetime: datetime = None) -> timedelta:
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
 
         return format_timedelta(delta_from_datetime - self.created, locale=get_locale())
 
-    def datetime_as_delta(self, datetime_object, delta_from_datetime: datetime = None):
+    def datetime_as_delta(self, datetime_object, delta_from_datetime: datetime = None) -> timedelta:
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - datetime_object, locale=get_locale())
 
-    def get_child_nb(self, content_type: str, content_status=""):
+    def get_child_nb(self, content_type: str, content_status="") -> int:
         child_nb = 0
         for child in self.get_valid_children():
             if child.type == content_type or content_type.slug == content_type_list.Any_SLUG:
@@ -1287,7 +1288,7 @@ class Content(DeclarativeBase):
                     child_nb = child_nb + 1
         return child_nb
 
-    def get_label(self):
+    def get_label(self) -> str:
         return self.label or self.file_name or ""
 
     def get_status(self) -> ContentStatus:
@@ -1344,7 +1345,7 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(self):
+    def get_comments(self) -> typing.List["Content"]:
         children = []
         for child in self.children:
             if (
@@ -1381,12 +1382,12 @@ class Content(DeclarativeBase):
 
         return None
 
-    def description_as_raw_text(self):
+    def description_as_raw_text(self) -> str:
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
         return BeautifulSoup(self.description, "html.parser").text
 
-    def get_allowed_content_types(self):
+    def get_allowed_content_types(self) -> typing.List[ContentType]:
         types = []
         try:
             allowed_types = self.properties["allowed_content"]
@@ -1433,7 +1434,7 @@ class Content(DeclarativeBase):
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
-    def get_tree_revisions(self):
+    def get_tree_revisions(self) -> typing.List[ContentRevisionRO]:
         """Get all revision sorted by id of content and all his children recursively"""
         revisions = []  # type: typing.List[ContentRevisionRO]
         for revision in self.revisions:
