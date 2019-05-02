@@ -545,7 +545,7 @@ class ContentApi(object):
             # set label and file_extension
             content.file_name = filename
         else:
-            if content_type_slug == content_type_list.Comment.slug:
+            if self._allow_empty_label(content_type_slug):
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ""
@@ -1400,10 +1400,22 @@ class ContentApi(object):
         else:
             if new_parent:
                 item.workspace = new_parent.workspace
-
-        self._is_filename_available_or_raise(
-            item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if item.file_name:
+            self._is_filename_available_or_raise(
+                item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
         item.revision_type = ActionDescription.MOVE
 
     def _get_allowed_content_type(
@@ -1442,6 +1454,36 @@ class ContentApi(object):
                 )
 
     def copy(
+        self,
+        item: Content,
+        new_parent: Content = None,
+        new_label: str = None,
+        new_workspace: Workspace = None,
+        new_file_extension: str = None,
+        do_save: bool = True,
+        do_notify: bool = True,
+    ) -> Content:
+        """
+        Copy all content, revision and children included (children are included
+        recursively).
+        :param item: Item to copy
+        :param new_parent: new parent of the new copied item
+        :param new_label: new label of the new copied item
+        :param do_notify: notify copy or not
+        :return: Newly copied item
+        """
+        new_content = self._copy_current(
+            item=item,
+            new_label=new_label,
+            new_file_extension=new_file_extension,
+            new_parent=new_parent,
+            new_workspace=new_workspace,
+            do_notify=do_notify,
+            do_save=do_save,
+        )
+        self._copy_children(item, new_content)
+
+    def _copy_current(
         self,
         item: Content,
         new_parent: Content = None,
@@ -1492,8 +1534,23 @@ class ContentApi(object):
             file_extension = new_file_extension
         else:
             file_extension = item.file_extension
+
         filename = self._prepare_filename(label, file_extension)
-        self._is_filename_available_or_raise(filename, workspace, parent)
+        content_type_slug = item.type
+        if filename:
+            self._is_filename_available_or_raise(filename, workspace, parent)
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
+
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1515,9 +1572,9 @@ class ContentApi(object):
             self.save(content, ActionDescription.COPY, do_notify=do_notify)
         return content
 
-    def copy_children(self, origin_content: Content, new_content: Content):
+    def _copy_children(self, origin_content: Content, new_content: Content):
         for child in origin_content.children:
-            self.copy(child, new_content)
+            self._copy_current(child, new_content, do_notify=False)
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
@@ -1591,9 +1648,22 @@ class ContentApi(object):
 
         label = new_label or item.label
         filename = self._prepare_filename(label, item.file_extension)
-        self._is_filename_available_or_raise(
-            filename, item.workspace, item.parent, exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if filename:
+            self._is_filename_available_or_raise(
+                filename, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
 
         item.owner = self._user
         item.label = new_label
@@ -1620,9 +1690,22 @@ class ContentApi(object):
         #         new_content == item.depot_file.file.read():
         #     raise SameValueError('The content did not changed')
         item.owner = self._user
-        self._is_filename_available_or_raise(
-            new_filename, item.workspace, item.parent, exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if new_filename:
+            self._is_filename_available_or_raise(
+                new_filename, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
@@ -1639,6 +1722,8 @@ class ContentApi(object):
             label=content.label, action="archived", date=current_date_for_filename()
         )
         filename = self._prepare_filename(label, content.file_extension)
+        # INFO - G.M - 2019-04-29 - filename already exist here, for special type
+        # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
@@ -1660,6 +1745,8 @@ class ContentApi(object):
             label=content.label, action="deleted", date=current_date_for_filename()
         )
         filename = self._prepare_filename(label, content.file_extension)
+        # INFO - G.M - 2019-04-29 - filename already exist here, for special type
+        # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
@@ -2011,3 +2098,11 @@ class ContentApi(object):
             query = query.filter(Content.parent == parent)
 
         return _("New folder {0}").format(query.count() + 1)
+
+    def _allow_empty_label(self, content_type_slug: str) -> bool:
+        if (
+            content_type_list.get_one_by_slug(content_type_slug).slug
+            == content_type_list.Comment.slug
+        ):
+            return True
+        return False
