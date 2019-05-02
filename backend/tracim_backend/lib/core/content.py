@@ -2099,7 +2099,7 @@ class ContentApi(object):
 
         return _("New folder {0}").format(query.count() + 1)
 
-    def _allow_empty_label(self, content_type_slug: str):
+    def _allow_empty_label(self, content_type_slug: str) -> bool:
         if (
             content_type_list.get_one_by_slug(content_type_slug).slug
             == content_type_list.Comment.slug
