@@ -1481,7 +1481,6 @@ class ContentApi(object):
             do_notify=do_notify,
             do_save=do_save,
         )
-        self._copy_children(item, new_content)
 
     def _copy_current(
         self,

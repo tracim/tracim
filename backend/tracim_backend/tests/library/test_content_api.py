@@ -1162,16 +1162,16 @@ class TestContentApi(DefaultTest):
         # INFO - G.M - 2019-04-30 - check if both recursive
         # revision tree of content and copy are similar
         assert (
-                len(text_file_copy.get_tree_revisions)
-                == len(text_file.get_tree_revisions) + 3
+                len(text_file_copy.get_tree_revisions())
+                == len(text_file.get_tree_revisions()) + 3
         )
-        for num, revision in enumerate(text_file_copy.get_tree_revisions[:-3]):
+        for num, revision in enumerate(text_file_copy.get_tree_revisions()[:-3]):
             assert (
-                text_file.get_tree_revisions[num].revision_type
-                == text_file_copy.get_tree_revisions[num].revision_type
+                text_file.get_tree_revisions()[num].revision_type
+                == text_file_copy.get_tree_revisions()[num].revision_type
             )
         # INFO - G.M - 2019-04-30 - check if all supplementary revision are copy one.
-        for revision in text_file_copy.get_tree_revisions[-3:]:
+        for revision in text_file_copy.get_tree_revisions()[-3:]:
             assert revision.revision_type == ActionDescription.COPY
 
     def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(self):

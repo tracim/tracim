@@ -1438,8 +1438,8 @@ class Content(DeclarativeBase):
         revisions = []  # type: typing.List[ContentRevisionRO]
         for revision in self.revisions:
             revisions.append(revision)
-            for child in self.get_children(recursively=True):
-                revisions.extend(child.revisions)
+        for child in self.get_children(recursively=True):
+            revisions.extend(child.revisions)
         revisions = sorted(revisions, key=lambda revision: revision.revision_id)
         return revisions
 
