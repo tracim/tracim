@@ -6,7 +6,6 @@ from html import escape
 import logging
 import typing
 
-from lxml.html.diff import htmldiff
 from mako.template import Template
 from sqlalchemy.orm import Session
 
@@ -439,7 +438,14 @@ class EmailManager(object):
         :return: template rendered string
         """
         try:
-            template = Template(filename=mako_template_filepath)
+            template = Template(
+                filename=mako_template_filepath,
+                default_filters=["html_escape"],
+                imports=[
+                    "from mako.filters import html_escape",
+                    "from lxml.html.diff import htmldiff",
+                ],
+            )
             return template.render(_=translator.get_translation, config=self.config, **context)
         except Exception as exc:
             logger.exception(self, "Failed to render email template: {}".format(exc.__str__()))
@@ -458,105 +464,35 @@ class EmailManager(object):
         _ = translator.get_translation
         content = content_in_context.content
         action = content.get_last_action().id
-
-        # default values
-        user = role.user
-        workspace = role.workspace
+        previous_revision = content.get_previous_revision()
+        new_status = _(content.get_status().label)
         workspace_url = workspace_in_context.frontend_url
-        main_title = content.label
-        status_label = content.get_status().label
-        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for status_icon_url
-        status_icon_url = ""
         role_label = role.role_as_label()
-        content_intro = '<span id="content-intro-username">{}</span> did something.'.format(
-            actor.display_name
-        )
-        content_text = content.description
-        call_to_action_url = content_in_context.frontend_url
         logo_url = get_email_logo_frontend_url(self.config)
-        content_name_pattern = "<i><a href={call_to_action_url}>{content}</a></i>"
-        if ActionDescription.COMMENT == action:
-            main_title = parent_in_context.label
-            content_intro = ""
-            call_to_action_url = parent_in_context.frontend_url
-        elif ActionDescription.STATUS_UPDATE == action:
-            new_status = translator.get_translation(content.get_status().label)
-            main_title = content_in_context.label
-            content_name = content_name_pattern.format(
-                call_to_action_url=call_to_action_url, content=content.get_label()
-            )
-            content_intro = _(
-                "I modified the status of {content_name}. The new status is <i>{new_status}</i>"
-            ).format(content_name=content_name, new_status=new_status)
-            content_text = ""
-            call_to_action_url = content_in_context.frontend_url
-        elif ActionDescription.CREATION == action:
-            main_title = content_in_context.label
-            content_name = content_name_pattern.format(
-                call_to_action_url=call_to_action_url, content=content.get_label()
-            )
-            content_intro = _("I added an item entitled {content_name}.").format(
-                content_name=content_name
-            )
-            content_text = ""
-        elif action in (ActionDescription.REVISION, ActionDescription.EDITION):
-            main_title = content_in_context.label
-            content_name = content_name_pattern.format(
-                call_to_action_url=call_to_action_url, content=content.get_label()
-            )
-            content_intro = _("I updated {content_name}.").format(content_name=content_name)
-            previous_revision = content.get_previous_revision()
-            title_diff = htmldiff(previous_revision.label, content.label)
-            content_diff = htmldiff(previous_revision.description, content.description)
-            if title_diff or content_diff:
-                content_text = (
-                    "<p>{diff_intro_text}</p>\n<br/>"
-                    '<div style="border-left: 1em solid #ccc; padding-left: 0.5em;"><br/>\n'
-                    "<b>{title_diff}</b>\n"
-                    "{content_diff}\n"
-                    "</div>\n".format(
-                        diff_intro_text=_("Here is an overview of the changes:"),
-                        title_diff=title_diff,
-                        content_diff=content_diff,
-                    )
-                )
-        # if not content_intro and not content_text:
-        #     # Skip notification, but it's not normal
-        #     logger.error(
-        #         self,
-        #         'A notification is being sent but no content. '
-        #         'Here are some debug informations: [content_id: {cid}]'
-        #         '[action: {act}][author: {actor}]'.format(
-        #             cid=content.content_id,
-        #             act=action,
-        #             actor=actor
-        #         )
-        #     )
-        #     raise EmptyNotificationError('Unexpected empty notification')
 
         # FIXME: remove/readapt assert to debug easily broken case
-        assert user
-        assert workspace
-        assert main_title
-        assert status_label
-        # assert status_icon_url
-        assert role_label
-        # assert content_intro
-        assert content_text or content_text == content.description
-        assert call_to_action_url
-        assert logo_url
+        # assert user
+        # assert workspace
+        # assert main_title
+        # assert status_label
+        # # assert status_icon_url
+        # assert role_label
+        # # assert content_intro
+        # assert content_text or content_text == content.description
+        # assert logo_url
 
         return {
             "user": role.user,
+            "actor": actor,
+            "action": action,
             "workspace": role.workspace,
+            "ActionDescription": ActionDescription,
+            "parent_in_context": parent_in_context,
+            "content_in_context": content_in_context,
             "workspace_url": workspace_url,
-            "main_title": main_title,
-            "status_label": status_label,
-            "status_icon_url": status_icon_url,
+            "previous_revision": previous_revision,
+            "new_status": new_status,
             "role_label": role_label,
-            "content_intro": content_intro,
-            "content_text": content_text,
-            "call_to_action_url": call_to_action_url,
             "logo_url": logo_url,
         }
 
