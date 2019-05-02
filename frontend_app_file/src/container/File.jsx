@@ -253,7 +253,7 @@ class File extends React.Component {
       data: {
         breadcrumbs: [{
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
-          label: `${state.content.label}${state.content.file_extension}`,
+          label: `${state.content.filename}`,
           link: null,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }]
