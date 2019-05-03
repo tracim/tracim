@@ -197,7 +197,7 @@ jobs:
       <<: *_install_full_tracim
       env:
         - DB=sqlite;
-        - TRACIM_SQLALCHEMY__URL=sqlite:///tmp/tracim_cypress.sqlite
+        - TRACIM_SQLALCHEMY__URL=sqlite:////tmp/tracim_cypress.sqlite
         - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
       script:
