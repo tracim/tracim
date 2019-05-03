@@ -3,7 +3,7 @@ env:
   global:
     - BACKEND_TEST_CONFIG_FILE=tests_configs.ini
     - DEFAULT_SQLITE_SQLALCHEMY__URL=sqlite:////tmp/tracim.sqlite
-    - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracimtest
+    - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracim_test
     - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
     - DB=sqlite
     - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
@@ -51,8 +51,10 @@ _install_backend: &_install_backend
     - pip install python-coveralls
     - pip install -r "requirements.txt"
     # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
     - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
     # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
     - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
     # sqlite
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
@@ -77,14 +79,18 @@ _install_full_tracim: &_install_full_tracim
     - pip install python-coveralls
     - pip install -r "requirements.txt"
     # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
     - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
     # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
     - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
     # sqlite
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    # setup backend for running
     - cp ../color.json.sample ../color.json
     - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE
     - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
+    # install frontend
     - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh root
     - ./build_full_frontend.sh root
