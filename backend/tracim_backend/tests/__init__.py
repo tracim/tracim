@@ -122,7 +122,7 @@ class FunctionalTest(unittest.TestCase):
         # https://github.com/algoo/hapic/issues/144
         hapic._controllers = []
         self.app_config = CFG(self.settings)  # type: CFG
-        self.override_app_config()
+        self.app_config = self.override_app_config(self.app_config)
         self.app_config.configure_filedepot()
         self.connect_database(create_tables=True)
         self.init_database()
@@ -145,9 +145,9 @@ class FunctionalTest(unittest.TestCase):
         """
         return settings
 
-    def override_app_config(self) -> None:
+    def override_app_config(self, app_config: CFG) -> CFG:
         """
-        Allow to override some setting by code.
+        Allow to override app_config parameter for tests
         by default : do nothing.
         """
         pass
@@ -259,11 +259,13 @@ class FunctionalTestNoDB(FunctionalTest):
         settings["sqlalchemy.url"] = "sqlite://"
         return settings
 
-    def override_app_config(self) -> None:
+    def override_app_config(self, app_config: CFG) -> CFG:
         """
+        Override CFG parameter
         Disable sqlalchemy.url app config parameter with wrong value
         """
-        self.app_config.SQLALCHEMY__URL = "sqlite://"
+        app_config.SQLALCHEMY__URL = "sqlite://"
+        return app_config
 
     def init_database(self) -> None:
         self.engine = get_engine(self.app_config)
