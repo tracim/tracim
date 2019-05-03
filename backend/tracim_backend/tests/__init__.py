@@ -150,7 +150,7 @@ class FunctionalTest(unittest.TestCase):
         Allow to override app_config parameter for tests
         by default : do nothing.
         """
-        pass
+        return app_config
 
     def run_app(self) -> None:
         app = web({}, **self.settings)
