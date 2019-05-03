@@ -16,7 +16,8 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
-  Badge
+  Badge,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -77,12 +78,8 @@ class File extends React.Component {
     switch (type) {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        if (data.content.content_id !== state.content.content_id) {
-          const event = new CustomEvent('appCustomEvent', {detail: {type: 'file_reloadContent',data: data.content}})
-          document.dispatchEvent(event)
-          return
-        }
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
 
       case 'file_hideApp':

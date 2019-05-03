@@ -5,7 +5,8 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   revisionTypeList,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  appFeatureCustomEventHandlerShowApp
 } from './helper.js'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -77,5 +78,6 @@ export {
   ArchiveDeleteContent,
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
-  NewMemberForm
+  NewMemberForm,
+  appFeatureCustomEventHandlerShowApp
 }

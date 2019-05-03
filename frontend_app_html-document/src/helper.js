@@ -99,3 +99,18 @@ export const debug = {
   },
   timeline: timelineDebugData
 }
+
+export const initWysiwyg = (state, lang, handlerNewComment, handlerNewVersion) => {
+  if (state.timelineWysiwyg) {
+    tinymce.remove('#wysiwygTimelineComment')
+    wysiwyg('#wysiwygTimelineComment', lang, handlerNewComment)
+  }
+  if (state.mode === MODE.EDIT) {
+    console.log('before remove')
+    console.log(document.getElementById('wysiwygNewVersion'))
+    tinymce.remove('#wysiwygNewVersion')
+    console.log('after remove')
+    console.log(document.getElementById('wysiwygNewVersion'))
+    wysiwyg('#wysiwygNewVersion', lang, handlerNewVersion)
+  }
+}

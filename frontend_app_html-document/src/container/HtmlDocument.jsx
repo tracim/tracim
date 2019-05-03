@@ -15,9 +15,14 @@ import {
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
-import { MODE, debug } from '../helper.js'
+import {
+  MODE,
+  debug,
+  initWysiwyg
+} from '../helper.js'
 import {
   getHtmlDocContent,
   getHtmlDocComment,
@@ -60,13 +65,19 @@ class HtmlDocument extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+  customEventReducer = async ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
       case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+        // const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        // if (isSameContentId) {
+        //   await this.loadContent()
+        //   initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+        //   this.setState({isVisible: true})
+        // }
         if (data.content.content_id !== state.content.content_id) {
-          const event = new CustomEvent('appCustomEvent', {detail: {type: 'html-document_reloadContent',data: data.content}})
+          const event = new CustomEvent('appCustomEvent', {detail: {type: `${state.content.content_type}_reloadContent`, data: data.content}})
           document.dispatchEvent(event)
           return
         }
@@ -299,7 +310,6 @@ class HtmlDocument extends React.Component {
 
   handleClickNewVersion = () => {
     const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
-    console.log('handleClickNewVersion(), previouslyUnsavedRawContent', previouslyUnsavedRawContent)
 
     this.setState(prev => ({
       content: {

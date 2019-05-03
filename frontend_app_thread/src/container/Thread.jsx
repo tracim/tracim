@@ -14,7 +14,8 @@ import {
   ArchiveDeleteContent,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -60,12 +61,8 @@ class Thread extends React.Component {
     switch (type) {
       case 'thread_showApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        if (data.content.content_id !== state.content.content_id) {
-          const event = new CustomEvent('appCustomEvent', {detail: {type: 'thread_reloadContent',data: data.content}})
-          document.dispatchEvent(event)
-          return
-        }
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
 
       case 'thread_hideApp':
