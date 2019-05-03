@@ -892,14 +892,13 @@ class FileResource(DAVNonCollection):
         except ContentNotFound:
             destination_parent = None
         try:
-            new_content = self.content_api.copy(
+            self.content_api.copy(
                 item=self.content,
                 new_label=new_label,
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
             )
-            self.content_api.copy_children(self.content, new_content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
         transaction.commit()

@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { Link } from 'react-router-dom'
 import { Badge } from 'tracim_frontend_lib'
+import { PAGE } from '../../helper.js'
 
 require('./RecentActivity.styl')
 
@@ -25,24 +27,47 @@ export const RecentActivity = props =>
       {props.recentActivityList.length > 0
         ? props.recentActivityList.map(content => {
           const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || {hexcolor: '', faIcon: ''}
-          return (
-            <div
-              className={classnames('recentactivity__list__item primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
-              onClick={() => props.onClickRecentContent(content.id, content.type)}
-              title={content.label}
-              key={content.id}
-            >
-              <div className='recentactivity__list__item__icon' style={{color: contentType.hexcolor}}>
-                <i className={`fa fa-${contentType.faIcon}`} />
-              </div>
-              <div className='recentactivity__list__item__name'>
-                {content.label}
-                {content.type === 'file' && (
-                  <Badge text={content.fileExtension} customClass='badgeBackgroundColor' />
-                )}
-              </div>
+
+          const recentActivityItemIcon = (
+            <div className='recentactivity__list__item__icon' style={{color: contentType.hexcolor}}>
+              <i className={`fa fa-${contentType.faIcon}`} />
             </div>
           )
+
+          const recentActivityItemName = (
+            <div className='recentactivity__list__item__name'>
+              {content.label}
+              {content.type === 'file' && (
+                <Badge text={content.fileExtension} customClass='badgeBackgroundColor' />
+              )}
+            </div>
+          )
+
+          if (content.type === 'folder' && props.roleIdForLoggedUser < 4) {
+            return (
+              <div
+                className={classnames('recentactivity__list__item nolink primaryColorBgLightenHover')}
+                title={content.label}
+                key={content.id}
+              >
+                {recentActivityItemIcon}
+                {recentActivityItemName}
+              </div>
+            )
+          }
+          else {
+            return (
+              <Link
+                className={classnames('recentactivity__list__item primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
+                to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
+                title={content.label}
+                key={content.id}
+              >
+                {recentActivityItemIcon}
+                {recentActivityItemName}
+              </Link>
+            )
+          }
         })
         : <div className='recentactivity__empty'>{props.t('No recent activity')}</div>
       }
@@ -68,6 +93,8 @@ RecentActivity.propTypes = {
   recentActivityList: PropTypes.array.isRequired,
   contentTypeList: PropTypes.array.isRequired,
   onClickSeeMore: PropTypes.func.isRequired,
+  workspaceId: PropTypes.number.isRequired,
+  roleIdForLoggedUser: PropTypes.number.isRequired,
   readByUserList: PropTypes.array
 }
 

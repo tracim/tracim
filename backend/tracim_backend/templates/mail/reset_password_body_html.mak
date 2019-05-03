@@ -1,7 +1,7 @@
 ## -*- coding: utf-8 -*-
 <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
-<p>${_('Someone has requested to reset the password for your account on <i>{website_title}</i>.').format(website_title=config.WEBSITE__TITLE)}</p>
+<p>${_('Someone has requested to reset the password for your account on <i>{website_title}</i>.').format(website_title=html_escape(config.WEBSITE__TITLE))| n}</p>
 
 <p>${_('If you did not perform this request, you can safely ignore this email.')}</p>
 

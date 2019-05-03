@@ -930,6 +930,110 @@ class TestContentApi(DefaultTest):
         eq_("", c.label)
         eq_(ActionDescription.COMMENT, c.revision_type)
 
+    def test_unit_move_file_with_comments__different_parent_same_workspace(self):
+        """
+        Check if move of content does proper copy of subcontent.
+        """
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+        )
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        with self.session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=foldera,
+                label="test_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
+        api.save(text_file, ActionDescription.CREATION)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
+        folderb = api.create(content_type_list.Folder.slug, workspace, None, "folder b", "", True)
+        comment_before_move_id = text_file.children[0].id
+        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
+            api.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
+            api.save(text_file)
+        transaction.commit()
+        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
+        comment_after_move = text_file_after_move.children[0]
+        assert text_file == text_file_after_move
+        assert comment_before_move_id == comment_after_move.id
+
+    def test_unit_move_file_with_comments__different_parent_different_workspace(self):
+        """
+        Check if copy of content does proper copy of subcontent.
+        """
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+        )
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        with self.session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=foldera,
+                label="test_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
+        api.save(text_file, ActionDescription.CREATION)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
+        comment_before_move_id = text_file.children[0].id
+        comment_before_move_workspace_id = text_file.children[0].workspace_id
+        assert text_file.children[0].description == "just a comment"
+        workspace2 = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace2", save_now=True)
+        folderb = api.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
+            api.move(
+                item=text_file,
+                new_parent=folderb,
+                new_workspace=workspace2,
+                must_stay_in_same_workspace=False,
+            )
+            api.save(text_file)
+        transaction.commit()
+        api2 = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
+        assert text_file_after_move.children[0].description == "just a comment"
+        assert text_file_after_move.children[0].id == comment_before_move_id
+        assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
+
     def test_unit_copy_file_different_label_different_parent_ok(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
@@ -985,6 +1089,87 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.file_mimetype == text_file.file_mimetype
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
+
+    def test_unit_copy_file_with_comments_different_label_different_parent_ok(self):
+        """
+        Check if copy of content does proper copy of subcontent.
+        """
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+        )
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        with self.session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=foldera,
+                label="test_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
+        api.save(text_file, ActionDescription.CREATION)
+        api.create_comment(
+            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+        )
+        with new_revision(self.session, transaction.manager, content=text_file):
+            api.update_content(text_file, text_file.label, new_content="just a description")
+            api.save(
+                content=text_file, action_description=ActionDescription.EDITION, do_notify=False
+            )
+        api.create_comment(
+            workspace,
+            parent=text_file,
+            content="just another comment",
+            do_save=True,
+            do_notify=False,
+        )
+        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        workspace2 = WorkspaceApi(
+            current_user=user2, session=self.session, config=self.app_config
+        ).create_workspace("test workspace2", save_now=True)
+        folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+
+        api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
+
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
+
+        assert len(text_file.children) == 2
+        assert len(text_file_copy.children) == 2
+        assert text_file.children[0].description == "just a comment"
+        assert text_file_copy.children[0].description == text_file.children[0].description
+        assert text_file_copy.children[0].id != text_file.children[0].id
+        assert text_file_copy.children[0].created == text_file.children[0].created
+
+        assert text_file.children[1].description == "just another comment"
+        assert text_file_copy.children[1].description == text_file.children[1].description
+        assert text_file_copy.children[1].id != text_file.children[1].id
+        assert text_file_copy.children[1].created == text_file.children[1].created
+        # INFO - G.M - 2019-04-30 - check if both recursive
+        # revision tree of content and copy are similar
+        assert len(text_file_copy.get_tree_revisions()) == len(text_file.get_tree_revisions()) + 3
+        for num, revision in enumerate(text_file_copy.get_tree_revisions()[:-3]):
+            assert (
+                text_file.get_tree_revisions()[num].revision_type
+                == text_file_copy.get_tree_revisions()[num].revision_type
+            )
+        # INFO - G.M - 2019-04-30 - check if all supplementary revision are copy one.
+        for revision in text_file_copy.get_tree_revisions()[-3:]:
+            assert revision.revision_type == ActionDescription.COPY
 
     def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
