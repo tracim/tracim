@@ -111,6 +111,18 @@ def compare_tree_items_for_sorting_by_type_and_name(
     return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
 
 
+class AddCopyRevisionsResult(object):
+    def __init__(
+        self,
+        new_content: Content,
+        new_children_dict: typing.Dict[int, Content],
+        original_children_dict: typing.Dict[int, Content],
+    ) -> None:
+        self.new_content = new_content
+        self.new_children_dict = new_children_dict  # dict key is original content id
+        self.original_children_dict = original_children_dict  # dict key is original content id
+
+
 class ContentApi(object):
 
     SEARCH_SEPARATORS = ",| "
@@ -545,7 +557,7 @@ class ContentApi(object):
             # set label and file_extension
             content.file_name = filename
         else:
-            if content_type_slug == content_type_list.Comment.slug:
+            if self._allow_empty_label(content_type_slug):
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ""
@@ -1400,10 +1412,22 @@ class ContentApi(object):
         else:
             if new_parent:
                 item.workspace = new_parent.workspace
-
-        self._is_filename_available_or_raise(
-            item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if item.file_name:
+            self._is_filename_available_or_raise(
+                item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
         item.revision_type = ActionDescription.MOVE
 
     def _get_allowed_content_type(
@@ -1452,8 +1476,8 @@ class ContentApi(object):
         do_notify: bool = True,
     ) -> Content:
         """
-        Copy nearly all content, revision included. Children not included, see
-        "copy_children" for this.
+        Copy all content, revision and children included (children are included
+        recursively).
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
         :param new_label: new label of the new copied item
@@ -1492,32 +1516,149 @@ class ContentApi(object):
             file_extension = new_file_extension
         else:
             file_extension = item.file_extension
+
         filename = self._prepare_filename(label, file_extension)
-        self._is_filename_available_or_raise(filename, workspace, parent)
-        content = item.copy(parent)
-        # INFO - GM - 15-03-2018 - add "copy" revision
+        content_type_slug = item.type
+        if filename:
+            self._is_filename_available_or_raise(filename, workspace, parent)
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
+
+        copy_result = self._copy(item, parent)
+        copy_result = self._add_copy_revisions(
+            item,
+            copy_result.new_content,
+            copy_result.original_children_dict,
+            copy_result.new_children_dict,
+            parent,
+            label,
+            workspace,
+            file_extension,
+            do_save,
+            do_notify,
+        )
+        return copy_result.new_content
+
+    def _copy(self, content: Content, new_parent: Content = None) -> AddCopyRevisionsResult:
+        """
+        Create new content for content and his children, recreate all revision in order and
+        return all these new content
+        :param content: original root content of copy
+        :param new_parent: new parent of root content of copy
+        :return: new content created based on original root content,
+        dict of new children content and original children content with original content id as key.
+        """
+        new_content = Content()
+        # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
+        # to be able to retrieve them for applying new revisions on them easily. key of dict is
+        # original content_id.
+        new_content_children = {}  # type: typing.Dict[int,Content]
+        # INFO - G.M - 2019-04-30 - we store alse old content of children to allow applying new
+        # revision related to old data. key of dict is original content id.
+        original_content_children = {}  # type: typing.Dict[int,Content]
+
+        for rev in content.get_tree_revisions():
+            if rev.content_id == content.content_id:
+                related_content = new_content
+                related_parent = new_parent
+            else:
+                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                # we create it.
+                if rev.content_id not in new_content_children:
+                    new_content_children[rev.content_id] = Content()
+                    original_content_children[rev.content_id] = rev.node
+                related_content = new_content_children[rev.content_id]  # type: Content
+                if rev.parent_id == content.content_id:
+                    related_parent = new_content
+                else:
+                    related_parent = new_content_children[rev.parent_id]
+            # INFO - G.M - 2019-04-30 - copy of revision itself.
+            cpy_rev = ContentRevisionRO.copy(rev, related_parent)
+            related_content.revisions.append(cpy_rev)
+            self._session.add(related_content)
+            self._session.flush()
+        return AddCopyRevisionsResult(
+            new_content=new_content,
+            new_children_dict=new_content_children,
+            original_children_dict=original_content_children,
+        )
+
+    def _add_copy_revisions(
+        self,
+        original_content: Content,
+        new_content: Content,
+        original_content_children,
+        new_content_children,
+        new_parent: Content = None,
+        new_label: str = None,
+        new_workspace: Workspace = None,
+        new_file_extension: str = None,
+        do_save: bool = True,
+        do_notify: bool = True,
+    ) -> AddCopyRevisionsResult:
+        """
+        Add copy revision for all new content
+        :param original_content: original content of root content in copy
+        :param new_content: new content of new root content in copy
+        :param original_content_children: original contents of children of root content in copy
+        :param new_content_children: new contents of children of root content in copy
+        :param new_parent: new parent of root content
+        :param new_label: new label of root content
+        :param new_workspace: new workspace all new content
+        :param new_file_extension: new file_extension for root content
+        :return: new content created based on root content,
+        dict of new children content and original children content with original content id as key.
+        """
+        for original_content_id, new_child in new_content_children.items():
+            original_child = original_content_children[original_content_id]
+            with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=new_child,
+                force_create_new_revision=True,
+            ) as rev:
+                rev.workspace = new_workspace
+                rev.revision_type = ActionDescription.COPY
+                properties = rev.properties.copy()
+                properties["origin"] = {
+                    "content": original_child.id,
+                    "revision": original_child.last_revision.revision_id,
+                }
+                rev.properties = properties
+            self.save(new_child, ActionDescription.COPY, do_notify=False)
         with new_revision(
             session=self._session,
             tm=transaction.manager,
-            content=content,
+            content=new_content,
             force_create_new_revision=True,
         ) as rev:
-            rev.parent = parent
-            rev.workspace = workspace
-            rev.label = label
-            rev.file_extension = file_extension
+            rev.parent = new_parent
+            rev.workspace = new_workspace
+            rev.label = new_label
+            rev.file_extension = new_file_extension
             rev.revision_type = ActionDescription.COPY
-            rev.properties["origin"] = {
-                "content": item.id,
-                "revision": item.last_revision.revision_id,
+            properties = rev.properties.copy()
+            properties["origin"] = {
+                "content": original_content.id,
+                "revision": original_content.last_revision.revision_id,
             }
+            rev.properties = properties
         if do_save:
-            self.save(content, ActionDescription.COPY, do_notify=do_notify)
-        return content
-
-    def copy_children(self, origin_content: Content, new_content: Content):
-        for child in origin_content.children:
-            self.copy(child, new_content)
+            self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
+        return AddCopyRevisionsResult(
+            new_content=new_content,
+            new_children_dict=new_content_children,
+            original_children_dict=original_content_children,
+        )
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
@@ -1591,9 +1732,22 @@ class ContentApi(object):
 
         label = new_label or item.label
         filename = self._prepare_filename(label, item.file_extension)
-        self._is_filename_available_or_raise(
-            filename, item.workspace, item.parent, exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if filename:
+            self._is_filename_available_or_raise(
+                filename, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
 
         item.owner = self._user
         item.label = new_label
@@ -1620,9 +1774,22 @@ class ContentApi(object):
         #         new_content == item.depot_file.file.read():
         #     raise SameValueError('The content did not changed')
         item.owner = self._user
-        self._is_filename_available_or_raise(
-            new_filename, item.workspace, item.parent, exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if new_filename:
+            self._is_filename_available_or_raise(
+                new_filename, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
@@ -1639,6 +1806,8 @@ class ContentApi(object):
             label=content.label, action="archived", date=current_date_for_filename()
         )
         filename = self._prepare_filename(label, content.file_extension)
+        # INFO - G.M - 2019-04-29 - filename already exist here, for special type
+        # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
@@ -1660,6 +1829,8 @@ class ContentApi(object):
             label=content.label, action="deleted", date=current_date_for_filename()
         )
         filename = self._prepare_filename(label, content.file_extension)
+        # INFO - G.M - 2019-04-29 - filename already exist here, for special type
+        # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
@@ -2011,3 +2182,11 @@ class ContentApi(object):
             query = query.filter(Content.parent == parent)
 
         return _("New folder {0}").format(query.count() + 1)
+
+    def _allow_empty_label(self, content_type_slug: str) -> bool:
+        if (
+            content_type_list.get_one_by_slug(content_type_slug).slug
+            == content_type_list.Comment.slug
+        ):
+            return True
+        return False

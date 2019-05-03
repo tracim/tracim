@@ -25,7 +25,8 @@ import {
 import {
   COOKIE_FRONTEND,
   PAGE,
-  PROFILE
+  PROFILE,
+  unLoggedAllowedPageList
 } from '../helper.js'
 
 class Header extends React.Component {
@@ -86,7 +87,6 @@ class Header extends React.Component {
 
   render () {
     const { props } = this
-    const unLoggedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.RESET_PASSWORD]
 
     return (
       <header className='header'>
@@ -97,7 +97,7 @@ class Header extends React.Component {
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
-              {!unLoggedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
+              {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <i className='header__menu__system__icon slowblink fa fa-warning' />
@@ -115,7 +115,7 @@ class Header extends React.Component {
                 </li>
               )}
 
-              {!unLoggedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
+              {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
                   <button
                     className='btn outlineTextBtn primaryColorBorder nohover'

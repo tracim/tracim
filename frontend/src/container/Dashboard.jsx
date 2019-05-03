@@ -209,8 +209,6 @@ class Dashboard extends React.Component {
 
   handleToggleWebdavBtn = () => this.setState(prevState => ({displayWebdavBtn: !prevState.displayWebdavBtn}))
 
-  handleClickRecentContent = (idContent, typeContent) => this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.curWs.id, typeContent, idContent))
-
   handleClickMarkRecentActivityAsRead = async () => {
     const { props } = this
     const fetchUserWorkspaceAllRead = await props.dispatch(putMyselfWorkspaceRead(props.curWs.id))
@@ -512,10 +510,11 @@ class Dashboard extends React.Component {
               <div className='dashboard__workspaceInfo'>
                 <RecentActivity
                   customClass='dashboard__activity'
+                  workspaceId={props.curWs.id}
+                  roleIdForLoggedUser={idRoleUserWorkspace}
                   recentActivityList={props.curWs.recentActivityList}
                   readByUserList={props.curWs.contentReadStatusList}
                   contentTypeList={props.contentType}
-                  onClickRecentContent={this.handleClickRecentContent}
                   onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
                   onClickSeeMore={this.handleClickSeeMore}
                   t={props.t}

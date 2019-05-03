@@ -25,7 +25,8 @@ import {
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
-  postUserLogin
+  postUserLogin,
+  putUserLang
 } from '../action-creator.async.js'
 import {
   PAGE,
@@ -57,7 +58,7 @@ class Login extends React.Component {
 
     const defaultLangCookie = Cookies.get(COOKIE_FRONTEND.DEFAULT_LANGUAGE)
 
-    if (defaultLangCookie) {
+    if (defaultLangCookie !== 'null') {
       i18n.changeLanguage(defaultLangCookie)
       props.dispatch(setUserLang(defaultLangCookie))
     }
@@ -98,6 +99,8 @@ class Login extends React.Component {
           ...fetchPostUserLogin.json,
           logged: true
         }
+
+        if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
 
         Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserConnected(loggedUser))
@@ -152,6 +155,15 @@ class Login extends React.Component {
     const { props } = this
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
     if (fetchGetWorkspaceList.status === 200) props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
+  }
+
+  setDefaultUserLang = async loggedUser => {
+    const { props } = this
+    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    switch (fetchPutUserLang.status) {
+      case 200: break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+    }
   }
 
   handleClickForgotPassword = () => {
