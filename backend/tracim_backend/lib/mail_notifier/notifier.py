@@ -359,7 +359,7 @@ class EmailManager(object):
 
         context = {
             "user": user,
-            "encoded_password": escape(password),
+            "password": password,
             "logo_url": get_email_logo_frontend_url(self.config),
             "login_url": get_login_frontend_url(self.config),
         }
