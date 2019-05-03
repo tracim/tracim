@@ -4,7 +4,9 @@ import typing
 
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
+from sqlalchemy.engine import Engine
 from sqlalchemy.event import listen
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -19,13 +21,15 @@ from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
 from tracim_backend.models.meta import DeclarativeBase  # noqa: F401
 
 if typing.TYPE_CHECKING:
+    # INFO - G.M - 2019-05-03 - import for type-checking only, setted here to
+    # avoid circular import issue
     from tracim_backend.config import CFG
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()
 
 
-def get_engine(app_config: "CFG", prefix="sqlalchemy."):
+def get_engine(app_config: "CFG", prefix="sqlalchemy.") -> Engine:
     sqlalchemy_params = sliced_dict(
         app_config.__dict__, beginning_key_string=prefix.upper().replace(".", "__")
     )
@@ -39,19 +43,19 @@ def get_engine(app_config: "CFG", prefix="sqlalchemy."):
     return engine_from_config(new_config, prefix=prefix)
 
 
-def get_session_factory(engine):
+def get_session_factory(engine) -> sessionmaker:
     factory = sessionmaker(expire_on_commit=False)
     factory.configure(bind=engine)
     return factory
 
 
-def get_scoped_session_factory(engine):
+def get_scoped_session_factory(engine) -> scoped_session:
     factory = scoped_session(sessionmaker(expire_on_commit=False))
     factory.configure(bind=engine)
     return factory
 
 
-def get_tm_session(session_factory, transaction_manager):
+def get_tm_session(session_factory, transaction_manager) -> Session:
     """
     Get a ``sqlalchemy.orm.Session`` instance backed by a transaction.
 
@@ -90,7 +94,7 @@ def get_tm_session(session_factory, transaction_manager):
     return dbsession
 
 
-def init_models(configurator: Configurator, app_config: "CFG"):
+def init_models(configurator: Configurator, app_config: "CFG") -> None:
     """
     Initialize the model for a Pyramid app.
     """

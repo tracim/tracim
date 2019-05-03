@@ -289,11 +289,11 @@ def webdav_convert_file_name_to_bdd(string: str) -> str:
     return string
 
 
-def add_trailing_slash(path: str):
+def add_trailing_slash(path: str) -> str:
     return (path + "/").replace("//", "/")
 
 
-def normpath(path):
+def normpath(path: str) -> str:
     if path == b"":
         path = b"/"
     elif path == "":
@@ -301,7 +301,7 @@ def normpath(path):
     return base_normpath(path)
 
 
-def sliced_dict(data: typing.Dict[str, any], beginning_key_string: str):
+def sliced_dict(data: typing.Dict[str, any], beginning_key_string: str) -> typing.Dict[str, any]:
     """
     Get dict of all item beginning with beginning_key_string
     :param data:
