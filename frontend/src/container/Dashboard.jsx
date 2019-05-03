@@ -42,6 +42,7 @@ import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
+import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -518,13 +519,23 @@ class Dashboard extends React.Component {
                 />
               </div>
 
-              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled &&
+              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
                 <AgendaInfo
-                  customClass='dashboard__agenda'
-                  introText={props.t('Use this link to access this shared space agenda from anywhere')}
+                  customClass='dashboard__section'
+                  introText={props.t("Use this link to integrate this shared space's agenda to your")}
+                  caldavText={props.t('CalDAV compatible software')}
                   agendaUrl={props.curWs.agendaUrl}
                 />
-              }
+              )}
+
+              {props.system.config.webdav_enabled && (
+                <WebdavInfo
+                  customClass='dashboard__section'
+                  introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                  webdavText={props.t('(protocole WebDAV)')}
+                  webdavUrl={props.system.config.webdav_url}
+                />
+              )}
             </PageContent>
           </PageWrapper>
         </div>
