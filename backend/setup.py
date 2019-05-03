@@ -78,7 +78,8 @@ tests_require = [
     'responses',
     'mock',
     'Pillow',
-    'freezegun'
+    'freezegun',
+    'pre-commit'
 ]
 
 mysql_require = [
