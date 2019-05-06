@@ -1163,6 +1163,7 @@ class Content(DeclarativeBase):
             .query(func.max(ContentRevisionRO.revision_id))
             .filter(ContentRevisionRO.content_id.in_(children_content_ids))
             .group_by(ContentRevisionRO.content_id)
+            .order_by(ContentRevisionRO.content_id)
             .all()
         )
 
@@ -1183,6 +1184,7 @@ class Content(DeclarativeBase):
             children.append(child)
             if recursively:
                 children.extend(child.get_children(recursively=recursively))
+        children = sorted(children, key=lambda child: child.content_id)
         return children
 
     @property
