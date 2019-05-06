@@ -11,8 +11,8 @@ from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
-from wsgi import CALDAV_APP_NAME
-from wsgi import caldav_app
+from tracim_backend.wsgi import CALDAV_APP_NAME
+from tracim_backend.wsgi import caldav_app
 
 
 class CaldavRunnerCommand(AppContextCommand):
