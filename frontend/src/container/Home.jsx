@@ -4,7 +4,9 @@ import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
-import { workspaceConfig } from '../helper.js'
+import {
+  workspaceConfig
+} from '../helper.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'

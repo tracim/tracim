@@ -93,8 +93,6 @@ class Header extends React.Component {
         <nav className='navbar navbar-expand-md navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
-          <div className='header__breadcrumb d-none d-lg-block ml-4' />
-
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>

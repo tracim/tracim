@@ -17,6 +17,7 @@ import {
   setContentTypeList,
   setAppList,
   setConfig,
+  resetBreadcrumbs,
   setUserLang
 } from '../action-creator.sync.js'
 import {
@@ -52,6 +53,8 @@ class Login extends React.Component {
 
   async componentDidMount () {
     const { props } = this
+
+    props.dispatch(resetBreadcrumbs())
 
     const defaultLangCookie = Cookies.get(COOKIE_FRONTEND.DEFAULT_LANGUAGE)
 
@@ -243,5 +246,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system }) => ({ user, system })
+const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
 export default withRouter(connect(mapStateToProps)(translate()(Login)))

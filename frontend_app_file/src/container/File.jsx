@@ -16,7 +16,8 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
-  Badge
+  Badge,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -48,9 +49,12 @@ class File extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
-      externalTradList: [
+      externalTranslationList: [
+        props.t('File'),
+        props.t('Files'),
+        props.t('file'),
+        props.t('files'),
         props.t('Upload a file'),
-        props.t('Files')
       ],
       newComment: '',
       newFile: '',
@@ -122,7 +126,7 @@ class File extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
     const { appName, content } = this.state
@@ -131,11 +135,12 @@ class File extends React.Component {
     )
     if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
-    this.loadContent()
+    await this.loadContent()
     this.loadTimeline()
+    this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -143,8 +148,9 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      this.loadContent()
+      await this.loadContent()
       this.loadTimeline()
+      this.buildBreadcrumbs()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -239,6 +245,22 @@ class File extends React.Component {
 
     this.setState({
       timeline: revisionWithComment
+    })
+  }
+
+  buildBreadcrumbs = () => {
+    const { state } = this
+
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          label: `${state.content.filename}`,
+          link: null,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }]
+      }
     })
   }
 
