@@ -1159,6 +1159,9 @@ class Content(DeclarativeBase):
             .all()
         )
         children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
+        # INFO - G.M - 2019-05-06 - we get max revision (latest) for each content (defined
+        # by content id). As we use a group_by , what we retrieve here
+        #  is not a list of ContentRevisionRO, but a standard object of sqlalchemy.
         all_up_to_date_revisions_result = (
             object_session(self)
             .query(func.max(ContentRevisionRO.revision_id))
