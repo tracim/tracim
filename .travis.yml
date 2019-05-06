@@ -11,6 +11,8 @@ env:
     - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
     - TRACIM_PREVIEW_CACHE_DIR=/tmp/test/preview_cache
     - TRACIM_COLOR__CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/color-test.json
+    - TRACIM_SESSION__DATA_DIR=/tmp/test/sessions/data
+    - TRACIM_SESSION__LOCK_DIR=/tmp/test/sessions/lock
 sudo: false
 language: python
 dist: trusty
@@ -64,6 +66,11 @@ _install_backend: &_install_backend
     - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
     - echo "$TRACIM_SQLALCHEMY__URL"
+    - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
+    - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
+    - mkdir -p $TRACIM_SESSION__DATA_DIR
+    - mkdir -p $TRACIM_SESSION__LOCK_DIR
+    - tree /tmp/test
   after_success:
     - coveralls
 
