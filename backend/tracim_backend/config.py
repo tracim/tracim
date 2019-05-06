@@ -13,10 +13,12 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.exceptions import ConfigCodeError
 from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -515,7 +517,6 @@ class CFG(object):
         """
         Check config for global stuff
         """
-        mandatory_msg = "ERROR: {} configuration is mandatory. Set it before continuing."
         # INFO - G.M - 2019-04-03 - check color file validity
         if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
             raise Exception(
@@ -541,15 +542,13 @@ class CFG(object):
 
         # INFO - G.M - 2019-04-03 - depot dir validity
         if not self.DEPOT_STORAGE_DIR:
-            raise Exception(mandatory_msg.format("depot_storage_dir"))
+            self.check_mandatory_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR)
 
         if not self.DEPOT_STORAGE_NAME:
-            raise Exception(mandatory_msg.format("depot_storage_name"))
+            self.check_mandatory_param("DEPOT_STORAGE_NAME", self.DEPOT_STORAGE_NAME)
 
         if not self.PREVIEW_CACHE_DIR:
-            raise Exception(
-                "ERROR: preview_cache_dir configuration is mandatory. " "Set it before continuing."
-            )
+            self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
 
         if AuthType.REMOTE is self.AUTH_TYPES:
             raise Exception(
@@ -559,7 +558,7 @@ class CFG(object):
 
         if not self.WEBSITE__BASE_URL:
             raise Exception(
-                "website.base_url is needed in order to have correct path in"
+                "WEBSITE__BASE_URL is needed in order to have correct path in"
                 "few place like in email."
                 "You should set it with frontend root url."
             )
@@ -567,7 +566,7 @@ class CFG(object):
         if not os.path.isdir(self.BACKEND__I18N_FOLDER_PATH):
             raise Exception(
                 "ERROR: {} folder does not exist as folder. "
-                "please set backend.i8n_folder_path"
+                "please set BACKEND__I18N_FOLDER_PATH"
                 "with a correct value".format(self.BACKEND__I18N_FOLDER_PATH)
             )
 
@@ -575,7 +574,7 @@ class CFG(object):
         if self.FRONTEND__SERVE and not os.path.isdir(self.FRONTEND__DIST_FOLDER_PATH):
             raise Exception(
                 "ERROR: {} folder does not exist as folder. "
-                "please set frontend.dist_folder.path"
+                "please set FRONTEND__DIST_FOLDER_PATH"
                 "with a correct value".format(self.FRONTEND__DIST_FOLDER_PATH)
             )
 
@@ -583,7 +582,6 @@ class CFG(object):
         """
         Check if config is correctly setted for email features
         """
-        mandatory_msg = "ERROR: {} configuration is mandatory. Set it before continuing."
         if not self.EMAIL__NOTIFICATION__ACTIVATED:
             logger.warning(
                 self,
@@ -592,7 +590,11 @@ class CFG(object):
             )
 
         if not self.EMAIL__REPLY__LOCKFILE_PATH and self.EMAIL__REPLY__ACTIVATED:
-            raise Exception(mandatory_msg.format("email.reply.lockfile_path"))
+            self.check_mandatory_param(
+                "EMAIL__REPLY__LOCKFILE_PATH",
+                self.EMAIL__REPLY__LOCKFILE_PATH,
+                when_str="when email reply is activated",
+            )
         # INFO - G.M - 2019-02-01 - check if template are available,
         # do not allow running with email_notification_activated
         # if templates needed are not available
@@ -613,7 +615,7 @@ class CFG(object):
 
         if self.EMAIL__PROCESSING_MODE not in (self.CST.ASYNC, self.CST.SYNC):
             raise Exception(
-                "email.processing_mode "
+                "EMAIL__PROCESSING_MODE "
                 "can "
                 'be "{}" or "{}", not "{}"'.format(
                     self.CST.ASYNC, self.CST.SYNC, self.EMAIL__PROCESSING_MODE
@@ -625,9 +627,10 @@ class CFG(object):
         Check if config is correctly setted for caldav features
         """
         if self.CALDAV__ENABLED and not self.CALDAV__RADICALE_PROXY__BASE_URL:
-            raise ConfigurationError(
-                "ERROR: Caldav radicale proxy cannot be activated if no radicale"
-                'base url is configured. set "caldav.radicale_proxy.base_url" properly'
+            self.check_mandatory_param(
+                "CALDAV__RADICALE_PROXY__BASE_URL",
+                self.CALDAV__RADICALE_PROXY__BASE_URL,
+                when_str="when caldav feature is enabled",
             )
 
     # INFO - G.M - 2019-04-05 - Post Actions Methods
@@ -786,6 +789,13 @@ class CFG(object):
     class CST(object):
         ASYNC = "ASYNC"
         SYNC = "SYNC"
+
+    def check_mandatory_param(self, param_name: str, value: typing.Any, when_str: str = "") -> None:
+        if not value:
+            raise ConfigurationError(
+                'ERROR: "{}" configuration is mandatory {when_str}.'
+                "Set it before continuing.".format(param_name, when_str="")
+            )
 
 
 class PreviewDim(object):
