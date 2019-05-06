@@ -70,18 +70,8 @@ class HtmlDocument extends React.Component {
     switch (type) {
       case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        // const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        // if (isSameContentId) {
-        //   await this.loadContent()
-        //   initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
-        //   this.setState({isVisible: true})
-        // }
-        if (data.content.content_id !== state.content.content_id) {
-          const event = new CustomEvent('appCustomEvent', {detail: {type: `${state.content.content_type}_reloadContent`, data: data.content}})
-          document.dispatchEvent(event)
-          return
-        }
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
 
       case 'html-document_hideApp':
@@ -109,14 +99,7 @@ class HtmlDocument extends React.Component {
       case 'allApp_changeLang':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
 
-        if (state.timelineWysiwyg) {
-          tinymce.remove('#wysiwygTimelineComment')
-          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
-        }
-        if (state.mode === MODE.EDIT) {
-          tinymce.remove('#wysiwygNewVersion')
-          wysiwyg('#wysiwygNewVersion', data, this.handleChangeText)
-        }
+        initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
 
         this.setState(prev => ({
           loggedUser: {
@@ -139,7 +122,7 @@ class HtmlDocument extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<HtmlDocument> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
@@ -156,6 +139,11 @@ class HtmlDocument extends React.Component {
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+
+    // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
+    if (!prevState.isVisible && state.isVisible) {
+      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+    }
   }
 
   componentWillUnmount () {
