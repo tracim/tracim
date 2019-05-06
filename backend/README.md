@@ -62,9 +62,9 @@ Upgrade packaging tools:
 
     pip install -r requirements.txt
 
-Install the project in editable mode with its testing requirements :
+Install the project in editable mode with its develop requirements :
 
-    pip install -e ".[testing]"
+    pip install -e ".[dev]"
 
 If you want to use postgresql, mysql or other databases
 than the default one: sqlite, you need to install python driver for those databases
@@ -75,11 +75,11 @@ specific driver.
 
 For PostgreSQL:
 
-    pip install -e ".[testing,postgresql]"
+    pip install -e ".[dev,postgresql]"
 
 For mySQL:
 
-    pip install -e ".[testing,mysql]"
+    pip install -e ".[dev,mysql]"
 
 ### Configure Tracim_backend ###
 
@@ -101,7 +101,7 @@ Stamp current version of database to last (useful for migration):
 ## Run Tracim_backend web services With Uwsgi : great for production ##
 
 if not did before, you need to create a color.json file at root of tracim :
-   
+
     cp ../color.json.sample ../color.json
 
 #### Install Uwsgi
@@ -120,7 +120,7 @@ or on debian 9 :
 
 
 Run all web services with uwsgi
-    
+
     ## UWSGI SERVICES
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
@@ -130,7 +130,7 @@ Run all web services with uwsgi
     uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --plugin python3 --wsgi-file wsgi/webdav.py -H env --pidfile /tmp/tracim_webdav.pid
     # caldav radicale server (used behind pyramid webserver for auth)
     uwsgi -d /tmp/tracim_caldav.log --http-socket localhost:5232 --plugin python3 --wsgi-file wsgi/caldav.py -H env --pidfile /tmp/tracim_caldav.pid
-    
+
 to stop them:
 
     # pyramid webserver
@@ -283,11 +283,19 @@ Run your project's tests:
 
 Run mypy checks:
 
-    mypy --ignore-missing-imports --disallow-untyped-defs tracim
+    mypy --ignore-missing-imports --disallow-untyped-defs tracim_backend
 
-Run pep8 checks:
+Code formatting using black:
 
-    pep8 tracim
+    black -l 100 tracim_backend
+
+Sorting of import:
+
+    isort tracim_backend/**/*.py
+
+Flake8 check(unused import, variable and many other checks):
+
+    flake8 tracim_backend
 
 Tracim API
 ----------
