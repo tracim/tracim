@@ -8,7 +8,7 @@
 
 <ul>
     <li>${_('login: {email_address}').format(email_address=user.email)}</li>
-    <li>${_('password: {password}').format(password=encoded_password)}</li>
+    <li>${_('password: {password}').format(password=password)}</li>
 </ul>
 
 <p>
