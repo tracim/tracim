@@ -638,24 +638,22 @@ class CFG(object):
             # TODO - G.M - 2019-05-06 - convert "caldav.radicale.storage.filesystem_folder"
             # as tracim global parameter
             self.check_mandatory_param(
-                'caldav.radicale.storage.filesystem_folder',
-                self.settings.get('caldav.radicale.storage.filesystem_folder'),
-                when_str='if caldav feature is enabled'
+                "caldav.radicale.storage.filesystem_folder",
+                self.settings.get("caldav.radicale.storage.filesystem_folder"),
+                when_str="if caldav feature is enabled",
             )
             self.check_directory_path_param(
-                'caldav.radicale.storage.filesystem_folder',
-                self.settings.get('caldav.radicale.storage.filesystem_folder'),
-                writable=True
+                "caldav.radicale.storage.filesystem_folder",
+                self.settings.get("caldav.radicale.storage.filesystem_folder"),
+                writable=True,
             )
-            radicale_storage_type = self.settings.get('caldav.radicale.storage.type')
-            if radicale_storage_type != 'multifilesystem':
+            radicale_storage_type = self.settings.get("caldav.radicale.storage.type")
+            if radicale_storage_type != "multifilesystem":
                 raise ConfigurationError(
                     '"{}" should be set to "{}"'
-                    ' (currently only valid value)'
+                    " (currently only valid value)"
                     ' when "{}" is true'.format(
-                        'caldav.radicale.storage.type',
-                        'multifilesystem',
-                        'caldav.enabled',
+                        "caldav.radicale.storage.type", "multifilesystem", "caldav.enabled"
                     )
                 )
 
