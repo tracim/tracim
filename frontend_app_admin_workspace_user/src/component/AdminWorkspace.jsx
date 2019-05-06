@@ -13,6 +13,7 @@ const AdminWorkspace = props =>
       parentClass={'adminWorkspace'}
       title={props.t('Shared space management')}
       icon={'bank'}
+      breadcrumbsList={props.breadcrumbsList}
     />
 
     <PageContent parentClass='adminWorkspace'>

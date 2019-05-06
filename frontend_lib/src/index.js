@@ -6,8 +6,11 @@ import {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  BREADCRUMBS_TYPE
 } from './helper.js'
+
+import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -58,6 +61,7 @@ export {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -79,5 +83,6 @@ export {
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
+  BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp
 }

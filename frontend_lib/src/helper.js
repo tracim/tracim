@@ -58,6 +58,12 @@ export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new 
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
+export const BREADCRUMBS_TYPE = {
+  CORE: 'CORE',
+  APP_FULLSCREEN: 'APP_FULLSCREEN',
+  APP_FEATURE: 'APP_FEATURE'
+}
+
 export const revisionTypeList = [{
   id: 'archiving',
   faIcon: 'archive',

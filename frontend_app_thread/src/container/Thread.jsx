@@ -15,7 +15,8 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -43,9 +44,12 @@ class Thread extends React.Component {
       listMessage: props.data ? [] : [], // debug.listMessage,
       newComment: '',
       timelineWysiwyg: false,
-      externalTradList: [
-        i18n.t('Start a topic'),
-        i18n.t('Threads')
+      externalTranslationList: [
+        props.t('Thread'),
+        props.t('Threads'),
+        props.t('thread'),
+        props.t('threads'),
+        props.t('Start a topic')
       ]
     }
 
@@ -110,7 +114,7 @@ class Thread extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
 
     const { appName, content } = this.state
@@ -119,17 +123,21 @@ class Thread extends React.Component {
     )
     if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
-    this.loadContent()
+    await this.loadContent()
+    this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Thread> did Update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<Thread> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      await this.loadContent()
+      this.buildBreadcrumbs()
+    }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
@@ -201,6 +209,22 @@ class Thread extends React.Component {
 
     await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
     GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
+  }
+
+  buildBreadcrumbs = () => {
+    const { state } = this
+
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          label: state.content.label,
+          link: null,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }]
+      }
+    })
   }
 
   handleClickBtnCloseApp = () => {

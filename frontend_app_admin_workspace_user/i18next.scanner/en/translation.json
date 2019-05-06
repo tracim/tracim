@@ -41,5 +41,9 @@
   "Full name": "Full name",
   "Full name must be at least 3 characters": "Full name must be at least 3 characters",
   "Email notification are disabled, please manually notify users of any change": "Email notification are disabled, please manually notify users of any change",
-  "Error, invalid email address": "Error, invalid email address"
+  "Error, invalid email address": "Error, invalid email address",
+  "Create a shared space": "Create a shared space",
+  "Home": "Home",
+  "Users": "Users",
+  "Manage": "Manage"
 }

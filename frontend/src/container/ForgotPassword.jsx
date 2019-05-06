@@ -8,7 +8,10 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { postForgotPassword } from '../action-creator.async.js'
-import { newFlashMessage } from '../action-creator.sync.js'
+import {
+  newFlashMessage,
+  resetBreadcrumbs
+} from '../action-creator.sync.js'
 import { PAGE } from '../helper.js'
 
 export class ForgotPassword extends React.Component {
@@ -20,6 +23,10 @@ export class ForgotPassword extends React.Component {
         isInvalid: false
       }
     }
+  }
+
+  componentDidMount () {
+    this.props.dispatch(resetBreadcrumbs())
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()

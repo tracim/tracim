@@ -42,5 +42,9 @@
   "A content with same name already exists": "A content with same name already exists",
   "Error while saving new title": "Error while saving new title",
   "This content is archived": "This content is archived",
-  "This content is deleted": "This content is deleted"
+  "This content is deleted": "This content is deleted",
+  "Error while changing status": "Error while changing status",
+  "File": "File",
+  "file": "file",
+  "files": "files"
 }
