@@ -1,5 +1,6 @@
 import datetime
 import typing
+from urllib.parse import urljoin
 
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
@@ -25,6 +26,8 @@ class SystemApi(object):
         return ConfigModel(
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,
+            webdav_enabled=self._config.WEBDAV__UI__ENABLED,
+            webdav_url=urljoin(self._config.WEBDAV__BASE_URL, self._config.WEBDAV__ROOT_PATH),
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

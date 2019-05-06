@@ -171,6 +171,8 @@ class TestConfigEndpoint(FunctionalTest):
         res = self.testapp.get("/api/v2/system/config", status=200)
         assert res.json_body["email_notification_activated"] is False
         assert res.json_body["new_user_invitation_do_notify"] is True
+        assert res.json_body["webdav_enabled"] is False
+        assert res.json_body["webdav_url"] == "https://localhost:3030/webdav"
 
     @pytest.mark.xfail(reason="[config_unauthenticated] issue #1270 ")
     def test_api__get_config__err_401__unregistered_user(self):
