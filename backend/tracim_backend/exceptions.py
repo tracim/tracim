@@ -18,6 +18,10 @@ class NotWritableDirectory(Exception):
     pass
 
 
+class NotReadableDirectory(Exception):
+    pass
+
+
 class ContentRevisionUpdateError(RuntimeError):
     pass
 

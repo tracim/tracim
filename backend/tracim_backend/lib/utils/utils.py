@@ -13,6 +13,7 @@ import pytz
 from redis import Redis
 from rq import Queue
 
+from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 
 if typing.TYPE_CHECKING:
@@ -318,16 +319,31 @@ def sliced_dict(data: typing.Dict[str, any], beginning_key_string: str) -> typin
     return sliced_dict
 
 
+def is_dir_exist(path: str) -> bool:
+    if not os.path.isdir(path):
+        raise NotADirectoryError("{} is not a directory".format(path))
+    return True
+
+
 def is_dir_writable(path: str) -> bool:
     """
     Check if path given is a writable dir for current user(the one which run
     the process)
     """
-    if not os.path.isdir(path):
-        raise NotADirectoryError("{} is not a directory".format(path))
-
     if not os.access(
         path=path, mode=os.W_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
     ):
         raise NotWritableDirectory("{} is not a writable directory".format(path))
+    return True
+
+
+def is_dir_readable(path: str) -> bool:
+    """
+    Check if path given is a writable dir for current user(the one which run
+    the process)
+    """
+    if not os.access(
+        path=path, mode=os.R_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+    ):
+        raise NotReadableDirectory("{} is not a writable directory".format(path))
     return True

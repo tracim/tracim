@@ -13,11 +13,14 @@ from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.exceptions import ConfigCodeError
 from tracim_backend.exceptions import ConfigurationError
+from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import is_dir_exist
+from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
@@ -313,7 +316,7 @@ class CFG(object):
         )
         self.EMAIL__NOTIFICATION__FROM = self.get_raw_config("email.notification.from")
         if self.get_raw_config("email.notification.from"):
-            raise Exception(
+            raise ConfigurationError(
                 "email.notification.from configuration is deprecated. "
                 "Use instead email.notification.from.email and "
                 "email.notification.from.default_label."
@@ -517,11 +520,17 @@ class CFG(object):
         """
         Check config for global stuff
         """
+        self.check_mandatory_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR)
+        self.check_directory_path_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True)
+
+        self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
+        self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
         # INFO - G.M - 2019-04-03 - check color file validity
+        self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
         if not os.path.exists(self.COLOR__CONFIG_FILE_PATH):
-            raise Exception(
+            raise ConfigurationError(
                 "ERROR: {} file does not exist. "
-                "please create it or set color.config_file_path"
+                'please create it or set "COLOR__CONFIG_FILE_PATH"'
                 "with a correct value".format(self.COLOR__CONFIG_FILE_PATH)
             )
 
@@ -529,53 +538,47 @@ class CFG(object):
             with open(self.COLOR__CONFIG_FILE_PATH) as json_file:
                 self.APPS_COLORS = json.load(json_file)
         except Exception as e:
-            raise Exception(
+            raise ConfigurationError(
                 "Error: {} file could not be load as json".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
         try:
             self.APPS_COLORS["primary"]
         except KeyError as e:
-            raise Exception(
+            raise ConfigurationError(
                 "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
             ) from e
 
-        # INFO - G.M - 2019-04-03 - depot dir validity
-        if not self.DEPOT_STORAGE_DIR:
-            self.check_mandatory_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR)
+        self.check_mandatory_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR)
+        self.check_directory_path_param("DEPOT_STORAGE_DIR", self.DEPOT_STORAGE_DIR, writable=True)
 
-        if not self.DEPOT_STORAGE_NAME:
-            self.check_mandatory_param("DEPOT_STORAGE_NAME", self.DEPOT_STORAGE_NAME)
+        self.check_mandatory_param("DEPOT_STORAGE_NAME", self.DEPOT_STORAGE_NAME)
 
-        if not self.PREVIEW_CACHE_DIR:
-            self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
+        self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
+        self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
 
         if AuthType.REMOTE is self.AUTH_TYPES:
-            raise Exception(
+            raise ConfigurationError(
                 'ERROR: "remote" auth not allowed in auth_types'
                 " list, use remote_user_header instead"
             )
 
-        if not self.WEBSITE__BASE_URL:
-            raise Exception(
-                "WEBSITE__BASE_URL is needed in order to have correct path in"
-                "few place like in email."
-                "You should set it with frontend root url."
-            )
+        self.check_mandatory_param("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
 
-        if not os.path.isdir(self.BACKEND__I18N_FOLDER_PATH):
-            raise Exception(
-                "ERROR: {} folder does not exist as folder. "
-                "please set BACKEND__I18N_FOLDER_PATH"
-                "with a correct value".format(self.BACKEND__I18N_FOLDER_PATH)
-            )
+        self.check_mandatory_param("BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH)
+        self.check_directory_path_param(
+            "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH, readable=True
+        )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
-        if self.FRONTEND__SERVE and not os.path.isdir(self.FRONTEND__DIST_FOLDER_PATH):
-            raise Exception(
-                "ERROR: {} folder does not exist as folder. "
-                "please set FRONTEND__DIST_FOLDER_PATH"
-                "with a correct value".format(self.FRONTEND__DIST_FOLDER_PATH)
+        if self.FRONTEND__SERVE:
+            self.check_mandatory_param(
+                "FRONTEND__DIST_FOLDER_PATH",
+                self.FRONTEND__DIST_FOLDER_PATH,
+                when_str="if frontend serving is activated",
+            )
+            self.check_directory_path_param(
+                "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
             )
 
     def _check_email_config_validity(self) -> None:
@@ -626,12 +629,35 @@ class CFG(object):
         """
         Check if config is correctly setted for caldav features
         """
-        if self.CALDAV__ENABLED and not self.CALDAV__RADICALE_PROXY__BASE_URL:
+        if self.CALDAV__ENABLED:
             self.check_mandatory_param(
                 "CALDAV__RADICALE_PROXY__BASE_URL",
                 self.CALDAV__RADICALE_PROXY__BASE_URL,
                 when_str="when caldav feature is enabled",
             )
+            # TODO - G.M - 2019-05-06 - convert "caldav.radicale.storage.filesystem_folder"
+            # as tracim global parameter
+            self.check_mandatory_param(
+                'caldav.radicale.storage.filesystem_folder',
+                self.settings.get('caldav.radicale.storage.filesystem_folder'),
+                when_str='if caldav feature is enabled'
+            )
+            self.check_directory_path_param(
+                'caldav.radicale.storage.filesystem_folder',
+                self.settings.get('caldav.radicale.storage.filesystem_folder'),
+                writable=True
+            )
+            radicale_storage_type = self.settings.get('caldav.radicale.storage.type')
+            if radicale_storage_type != 'multifilesystem':
+                raise ConfigurationError(
+                    '"{}" should be set to "{}"'
+                    ' (currently only valid value)'
+                    ' when "{}" is true'.format(
+                        'caldav.radicale.storage.type',
+                        'multifilesystem',
+                        'caldav.enabled',
+                    )
+                )
 
     # INFO - G.M - 2019-04-05 - Post Actions Methods
     def do_post_check_action(self) -> None:
@@ -796,6 +822,41 @@ class CFG(object):
                 'ERROR: "{}" configuration is mandatory {when_str}.'
                 "Set it before continuing.".format(param_name, when_str="")
             )
+
+    def check_directory_path_param(
+        self, param_name: str, path: str, writable: bool = False, readable: bool = True
+    ) -> None:
+        try:
+            is_dir_exist(path)
+            if writable:
+                is_dir_writable(path)
+            if readable:
+                is_dir_readable(path)
+        except NotADirectoryError as exc:
+            not_a_directory_msg = (
+                'ERROR: "{}" is not a valid directory path, '
+                'create it or change "{}" value in config '
+                "to a valid directory path."
+            )
+            raise ConfigurationError(not_a_directory_msg.format(path, param_name)) from exc
+        except NotWritableDirectory as exc:
+            directory_not_writable_msg = (
+                "ERROR: current user as not enough right to write and create file"
+                ' into "{}" directory.'
+                " Change permission of current user on this directory,"
+                " change user running this code or change"
+                ' directory path of parameter in config "{}" to solve this.'
+            )
+            raise ConfigurationError(directory_not_writable_msg.format(path, param_name)) from exc
+        except NotReadableDirectory as exc:
+            directory_not_writable_msg = (
+                "ERROR: current user as not enough right to read and/or open"
+                ' "{}" directory.'
+                " Change permission of current user on this directory,"
+                " change user running this code or change"
+                ' directory path of parameter in config "{}" to solve this.'
+            )
+            raise ConfigurationError(directory_not_writable_msg.format(path, param_name)) from exc
 
 
 class PreviewDim(object):
