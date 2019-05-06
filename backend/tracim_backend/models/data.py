@@ -1155,6 +1155,7 @@ class Content(DeclarativeBase):
             object_session(self)
             .query(ContentRevisionRO)
             .filter(ContentRevisionRO.parent_id == self.content_id)
+            .order_by(ContentRevisionRO.content_id)
             .all()
         )
         children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
