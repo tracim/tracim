@@ -464,6 +464,9 @@ class CFG(object):
         self.CALDAV__RADICALE_PROXY__BASE_URL = self.get_raw_config(
             "caldav.radicale_proxy.base_url", None
         )
+        self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = self.get_raw_config(
+            "caldav.radicale.storage.filesystem_folder"
+        )
         self.CALDAV__RADICALE__AGENDA_DIR = "agenda"
         self.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
         self.CALDAV__RADICALE__USER_SUBDIR = "user"
@@ -638,13 +641,13 @@ class CFG(object):
             # TODO - G.M - 2019-05-06 - convert "caldav.radicale.storage.filesystem_folder"
             # as tracim global parameter
             self.check_mandatory_param(
-                "caldav.radicale.storage.filesystem_folder",
-                self.settings.get("caldav.radicale.storage.filesystem_folder"),
+                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
+                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
                 when_str="if caldav feature is enabled",
             )
             self.check_directory_path_param(
-                "caldav.radicale.storage.filesystem_folder",
-                self.settings.get("caldav.radicale.storage.filesystem_folder"),
+                "CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER",
+                self.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
                 writable=True,
             )
             radicale_storage_type = self.settings.get("caldav.radicale.storage.type")

@@ -17,12 +17,19 @@ RADICALE_SUBMAIN_SECTION = "radicale"
 class CaldavAppFactory(object):
     def __init__(self, **settings):
         logger.info(self, "Add additional radicale config")
-        self.radicale_config = load_radicale_config(())
-        self.radicale_config = self._parse_additional_radicale_config(
-            self.radicale_config, settings
-        )
+        radicale_config = load_radicale_config(())
+        radicale_config = self._parse_additional_radicale_config(radicale_config, settings)
         self.app_config = CFG(settings)
+        self.radicale_config = self.override_setting_by_tracim_config(
+            radicale_config, self.app_config
+        )
         self.create_dir_tree(self.radicale_config, self.app_config)
+
+    def override_setting_by_tracim_config(self, radicale_config: ConfigParser, app_config: CFG):
+        radicale_config.set(
+            "storage", "filesystem_folder", app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
+        )
+        return radicale_config
 
     def create_dir_tree(self, radicale_config: ConfigParser, app_config: CFG):
         # FIXME - G.M - 2019-03-08 - create dir tree if not exist in order

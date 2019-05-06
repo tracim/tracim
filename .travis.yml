@@ -13,6 +13,7 @@ env:
     - TRACIM_COLOR__CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/color-test.json
     - TRACIM_SESSION__DATA_DIR=/tmp/test/sessions/data
     - TRACIM_SESSION__LOCK_DIR=/tmp/test/sessions/lock
+    - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
 sudo: false
 language: python
 dist: trusty
@@ -70,6 +71,7 @@ _install_backend: &_install_backend
     - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
     - mkdir -p $TRACIM_SESSION__DATA_DIR
     - mkdir -p $TRACIM_SESSION__LOCK_DIR
+    - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
     - tree /tmp/test
   after_success:
     - coveralls
