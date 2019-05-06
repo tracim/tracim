@@ -542,6 +542,7 @@ class CFG(object):
         # INFO - G.M - 2019-04-03 - depot dir validity
         if not self.DEPOT_STORAGE_DIR:
             raise Exception(mandatory_msg.format("depot_storage_dir"))
+
         if not self.DEPOT_STORAGE_NAME:
             raise Exception(mandatory_msg.format("depot_storage_name"))
 
