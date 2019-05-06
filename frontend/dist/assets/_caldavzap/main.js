@@ -2004,7 +2004,7 @@ function setAgendaFullscreen () {
     iframeElement.style.position = 'fixed'
     iframeElement.style.top = '0px'
     iframeElement.style.left = '0px'
-    iframeElement.style.zIndex = '20'
+    iframeElement.style.zIndex = '40'
   }
   isIframeCaldavzapInFullscreen = !isIframeCaldavzapInFullscreen
 }

@@ -23,7 +23,7 @@ defusedxml==0.5.0         # via wsgidav
 email-reply-parser==0.5.9
 filedepot==0.5.2
 filelock==3.0.10
-hapic[marshmallow]==0.73
+hapic[marshmallow]==0.75
 hupper==1.4.2             # via pyramid
 idna==2.8                 # via requests
 imapclient==2.1.0
