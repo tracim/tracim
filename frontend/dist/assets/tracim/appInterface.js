@@ -36,7 +36,7 @@
     const selectedApp = getSelectedApp(app.config.slug)
 
     if (selectedApp.isRendered) {
-      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/AdminWorkspaceUser.jsx
+      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app})
     } else {
       selectedApp.renderAppFeature(app)
       selectedApp.isRendered = true
@@ -51,7 +51,7 @@
     const selectedApp = getSelectedApp(app.config.slug)
 
     if (selectedApp.isRendered) {
-      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/AdminWorkspaceUser.jsx
+      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app})
     } else {
       selectedApp.renderAppFullscreen(app)
       selectedApp.isRendered = true

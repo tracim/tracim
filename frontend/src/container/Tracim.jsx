@@ -7,7 +7,6 @@ import i18n from '../i18n.js'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { Switch } from 'react-router'
 import Dashboard from './Dashboard.jsx'
 import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
@@ -212,26 +211,18 @@ class Tracim extends React.Component {
               <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
             } />,
 
-            <Switch key='workspace_content'>
-              <Route
-                path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')}
-                key='workspace_contentopen'
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
-              <Route
-                path={PAGE.WORKSPACE.CONTENT_LIST(':idws')}
-                key='workspace_contentlist'
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
-            </Switch>,
+            <Route
+              path={[
+                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                PAGE.WORKSPACE.CONTENT_LIST(':idws')
+              ]}
+              key='workspace_contentlist'
+              render={() =>
+                <div className='tracim__content fullWidthFullHeight'>
+                  <WorkspaceContent />
+                </div>
+              }
+            />,
 
             <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
               <div className='tracim__content fullWidthFullHeight'>

@@ -6,6 +6,7 @@ import {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE
 } from './helper.js'
 
@@ -82,5 +83,6 @@ export {
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  appFeatureCustomEventHandlerShowApp
 }

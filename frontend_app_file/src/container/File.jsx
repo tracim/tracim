@@ -17,7 +17,8 @@ import {
   convertBackslashNToBr,
   generateLocalStorageContentId,
   Badge,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -54,7 +55,7 @@ class File extends React.Component {
         props.t('Files'),
         props.t('file'),
         props.t('files'),
-        props.t('Upload a file'),
+        props.t('Upload a file')
       ],
       newComment: '',
       newFile: '',
@@ -81,8 +82,10 @@ class File extends React.Component {
     switch (type) {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
+
       case 'file_hideApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -91,6 +94,7 @@ class File extends React.Component {
           timelineWysiwyg: false
         })
         break
+
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -106,6 +110,7 @@ class File extends React.Component {
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
 

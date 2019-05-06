@@ -15,6 +15,7 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
+  appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
@@ -64,8 +65,10 @@ class Thread extends React.Component {
     switch (type) {
       case 'thread_showApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
+
       case 'thread_hideApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -74,6 +77,7 @@ class Thread extends React.Component {
           timelineWysiwyg: false
         })
         break
+
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -89,6 +93,7 @@ class Thread extends React.Component {
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
 

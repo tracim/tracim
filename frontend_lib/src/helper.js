@@ -111,3 +111,12 @@ export const revisionTypeList = [{
 }]
 
 export const generateLocalStorageContentId = (idWorkspace, idContent, typeContent, dataType) => `${idWorkspace}/${idContent}/${typeContent}_${dataType}`
+
+export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
+  if (newContent.content_id !== currentContentId) {
+    const event = new CustomEvent('appCustomEvent', {detail: {type: `${appName}_reloadContent`, data: newContent}})
+    document.dispatchEvent(event)
+    return false
+  }
+  return true
+}
