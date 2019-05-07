@@ -49,6 +49,7 @@ class FrontendController(Controller):
             {
                 "colors": {"primary": ExtendedColor(app_config.APPS_COLORS["primary"])},
                 "applications": frontend_apps,
+                "website_title": app_config.WEBSITE__TITLE
             },
         )
 
