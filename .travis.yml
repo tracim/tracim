@@ -6,6 +6,7 @@ env:
     - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracim_test
     - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
     - DB=sqlite
+    - PSERVE_LOG=/tmp/pserve_log.log
     - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
     - TRACIM_DEPOT_STORAGE_NAME=test
     - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
@@ -97,7 +98,7 @@ _install_full_tracim: &_install_full_tracim
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
     # setup backend for running
     - cp ../color.json.sample ../color.json
-    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE
+    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE -d
     - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
@@ -211,10 +212,13 @@ jobs:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
-        - nohup pserve $BACKEND_TEST_CONFIG_FILE&
+        - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR
+      after_failure:
+        - touch $PSERVE_LOG
+        - cat $PSERVE_LOG
 
 stages:
   - static-tests
