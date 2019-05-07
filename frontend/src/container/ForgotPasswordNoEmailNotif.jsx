@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -58,4 +59,5 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
   }
 }
 
-export default translate()(ForgotPasswordNoEmailNotif)
+const mapStateToProps = () => ({})
+export default connect(mapStateToProps)(translate()(ForgotPasswordNoEmailNotif))
