@@ -6,6 +6,8 @@
                     call_to_action_url=html_escape(call_to_action_url),
                     content=html_escape(content_in_context.label)
          )
+        if action == ActionDescription.COMMENT:
+          call_to_action_url = parent_in_context.frontend_url
     %>
 <style>
   ins { background-color: #c0ffc0; }
