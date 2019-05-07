@@ -41,10 +41,16 @@ _install_backend: &_install_backend
     - redis-server
     - mysql
   before_install:
-    - docker pull mailhog/mailhog
-    - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-    - docker pull rroemhild/test-openldap
-    - docker run -d -p 3890:389 rroemhild/test-openldap
+    # INFO - G.M - 2019-05-02 - some useful debug information
+    - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
+    - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
+    - echo "$TRACIM_SQLALCHEMY__URL"
+    - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
+    - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
+    - mkdir -p $TRACIM_SESSION__DATA_DIR
+    - mkdir -p $TRACIM_SESSION__LOCK_DIR
+    - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
+    - ls -R /tmp/test
   install:
     - cd $TRAVIS_BUILD_DIR/backend
     - pip install --upgrade pip setuptools
@@ -64,39 +70,17 @@ _install_backend: &_install_backend
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
     - cd $TRAVIS_BUILD_DIR
   before_script:
-    # INFO - G.M - 2019-05-02 - some useful debug information
-    - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
-    - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
-    - echo "$TRACIM_SQLALCHEMY__URL"
-    - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
-    - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
-    - mkdir -p $TRACIM_SESSION__DATA_DIR
-    - mkdir -p $TRACIM_SESSION__LOCK_DIR
-    - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
-    - tree /tmp/test
-  after_success:
-    - coveralls
+    - docker pull mailhog/mailhog
+    - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+    - docker pull rroemhild/test-openldap
+    - docker run -d -p 3890:389 rroemhild/test-openldap
+
 
 _install_full_tracim: &_install_full_tracim
   <<: *_install_backend
-  install:
-    - cd $TRAVIS_BUILD_DIR/backend
-    - pip install --upgrade pip setuptools
-    # using old version of pytest-cov to avoid
-    # version conflict with python-coveralls
-    # see https://github.com/z4r/python-coveralls/issues/66
-    - pip install 'pytest-cov<2.6'
-    - pip install python-coveralls
-    - pip install -r "requirements.txt"
-    # postgresql
-    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-    - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
-    # mysql
-    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-    - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
-    # sqlite
-    - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+  before_script:
     # setup backend for running
+    - cd $TRAVIS_BUILD_DIR/backend
     - cp ../color.json.sample ../color.json
     - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE -d
     - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
@@ -114,7 +98,7 @@ _backend_quick_test: &_backend_quick_test
       packages:
         - libimage-exiftool-perl
   services:
-  before_install:
+  before_script:
   script:
     - cd $TRAVIS_BUILD_DIR/backend/
     - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
@@ -189,8 +173,10 @@ jobs:
     - stage: backend
       <<: *_backend_test
       env:
-        - DB=postgres
+        - DB=sqlite
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
+      after_success:
+        - coveralls --base_dir backend
     - stage: backend
       <<: *_backend_test
       env:
