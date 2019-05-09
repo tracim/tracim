@@ -1,4 +1,5 @@
 ## -*- coding: utf-8 -*-
+	<!--FIXME After discuss with Damien: dont add intelligent code in template -->
     <%
         call_to_action_url = content_in_context.frontend_url
         content_name_pattern = "<i><a href={call_to_action_url}>{content}</a></i>"
