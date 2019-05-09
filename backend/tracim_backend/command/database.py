@@ -119,7 +119,10 @@ class DeleteDBCommand(AppContextCommand):
                 depot = DepotManager.get()
                 depot_files = depot.list()
                 for file_ in depot_files:
-                    depot.delete(file_)
+                    try:
+                        depot.delete(file_)
+                    except Exception as exc:
+                        print('Something goes wrong during deletion of {}'.format(file_))
                 print("Cleaning depot done.")
             except FileNotFoundError:
                 print("Warning! Can delete depots file, is depot path correctly" " configured?")
