@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
@@ -10,12 +11,12 @@ const ContentItem = props => {
 
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
   return (
-    <div
+    <Link
       className={
         classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
       }
-      onClick={props.onClickItem}
       title={props.label}
+      to={props.urlContent}
     >
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
@@ -48,7 +49,7 @@ const ContentItem = props => {
           <i className={`fa fa-fw fa-${status.faIcon}`} />
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
@@ -63,12 +64,14 @@ ContentItem.propTypes = {
   contentType: PropTypes.object,
   onClickItem: PropTypes.func,
   faIcon: PropTypes.string,
-  read: PropTypes.bool
+  read: PropTypes.bool,
+  urlContent: PropTypes.string
 }
 
 ContentItem.defaultProps = {
   label: '',
   customClass: '',
   onClickItem: () => {},
-  read: false
+  read: false,
+  urlContent: ''
 }

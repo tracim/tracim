@@ -1,8 +1,6 @@
 tracim_backend
 ==============
 
-This code is "work in progress". Not usable at all for production.
-
 Backend source code of tracim v2, using Pyramid Framework.
 
 Installation
@@ -12,13 +10,24 @@ Installation
 
 on Debian Stretch (9) with sudo:
 
-    sudo apt update
-    sudo apt install git
-    sudo apt install python3 python3-venv python3-dev python3-pip
-    sudo apt install redis-server
-    sudo apt install zlib1g-dev libjpeg-dev
-    sudo apt install imagemagick libmagickwand-dev ghostscript poppler-utils libfile-mimeinfo-perl
-    sudo apt install libldap2-dev libsasl2-dev
+    sudo apt update && apt install \
+    ghostscript \
+    git \
+    imagemagick \
+    libfile-mimeinfo-perl \
+    libjpeg-dev \
+    libldap2-dev \
+    libmagickwand-dev \
+    libpq-dev \
+    libsasl2-dev
+    poppler-utils \
+    python3 \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    qpdf \
+    redis-server \
+    zlib1g-dev
 
 for better preview support:
 
@@ -119,14 +128,17 @@ Run all web services with uwsgi
     uwsgi -d /tmp/tracim_web.log --http-socket :6543 --plugin python3 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
     uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --plugin python3 --wsgi-file wsgi/webdav.py -H env --pidfile /tmp/tracim_webdav.pid
+    # caldav radicale server (used behind pyramid webserver for auth)
+    uwsgi -d /tmp/tracim_caldav.log --http-socket localhost:5232 --plugin python3 --wsgi-file wsgi/caldav.py -H env --pidfile /tmp/tracim_caldav.pid
     
-
 to stop them:
 
     # pyramid webserver
     uwsgi --stop /tmp/tracim_web.pid
     # webdav wsgidav server
     uwsgi --stop /tmp/tracim_webdav.pid
+    # caldav radicale server
+    uwsgi --stop /tmp/tracim_caldav.pid
 
 ## With Uwsgi ini script file ##
 
@@ -140,7 +152,7 @@ You can also preset uwsgi config for tracim, this way, creating this kind of .in
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-and :
+and for webdav :
 
     # You need to replace <PATH> with correct absolute path
     [uwsgi]
@@ -150,12 +162,24 @@ and :
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
+and for caldav :
+
+    # You need to replace <PATH> with correct absolute path
+    [uwsgi]
+    plugins = python3
+    chdir = <PATH>/tracim/backend/
+    module = wsgi.caldav:application
+    home = <PATH>/tracim/backend/env/
+    env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+
 You can then run the process this way :
 
     # You need to replace <WSGI_CONF_WEB> with correct path
     uwsgi --ini <WSGI_CONF_WEB>.ini --http-socket :6543
     # You need to replace <WSGI_CONF_WEBDAV> with correct path
     uwsgi --ini <WSGI_CONF_WEBDAV>.ini --http-socket :3030
+    # You need to replace <WSGI_CONF_CALDAV> with correct path
+    uwsgi --ini <WSGI_CONF_CALDAV>.ini --http-socket localhost:5232
 
 ### Run Tracim_Backend with Waitress : legacy way, usefull for debug and dev ###
 
@@ -166,6 +190,10 @@ run tracim_backend web api:
 run wsgidav server:
 
     tracimcli webdav start
+
+run caldav server
+
+    tracimcli caldav start
 
 ## Run daemons according to your config
 

@@ -1,3 +1,5 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
@@ -14,20 +16,22 @@ sidebarColorDarken = darken(sidebarColor, 15%)
   height 100%
 
 .sidebar
-  display flex
-  flex-direction column
-  justify-content space-between
   position relative
   transition all sidebar-animate-speed
   width sidebar-width
-  min-height 100%
+  height "calc(100vh - %s)" % headerHeight
+  overflow hidden
   background-image url('../img/applat.png')
   background-repeat repeat
   z-index 10
-  box-shadow 0 0 2px 1px #333
+  box-shadow -1px 2px 2px 1px #333
   background-color sidebarColor // #1168
   &.sidebarclose
     width 0
+  &__scrollview
+    width "calc(%s + 20px)" % sidebar-width
+    height 100%
+    overflow-y scroll
   &__expand
     position fixed
     left sidebar-width
@@ -41,7 +45,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     color white
     transition all sidebar-animate-speed
     background-color sidebarColor // #1168
-    ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__expand
+    ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__expand
       left 0
   &__scrollup
     position fixed
@@ -57,12 +61,11 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     color white
     transition all sidebar-animate-speed
     background-color sidebarColor // #1168
-    ^[0].sidebarclose > ^[1] // renders .sidebar.sidebarclose > .sidebar__scrollup
+    ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
       left 0
   &__content
-    height 100%
     &__btnnewworkspace
-      margin 50px 0
+      padding 50px 0
       overflow hidden
       color fontColor
       &__btn
@@ -143,6 +146,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
                 height 100%
                 font-size 18px
                 opacity 0.95
+                color fontColor
               .dropdown__title
                 white-space nowrap
                 overflow hidden
@@ -160,42 +164,34 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             text-decoration underline
             color fourthColor
 
-// MEDIAQUERIES
-
 @media (min-width: min-lg) and (max-width: max-lg)
-
   .sidebarpagecontainer
     position relative
 
   .sidebar
     position absolute
-    min-height calc(100% - 88px)
+    min-height "calc(100% - %s)" % headerHeight
 
 @media (min-width: min-md) and (max-width: max-md)
-
   .sidebarpagecontainer
     position relative
 
   .sidebar
     position absolute
-    min-height calc(100% - 88px)
+    min-height "calc(100% - %s)" % headerHeight
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
   .sidebarpagecontainer
     position relative
-    padding-top 69px
 
   .sidebar
     position absolute
-    min-height calc(100% - 69px)
+    min-height "calc(100% - %s)" % headerHeight
 
 @media (max-width: 575px)
-
   .sidebarpagecontainer
     position relative
-    padding-top 69px
 
   .sidebar
     position absolute
-    min-height calc(100% - 69px)
+    min-height "calc(100% - %s)" % headerHeight

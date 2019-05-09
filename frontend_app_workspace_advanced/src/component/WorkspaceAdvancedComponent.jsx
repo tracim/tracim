@@ -40,7 +40,7 @@ const WorkspaceAdvancedComponent = props => {
       </div>
 
       <div className='formBlock workspace_advanced__userlist'>
-        {props.displayFormNewMember === false &&
+        {props.displayFormNewMember === false && (
           <div>
             <div className='formBlock__title workspace_advanced__userlist__title'>
               {props.t('Members list')}
@@ -133,7 +133,7 @@ const WorkspaceAdvancedComponent = props => {
               </div>
             </div>
           </div>
-        }
+        )}
 
         {props.displayFormNewMember === true && (
           <NewMemberForm
@@ -157,6 +157,23 @@ const WorkspaceAdvancedComponent = props => {
         )}
       </div>
 
+      {props.appAgendaAvailable && (
+        <div className='formBlock workspace_advanced__agendaconfig'>
+          <div className='formBlock__title workspace_advanced__agendaconfig__title'>
+            {props.t('Agenda')}
+          </div>
+
+          <div className='formBlock__field workspace_advanced__agendaconfig__content'>
+            <BtnSwitch
+              checked={props.agendaEnabled}
+              onChange={props.onToggleAgendaEnabled}
+              activeLabel={props.t('Agenda activated')}
+              inactiveLabel={props.t('Agenda deactivated')}
+            />
+          </div>
+        </div>
+      )}
+
       <div className='formBlock workspace_advanced__delete'>
         <div className='formBlock__title workspace_advanced__delete__title'>
           {props.t('Delete shared space')}
@@ -165,7 +182,7 @@ const WorkspaceAdvancedComponent = props => {
         <div className='formBlock__field workspace_advanced__delete__content'>
           <button
             className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
-            onClick={props.onClickDelteWorkspaceBtn}
+            onClick={props.onClickDeleteWorkspaceBtn}
           >
             {props.t('Delete')}
           </button>

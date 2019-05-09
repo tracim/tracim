@@ -7,7 +7,9 @@ import {
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
   WORKSPACE_MEMBER, UPDATE,
-  USER_WORKSPACE_DO_NOTIFY, FOLDER_READ
+  USER_WORKSPACE_DO_NOTIFY,
+  FOLDER_READ,
+  WORKSPACE_AGENDA_URL
 } from '../action-creator.sync.js'
 
 const defaultWorkspace = {
@@ -15,11 +17,13 @@ const defaultWorkspace = {
   slug: '',
   label: '',
   description: '',
+  agendaEnabled: false,
   sidebarEntryList: [],
   memberList: [],
   recentActivityList: [],
   recentActivityForUserList: [],
-  contentReadStatusList: []
+  contentReadStatusList: [],
+  agendaUrl: ''
 }
 
 export default function currentWorkspace (state = defaultWorkspace, action) {
@@ -31,6 +35,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         slug: action.workspaceDetail.slug,
         label: action.workspaceDetail.label,
         description: action.workspaceDetail.description,
+        agendaEnabled: action.workspaceDetail.agenda_enabled,
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
           route: sbe.route,
@@ -122,6 +127,9 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           ...state,
           contentReadStatusList: [...state.contentReadStatusList, action.idFolder]
         }
+
+    case `${SET}/${WORKSPACE_AGENDA_URL}`:
+      return {...state, agendaUrl: action.agendaUrl}
 
     default:
       return state

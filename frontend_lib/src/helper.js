@@ -58,6 +58,12 @@ export const displayDistanceDate = (dateToDisplay, lang) => distanceInWords(new 
 
 export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
+export const BREADCRUMBS_TYPE = {
+  CORE: 'CORE',
+  APP_FULLSCREEN: 'APP_FULLSCREEN',
+  APP_FEATURE: 'APP_FEATURE'
+}
+
 export const revisionTypeList = [{
   id: 'archiving',
   faIcon: 'archive',
@@ -85,7 +91,7 @@ export const revisionTypeList = [{
 }, {
   id: 'status-update',
   faIcon: 'random',
-  label: i18n.t('New status')
+  label: statusLabel => i18n.t('Status changed to {{status}}', {status: statusLabel})
 }, {
   id: 'unarchiving',
   faIcon: 'file-archive-o',
@@ -105,3 +111,12 @@ export const revisionTypeList = [{
 }]
 
 export const generateLocalStorageContentId = (idWorkspace, idContent, typeContent, dataType) => `${idWorkspace}/${idContent}/${typeContent}_${dataType}`
+
+export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
+  if (newContent.content_id !== currentContentId) {
+    const event = new CustomEvent('appCustomEvent', {detail: {type: `${appName}_reloadContent`, data: newContent}})
+    document.dispatchEvent(event)
+    return false
+  }
+  return true
+}

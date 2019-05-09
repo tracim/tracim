@@ -1,3 +1,20 @@
+## Next version x.x.x /xxxx-xx-xx
+
+### Known issues
+- Changing parameter caldav.radicale.server.host in development.ini with specific IP address show wrong url after starting caldav (issue #1535)
+- If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
+- if you create shared spaces while radicale server is not running (tracimcli caldav start), the agendas are not available (issue #1537)
+
+### REST API Changes
+
+- Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
+
+### Others Changes
+
+- rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config,
+old parameter is now deprecated. (issue #970)
+
+
 ## 2.1.0 / 2019-02-15
 
 ### New Features

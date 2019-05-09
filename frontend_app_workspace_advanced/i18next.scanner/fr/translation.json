@@ -3,8 +3,8 @@
   "Validate": "Valider",
   "Members list": "Liste des membres",
   "Add a member": "Ajouter un membre",
-  "Error while loading members list": "Erreur lors de chargement de la liste des membres",
-  "Save successful": "Sauvegarde réussi",
+  "Error while loading members list": "Erreur lors du chargement de la liste des membres",
+  "Save successful": "Sauvegarde réussie",
   "Error while saving new description": "Erreur lors de la sauvegarde de la description",
   "Error while saving new role for member": "Erreur lors de la sauvegarde du rôle",
   "Error while fetching known members list": "Erreur lors du chargement de la liste des membres connus",
@@ -25,5 +25,11 @@
   "This account is deactivated": "Ce compte est désactivé",
   "Error while removing member": "Erreur lors de la suppression du membre",
   "Note, only administrators can send invitational email": "Rappel, seul les administrateurs peuvent envoyer des invitations par email",
-  "This user already is in the shared space": "Cet utilisateur est déjà dans cet espace partagé"
+  "This user already is in the shared space": "Cet utilisateur est déjà dans cet espace partagé",
+  "Error while loading app list": "warning",
+  "Agenda activated": "Agenda activé",
+  "Agenda deactivated": "Agenda désactivé",
+  "Error while activating agenda": "Erreur lors de l'activation de l'agenda",
+  "Error while deactivating agenda": "Erreur lors de la désactivation de l'agenda",
+  "Agenda": "Agenda"
 }

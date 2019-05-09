@@ -3,7 +3,9 @@ export const UPDATE = 'Update' // edit data from api
 export const TOGGLE = 'Toggle'
 export const ADD = 'Add'
 export const REMOVE = 'Remove'
+export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
+export const RESET = 'Reset'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -37,6 +39,8 @@ export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newN
 export const USER_EMAIL = `${USER}/Email`
 export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
+export const updateUserAgendaUrl = newAgendaUrl => ({ type: `${SET}/${USER_AGENDA_URL}`, newAgendaUrl })
+export const USER_AGENDA_URL = `${USER}/Agenda`
 
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
@@ -85,6 +89,9 @@ export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
 export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
 
+export const WORKSPACE_AGENDA_URL = `${WORKSPACE}/AgendaUrl`
+export const setWorkspaceAgendaUrl = agendaUrl => ({ type: `${SET}/${WORKSPACE_AGENDA_URL}`, agendaUrl })
+
 export const FOLDER = 'Folder'
 export const READ = 'Read'
 export const toggleFolderOpen = idFolder => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, idFolder })
@@ -104,3 +111,9 @@ export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
+
+export const BREADCRUMBS = 'Breadcrumbs'
+export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
+export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
+export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${BREADCRUMBS}`, prependBreadcrumbs })
+export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })

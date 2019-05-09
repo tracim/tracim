@@ -101,13 +101,14 @@ Cypress.Commands.add('loginAs', (role = 'administrators') => {
     }))
     .then(response => cy.request({
       method: 'PUT',
-      url: '/api/v2/users/'+response.body.user_id,
+      url: '/api/v2/users/' + response.body.user_id,
       body: {
-        "lang": "en",
-        "public_name": response.body.public_name,
-        "timezone": "Europe/Paris"
-        }
-    })).then(response => response.body)
+        lang: 'en',
+        public_name: response.body.public_name,
+        timezone: 'Europe/Paris'
+      }
+    }))
+    .then(response => response.body)
 })
 
 Cypress.Commands.add('logout', () => {
@@ -124,7 +125,7 @@ Cypress.Commands.add('typeInTinyMCE', (content) => {
     })
 })
 
-Cypress.Commands.add('assertTinyMCEContent', (content) => {
+Cypress.Commands.add('assertTinyMCEContent', () => {
   cy.window({ timeout: 5000 })
     .its('tinyMCE')
     .its('activeEditor')
@@ -134,9 +135,11 @@ Cypress.Commands.add('assertTinyMCEContent', (content) => {
 })
 
 Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
-  const assertion = (isActive ? assert.isNotNull : assert.isNull)
   const message = (isActive ? 'tinyMCE is active' : 'tinyMCE is not active')
-  cy.window().then(window => assertion(window.tinyMCE.activeEditor, message))
+  cy.window().then(win => isActive
+    ? assert.isNotNull(win.tinyMCE.activeEditor, message)
+    : assert.isNull(win.tinyMCE.activeEditor, message)
+  )
 })
 
 Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector) => {
@@ -148,4 +151,16 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
   })
 
   cy.get(dropZoneSelector).trigger('drop', dropEvent)
+})
+
+Cypress.Commands.add('waitForTinyMCELoaded', () => {
+  cy.document().then($doc => {
+    return new Cypress.Promise(resolve => { // Cypress will wait for this Promise to resolve
+      const onTinyMceLoaded = () => {
+        $doc.removeEventListener('tinymceLoaded', onTinyMceLoaded) // cleanup
+        resolve() // resolve and allow Cypress to continue
+      }
+      $doc.addEventListener('tinymceLoaded', onTinyMceLoaded)
+    })
+  })
 })

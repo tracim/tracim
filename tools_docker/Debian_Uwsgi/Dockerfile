@@ -28,9 +28,9 @@ RUN \
     apache2 \
     build-essential \
     curl \
+    ghostscript \
     git \
     gnupg \
-    ghostscript \
     imagemagick \
     inkscape \
     libapache2-mod-wsgi-py3 \
@@ -38,6 +38,7 @@ RUN \
     libimage-exiftool-perl \
     libjpeg-dev \
     libmagickwand-dev \
+    libpq-dev \
     libreoffice \
     locales \
     mysql-client \
@@ -47,12 +48,13 @@ RUN \
     python3-dev \
     python3-pip \
     python3-venv \
+    qpdf \
+    redis-server \
+    supervisor \
     uwsgi \
     uwsgi-plugin-python3 \
-    redis-server \
-    zlib1g-dev \
-    supervisor \
     vim \
+    zlib1g-dev \
 # Install nodejs
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt update \
@@ -78,6 +80,7 @@ RUN \
 # Clean frontend installation
     && rm -rf /tracim/frontend/node_modules \
     && rm -rf /tracim/frontend_app_admin_workspace_user/node_modules \
+    && rm -rf /tracim/frontend_app_calendar/node_modules \
     && rm -rf /tracim/frontend_app_file/node_modules \
     && rm -rf /tracim/frontend_app_folder_advanced/node_modules \
     && rm -rf /tracim/frontend_app_html-document/node_modules \

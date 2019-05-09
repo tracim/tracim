@@ -21,6 +21,7 @@ basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
 basic_setup.depot_storage_dir = %(here)s/depot/
+basic_setup.caldav_storage_dir = %(here)s/radicale_storage/
 basic_setup.preview_cache_dir = /tmp/tracim/preview/
 basic_setup.sessions_data_root_dir = %(here)s
 ## secret
@@ -35,6 +36,11 @@ basic_setup.session_secret = change_this_value_please!
 ####
 # CORE
 ####
+
+### Lang ###
+## default lang used in backend if user doesn't provided any lang.
+# Available parameter: en, fr
+; default_lang = en
 
 ### Apps ###
 ## app enabled explicit list:
@@ -82,6 +88,15 @@ depot_storage_dir = %(basic_setup.depot_storage_dir)s
 ### Preview ###
 ## preview cache directory
 preview_cache_dir = %(basic_setup.preview_cache_dir)s
+
+## You can parametrized allowed jpg preview dimension list, if not set, default
+## is 256x256. First {width}x{length} items is default preview dimensions.
+## All items should be separated by a coma. Example below:
+; preview.jpg.allowed_dims = 256x256,512x512,1024x1024
+## Preview dimensions can be set as restricted. If set as restricted, access
+## endpoint to get any other preview dimensions than allowed_dims will
+## return error
+; preview.jpg.restricted_dims = True
 
 ### Session ###
 # shortcut for pyramid_beaker specific config
@@ -147,8 +162,8 @@ auth_types = internal
 
 ## User auth token validity in seconds (used to interfaces like web calendars)
 user.auth_token.validity = 604800
-## user reset_password token validity (default to 900s -> 15 minutes)
-user.reset_password.validity = 900
+## user reset_password token lifetime (default to 900s -> 15 minutes)
+user.reset_password.token_lifetime = 900
 
 ####
 # IHM
@@ -179,10 +194,11 @@ frontend.serve = True
 
 ### Webdav ###
 # webdav url for client
-# url can be extended like localhost/webdav
+# url can be extended like localhost/webdav by setting webdav.root_path
 # in this case, you have to create your own proxy behind this url.
 # Do not set http:// prefix.
-; wsgidav.client.base_url = localhost:<WSGIDAV_PORT>
+webdav.base_url = http://localhost:3030
+webdav.ui.enabled = True
 
 ####
 # EMAIL-COMMON
@@ -220,12 +236,6 @@ email.notification.smtp.port = 25
 email.notification.smtp.user = your_smtp_user
 email.notification.smtp.password = your_smtp_password
 
-### Processing ###
-# processing_mode may be sync or async
-# if async is choosen, you need also to run mail_notifier daemon.
-# more info in README (Run daemons according to your config)
-email.notification.processing_mode = sync
-
 ### Headers ###
 email.notification.from.default_label = Tracim Notifications
 
@@ -260,7 +270,7 @@ email.notification.reply_to.email = reply+{content_id}@trac.im
 ## valid variable is 'content_id' for 'references' header
 email.notification.references.email = thread+{content_id}@trac.im
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
-email.notification.created_account.subject = [{website_title}] Created account
+email.notification.created_account.subject = [{website_title}] Someone created an account for you
 
 ### Templates ###
 email.notification.content_update.template.html = %(email.template_dir)s/content_update_body_html.mak
@@ -340,6 +350,40 @@ webdav.listen = localhost:3030
 ## footer.
 ; webdav.dir_browser.footer = Just another footer
 
+####
+# CALDAV (Radicale)
+####
+
+### Main Config for Caldav ##
+caldav.enabled = True
+
+### Radicale Proxy config ##
+## path to tracim radicale server, usually at localhost:port
+caldav.radicale_proxy.base_url = http://localhost:5232
+
+### Radicale config ###
+# those params are same as in config file of radicale but syntax
+# is different.
+# use syntax:
+; caldav.radicale.section.param_name = value
+# instead of radicale.ini syntax:
+; [section]
+; param_name = value
+caldav.radicale.server.host = localhost:5232
+## To make tracim work, we need to disable auth and rights.
+caldav.radicale.auth.type = None
+caldav.radicale.rights.type = None
+## We do not need radicale web ui
+caldav.radicale.web.type = None
+## for tracim we do use file storage.
+caldav.radicale.storage.type = multifilesystem
+caldav.radicale.storage.filesystem_folder = %(basic_setup.caldav_storage_dir)s
+# CORS config for radicale
+caldav.radicale.headers.Access-Control-Allow-Origin = *
+caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROPFIND, PROPPATCH, REPORT, PUT, MOVE, DELETE, LOCK, UNLOCK
+caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With, Prefer
+caldav.radicale.headers.Access-Control-Expose-Headers = Etag
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################
@@ -387,6 +431,10 @@ pipeline = tracim_webdav
 [app:tracim_webdav]
 use = egg:tracim_backend#webdav
 
+[pipeline:caldav]
+pipeline = tracim_caldav
+[app:tracim_caldav]
+use = egg:tracim_backend#caldav
 
 [server:main]
 use = egg:waitress#main
@@ -396,6 +444,9 @@ listen = %(basic_setup.listen)s
 use = egg:waitress#main
 listen = %(webdav.listen)s
 
+[server:caldav]
+use = egg:waitress#main
+listen = %(caldav.radicale.server.host)s
 ######################
 # DATABASE MIGRATION #
 ######################

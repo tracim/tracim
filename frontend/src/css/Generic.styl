@@ -1,21 +1,11 @@
-html
-  height 100%
-
-body
-  min-height 100%
-
-#content
-  height 100%
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 a
-  color fontColor
   &:hover, &:link, &:visited
-    color fontColor
     text-decoration none
 
 .fullWidthFullHeight
-  width 100%
-  min-height 100%
+  flex 1
 
 .table td
   vertical-align middle
@@ -51,73 +41,14 @@ a
 div.mce-fullscreen
   z-index 1050
   &.mce-container
-    top 88px
-
-.unLoggedPage
-  padding-top 85px // 85 = header height
-  min-height 100%
-  background-image url('../img/tracimLogoAsBg.png')
-  background-repeat no-repeat
-  background-size contain
-  background-position center
-  width 100%
+    top 61px
 
 .sidebarpagecontainer
   display flex
-  padding-top 88px
-  min-height 100vh
 
-.pageWrapperGeneric
-  width 100%
-  &__header
-    display flex
-  &__content
-    margin 10px 10px 120px 10px
-@media (min-width: min-md) and (max-width: max-md)
-  .pageWrapperGeneric
-    display block
-    &__header
-      margin 95px 0 5px 30px
-    &__content
-      margin 0
-@media (min-width: min-sm) and (max-width: max-sm)
-  .pageWrapperGeneric
-    display block
-    &__header
-      margin 95px 0 35px 0
-      &__title
-        display inline-block
-        margin-left 0
-    &__content
-      margin 0
-@media (max-width: max-xs)
-  .pageWrapperGeneric
-    display block
-    &__header
-      display block
-      margin-top 60px
-    &__content
-      margin 0
 
 .nopadding
   padding 0
-
-.pageTitleGeneric
-  margin 45px 0
-  width 100%
-  &__title
-    margin-left 10px
-    font-size 30px
-    color darkGrey
-@media (max-width: max-xs)
-  .pageTitleGeneric
-    display block
-
-
-.pageContentGeneric
-  margin 10px 30px 0 30px
-  width 100%
-  height 100%
 
 .dropdownCreateBtn
   margin-left 10px
@@ -188,3 +119,15 @@ div.mce-fullscreen
     left 0
     border-width 0 0 6px 6px
     border-color inherit
+
+#appFullscreenContainer
+  height "calc(100vh - %s)" % headerHeight
+  overflow hidden
+  & > div[data-radium="true"]
+    width calc(100% + 20px)
+    height 100%
+    overflow-y scroll
+    & > .pageWrapperGeneric
+      width auto
+      height auto
+      overflow-y auto

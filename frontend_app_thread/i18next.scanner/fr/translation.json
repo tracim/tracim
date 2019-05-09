@@ -4,12 +4,16 @@
   "New Thread": "Nouvelle discussion",
   "Error while archiving thread": "Erreur lors de l'archivage du fil de discussion",
   "Error while deleting thread": "Erreur lors de la suppression du fil de discussion",
-  "Error while restoring thread": "Erreur lors de la restoration du fil de discussion",
+  "Error while restoring thread": "Erreur lors de la restauration du fil de discussion",
   "Threads": "Discussions",
   "Start a topic": "Lancer une discussion",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while creating thread": "Erreur lors de la création de la discussion",
   "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire",
   "A content with same name already exists": "Un contenu avec le même nom existe déjà",
-  "Error while saving new title": "Erreur lors de la sauvegarde du nouveau titre"
+  "Error while saving new title": "Erreur lors de la sauvegarde du nouveau titre",
+  "Error while changing status": "Erreur lors de la sauvegarde du statut",
+  "Thread": "Discussion",
+  "thread": "discussion",
+  "threads": "discussions"
 }

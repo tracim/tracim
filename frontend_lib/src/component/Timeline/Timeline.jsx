@@ -119,9 +119,11 @@ class Timeline extends React.Component {
                     createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
                     createdDistance={content.created}
                     number={content.number}
-                    key={`revision_${content.revision_id}`}
+                    status={props.availableStatusList.find(status => status.slug === content.status)}
+                    authorPublicName={content.author.public_name}
                     allowClickOnRevision={props.allowClickOnRevision}
                     onClickRevision={() => props.onClickRevisionBtn(content)}
+                    key={`revision_${content.revision_id}`}
                   />
               }
             })}

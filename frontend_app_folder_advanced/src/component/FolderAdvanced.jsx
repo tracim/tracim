@@ -39,7 +39,7 @@ const FolderAdvanced = props => {
         </div>
 
         <form className='formBlock__field folder_advanced__content__form'>
-          {props.tracimAppList.map(app =>
+          {props.tracimContentTypeList.map(app =>
             <div
               className='folder_advanced__content__form__type'
               onClick={() => !props.isArchived && !props.isDeleted && props.onClickApp(app.slug)}

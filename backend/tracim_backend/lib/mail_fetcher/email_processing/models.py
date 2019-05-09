@@ -4,17 +4,13 @@ from bs4 import BeautifulSoup
 
 
 class BodyMailPartType(object):
-    Signature = 'sign'
-    Main = 'main'
-    Quote = 'quote'
+    Signature = "sign"
+    Main = "main"
+    Quote = "quote"
 
 
 class BodyMailPart(object):
-    def __init__(
-            self,
-            text: str,
-            part_type: str
-    )-> None:
+    def __init__(self, text: str, part_type: str) -> None:
         self.text = text
         self.part_type = part_type
 
@@ -29,6 +25,7 @@ class BodyMailParts(object):
     This object doesn't provide other set method than append() in order to
     preserve object coherence.
     """
+
     def __init__(self) -> None:
         self._list = []  # type; List[BodyMailPart]
         # INFO - G.M -
@@ -95,21 +92,20 @@ class BodyMailParts(object):
         return count
 
     def __str__(self) -> str:
-        s_mail = ''
+        s_mail = ""
         for elem in self._list:
             s_mail += elem.text
         return str(s_mail)
 
 
 class HtmlBodyMailParts(BodyMailParts):
-
     def append(self, value):
         # INFO - G.M - 2017-12-01 - Override part_type is elem has no content.
         # Choose last elem part_type instead of the proposed one.
         if len(self._list) > 0:
-            txt = BeautifulSoup(value.text, 'html.parser').get_text()
-            txt = txt.replace('\n', '').strip()
-            img = BeautifulSoup(value.text, 'html.parser').find('img')
+            txt = BeautifulSoup(value.text, "html.parser").get_text()
+            txt = txt.replace("\n", "").strip()
+            img = BeautifulSoup(value.text, "html.parser").find("img")
             if not txt and not img:
                 value.part_type = self._list[-1].part_type
         BodyMailParts._check_value(value)

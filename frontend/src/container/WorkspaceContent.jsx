@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route } from 'react-router-dom'
+import { Link, withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
 import {
@@ -17,7 +17,8 @@ import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.js
 import {
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -37,7 +38,8 @@ import {
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
-  setWorkspaceContentRead
+  setWorkspaceContentRead,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -83,6 +85,8 @@ class WorkspaceContent extends React.Component {
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
         this.setState({appOpenedType: false})
         break
+
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
@@ -99,30 +103,74 @@ class WorkspaceContent extends React.Component {
     } else wsToLoad = match.params.idws
 
     this.loadContentList(wsToLoad)
+    this.buildBreadcrumbs()
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
   // and add process that always keep url and folders open sync
   async componentDidUpdate (prevProps, prevState) {
-    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838')
+    const { props, state } = this
 
-    if (this.state.idWorkspaceInUrl === null) return
+    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
 
-    const idWorkspace = parseInt(this.props.match.params.idws)
+    if (state.idWorkspaceInUrl === null) return
+
+    const idWorkspace = parseInt(props.match.params.idws)
     if (isNaN(idWorkspace)) return
 
     const prevFilter = qs.parse(prevProps.location.search).type
-    const currentFilter = qs.parse(this.props.location.search).type
+    const currentFilter = qs.parse(props.location.search).type
 
     if (prevState.idWorkspaceInUrl !== idWorkspace || prevFilter !== currentFilter) {
       this.setState({idWorkspaceInUrl: idWorkspace})
       this.loadContentList(idWorkspace)
+      this.buildBreadcrumbs()
     }
   }
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent('unmount_app')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.idWorkspaceInUrl)}>
+          {props.t(props.workspaceList.find(ws => ws.id === state.idWorkspaceInUrl).label)}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE
+    }]
+
+    const urlFilter = qs.parse(props.location.search).type
+
+    if (urlFilter) {
+      breadcrumbsList.push({
+        link: (
+          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}?type=${urlFilter}`}>
+            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label + 's')}
+          </Link>
+        ),
+        type: BREADCRUMBS_TYPE.CORE
+      })
+    } else {
+      breadcrumbsList.push({
+        link: (
+          <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl)}`}>
+            {props.t('All contents')}
+          </Link>
+        ),
+        type: BREADCRUMBS_TYPE.CORE
+      })
+    }
+
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
   loadContentList = async idWorkspace => {
@@ -297,7 +345,7 @@ class WorkspaceContent extends React.Component {
     : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
 
   render () {
-    const { user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
     const { state } = this
 
     const urlFilter = qs.parse(location.search).type
@@ -315,8 +363,8 @@ class WorkspaceContent extends React.Component {
       .filter(ct => idRoleUserWorkspace === 2 ? ct.slug !== 'folder' : true)
 
     return (
-      <div className='tracim__content fullWidthFullHeight'>
-        <div className='WorkspaceContent' style={{width: '100%'}}>
+      <div className='tracim__content-scrollview fullWidthFullHeight'>
+        <div className='WorkspaceContent'>
           {state.contentLoaded &&
             <OpenContentApp
               // automatically open the app for the idContent in url
@@ -336,12 +384,13 @@ class WorkspaceContent extends React.Component {
             } />
           }
 
-          <PageWrapper customeClass='workspace'>
+          <PageWrapper customClass='workspace'>
             <PageTitle
               parentClass='workspace__header'
               customClass='justify-content-between align-items-center'
               title={this.getTitle(urlFilter)}
               icon={this.getIcon(urlFilter)}
+              breadcrumbsList={breadcrumbs}
             >
               {idRoleUserWorkspace >= 2 &&
                 <DropdownCreateButton
@@ -377,7 +426,6 @@ class WorkspaceContent extends React.Component {
                             ...content,
                             content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
                           }}
-                          onClickItem={this.handleClickContentItem}
                           idRoleUserWorkspace={idRoleUserWorkspace}
                           onClickExtendedAction={{
                             edit: this.handleClickEditContentItem,
@@ -405,7 +453,7 @@ class WorkspaceContent extends React.Component {
                           statusSlug={content.statusSlug}
                           read={currentWorkspace.contentReadStatusList.includes(content.id)}
                           contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                          onClickItem={() => this.handleClickContentItem(content)}
+                          urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
                           idRoleUserWorkspace={idRoleUserWorkspace}
                           onClickExtendedAction={{
                             edit: e => this.handleClickEditContentItem(e, content),
@@ -438,7 +486,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
-  user, currentWorkspace, workspaceContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

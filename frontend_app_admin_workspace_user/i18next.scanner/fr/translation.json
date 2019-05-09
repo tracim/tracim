@@ -24,7 +24,7 @@
   "List of every shared spaces": "Liste de tous les espaces partagés",
   "Shared space": "Espace partagé",
   "There is no shared space yet": "Il n'y a aucun espace partagé",
-  "Error while loading shared spaces list": "Erreur lors du chargemetn des espaces partagés",
+  "Error while loading shared spaces list": "Erreur lors du chargement des espaces partagés",
   "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
   "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur",
   "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte",
@@ -41,5 +41,9 @@
   "Full name": "Nom complet",
   "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
   "Email notification are disabled, please manually notify users of any change": "Les notifications par email sont désactivées, veuillez informer manuellement les utilisateurs des changements",
-  "Error, invalid email address": "Erreur, email invalide"
+  "Error, invalid email address": "Erreur, email invalide",
+  "Create a shared space": "Créer un espace de travail",
+  "Home": "Accueil",
+  "Users": "Utilisateurs",
+  "Manage": "Administrer"
 }

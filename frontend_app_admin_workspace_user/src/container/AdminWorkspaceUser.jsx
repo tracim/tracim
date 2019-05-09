@@ -1,26 +1,27 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
+  CardPopup,
   handleFetchResult,
-  CardPopup
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
+  deleteWorkspace,
+  getUserDetail,
+  getUserList,
   getWorkspaceList,
   getWorkspaceMemberList,
-  // getWorkspaceDetail,
-  deleteWorkspace,
-  getUserList,
-  getUserDetail,
+  postAddUser,
+  putMyselfProfile,
   putUserDisable,
   putUserEnable,
-  putUserProfile,
-  putMyselfProfile,
-  postAddUser
+  putUserProfile
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
@@ -39,7 +40,8 @@ class AdminWorkspaceUser extends React.Component {
       content: props.data ? props.data.content : debug.content,
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
-      workspaceIdOpened: null
+      workspaceIdOpened: null,
+      breadcrumbsList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -70,17 +72,23 @@ class AdminWorkspaceUser extends React.Component {
         i18n.changeLanguage(data)
         if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
         else if (this.state.config.type === 'user') this.loadUserContent()
+        this.buildBreadcrumbs()
         break
       default:
         break
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
-    if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
-    else if (this.state.config.type === 'user') this.loadUserContent()
+    // FIXME - CH - 2019-04-08 - line below should not exist. See https://github.com/tracim/tracim/issues/1572
+    document.getElementById('appFullscreenContainer').style.flex = 'auto'
+
+    if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
+    else if (this.state.config.type === 'user') await this.loadUserContent()
+
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -90,11 +98,13 @@ class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
+      this.buildBreadcrumbs()
     }
   }
 
   componentWillUnmount () {
     console.log('%c<AdminWorkspaceUser> will Unmount', `color: ${this.state.config.hexcolor}`)
+    document.getElementById('appFullscreenContainer').style.flex = 'none'
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -157,6 +167,37 @@ class AdminWorkspaceUser extends React.Component {
         break
       default: this.sendGlobalFlashMsg(props.t('Error while loading users list'), 'warning')
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: <span>{props.t('Manage')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      notALink: true
+    }]
+
+    if (state.config.type === 'workspace') {
+      breadcrumbsList.push({
+        link: <Link to={'/ui/admin/workspace'}>{props.t('Shared space')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    } else if (state.config.type === 'user') {
+      breadcrumbsList.push({
+        link: <Link to={'/ui/admin/user'}>{props.t('Users')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    }
+
+    // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
+    // app crash telling it cannot render a Link outside a router
+    // see https://github.com/tracim/tracim/issues/1637
+    // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
+    this.setState({breadcrumbsList: breadcrumbsList})
   }
 
   handleDeleteWorkspace = async () => {
@@ -289,13 +330,8 @@ class AdminWorkspaceUser extends React.Component {
     this.setState({workspaceIdOpened: idWorkspace})
   }
 
-  handleClickUser = idUser => {
-    GLOBAL_dispatchEvent({
-      type: 'redirect',
-      data: {
-        url: `/ui/admin/user/${idUser}`
-      }
-    })
+  handleClickNewWorkspace = () => {
+    GLOBAL_dispatchEvent({type: 'showCreateWorkspacePopup', data: {}})
   }
 
   render () {
@@ -309,7 +345,9 @@ class AdminWorkspaceUser extends React.Component {
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickWorkspace}
+            onClickNewWorkspace={this.handleClickNewWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
+            breadcrumbsList={state.breadcrumbsList}
           />
         )}
 
@@ -319,10 +357,10 @@ class AdminWorkspaceUser extends React.Component {
             idLoggedUser={state.loggedUser.user_id}
             profile={state.config.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
-            onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
+            breadcrumbsList={state.breadcrumbsList}
           />
         )}
 

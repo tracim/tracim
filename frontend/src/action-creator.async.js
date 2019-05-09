@@ -2,6 +2,7 @@ import React from 'react'
 import {
   FETCH_CONFIG,
   PAGE,
+  COOKIE_FRONTEND,
   unLoggedAllowedPageList
 } from './helper.js'
 import i18n from './i18n.js'
@@ -38,7 +39,8 @@ import {
   USER_WORKSPACE_LIST,
   CONTENT,
   WORKSPACE_CONTENT_PATH,
-  newFlashMessage
+  newFlashMessage,
+  WORKSPACE_AGENDA_URL
 } from './action-creator.sync.js'
 import { history } from './index.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
@@ -76,7 +78,8 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
         if (!unLoggedAllowedPageList.includes(document.location.pathname)) {
           dispatch(setRedirectLogin(document.location.pathname + document.location.search))
           dispatch(setUserDisconnected())
-          history.push(`${PAGE.LOGIN}${Cookies.get('lastConnection') ? '?dc=1' : ''}`)
+          history.push(`${PAGE.LOGIN}${Cookies.get(COOKIE_FRONTEND.LAST_CONNECTION) ? '?dc=1' : ''}`)
+          Cookies.remove(COOKIE_FRONTEND.LAST_CONNECTION)
         }
         return ''
       }
@@ -671,6 +674,21 @@ export const putFolderRead = (idUser, idWorkspace, idContent) => dispatch => {
       method: 'PUT'
     },
     actionName: FOLDER_READ,
+    dispatch
+  })
+}
+
+export const getLoggedUserCalendar = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/me/agenda`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_AGENDA_URL,
     dispatch
   })
 }

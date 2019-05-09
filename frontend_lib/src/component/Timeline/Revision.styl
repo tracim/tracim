@@ -1,14 +1,14 @@
 @import '../../css/Variable.styl'
 
 .revision
-  display flex
-  justify-content space-between
   align-items center
   margin-top 20px
   padding 10px 15px
   width 100%
   background-color lightGrey
   &__data
+    display flex
+    align-items center
     &__nb
       display inline-block
       min-width 20px
@@ -16,8 +16,11 @@
       margin-right 5px
       font-weight bold
     &__icon
-      margin-right 4px
+      margin-right 5px
+    &__created
+      margin-left auto
+      text-align right
   &__date
     color grey
     font-size 17px
-    margin auto 15px
+    margin auto 15px auto auto

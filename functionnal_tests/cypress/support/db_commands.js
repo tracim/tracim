@@ -107,3 +107,34 @@ Cypress.Commands.add('getUserByRole', (role) => {
   return cy
     .fixture(userFixtures[role])
 })
+
+Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId) => {
+  let url = `/api/v2/workspaces/${workspaceId}/contents`
+  let data = {
+    content_type: 'html-document',
+    label: title,
+    parent_id: parentId
+  }
+  cy
+    .request('POST', url, data)
+    .then(response => response.body)
+})
+
+Cypress.Commands.add('updateHtmlDocument', (contentId, workspaceId, text, title) => {
+  let url = `/api/v2/workspaces/${workspaceId}/html-documents/${contentId}`
+  let data = {
+    raw_content: text,
+    label: title
+  }
+  cy
+    .request('PUT', url, data)
+    .then(response => response.body)
+})
+
+Cypress.Commands.add('changeHtmlDocumentStatus', (contentId, workspaceId, status) => {
+  let url = `/api/v2/workspaces/${workspaceId}/html-documents/${contentId}/status`
+  let data = { status: status }
+  cy
+    .request('PUT', url, data)
+    .then(response => response.body)
+})

@@ -3,19 +3,21 @@ from datetime import datetime
 
 from freezegun import freeze_time
 import transaction
-from tracim_backend.tests import BaseTest
+
 from tracim_backend.models.auth import User
+from tracim_backend.tests import BaseTest
 
 
 class TestUserModel(BaseTest):
     """
     Test for User model
     """
+
     def test_unit__create__ok__nominal_case(self):
         self.session.flush()
         transaction.commit()
-        name = 'Damien'
-        email = 'damien@accorsi.info'
+        name = "Damien"
+        email = "damien@accorsi.info"
 
         user = User()
         user.display_name = name
@@ -25,7 +27,7 @@ class TestUserModel(BaseTest):
         self.session.flush()
         transaction.commit()
 
-        new_user = self.session.query(User).filter(User.display_name == name).one()  # nopep8
+        new_user = self.session.query(User).filter(User.display_name == name).one()
 
         assert new_user.display_name == name
         assert new_user.email == email
@@ -37,9 +39,9 @@ class TestUserModel(BaseTest):
         can be retrieve. Verify if hashed password is not
         same as password.
         """
-        name = 'Damien'
-        email = 'tracim@trac.im'
-        password = 'my_secure_password'
+        name = "Damien"
+        email = "tracim@trac.im"
+        password = "my_secure_password"
 
         user = User()
         user.display_name = name
@@ -56,9 +58,9 @@ class TestUserModel(BaseTest):
         one
         """
 
-        name = 'Damien'
-        email = 'tracim@trac.im'
-        password = 'my_secure_password'
+        name = "Damien"
+        email = "tracim@trac.im"
+        password = "my_secure_password"
 
         user = User()
         user.display_name = name
@@ -71,37 +73,37 @@ class TestUserModel(BaseTest):
         # Check bug #70 fixed
         # http://tracim.org/workspaces/4/folders/5/threads/70
 
-        name = 'Damien'
-        email = 'tracim@trac.im'
+        name = "Damien"
+        email = "tracim@trac.im"
 
         user = User()
         user.display_name = name
         user.email = email
 
-        assert user.validate_password('') is False
+        assert user.validate_password("") is False
 
     def test_unit__validate_password__false__bad_password(self):
         """
         Check if validate_password can correctly check if password is
         an uncorrect correct one
         """
-        name = 'Damien'
-        email = 'tracim@trac.im'
-        password = 'my_secure_password'
+        name = "Damien"
+        email = "tracim@trac.im"
+        password = "my_secure_password"
 
         user = User()
         user.display_name = name
         user.email = email
         user.password = password
 
-        assert user.validate_password('uncorrect_password') is False
+        assert user.validate_password("uncorrect_password") is False
 
     def test_unit__validate_password__false__empty_password(self):
         """
         Check if validate_password failed if not password
         """
-        name = 'Damien'
-        email = 'tracim@trac.im'
+        name = "Damien"
+        email = "tracim@trac.im"
         password = None
 
         user = User()
@@ -110,22 +112,21 @@ class TestUserModel(BaseTest):
         user.password = password
 
         assert user.validate_password(password) is False
-        assert user.validate_password('') is False
-
+        assert user.validate_password("") is False
 
     def test_unit__repr__ok__nominal_case(self):
-        name = 'Damien'
-        email = 'tracim@trac.im'
+        name = "Damien"
+        email = "tracim@trac.im"
 
         user = User()
         user.display_name = name
         user.email = email
 
-        assert user.__repr__() == "<User: email='tracim@trac.im', display='Damien'>"  # nopep8
+        assert user.__repr__() == "<User: email='tracim@trac.im', display='Damien'>"
 
     def test_unit__unicode__ok__nominal_case(self):
-        name = 'Damien'
-        email = 'tracim@trac.im'
+        name = "Damien"
+        email = "tracim@trac.im"
 
         user = User()
         user.display_name = name
@@ -135,7 +136,7 @@ class TestUserModel(BaseTest):
 
     def test__unit__unicode__ok__no_display_name(self):
 
-        email = 'tracim@trac.im'
+        email = "tracim@trac.im"
 
         user = User()
         user.email = email
@@ -143,7 +144,7 @@ class TestUserModel(BaseTest):
         assert user.__unicode__() == email
 
     def test_unit__reset_token__ok__nominal_case(self):
-        email = 'tracim@trac.im'
+        email = "tracim@trac.im"
 
         user = User()
         user.email = email

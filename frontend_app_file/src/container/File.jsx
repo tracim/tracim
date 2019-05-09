@@ -16,7 +16,9 @@ import {
   displayDistanceDate,
   convertBackslashNToBr,
   generateLocalStorageContentId,
-  Badge
+  Badge,
+  BREADCRUMBS_TYPE,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -48,9 +50,12 @@ class File extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
-      externalTradList: [
-        props.t('Upload a file'),
-        props.t('Files')
+      externalTranslationList: [
+        props.t('File'),
+        props.t('Files'),
+        props.t('file'),
+        props.t('files'),
+        props.t('Upload a file')
       ],
       newComment: '',
       newFile: '',
@@ -77,8 +82,10 @@ class File extends React.Component {
     switch (type) {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
+
       case 'file_hideApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -87,6 +94,7 @@ class File extends React.Component {
           timelineWysiwyg: false
         })
         break
+
       case 'file_reloadContent':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -102,6 +110,7 @@ class File extends React.Component {
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
 
@@ -122,7 +131,7 @@ class File extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
     const { appName, content } = this.state
@@ -131,11 +140,12 @@ class File extends React.Component {
     )
     if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
-    this.loadContent()
+    await this.loadContent()
     this.loadTimeline()
+    this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -143,8 +153,9 @@ class File extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      this.loadContent()
+      await this.loadContent()
       this.loadTimeline()
+      this.buildBreadcrumbs()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
@@ -242,6 +253,22 @@ class File extends React.Component {
     })
   }
 
+  buildBreadcrumbs = () => {
+    const { state } = this
+
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          label: `${state.content.filename}`,
+          link: null,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }]
+      }
+    })
+  }
+
   handleClickBtnCloseApp = () => {
     const { state, props } = this
 
@@ -269,6 +296,7 @@ class File extends React.Component {
         break
       case 400:
         switch (fetchResultSaveFile.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
@@ -336,19 +364,21 @@ class File extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveEditStatus = putFileStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    if (newStatus === state.content.status) return
 
-    handleFetchResult(await fetchResultSaveEditStatus)
-      .then(resSave => {
-        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
-          console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
-        } else {
-          this.loadContent()
-          this.loadTimeline()
-        }
-      })
+    const fetchResultSaveEditStatus = await handleFetchResult(
+      await putFileStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+    )
+
+    switch (fetchResultSaveEditStatus.status) {
+      case 204:
+        this.loadContent()
+        this.loadTimeline()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
+    }
   }
 
   handleClickArchive = async () => {
@@ -667,6 +697,7 @@ class File extends React.Component {
             timelineData={state.timeline}
             newComment={state.newComment}
             disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

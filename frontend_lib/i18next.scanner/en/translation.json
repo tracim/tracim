@@ -16,7 +16,6 @@
   "Item created": "Item created",
   "Item deleted": "Item deleted",
   "New revision": "New revision",
-  "New status": "New status",
   "Item unarchived": "Item unarchived",
   "Item restored": "Item restored",
   "Item moved": "Item moved",
@@ -28,11 +27,11 @@
   "Email notifications are disabled, you can't create new users from here": "Email notifications are disabled, you can't create new users from here",
   "Send an invitational email to this user": "Send an invitational email to this user",
   "I know this user exist": "I know this user exist",
-  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
   "Cancel": "Cancel",
   "Full name or email": "Full name or email",
   "Unknown error, please inform an administrator": "Unknown error, please inform an administrator",
   "Error detail": "Error detail",
   "This content is archived": "This content is archived",
-  "This content is deleted": "This content is deleted"
+  "This content is deleted": "This content is deleted",
+  "Status changed to {{status}}": "Status changed to {{status}}"
 }

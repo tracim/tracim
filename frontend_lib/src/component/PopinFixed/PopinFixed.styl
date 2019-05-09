@@ -2,7 +2,7 @@
 
 .wsContentGeneric
   position fixed
-  top 88px
+  top headerHeight
   right 0
   width 70%
   max-width calc(100% - 345px) // 300px sidebar with + 45px btn toggle sidebar
@@ -106,10 +106,8 @@
   //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
 
 
-// MEDIAQUERIES
 
 @media (min-width: min-lg) and (max-width: max-lg)
-
   .wsContentGeneric
     &__content
       overflow-Y auto
@@ -124,7 +122,6 @@
 
 
 @media (min-width: min-md) and (max-width: max-md)
-
   .wsContentGeneric
     &__content
       overflow-Y auto
@@ -141,11 +138,10 @@
         height auto
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
   .wsContentGeneric
     width 100%
     max-width 100%
-    top 68px
+    top headerHeight
     &__content
       overflow-Y auto
       width 100%
@@ -161,11 +157,10 @@
         height auto
 
 @media (max-width: max-xs)
-
   .wsContentGeneric
     width 100%
     max-width 100%
-    top 68px
+    top headerHeight
     &__option
       display none
     &__content

@@ -1,0 +1,35 @@
+#########################################################################################################################
+# Apache configuration (REQUIRED for correct HTML5 cache functionality in browsers):
+# 1.) You NEED to enable the following Apache modules: mod_mime, mod_headers (optionally you can also enable mod_deflate)
+# 2.) You NEED to add the following lines into your Apache vhost configuration (without the # character):
+#     <Directory /client/installation/directory/>
+#        AllowOverride FileInfo Limit
+#         <IfVersion >= 2.3>
+#             Require all granted
+#         </IfVersion>
+#         <IfVersion < 2.3>
+#             Order allow,deny
+#             Allow from all
+#         </IfVersion>
+#     </Directory>
+#########################################################################################################################
+
+# Add "Content-Type: text/cache-manifest" header for .manifest files
+<IfModule mod_mime.c>
+    AddType text/cache-manifest .manifest
+</IfModule>
+
+# Add "Cache-Control: max-age=0, must-revalidate, no-cache, no-transform, private" header for all files
+#  for more information see: https://tools.ietf.org/html/rfc7234
+<IfModule mod_headers.c>
+    Header set Cache-Control "max-age=0, must-revalidate, no-cache, no-transform, private"
+</IfModule>
+
+<IfModule mod_deflate.c>
+    SetOutputFilter DEFLATE
+</IfModule>
+
+# If you use mod_cache set the correct path for the cache.manifest here
+#<IfModule mod_cache.c>
+#    CacheDisable cache.manifest
+#</IfModule>

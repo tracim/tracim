@@ -16,17 +16,22 @@ import {
   setWorkspaceList,
   setContentTypeList,
   setAppList,
-  setConfig
+  setConfig,
+  resetBreadcrumbs,
+  setUserLang
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
-  postUserLogin
+  postUserLogin,
+  putUserLang
 } from '../action-creator.async.js'
-import { PAGE } from '../helper.js'
-import { Checkbox } from 'tracim_frontend_lib'
+import {
+  PAGE,
+  COOKIE_FRONTEND
+} from '../helper.js'
 
 const qs = require('query-string')
 
@@ -49,8 +54,21 @@ class Login extends React.Component {
   async componentDidMount () {
     const { props } = this
 
+    props.dispatch(resetBreadcrumbs())
+
+    const defaultLangCookie = Cookies.get(COOKIE_FRONTEND.DEFAULT_LANGUAGE)
+
+    if (defaultLangCookie && defaultLangCookie !== 'null') {
+      i18n.changeLanguage(defaultLangCookie)
+      props.dispatch(setUserLang(defaultLangCookie))
+    }
+
     const query = qs.parse(props.location.search)
-    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
+    if (query.dc && query.dc === '1') {
+      props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
+      props.history.push(props.location.pathname)
+      return
+    }
 
     await this.loadConfig()
   }
@@ -82,8 +100,12 @@ class Login extends React.Component {
           logged: true
         }
 
-        Cookies.set('lastConnection', '1', {expires: 180})
+        if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
+
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserConnected(loggedUser))
+
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppList()
@@ -135,6 +157,15 @@ class Login extends React.Component {
     if (fetchGetWorkspaceList.status === 200) props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
   }
 
+  setDefaultUserLang = async loggedUser => {
+    const { props } = this
+    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    switch (fetchPutUserLang.status) {
+      case 200: break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+    }
+  }
+
   handleClickForgotPassword = () => {
     const { props } = this
     props.history.push(
@@ -149,93 +180,65 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{pathname: '/ui'}} />
 
     return (
-      <section className='unLoggedPage loginpage primaryColorBg'>
-        <div className='container-fluid'>
-          { /*
-            AC - 11/09/2018 - disable the logo to leave more space for the login form
-            <LoginLogo
-              customClass='loginpage__logo'
-              logoSrc={LoginLogoImg}
-            />
-          */ }
+      <section className='loginpage primaryColorBg'>
+        <Card customClass='loginpage__card'>
+          <CardHeader customClass='loginpage__card__header primaryColorBgLighten'>
+            {props.t('Connection')}
+          </CardHeader>
 
-          <div className='row justify-content-center'>
-            <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-              <Card customClass='loginpage__connection'>
-                <CardHeader customClass='connection__header primaryColorBgLighten text-center'>
-                  {props.t('Connection')}
-                </CardHeader>
+          <CardBody formClass='loginpage__card__form'>
+            <form>
+              <InputGroupText
+                parentClassName='loginpage__card__form__groupemail'
+                customClass='mb-3 mt-4'
+                icon='fa-envelope-open-o'
+                type='email'
+                placeHolder={props.t('Email Address')}
+                invalidMsg={props.t('Invalid email')}
+                isInvalid={state.inputLogin.isInvalid}
+                value={state.inputLogin.value}
+                onChange={this.handleChangeLogin}
+                onKeyDown={this.handleInputKeyDown}
+                maxLength={512}
+              />
 
-                <CardBody formClass='connection__form'>
-                  <form>
-                    <InputGroupText
-                      parentClassName='connection__form__groupemail'
-                      customClass='mb-3 mt-4'
-                      icon='fa-envelope-open-o'
-                      type='email'
-                      placeHolder={props.t('Email Address')}
-                      invalidMsg='Email invalide.'
-                      isInvalid={state.inputLogin.isInvalid}
-                      value={state.inputLogin.value}
-                      onChange={this.handleChangeLogin}
-                      onKeyDown={this.handleInputKeyDown}
-                      maxLength={512}
-                    />
+              <InputGroupText
+                parentClassName='loginpage__card__form__groupepw'
+                customClass=''
+                icon='fa-lock'
+                type='password'
+                placeHolder={props.t('Password')}
+                invalidMsg={props.t('Invalid password')}
+                isInvalid={state.inputPassword.isInvalid}
+                value={state.inputPassword.value}
+                onChange={this.handleChangePassword}
+                onKeyDown={this.handleInputKeyDown}
+                maxLength={512}
+              />
 
-                    <InputGroupText
-                      parentClassName='connection__form__groupepw'
-                      customClass=''
-                      icon='fa-lock'
-                      type='password'
-                      placeHolder={props.t('Password')}
-                      invalidMsg='Mot de passe invalide.'
-                      isInvalid={state.inputPassword.isInvalid}
-                      value={state.inputPassword.value}
-                      onChange={this.handleChangePassword}
-                      onKeyDown={this.handleInputKeyDown}
-                      maxLength={512}
-                    />
+              <div className='row mt-4 mb-4'>
+                <div className='col-12 col-sm-6'>
+                  <div
+                    className='loginpage__card__form__pwforgot'
+                    onClick={this.handleClickForgotPassword}
+                  >
+                    {props.t('Forgotten password ?')}
+                  </div>
+                </div>
 
-                    <div className='row mt-4 mb-4'>
-                      <div className='col-12 col-sm-6'>
-                        <div
-                          className='connection__form__rememberme'
-                          onClick={this.handleChangeRememberMe}
-                          style={{'display': 'none'}}
-                          // AC - 10/09/2018 - not included in v2.0 roadmap
-                        >
-                          <Checkbox
-                            name='inputRememberMe'
-                            checked={state.inputRememberMe}
-                            onClickCheckbox={() => {}}
-                          />
-                          {props.t('Remember me')}
-                        </div>
-
-                        <div
-                          className='connection__form__pwforgot'
-                          onClick={this.handleClickForgotPassword}
-                        >
-                          {props.t('Forgotten password ?')}
-                        </div>
-                      </div>
-
-                      <div className='col-12 col-sm-6 d-flex align-items-end'>
-                        <Button
-                          htmlType='button'
-                          bootstrapType='primary'
-                          customClass='btnSubmit connection__form__btnsubmit ml-auto'
-                          label={props.t('Connection')}
-                          onClick={this.handleClickSubmit}
-                        />
-                      </div>
-                    </div>
-                  </form>
-                </CardBody>
-              </Card>
-            </div>
-          </div>
-        </div>
+                <div className='col-12 col-sm-6 d-flex align-items-end'>
+                  <Button
+                    htmlType='button'
+                    bootstrapType='primary'
+                    customClass='btnSubmit loginpage__card__form__btnsubmit ml-auto'
+                    label={props.t('Connection')}
+                    onClick={this.handleClickSubmit}
+                  />
+                </div>
+              </div>
+            </form>
+          </CardBody>
+        </Card>
 
         <FooterLogin />
       </section>
@@ -243,5 +246,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system }) => ({ user, system })
+const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
 export default withRouter(connect(mapStateToProps)(translate()(Login)))

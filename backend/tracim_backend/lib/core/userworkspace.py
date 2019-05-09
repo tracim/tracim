@@ -13,10 +13,8 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.roles import WorkspaceRoles
 
-__author__ = 'damien'
-
+__author__ = "damien"
 
 
 class RoleApi(object):
@@ -62,10 +60,7 @@ class RoleApi(object):
     #     return False
 
     def get_user_role_workspace_with_context(
-            self,
-            user_role: UserRoleInWorkspace,
-            newly_created:bool = None,
-            email_sent: bool = None,
+        self, user_role: UserRoleInWorkspace, newly_created: bool = None, email_sent: bool = None
     ) -> UserRoleWorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
@@ -80,12 +75,7 @@ class RoleApi(object):
         )
         return workspace
 
-    def __init__(
-        self,
-        session: Session,
-        current_user: typing.Optional[User],
-        config: CFG,
-    )-> None:
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         self._session = session
         self._user = current_user
         self._config = config
@@ -96,19 +86,20 @@ class RoleApi(object):
         :param workspace_id:
         :return: a Query object, filtered query but without fetching the object.
         """
-        return self._session.query(UserRoleInWorkspace).\
-            filter(UserRoleInWorkspace.workspace_id == workspace_id).\
-            filter(UserRoleInWorkspace.user_id == user_id)
+        return (
+            self._session.query(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
+            .filter(UserRoleInWorkspace.user_id == user_id)
+        )
 
     def get_one(self, user_id: int, workspace_id: int) -> UserRoleInWorkspace:
         try:
             user_role = self._get_one_rsc(user_id, workspace_id).one()
-        except NoResultFound as exc:
+        except NoResultFound:
             raise UserRoleNotFound(
-                'Role for user {user_id} '
-                'in workspace {workspace_id} was not found.'.format(
-                    user_id=user_id,
-                    workspace_id=workspace_id,
+                "Role for user {user_id} "
+                "in workspace {workspace_id} was not found.".format(
+                    user_id=user_id, workspace_id=workspace_id
                 )
             )
         return user_role
@@ -118,7 +109,7 @@ class RoleApi(object):
         role: UserRoleInWorkspace,
         role_level: int,
         with_notif: typing.Optional[bool] = None,
-        save_now: bool=False,
+        save_now: bool = False,
     ):
         """
         Update role of user in this workspace
@@ -142,16 +133,15 @@ class RoleApi(object):
         workspace: Workspace,
         role_level: int,
         with_notif: bool,
-        flush: bool=True
+        flush: bool = True,
     ) -> UserRoleInWorkspace:
 
         # INFO - G.M - 2018-10-29 - Check if role already exist
         query = self._get_one_rsc(user.user_id, workspace.workspace_id)
         if query.count() > 0:
             raise RoleAlreadyExistError(
-                'Role already exist for user {} in workspace {}.'.format(
-                    user.user_id,
-                    workspace.workspace_id
+                "Role already exist for user {} in workspace {}.".format(
+                    user.user_id, workspace.workspace_id
                 )
             )
         role = UserRoleInWorkspace()
@@ -170,28 +160,25 @@ class RoleApi(object):
             )
         if self._get_one_rsc(user_id, workspace_id).count() == 0:
             raise UserRoleNotFound(
-                'Role for user {user_id} '
-                'in workspace {workspace_id} was not found.'.format(
-                    user_id=user_id,
-                    workspace_id=workspace_id,
+                "Role for user {user_id} "
+                "in workspace {workspace_id} was not found.".format(
+                    user_id=user_id, workspace_id=workspace_id
                 )
             )
         self._get_one_rsc(user_id, workspace_id).delete()
         if flush:
             self._session.flush()
 
-    def get_all_for_workspace(
-        self,
-        workspace:Workspace
-    ) -> typing.List[UserRoleInWorkspace]:
-        return self._session.query(UserRoleInWorkspace)\
-            .filter(UserRoleInWorkspace.workspace_id==workspace.workspace_id)\
-            .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)\
+    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
+        return (
+            self._session.query(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id)
+            .order_by(UserRoleInWorkspace.workspace_id, UserRoleInWorkspace.user_id)
             .all()
+        )
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()
-
 
     # TODO - G.M - 29-06-2018 - [Cleanup] Drop this
     # @classmethod

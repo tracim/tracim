@@ -1,23 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
+import { PAGE } from '../../helper.js'
 
 require('./Folder.styl')
 
 class Folder extends React.Component {
-  // componentDidMount () {
-  //   const { props } = this
-  //   if (props.folderData.isOpen) props.setFolderRead(props.folderData.id)
-  // }
-  //
-  // componentDidUpdate (prevProps) {
-  //   const { props } = this
-  //   if (!prevProps.folderData.isOpen && props.folderData.isOpen) props.setFolderRead(props.folderData.id)
-  // }
-
   render () {
     const { props } = this
 
@@ -72,7 +64,12 @@ class Folder extends React.Component {
                       aria-expanded='false'
                       onClick={e => e.stopPropagation()}
                     >
-                      {`${props.t('Create in folder')}...`}
+                      <span className='folder__header__button__addbtn__text-desktop'>
+                        {`${props.t('Create in folder')}...`}
+                      </span>
+                      <span className='folder__header__button__addbtn__text-responsive'>
+                        <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
+                      </span>
                     </button>
 
                     <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
@@ -116,7 +113,6 @@ class Folder extends React.Component {
                   ...content,
                   content: props.folderData.content.filter(c => c.idParent !== props.folderData.id)
                 }}
-                onClickItem={props.onClickItem}
                 idRoleUserWorkspace={props.idRoleUserWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
                 onClickFolder={props.onClickFolder}
@@ -127,6 +123,7 @@ class Folder extends React.Component {
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
                 t={props.t}
+                location={props.location}
               />
             )
             : (
@@ -139,7 +136,7 @@ class Folder extends React.Component {
                 statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                onClickItem={() => props.onClickItem(content)}
+                urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
                 idRoleUserWorkspace={props.idRoleUserWorkspace}
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
@@ -159,12 +156,11 @@ class Folder extends React.Component {
   }
 }
 
-export default Folder
+export default withRouter(Folder)
 
 Folder.propTypes = {
   folderData: PropTypes.object,
   app: PropTypes.array,
-  onClickItem: PropTypes.func.isRequired,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
 }

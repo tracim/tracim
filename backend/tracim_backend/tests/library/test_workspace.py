@@ -5,298 +5,136 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.data import Content
-from tracim_backend.models.auth import User
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
 
-class TestThread(DefaultTest):
 
+class TestThread(DefaultTest):
     def test_children(self):
-        admin = self.session.query(User).filter(
-            User.email == 'admin@admin.admin'
-        ).one()
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         self._create_thread_and_test(
-            workspace_name='workspace_1',
-            folder_name='folder_1',
-            thread_name='thread_1',
-            user=admin
+            workspace_name="workspace_1", folder_name="folder_1", thread_name="thread_1", user=admin
         )
-        workspace = self.session.query(Workspace).filter(
-            Workspace.label == 'workspace_1'
-        ).one()
-        content_api = ContentApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
-        folder = content_api.get_canonical_query().filter(
-            Content.label == 'folder_1'
-        ).one()
-        eq_([folder, ], list(workspace.get_valid_children()))
+        workspace = self.session.query(Workspace).filter(Workspace.label == "workspace_1").one()
+        content_api = ContentApi(session=self.session, current_user=admin, config=self.app_config)
+        folder = content_api.get_canonical_query().filter(Content.label == "folder_1").one()
+        eq_([folder], list(workspace.get_valid_children()))
 
     def test__unit__get_notifiable_roles__ok__nominal_case(self):
-        admin = self.session.query(User) \
-            .filter(User.email == 'admin@admin.admin').one()
-        wapi = WorkspaceApi(
-            session=self.session,
-            config=self.app_config,
-            current_user=admin,
-        )
-        workspace = wapi.create_workspace(label='workspace w', save_now=True)
-        uapi = UserApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config
-        )
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, config=self.app_config, current_user=admin)
+        workspace = wapi.create_workspace(label="workspace w", save_now=True)
+        uapi = UserApi(session=self.session, current_user=admin, config=self.app_config)
         user_1 = uapi.create_user(
-            email='u.1@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify=False
+            email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         user_2 = uapi.create_user(
-            email='u.2@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify = False
+            email="u.2@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
-        rapi = RoleApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
-        role_1 = rapi.create_one(
-            user_1,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
-        role_2 = rapi.create_one(
-            user_2,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=False
-        )
+        rapi = RoleApi(session=self.session, current_user=admin, config=self.app_config)
+        role_1 = rapi.create_one(user_1, workspace, UserRoleInWorkspace.READER, with_notif=True)
+        role_2 = rapi.create_one(user_2, workspace, UserRoleInWorkspace.READER, with_notif=False)
         assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
-        assert not role_2 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_2 not in wapi.get_notifiable_roles(workspace=workspace)
 
     def test__unit__get_notifiable_roles__ok__do_not_show_inactive(self):
-        admin = self.session.query(User) \
-            .filter(User.email == 'admin@admin.admin').one()
-        wapi = WorkspaceApi(
-            session=self.session,
-            config=self.app_config,
-            current_user=admin,
-        )
-        workspace = wapi.create_workspace(label='workspace w',
-                                          save_now=True)
-        uapi = UserApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config
-        )
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, config=self.app_config, current_user=admin)
+        workspace = wapi.create_workspace(label="workspace w", save_now=True)
+        uapi = UserApi(session=self.session, current_user=admin, config=self.app_config)
         user_1 = uapi.create_user(
-            email='u.1@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify=False
+            email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         user_2 = uapi.create_user(
-            email='u.2@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify = False
+            email="u.2@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        rapi = RoleApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
-        role_1 = rapi.create_one(
-            user_1,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
-        role_2 = rapi.create_one(
-            user_2,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
+        rapi = RoleApi(session=self.session, current_user=admin, config=self.app_config)
+        role_1 = rapi.create_one(user_1, workspace, UserRoleInWorkspace.READER, with_notif=True)
+        role_2 = rapi.create_one(user_2, workspace, UserRoleInWorkspace.READER, with_notif=True)
 
         assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
         user_1.is_active = False
-        assert not role_1 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_1 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
     def test__unit__get_notifiable_roles__ok__do_not_show_deleted(self):
-        admin = self.session.query(User) \
-            .filter(User.email == 'admin@admin.admin').one()
-        wapi = WorkspaceApi(
-            session=self.session,
-            config=self.app_config,
-            current_user=admin,
-        )
-        workspace = wapi.create_workspace(label='workspace w',
-                                          save_now=True)
-        uapi = UserApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config
-        )
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, config=self.app_config, current_user=admin)
+        workspace = wapi.create_workspace(label="workspace w", save_now=True)
+        uapi = UserApi(session=self.session, current_user=admin, config=self.app_config)
         user_1 = uapi.create_user(
-            email='u.1@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify=False
+            email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         user_2 = uapi.create_user(
-            email='u.2@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify = False
+            email="u.2@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        rapi = RoleApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
-        role_1 = rapi.create_one(
-            user_1,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
-        role_2 = rapi.create_one(
-            user_2,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
+        rapi = RoleApi(session=self.session, current_user=admin, config=self.app_config)
+        role_1 = rapi.create_one(user_1, workspace, UserRoleInWorkspace.READER, with_notif=True)
+        role_2 = rapi.create_one(user_2, workspace, UserRoleInWorkspace.READER, with_notif=True)
 
         assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
         user_1.is_deleted = True
-        assert not role_1 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_1 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_2 in wapi.get_notifiable_roles(workspace=workspace)
 
     def test__unit__get_notifiable_roles__ok__do_not_show_unknown_auth(self):
-        admin = self.session.query(User) \
-            .filter(User.email == 'admin@admin.admin').one()
-        wapi = WorkspaceApi(
-            session=self.session,
-            config=self.app_config,
-            current_user=admin,
-        )
-        workspace = wapi.create_workspace(label='workspace w',
-                                          save_now=True)
-        uapi = UserApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config
-        )
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, config=self.app_config, current_user=admin)
+        workspace = wapi.create_workspace(label="workspace w", save_now=True)
+        uapi = UserApi(session=self.session, current_user=admin, config=self.app_config)
 
         user_1 = uapi.create_user(
-            email='u.1@u.u',
-            auth_type=AuthType.INTERNAL,
-            do_save=True,
-            do_notify=False
+            email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         user_2 = uapi.create_user(
-            email='u.2@u.u',
-            auth_type=AuthType.UNKNOWN,
-            do_save=True,
-            do_notify=False
+            email="u.2@u.u", auth_type=AuthType.UNKNOWN, do_save=True, do_notify=False
         )
         user_3 = uapi.create_user(
-            email='u.3@u.u',
-            auth_type=AuthType.REMOTE,
-            do_save=True,
-            do_notify=False
+            email="u.3@u.u", auth_type=AuthType.REMOTE, do_save=True, do_notify=False
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        rapi = RoleApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
-        role_1 = rapi.create_one(
-            user_1,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
-        role_2 = rapi.create_one(
-            user_2,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
-        role_3 = rapi.create_one(
-            user_3,
-            workspace,
-            UserRoleInWorkspace.READER,
-            with_notif=True
-        )
+        rapi = RoleApi(session=self.session, current_user=admin, config=self.app_config)
+        role_1 = rapi.create_one(user_1, workspace, UserRoleInWorkspace.READER, with_notif=True)
+        role_2 = rapi.create_one(user_2, workspace, UserRoleInWorkspace.READER, with_notif=True)
+        role_3 = rapi.create_one(user_3, workspace, UserRoleInWorkspace.READER, with_notif=True)
 
         assert role_1 in wapi.get_notifiable_roles(workspace=workspace)
-        assert not role_2 in wapi.get_notifiable_roles(workspace=workspace)
+        assert role_2 not in wapi.get_notifiable_roles(workspace=workspace)
         assert role_3 in wapi.get_notifiable_roles(workspace=workspace)
 
-
     def test_unit__get_all_manageable(self):
-        admin = self.session.query(User) \
-            .filter(User.email == 'admin@admin.admin').one()
-        uapi = UserApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        uapi = UserApi(session=self.session, current_user=admin, config=self.app_config)
         # Checks a case without workspaces.
-        wapi = WorkspaceApi(
-            session=self.session,
-            current_user=admin,
-            config=self.app_config,
-        )
+        wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
         eq_([], wapi.get_all_manageable())
         # Checks an admin gets all workspaces.
-        w4 = wapi.create_workspace(label='w4')
-        w3 = wapi.create_workspace(label='w3')
-        w2 = wapi.create_workspace(label='w2')
-        w1 = wapi.create_workspace(label='w1')
+        w4 = wapi.create_workspace(label="w4")
+        w3 = wapi.create_workspace(label="w3")
+        w2 = wapi.create_workspace(label="w2")
+        w1 = wapi.create_workspace(label="w1")
         eq_([w1, w2, w3, w4], wapi.get_all_manageable())
         # Checks a regular user gets none workspace.
-        gapi = GroupApi(
-            session=self.session,
-            current_user=None,
-            config=self.app_config,
-        )
-        u = uapi.create_minimal_user('u.s@e.r', [gapi.get_one(Group.TIM_USER)], True)
-        wapi = WorkspaceApi(
-            session=self.session,
-            current_user=u,
-            config=self.app_config,
-        )
-        rapi = RoleApi(
-            session=self.session,
-            current_user=None,
-            config=self.app_config,
-        )
+        gapi = GroupApi(session=self.session, current_user=None, config=self.app_config)
+        u = uapi.create_minimal_user("u.s@e.r", [gapi.get_one(Group.TIM_USER)], True)
+        wapi = WorkspaceApi(session=self.session, current_user=u, config=self.app_config)
+        rapi = RoleApi(session=self.session, current_user=None, config=self.app_config)
         rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)
         rapi.create_one(u, w3, UserRoleInWorkspace.CONTRIBUTOR, False)
         rapi.create_one(u, w2, UserRoleInWorkspace.CONTENT_MANAGER, False)

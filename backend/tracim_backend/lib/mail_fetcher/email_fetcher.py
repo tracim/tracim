@@ -1,43 +1,41 @@
 # -*- coding: utf-8 -*-
 
-import json
-import re
-import socket
-import ssl
-import time
-import typing
 from email import message_from_bytes
 from email.header import decode_header
 from email.header import make_header
 from email.message import Message
 from email.utils import parseaddr
+import socket
+import ssl
+import time
+import typing
 
+from email_reply_parser import EmailReplyParser
 import filelock
 import imapclient
 import markdown
 import requests
-from email_reply_parser import EmailReplyParser
 
 from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.exceptions import EmptyEmailBody
 from tracim_backend.exceptions import NoSpecialKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
-from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer  # nopep8
+from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER  # nopep8
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.logger import logger
 
-TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
-CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
-CONTENT_TYPE_TEXT_HTML = 'text/html'
+TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
+CONTENT_TYPE_TEXT_PLAIN = "text/plain"
+CONTENT_TYPE_TEXT_HTML = "text/html"
 
 IMAP_CHECKED_FLAG = imapclient.FLAGGED
 IMAP_SEEN_FLAG = imapclient.SEEN
 
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
-MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
-MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT = 60*9   # this should be not more
+MAIL_FETCHER_CONNECTION_TIMEOUT = 60 * 3
+MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT = 60 * 9  # this should be not more
 # that 29 minutes according to rfc2177.(server wait 30min by default)
 
 
@@ -48,11 +46,12 @@ class MessageContainer(object):
 
 
 class DecodedMail(object):
-    def __init__(self,
-                 message: Message,
-                 uid: int=None,
-                 reply_to_pattern: str = '',
-                 references_pattern: str = '',
+    def __init__(
+        self,
+        message: Message,
+        uid: int = None,
+        reply_to_pattern: str = "",
+        references_pattern: str = "",
     ) -> None:
         self._message = message
         self.uid = uid
@@ -67,41 +66,35 @@ class DecodedMail(object):
             return None
 
     def get_subject(self) -> typing.Optional[str]:
-        return self._decode_header('subject')
+        return self._decode_header("subject")
 
     def get_from_address(self) -> str:
-        return parseaddr(self._message['From'])[1]
+        return parseaddr(self._message["From"])[1]
 
     def get_to_address(self) -> str:
-        return parseaddr(self._message['To'])[1]
+        return parseaddr(self._message["To"])[1]
 
     def get_first_ref(self) -> str:
-        return parseaddr(self._message['References'])[1]
+        return parseaddr(self._message["References"])[1]
 
     def get_special_key(self) -> typing.Optional[str]:
         return self._decode_header(TRACIM_SPECIAL_KEY_HEADER)
 
-    def get_body(
-            self,
-            use_html_parsing=True,
-            use_txt_parsing=True,
-    ) -> typing.Optional[str]:
+    def get_body(self, use_html_parsing=True, use_txt_parsing=True) -> typing.Optional[str]:
         body_part = self._get_mime_body_message()
         body = None
         if body_part:
-            charset = body_part.get_content_charset('iso-8859-1')
+            charset = body_part.get_content_charset("iso-8859-1")
             content_type = body_part.get_content_type()
             if content_type == CONTENT_TYPE_TEXT_PLAIN:
-                txt_body = body_part.get_payload(decode=True).decode(
-                    charset)
+                txt_body = body_part.get_payload(decode=True).decode(charset)
                 if use_txt_parsing:
                     txt_body = EmailReplyParser.parse_reply(txt_body)
                 html_body = markdown.markdown(txt_body)
                 body = HtmlSanitizer.sanitize(html_body)
 
             elif content_type == CONTENT_TYPE_TEXT_HTML:
-                html_body = body_part.get_payload(decode=True).decode(
-                    charset)
+                html_body = body_part.get_payload(decode=True).decode(charset)
                 if use_html_parsing:
                     html_body = str(ParsedHTMLMail(html_body))
                 body = HtmlSanitizer.sanitize(html_body)
@@ -115,16 +108,14 @@ class DecodedMail(object):
         # Check for html
         for part in self._message.walk():
             content_type = part.get_content_type()
-            content_dispo = str(part.get('Content-Disposition'))
-            if content_type == CONTENT_TYPE_TEXT_HTML \
-                    and 'attachment' not in content_dispo:
+            content_dispo = str(part.get("Content-Disposition"))
+            if content_type == CONTENT_TYPE_TEXT_HTML and "attachment" not in content_dispo:
                 return part
         # check for plain text
         for part in self._message.walk():
             content_type = part.get_content_type()
-            content_dispo = str(part.get('Content-Disposition'))
-            if content_type == CONTENT_TYPE_TEXT_PLAIN \
-                    and 'attachment' not in content_dispo:
+            content_dispo = str(part.get("Content-Disposition"))
+            if content_type == CONTENT_TYPE_TEXT_PLAIN and "attachment" not in content_dispo:
                 return part
         return part
 
@@ -142,18 +133,19 @@ class DecodedMail(object):
         if special_key:
             return special_key
         if to_address:
-            return DecodedMail.find_key_from_mail_address(to_address, self.reply_to_pattern, '{content_id}')
+            return DecodedMail.find_key_from_mail_address(
+                to_address, self.reply_to_pattern, "{content_id}"
+            )
         if first_ref:
-            return DecodedMail.find_key_from_mail_address(first_ref, self.references_pattern, '{content_id}')
+            return DecodedMail.find_key_from_mail_address(
+                first_ref, self.references_pattern, "{content_id}"
+            )
 
         raise NoSpecialKeyFound()
 
     @classmethod
     def find_key_from_mail_address(
-        cls,
-        mail_address: str,
-        pattern: str,
-        marker_str: str
+        cls, mail_address: str, pattern: str, marker_str: str
     ) -> typing.Optional[str]:
         """ Parse mail_adress-like string
         to retrieve key.
@@ -171,13 +163,12 @@ class DecodedMail(object):
         if len(static_parts) == 2:
             before, after = static_parts
             if mail_address.startswith(before) and mail_address.endswith(after):
-                key = mail_address.replace(before, '').replace(after, '')
+                key = mail_address.replace(before, "").replace(after, "")
                 assert key.isalnum()
                 return key
-            logger.warning(cls, 'pattern {} does not match email address {} '.format(
-                pattern,
-                mail_address
-            ))
+            logger.warning(
+                cls, "pattern {} does not match email address {} ".format(pattern, mail_address)
+            )
             return None
 
 
@@ -250,29 +241,24 @@ class MailFetcher(object):
         self.burst = burst
 
     def run(self) -> None:
-        logger.info(self, 'Starting MailFetcher')
+        logger.info(self, "Starting MailFetcher")
         while self._is_active:
             imapc = None
             sleep_after_connection = True
             try:
                 imapc = imapclient.IMAPClient(
-                    self.host,
-                    self.port,
-                    ssl=self.use_ssl,
-                    timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                    self.host, self.port, ssl=self.use_ssl, timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
                 )
                 imapc.login(self.user, self.password)
 
-                logger.debug(self, 'Select folder {}'.format(
-                    self.folder,
-                ))
+                logger.debug(self, "Select folder {}".format(self.folder))
                 imapc.select_folder(self.folder)
 
                 # force renew connection when deadline is reached
                 deadline = time.time() + self.connection_max_lifetime
                 while True:
                     if not self._is_active:
-                        logger.warning(self, 'Mail Fetcher process aborted')
+                        logger.warning(self, "Mail Fetcher process aborted")
                         sleep_after_connection = False
                         break
 
@@ -280,61 +266,59 @@ class MailFetcher(object):
                         logger.debug(
                             self,
                             "MailFetcher Connection Lifetime limit excess"
-                            ", Try Re-new connection")
+                            ", Try Re-new connection",
+                        )
                         sleep_after_connection = False
                         break
 
                     # check for new mails
                     self._check_mail(imapc)
 
-                    if self.use_idle and imapc.has_capability('IDLE'):
+                    if self.use_idle and imapc.has_capability("IDLE"):
                         # IDLE_mode wait until event from server
-                        logger.debug(self, 'wail for event(IDLE)')
+                        logger.debug(self, "wail for event(IDLE)")
                         imapc.idle()
-                        imapc.idle_check(
-                            timeout=MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT
-                        )
+                        imapc.idle_check(timeout=MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT)
                         imapc.idle_done()
                     else:
-                        if self.use_idle and not imapc.has_capability('IDLE'):
-                            log = 'IDLE mode activated but server do not' \
-                                  'support it, use polling instead.'
+                        if self.use_idle and not imapc.has_capability("IDLE"):
+                            log = (
+                                "IDLE mode activated but server do not"
+                                "support it, use polling instead."
+                            )
                             logger.warning(self, log)
 
                         if self.burst:
                             self.stop()
                             break
                         # normal polling mode : sleep a define duration
-                        logger.debug(self,
-                                     'sleep for {}'.format(self.heartbeat))
+                        logger.debug(self, "sleep for {}".format(self.heartbeat))
                         time.sleep(self.heartbeat)
 
                     if self.burst:
                         self.stop()
                         break
             # Socket
-            except (socket.error,
-                    socket.gaierror,
-                    socket.herror) as e:
-                log = 'Socket fail with IMAP connection {}'
+            except (socket.error, socket.gaierror, socket.herror) as e:
+                log = "Socket fail with IMAP connection {}"
                 logger.error(self, log.format(e.__str__()))
 
             except socket.timeout as e:
-                log = 'Socket timeout on IMAP connection {}'
+                log = "Socket timeout on IMAP connection {}"
                 logger.error(self, log.format(e.__str__()))
 
             # SSL
             except ssl.SSLError as e:
-                log = 'SSL error on IMAP connection'
+                log = "SSL error on IMAP connection"
                 logger.error(self, log.format(e.__str__()))
 
             except ssl.CertificateError as e:
-                log = 'SSL Certificate verification failed on IMAP connection'
+                log = "SSL Certificate verification failed on IMAP connection"
                 logger.error(self, log.format(e.__str__()))
 
             # Filelock
             except filelock.Timeout as e:
-                log = 'Mail Fetcher Lock Timeout {}'
+                log = "Mail Fetcher Lock Timeout {}"
                 logger.warning(self, log.format(e.__str__()))
 
             # IMAP
@@ -342,13 +326,15 @@ class MailFetcher(object):
             # when Imapclient stable will be 2.0+
 
             except BadIMAPFetchResponse as e:
-                log = 'Imap Fetch command return bad response.' \
-                      'Is someone else connected to the mailbox ?: ' \
-                      '{}'
+                log = (
+                    "Imap Fetch command return bad response."
+                    "Is someone else connected to the mailbox ?: "
+                    "{}"
+                )
                 logger.error(self, log.format(e.__str__()))
             # Others
             except Exception as e:
-                log = 'Mail Fetcher error {}'
+                log = "Mail Fetcher error {}"
                 logger.error(self, log.format(e.__str__()))
 
             finally:
@@ -358,7 +344,7 @@ class MailFetcher(object):
                 # TODO : Use __exit__ method instead when imapclient stable will
                 # be 2.0+ .
                 if imapc:
-                    logger.debug(self, 'Try logout')
+                    logger.debug(self, "Try logout")
                     try:
                         imapc.logout()
                     except Exception:
@@ -373,54 +359,43 @@ class MailFetcher(object):
                 break
 
             if sleep_after_connection:
-                logger.debug(self, 'sleep for {}'.format(self.heartbeat))
+                logger.debug(self, "sleep for {}".format(self.heartbeat))
                 time.sleep(self.heartbeat)
 
-        log = 'Mail Fetcher stopped'
+        log = "Mail Fetcher stopped"
         logger.debug(self, log)
 
     def _check_mail(self, imapc: imapclient.IMAPClient) -> None:
-        with self.lock.acquire(
-                timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
-        ):
+        with self.lock.acquire(timeout=MAIL_FETCHER_FILELOCK_TIMEOUT):
             messages = self._fetch(imapc)
-            cleaned_mails = [DecodedMail(
-                m.message,
-                m.uid,
-                self.reply_to_pattern,
-                self.references_pattern
-            ) for m in messages]
+            cleaned_mails = [
+                DecodedMail(m.message, m.uid, self.reply_to_pattern, self.references_pattern)
+                for m in messages
+            ]
             self._notify_tracim(cleaned_mails, imapc)
 
     def stop(self) -> None:
         self._is_active = False
 
-    def _fetch(
-        self, 
-        imapc: imapclient.IMAPClient,
-    ) -> typing.List[MessageContainer]:
+    def _fetch(self, imapc: imapclient.IMAPClient) -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
         """
         messages = []
 
-        logger.debug(self, 'Fetch unflagged messages')
-        uids = imapc.search(['UNFLAGGED'])
-        logger.debug(self, 'Found {} unflagged mails'.format(
-            len(uids),
-        ))
-        for msgid, data in imapc.fetch(uids, ['BODY.PEEK[]']).items():
+        logger.debug(self, "Fetch unflagged messages")
+        uids = imapc.search(["UNFLAGGED"])
+        logger.debug(self, "Found {} unflagged mails".format(len(uids)))
+        for msgid, data in imapc.fetch(uids, ["BODY.PEEK[]"]).items():
             # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
             # Retrieve all mail(body and header) but don't set mail
             # as seen because of PEEK
             # see rfc3501
-            logger.debug(self, 'Fetch mail "{}"'.format(
-                msgid,
-            ))
+            logger.debug(self, 'Fetch mail "{}"'.format(msgid))
 
             try:
-                msg = message_from_bytes(data[b'BODY[]'])
+                msg = message_from_bytes(data[b"BODY[]"])
             except KeyError as e:
                 # INFO - G.M - 12-01-2018 - Fetch may return events response
                 # In some specific case, fetch command may return events
@@ -428,7 +403,7 @@ class MailFetcher(object):
                 # This should happen only when someone-else use the mailbox
                 # at the same time of the fetcher.
                 # see https://github.com/mjs/imapclient/issues/334
-                except_msg = 'fetch response : {}'.format(str(data))
+                except_msg = "fetch response : {}".format(str(data))
                 raise BadIMAPFetchResponse(except_msg) from e
 
             msg_container = MessageContainer(msg, msgid)
@@ -436,19 +411,13 @@ class MailFetcher(object):
 
         return messages
 
-    def _notify_tracim(
-        self,
-        mails: typing.List[DecodedMail],
-        imapc: imapclient.IMAPClient
-    ) -> None:
+    def _notify_tracim(self, mails: typing.List[DecodedMail], imapc: imapclient.IMAPClient) -> None:
         """
         Send http request to tracim endpoint
         :param mails: list of mails to send
         :return: none
         """
-        logger.debug(self, 'Notify tracim about {} new responses'.format(
-            len(mails),
-        ))
+        logger.debug(self, "Notify tracim about {} new responses".format(len(mails)))
         # TODO BS 20171124: Look around mail.get_from_address(), mail.get_key()
         # , mail.get_body() etc ... for raise InvalidEmailError if missing
         #  required informations (actually get_from_address raise IndexError
@@ -456,17 +425,17 @@ class MailFetcher(object):
         while mails:
             mail = mails.pop()
             try:
-                method, endpoint, json_body_dict = self._create_comment_request(mail)  # nopep8
+                method, endpoint, json_body_dict = self._create_comment_request(mail)
             except NoSpecialKeyFound as exc:
-                log = 'Failed to create comment request due to missing specialkey in mail {}'  # nopep8
+                log = "Failed to create comment request due to missing specialkey in mail {}"
                 logger.error(self, log.format(exc.__str__()))
                 continue
-            except EmptyEmailBody as exc:
-                log = 'Empty body, skip mail'
+            except EmptyEmailBody:
+                log = "Empty body, skip mail"
                 logger.error(self, log)
                 continue
             except Exception as exc:
-                log = 'Failed to create comment request in mail fetcher error : {}'  # nopep8
+                log = "Failed to create comment request in mail fetcher error : {}"
                 logger.error(self, log.format(exc.__str__()))
                 continue
 
@@ -479,73 +448,61 @@ class MailFetcher(object):
                     json_body_dict=json_body_dict,
                 )
             except requests.exceptions.Timeout as e:
-                log = 'Timeout error to transmit fetched mail to tracim : {}'
+                log = "Timeout error to transmit fetched mail to tracim : {}"
                 logger.error(self, log.format(str(e)))
             except requests.exceptions.RequestException as e:
-                log = 'Fail to transmit fetched mail to tracim : {}'
+                log = "Fail to transmit fetched mail to tracim : {}"
                 logger.error(self, log.format(str(e)))
 
     def _get_auth_headers(self, user_email) -> dict:
-        return {
-            TRACIM_API_KEY_HEADER: self.api_key,
-            TRACIM_API_USER_EMAIL_LOGIN_HEADER: user_email
-        }
+        return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_EMAIL_LOGIN_HEADER: user_email}
 
     def _get_content_info(self, content_id, user_email):
-        endpoint = '{api_base_url}contents/{content_id}'.format(
-            api_base_url=self.api_base_url,
-            content_id=content_id,
+        endpoint = "{api_base_url}contents/{content_id}".format(
+            api_base_url=self.api_base_url, content_id=content_id
         )
-        result = requests.get(
-            endpoint,
-            headers=self._get_auth_headers(user_email)
-        )
+        result = requests.get(endpoint, headers=self._get_auth_headers(user_email))
         if result.status_code not in [200, 204]:
             details = str(result.content)
-            msg = 'bad status code {}(200 is valid) response when trying to get info about a content: {}'  # nopep8
+            msg = "bad status code {}(200 is valid) response when trying to get info about a content: {}"
             msg = msg.format(str(result.status_code), details)
             raise BadStatusCode(msg)
         return result.json()
 
-    def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:  # nopep8
+    def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:
         content_id = mail.get_key()
-        content_info = self._get_content_info(content_id, mail.get_from_address())  # nopep8
+        content_info = self._get_content_info(content_id, mail.get_from_address())
         mail_body = mail.get_body(
-            use_html_parsing=self.use_html_parsing,
-            use_txt_parsing=self.use_txt_parsing,
+            use_html_parsing=self.use_html_parsing, use_txt_parsing=self.use_txt_parsing
         )
-        endpoint = '{api_base_url}workspaces/{workspace_id}/contents/{content_id}/comments'.format(  # nopep8
+        endpoint = "{api_base_url}workspaces/{workspace_id}/contents/{content_id}/comments".format(
             api_base_url=self.api_base_url,
             content_id=content_id,
-            workspace_id=content_info['workspace_id']
+            workspace_id=content_info["workspace_id"],
         )
-        method = 'POST'
-        body = {
-            'raw_content': mail_body
-        }
+        method = "POST"
+        body = {"raw_content": mail_body}
         return method, endpoint, body
 
     def _send_request(
-            self,
-            mail: DecodedMail,
-            imapc: imapclient.IMAPClient,
-            method: str,
-            endpoint: str,
-            json_body_dict: dict
+        self,
+        mail: DecodedMail,
+        imapc: imapclient.IMAPClient,
+        method: str,
+        endpoint: str,
+        json_body_dict: dict,
     ):
         logger.debug(
             self,
-            'Contact API on {endpoint} with method {method} with body {body}'.format(   # nopep8
-                endpoint=endpoint,
-                method=method,
-                body=str(json_body_dict),
+            "Contact API on {endpoint} with method {method} with body {body}".format(
+                endpoint=endpoint, method=method, body=str(json_body_dict)
             ),
         )
-        if method == 'POST':
+        if method == "POST":
             request_method = requests.post
         else:
             # TODO - G.M - 2018-08-24 - Better handling exception
-            raise UnsupportedRequestMethod('Request method not supported')
+            raise UnsupportedRequestMethod("Request method not supported")
 
         r = request_method(
             url=endpoint,
@@ -553,8 +510,8 @@ class MailFetcher(object):
             headers=self._get_auth_headers(mail.get_from_address()),
         )
         if r.status_code not in [200, 204]:
-            details = r.json().get('message')
-            msg = 'bad status code {} (200 and 204 are valid) response when sending mail to tracim: {}'  # nopep8
+            details = r.json().get("message")
+            msg = "bad status code {} (200 and 204 are valid) response when sending mail to tracim: {}"
             msg = msg.format(str(r.status_code), details)
             raise BadStatusCode(msg)
         # Flag all correctly checked mail

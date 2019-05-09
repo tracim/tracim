@@ -116,28 +116,18 @@ folderopen()
             margin-right 0
           &::after
             margin-left 20px
+          &-desktop
+            display inline
+          &-responsive
+            display none
       .addbtn__subdropdown
         padding 0
     &__status
       flex-grow 0
       padding 0 15px
       width 180px
-    &__contenttype
-      display flex
-      justify-content flex-end
-      &__text
-        font-size 17px
-        color darkBlue
-      &__icon
-        font-size 17px
-        color darkBlue
-        & > i
-          margin-right 3px
-
-// MEDIAQUERIES
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
   .folder
     &__header
       &__button__addbtn__text
@@ -158,3 +148,11 @@ folderopen()
         margin-right 15px
       &__status
         display none
+      &__button__addbtn__text
+        &-desktop
+          display none
+        &-responsive
+          display inline
+        &::after
+          display none // hide the dropdown triangle
+

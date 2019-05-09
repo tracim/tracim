@@ -4,13 +4,12 @@ import { Provider } from 'react-redux'
 import { store } from './store.js'
 import Tracim from './container/Tracim.jsx'
 import { Router } from 'react-router'
-import createBrowserHistory from 'history/createBrowserHistory'
 import { I18nextProvider } from 'react-i18next'
 import i18n from './i18n.js'
 
-require('./css/index.styl')
+export const history = require('history').createBrowserHistory()
 
-export const history = createBrowserHistory()
+require('./css/index.styl')
 
 ReactDOM.render(
   <Provider store={store}>

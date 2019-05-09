@@ -15,7 +15,7 @@ import {
 import { debug } from '../helper.js'
 import {
   getFolder,
-  getAppList,
+  getContentTypeList,
   putFolder,
   // putFolderStatus,
   putFolderIsArchived,
@@ -33,11 +33,11 @@ class FolderAdvanced extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
-      externalTradList: [
+      externalTranslationList: [
         props.t('Create a folder'),
         props.t('Folder')
       ],
-      tracimAppList: []
+      tracimContentTypeList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -98,16 +98,16 @@ class FolderAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchFolder = await handleFetchResult(await getFolder(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
-    const fetchAppList = await handleFetchResult(await getAppList(state.config.apiUrl))
+    const fetchContentTypeList = await handleFetchResult(await getContentTypeList(state.config.apiUrl))
 
     switch (fetchFolder.apiResponse.status) {
       case 200: this.setState({content: fetchFolder.body}); break
       default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
     }
 
-    switch (fetchAppList.apiResponse.status) {
-      case 200: this.setState({tracimAppList: fetchAppList.body}); break
-      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's app list"), 'warning')
+    switch (fetchContentTypeList.apiResponse.status) {
+      case 200: this.setState({tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment')}); break
+      default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
     }
   }
 
@@ -133,13 +133,11 @@ class FolderAdvanced extends React.Component {
   handleClickCheckbox = async appSlug => {
     const { props, state } = this
 
-    const simpleAppSlug = (appSlug.split('/') || ['', ''])[1] // appSlug are like 'content/${slug}' and need to remove 'content/'
-
     const oldAvailableAppList = state.content.sub_content_types
 
-    const newAvailableAppList = state.content.sub_content_types.find(c => c === simpleAppSlug)
-      ? state.content.sub_content_types.filter(c => c !== simpleAppSlug)
-      : [...state.content.sub_content_types, simpleAppSlug]
+    const newAvailableAppList = state.content.sub_content_types.find(c => c === appSlug)
+      ? state.content.sub_content_types.filter(c => c !== appSlug)
+      : [...state.content.sub_content_types, appSlug]
 
     this.setState(prev => ({content: {...prev.content, sub_content_types: newAvailableAppList}}))
 
@@ -263,8 +261,8 @@ class FolderAdvanced extends React.Component {
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <FolderAdvancedComponent
-            folderSubContentType={(state.content.sub_content_types || []).map(c => `contents/${c}`)}
-            tracimAppList={state.tracimAppList}
+            folderSubContentType={state.content.sub_content_types || []}
+            tracimContentTypeList={state.tracimContentTypeList}
             onClickApp={this.handleClickCheckbox}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}

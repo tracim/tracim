@@ -1,0 +1,24 @@
+        RewriteEngine On
+        <IfModule mod_headers.c>
+                Header unset Access-Control-Allow-Origin
+                Header unset Access-Control-Allow-Methods
+                Header unset Access-Control-Allow-Headers
+                Header unset Access-Control-Allow-Credentials
+                Header unset Access-Control-Expose-Headers
+
+                # If your setup is working and complete you can replace the "*" with CardDavMATE instalation
+                #  origin (protocol/host/port) - see the examples below (for multiple origins use multiple headers)
+                #Header always set Access-Control-Allow-Origin "http://www.server.com"
+                #Header always set Access-Control-Allow-Origin "https://www.server.com"
+                #Header always set Access-Control-Allow-Origin "https://www.server.com:8080"
+
+                Header always set Access-Control-Allow-Origin "*"
+                Header always set Access-Control-Allow-Methods "GET,POST,OPTIONS,PROPFIND,PROPPATCH,REPORT,PUT,MOVE,DELETE,LOCK,UNLOCK"
+                Header always set Access-Control-Allow-Headers "User-Agent,Authorization,Content-type,Depth,If-match,If-None-Match,Lock-Token,Timeout,Destination,Overwrite,Prefer,X-client,X-Requested-With"
+                Header always set Access-Control-Allow-Credentials false
+                Header always set Access-Control-Expose-Headers "Etag,Preference-Applied"
+
+                RewriteCond %{HTTP:Access-Control-Request-Method} !^$
+                RewriteCond %{REQUEST_METHOD} OPTIONS
+                RewriteRule ^(.*)$ $1 [R=200,L]
+        </IfModule>

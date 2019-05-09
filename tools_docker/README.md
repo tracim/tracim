@@ -33,9 +33,13 @@ If you want to use reply_by_email function:
 
 * REPLY_BY_EMAIL=1 (if email reply is enabled)
 
-If you want to use async for sendinf email
+If you want to use async for sendinf email:
 
 * EMAIL_MODE_ASYNC=1 (for async email notification)
+
+If you want to use caldav:
+
+* START_CALDAV=1 (to activate agenda in tracim)
 
 #### Example commands
 
@@ -61,12 +65,13 @@ Example with SQLite
                -p 80:80 \
                -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
                
-Exemple with SQlite, webdav, reply_by_email and email_mode_async
+Exemple with SQlite, webdav, reply_by_email, email_mode_async and caldav:
 
     docker run -e DATABASE_TYPE=sqlite \
                -e START_WEBDAV=1 \
                -e REPLY_BY_EMAIL=1 \
                -e EMAIL_MODE_ASYNC=1 \
+               -e START_CALDAV=1 \
                -p 80:80 \
                -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
 

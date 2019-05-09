@@ -13,9 +13,19 @@ const AdminWorkspace = props =>
       parentClass={'adminWorkspace'}
       title={props.t('Shared space management')}
       icon={'bank'}
+      breadcrumbsList={props.breadcrumbsList}
     />
 
     <PageContent parentClass='adminWorkspace'>
+      <div className='adminWorkspace__btnnewworkspace'>
+        <button
+          className='adminWorkspace__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+          onClick={props.onClickNewWorkspace}
+        >
+          {props.t('Create a shared space')}
+        </button>
+      </div>
+
       <div className='adminWorkspace__description'>
         {props.t('List of every shared spaces')}
       </div>

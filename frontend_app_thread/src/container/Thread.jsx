@@ -14,7 +14,9 @@ import {
   ArchiveDeleteContent,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  appFeatureCustomEventHandlerShowApp,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -42,9 +44,12 @@ class Thread extends React.Component {
       listMessage: props.data ? [] : [], // debug.listMessage,
       newComment: '',
       timelineWysiwyg: false,
-      externalTradList: [
-        i18n.t('Start a topic'),
-        i18n.t('Threads')
+      externalTranslationList: [
+        props.t('Thread'),
+        props.t('Threads'),
+        props.t('thread'),
+        props.t('threads'),
+        props.t('Start a topic')
       ]
     }
 
@@ -60,8 +65,10 @@ class Thread extends React.Component {
     switch (type) {
       case 'thread_showApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
+
       case 'thread_hideApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -70,6 +77,7 @@ class Thread extends React.Component {
           timelineWysiwyg: false
         })
         break
+
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
@@ -85,6 +93,7 @@ class Thread extends React.Component {
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
         }))
         break
+
       case 'allApp_changeLang':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
 
@@ -105,7 +114,7 @@ class Thread extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
 
     const { appName, content } = this.state
@@ -114,17 +123,21 @@ class Thread extends React.Component {
     )
     if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
-    this.loadContent()
+    await this.loadContent()
+    this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Thread> did Update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<Thread> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      await this.loadContent()
+      this.buildBreadcrumbs()
+    }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
@@ -198,6 +211,22 @@ class Thread extends React.Component {
     GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
   }
 
+  buildBreadcrumbs = () => {
+    const { state } = this
+
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          label: state.content.label,
+          link: null,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }]
+      }
+    })
+  }
+
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
@@ -217,6 +246,7 @@ class Thread extends React.Component {
         break
       case 400:
         switch (fetchResultSaveThread.body.code) {
+          case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
           case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
@@ -263,18 +293,18 @@ class Thread extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { state, props } = this
 
-    const fetchResultSaveEditStatus = putThreadStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    if (newStatus === state.content.status) return
 
-    handleFetchResult(await fetchResultSaveEditStatus)
-      .then(resSave => {
-        if (resSave.status === 204) { // 204 no content so dont take status from resSave.apiResponse.status
-          this.loadContent()
-        } else {
-          console.warn('Error saving thread comment. Result:', resSave, 'content:', content, 'config:', config)
-        }
-      })
+    const fetchResultSaveEditStatus = await handleFetchResult(
+      await putThreadStatus(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newStatus)
+    )
+
+    switch (fetchResultSaveEditStatus.status) {
+      case 204: this.loadContent(); break
+      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
+    }
   }
 
   handleClickArchive = async () => {
@@ -410,6 +440,7 @@ class Thread extends React.Component {
             timelineData={listMessage}
             newComment={newComment}
             disableComment={!content.is_editable}
+            availableStatusList={config.availableStatuses}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

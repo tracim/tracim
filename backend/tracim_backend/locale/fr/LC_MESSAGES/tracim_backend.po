@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-01-30 11:47+0100\n"
+"POT-Creation-Date: 2019-03-24 17:01+0100\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,75 +18,75 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:282
+#: tracim_backend/config.py:287
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:290
+#: tracim_backend/config.py:295
 msgid "[{website_title}] Someone created an account for you"
-msgstr "[{website_title}] Quelqu'un vous à créer un compte"
+msgstr "[{website_title}] Quelqu'un vous à créé un compte"
 
-#: tracim_backend/config.py:299
+#: tracim_backend/config.py:304
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
-#: tracim_backend/app_models/contents.py:48
+#: tracim_backend/app_models/contents.py:46
 msgid "Open"
 msgstr "Ouvert"
 
-#: tracim_backend/app_models/contents.py:56
+#: tracim_backend/app_models/contents.py:54
 msgid "Validated"
 msgstr "Validé"
 
-#: tracim_backend/app_models/contents.py:64
+#: tracim_backend/app_models/contents.py:62
 msgid "Cancelled"
 msgstr "Annulé"
 
-#: tracim_backend/app_models/contents.py:72
+#: tracim_backend/app_models/contents.py:70
 msgid "Deprecated"
 msgstr "Obsolète"
 
-#: tracim_backend/lib/core/content.py:2138
+#: tracim_backend/lib/core/content.py:2174
 msgid "New folder"
 msgstr "Nouveau dossier"
 
-#: tracim_backend/lib/core/content.py:2143
+#: tracim_backend/lib/core/content.py:2179
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
-#: tracim_backend/lib/core/workspace.py:295
+#: tracim_backend/lib/core/workspace.py:298
 msgid "Workspace"
 msgstr "Espace partagé"
 
-#: tracim_backend/lib/core/workspace.py:298
+#: tracim_backend/lib/core/workspace.py:301
 msgid "Workspace {}"
 msgstr "Espace partagé {0}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:300
+#: tracim_backend/lib/mail_notifier/notifier.py:311
 msgid "{username} & all members of {workspace}"
-msgstr "{username} & tout tout les membres de {workspace}"
+msgstr "{username} & tous les membres de {workspace}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:607
+#: tracim_backend/lib/mail_notifier/notifier.py:550
 msgid ""
-"I modified the status of <i>{content}</i>. The new status is "
+"I modified the status of {content_name}. The new status is "
 "<i>{new_status}</i>"
 msgstr ""
-"J'ai modifié le status de <i>{content}</i>. Le nouveau status est "
+"J'ai modifié le statut de {content_name}. Le nouveau statut est "
 "<i>{new_status}</i>"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:615
-msgid "I added an item entitled <i>{content}</i>."
-msgstr "J'ai ajouté un élément nommé <i>{content}</i>."
+#: tracim_backend/lib/mail_notifier/notifier.py:562
+msgid "I added an item entitled {content_name}."
+msgstr "J'ai ajouté un élément nommé {content_name}."
 
-#: tracim_backend/lib/mail_notifier/notifier.py:619
-msgid "I updated <i>{content}</i>."
-msgstr "J'ai mis à jour <i>{content}</i>\""
+#: tracim_backend/lib/mail_notifier/notifier.py:572
+msgid "I updated {content_name}."
+msgstr "J'ai mis à jour {content_name}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:626
+#: tracim_backend/lib/mail_notifier/notifier.py:578
 msgid "Here is an overview of the changes:"
-msgstr "Voici une vue d'ensemble des changements:"
+msgstr "Voici une vue d'ensemble des changements :"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:17
 msgid ""
@@ -94,11 +94,11 @@ msgid ""
 "on tracim</a>"
 msgstr ""
 "Répondez directement à cet email ou <a "
-"href=\"{call_to_action_url}\">aller voir sur tracim</a>"
+"href=\"{call_to_action_url}\">allez voir sur tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:19
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
-msgstr "<a href=\\{call_to_action_url}\\>aller voir sur tracim</a>"
+msgstr "<a href=\"{call_to_action_url}\">aller voir sur tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:21
 msgid "You're receiving this email because of your account on {website_title}."
@@ -119,19 +119,19 @@ msgstr "Bonjour {username},"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:4
 msgid "Someone invited you to join <i>{website_title}</i>."
-msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title<i>."
+msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title}<i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:6
 msgid "Your credentials are:"
-msgstr "Vos identifiants sont:"
+msgstr "Vos identifiants sont :"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:9
 msgid "login: {email_address}"
-msgstr "login: {email_address}"
+msgstr "login : {email_address}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:10
 msgid "password: {password}"
-msgstr "mot de passe: {password}"
+msgstr "mot de passe : {password}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:14
 msgid ""
@@ -139,7 +139,7 @@ msgid ""
 "collaborators by logging into your shared space: {a_link}"
 msgstr ""
 "Commençez à discuter, partager des fichiers, agendas et documentations "
-"avec vos collaborateurs en vous connectant dans votre espace partagé: "
+"avec vos collaborateurs en vous connectant dans votre espace partagé : "
 "{a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:16
@@ -174,7 +174,7 @@ msgid ""
 "Someone has requested to reset the password for your account on "
 "<i>{website_title}</i>."
 msgstr ""
-"Quelqu'un à demandez la réinitialisation du mot de passe de votre compte "
+"Quelqu'un à demandé la réinitialisation du mot de passe de votre compte "
 "sur <i>{website_title}</i>"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:6
@@ -197,5 +197,5 @@ msgstr "Réinitialiser mon mot de passe"
 msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
 "Si le lien ne fonctionne pas, Je vous suggère de copier/coller l'url "
-"entière:"
+"entière :"
 

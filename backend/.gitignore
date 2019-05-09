@@ -62,9 +62,11 @@ track.js
 depot/
 sessions_data/
 sessions_lock/
+radicale_storage/
 
 # binary translation files
 *.mo
 .mypy_cache/
 
 backend.json
+radicale.ini

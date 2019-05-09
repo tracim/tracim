@@ -43,14 +43,26 @@ This will drop all your database, be carefull !
     tracimcli user create -h
     tracimcli user update -h
  
-## Help ##
+## Caldav ##
 
-    tracimcli -h
-    
-## Run services ##
+### Run service ###
 
-### Webdav wsgidav server ###
+    tracimcli caldav start
+
+### Check and recreate agenda for user/workspace ###
+
+in some case, agenda of user or workspace can failed to be created,
+to check if all agenda are created and force their creation if they're not,
+you can do:
+
+    tracimcli caldav agenda create
+
+## Webdav ##
+
+### Run service ###
 
     tracimcli webdav start
 
+## Help ##
 
+    tracimcli -h

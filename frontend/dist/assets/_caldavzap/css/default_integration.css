@@ -1,0 +1,241 @@
+.integration_d
+{
+	position: absolute;
+	display: none;
+	overflow: hidden;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 49px;
+	background: #f0f0f0;
+	color: #FFFFFF;
+	border-right: 1px solid #c0c0c0;
+	z-index: 26;
+	padding-top: 3px;
+	cursor: default;
+
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.integration_d div
+{
+	display: none;
+	height: 36px;
+	width: 36px;
+	padding: 7px 7px;
+	cursor: pointer;
+}
+
+.integration_d .intBlank
+{
+	cursor: default;
+}
+
+#intCaldav
+{
+	background: url(../images/banner_calendar.svg) no-repeat center;
+}
+
+#intCaldavTodo
+{
+	background: url(../images/banner_todo.svg) no-repeat center;
+}
+
+#intCarddav
+{
+	/*background: url(../images/banner_addressbook.svg) no-repeat center;*/
+}
+
+#intProjects
+{
+	/*background: url(../images/banner_projects.svg) no-repeat center;*/
+}
+
+#intReports
+{
+	/*background: url(../images/banner_reports.svg) no-repeat center;*/
+}
+
+#intSettings
+{
+	/*background: url(../images/banner_settings.svg) no-repeat center;*/
+}
+
+#intRefresh
+{
+	background: url(../images/banner_refresh.svg) no-repeat center;
+}
+
+#intLogout
+{
+	background: url(../images/banner_logout.svg) no-repeat center;
+}
+
+.int_error
+{
+	display: none;
+	margin: 28px 0px 0px 28px;
+}
+
+#resourceCalDAV_h, #resourceCalDAVTODO_h, #ResourceCalDAVList, #ResourceCalDAVTODOList, #timezoneWrapper, #timezoneWrapperTODO
+{
+	left: 0; /* default value 50px */
+}
+
+#main, #main_h, #searchForm, #mainTODO, #main_h_TODO, #searchFormTODO
+{
+	left: 224px; /* default value 274px */
+}
+
+#MainLoader, #EventDisabler, #TodoDisabler, #AlertDisabler, #ProjectsDisabler
+{
+	left: 0; /* default value 50px */
+}
+
+#CalendarLoader, #CalendarLoaderTODO
+{
+	left: 224px; /* default value 275px */
+}
+
+.resourcesCardDAV_d, #ResourceCardDAVList, #ResourceCardDAVListOverlay
+{
+	left: 0; /* default value 50px */
+}
+
+.collection_d, #SearchBox, #ABList, #ABListOverlay, #AddressbookOverlay
+{
+	left: 224px; /* default value 275px */
+}
+
+/*.contact_d, #ABContactColor, #ABContactOverlay, #ABMessage
+{
+	left: 526px;
+}
+
+#ABContact
+{
+	left: 529px;
+}*/
+
+.filters_d, .statistics_d, #FilterList, #ProjectsData, #SystemProjectsLock, #SystemReportsLock, #ProjectListDisabler
+{
+	left: 50px; /* default value 50px */
+}
+
+.projects_d, #ProjectList, #SearchBoxProject, #ProjectListOverlay
+{
+	left: 375px; /* default value 375px */
+}
+
+.project_d, #ProjectForm, #ProjectFormLoader, #ProjectEventsContainer, #ActivityListDisabler, #ProjectFormMessage
+{
+	left: 626px; /* default value 626px */
+}
+
+.resourcesReports_d, #ResourceReportsList
+{
+	left: 50px; /* default value 50px */
+}
+
+.resourcesSettings_d, #ResourceSettingsList
+{
+	left: 50px; /* default value 50px */
+}
+
+#ResourceReportsListOverlay
+{
+	left: 50px; /* default value 50px */
+}
+
+.report_filters_d, #ReportFilterList
+{
+	left: 275px; /* default value 275px */
+}
+
+.reports_d, #ReportsColor, #ReportsFormOverlay
+{
+	left: 600px; /* default value 600px */
+}
+
+#ReportsForm
+{
+	left: 603px; /* default value 603px */
+}
+
+#ResourceSettingsListOverlay
+{
+	left: 50px; /* default value 50px */
+}
+
+.settings_d, #SettingsColor, #SettingsFormOverlay
+{
+	left: 275px; /* default value 275px */
+}
+
+#SettingsForm
+{
+	left: 278px; /* default value 278px */
+}
+
+
+/***** Modification tracim v2 *****/
+
+.integration_d {
+  display: none !important;
+}
+#ResourceCalDAVToggle {
+  display: none;
+}
+#ResourceCalDAVList {
+  top: 34px;
+}
+#resourceCalDAV_h {
+  height: 69px;
+}
+.headers span[data-type=resourcesCalDAV_txt] {
+  padding: 10px 0 0 50px
+}
+#showUnloadedCalendars {
+  display: none;
+}
+#searchForm > img {
+  margin-left: 48px !important;
+}
+.searchContainer {
+  left: 70px;
+}
+/*
+  FIXME - CH - 2018/04/05 - commented css below is used to move the timezone to give space to the scroll to top btn
+  from sidebar. See https://github.com/tracim/tracim/issues/1554
+#timezoneWrapper {
+  height: 37px;
+  z-index: 25;
+}
+#timezoneWrapper > label {
+  display: block;
+  max-width: none;
+  margin-right: 86px;
+  text-align: right;
+}
+#timezoneWrapper > #timezoneSelectDiv {
+  position: static;
+  width: calc(100% - 42px);
+  margin-left: 42px;
+  text-align: right;
+}
+#timezoneWrapper > #timezoneSelectDiv > #timezonePicker {
+  width: 100%;
+}
+*/
+
+#caldavzap__fullscreenbtn {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  cursor: pointer;
+}
+#loadUnloadedCalendars, #loadUnloadedCalendarsCancel {
+  display: none;
+}

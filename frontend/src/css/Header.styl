@@ -5,14 +5,17 @@
     opacity 0
 
 .header
-  position fixed
   width 100%
-  border-bottom 1px solid grey
-  z-index 30
+  & .navbar
+    padding 5px
+    z-index 30 // INFO - CH - 2019-04-18 - higher than .wsContentGeneric and lower than caldavzap fullscreen
+    border-bottom 1px solid grey
   &__logo
+    padding 0
     cursor pointer
     &__img
-      width 150px
+      max-width 150px
+      max-height 50px
   &__breadcrumb
     width auto
   &__menu
@@ -30,29 +33,21 @@
     &__system
       display flex
       justify-content flex-end
-      width 100%
+      align-items center
+      height 100%
       &__icon
         margin-right 5px
         opacity 1
       &__text
         margin-right 5px
-        font-size 14px
+        font-size 12px
     &__rightside
       display flex
-      margin-top 15px
+      justify-content flex-end
+      margin 5px 0
       list-style none
-      &__adminlink
-        .adminlink
-          &__btn
-            margin-right 15px
-            &::after
-              margin-left 15px
-          &__setting
-            padding 0
-            .setting__link
-              padding 10px
-              &:hover
-                color offWhite
+      & li:not(:last-child)
+        margin-right 10px
       &__itemsearch
         display none
         margin-right 8%
@@ -68,39 +63,6 @@
           margin-right 30px
           .btnquestion__icon
             color darkGrey
-      &__itemprofil
-        .profilgroup
-          margin-right 30px
-          &__name
-            border 0
-            padding 0 5px
-            &::after //bootstrap overrides
-              vertical-align middle
-              color darkGrey
-            &__imgprofil
-              display inline-block
-              margin-right 10px
-              width 40px
-              height 40px
-            &__text
-              display inline-block
-              margin-right 10px
-          &__sub
-            color darkGrey
-            cursor pointer
-            &:focus
-              box-shadow none
-          &__setting
-            padding 0
-            left inherit
-            right 0
-            width 100%
-            cursor pointer
-            .setting__link
-              padding 10px
-              // color fontColor
-              &:hover
-                color offWhite
       &__itemnotification
         display none
         &__timeline
@@ -117,8 +79,12 @@
               cursor pointer
               &__text
                 padding 10px;
-
-// MEDIAQUERIES
+      &__agenda
+        margin-right 15px
+        & .btn
+          font-size 14px
+        & .fa
+          margin-right 8px
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .header
@@ -136,11 +102,22 @@
       &__rightside
         width 100%
 
+
+responsiveNavbarCollapseFixed =
+  position fixed
+  left 0
+  top "calc(%s - 1px)" % headerHeight
+  width 100%
+  background-color #f8f9fa
+  border-bottom 1px solid #ccc
+
 @media (min-width: min-sm) and (max-width: max-sm)
   .header
     &__logo__img
       margin-left 0
     &__menu
+      &.navbar-collapse
+        {responsiveNavbarCollapseFixed}
       &__rightside
         padding-left 0
         width 100%
@@ -152,19 +129,12 @@
     &__logo__img
       margin-left 0
     &__menu
+      &.navbar-collapse
+        {responsiveNavbarCollapseFixed}
       &__rightside
         flex-wrap wrap
         padding-left 0
-        &__adminlink
-          margin-bottom 20px
-        &__itemlanguage
-          margin-bottom 20px
+        & li
+          margin 2px 0
         &__itemquestion
           display none
-        &__itemprofil
-          &__profilgroup
-            margin-top 20px
-          .profilgroup__setting
-            left 0
-
-

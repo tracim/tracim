@@ -1,17 +1,38 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest a new feature
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Feature description
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+*Explain the requested feature and the functionnal and technical expectations.*
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Context
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+*Explain the why and the how of the requested feature.*
+
+## Prerequisites
+
+*Optional - if some other issues must be closed before the current, list them here.*
+
+- *#xxx*
+- *...*
+
+## Impacted components
+
+*Optional - list components which will be impacted.*
+
+*For example:*
+
+- *backend*
+- *frontend*
+- *htmldoc / file / thread app*
+- *webdav*
+- *...*
+
+*If unsure, write "unknown"*
+
+## Extra information
+
+*Optional - Add any extra information which will be usefull for understanding and developing the feature*

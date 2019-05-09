@@ -16,11 +16,13 @@ import {
   getWorkspaceMember,
   putLabel,
   putDescription,
+  putAgendaEnabled,
   putMemberRole,
   deleteMember,
   getMyselfKnownMember,
   postWorkspaceMember,
-  deleteWorkspace
+  deleteWorkspace,
+  getAppList
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -117,23 +119,28 @@ class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
     const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id))
+    const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
-    const [resDetail, resMember] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember])
+    const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
 
     if (resDetail.apiResponse.status !== 200) {
       this.sendGlobalFlashMessage(props.t('Error while loading shared space details', 'warning'))
       resDetail.body = {}
     }
-
     if (resMember.apiResponse.status !== 200) {
       this.sendGlobalFlashMessage(props.t('Error while loading members list', 'warning'))
       resMember.body = []
+    }
+    if (resAppList.apiResponse.status !== 200) {
+      this.sendGlobalFlashMessage(props.t('Error while loading app list', 'warning'))
+      resAppList.body = []
     }
 
     this.setState({
       content: {
         ...resDetail.body,
-        memberList: resMember.body
+        memberList: resMember.body,
+        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda')
       }
     })
   }
@@ -145,7 +152,8 @@ class WorkspaceAdvanced extends React.Component {
 
   handleSaveEditLabel = async newLabel => {
     const { props, state } = this
-    const fetchPutWorkspaceLabel = await handleFetchResult(await putLabel(state.config.apiUrl, state.content.workspace_id, newLabel, state.content.description))
+    const fetchPutWorkspaceLabel = await handleFetchResult(await putLabel(state.config.apiUrl, state.content, newLabel))
+
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
@@ -164,7 +172,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleClickValidateNewDescription = async () => {
     const { props, state } = this
-    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content.workspace_id, state.content.label, state.content.description))
+    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, state.content.description))
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200:
@@ -190,6 +198,33 @@ class WorkspaceAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: 'refreshDashboardMemberList', data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
+    }
+  }
+
+  handleToggleAgendaEnabled = async () => {
+    const { props, state } = this
+    const oldAgendaEnabledValue = state.content.agenda_enabled
+    const newAgendaEnabledValue = !state.content.agenda_enabled
+
+    this.setState(prev => ({content: {...prev.content, agenda_enabled: newAgendaEnabledValue}}))
+    const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
+
+    switch (fetchToggleAgendaEnabled.apiResponse.status) {
+      case 200:
+        this.sendGlobalFlashMessage(
+          newAgendaEnabledValue ? props.t('Agenda activated') : props.t('Agenda deactivated'),
+          'info'
+        )
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // @INFO - CH - 2018-04-01 - for sidebar and dashboard and admin workspace
+        break
+      default:
+        this.setState(prev => ({content: {...prev.content, agenda_enabled: oldAgendaEnabledValue}}))
+        this.sendGlobalFlashMessage(
+          newAgendaEnabledValue
+            ? props.t('Error while activating agenda')
+            : props.t('Error while deactivating agenda'),
+          'warning'
+        )
     }
   }
 
@@ -263,12 +298,12 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     if (state.newMember.nameOrEmail === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a name or email', 'warning'))
+      this.sendGlobalFlashMessage(props.t('Please set a name or email'), 'warning')
       return
     }
 
     if (state.newMember.role === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a role', 'warning'))
+      this.sendGlobalFlashMessage(props.t('Please set a role'), 'warning')
       return
     }
 
@@ -383,27 +418,17 @@ class WorkspaceAdvanced extends React.Component {
           <WorkspaceAdvancedComponent
             customColor={state.config.hexcolor}
             description={state.content.description}
-            onChangeDescription={this.handleChangeDescription}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             roleList={state.config.roleList}
-            onClickNewRole={this.handleClickNewRole}
             memberList={state.content.memberList}
+            agendaEnabled={state.content.agenda_enabled}
+            appAgendaAvailable={state.content.appAgendaAvailable}
             displayFormNewMember={state.displayFormNewMember}
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
             newMemberName={state.newMember.nameOrEmail}
             isEmail={state.newMember.isEmail}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
             newMemberRole={state.newMember.role}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickDeleteMember={this.handleClickDeleteMember}
             searchedKnownMemberList={state.searchedKnownMemberList}
-            onClickKnownMember={this.handleClickKnownMember}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
-            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
-            onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
-            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             loggedUser={state.loggedUser}
             idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
             canSendInviteNewUser={
@@ -411,7 +436,20 @@ class WorkspaceAdvanced extends React.Component {
             }
             emailNotifActivated={state.config.system.config.email_notification_activated}
             autoCompleteClicked={state.autoCompleteClicked}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            onClickNewRole={this.handleClickNewRole}
+            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+            onClickNewMemberRole={this.handleClickNewMemberRole}
+            onClickDeleteMember={this.handleClickDeleteMember}
+            onClickKnownMember={this.handleClickKnownMember}
+            onClickValidateNewMember={this.handleClickValidateNewMember}
+            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
+            onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
+            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             onClickAutoComplete={this.handleClickAutoComplete}
+            onChangeDescription={this.handleChangeDescription}
+            onChangeNewMemberName={this.handleChangeNewMemberName}
+            onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>

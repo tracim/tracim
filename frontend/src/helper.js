@@ -28,7 +28,7 @@ export const PAGE = {
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
-    CALENDAR: (idws = ':idws') => `/ui/workspaces/${idws}/calendar`,
+    AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
     ADMIN: (idws = ':idws') => `/ui/workspaces/${idws}/admin`
@@ -38,6 +38,7 @@ export const PAGE = {
   FORGOT_PASSWORD_NO_EMAIL_NOTIF: '/ui/forgot-password-no-email-notif',
   RESET_PASSWORD: '/ui/reset-password',
   ACCOUNT: '/ui/account',
+  AGENDA: '/ui/agenda',
   ADMIN: {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',
@@ -146,6 +147,12 @@ export const PROFILE = {
   }
 }
 
+export const COOKIE_FRONTEND = {
+  LAST_CONNECTION: 'lastConnection',
+  DEFAULT_LANGUAGE: 'defaultLanguage',
+  DEFAULT_EXPIRE_TIME: 180
+}
+
 export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}
 
 const USER_AUTH_INTERNAL = 'internal'
@@ -156,17 +163,11 @@ export const editableUserAuthTypeList = [USER_AUTH_INTERNAL, USER_AUTH_UNKNOWN]
 // and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
-const translationKeyFromBackend = [ // eslint-disable-line no-unused-vars
+const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Dashboard'),
   i18n.t('All Contents'),
   i18n.t('Open'),
   i18n.t('Validated'),
   i18n.t('Cancelled'),
-  i18n.t('Deprecated'),
-  i18n.t('text document'),
-  i18n.t('text documents'),
-  i18n.t('thread'),
-  i18n.t('threads'),
-  i18n.t('file'),
-  i18n.t('files')
+  i18n.t('Deprecated')
 ]

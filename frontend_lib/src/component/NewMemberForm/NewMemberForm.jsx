@@ -145,7 +145,7 @@ export const NewMemberForm = props => {
       <div className='memberlist__form__submitbtn'>
         <button
           className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
-          disabled={!props.autoCompleteClicked || props.role === ''}
+          disabled={!props.autoCompleteClicked}
           onClick={props.onClickBtnValidate}
         >
           {props.t('Validate')}

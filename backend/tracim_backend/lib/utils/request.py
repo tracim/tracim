@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import re
-import typing
 from json import JSONDecodeError
-from os.path import dirname, basename
+import typing
 
 from pyramid.request import Request
 from sqlalchemy.orm import Session
@@ -50,39 +48,31 @@ class TracimContext(object):
     # INFO - G.M - 2018-12-03 - Useful property of Tracim Context
 
     @property
-    def current_user(self):
+    def current_user(self) -> User:
         """
         Current authenticated user if exist
         """
-        return self._generate_if_none(
-            self._current_user,
-            self._get_user,
-            self._get_current_user_id
-        )
+        return self._generate_if_none(self._current_user, self._get_user, self._get_current_user_id)
 
     @property
-    def current_workspace(self):
+    def current_workspace(self) -> Workspace:
         """
         Workspace of current ressources used if exist, for example,
         if you are editing content 21 in workspace 3,
         current_workspace will be 3.
         """
         return self._generate_if_none(
-            self._current_workspace,
-            self._get_workspace,
-            self._get_current_workspace_id
+            self._current_workspace, self._get_workspace, self._get_current_workspace_id
         )
 
     @property
-    def current_content(self):
+    def current_content(self) -> Content:
         """
         Current content if exist, if you are editing content 21, current content
         will be content 21.
         """
         return self._generate_if_none(
-            self._current_content,
-            self._get_content,
-            self._get_current_content_id
+            self._current_content, self._get_content, self._get_current_content_id
         )
 
     @property
@@ -92,9 +82,7 @@ class TracimContext(object):
         current comment will be 8.
         """
         return self._generate_if_none(
-            self._current_comment,
-            self._get_content,
-            self._get_current_comment_id
+            self._current_comment, self._get_content, self._get_current_comment_id
         )
 
     @property
@@ -105,9 +93,7 @@ class TracimContext(object):
         (user_id=2), current_user will be admin but candidate user will be bob.
         """
         return self._generate_if_none(
-            self._candidate_user,
-            self._get_user,
-            self._get_candidate_user_id
+            self._candidate_user, self._get_user, self._get_candidate_user_id
         )
 
     @property
@@ -119,9 +105,7 @@ class TracimContext(object):
         will be A but candidate workspace will be B.
         """
         return self._generate_if_none(
-            self._candidate_workspace,
-            self._get_workspace,
-            self._get_candidate_workspace_id
+            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_id
         )
 
     @property
@@ -139,10 +123,7 @@ class TracimContext(object):
     # in access of public_parameters
 
     def _generate_if_none(
-            self,
-            param: typing.Any,
-            generator: typing.Callable,
-            id_fetcher: typing.Callable
+        self, param: typing.Any, generator: typing.Callable, id_fetcher: typing.Callable
     ):
         """
         generate parameter if None else return it directly
@@ -157,12 +138,7 @@ class TracimContext(object):
 
     def _get_user(self, user_id_fetcher: typing.Callable):
         user_id = user_id_fetcher()
-        uapi = UserApi(
-            None,
-            show_deleted=True,
-            session=self.dbsession,
-            config=self.app_config
-        )
+        uapi = UserApi(None, show_deleted=True, session=self.dbsession, config=self.app_config)
         return uapi.get_one(user_id)
 
     def _get_workspace(self, workspace_id_fetcher):
@@ -178,21 +154,22 @@ class TracimContext(object):
     def _get_content(self, content_id_fetcher):
         content_id = content_id_fetcher()
         api = ContentApi(
-            current_user = self.current_user,
-            show_deleted = True,
-            show_archived = True,
-            session = self.dbsession,
-            config = self.app_config,
+            current_user=self.current_user,
+            show_deleted=True,
+            show_archived=True,
+            session=self.dbsession,
+            config=self.app_config,
         )
         return api.get_one(
             content_id=content_id,
             workspace=self.current_workspace,
-            content_type=content_type_list.Any_SLUG
+            content_type=content_type_list.Any_SLUG,
         )
 
     def _get_content_type(self, content_type_slug_fetcher):
         content_type_slug = content_type_slug_fetcher()
         return content_type_list.get_one_by_slug(content_type_slug)
+
     # INFO - G.M - 2018-12-03 - Theses method need to be implemented
     # to support correctly Tracim Context
     # Method to Implements
@@ -204,59 +181,46 @@ class TracimContext(object):
         """
         Current session available
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @property
     def app_config(self) -> CFG:
         """
         Current config available
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     # IDs fetchers
 
     def _get_current_user_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_current_workspace_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_current_content_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_current_comment_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_candidate_user_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_candidate_workspace_id(self) -> int:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def _get_candidate_content_type_slug(self) -> str:
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class TracimRequest(TracimContext, Request):
     """
     Request with tracim specific params/methods
     """
-    def __init__(
-            self,
-            environ,
-            charset=None,
-            unicode_errors=None,
-            decode_param_names=None,
-            **kw
-    ):
-        Request.__init__(
-            self,
-            environ,
-            charset,
-            unicode_errors,
-            decode_param_names,
-            **kw
-        )
+
+    def __init__(self, environ, charset=None, unicode_errors=None, decode_param_names=None, **kw):
+        Request.__init__(self, environ, charset, unicode_errors, decode_param_names, **kw)
         TracimContext.__init__(self)
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
@@ -269,9 +233,9 @@ class TracimRequest(TracimContext, Request):
 
     @property
     def app_config(self) -> CFG:
-        return self.registry.settings['CFG']
+        return self.registry.settings["CFG"]
 
-    def _cleanup(self, request: 'TracimRequest') -> None:
+    def _cleanup(self, request: "TracimRequest") -> None:
         """
         Close dbsession at the end of the request in order to avoid exception
         about not properly closed session or "object created in another thread"
@@ -287,10 +251,7 @@ class TracimRequest(TracimContext, Request):
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 
     def _get_path_id(
-        self,
-        name: str,
-        exception_if_none: Exception,
-        exception_if_invalid_id: Exception
+        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception
     ) -> int:
         """
         Get id from pyramid path or raise one of the Exception
@@ -303,16 +264,12 @@ class TracimRequest(TracimContext, Request):
         if name not in self.matchdict:
             raise exception_if_none
         id_param_as_str = self.matchdict[name]
-        if not isinstance(id_param_as_str, str) \
-                or not id_param_as_str.isdecimal():
+        if not isinstance(id_param_as_str, str) or not id_param_as_str.isdecimal():
             raise exception_if_invalid_id
         return int(id_param_as_str)
 
     def _get_body_id(
-            self,
-            name: str,
-            exception_if_none: Exception,
-            exception_if_invalid_id: Exception
+        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception
     ) -> int:
         """
         Get id from pyramid json_body or raise one of the Exception
@@ -336,11 +293,7 @@ class TracimRequest(TracimContext, Request):
             raise exception_if_invalid_id
         return id_param
 
-    def _get_body_str(
-            self,
-            name: str,
-            exception_if_none: Exception,
-    ) -> str:
+    def _get_body_str(self, name: str, exception_if_none: Exception) -> str:
         """
         Get string from pyramid json_body
         :param name: name of the parameter
@@ -364,84 +317,47 @@ class TracimRequest(TracimContext, Request):
         try:
             if not self.authenticated_userid:
                 raise UserNotFoundInTracimRequest(
-                    'You request a current user '
-                    'but the context not permit to found one'
+                    "You request a current user " "but the context not permit to found one"
                 )
         except UserNotFoundInTracimRequest as exc:
-            raise NotAuthenticated('User not found') from exc
+            raise NotAuthenticated("User not found") from exc
         return self.authenticated_userid
 
     def _get_current_workspace_id(self) -> int:
         exception_if_none = WorkspaceNotFoundInTracimRequest(
-            'No workspace_id property found in request'
+            "No workspace_id property found in request"
         )
-        exception_if_invalid_id = InvalidWorkspaceId(
-            'workspace_id is not a correct integer'
-        )
-        return self._get_path_id(
-            'workspace_id',
-            exception_if_none,
-            exception_if_invalid_id
-        )
+        exception_if_invalid_id = InvalidWorkspaceId("workspace_id is not a correct integer")
+        return self._get_path_id("workspace_id", exception_if_none, exception_if_invalid_id)
 
     def _get_current_content_id(self) -> int:
         exception_if_none = ContentNotFoundInTracimRequest(
-            'No content_id property found in request'
+            "No content_id property found in request"
         )
-        exception_if_invalid_id = InvalidContentId(
-            'content_id is not a correct integer'
-        )
-        return self._get_path_id(
-            'content_id',
-            exception_if_none,
-            exception_if_invalid_id
-        )
+        exception_if_invalid_id = InvalidContentId("content_id is not a correct integer")
+        return self._get_path_id("content_id", exception_if_none, exception_if_invalid_id)
 
     def _get_current_comment_id(self) -> int:
         exception_if_none = ContentNotFoundInTracimRequest(
-            'No comment_id property found in request'
+            "No comment_id property found in request"
         )
-        exception_if_invalid_id = InvalidCommentId(
-            'comment_id is not a correct integer'
-        )
-        return self._get_path_id(
-            'comment_id',
-            exception_if_none,
-            exception_if_invalid_id
-        )
+        exception_if_invalid_id = InvalidCommentId("comment_id is not a correct integer")
+        return self._get_path_id("comment_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_user_id(self) -> int:
         exception_if_none = UserNotFoundInTracimRequest(
-            'You request a candidate user but the '
-            'context not permit to found one'
+            "You request a candidate user but the " "context not permit to found one"
         )
-        exception_if_invalid_id = InvalidUserId(
-            'user_id is not a correct integer'
-        )
-        return self._get_path_id(
-            'user_id',
-            exception_if_none,
-            exception_if_invalid_id
-        )
+        exception_if_invalid_id = InvalidUserId("user_id is not a correct integer")
+        return self._get_path_id("user_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_workspace_id(self) -> int:
         exception_if_none = WorkspaceNotFoundInTracimRequest(
-            'No new_workspace_id property found in body'
+            "No new_workspace_id property found in body"
         )
-        exception_if_invalid_id = InvalidWorkspaceId(
-            'new_workspace_id is not a correct integer'
-        )
-        return self._get_body_id(
-            'new_workspace_id',
-            exception_if_none,
-            exception_if_invalid_id
-        )
+        exception_if_invalid_id = InvalidWorkspaceId("new_workspace_id is not a correct integer")
+        return self._get_body_id("new_workspace_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_content_type_slug(self):
-        exception_if_none = ContentTypeNotInTracimRequest(
-            'No content_type property found in body'
-        )
-        return self._get_body_str(
-            'content_type',
-            exception_if_none,
-        )
+        exception_if_none = ContentTypeNotInTracimRequest("No content_type property found in body")
+        return self._get_body_str("content_type", exception_if_none)
