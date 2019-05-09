@@ -121,8 +121,9 @@ class DeleteDBCommand(AppContextCommand):
                 for file_ in depot_files:
                     try:
                         depot.delete(file_)
-                    except Exception as exc:
-                        print('Something goes wrong during deletion of {}'.format(file_))
+                    # TODO - G.M - 2019-05-09 - better handling of exception here
+                    except Exception:
+                        print("Something goes wrong during deletion of {}".format(file_))
                 print("Cleaning depot done.")
             except FileNotFoundError:
                 print("Warning! Can delete depots file, is depot path correctly" " configured?")
