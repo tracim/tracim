@@ -1,7 +1,6 @@
 ---
 env:
   global:
-    - BACKEND_TEST_CONFIG_FILE=tests_configs.ini
     - DEFAULT_SQLITE_SQLALCHEMY__URL=sqlite:////tmp/tracim.sqlite
     - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracim_test
     - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
@@ -15,6 +14,8 @@ env:
     - TRACIM_SESSION__DATA_DIR=/tmp/test/sessions/data
     - TRACIM_SESSION__LOCK_DIR=/tmp/test/sessions/lock
     - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
+    - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tests_configs.ini
+    - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
 sudo: false
 language: python
 dist: trusty

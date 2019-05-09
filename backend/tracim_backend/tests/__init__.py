@@ -2,6 +2,7 @@
 from io import BytesIO
 import logging
 import multiprocessing
+import os
 import typing
 import unittest
 
@@ -35,6 +36,8 @@ from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.setup_models import init_models
+
+TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
 
 
 def eq_(a, b, msg=None) -> None:
@@ -96,7 +99,7 @@ class AbstractMailHogTest(object):
 class FunctionalTest(unittest.TestCase):
 
     fixtures = [BaseFixture]
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "functional_test"
 
     def _set_logger(self) -> None:
@@ -201,7 +204,7 @@ class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):
 
 
 class WebdavFunctionalTest(FunctionalTest):
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "functional_webdav_test"
 
     def run_app(self) -> None:
@@ -287,7 +290,7 @@ class BaseTest(unittest.TestCase):
     """
 
     fixtures = []
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "base_test"
 
     def _set_logger(self) -> None:
