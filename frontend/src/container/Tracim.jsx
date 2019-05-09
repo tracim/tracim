@@ -7,7 +7,8 @@ import i18n from '../i18n.js'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { Switch } from 'react-router'
+import Dashboard from './Dashboard.jsx'
+import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
@@ -41,10 +42,10 @@ import {
   setAppList,
   setContentTypeList,
   setUserConnected,
-  setWorkspaceList
+  setWorkspaceList,
+  setBreadcrumbs,
+  appendBreadcrumbs
 } from '../action-creator.sync.js'
-import Dashboard from './Dashboard.jsx'
-import Sidebar from './Sidebar.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -74,6 +75,14 @@ class Tracim extends React.Component {
       case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
         await this.loadWorkspaceList()
         this.props.history.push(data.url)
+        break
+      case 'setBreadcrumbs':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(setBreadcrumbs(data.breadcrumbs))
+        break
+      case 'appendBreadcrumbs':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
         break
     }
   }
@@ -202,26 +211,18 @@ class Tracim extends React.Component {
               <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
             } />,
 
-            <Switch key='workspace_content'>
-              <Route
-                path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')}
-                key='workspace_contentopen'
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
-              <Route
-                path={PAGE.WORKSPACE.CONTENT_LIST(':idws')}
-                key='workspace_contentlist'
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
-            </Switch>,
+            <Route
+              path={[
+                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                PAGE.WORKSPACE.CONTENT_LIST(':idws')
+              ]}
+              key='workspace_contentlist'
+              render={() =>
+                <div className='tracim__content fullWidthFullHeight'>
+                  <WorkspaceContent />
+                </div>
+              }
+            />,
 
             <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
               <div className='tracim__content fullWidthFullHeight'>
@@ -261,5 +262,7 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({ user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system })
+const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
+  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
+})
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))

@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -6,8 +7,13 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { PAGE } from '../helper.js'
+import { resetBreadcrumbs } from '../action-creator.sync.js'
 
 export class ForgotPasswordNoEmailNotif extends React.Component {
+  componentDidMount () {
+    this.props.dispatch(resetBreadcrumbs())
+  }
+
   handleClickBack = () => this.props.history.push(PAGE.LOGIN)
 
   render () {
@@ -53,4 +59,5 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
   }
 }
 
-export default translate()(ForgotPasswordNoEmailNotif)
+const mapStateToProps = () => ({})
+export default connect(mapStateToProps)(translate()(ForgotPasswordNoEmailNotif))

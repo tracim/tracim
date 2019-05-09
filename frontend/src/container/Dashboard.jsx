@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
   PageContent,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -17,7 +18,8 @@ import {
   postWorkspaceMember,
   putMyselfWorkspaceRead,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
+  putMyselfWorkspaceDoNotify,
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -28,7 +30,8 @@ import {
   setWorkspaceReadStatusList,
   removeWorkspaceMember,
   updateUserWorkspaceSubscriptionNotif,
-  setWorkspaceAgendaUrl
+  setWorkspaceAgendaUrl,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -42,6 +45,7 @@ import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
+import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -71,13 +75,15 @@ class Dashboard extends React.Component {
     switch (type) {
       case 'refreshDashboardMemberList': this.loadMemberList(); break
       case 'refreshWorkspaceList': this.loadWorkspaceDetail(); break
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
-  componentDidMount () {
-    this.loadWorkspaceDetail()
+  async componentDidMount () {
+    await this.loadWorkspaceDetail()
     this.loadMemberList()
     this.loadRecentActivity()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -169,6 +175,31 @@ class Dashboard extends React.Component {
       case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+          {props.curWs.label}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+          {props.t('Dashboard')}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE
+    }]
+
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
   handleClickAddMemberBtn = () => this.setState({displayNewMemberForm: true})
@@ -417,8 +448,9 @@ class Dashboard extends React.Component {
               title={props.t('Dashboard')}
               subtitle={''}
               icon='home'
+              breadcrumbsList={props.breadcrumbs}
             >
-              <div className='dashboard__header__advancedmode ml-3'>
+              <div className='dashboard__header__advancedmode'>
                 {idRoleUserWorkspace >= 8 &&
                   <button
                     type='button'
@@ -454,7 +486,7 @@ class Dashboard extends React.Component {
                           faIcon={app.faIcon}
                           // TODO - Côme - 2018/09/12 - translation key below is a little hacky:
                           // The creation label comes from api but since there is no translation in backend
-                          // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                          // every files has a 'externalTranslationList' array just to generate the translation key in the json files through i18n.scanner
                           creationLabel={props.t(app.creationLabel)}
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}
@@ -518,13 +550,23 @@ class Dashboard extends React.Component {
                 />
               </div>
 
-              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled &&
+              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
                 <AgendaInfo
-                  customClass='dashboard__agenda'
-                  introText={props.t('Use this link to access this shared space agenda from anywhere')}
+                  customClass='dashboard__section'
+                  introText={props.t("Use this link to integrate this shared space's agenda to your")}
+                  caldavText={props.t('CalDAV compatible software')}
                   agendaUrl={props.curWs.agendaUrl}
                 />
-              }
+              )}
+
+              {props.system.config.webdav_enabled && (
+                <WebdavInfo
+                  customClass='dashboard__section'
+                  introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                  webdavText={props.t('(protocole WebDAV)')}
+                  webdavUrl={props.system.config.webdav_url}
+                />
+              )}
             </PageContent>
           </PageWrapper>
         </div>
@@ -533,5 +575,7 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType, appList, currentWorkspace, system }) => ({ user, contentType, appList, curWs: currentWorkspace, system })
+const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
+  breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
+})
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

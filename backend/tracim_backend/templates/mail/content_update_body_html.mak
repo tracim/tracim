@@ -1,4 +1,5 @@
 ## -*- coding: utf-8 -*-
+	<!--FIXME After discuss with Damien: dont add intelligent code in template -->
     <%
         call_to_action_url = content_in_context.frontend_url
         content_name_pattern = "<i><a href={call_to_action_url}>{content}</a></i>"
@@ -6,6 +7,8 @@
                     call_to_action_url=html_escape(call_to_action_url),
                     content=html_escape(content_in_context.label)
          )
+        if action == ActionDescription.COMMENT:
+          call_to_action_url = parent_in_context.frontend_url
     %>
 <style>
   ins { background-color: #c0ffc0; }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -6,7 +7,8 @@ import {
   handleFetchResult,
   PageContent,
   PageTitle,
-  PageWrapper
+  PageWrapper,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -14,8 +16,6 @@ import {
   getWorkspaceDetail,
   getWorkspaceMemberList
 } from '../action.async.js'
-
-require('../css/index.styl')
 
 class Agenda extends React.Component {
   constructor (props) {
@@ -28,7 +28,9 @@ class Agenda extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       userWorkspaceList: [],
-      userWorkspaceListLoaded: false
+      userWorkspaceListLoaded: false,
+      breadcrumbsList: [],
+      appMounted: false
     }
 
     // i18n has been init, add resources from frontend
@@ -57,6 +59,7 @@ class Agenda extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.buildBreadcrumbs()
         this.agendaIframe.contentWindow.location.reload()
         break
       default:
@@ -64,7 +67,7 @@ class Agenda extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { state } = this
 
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
@@ -73,7 +76,8 @@ class Agenda extends React.Component {
     document.getElementById('appFullscreenContainer').style.flex = '1'
 
     this.loadAgendaList(state.config.appConfig.idWorkspace)
-    if (state.config.appConfig.idWorkspace !== null) this.loadWorkspaceData()
+    if (state.config.appConfig.idWorkspace !== null) await this.loadWorkspaceData()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -156,6 +160,36 @@ class Agenda extends React.Component {
     })
   }
 
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }]
+
+    if (state.config.appConfig.idWorkspace) {
+      breadcrumbsList.push({
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/dashboard`}>{state.content.workspaceLabel}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      }, {
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/agenda`}>{props.t('Agenda')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    } else {
+      breadcrumbsList.push({
+        link: <Link to={`/ui/agenda`}>{props.t('All my agendas')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    }
+
+    // FIXME - CH - 2019/04/25 - We should keep redux breadcrumbs sync with fullscreen apps but when do the setBreadcrumbs,
+    // app crash telling it cannot render a Link outside a router
+    // see https://github.com/tracim/tracim/issues/1637
+    // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
+    this.setState({breadcrumbsList: breadcrumbsList})
+  }
+
   loadWorkspaceData = async () => {
     const { state } = this
 
@@ -205,6 +239,7 @@ class Agenda extends React.Component {
           parentClass='agendaPage'
           title={pageTitle}
           icon={'calendar'}
+          breadcrumbsList={state.breadcrumbsList}
         />
 
         <PageContent parentClass='agendaPage'>
