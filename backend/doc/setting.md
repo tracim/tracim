@@ -16,6 +16,7 @@ Priority order is (from less to most priority):
 
  | <config_name> | <env_var_name> | <config_file_name> |
  |-------------------|--------------------|----------------------------|
+ | SQLALCHEMY__URL | TRACIM_SQLALCHEMY__URL | sqlalchemy.url |
  | DEFAULT_LANG | TRACIM_DEFAULT_LANG | default_lang |
  | COLOR__CONFIG_FILE_PATH | TRACIM_COLOR__CONFIG_FILE_PATH | color.config_file_path |
  | APP__ENABLED | TRACIM_APP__ENABLED | app.enabled |
@@ -26,6 +27,8 @@ Priority order is (from less to most priority):
  | REMOTE_USER_HEADER | TRACIM_REMOTE_USER_HEADER | remote_user_header |
  | API__KEY | TRACIM_API__KEY | api.key |
  | SESSION__REISSUE_TIME | TRACIM_SESSION__REISSUE_TIME | session.reissue_time |
+ | SESSION__DATA_DIR | TRACIM_SESSION__DATA_DIR | session.data_dir |
+ | SESSION__LOCK_DIR | TRACIM_SESSION__LOCK_DIR | session.lock_dir |
  | WEBSITE__TITLE | TRACIM_WEBSITE__TITLE | website.title |
  | WEBSITE__BASE_URL | TRACIM_WEBSITE__BASE_URL | website.base_url |
  | API__BASE_URL | TRACIM_API__BASE_URL | api.base_url |
