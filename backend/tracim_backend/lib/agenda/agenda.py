@@ -1,4 +1,5 @@
 import typing
+from xml.sax.saxutils import escape
 
 import caldav
 from caldav.elements.base import ValuedBaseElement
@@ -69,9 +70,9 @@ class AgendaApi(object):
         # INFO - G.M - 2019-05-10 - we use str as pick key as it is determinist: same
         # result between run. default method use hash which use random hash for security concern
         body = CREATE_AGENDA_TEMPLATE.format(
-            agenda_name=agenda_name,
+            agenda_name=escape(agenda_name),
             agenda_color=Color(pick_for=agenda_name, pick_key=str).get_hex(),
-            agenda_description=agenda_description,
+            agenda_description=escape(agenda_description),
         )
         try:
             response = requests.request("mkcol", agenda_url, data=body)
