@@ -68,7 +68,7 @@ class AgendaApi(object):
         logger.debug(self, "create a new caldav agenda at url {}".format(agenda_url))
         body = CREATE_AGENDA_TEMPLATE.format(
             agenda_name=agenda_name,
-            agenda_color=Color(pick_for="agenda_name").get_hex(),
+            agenda_color=Color(pick_for=agenda_name).get_hex(),
             agenda_description=agenda_description,
         )
         try:
