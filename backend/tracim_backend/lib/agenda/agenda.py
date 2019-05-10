@@ -75,7 +75,7 @@ class AgendaApi(object):
             agenda_description=escape(agenda_description),
         )
         try:
-            response = requests.request("mkcol", agenda_url, data=body)
+            response = requests.request("mkcol", agenda_url, data=body.encode("utf-8"))
         except requests.exceptions.ConnectionError as exc:
             raise AgendaServerConnectionError() from exc
         if not response.status_code == 201:
