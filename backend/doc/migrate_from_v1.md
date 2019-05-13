@@ -14,18 +14,33 @@ Files is in format of radicale 2.0.0
 
 **:warning:** {personal_path} can be any valid path (right to read/write)
 
-1. Create folder in your system to make migration of files, ex: `{personal_path}/migration_process/`
-2. Create venv with python >= 3.3 in this folder `python3 -m venv env`
-3. Activate this venv `source env/bin/activate`
-4. Install radicale 1.1.6 in this venv with this command `pip install --upgrade radicale==1.1.6`
-5. Copy folder `radicale_data/` from Tracim v1 to folder `{personal_path}/migration_process/`
-6. Make a config file (ex: conf.ini) for migration in `{personal_path}/migration_process/` with this parameter:
-    ~~~
+Create folder in your system to make migration of files. ex:
+
+    {personal_path}/migration_process/
+
+Create venv with python >= 3.3 in this folder
+
+    python3 -m venv env
+
+Activate this venv
+
+    source env/bin/activate
+
+Install radicale 1.1.6 in this venv with this command:
+
+    pip install --upgrade radicale==1.1.6
+
+Copy folder `radicale_data/` from Tracim v1 to folder `{personal_path}/migration_process/`
+
+Make a config file (ex: conf.ini) for migration in `{personal_path}/migration_process/` with this parameter:
+
+
     [storage]
     filesystem_folder = {personal_path}/migration_process/radicale_data
-    ~~~
-7. Convert file with this command:
-    ~~~
+
+
+Convert file with this command:
+
     radicale --export-storage export -C conf.ini --debug \
         && cd export/collection-root/ \
         && mv collections/ agenda/ \
@@ -33,10 +48,16 @@ Files is in format of radicale 2.0.0
         && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done \
         && cd ../workspace/ \
         && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done
-    ~~~
-8. After migration, file is accessible in `{personal_path}/migration_process/export/`
-9. Copy folder `collection-root/agenda/` in `radicale_storage/`
-10. Now you just need to start caldav with `tracimcli caldav start`
+
+After migration, file is accessible in:
+
+    {personal_path}/migration_process/export/
+
+Copy folder `collection-root/agenda/` in `radicale_storage/`.
+
+Now you just need to start caldav:
+
+    tracimcli caldav start
     
 **:warning:** If you have starting tracim and created some shared space without starting caldav you need also to start this command `tracimcli caldav agenda create` to create missing agenda.
 
