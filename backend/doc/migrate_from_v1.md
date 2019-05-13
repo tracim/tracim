@@ -12,16 +12,19 @@ Files is in format of radicale 2.0.0
 
 ### Migration stage by stage
 
-1. Create folder in your system to make migration of files, ex: `migration_process/`
-2. Create venv with python3.4 in this folder
-3. Install radicale 1.1.6 in this venv
-4. Copy folder `radicale_data/` from tracim_v1 to folder `migration_process/`
-5. Make a config file (ex: conf.ini) for migration in `migration_process/` with this parameter:
+**:warning:** {personal_path} can be any valid path (right to read/write)
+
+1. Create folder in your system to make migration of files, ex: `{personal_path}/migration_process/`
+2. Create venv with python >= 3.3 in this folder `python3 -m venv env`
+3. Activate this venv `source env/bin/activate`
+4. Install radicale 1.1.6 in this venv with this command `pip install --upgrade radicale==1.1.6`
+5. Copy folder `radicale_data/` from Tracim v1 to folder `{personal_path}/migration_process/`
+6. Make a config file (ex: conf.ini) for migration in `{personal_path}/migration_process/` with this parameter:
     ~~~
     [storage]
-    filesystem_folder = {your_path}/migration_process/radicale_data
+    filesystem_folder = {personal_path}/migration_process/radicale_data
     ~~~
-6. Convert file with this command:
+7. Convert file with this command:
     ~~~
     radicale --export-storage export -C conf.ini --debug \
         && cd export/collection-root/ \
@@ -31,15 +34,45 @@ Files is in format of radicale 2.0.0
         && cd ../workspace/ \
         && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done
     ~~~
-7. After migration, file is accessible in `migration_process/export/`
-8. Copy folder `collection-root/agenda/` in `radicale_storage/`
-9. Now you just need to start caldav with `tracimcli caldav start`
+8. After migration, file is accessible in `{personal_path}/migration_process/export/`
+9. Copy folder `collection-root/agenda/` in `radicale_storage/`
+10. Now you just need to start caldav with `tracimcli caldav start`
     
 **:warning:** If you have starting tracim and created some shared space without starting caldav you need also to start this command `tracimcli caldav agenda create` to create missing agenda.
 
 ## Parameter changed from v2.1 to v2.2
 
- 
+### Caldav
+
+New alias parameter: `basic_setup.caldav_storage_dir = %(here)s/radicale_storage/`
+
+New block of parameters: `caldav.*` (Radicale)
+
+New app caldav:
+
+- "[pipeline:caldav]"
+- "[app:tracim_caldav]"
+- "[server:caldav]"
+
+### Webdav
+
+This parameter not exist anymore: `wsgidav.client.base_url = localhost:<WSGIDAV_PORT>`
+
+Replaced by: `webdav.base_url = http://localhost:3030` (Syntaxe is not the same than oldest version)
+
+New parameter: `webdav.ui.enabled = True`
+
+### Other
+New parameter: `default_lang = en`
+
+Parameter `user.reset_password.validity` replaced by `user.reset_password.token_lifetime`
+
+Remove unused parameter: `email.notification.processing_mode`
+
+This is not new parameter but not visible in config file in 2.1:
+`preview.jpg.allowed_dims = 256x256,512x512,1024x1024`
+`preview.jpg.restricted_dims = True`
+
 
 # Migration from Tracim v1 to Tracim v2.1
 
