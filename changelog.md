@@ -1,13 +1,43 @@
 ## Next version x.x.x /xxxx-xx-xx
 
 ### Known issues
-- Changing parameter caldav.radicale.server.host in development.ini with specific IP address show wrong url after starting caldav (issue #1535)
-- If user does not manually change the language, email notifications will stay in English. In order to get notifications in French, change language to English, then back to French (issue #1374)
-- if you create shared spaces while radicale server is not running (tracimcli caldav start), the agendas are not available (issue #1537)
 
 ### REST API Changes
 
 - Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
+
+## 2.2.0 / 2019-05-XX
+
+### New Features
+
+- Agenda is available
+- Migration agenda from tracim_v1 to tracim_v2 is now available
+-  
+
+### Known issues
+
+- Search & filtering not yet migrated from tracim v1
+- Duplicated creation of content may appear on slow network (issue #1361)
+- if you create shared spaces while radicale server is not running (tracimcli caldav start), the agendas are not available (issue #1537)
+- Changing parameter caldav.radicale.server.host in development.ini with specific IP address show wrong url after starting caldav (issue #1535)
+
+### Fixed issues
+
+- Documentation: #1493
+- Agenda: #1181, #1250, #1486, #1498, #1527, #1532, #1533, #1536, #1539, #1540, #1545, #1556, #1573, #1575, #1577, #1584, #1600, #1605, #1608, #1631, #1644
+- UX: #1374
+- Timeline: #727, #869, #1371
+- Dashbord: #1084, #1488, #1641 
+- Header: #681, #860, #1621
+- Contents: #818, #827, #1067, #1097, #1105, #1507, #1563, #1624, #1648 
+- Sidebar: #1177, #1571
+- Backend config file: #987, #1475, #1495, #1550, #1626, #1665, #1690, #1696
+- Email: #1489, #1491, #1649 
+- Security related: #1617
+- Preview-generator: #1126, #1472
+- Webdav: #1499, #1652
+- Docker image: #1387, #1565, #1567, #1681
+- Other: #660, #819, #1006, #1012, #1030, #1610, #1627, #1630, #1658, #1679, #1698
 
 ### Others Changes
 
