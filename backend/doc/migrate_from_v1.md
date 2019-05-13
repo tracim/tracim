@@ -1,3 +1,46 @@
+# Migration from Tracim v2.1 to Tracim v2.2
+
+**:warning:** Agenda is now available. You can now migrate your Tracim v1 calendar to Tracim v2.2 agenda.
+
+## How to migrate your calendar/agenda
+
+### Reminder
+- data/file about all calendar (Tracim v1) are in this folder `radicale_data/` in your instance server.
+Files is in format of radicale 1.1.1
+- data/file about all agenda (Tracim v2.2) are in this folder `radicale_storage/` in path `/tracim/backend/` by default.
+Files is in format of radicale 2.0.0
+
+### Migration stage by stage
+
+1. Create folder in your system to make migration of files, ex: `migration_process/`
+2. Create venv with python3.4 in this folder
+3. Install radicale 1.1.6 in this venv
+4. Copy folder `radicale_data/` from tracim_v1 to folder `migration_process/`
+5. Make a config file (ex: conf.ini) for migration in `migration_process/` with this parameter:
+    ~~~
+    [storage]
+    filesystem_folder = {your_path}/migration_process/radicale_data
+    ~~~
+6. Convert file with this command:
+    ~~~
+    radicale --export-storage export -C conf.ini --debug \
+        && cd export/collection-root/ \
+        && mv collections/ agenda/ \
+        && cd agenda/user/ \
+        && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done \
+        && cd ../workspace/ \
+        && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done
+    ~~~
+7. After migration, file is accessible in `migration_process/export/`
+8. Copy folder `collection-root/agenda/` in `radicale_storage/`
+9. Now you just need to start caldav with `tracimcli caldav start`
+    
+**:warning:** If you have starting tracim and created some shared space without starting caldav you need also to start this command `tracimcli caldav agenda create` to create missing agenda.
+
+## Parameter changed from v2.1 to v2.2
+
+ 
+
 # Migration from Tracim v1 to Tracim v2.1
 
 **:warning:**  2.0 version of Tracim doesn't support folder and ldap. If you want to migrate from tracim v1, you should use 2.1 or latest.
