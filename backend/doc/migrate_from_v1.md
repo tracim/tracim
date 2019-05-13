@@ -12,11 +12,12 @@ Files is in format of radicale 2.0.0
 
 ### Migration stage by stage
 
-**:warning:** {personal_path} can be any valid path (right to read/write)
+**:warning:** Current user must have read/write access on tracim v1 folder and read/write access for migration output folder.
+
 
 Create folder in your system to make migration of files. ex:
 
-    {personal_path}/migration_process/
+    mkdir /your/migration/folder/path/
 
 Create venv with python >= 3.3 in this folder
 
@@ -30,13 +31,15 @@ Install radicale 1.1.6 in this venv with this command:
 
     pip install --upgrade radicale==1.1.6
 
-Copy folder `radicale_data/` from Tracim v1 to folder `{personal_path}/migration_process/`
+Copy folder `radicale_data/` from Tracim v1 to folder `/<your>/<migration>/<folder>/<path>/`
 
-Make a config file (ex: conf.ini) for migration in `{personal_path}/migration_process/` with this parameter:
+    cp -r /your/tracimv1/path/radicale_data /<your>/<migration>/<folder>/<path>/
+
+Make a config file (ex: conf.ini) for migration in `/<your>/<migration>/<folder>/<path>/` with this parameter:
 
 
     [storage]
-    filesystem_folder = {personal_path}/migration_process/radicale_data
+    filesystem_folder = /<your>/<migration>/<folder>/<path>/radicale_data
 
 
 Convert file with this command:
@@ -51,15 +54,15 @@ Convert file with this command:
 
 After migration, file is accessible in:
 
-    {personal_path}/migration_process/export/
+    /<your>/<migration>/<folder>/<path>/export/
 
 Copy folder `collection-root/agenda/` in `radicale_storage/`.
 
-Now you just need to start caldav:
+    cp -r export/collection-root /your/tracimv2/path/radicale_storage/
 
-    tracimcli caldav start
+Now when you start caldav all this data is used.
     
-**:warning:** If you have starting tracim and created some shared space without starting caldav you need also to start this command `tracimcli caldav agenda create` to create missing agenda.
+**:warning:** If you have starting tracim and created some shared space without starting caldav you need to start caldav and after that to start this command `tracimcli caldav agenda create` to create missing agenda.
 
 ## Parameter changed from v2.1 to v2.2
 
