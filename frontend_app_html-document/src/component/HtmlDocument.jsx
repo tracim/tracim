@@ -6,7 +6,7 @@ import DisplayState from './DisplayState.jsx'
 
 const HtmlDocument = props => {
   return (
-    <div className='html-document__contentpage__left'>
+    <div className='html-document__contentpage__left__wrapper'>
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.isArchived && (
           <DisplayState
