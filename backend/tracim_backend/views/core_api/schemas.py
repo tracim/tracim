@@ -766,6 +766,7 @@ class ConfigSchema(marshmallow.Schema):
     new_user_invitation_do_notify = marshmallow.fields.Bool()
     webdav_enabled = marshmallow.fields.Bool()
     webdav_url = marshmallow.fields.String()
+    search_enabled = marshmallow.fields.Bool()
 
 
 class ErrorCodeSchema(marshmallow.Schema):
