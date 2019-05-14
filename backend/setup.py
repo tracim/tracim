@@ -65,7 +65,10 @@ requires = [
     'requests',
     # caldav support
     'radicale',
-    'caldav'
+    'caldav',
+    # search support
+    'elasticsearch',
+    'elasticsearch-dsl'
 ]
 
 tests_require = [
