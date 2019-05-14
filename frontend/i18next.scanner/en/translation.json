@@ -176,5 +176,9 @@
   "Invalid email": "Invalid email",
   "Invalid password": "Invalid password",
   "Error while saving your language": "Error while saving your language",
-  "Manage": "Manage"
+  "Manage": "Manage",
+  "Use this link to integrate this shared space's agenda to your": "Use this link to integrate this shared space's agenda to your",
+  "Use this link to integrate Tracim in your file explorer": "Use this link to integrate Tracim in your file explorer",
+  "CalDAV compatible software": "CalDAV compatible software",
+  "(protocole WebDAV)": "(WebDAV protocol)"
 }
