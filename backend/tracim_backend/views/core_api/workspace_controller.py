@@ -445,6 +445,7 @@ class WorkspaceController(Controller):
             parent=parent,
         )
         api.save(content, ActionDescription.CREATION)
+        api.execute_created_content_actions(content)
         content = api.get_content_in_context(content)
         return content
 

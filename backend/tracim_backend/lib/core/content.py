@@ -606,10 +606,53 @@ class ContentApi(object):
         )
         item.description = content
         item.revision_type = ActionDescription.COMMENT
-
         if do_save:
             self.save(item, ActionDescription.COMMENT, do_notify=do_notify)
         return item
+
+    def execute_created_content_actions(self, content: Content) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post-create user actions
+        """
+        if self._config.SEARCH__ENABLED:
+            from tracim_backend.lib.search.search import SearchApi
+
+            try:
+                content_in_context = ContentInContext(
+                    content, config=self._config, dbsession=self._session
+                )
+                search_api = SearchApi(
+                    current_user=self._user, config=self._config, session=self._session
+                )
+                search_api.index_content(content_in_context)
+            except Exception:
+                logger.exception(self, "Something goes wrong during indexing of new content")
+
+    def execute_update_content_actions(self, content: Content) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post-create user actions
+        """
+        if self._config.SEARCH__ENABLED:
+            from tracim_backend.lib.search.search import SearchApi
+
+            try:
+                content_in_context = ContentInContext(
+                    content, config=self._config, dbsession=self._session
+                )
+                search_api = SearchApi(
+                    current_user=self._user, config=self._config, session=self._session
+                )
+                search_api.index_content(content_in_context)
+            except Exception:
+                logger.exception(self, "Something goes wrong during indexing of content")
 
     def get_one_from_revision(
         self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None

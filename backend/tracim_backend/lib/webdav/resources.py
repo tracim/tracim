@@ -332,6 +332,7 @@ class WorkspaceResource(DAVCollection):
                 label=folder_label,
                 parent=self.content,
             )
+            self.content_api.execute_created_content_actions(folder)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
@@ -592,6 +593,7 @@ class FolderResource(WorkspaceResource):
                         new_workspace=destination_workspace,
                         must_stay_in_same_workspace=False,
                     )
+                self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
@@ -851,6 +853,7 @@ class FileResource(DAVNonCollection):
                         must_stay_in_same_workspace=False,
                         new_workspace=destination_workspace,
                     )
+                self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
