@@ -10,10 +10,6 @@ class PopinFixedContent extends React.Component {
     }
   }
 
-  componentDidMount () {
-    if (this.props.showRightPartOnLoad) this.setState({rightPartOpen: true})
-  }
-
   handleToggleRightPart = () => {
     if (window.innerWidth < 1200) return
 
