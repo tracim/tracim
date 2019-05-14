@@ -140,6 +140,7 @@ class CFG(object):
         self._load_ldap_config()
         self._load_webdav_config()
         self._load_caldav_config()
+        self._load_search_config()
 
     def _load_global_config(self) -> None:
         """
@@ -502,6 +503,15 @@ class CFG(object):
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
         self.LDAP_GET_INFO = None
+
+    def _load_search_config(self):
+        self.SEARCH__ENABLED = asbool(self.get_raw_config("search.enabled", "False"))
+        self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
+            "search.elasticsearch.host", "localhost"
+        )
+        self.SEARCH__ELASTICSEARCH__PORT = int(
+            self.get_raw_config("search.elasticsearch.port", "9200")
+        )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

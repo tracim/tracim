@@ -384,6 +384,14 @@ caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROP
 caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With, Prefer
 caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
+####
+# SEARCH (ElasticSearch)
+####
+search.enabled = False
+search.elasticsearch.host = localhost
+search.elasticsearch.port = 9200
+
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################
