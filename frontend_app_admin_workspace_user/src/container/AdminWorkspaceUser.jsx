@@ -176,7 +176,7 @@ class AdminWorkspaceUser extends React.Component {
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <span>{props.t('Manage')}</span>,
+      link: <span>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }]
