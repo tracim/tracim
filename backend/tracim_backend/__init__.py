@@ -61,6 +61,7 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
+from tracim_backend.views.search_api.search_controller import SearchController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -220,6 +221,9 @@ def web(global_config, **local_settings):
         configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
         configurator.include(radicale_proxy_controller.bind)
 
+    if app_config.SEARCH__ENABLED:
+        search_controller = SearchController()
+        configurator.include(search_controller.bind, route_prefix=BASE_API_V2)
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
