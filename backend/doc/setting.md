@@ -437,3 +437,24 @@ to have more/less log about something.
 You can change default color of apps by setting color.json file, by default,
 placed at root of tracim dir, see [color.json.sample](../../color.json.sample)
 for default config file.
+
+# Search method using elastic_search (tracim 2.3+) #
+
+First, you need an elastic_search server, and easy way to have this is with docker:
+
+`docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
+
+You then need to setup config file:
+
+    search.enabled = True
+    search.elasticsearch.host = localhost
+    search.elasticsearch.port = 9200
+
+You're elasticsearch server need to be running. You can then setup index with:
+
+`tracimcli search index`
+
+This command will also indexing content and can be runned anytime your index is not anymore synchronized with
+tracim.
+
+Your data are correctly indexed now, you can go to tracim ui and use search mecanism.

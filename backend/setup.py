@@ -144,7 +144,8 @@ setup(
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand'
+            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',
+            'search index = tracim_backend.command.search:SearchIndexCommand',
         ]
     },
     message_extractors={'tracim_backend': [
