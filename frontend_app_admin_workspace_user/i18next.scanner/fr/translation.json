@@ -42,7 +42,7 @@
   "Full name must be at least 3 characters": "Le nom complet doit faire au moins 3 caractères",
   "Email notification are disabled, please manually notify users of any change": "Les notifications par email sont désactivées, veuillez informer manuellement les utilisateurs des changements",
   "Error, invalid email address": "Erreur, email invalide",
-  "Create a shared space": "Créer un espace de travail",
+  "Create a shared space": "Créer un espace partagé",
   "Home": "Accueil",
   "Users": "Utilisateurs",
   "Administration": "Administration"
