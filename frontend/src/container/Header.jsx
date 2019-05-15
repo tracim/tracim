@@ -90,7 +90,7 @@ class Header extends React.Component {
 
     return (
       <header className='header'>
-        <nav className='navbar navbar-expand-md navbar-light bg-light'>
+        <nav className='navbar navbar-expand-lg navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
           <NavbarToggler />
