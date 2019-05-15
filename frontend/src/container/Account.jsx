@@ -127,7 +127,7 @@ class Account extends React.Component {
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <span className='nolink'>{props.t('Manage')}</span>,
+      link: <span className='nolink'>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }, {
