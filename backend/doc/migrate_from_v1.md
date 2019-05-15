@@ -58,11 +58,12 @@ After migration, file is accessible in:
 
 Copy folder `collection-root/agenda/` in `radicale_storage/`.
 
-    cp -r export/collection-root /your/tracimv2/path/radicale_storage/
+    cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
 
-Now when you start caldav all this data is used.
+After starting caldav server you need to synchronize tracim with radicale. For that you need to use this command:
+
+    tracimcli caldav sync
     
-**:warning:** If you have starting tracim and created some shared space without starting caldav you need to start caldav and after that to start this command `tracimcli caldav agenda create` to create missing agenda.
 
 ## Parameter changed from v2.1 to v2.2
 
