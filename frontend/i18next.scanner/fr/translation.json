@@ -168,8 +168,6 @@
   "Open the agenda": "Ouvrir l'agenda",
   "Agenda": "Agenda",
   "Error while loading your agenda": "Erreur lors du chargement de votre agenda",
-  "Use this link to access your personal agenda from anyhere": "Utiliser ce lien pour accéder à votre agenda depuis n'importe où",
-  "Use this link to access this shared space agenda from anywhere": "Utiliser ce lien pour accéder à l'agenda de cet espace partagé depuis n'importe où",
   "agenda details": "de l'agenda",
   "Home": "Accueil",
   "All contents": "Tous les contenus",
@@ -180,5 +178,6 @@
   "Use this link to integrate Tracim in your file explorer": "Utilisez ce lien pour intégrer Tracim à votre explorateur de fichiers",
   "CalDAV compatible software": "logiciel compatible CalDAV",
   "(protocole WebDAV)": "(protocole WebDAV)",
-  "Administration": "Administration"
+  "Administration": "Administration",
+  "Agendas": "Agendas"
 }

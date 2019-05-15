@@ -122,7 +122,7 @@ class Header extends React.Component {
                     onClick={this.handleClickAgendaButton}
                   >
                     <i className='fa fa-fw fa-calendar' />
-                    {props.t('Agenda')}
+                    {props.t('Agendas')}
                   </button>
                 </li>
               )}
