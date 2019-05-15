@@ -9,15 +9,62 @@ from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.models.context_models import ContentInContext
 
 
-class SearchIndexCommand(AppContextCommand):
+class SearchIndexInitCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "Index content into search engine"
+        return "init index of search engine"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "--empty",
+            help="do not insered content after creating index template",
+            dest="empty",
+            required=False,
+            default=None,
+        )
+        return parser
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        # TODO - G.M - 05-04-2018 -Refactor this in order
+        # to not setup object var outside of __init__ .
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+        self.search_api = SearchApi(
+            current_user=None, session=self._session, config=self._app_config
+        )
+        self.search_api.create_index_template()
+        print("Index template was created")
+        if not parsed_args.empty:
+            print("Indexing all content")
+            self.search_api.index_all_content()
+            print("All content where indexed")
+
+
+class SearchIndexUpdateCommand(AppContextCommand):
+    def get_description(self) -> str:
+        return "update index of search engine"
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        # TODO - G.M - 05-04-2018 -Refactor this in order
+        # to not setup object var outside of __init__ .
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+        self.search_api = SearchApi(
+            current_user=None, session=self._session, config=self._app_config
+        )
+        self.search_api.migrate()
+
+
+class SearchIndexAddCommand(AppContextCommand):
+    def get_description(self) -> str:
+        return "Add content into search engine"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "--content_id",
-            help="select a specific content_id to index",
+            help="select a specific content_id to index, "
+            "if not provided will index all content of tracim",
             dest="content_id",
             required=False,
             default=None,
@@ -32,7 +79,6 @@ class SearchIndexCommand(AppContextCommand):
         self.search_api = SearchApi(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.update_index()
         if parsed_args.content_id:
             content_api = ContentApi(
                 current_user=None, session=self._session, config=self._app_config
@@ -48,3 +94,10 @@ class SearchIndexCommand(AppContextCommand):
             print("Indexing all content")
             self.search_api.index_all_content()
             print("All content where indexed")
+
+
+class SearchIndexDeleteCommand(AppContextCommand):
+    # TODO - G.M - 2019-05-15 - Add delete index command
+
+    def get_description(self) -> str:
+        return "NOT YET SUPPORTED!"

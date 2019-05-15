@@ -44,7 +44,10 @@ class TestCommands(CommandFunctionalTest):
         assert output.find("webdav start") > 0
         assert output.find("caldav start") > 0
         assert output.find("caldav sync") > 0
-        assert output.find("search index") > 0
+        assert output.find("search init") > 0
+        assert output.find("search add") > 0
+        assert output.find("search update") > 0
+        assert output.find("search delete") > 0
 
     def test_func__user_create_command__ok__nominal_case(self) -> None:
         """

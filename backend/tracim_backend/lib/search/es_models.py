@@ -1,3 +1,5 @@
+from fnmatch import fnmatch
+
 from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
 from elasticsearch_dsl import Document
@@ -7,7 +9,8 @@ from elasticsearch_dsl import Text
 from elasticsearch_dsl import analyzer
 
 folding = analyzer("folding", tokenizer="standard", filter=["lowercase", "asciifolding"])
-INDEX_DOCUMENTS = "documents"
+INDEX_DOCUMENTS_ALIAS = "documents"
+INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_ALIAS + "-*"
 
 
 class IndexedContent(Document):
@@ -16,8 +19,17 @@ class IndexedContent(Document):
     Used for index creation.
     """
 
+    @classmethod
+    def _matches(cls, hit):
+        # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
+        # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
+        # override _matches to match indices in a pattern instead of just ALIAS
+        # hit is the raw dict as returned by elasticsearch
+        return fnmatch(hit["_index"], INDEX_DOCUMENTS_PATTERN)
+
     class Index:
-        name = INDEX_DOCUMENTS
+        # we will use an alias instead of the index
+        name = INDEX_DOCUMENTS_ALIAS
 
     content_id = Integer()
     parent_id = Integer()
@@ -36,3 +48,4 @@ class IndexedContent(Document):
     modified = Date()
     created = Date()
     raw_content = Text(analyzer=folding)
+    lapin = Text()

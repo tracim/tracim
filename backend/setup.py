@@ -146,7 +146,10 @@ setup(
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
             'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',
-            'search index = tracim_backend.command.search:SearchIndexCommand',
+            'search init = tracim_backend.command.search:SearchIndexInitCommand',
+            'search add = tracim_backend.command.search:SearchIndexAddCommand',
+            'search update = tracim_backend.command.search:SearchIndexUpdateCommand',
+            'search delete = tracim_backend.command.search:SearchIndexDeleteCommand',
         ]
     },
     message_extractors={'tracim_backend': [
