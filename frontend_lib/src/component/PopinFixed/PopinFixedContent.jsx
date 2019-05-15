@@ -6,7 +6,7 @@ class PopinFixedContent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      rightPartOpen: false
+      rightPartOpen: true
     }
   }
 
