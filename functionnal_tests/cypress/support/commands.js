@@ -21,6 +21,7 @@ Cypress.Commands.add('create_thread', () => {
   cy.get('.thread.visible').should('not.be.visible')
 })
 
+// DEPRECATED - CH - 2019-05-15 - Best way is to use the function in helpers/htmldoc.js
 Cypress.Commands.add('create_htmldocument', () => {
   cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
