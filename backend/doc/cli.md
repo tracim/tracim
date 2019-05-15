@@ -55,7 +55,7 @@ in some case, agenda of user or workspace can failed to be created,
 to check if all agenda are created and force their creation if they're not,
 you can do:
 
-    tracimcli caldav agenda create
+    tracimcli caldav sync
 
 ## Webdav ##
 

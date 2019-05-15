@@ -62,7 +62,7 @@ Copy folder `collection-root/agenda/` in `radicale_storage/`.
 
 Now when you start caldav all this data is used.
     
-**:warning:** If you have starting tracim and created some shared space without starting caldav you need to start caldav and after that to start this command `tracimcli caldav agenda create` to create missing agenda.
+**:warning:** If you have starting tracim and created some shared space without starting caldav you need to start caldav and after that to start this command `tracimcli caldav sync` to create missing agenda.
 
 ## Parameter changed from v2.1 to v2.2
 
