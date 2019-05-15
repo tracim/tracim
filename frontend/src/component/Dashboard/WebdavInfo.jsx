@@ -24,7 +24,7 @@ export const WebdavInfo = props => (
 
       <div className='webdavInfo__content__link'>
         <div className='webdavInfo__content__link__icon primaryColorBorder'>
-          <i className='fa fa-calendar' />
+          <i className='fa fa-cloud' />
         </div>
 
         <div className='webdavInfo__content__link__url primaryColorBorder'>
