@@ -321,7 +321,7 @@ class HtmlDocument extends React.Component {
 
   handleClickNewVersion = () => {
     const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
- 
+
     this.setState(prev => ({
       content: {
         ...prev.content,

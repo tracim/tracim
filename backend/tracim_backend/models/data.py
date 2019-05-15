@@ -1155,14 +1155,19 @@ class Content(DeclarativeBase):
             object_session(self)
             .query(ContentRevisionRO)
             .filter(ContentRevisionRO.parent_id == self.content_id)
+            .order_by(ContentRevisionRO.content_id)
             .all()
         )
         children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
+        # INFO - G.M - 2019-05-06 - we get max revision (latest) for each content (defined
+        # by content id). As we use a group_by , what we retrieve here
+        #  is not a list of ContentRevisionRO, but a standard object of sqlalchemy.
         all_up_to_date_revisions_result = (
             object_session(self)
             .query(func.max(ContentRevisionRO.revision_id))
             .filter(ContentRevisionRO.content_id.in_(children_content_ids))
             .group_by(ContentRevisionRO.content_id)
+            .order_by(ContentRevisionRO.content_id)
             .all()
         )
 
@@ -1183,6 +1188,7 @@ class Content(DeclarativeBase):
             children.append(child)
             if recursively:
                 children.extend(child.get_children(recursively=recursively))
+        children = sorted(children, key=lambda child: child.content_id)
         return children
 
     @property

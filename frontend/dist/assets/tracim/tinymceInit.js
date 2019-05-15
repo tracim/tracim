@@ -98,7 +98,7 @@
             customFullscreen = {
               active: !customFullscreen.active,
               originalHeight: customFullscreen.originalHeight,
-              newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - 88 // 88px is Tracim's header height
+              newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - 61 // 61px is Tracim's header height
             }
 
             iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'

@@ -72,6 +72,7 @@ tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
     'pytest-cov',
+    'pytest-dotenv',
     'parameterized',
     'pep8',
     'mypy',
@@ -134,7 +135,6 @@ setup(
             'tracimcli = tracim_backend.command:main',
         ],
         'tracimcli': [
-            'test = tracim_backend.command:TestTracimCommand',
             'user_create = tracim_backend.command.user:CreateUserCommand',
             'user_update = tracim_backend.command.user:UpdateUserCommand',
             'db_init = tracim_backend.command.database:InitializeDBCommand',

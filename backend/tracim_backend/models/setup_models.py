@@ -1,12 +1,18 @@
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
+import typing
+
+from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
+from sqlalchemy.engine import Engine
 from sqlalchemy.event import listen
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 import zope.sqlalchemy
 
+from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import Group  # noqa: F401
 from tracim_backend.models.auth import Permission  # noqa: F401
 from tracim_backend.models.auth import User  # noqa: F401
@@ -14,28 +20,42 @@ from tracim_backend.models.data import Content  # noqa: F401
 from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
 from tracim_backend.models.meta import DeclarativeBase  # noqa: F401
 
+if typing.TYPE_CHECKING:
+    # INFO - G.M - 2019-05-03 - import for type-checking only, setted here to
+    # avoid circular import issue
+    from tracim_backend.config import CFG
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()
 
 
-def get_engine(settings, prefix="sqlalchemy."):
-    return engine_from_config(settings, prefix)
+def get_engine(app_config: "CFG", prefix="sqlalchemy.") -> Engine:
+    sqlalchemy_params = sliced_dict(
+        app_config.__dict__, beginning_key_string=prefix.upper().replace(".", "__")
+    )
+    # INFO - G.M - 2019-04-30 - get setting as default config for supporting custom sqlalchemy
+    # parameter in config file only
+    new_config = sliced_dict(app_config.settings, beginning_key_string=prefix)
+    for key, value in sqlalchemy_params.items():
+        new_key = key.lower().replace("__", ".")
+        new_config[new_key] = value
+
+    return engine_from_config(new_config, prefix=prefix)
 
 
-def get_session_factory(engine):
+def get_session_factory(engine) -> sessionmaker:
     factory = sessionmaker(expire_on_commit=False)
     factory.configure(bind=engine)
     return factory
 
 
-def get_scoped_session_factory(engine):
+def get_scoped_session_factory(engine) -> scoped_session:
     factory = scoped_session(sessionmaker(expire_on_commit=False))
     factory.configure(bind=engine)
     return factory
 
 
-def get_tm_session(session_factory, transaction_manager):
+def get_tm_session(session_factory, transaction_manager) -> Session:
     """
     Get a ``sqlalchemy.orm.Session`` instance backed by a transaction.
 
@@ -74,28 +94,24 @@ def get_tm_session(session_factory, transaction_manager):
     return dbsession
 
 
-def includeme(config):
+def init_models(configurator: Configurator, app_config: "CFG") -> None:
     """
     Initialize the model for a Pyramid app.
-
-    Activate this setup using
-    ``config.include('tracim_backend.models.setup_models')``.
-
     """
-    settings = config.get_settings()
+    settings = configurator.get_settings()
     settings["tm.manager_hook"] = "pyramid_tm.explicit_manager"
 
     # use pyramid_tm to hook the transaction lifecycle to the request
-    config.include("pyramid_tm")
+    configurator.include("pyramid_tm")
 
     # use pyramid_retry to retry a request when transient exceptions occur
-    config.include("pyramid_retry")
+    configurator.include("pyramid_retry")
 
-    session_factory = get_session_factory(get_engine(settings))
-    config.registry["dbsession_factory"] = session_factory
+    session_factory = get_session_factory(get_engine(app_config))
+    configurator.registry["dbsession_factory"] = session_factory
 
     # make request.dbsession available for use in Pyramid
-    config.add_request_method(
+    configurator.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
         lambda r: get_tm_session(session_factory, r.tm),
         "dbsession",
