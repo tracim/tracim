@@ -42,6 +42,7 @@ requires = [
     'python-slugify',
     'preview-generator>=0.10',
     'colour',
+    'python-dateutil',
     # mail-notifier
     'mako',
     'lxml',

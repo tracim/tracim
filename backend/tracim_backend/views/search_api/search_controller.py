@@ -8,6 +8,7 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.search_api.schema import ContentSearchResultSchema
 from tracim_backend.views.search_api.schema import SearchFilterQuerySchema
 
 SWAGGER_TAG__SEARCH_SECTION = "Search"
@@ -17,6 +18,7 @@ class SearchController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
     @check_right(is_user)
     @hapic.input_query(SearchFilterQuerySchema())
+    @hapic.output_body(ContentSearchResultSchema())
     def search_content(self, context, request: TracimRequest, hapic_data: HapicData = None):
         app_config = request.registry.settings["CFG"]  # type: CFG
         search_api = SearchApi(
@@ -36,4 +38,4 @@ class SearchController(Controller):
         configurator.add_route(
             "search_content", "/search/content", request_method="GET"
         )  # noqa: W605
-        configurator.add_view(self.search_content, route_name="search_content", renderer="json")
+        configurator.add_view(self.search_content, route_name="search_content")

@@ -1,37 +1,17 @@
 import typing
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Boolean
-from elasticsearch_dsl import Document
-from elasticsearch_dsl import Integer
-from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Search
-from elasticsearch_dsl import Text
-from elasticsearch_dsl import analyzer
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS
+from tracim_backend.lib.search.es_models import IndexedContent
+from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
-
-folding = analyzer("folding", tokenizer="standard", filter=["lowercase", "asciifolding"])
-
-INDEX_DOCUMENTS = "documents"
-
-
-class IndexedContent(Document):
-    class Index:
-        name = INDEX_DOCUMENTS
-
-    title = Text(analyzer=folding)
-    raw_content = Text(analyzer=folding)
-    content_type = Keyword()
-    status = Keyword()
-    is_deleted = Boolean()
-    is_archived = Boolean()
-    workspace_id = Integer()
 
 
 class SearchApi(object):
@@ -67,12 +47,23 @@ class SearchApi(object):
     def index_content(self, content: ContentInContext):
         logger.info(self, "Indexing content {}".format(content.content_id))
         indexed_content = IndexedContent(
-            title=content.label,
-            raw_content=content.raw_content,
+            content_id=content.content_id,
+            workspace_id=content.workspace_id,
+            parent_id=content.parent_id,
+            label=content.label,
+            slug=content.slug,
+            status=content.status,
             content_type=content.content_type,
+            sub_content_types=content.sub_content_types,
             is_deleted=content.is_deleted,
             is_archived=content.is_archived,
-            workspace_id=content.workspace_id,
+            is_editable=content.is_editable,
+            show_in_ui=content.show_in_ui,
+            file_extension=content.file_extension,
+            filename=content.filename,
+            modified=content.modified,
+            created=content.created,
+            raw_content=content.raw_content,
         )
         indexed_content.meta.id = content.content_id
         indexed_content.save(using=self.es)
@@ -105,5 +96,6 @@ class SearchApi(object):
             search = Search(using=self.es, index=INDEX_DOCUMENTS).query("match_all")
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
-        res = search.execute().to_dict()
+        search = search.response_class(ContentSearchResponse)
+        res = search.execute()
         return res
