@@ -614,7 +614,6 @@ class HtmlDocument extends React.Component {
 
         <PopinFixedContent
           customClass={`${config.slug}__contentpage`}
-          showRightPartOnLoad={mode === MODE.VIEW}
         >
           <HtmlDocumentComponent
             mode={mode}
