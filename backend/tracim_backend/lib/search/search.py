@@ -1,7 +1,13 @@
 import typing
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Document, Text, Keyword, Boolean, Integer, analyzer
+from elasticsearch_dsl import Boolean
+from elasticsearch_dsl import Document
+from elasticsearch_dsl import Integer
+from elasticsearch_dsl import Keyword
+from elasticsearch_dsl import Search
+from elasticsearch_dsl import Text
+from elasticsearch_dsl import analyzer
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
@@ -10,12 +16,12 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 
-folding = analyzer('folding', tokenizer="standard", filter=["lowercase", "asciifolding"])
+folding = analyzer("folding", tokenizer="standard", filter=["lowercase", "asciifolding"])
 
 INDEX_DOCUMENTS = "documents"
 
-class IndexedContent(Document):
 
+class IndexedContent(Document):
     class Index:
         name = INDEX_DOCUMENTS
 
@@ -73,8 +79,12 @@ class SearchApi(object):
 
     def index_all_content(self):
         content_api = ContentApi(
-            session=self._session, config=self._config, current_user=self._user,
-            show_archived=True, show_active=True, show_deleted=True
+            session=self._session,
+            config=self._config,
+            current_user=self._user,
+            show_archived=True,
+            show_active=True,
+            show_deleted=True,
         )
         contents = content_api.get_all()
         for content in contents:
@@ -89,12 +99,10 @@ class SearchApi(object):
         print("search for: {}".format(search_string))
         if search_string:
             search = Search(using=self.es, index=INDEX_DOCUMENTS).query(
-                "query_string", query=search_string, fields=['title', 'raw_content']
+                "query_string", query=search_string, fields=["title", "raw_content"]
             )
         else:
-            search = Search(using=self.es, index=INDEX_DOCUMENTS).query(
-                "match_all"
-            )
+            search = Search(using=self.es, index=INDEX_DOCUMENTS).query("match_all")
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
         res = search.execute().to_dict()
