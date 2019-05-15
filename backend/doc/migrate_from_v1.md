@@ -64,6 +64,7 @@ After starting caldav server you need to synchronize tracim with radicale. For t
 
     tracimcli caldav sync
     
+Now all of your agendas are visible in tracim.
 
 ## Parameter changed from v2.1 to v2.2
 
