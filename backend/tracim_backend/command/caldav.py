@@ -39,7 +39,7 @@ class CaldavRunnerCommand(AppContextCommand):
 
 class CaldavSyncCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "synchronize tracim with radicale for all workspaces/user"
+        return "synchronize tracim with radicale"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
