@@ -23,6 +23,8 @@ export class OpenContentApp extends React.Component {
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
+      this.props.dispatchCustomEvent('unmount_app')
+
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
         workspace_id: parseInt(idWorkspace),
