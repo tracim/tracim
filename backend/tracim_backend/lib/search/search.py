@@ -59,6 +59,11 @@ class SearchApi(object):
 
         logger.info(self, "ES index is ready")
 
+    def delete(self):
+        logger.info(self, 'delete index with pattern {}'.format(INDEX_DOCUMENTS_PATTERN))
+        self.es.indices.delete(INDEX_DOCUMENTS_PATTERN, allow_no_indices=True)
+        self.es.indices.delete_template(INDEX_DOCUMENTS_ALIAS)
+
     def migrate(self, move_data=True, update_alias=True) -> None:
         """
         Upgrade function that creates a new index for the data. Optionally it also can

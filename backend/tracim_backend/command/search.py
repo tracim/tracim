@@ -100,4 +100,14 @@ class SearchIndexDeleteCommand(AppContextCommand):
     # TODO - G.M - 2019-05-15 - Add delete index command
 
     def get_description(self) -> str:
-        return "NOT YET SUPPORTED!"
+        return "Delete all index, alias and template of tracim document"
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+        self.search_api = SearchApi(
+            current_user=None, session=self._session, config=self._app_config
+        )
+        print('delete index')
+        self.search_api.delete()
+        print('Index where deleted')
