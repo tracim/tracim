@@ -13,7 +13,7 @@ class ContentSearchResponse(object):
     for elasticsearch search
     """
 
-    def __init__(self, search: Search, response: Response):
+    def __init__(self, search: Search, response: Response) -> None:
         self._response = response
         self._search = search
         self.contents = []
@@ -69,7 +69,7 @@ class SearchedContent(object):
         created: datetime,
         raw_content: str,
         score: float,
-    ):
+    ) -> None:
         self.content_id = content_id
         self.parent_id = parent_id
         self.workspace_id = workspace_id

@@ -1,4 +1,5 @@
 from fnmatch import fnmatch
+import typing
 
 from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
@@ -20,7 +21,7 @@ class IndexedContent(Document):
     """
 
     @classmethod
-    def _matches(cls, hit):
+    def _matches(cls, hit: dict[str, typing.Any]) -> bool:
         # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # override _matches to match indices in a pattern instead of just ALIAS

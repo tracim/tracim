@@ -15,10 +15,11 @@ from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.data import UserRoleInWorkspace
 
 
 class SearchApi(object):
-    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG):
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         assert config.SEARCH__ENABLED
         self._user = current_user
         self._session = session
@@ -34,7 +35,7 @@ class SearchApi(object):
             ]
         )
 
-    def create_index_template(self):
+    def create_index_template(self) -> None:
         """
         Create the index template in elasticsearch specifying the mappings and any
         settings to be used. This can be run at any time, ideally at every new code
@@ -58,7 +59,7 @@ class SearchApi(object):
 
         logger.info(self, "ES index is ready")
 
-    def migrate(self, move_data=True, update_alias=True):
+    def migrate(self, move_data=True, update_alias=True) -> None:
         """
         Upgrade function that creates a new index for the data. Optionally it also can
         (and by default will) reindex previous copy of the data into the new index
@@ -104,7 +105,7 @@ class SearchApi(object):
                 }
             )
 
-    def index_content(self, content: ContentInContext):
+    def index_content(self, content: ContentInContext) -> None:
         logger.info(self, "Indexing content {}".format(content.content_id))
         indexed_content = IndexedContent(
             content_id=content.content_id,
@@ -128,7 +129,7 @@ class SearchApi(object):
         indexed_content.meta.id = content.content_id
         indexed_content.save(using=self.es)
 
-    def index_all_content(self):
+    def index_all_content(self) -> None:
         content_api = ContentApi(
             session=self._session,
             config=self._config,
