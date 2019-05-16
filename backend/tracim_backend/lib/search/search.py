@@ -106,6 +106,9 @@ class SearchApi(object):
             )
 
     def index_content(self, content: ContentInContext) -> None:
+        """
+        Index/update a content into elastic_search engine
+        """
         logger.info(self, "Indexing content {}".format(content.content_id))
         indexed_content = IndexedContent(
             content_id=content.content_id,
@@ -130,6 +133,9 @@ class SearchApi(object):
         indexed_content.save(using=self.es)
 
     def index_all_content(self) -> None:
+        """
+        Index/update all content in current index of ElasticSearch
+        """
         content_api = ContentApi(
             session=self._session,
             config=self._config,
@@ -145,13 +151,21 @@ class SearchApi(object):
             )
             self.index_content(content_in_context)
 
-    def _get_user_workspaces_id(self, min_role: int) -> typing.List[int]:
+    def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
+        """
+        Get user workspace list or None if no user set
+        """
         if self._user:
             rapi = RoleApi(config=self._config, session=self._session, current_user=self._user)
             return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
         return None
 
     def search_content(self, search_string: str) -> ContentSearchResponse:
+        """
+        Search content into elastic search server:
+        - do no show archived/deleted content by default
+        - filter content found according to workspace of current_user
+        """
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
         # Add wildcard at end of each word (only at end for performances)
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
@@ -164,7 +178,8 @@ class SearchApi(object):
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
         search = search.response_class(ContentSearchResponse)
-
+        # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
+        # return all workspaces content, empty list mean return nothing.
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
         res = search.execute()
