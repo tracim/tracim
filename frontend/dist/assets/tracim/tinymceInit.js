@@ -49,6 +49,16 @@
         $editor.on('init', function (e) {
           const event = new CustomEvent('tinymceLoaded', {detail: {}, editor: this})
           document.dispatchEvent(event)
+
+          window.onresize = function(){
+            var iframeElement = $editor.getWin()
+            if(customFullscreen.active){
+              var currentHeight = iframeElement.frameElement.style.height
+              var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
+              customFullscreen.newHeight = currentHeightInt - 61 // 61px is Tracim's header height
+              iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
+            }
+          }
         })
 
         $editor.on('change keyup', function (e) {
