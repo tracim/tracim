@@ -31,6 +31,12 @@
       }
     })
 
+    getIframeHeight = function (iframeElement) {
+      var currentHeight = iframeElement.frameElement.style.height
+      var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
+      return currentHeightInt
+    }
+
     tinymce.init({
       selector: selector,
       language: lang === 'fr' ? 'fr_FR' : lang,
@@ -49,16 +55,6 @@
         $editor.on('init', function (e) {
           const event = new CustomEvent('tinymceLoaded', {detail: {}, editor: this})
           document.dispatchEvent(event)
-
-          window.onresize = function(){
-            var iframeElement = $editor.getWin()
-            if(customFullscreen.active){
-              var currentHeight = iframeElement.frameElement.style.height
-              var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
-              customFullscreen.newHeight = currentHeightInt - 61 // 61px is Tracim's header height
-              iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
-            }
-          }
         })
 
         $editor.on('change keyup', function (e) {
@@ -96,22 +92,29 @@
           icon: 'mce-ico mce-i-fullscreen',
           title: 'Fullscreen',
           onclick: function () {
+            const headerHeight = 61 // 61px is Tracim's header height
             var iframeElement = $editor.getWin()
 
             if (customFullscreen.originalHeight === null) customFullscreen.originalHeight = iframeElement.frameElement.style.height
 
             $editor.execCommand('mceFullScreen')
 
-            var currentHeight = iframeElement.frameElement.style.height
-            var currentHeightInt = parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
+            var currentHeightInt = getIframeHeight(iframeElement)
 
             customFullscreen = {
               active: !customFullscreen.active,
               originalHeight: customFullscreen.originalHeight,
-              newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - 61 // 61px is Tracim's header height
+              newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - headerHeight
             }
 
             iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
+
+            window.onresize = function () {
+              var iframeElement = $editor.getWin()
+              var currentHeightInt = getIframeHeight(iframeElement)
+              customFullscreen.newHeight = currentHeightInt - headerHeight
+              iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
+            }
           }
         })
 
