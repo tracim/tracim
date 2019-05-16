@@ -202,7 +202,7 @@ jobs:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
-        - nohup pserve $BACKEND_TEST_CONFIG_FILE& >pserve.log 2>&1
+        - nohup pserve $BACKEND_TEST_CONFIG_FILE >pserve.log 2>&1 &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR
