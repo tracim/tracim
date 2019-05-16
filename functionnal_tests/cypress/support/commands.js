@@ -1,3 +1,5 @@
+import 'cypress-wait-until'
+
 let LOGIN_URL = '/api/v2/auth/login'
 
 Cypress.Commands.add('create_file', () => {
@@ -92,23 +94,28 @@ Cypress.Commands.add('delete_htmldocument', () => {
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
   cy.getUserByRole(role)
-    .then(user => cy.request({
-      method: 'POST',
-      url: LOGIN_URL,
-      body: {
-        'email': user.email,
-        'password': user.password
-      }
-    }))
-    .then(response => cy.request({
-      method: 'PUT',
-      url: '/api/v2/users/' + response.body.user_id,
-      body: {
-        lang: 'en',
-        public_name: response.body.public_name,
-        timezone: 'Europe/Paris'
-      }
-    }))
+    .then(user => {
+      return cy.request({
+        method: 'POST',
+        url: LOGIN_URL,
+        body: {
+          'email': user.email,
+          'password': user.password
+        }
+      })
+    })
+    .then(response => {
+      cy.waitUntil(() => cy.getCookie('session_key').then(cookie => Boolean(cookie && cookie.value)))
+      return cy.request({
+        method: 'PUT',
+        url: '/api/v2/users/' + response.body.user_id,
+        body: {
+          lang: 'en',
+          public_name: response.body.public_name,
+          timezone: 'Europe/Paris'
+        }
+      })
+    })
     .then(response => response.body)
 })
 
