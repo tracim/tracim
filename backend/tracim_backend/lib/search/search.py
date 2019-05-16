@@ -74,12 +74,12 @@ class SearchApi(object):
         # construct a new index name by appending current timestamp
         next_index = INDEX_DOCUMENTS_PATTERN.replace("*", datetime.now().strftime("%Y%m%d%H%M%S%f"))
 
-        print('create new index "{}"'.format(next_index))
+        logger.info(self, 'create new index "{}"'.format(next_index))
         # create new index, it will use the settings from the template
         self.es.indices.create(index=next_index)
 
         if move_data:
-            print('reindex data from "{}" to "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index))
+            logger.info(self, 'reindex data from "{}" to "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index))
             # move data from current alias to the new index
             self.es.reindex(
                 body={"source": {"index": INDEX_DOCUMENTS_ALIAS}, "dest": {"index": next_index}},
@@ -89,7 +89,7 @@ class SearchApi(object):
             self.es.indices.refresh(index=next_index)
 
         if update_alias:
-            print('set alias "{}" to point on index "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index))
+            logger.info(self, 'set alias "{}" to point on index "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index))
             # repoint the alias to point to the newly created index
             self.es.indices.update_aliases(
                 body={
