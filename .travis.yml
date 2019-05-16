@@ -202,10 +202,12 @@ jobs:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
-        - nohup pserve $BACKEND_TEST_CONFIG_FILE&
+        - nohup pserve $BACKEND_TEST_CONFIG_FILE& >pserve.log 2>&1
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR
+      after_failure:
+        - cat $TRAVIS_BUILD_DIR/backend/pserve.log
 
 stages:
   - static-tests
