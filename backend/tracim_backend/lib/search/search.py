@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
 from tracim_backend.lib.search.es_models import IndexedContent
@@ -143,10 +144,16 @@ class SearchApi(object):
             )
             self.index_content(content_in_context)
 
-    def search_content(self, search_string: str):
+    def _get_user_workspaces_id(self, min_role: int) -> typing.List[int]:
+        if self._user:
+            rapi = RoleApi(config=self._config, session=self._session, current_user=self._user)
+            return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
+        return None
+
+    def search_content(self, search_string: str) -> ContentSearchResponse:
+        filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
         # Add wildcard at end of each word (only at end for performances)
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
-        print("search for: {}".format(search_string))
         if search_string:
             search = Search(using=self.es, index=INDEX_DOCUMENTS_ALIAS).query(
                 "query_string", query=search_string, fields=["title", "raw_content"]
@@ -156,5 +163,7 @@ class SearchApi(object):
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
         search = search.response_class(ContentSearchResponse)
+        if filtered_workspace_ids is not None:
+            search = search.filter("terms", workspace_id=filtered_workspace_ids)
         res = search.execute()
         return res
