@@ -37,9 +37,9 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
 
       it('should close the app Htmldoc and open the app File', () => {
-        cy.get(contentHtmlDocGetter).click()
+        cy.get(contentHtmlDocGetter).click('topLeft')
         cy.wait(1000) // wait for tinymce or a js error might occur
-        cy.get(contentFileGetter).click()
+        cy.get(contentFileGetter).click('topLeft')
 
         cy.get('.wsContentGeneric.html-document').should('be.not.visible')
         cy.get('.wsContentGeneric.file').should('be.visible')
@@ -48,8 +48,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('From app File to app Thread', () => {
       it('should close the app File and open the app Thread', () => {
-        cy.get(contentFileGetter).click()
-        cy.get(contentThreadGetter).click()
+        cy.get(contentFileGetter).click('topLeft')
+        cy.get(contentThreadGetter).click('topLeft')
 
         cy.get('.wsContentGeneric.file').should('be.not.visible')
         cy.get('.wsContentGeneric.thread').should('be.visible')
@@ -58,8 +58,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('From app Thread to app Htmldoc', () => {
       it('should close the app Thread and open the app Htmldoc', () => {
-        cy.get(contentThreadGetter).click()
-        cy.get(contentHtmlDocGetter).click()
+        cy.get(contentThreadGetter).click('topLeft')
+        cy.get(contentHtmlDocGetter).click('topLeft')
         cy.wait(1000) // wait for tinymce or a js error might occur
 
         cy.get('.wsContentGeneric.thread').should('be.not.visible')
@@ -74,11 +74,11 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
 
       it("should hide the app Htmldoc and set it visible back", () => {
-        cy.get(contentHtmlDocGetter).click()
+        cy.get(contentHtmlDocGetter).click('topLeft')
         cy.wait(1000) // wait for tinymce or a js error might occur
 
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
-        cy.get(contentHtmlDocGetter).click()
+        cy.get(contentHtmlDocGetter).click('topLeft')
         cy.wait(1000) // wait for tinymce or a js error might occur
 
         cy.get('.wsContentGeneric.html-document').should('be.visible')
@@ -92,10 +92,10 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
 
       it("should hide the app File and set it visible back", () => {
-        cy.get(contentFileGetter).click()
+        cy.get(contentFileGetter).click('topLeft')
 
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
-        cy.get(contentFileGetter).click()
+        cy.get(contentFileGetter).click('topLeft')
 
         cy.get('.wsContentGeneric.file').should('be.visible')
       })
@@ -108,10 +108,10 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
 
       it("should hide the app Thread and set it visible back", () => {
-        cy.get(contentThreadGetter).click()
+        cy.get(contentThreadGetter).click('topLeft')
 
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
-        cy.get(contentThreadGetter).click()
+        cy.get(contentThreadGetter).click('topLeft')
 
         cy.get('.wsContentGeneric.thread').should('be.visible')
       })
