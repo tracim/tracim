@@ -44,7 +44,9 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.get('.wsContentGeneric.html-document').should('be.not.visible')
         cy.get('.wsContentGeneric.file').should('be.visible')
       })
+    })
 
+    describe('From app File to app Thread', () => {
       it('should close the app File and open the app Thread', () => {
         cy.get(contentFileGetter).click()
         cy.get(contentThreadGetter).click()
@@ -52,7 +54,9 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.get('.wsContentGeneric.file').should('be.not.visible')
         cy.get('.wsContentGeneric.thread').should('be.visible')
       })
+    })
 
+    describe('From app Thread to app Htmldoc', () => {
       it('should close the app Thread and open the app Htmldoc', () => {
         cy.get(contentThreadGetter).click()
         cy.get(contentHtmlDocGetter).click()
@@ -63,7 +67,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
     })
 
-    describe('From app Htmldoc to another app Htmldoc', () => {
+    describe('Closing the app Htmldoc and reopening it', () => {
       beforeEach(() => {
         cy.loginAs('administrators')
         cy.visit(`/ui/workspaces/${workspaceId}/contents`)
@@ -81,7 +85,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
     })
 
-    describe('From app File to another app File', () => {
+    describe('Closing the app File and reopening it', () => {
       beforeEach(() => {
         cy.loginAs('administrators')
         cy.visit(`/ui/workspaces/${workspaceId}/contents`)
@@ -97,7 +101,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       })
     })
 
-    describe('From app Thread to another app Thread', () => {
+    describe('Closing the app Thread and reopening it', () => {
       beforeEach(() => {
         cy.loginAs('administrators')
         cy.visit(`/ui/workspaces/${workspaceId}/contents`)
