@@ -155,14 +155,15 @@ class SearchApi(object):
         # Add wildcard at end of each word (only at end for performances)
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
         if search_string:
-            search = Search(using=self.es, index=INDEX_DOCUMENTS_ALIAS).query(
+            search = Search(using=self.es, doc_type=IndexedContent).query(
                 "query_string", query=search_string, fields=["title", "raw_content"]
             )
         else:
-            search = Search(using=self.es, index=INDEX_DOCUMENTS_ALIAS).query("match_all")
+            search = Search(using=self.es, doc_type=IndexedContent).query("match_all")
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
         search = search.response_class(ContentSearchResponse)
+
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
         res = search.execute()
