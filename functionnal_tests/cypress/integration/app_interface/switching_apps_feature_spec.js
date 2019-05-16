@@ -30,12 +30,12 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     const contentThreadGetter = `.workspace__content__fileandfolder > .content[title="${ThreadTitle}"]`
     const contentFileGetter = `.workspace__content__fileandfolder > .content[title="blob"]`
 
-    describe('From app Htmldoc to app File', () => {
-      beforeEach(() => {
-        cy.loginAs('administrators')
-        cy.visit(`/ui/workspaces/${workspaceId}/contents`)
-      })
+    beforeEach(() => {
+      cy.loginAs('administrators')
+      cy.visit(`/ui/workspaces/${workspaceId}/contents`)
+    })
 
+    describe('From app Htmldoc to app File', () => {
       it('should close the app Htmldoc and open the app File', () => {
         cy.get(contentHtmlDocGetter).click('left')
         cy.wait(1000) // wait for tinymce or a js error might occur
@@ -68,11 +68,6 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     })
 
     describe('Closing the app Htmldoc and reopening it', () => {
-      beforeEach(() => {
-        cy.loginAs('administrators')
-        cy.visit(`/ui/workspaces/${workspaceId}/contents`)
-      })
-
       it("should hide the app Htmldoc and set it visible back", () => {
         cy.get(contentHtmlDocGetter).click('left')
         cy.wait(1000) // wait for tinymce or a js error might occur
@@ -86,11 +81,6 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     })
 
     describe('Closing the app File and reopening it', () => {
-      beforeEach(() => {
-        cy.loginAs('administrators')
-        cy.visit(`/ui/workspaces/${workspaceId}/contents`)
-      })
-
       it("should hide the app File and set it visible back", () => {
         cy.get(contentFileGetter).click('left')
 
@@ -102,11 +92,6 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     })
 
     describe('Closing the app Thread and reopening it', () => {
-      beforeEach(() => {
-        cy.loginAs('administrators')
-        cy.visit(`/ui/workspaces/${workspaceId}/contents`)
-      })
-
       it("should hide the app Thread and set it visible back", () => {
         cy.get(contentThreadGetter).click('left')
 
