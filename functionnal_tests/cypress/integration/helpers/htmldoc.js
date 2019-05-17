@@ -17,10 +17,11 @@ export const create_htmldocument = (cy, htmlDocTitle = 'Html document 1') => {
   cy.get('[data-cy=popup__createcontent__form__button]')
     .click()
 
-  cy.get(`.workspace__content__fileandfolder > .content[title="${htmlDocTitle}"]`)
+  cy.get('[data-cy="popinFixed"].html-document')
     .should('be.visible')
 
-  // INFO - CH - 2019-05-15 - waiter added only for app html because without, it fails.
-  // probably because of tinymce ...
-  cy.wait(1000)
+  cy.waitForTinyMCELoaded().then(() => {
+    cy.get(`.workspace__content__fileandfolder > .content[title="${htmlDocTitle}"]`)
+      .should('be.visible')
+  })
 }

@@ -8,6 +8,9 @@ export const create_file = (cy) => {
   cy.get('[data-cy=popup__createcontent__form__button]')
     .click()
 
+  cy.get('[data-cy="popinFixed"].file')
+    .should('be.visible')
+
   cy.get(`.workspace__content__fileandfolder > .content[title="blob"] .fa.fa-paperclip`)
     .should('be.visible')
 }

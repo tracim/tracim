@@ -31,7 +31,6 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     const contentFileGetter = `.workspace__content__fileandfolder > .content[title="blob"]`
 
     beforeEach(() => {
-      cy.wait(200)
       cy.loginAs('administrators')
       cy.visit(`/ui/workspaces/${workspaceId}/contents`)
     })
@@ -39,11 +38,12 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     describe('From app Htmldoc to app File', () => {
       it('should close the app Htmldoc and open the app File', () => {
         cy.get(contentHtmlDocGetter).click('left')
-        cy.wait(1000) // wait for tinymce or a js error might occur
-        cy.get(contentFileGetter).click('left')
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.get(contentFileGetter).click('left')
 
-        cy.get('.wsContentGeneric.html-document').should('be.not.visible')
-        cy.get('.wsContentGeneric.file').should('be.visible')
+          cy.get('[data-cy="popinFixed"].html-document').should('be.not.visible')
+          cy.get('[data-cy="popinFixed"].file').should('be.visible')
+        })
       })
     })
 
@@ -52,8 +52,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.get(contentFileGetter).click('left')
         cy.get(contentThreadGetter).click('left')
 
-        cy.get('.wsContentGeneric.file').should('be.not.visible')
-        cy.get('.wsContentGeneric.thread').should('be.visible')
+        cy.get('[data-cy="popinFixed"].file').should('be.not.visible')
+        cy.get('[data-cy="popinFixed"].thread').should('be.visible')
       })
     })
 
@@ -61,23 +61,25 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       it('should close the app Thread and open the app Htmldoc', () => {
         cy.get(contentThreadGetter).click('left')
         cy.get(contentHtmlDocGetter).click('left')
-        cy.wait(1000) // wait for tinymce or a js error might occur
-
-        cy.get('.wsContentGeneric.thread').should('be.not.visible')
-        cy.get('.wsContentGeneric.html-document').should('be.visible')
+        cy.waitForTinyMCELoaded().then(() => {
+          cy.get('[data-cy="popinFixed"].thread').should('be.not.visible')
+          cy.get('[data-cy="popinFixed"].html-document').should('be.visible')
+        })
       })
     })
 
     describe('Closing the app Htmldoc and reopening it', () => {
       it("should hide the app Htmldoc and set it visible back", () => {
         cy.get(contentHtmlDocGetter).click('left')
-        cy.wait(1000) // wait for tinymce or a js error might occur
+        cy.waitForTinyMCELoaded().then(() => {
 
-        cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
-        cy.get(contentHtmlDocGetter).click('left')
-        cy.wait(1000) // wait for tinymce or a js error might occur
+          cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
+          cy.get(contentHtmlDocGetter).click('left')
+          cy.waitForTinyMCELoaded().then(() => {
 
-        cy.get('.wsContentGeneric.html-document').should('be.visible')
+            cy.get('[data-cy="popinFixed"].html-document').should('be.visible')
+          })
+        })
       })
     })
 
@@ -88,7 +90,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
         cy.get(contentFileGetter).click('left')
 
-        cy.get('.wsContentGeneric.file').should('be.visible')
+        cy.get('[data-cy="popinFixed"].file').should('be.visible')
       })
     })
 
@@ -99,7 +101,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
         cy.get(contentThreadGetter).click('left')
 
-        cy.get('.wsContentGeneric.thread').should('be.visible')
+        cy.get('[data-cy="popinFixed"].thread').should('be.visible')
       })
     })
   })

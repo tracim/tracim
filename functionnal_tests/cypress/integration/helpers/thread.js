@@ -17,6 +17,9 @@ export const create_thread = (cy, threadTitle = 'Thread 1') => {
   cy.get('[data-cy=popup__createcontent__form__button]')
     .click()
 
+  cy.get('[data-cy="popinFixed"].thread')
+    .should('be.visible')
+
   cy.get(`.workspace__content__fileandfolder > .content[title="${threadTitle}"]`)
     .should('be.visible')
 }
