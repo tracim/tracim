@@ -150,8 +150,8 @@ class TestThread(DefaultTest):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
         business_workspace = wapi.create_workspace(label="business")
-        assert business_workspace.label == 'business'
+        assert business_workspace.label == "business"
         wapi.delete(business_workspace)
         assert business_workspace.is_deleted is True
-        assert business_workspace.label != 'business'
-        assert business_workspace.label.startswith('business-deleted-')
+        assert business_workspace.label != "business"
+        assert business_workspace.label.startswith("business-deleted-")
