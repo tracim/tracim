@@ -31,7 +31,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     const contentFileGetter = `.workspace__content__fileandfolder > .content[title="blob"]`
 
     beforeEach(() => {
-      cy.wait(1)
+      cy.wait(200)
       cy.loginAs('administrators')
       cy.visit(`/ui/workspaces/${workspaceId}/contents`)
     })
