@@ -31,11 +31,10 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     const contentFileGetter = `.workspace__content__fileandfolder > .content[title="blob"]`
 
     beforeEach(() => {
+      cy.wait(200)
       cy.loginAs('administrators')
       cy.visit(`/ui/workspaces/${workspaceId}/contents`)
     })
-
-    afterEach(() => {cy.wait(1000)})
 
     describe('From app Htmldoc to app File', () => {
       it('should close the app Htmldoc and open the app File', () => {
