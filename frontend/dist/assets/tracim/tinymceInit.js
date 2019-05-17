@@ -110,10 +110,12 @@
             iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
 
             window.onresize = function () {
-              var iframeElement = $editor.getWin()
-              var currentHeightInt = getIframeHeight(iframeElement)
-              customFullscreen.newHeight = currentHeightInt - headerHeight
-              iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
+              if (customFullscreen.active) {
+                var iframeElement = $editor.getWin()
+                var currentHeightInt = getIframeHeight(iframeElement)
+                customFullscreen.newHeight = currentHeightInt - headerHeight
+                iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
+              }
             }
           }
         })
