@@ -146,7 +146,7 @@ class TestThread(DefaultTest):
         rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         eq_([w1, w2], wapi.get_all_manageable())
 
-    def test_workspace_delete(self):
+    def test__unit__workspace_deletion__ok__nominal_case(self) -> None:
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
         business_workspace = wapi.create_workspace(label="business")
