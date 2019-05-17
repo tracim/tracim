@@ -35,6 +35,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
       cy.visit(`/ui/workspaces/${workspaceId}/contents`)
     })
 
+    afterEach(() => {cy.wait(1000)})
+
     describe('From app Htmldoc to app File', () => {
       it('should close the app Htmldoc and open the app File', () => {
         cy.get(contentHtmlDocGetter).click('left')
