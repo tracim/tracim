@@ -179,5 +179,9 @@
   "CalDAV compatible software": "logiciel compatible CalDAV",
   "(protocole WebDAV)": "(protocole WebDAV)",
   "Administration": "Administration",
-  "Agendas": "Agendas"
+  "Agendas": "Agendas",
+  "see shared space": "voir l'espace partagé",
+  "hide shared space": "masquer l'espace partagé",
+  "see sidebar": "voir la barre latérale",
+  "hide sidebar": "masquer la barre latérale"
 }

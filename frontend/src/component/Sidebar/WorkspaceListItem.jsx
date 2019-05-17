@@ -54,7 +54,7 @@ const WorkspaceListItem = props => {
         </div>
 
         <div className='sidebar__content__navigation__workspace__item__icon'>
-          <i className={classnames(props.isOpenInSidebar ? 'fa fa-chevron-up' : 'fa fa-chevron-down')} />
+          {props.isOpenInSidebar ? <i className={classnames('fa fa-chevron-up')} title={props.t('hide shared space')} /> : <i className={classnames('fa fa-chevron-down')} title={props.t('see shared space')} />}
         </div>
       </div>
 
