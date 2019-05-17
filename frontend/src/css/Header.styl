@@ -102,7 +102,6 @@
       &__rightside
         width 100%
 
-
 responsiveNavbarCollapseFixed =
   position fixed
   left 0
@@ -110,6 +109,7 @@ responsiveNavbarCollapseFixed =
   width 100%
   background-color #f8f9fa
   border-bottom 1px solid #ccc
+  padding-right 5px
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .header
@@ -119,8 +119,11 @@ responsiveNavbarCollapseFixed =
       &.navbar-collapse
         {responsiveNavbarCollapseFixed}
       &__rightside
+        flex-wrap wrap
         padding-left 0
         width 100%
+        & li
+          margin 2px 0
         &__itemquestion
           display none
 

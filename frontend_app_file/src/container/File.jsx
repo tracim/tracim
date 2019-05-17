@@ -647,7 +647,6 @@ class File extends React.Component {
 
         <PopinFixedContent
           customClass={`${state.config.slug}__contentpage`}
-          showRightPartOnLoad={state.mode === MODE.VIEW}
         >
           <FileComponent
             mode={state.mode}

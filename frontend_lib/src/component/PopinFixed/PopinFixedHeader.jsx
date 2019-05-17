@@ -35,10 +35,17 @@ class PopinFixedHeader extends React.Component {
     }))
   }
 
+  handleClickUndoChangeTitleBtn = () => {
+    this.setState({
+      editTitle: false,
+      editTitleValue: this.props.rawTitle
+    })
+  }
+
   handleInputKeyPress = e => {
     switch (e.key) {
       case 'Enter': this.handleClickChangeTitleBtn(); break
-      case 'Escape': this.setState({editTitle: false, editTitleValue: this.props.rawTitle}); break
+      case 'Escape': this.handleClickUndoChangeTitleBtn(); break
     }
   }
 
@@ -66,6 +73,16 @@ class PopinFixedHeader extends React.Component {
             : componentTitle
           }
         </div>
+
+        {idRoleUserWorkspace >= 2 && state.editTitle &&
+          <button
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
+            onClick={this.handleClickUndoChangeTitleBtn}
+            disabled={disableChangeTitle}
+          >
+            <i className='fa fa-undo' title={t('undo change in title')} />
+          </button>
+        }
 
         {idRoleUserWorkspace >= 2 &&
           <button

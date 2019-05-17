@@ -127,7 +127,7 @@ class Account extends React.Component {
       link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <span className='nolink'>{props.t('Manage')}</span>,
+      link: <span className='nolink'>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }, {
@@ -254,7 +254,8 @@ class Account extends React.Component {
                         return (
                           <AgendaInfo
                             customClass='account__agenda'
-                            introText={props.t('Use this link to access your personal agenda from anyhere')}
+                            introText={props.t('Use this link to integrate this agenda to your')}
+                            caldavText={props.t('CalDAV compatible software')}
                             agendaUrl={props.user.agendaUrl}
                           />
                         )
