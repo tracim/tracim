@@ -60,7 +60,7 @@ class SearchApi(object):
         logger.info(self, "ES index is ready")
 
     def delete(self):
-        logger.info(self, 'delete index with pattern {}'.format(INDEX_DOCUMENTS_PATTERN))
+        logger.info(self, "delete index with pattern {}".format(INDEX_DOCUMENTS_PATTERN))
         self.es.indices.delete(INDEX_DOCUMENTS_PATTERN, allow_no_indices=True)
         self.es.indices.delete_template(INDEX_DOCUMENTS_ALIAS)
 
@@ -84,7 +84,9 @@ class SearchApi(object):
         self.es.indices.create(index=next_index)
 
         if move_data:
-            logger.info(self, 'reindex data from "{}" to "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index))
+            logger.info(
+                self, 'reindex data from "{}" to "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index)
+            )
             # move data from current alias to the new index
             self.es.reindex(
                 body={"source": {"index": INDEX_DOCUMENTS_ALIAS}, "dest": {"index": next_index}},
@@ -94,7 +96,10 @@ class SearchApi(object):
             self.es.indices.refresh(index=next_index)
 
         if update_alias:
-            logger.info(self, 'set alias "{}" to point on index "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index))
+            logger.info(
+                self,
+                'set alias "{}" to point on index "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index),
+            )
             # repoint the alias to point to the newly created index
             self.es.indices.update_aliases(
                 body={
