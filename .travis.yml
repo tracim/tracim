@@ -204,11 +204,11 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/backend
         - nohup pserve $BACKEND_TEST_CONFIG_FILE&
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - $(npm bin)/cypress run --spec "./cypress/integration/app_interface/switching_apps_feature_spec.js"
+        - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR
 
 stages:
-#  - static-tests
-#  - quick-tests
-#  - backend
+  - static-tests
+  - quick-tests
+  - backend
   - functional
