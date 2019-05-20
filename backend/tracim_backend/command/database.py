@@ -2,7 +2,6 @@
 import argparse
 
 from depot.manager import DepotManager
-import plaster_pastedeploy
 from pyramid.paster import get_appsettings
 from sqlalchemy.exc import IntegrityError
 import transaction
@@ -11,7 +10,6 @@ from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
-from tracim_backend.exceptions import InvalidSettingFile
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -47,24 +45,20 @@ class InitializeDBCommand(AppContextCommand):
         # section of config file in order to have both global and
         # web app specific param.
         settings.update(settings.global_conf)
-        if "sqlalchemy.url" not in settings or not settings["sqlalchemy.url"]:
-            raise InvalidSettingFile("Wrong or empty sqlalchemy database url," "check config file")
-        self._create_schema(settings)
-        self._populate_database(settings, add_test_data=parsed_args.test_data)
+        app_config = CFG(settings)
+        self._create_schema(app_config)
+        self._populate_database(app_config, add_test_data=parsed_args.test_data)
 
     @classmethod
-    def _create_schema(cls, settings: plaster_pastedeploy.ConfigDict) -> None:
+    def _create_schema(cls, app_config: CFG) -> None:
         print("- Create Schemas of databases -")
-        engine = get_engine(settings)
+        engine = get_engine(app_config)
         DeclarativeBase.metadata.create_all(engine)
 
     @classmethod
-    def _populate_database(
-        cls, settings: plaster_pastedeploy.ConfigDict, add_test_data: bool
-    ) -> None:
-        engine = get_engine(settings)
+    def _populate_database(cls, app_config: CFG, add_test_data: bool) -> None:
+        engine = get_engine(app_config)
         session_factory = get_session_factory(engine)
-        app_config = CFG(settings)
         print("- Populate database with default data -")
         with transaction.manager:
             dbsession = get_tm_session(session_factory, transaction.manager)
@@ -112,11 +106,9 @@ class DeleteDBCommand(AppContextCommand):
         # setup_logging(config_uri)
         settings = get_appsettings(config_uri)
         settings.update(settings.global_conf)
-        if "sqlalchemy.url" not in settings or not settings["sqlalchemy.url"]:
-            raise InvalidSettingFile("Wrong or empty sqlalchemy database url," "check config file")
-        engine = get_engine(settings)
         app_config = CFG(settings)
         app_config.configure_filedepot()
+        engine = get_engine(app_config)
 
         if parsed_args.force:
             print("Database deletion begin.")

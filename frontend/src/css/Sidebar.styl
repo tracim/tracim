@@ -32,6 +32,8 @@ sidebarColorDarken = darken(sidebarColor, 15%)
     width "calc(%s + 20px)" % sidebar-width
     height 100%
     overflow-y scroll
+    display flex
+    flex-direction column
   &__expand
     position fixed
     left sidebar-width
@@ -153,6 +155,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
                 text-overflow ellipsis
                 color offWhite
   &__footer
+    margin-top auto
     &__text
       color offWhite
       font-size 14px
