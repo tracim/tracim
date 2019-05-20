@@ -4,7 +4,8 @@ import { create_thread } from '../helpers/thread.js'
 
 describe('App Interface (the mechanism to open and close apps)', () => {
   const htmlDocTitle = 'HtmlDocForSwitch'
-  const ThreadTitle = 'ThreadForSwitch'
+  const threadTitle = 'ThreadForSwitch'
+  const fileTitle = 'FileForSwitch'
   let workspaceId
 
   before(() => {
@@ -14,26 +15,27 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.visit(`/ui/workspaces/${workspaceId}/contents`)
+
+      create_file(cy, fileTitle)
+      cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
+
       create_htmldocument(cy, htmlDocTitle)
       cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
 
-      create_file(cy)
-      cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
-
-      create_thread(cy, ThreadTitle)
+      create_thread(cy, threadTitle)
       cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
     })
   })
 
   describe('Switching between 2 different apps feature', () => {
     const contentHtmlDocGetter = `.workspace__content__fileandfolder > .content[title="${htmlDocTitle}"]`
-    const contentThreadGetter = `.workspace__content__fileandfolder > .content[title="${ThreadTitle}"]`
-    const contentFileGetter = `.workspace__content__fileandfolder > .content[title="blob"]`
+    const contentThreadGetter = `.workspace__content__fileandfolder > .content[title="${threadTitle}"]`
+    const contentFileGetter = `.workspace__content__fileandfolder > .content[title="${fileTitle}"]`
 
     beforeEach(() => {
       cy.wait(200)
       cy.loginAs('administrators')
-      cy.visit(`/ui/workspaces/${workspaceId}/contents`)
+      cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
     })
 
     describe('From app Htmldoc to app File', () => {

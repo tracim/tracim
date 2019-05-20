@@ -208,7 +208,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR
 
 stages:
-  - static-tests
-  - quick-tests
-  - backend
+#  - static-tests
+#  - quick-tests
+#  - backend
   - functional

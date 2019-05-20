@@ -4,5 +4,6 @@
   "viewportHeight": 1024,
   "defaultCommandTimeout": 30000,
   "video": false,
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "projectId": "191qrb"
 }
