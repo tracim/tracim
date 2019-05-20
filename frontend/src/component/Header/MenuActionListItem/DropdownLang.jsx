@@ -6,24 +6,29 @@ require('./DropdownLang.styl')
 const DropdownLang = props => {
   const activeLang = props.langList.find(l => l.id === props.idLangActive)
   return (
-    <li className='header__menu__rightside__itemlanguage'>
-      <div className='header__menu__rightside__itemlanguage__languagedropdown dropdown'>
+    <li className='dropdownlang'>
+      <div className='dropdownlang__dropdown dropdown'>
         <button
           type='button'
-          className='languagedropdown__btnlanguage btn outlineTextBtn nohover primaryColorBorder dropdown-toggle'
+          className='dropdownlang__dropdown__btnlanguage btn outlineTextBtn nohover primaryColorBorder dropdown-toggle'
           id='headerDropdownMenuButton'
           data-toggle='dropdown'
           aria-haspopup='true'
           aria-expanded='false'
         >
-          <img className='languagedropdown__btnlanguage__imgselected' src={activeLang.icon} />
-          { activeLang.label }
+          <img className='dropdownlang__dropdown__btnlanguage__imgselected' src={activeLang.icon} />
+          {activeLang.label}
         </button>
-        <div className='languagedropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
-          { props.langList.filter(l => l.id !== props.idLangActive).map(l =>
-            <div className='subdropdown__link primaryColorBgLightenHover dropdown-item' onClick={() => props.onChangeLang(l.id)} key={l.id}>
-              <img className='subdropdown__flag mr-2' src={l.icon} />
-              { l.label }
+
+        <div className='dropdownlang__dropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
+          {props.langList.filter(l => l.id !== props.idLangActive).map(l =>
+            <div
+              className='dropdownlang__dropdown__subdropdown__link primaryColorBgLightenHover dropdown-item'
+              onClick={() => props.onChangeLang(l.id)}
+              key={l.id}
+            >
+              <img className='dropdownlang__dropdown__subdropdown__link__flag' src={l.icon} />
+              {l.label}
             </div>
           )}
         </div>

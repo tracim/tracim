@@ -7,7 +7,8 @@ import i18n from '../i18n.js'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { Switch } from 'react-router'
+import Dashboard from './Dashboard.jsx'
+import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
@@ -22,6 +23,7 @@ import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   PAGE,
+  COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile
 } from '../helper.js'
@@ -30,7 +32,8 @@ import {
   getAppList,
   getContentTypeList,
   getUserIsConnected,
-  getMyselfWorkspaceList
+  getMyselfWorkspaceList,
+  putUserLang
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -39,10 +42,10 @@ import {
   setAppList,
   setContentTypeList,
   setUserConnected,
-  setWorkspaceList
+  setWorkspaceList,
+  setBreadcrumbs,
+  appendBreadcrumbs
 } from '../action-creator.sync.js'
-import Dashboard from './Dashboard.jsx'
-import Sidebar from './Sidebar.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -73,6 +76,14 @@ class Tracim extends React.Component {
         await this.loadWorkspaceList()
         this.props.history.push(data.url)
         break
+      case 'setBreadcrumbs':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(setBreadcrumbs(data.breadcrumbs))
+        break
+      case 'appendBreadcrumbs':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
+        break
     }
   }
 
@@ -83,12 +94,18 @@ class Tracim extends React.Component {
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
+        if (fetchGetUserIsConnected.json.lang === null) this.setDefaultUserLang(fetchGetUserIsConnected.json)
+
         props.dispatch(setUserConnected({
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
-        Cookies.set('lastConnection', '1', {expires: 180})
+
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
+
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
@@ -117,7 +134,7 @@ class Tracim extends React.Component {
   loadWorkspaceList = async (idOpenInSidebar = undefined) => {
     const { props } = this
 
-    const idWsToOpen = idOpenInSidebar || (props.workspaceList.find(ws => ws.isOpenInSidebar) || {id: undefined}).id
+    const idWsToOpen = idOpenInSidebar || props.currentWorkspace.id || undefined
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
@@ -130,6 +147,15 @@ class Tracim extends React.Component {
       return true
     }
     return false
+  }
+
+  setDefaultUserLang = async loggedUser => {
+    const { props } = this
+    const fetchPutUserLang = await props.dispatch(putUserLang(loggedUser, props.user.lang))
+    switch (fetchPutUserLang.status) {
+      case 200: break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving your language')))
+    }
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
@@ -174,7 +200,7 @@ class Tracim extends React.Component {
           <Route path='/ui/workspaces/:idws?' render={() => [// Workspace Router
             // @FIXME - CH - 2018-03-26 - the use of array in a render function avoid having to wrap everything into
             // a wrapper div.
-            // This is required here to avoid having the div.tracim__content in the calendars pages.
+            // This is required here to avoid having the div.tracim__content in the agendas pages.
             // To fix this, upgrade React to at least 16.2.0 and use the first class component React.Fragment instead
             // of the array syntax that is kind of misleading. Also remove the key props
             <Route exact path={PAGE.WORKSPACE.ROOT} key='workspace_root' render={() =>
@@ -185,26 +211,18 @@ class Tracim extends React.Component {
               <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
             } />,
 
-            <Switch>
-              <Route
-                path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')}
-                key='workspace_content'
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
-              <Route
-                path={PAGE.WORKSPACE.CONTENT_LIST(':idws')}
-                key='workspace_contentlist'
-                render={() =>
-                  <div className='tracim__content fullWidthFullHeight'>
-                    <WorkspaceContent />
-                  </div>
-                }
-              />
-            </Switch>,
+            <Route
+              path={[
+                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                PAGE.WORKSPACE.CONTENT_LIST(':idws')
+              ]}
+              key='workspace_contentlist'
+              render={() =>
+                <div className='tracim__content fullWidthFullHeight'>
+                  <WorkspaceContent />
+                </div>
+              }
+            />,
 
             <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
               <div className='tracim__content fullWidthFullHeight'>
@@ -212,7 +230,7 @@ class Tracim extends React.Component {
               </div>
             } />,
 
-            <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} key='workspace_calendar' render={() =>
+            <Route path={PAGE.WORKSPACE.AGENDA(':idws')} key='workspace_agenda' render={() =>
               <AppFullscreenRouter />
             } />
           ]} />
@@ -224,7 +242,7 @@ class Tracim extends React.Component {
           <Route exact path={[
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
-            PAGE.CALENDAR
+            PAGE.AGENDA
           ]} render={() => <AppFullscreenRouter />} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
@@ -244,5 +262,7 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, appList, contentType, workspaceList, flashMessage, system }) => ({ user, appList, contentType, workspaceList, flashMessage, system })
+const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
+  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
+})
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))

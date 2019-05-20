@@ -98,7 +98,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:19
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
-msgstr "<a href=\\{call_to_action_url}\\>aller voir sur tracim</a>"
+msgstr "<a href=\"{call_to_action_url}\">aller voir sur tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:21
 msgid "You're receiving this email because of your account on {website_title}."

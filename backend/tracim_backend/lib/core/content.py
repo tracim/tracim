@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 import datetime
 import os
 import re
 import traceback
 import typing
-from contextlib import contextmanager
 
-import sqlalchemy
-import transaction
+from depot.io.interfaces import StoredFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
+import sqlalchemy
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
@@ -24,14 +24,13 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
-from tracim_backend.config import CFG
+import transaction
 
 from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNotFound
@@ -41,8 +40,7 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
-from tracim_backend.exceptions import \
-    RevisionFilePathSearchFailedDepotCorrupted
+from tracim_backend.exceptions import RevisionFilePathSearchFailedDepotCorrupted
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
@@ -64,19 +62,15 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
-from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 
-__author__ = 'damien'
+__author__ = "damien"
 
 
 # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-def compare_content_for_sorting_by_type_and_name(
-        content1: Content,
-        content2: Content
-) -> int:
+def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Content) -> int:
     """
     :param content1:
     :param content2:
@@ -86,9 +80,9 @@ def compare_content_for_sorting_by_type_and_name(
     """
 
     if content1.type == content2.type:
-        if content1.get_label().lower()>content2.get_label().lower():
+        if content1.get_label().lower() > content2.get_label().lower():
             return 1
-        elif content1.get_label().lower()<content2.get_label().lower():
+        elif content1.get_label().lower() < content2.get_label().lower():
             return -1
         return 0
     else:
@@ -111,17 +105,29 @@ def compare_content_for_sorting_by_type_and_name(
         else:
             return 0
 
+
 # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_tree_items_for_sorting_by_type_and_name(
-        item1: NodeTreeItem,
-        item2: NodeTreeItem
+    item1: NodeTreeItem, item2: NodeTreeItem
 ) -> int:
     return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
 
 
+class AddCopyRevisionsResult(object):
+    def __init__(
+        self,
+        new_content: Content,
+        new_children_dict: typing.Dict[int, Content],
+        original_children_dict: typing.Dict[int, Content],
+    ) -> None:
+        self.new_content = new_content
+        self.new_children_dict = new_children_dict  # dict key is original content id
+        self.original_children_dict = original_children_dict  # dict key is original content id
+
+
 class ContentApi(object):
 
-    SEARCH_SEPARATORS = ',| '
+    SEARCH_SEPARATORS = ",| "
     SEARCH_DEFAULT_RESULT_NB = 50
 
     # DISPLAYABLE_CONTENTS = (
@@ -135,17 +141,17 @@ class ContentApi(object):
     # )
 
     def __init__(
-            self,
-            session: Session,
-            current_user: typing.Optional[User],
-            config: CFG,
-            show_archived: bool = False,
-            show_deleted: bool = False,
-            show_temporary: bool = False,
-            show_active: bool = True,
-            all_content_in_treeview: bool = True,
-            force_show_all_types: bool = False,
-            disable_user_workspaces_filter: bool = False,
+        self,
+        session: Session,
+        current_user: typing.Optional[User],
+        config: CFG,
+        show_archived: bool = False,
+        show_deleted: bool = False,
+        show_temporary: bool = False,
+        show_active: bool = True,
+        all_content_in_treeview: bool = True,
+        force_show_all_types: bool = False,
+        disable_user_workspaces_filter: bool = False,
     ) -> None:
         self._session = session
         self._user = current_user
@@ -158,7 +164,7 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
-        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)
         default_lang = None
         if self._user:
             default_lang = self._user.lang
@@ -166,11 +172,8 @@ class ContentApi(object):
 
     @contextmanager
     def show(
-            self,
-            show_archived: bool=False,
-            show_deleted: bool=False,
-            show_temporary: bool=False,
-    ) -> typing.Generator['ContentApi', None, None]:
+        self, show_archived: bool = False, show_deleted: bool = False, show_temporary: bool = False
+    ) -> typing.Generator["ContentApi", None, None]:
         """
         Use this method as context manager to update show_archived,
         show_deleted and show_temporary properties during context.
@@ -193,62 +196,52 @@ class ContentApi(object):
             self._show_temporary = previous_show_temporary
 
     def get_content_in_context(self, content: Content) -> ContentInContext:
-        return ContentInContext(content, self._session, self._config, self._user)  # nopep8
+        return ContentInContext(content, self._session, self._config, self._user)
 
-    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
+    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:
         # TODO - G.M - 2018-06-173 - create revision in context object
-        return RevisionInContext(revision, self._session, self._config, self._user) # nopep8
-    
+        return RevisionInContext(revision, self._session, self._config, self._user)
+
     def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
         Return the Content/ContentRevision query join condition
         :return: Content/ContentRevision query join condition
         """
-        return and_(Content.id == ContentRevisionRO.content_id,
-                    ContentRevisionRO.revision_id == self._session.query(
-                        ContentRevisionRO.revision_id)
-                    .filter(ContentRevisionRO.content_id == Content.id)
-                    .order_by(ContentRevisionRO.revision_id.desc())
-                    .limit(1)
-                    .correlate(Content))
+        return and_(
+            Content.id == ContentRevisionRO.content_id,
+            ContentRevisionRO.revision_id
+            == self._session.query(ContentRevisionRO.revision_id)
+            .filter(ContentRevisionRO.content_id == Content.id)
+            .order_by(ContentRevisionRO.revision_id.desc())
+            .limit(1)
+            .correlate(Content),
+        )
 
     def get_canonical_query(self) -> Query:
         """
         Return the Content/ContentRevision base query who join these table on the last revision.
         :return: Content/ContentRevision Query
         """
-        return self._session.query(Content)\
-            .join(ContentRevisionRO, self._get_revision_join())
+        return self._session.query(Content).join(ContentRevisionRO, self._get_revision_join())
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
-    def sort_tree_items(
-        cls,
-        content_list: typing.List[NodeTreeItem],
-    )-> typing.List[NodeTreeItem]:
+    def sort_tree_items(cls, content_list: typing.List[NodeTreeItem]) -> typing.List[NodeTreeItem]:
         news = []
         for item in content_list:
             news.append(item)
 
-        content_list.sort(key=cmp_to_key(
-            compare_tree_items_for_sorting_by_type_and_name,
-        ))
+        content_list.sort(key=cmp_to_key(compare_tree_items_for_sorting_by_type_and_name))
 
         return content_list
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
-    def sort_content(
-        cls,
-        content_list: typing.List[Content],
-    ) -> typing.List[Content]:
+    def sort_content(cls, content_list: typing.List[Content]) -> typing.List[Content]:
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
         return content_list
 
-    def __real_base_query(
-        self,
-        workspace: Workspace = None,
-    ) -> Query:
+    def __real_base_query(self, workspace: Workspace = None) -> Query:
         result = self.get_canonical_query()
 
         # Exclude non displayable types
@@ -263,42 +256,40 @@ class ContentApi(object):
         if self._user and not self._disable_user_workspaces_filter:
             user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
-            workspace_ids = [r.workspace_id for r in user.roles \
-                             if r.role>=UserRoleInWorkspace.READER]
-            result = result.filter(or_(
-                Content.workspace_id.in_(workspace_ids),
-                # And allow access to non workspace document when he is owner
-                and_(
-                    Content.workspace_id == None,
-                    Content.owner_id == self._user_id,
+            workspace_ids = [
+                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
+            ]
+            result = result.filter(
+                or_(
+                    Content.workspace_id.in_(workspace_ids),
+                    # And allow access to non workspace document when he is owner
+                    and_(
+                        Content.workspace_id == None, Content.owner_id == self._user_id
+                    ),  # noqa: E711
                 )
-            ))
+            )
 
         return result
 
-    def _base_query(self, workspace: Workspace=None) -> Query:
+    def _base_query(self, workspace: Workspace = None) -> Query:
         result = self.__real_base_query(workspace)
 
         if not self._show_active:
-            result = result.filter(or_(
-                Content.is_deleted==True,
-                Content.is_archived==True,
-            ))
+            result = result.filter(
+                or_(Content.is_deleted == True, Content.is_archived == True)
+            )  # noqa: E711
         if not self._show_deleted:
-            result = result.filter(Content.is_deleted==False)
+            result = result.filter(Content.is_deleted == False)  # noqa: E711
 
         if not self._show_archived:
-            result = result.filter(Content.is_archived==False)
+            result = result.filter(Content.is_archived == False)  # noqa: E711
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary==False)
+            result = result.filter(Content.is_temporary == False)  # noqa: E711
 
         return result
 
-    def __revisions_real_base_query(
-        self,
-        workspace: Workspace=None,
-    ) -> Query:
+    def __revisions_real_base_query(self, workspace: Workspace = None) -> Query:
         result = self._session.query(ContentRevisionRO)
 
         # Exclude non displayable types
@@ -306,38 +297,33 @@ class ContentApi(object):
             result = result.filter(Content.type.in_(self.DISPLAYABLE_CONTENTS))
 
         if workspace:
-            result = result.filter(ContentRevisionRO.workspace_id==workspace.workspace_id)
+            result = result.filter(ContentRevisionRO.workspace_id == workspace.workspace_id)
 
         if self._user:
             user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
-            workspace_ids = [r.workspace_id for r in user.roles \
-                             if r.role>=UserRoleInWorkspace.READER]
+            workspace_ids = [
+                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
+            ]
             result = result.filter(ContentRevisionRO.workspace_id.in_(workspace_ids))
 
         return result
 
-    def _revisions_base_query(
-        self,
-        workspace: Workspace=None,
-    ) -> Query:
+    def _revisions_base_query(self, workspace: Workspace = None) -> Query:
         result = self.__revisions_real_base_query(workspace)
 
         if not self._show_deleted:
-            result = result.filter(ContentRevisionRO.is_deleted==False)
+            result = result.filter(ContentRevisionRO.is_deleted == False)  # noqa: E711
 
         if not self._show_archived:
-            result = result.filter(ContentRevisionRO.is_archived==False)
+            result = result.filter(ContentRevisionRO.is_archived == False)  # noqa: E711
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary==False)
+            result = result.filter(Content.is_temporary == False)  # noqa: E711
 
         return result
 
-    def _hard_filtered_base_query(
-        self,
-        workspace: Workspace=None,
-    ) -> Query:
+    def _hard_filtered_base_query(self, workspace: Workspace = None) -> Query:
         """
         If set to True, then filterign on is_deleted and is_archived will also
         filter parent properties. This is required for search() function which
@@ -351,35 +337,38 @@ class ContentApi(object):
 
         if not self._show_deleted:
             parent = aliased(Content)
-            result = result.join(parent, Content.parent).\
-                filter(Content.is_deleted==False).\
-                filter(parent.is_deleted==False)
+            result = (
+                result.join(parent, Content.parent)
+                .filter(Content.is_deleted == False)  # noqa: E711
+                .filter(parent.is_deleted == False)  # noqa: E711
+            )
 
         if not self._show_archived:
             parent = aliased(Content)
-            result = result.join(parent, Content.parent).\
-                filter(Content.is_archived==False).\
-                filter(parent.is_archived==False)
+            result = (
+                result.join(parent, Content.parent)
+                .filter(Content.is_archived == False)  # noqa: E711
+                .filter(parent.is_archived == False)  # noqa: E711
+            )
 
         if not self._show_temporary:
             parent = aliased(Content)
-            result = result.join(parent, Content.parent). \
-                filter(Content.is_temporary == False). \
-                filter(parent.is_temporary == False)
+            result = (
+                result.join(parent, Content.parent)
+                .filter(Content.is_temporary == False)  # noqa: E711
+                .filter(parent.is_temporary == False)  # noqa: E711
+            )
 
         return result
 
-    def get_base_query(
-        self,
-        workspace: Workspace,
-    ) -> Query:
+    def get_base_query(self, workspace: Workspace) -> Query:
         return self._base_query(workspace)
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
     #     """
     #     This method returns child items (folders or items) for left bar treeview.
-    # 
+    #
     #     :param parent:
     #     :param workspace:
     #     :param filter_by_allowed_content_types:
@@ -390,19 +379,19 @@ class ContentApi(object):
     #     """
     #     filter_by_allowed_content_types = filter_by_allowed_content_types or []  # FDV
     #     removed_item_ids = removed_item_ids or []  # FDV
-    # 
+    #
     #     if not allowed_node_types:
     #         allowed_node_types = [content_type_list.Folder.slug]
     #     elif allowed_node_types==content_type_list.Any_SLUG:
     #         allowed_node_types = ContentType.all()
-    # 
+    #
     #     parent_id = parent.content_id if parent else None
     #     folders = self._base_query(workspace).\
     #         filter(Content.parent_id==parent_id).\
     #         filter(Content.type.in_(allowed_node_types)).\
     #         filter(Content.content_id.notin_(removed_item_ids)).\
     #         all()
-    # 
+    #
     #     if not filter_by_allowed_content_types or \
     #                     len(filter_by_allowed_content_types)<=0:
     #         # Standard case for the left treeview: we want to show all contents
@@ -410,29 +399,29 @@ class ContentApi(object):
     #         # comments must not appear in the treeview
     #         return [folder for folder in folders \
     #                 if folder.type in ContentType.allowed_types_for_folding()]
-    # 
+    #
     #     # Now this is a case of Folders only (used for moving content)
     #     # When moving a content, you must get only folders that allow to be filled
     #     # with the type of content you want to move
     #     result = []
     #     for folder in folders:
     #         for allowed_content_type in filter_by_allowed_content_types:
-    # 
+    #
     #             is_folder = folder.type == content_type_list.Folder.slug
     #             content_type__allowed = folder.properties['allowed_content'][allowed_content_type] == True
-    # 
+    #
     #             if is_folder and content_type__allowed:
     #                 result.append(folder)
     #                 break
-    # 
+    #
     #     return result
 
     def _is_filename_available(
-            self,
-            filename: str,
-            workspace: Workspace,
-            parent: Content = None,
-            exclude_content_id: int = None,
+        self,
+        filename: str,
+        workspace: Workspace,
+        parent: Content = None,
+        exclude_content_id: int = None,
     ) -> bool:
         """
         Check if content label is free
@@ -453,27 +442,26 @@ class ContentApi(object):
         if parent:
             query = query.filter(Content.parent_id == parent.content_id)
         else:
-            query = query.filter(Content.parent_id == None)
+            query = query.filter(Content.parent_id == None)  # noqa: E711
 
         if exclude_content_id:
             query = query.filter(Content.content_id != exclude_content_id)
         query = query.filter(Content.workspace_id == workspace.workspace_id)
 
-
-        nb_content_with_the_filename = query.filter(
-            Content.file_name == filename
-        ).count()
+        nb_content_with_the_filename = query.filter(Content.file_name == filename).count()
         if nb_content_with_the_filename == 0:
             return True
         elif nb_content_with_the_filename == 1:
             return False
         else:
-            critical_error_text = 'Something is wrong in the database ! '\
-                                  'Content filename should be unique ' \
-                                  'in a same folder in database' \
-                                  'but you have {nb} content with ' \
-                                  'filename {filename} ' \
-                                  'in workspace {workspace_id}'
+            critical_error_text = (
+                "Something is wrong in the database ! "
+                "Content filename should be unique "
+                "in a same folder in database"
+                "but you have {nb} content with "
+                "filename {filename} "
+                "in workspace {workspace_id}"
+            )
 
             critical_error_text = critical_error_text.format(
                 nb=nb_content_with_the_filename,
@@ -481,18 +469,13 @@ class ContentApi(object):
                 workspace_id=workspace.workspace_id,
             )
             if parent:
-                critical_error_text = '{text} and parent as content {parent_id}'.format(  # nopep8
-                    text=critical_error_text,
-                    parent_id=parent.parent_id
+                critical_error_text = "{text} and parent as content {parent_id}".format(
+                    text=critical_error_text, parent_id=parent.parent_id
                 )
             logger.critical(self, critical_error_text)
             return False
 
-    def _prepare_filename(
-            self,
-            label: str,
-            file_extension: str,
-    ) -> str:
+    def _prepare_filename(self, label: str, file_extension: str) -> str:
         """
         generate correct file_name from label and file_extension
         :return: valid
@@ -500,10 +483,7 @@ class ContentApi(object):
         # TODO - G.M - 2018-10-11 - Find a way to
         # Refactor this in order to use same method
         # in both contentLib and .file_name of content
-        return '{label}{file_extension}'.format(
-            label=label,
-            file_extension=file_extension
-        )
+        return "{label}{file_extension}".format(label=label, file_extension=file_extension)
 
     def _is_filename_available_or_raise(
         self,
@@ -516,37 +496,39 @@ class ContentApi(object):
         Same as _is_filename_available but raise exception instead of
         returning boolean if content filename is already used
         """
-        if self._is_filename_available(
-            filename,
-            workspace,
-            parent,
-            exclude_content_id
-        ):
+        if self._is_filename_available(filename, workspace, parent, exclude_content_id):
             return True
         # INFO - G.M - 2018-10-11 - prepare exception message
-        exception_message = 'A Content already exist with the same filename ' \
-            '{filename}  in workspace {workspace_id}'
+        exception_message = (
+            "A Content already exist with the same filename "
+            "{filename}  in workspace {workspace_id}"
+        )
         exception_message = exception_message.format(
-            filename=filename,
-            workspace_id=workspace.workspace_id,
+            filename=filename, workspace_id=workspace.workspace_id
         )
         if parent:
-            exception_message = '{text} and parent as content {parent_id}'.format(
-                text=exception_message,
-                parent_id=parent.parent_id
+            exception_message = "{text} and parent as content {parent_id}".format(
+                text=exception_message, parent_id=parent.parent_id
             )
         raise ContentFilenameAlreadyUsedInFolder(exception_message)
 
-    def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+    def create(
+        self,
+        content_type_slug: str,
+        workspace: Workspace,
+        parent: Content = None,
+        label: str = "",
+        filename: str = "",
+        do_save=False,
+        is_temporary: bool = False,
+        do_notify=True,
+    ) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type_slug != content_type_list.Any_SLUG
         assert not (label and filename)
 
-        if (workspace and parent) and \
-            workspace.workspace_id != parent.workspace_id:
-            raise WorkspacesDoNotMatch(
-                'new parent workspace and new workspace should be the same.'
-            )
+        if (workspace and parent) and workspace.workspace_id != parent.workspace_id:
+            raise WorkspacesDoNotMatch("new parent workspace and new workspace should be the same.")
 
         if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
@@ -561,37 +543,29 @@ class ContentApi(object):
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
         if label:
-            file_extension = ''
+            file_extension = ""
             if content_type.file_extension:
                 file_extension = content_type.file_extension
             filename = self._prepare_filename(label, file_extension)
-            self._is_filename_available_or_raise(
-                filename,
-                workspace,
-                parent,
-            )
+            self._is_filename_available_or_raise(filename, workspace, parent)
             # TODO - G.M - 2018-10-15 - Set file extension and label
             # explicitly instead of filename in order to have correct
             # label/file-extension separation.
             content.label = label
             content.file_extension = file_extension
         elif filename:
-            self._is_filename_available_or_raise(
-                filename,
-                workspace,
-                parent
-            )
+            self._is_filename_available_or_raise(filename, workspace, parent)
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
             content.file_name = filename
         else:
-            if content_type_slug == content_type_list.Comment.slug:
+            if self._allow_empty_label(content_type_slug):
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
-                content.label = ''
+                content.label = ""
             else:
                 raise EmptyLabelNotAllowed(
-                    'Content of type {} should have a valid label'.format(content_type_slug)  # nopep8
+                    "Content of type {} should have a valid label".format(content_type_slug)
                 )
 
         content.owner = self._user
@@ -611,9 +585,9 @@ class ContentApi(object):
         self,
         workspace: Workspace = None,
         parent: Content = None,
-        content: str = '',
-        do_save: bool = False,
-        do_notify: bool = True
+        content: str = "",
+        do_save=False,
+        do_notify=True,
     ) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
         assert parent and parent.type != FOLDER_TYPE
@@ -637,7 +611,7 @@ class ContentApi(object):
             parent=parent,
             do_notify=False,
             do_save=False,
-            label='',
+            label="",
         )
         item.description = content
         item.revision_type = ActionDescription.COMMENT
@@ -646,7 +620,9 @@ class ContentApi(object):
             self.save(item, ActionDescription.COMMENT, do_notify=do_notify)
         return item
 
-    def get_one_from_revision(self, content_id: int, content_type: str, workspace: Workspace=None, revision_id=None) -> Content:
+    def get_one_from_revision(
+        self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None
+    ) -> Content:
         """
         This method is a hack to convert a node revision item into a node
         :param content_id:
@@ -657,22 +633,26 @@ class ContentApi(object):
         """
 
         content = self.get_one(content_id, content_type, workspace)
-        revision = self._session.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id==revision_id).one()
+        revision = (
+            self._session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.revision_id == revision_id)
+            .one()
+        )
 
-        if revision.content_id==content.content_id:
+        if revision.content_id == content.content_id:
             content.revision_to_serialize = revision.revision_id
         else:
-            raise ValueError('Revision not found for given content')
+            raise ValueError("Revision not found for given content")
 
         return content
 
     def get_one(
-            self,
-            content_id: int,
-            content_type: str,
-            workspace: Workspace=None,
-            parent: Content=None,
-            ignore_content_state_filter: bool=False
+        self,
+        content_id: int,
+        content_type: str,
+        workspace: Workspace = None,
+        parent: Content = None,
+        ignore_content_state_filter: bool = False,
     ) -> typing.Optional[Content]:
 
         if not content_id:
@@ -683,14 +663,13 @@ class ContentApi(object):
         else:
             base_request = self._base_query(workspace)
 
+        base_request = base_request.filter(Content.content_id == content_id)
 
-        base_request = base_request.filter(Content.content_id==content_id)
-
-        if content_type!=content_type_list.Any_SLUG:
-            base_request = base_request.filter(Content.type==content_type)
+        if content_type != content_type_list.Any_SLUG:
+            base_request = base_request.filter(Content.type == content_type)
 
         if parent:
-            base_request = base_request.filter(Content.parent_id==parent.content_id)  # nopep8
+            base_request = base_request.filter(Content.parent_id == parent.content_id)
 
         try:
             content = base_request.one()
@@ -700,10 +679,12 @@ class ContentApi(object):
             # like content doesn't exist, wrong parent, wrong content_type, wrong workspace,
             # wrong access to this workspace, wrong base filter according
             # to content_status.
-            raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
+            raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc
         return content
 
-    def get_one_revision(self, revision_id: int = None, content: Content= None) -> ContentRevisionRO:  # nopep8
+    def get_one_revision(
+        self, revision_id: int = None, content: Content = None
+    ) -> ContentRevisionRO:
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
@@ -711,15 +692,18 @@ class ContentApi(object):
         check if revision is related to this content.
         :return: An item Content linked with the correct revision
         """
-        assert revision_id is not None# DYN_REMOVE
+        assert revision_id is not None  # DYN_REMOVE
 
-        revision = self._session.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one()
+        revision = (
+            self._session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.revision_id == revision_id)
+            .one()
+        )
         if content and revision.content_id != content.content_id:
             raise RevisionDoesNotMatchThisContent(
-                'revision {revision_id} is not a revision of content {content_id}'.format(  # nopep8
-                    revision_id=revision.revision_id,
-                    content_id=content.content_id,
-                    )
+                "revision {revision_id} is not a revision of content {content_id}".format(
+                    revision_id=revision.revision_id, content_id=content.content_id
+                )
             )
         return revision
 
@@ -751,16 +735,12 @@ class ContentApi(object):
             return depot_file_path
         except IOError as exc:
             raise RevisionFilePathSearchFailedDepotCorrupted(
-                'IOError Unable to find Revision filepath.'
-                'File may be not available.'
+                "IOError Unable to find Revision filepath." "File may be not available."
             ) from exc
-
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent(
-            self,
-            content_label: str,
-            content_parent: Content=None,
+        self, content_label: str, content_parent: Content = None
     ) -> Content:
         """
         This method let us request the database to obtain a Content with its name and parent
@@ -786,14 +766,8 @@ class ContentApi(object):
                         Content.label == file_name,
                         Content.file_extension == file_extension,
                     ),
-                    and_(
-                        Content.type == content_type_list.Thread.slug,
-                        Content.label == file_name,
-                    ),
-                    and_(
-                        Content.type == content_type_list.Page.slug,
-                        Content.label == file_name,
-                    ),
+                    and_(Content.type == content_type_list.Thread.slug, Content.label == file_name),
+                    and_(Content.type == content_type_list.Page.slug, Content.label == file_name),
                     and_(
                         Content.type == content_type_list.Folder.slug,
                         Content.label == content_label,
@@ -803,15 +777,11 @@ class ContentApi(object):
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content "{}" not found in database'.format(content_label)
-            ) from exc  # nopep8
-
+            ) from exc
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_filename_and_parent_labels(
-            self,
-            content_label: str,
-            workspace: Workspace,
-            content_parent_labels: [str]=None,
+        self, content_label: str, workspace: Workspace, content_parent_labels: [str] = None
     ):
         """
         Return content with it's label, workspace and parents labels (optional)
@@ -828,46 +798,34 @@ class ContentApi(object):
         # Grab content parent folder if parent path given
         if content_parent_labels:
             parent_folder = self.get_folder_with_workspace_path_labels(
-                content_parent_labels,
-                workspace,
+                content_parent_labels, workspace
             )
 
         # Build query for found content by label
         content_query = self.filter_query_for_content_label_as_path(
-            query=query,
-            filename=content_label,
+            query=query, filename=content_label
         )
 
         # Modify query to apply parent folder filter if any
         if parent_folder:
-            content_query = content_query.filter(
-                Content.parent_id == parent_folder.content_id,
-            )
+            content_query = content_query.filter(Content.parent_id == parent_folder.content_id)
         else:
-            content_query = content_query.filter(
-                Content.parent_id == None,
-            )
+            content_query = content_query.filter(Content.parent_id == None)  # noqa: E711
 
         # Filter with workspace
-        content_query = content_query.filter(
-            Content.workspace_id == workspace.workspace_id,
-        )
+        content_query = content_query.filter(Content.workspace_id == workspace.workspace_id)
 
         # Return the content
         try:
-            return content_query.order_by(
-                Content.revision_id.desc(),
-            ).one()
+            return content_query.order_by(Content.revision_id.desc()).one()
         except NoResultFound as exc:
-            raise ContentNotFound('Content "{}" not found in database'.format(
-                content_label)) from exc  # nopep8
-
+            raise ContentNotFound(
+                'Content "{}" not found in database'.format(content_label)
+            ) from exc
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
-            self,
-            path_labels: [str],
-            workspace: Workspace,
+        self, path_labels: [str], workspace: Workspace
     ) -> Content:
         """
         Return a Content folder for given relative path.
@@ -883,39 +841,29 @@ class ContentApi(object):
 
         for label in path_labels:
             # Filter query on label
-            folder_query = query \
-                .filter(
+            folder_query = query.filter(
                 Content.type == content_type_list.Folder.slug,
                 Content.label == label,
                 Content.workspace_id == workspace.workspace_id,
-                )
+            )
 
             # Search into parent folder (if already deep)
             if folder:
-                folder_query = folder_query\
-                    .filter(
-                        Content.parent_id == folder.content_id,
-                    )
+                folder_query = folder_query.filter(Content.parent_id == folder.content_id)
             else:
-                folder_query = folder_query \
-                    .filter(Content.parent_id == None)
+                folder_query = folder_query.filter(Content.parent_id == None)  # noqa: E711
 
             # Get thirst corresponding folder
             try:
-                folder = folder_query \
-                    .order_by(Content.revision_id.desc()) \
-                    .one()
-            except NoResultFound as exc:
-                raise ContentNotFound('Folder not found')
+                folder = folder_query.order_by(Content.revision_id.desc()).one()
+            except NoResultFound:
+                raise ContentNotFound("Folder not found")
 
         return folder
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def filter_query_for_content_label_as_path(
-            self,
-            query: Query,
-            filename: str,
-            is_case_sensitive: bool = False,
+        self, query: Query, filename: str, is_case_sensitive: bool = False
     ) -> Query:
         """
         Apply normalised filters to found Content corresponding as given label.
@@ -927,19 +875,13 @@ class ContentApi(object):
         """
 
         if is_case_sensitive:
-            return query.filter(
-                (Content.label + Content.file_extension) == filename
-            )
+            return query.filter((Content.label + Content.file_extension) == filename)
         return query.filter(
             func.lower(Content.label + Content.file_extension) == func.lower(filename)
         )
 
     def get_pdf_preview_path(
-        self,
-        content_id: int,
-        revision_id: int,
-        page_number: int,
-        file_extension: str,
+        self, content_id: int, revision_id: int, page_number: int, file_extension: str
     ) -> str:
         """
         Get pdf preview of revision of content
@@ -953,17 +895,14 @@ class ContentApi(object):
         try:
             file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):
                 raise PageOfPreviewNotFound(
-                    'page_number {page_number} of content {content_id} does not exist'.format(  # nopep8
-                        page_number=page_number,
-                        content_id=content_id
-                    ),
+                    "page_number {page_number} of content {content_id} does not exist".format(
+                        page_number=page_number, content_id=content_id
+                    )
                 )
             pdf_preview_path = self.preview_manager.get_pdf_preview(
-                file_path,
-                page=page_number,
-                file_ext=file_extension,
+                file_path, page=page_number, file_ext=file_extension
             )
         except PageOfPreviewNotFound as exc:
             # passthrough as this exception is already supported with
@@ -973,25 +912,23 @@ class ContentApi(object):
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self,
-                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except Exception as exc:
             logger.warning(
-                self,
-                "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
+                self, "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         return pdf_preview_path
 
@@ -1004,30 +941,30 @@ class ContentApi(object):
         """
         try:
             file_path = self.get_one_revision_filepath(revision_id)
-            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path, file_ext=file_extension)  # nopep8
+            pdf_preview_path = self.preview_manager.get_pdf_preview(
+                file_path, file_ext=file_extension
+            )
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                'No preview available for revision {}'.format(revision_id)
+                "No preview available for revision {}".format(revision_id)
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self,
-                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                'No preview available for revision {}'.format(revision_id)  # nopep8
+                "No preview available for revision {}".format(revision_id)
             ) from exc
         except Exception as exc:
             logger.warning(
-                self,
-                "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
+                self, "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                'No preview available for revision {}'.format(revision_id)
+                "No preview available for revision {}".format(revision_id)
             ) from exc
         return pdf_preview_path
 
@@ -1036,8 +973,7 @@ class ContentApi(object):
         Get jpg preview allowed dimensions and strict bool param.
         """
         return PreviewAllowedDim(
-            self._config.PREVIEW_JPG_RESTRICTED_DIMS,
-            self._config.PREVIEW_JPG_ALLOWED_DIMS,
+            self._config.PREVIEW__JPG__RESTRICTED_DIMS, self._config.PREVIEW__JPG__ALLOWED_DIMS
         )
 
     def get_jpg_preview_path(
@@ -1063,37 +999,30 @@ class ContentApi(object):
         try:
             file_path = self.get_one_revision_filepath(revision_id)
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):
                 raise PageOfPreviewNotFound(
-                    'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
-                        page_number=page_number,
-                        revision_id=revision_id,
-                        content_id=content_id,
-                    ),
+                    "page {page_number} of revision {revision_id} of content {content_id} does not exist".format(
+                        page_number=page_number, revision_id=revision_id, content_id=content_id
+                    )
                 )
             if not width and not height:
-                width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
-                height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
+                width = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].width
+                height = self._config.PREVIEW__JPG__ALLOWED_DIMS[0].height
 
             allowed_dim = False
-            for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+            for preview_dim in self._config.PREVIEW__JPG__ALLOWED_DIMS:
                 if width == preview_dim.width and height == preview_dim.height:
                     allowed_dim = True
                     break
 
-            if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+            if not allowed_dim and self._config.PREVIEW__JPG__RESTRICTED_DIMS:
                 raise PreviewDimNotAllowed(
-                    'Size {width}x{height} is not allowed for jpeg preview'.format(
-                        width=width,
-                        height=height,
+                    "Size {width}x{height} is not allowed for jpeg preview".format(
+                        width=width, height=height
                     )
                 )
             jpg_preview_path = self.preview_manager.get_jpeg_preview(
-                file_path,
-                page=page_number,
-                width=width,
-                height=height,
-                file_ext=file_extension,
+                file_path, page=page_number, width=width, height=height, file_ext=file_extension
             )
         except (PreviewDimNotAllowed, PageOfPreviewNotFound) as exc:
             # passthrough as those exceptions are already supported with
@@ -1101,25 +1030,23 @@ class ContentApi(object):
             raise exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self,
-                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         except Exception as exc:
             logger.warning(
-                self,
-                "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
+                self, "Unknown Preview_Generator Exception Occured : {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+                "No preview available for content {}, revision {}".format(content_id, revision_id)
             ) from exc
         return jpg_preview_path
 
@@ -1129,7 +1056,9 @@ class ContentApi(object):
         content_type_slug: str = content_type_list.Any_SLUG,
         workspace: Workspace = None,
         label: str = None,
-        order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
+        order_by_properties: typing.Optional[
+            typing.List[typing.Union[str, QueryableAttribute]]
+        ] = None,
         complete_path_to_id: int = None,
     ) -> Query:
         """
@@ -1154,9 +1083,7 @@ class ContentApi(object):
         #  of content, workspace root included
         if complete_path_to_id:
             content = self.get_one(
-                complete_path_to_id,
-                content_type_list.Any_SLUG,
-                ignore_content_state_filter=True
+                complete_path_to_id, content_type_list.Any_SLUG, ignore_content_state_filter=True
             )
             if content.parent_id:
                 content = content.parent
@@ -1178,7 +1105,7 @@ class ContentApi(object):
             resultset = resultset.filter(Content.type.in_(all_slug_alias))
 
         if parent_ids is False:
-            resultset = resultset.filter(Content.parent_id == None)
+            resultset = resultset.filter(Content.parent_id == None)  # noqa: E711
 
         if parent_ids:
             # TODO - G.M - 2018-11-09 - Adapt list in order to deal with root
@@ -1191,11 +1118,15 @@ class ContentApi(object):
                 else:
                     allowed_parent_ids.append(parent_id)
             if allow_root:
-                resultset = resultset.filter(or_(Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None))  # nopep8
+                resultset = resultset.filter(
+                    or_(
+                        Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None
+                    )  # noqa: E711
+                )
             else:
-                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))  # nopep8
+                resultset = resultset.filter(Content.parent_id.in_(allowed_parent_ids))
         if label:
-            resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
+            resultset = resultset.filter(Content.label.ilike("%{}%".format(label)))
 
         for _property in order_by_properties:
             resultset = resultset.order_by(_property)
@@ -1203,13 +1134,15 @@ class ContentApi(object):
         return resultset
 
     def get_all(
-            self,
-            parent_ids: typing.List[int]=None,
-            content_type: str=content_type_list.Any_SLUG,
-            workspace: Workspace=None,
-            label: str=None,
-            order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
-            complete_path_to_id: int = None,
+        self,
+        parent_ids: typing.List[int] = None,
+        content_type: str = content_type_list.Any_SLUG,
+        workspace: Workspace = None,
+        label: str = None,
+        order_by_properties: typing.Optional[
+            typing.List[typing.Union[str, QueryableAttribute]]
+        ] = None,
+        complete_path_to_id: int = None,
     ) -> typing.List[Content]:
         """
         Return all content using some filters
@@ -1224,7 +1157,9 @@ class ContentApi(object):
         :return: List of contents
         """
         order_by_properties = order_by_properties or []  # FDV
-        return self._get_all_query(parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id).all()
+        return self._get_all_query(
+            parent_ids, content_type, workspace, label, order_by_properties, complete_path_to_id
+        ).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
@@ -1247,49 +1182,60 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # TODO find an other name to filter on is_deleted / is_archived
-    def get_all_with_filter(self, parent_id: int=None, content_type: str=content_type_list.Any_SLUG, workspace: Workspace=None) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None# DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
+    def get_all_with_filter(
+        self,
+        parent_id: int = None,
+        content_type: str = content_type_list.Any_SLUG,
+        workspace: Workspace = None,
+    ) -> typing.List[Content]:
+        assert parent_id is None or isinstance(parent_id, int)  # DYN_REMOVE
+        assert content_type is not None  # DYN_REMOVE
+        assert isinstance(content_type, str)  # DYN_REMOVE
 
         resultset = self._base_query(workspace)
 
         if content_type != content_type_list.Any_SLUG:
-            resultset = resultset.filter(Content.type==content_type)
+            resultset = resultset.filter(Content.type == content_type)
 
         resultset = resultset.filter(Content.is_deleted == self._show_deleted)
         resultset = resultset.filter(Content.is_archived == self._show_archived)
         resultset = resultset.filter(Content.is_temporary == self._show_temporary)
 
-        resultset = resultset.filter(Content.parent_id==parent_id)
+        resultset = resultset.filter(Content.parent_id == parent_id)
 
         return resultset.all()
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
-        assert content_type is not None# DYN_REMOVE
+    def get_all_without_exception(
+        self, content_type: str, workspace: Workspace = None
+    ) -> typing.List[Content]:
+        assert content_type is not None  # DYN_REMOVE
 
         resultset = self._base_query(workspace)
 
         if content_type != content_type_list.Any_SLUG:
-            resultset = resultset.filter(Content.type==content_type)
+            resultset = resultset.filter(Content.type == content_type)
 
         return resultset.all()
 
-    def get_last_unread(self, parent_id: int, content_type: str,
-                        workspace: Workspace=None, limit=10) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None# DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
-
-        read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
-            .filter(RevisionReadStatus.user_id==self._user_id)
-
-        not_read_revisions = self._revisions_base_query(workspace) \
-            .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
-            .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
-            .filter(Workspace.is_deleted.is_(False)) \
-            .subquery()
+    # def get_last_unread(
+    #     self, parent_id: int, content_type: str, workspace: Workspace = None, limit=10
+    # ) -> typing.List[Content]:
+    #     assert parent_id is None or isinstance(parent_id, int)  # DYN_REMOVE
+    #     assert content_type is not None  # DYN_REMOVE
+    #     assert isinstance(content_type, str)  # DYN_REMOVE
+    #
+    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id).filter(
+    #         RevisionReadStatus.user_id == self._user_id
+    #     )
+    #
+    #     not_read_revisions = (
+    #         self._revisions_base_query(workspace)
+    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids))
+    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id)
+    #         .filter(Workspace.is_deleted.is_(False))
+    #         .subquery()
+    #     )
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
@@ -1303,11 +1249,11 @@ class ContentApi(object):
     #     return resultset.all()
 
     def get_last_active(
-            self,
-            workspace: Workspace=None,
-            limit: typing.Optional[int]=None,
-            before_content: typing.Optional[Content]= None,
-            content_ids: typing.Optional[typing.List[int]] = None,
+        self,
+        workspace: Workspace = None,
+        limit: typing.Optional[int] = None,
+        before_content: typing.Optional[Content] = None,
+        content_ids: typing.Optional[typing.List[int]] = None,
     ) -> typing.List[Content]:
         """
         get contents list sorted by last update
@@ -1321,21 +1267,23 @@ class ContentApi(object):
         :return: list of content
         """
 
-        resultset = self._get_all_query(
-            workspace=workspace,
-        )
+        resultset = self._get_all_query(workspace=workspace)
         if content_ids:
             resultset = resultset.filter(
                 or_(
                     Content.content_id.in_(content_ids),
                     and_(
                         Content.parent_id.in_(content_ids),
-                        Content.type == content_type_list.Comment.slug
-                    )
+                        Content.type == content_type_list.Comment.slug,
+                    ),
                 )
             )
 
-        resultset = resultset.order_by(desc(ContentRevisionRO.updated), desc(ContentRevisionRO.revision_id), desc(ContentRevisionRO.content_id))
+        resultset = resultset.order_by(
+            desc(ContentRevisionRO.updated),
+            desc(ContentRevisionRO.revision_id),
+            desc(ContentRevisionRO.content_id),
+        )
 
         active_contents = []
         too_recent_content = []
@@ -1354,7 +1302,10 @@ class ContentApi(object):
             if not self._show_archived and related_active_content.is_archived:
                 continue
 
-            if related_active_content not in active_contents and related_active_content not in too_recent_content:  # nopep8
+            if (
+                related_active_content not in active_contents
+                and related_active_content not in too_recent_content
+            ):
 
                 if not before_content or before_content_find:
                     active_contents.append(related_active_content)
@@ -1369,67 +1320,7 @@ class ContentApi(object):
 
         return active_contents
 
-    # TODO - G.M - 2018-07-19 - Find a way to update this method to something
-    # usable and efficient for tracim v2 to get content with read/unread status
-    # instead of relying on has_new_information_for()
-    # def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
-    #                     workspace: Workspace=None, limit=10) -> typing.List[Content]:
-    #     assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-    #     assert content_type is not None# DYN_REMOVE
-    #     assert isinstance(content_type, str) # DYN_REMOVE
-    #
-    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
-    #         .filter(RevisionReadStatus.user_id==self._user_id)
-    #
-    #     not_read_revisions = self._revisions_base_query(workspace) \
-    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
-    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
-    #         .filter(Workspace.is_deleted.is_(False)) \
-    #         .subquery()
-    #
-    #     not_read_content_ids_query = self._session.query(
-    #         distinct(not_read_revisions.c.content_id)
-    #     )
-    #     not_read_content_ids = list(map(
-    #         itemgetter(0),
-    #         not_read_content_ids_query,
-    #     ))
-    #
-    #     not_read_contents = self._base_query(workspace) \
-    #         .filter(Content.content_id.in_(not_read_content_ids)) \
-    #         .order_by(desc(Content.updated))
-    #
-    #     if content_type != content_type_list.Any_SLUG:
-    #         not_read_contents = not_read_contents.filter(
-    #             Content.type==content_type)
-    #     else:
-    #         not_read_contents = not_read_contents.filter(
-    #             Content.type!=content_type_list.Folder.slug)
-    #
-    #     if parent_id:
-    #         not_read_contents = not_read_contents.filter(
-    #             Content.parent_id==parent_id)
-    #
-    #     result = []
-    #     for item in not_read_contents:
-    #         new_item = None
-    #         if content_type_list.Comment.slug == item.type:
-    #             new_item = item.parent
-    #         else:
-    #             new_item = item
-    #
-    #         # INFO - D.A. - 2015-05-20
-    #         # We do not want to show only one item if the last 10 items are
-    #         # comments about one thread for example
-    #         if new_item not in result:
-    #             result.append(new_item)
-    #
-    #         if len(result) >= limit:
-    #             break
-    #
-    #     return result
-
-    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:  # nopep8
+    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:
         """
         :param content: the given content instance
         :param allowed_content_dict: must be something like this:
@@ -1442,13 +1333,15 @@ class ContentApi(object):
         :return: content
         """
         properties = content.properties.copy()
-        if set(properties['allowed_content']) == set(allowed_content_dict) :
-            raise SameValueError('Content allowed content did not change')
-        properties['allowed_content'] = allowed_content_dict
+        if set(properties["allowed_content"]) == set(allowed_content_dict):
+            raise SameValueError("Content allowed content did not change")
+        properties["allowed_content"] = allowed_content_dict
         content.properties = properties
         return content
 
-    def set_allowed_content(self, content: Content, allowed_content_type_slug_list: typing.List[str]) -> Content:  # nopep8
+    def set_allowed_content(
+        self, content: Content, allowed_content_type_slug_list: typing.List[str]
+    ) -> Content:
         """
         :param content: the given content instance
         :param allowed_content_type_slug_list: list of content_type_slug to
@@ -1458,7 +1351,9 @@ class ContentApi(object):
         allowed_content_dict = {}
         for allowed_content_type_slug in allowed_content_type_slug_list:
             if allowed_content_type_slug not in content_type_list.endpoint_allowed_types_slug():
-                raise ContentTypeNotExist('Content_type {} does not exist'.format(allowed_content_type_slug))  # nopep8
+                raise ContentTypeNotExist(
+                    "Content_type {} does not exist".format(allowed_content_type_slug)
+                )
             allowed_content_dict[allowed_content_type_slug] = True
 
         return self._set_allowed_content(content, allowed_content_dict)
@@ -1469,9 +1364,9 @@ class ContentApi(object):
         :param content: the given content instance
         :return: nothing
         """
-        if content._properties and 'allowed_content' in content._properties:
+        if content._properties and "allowed_content" in content._properties:
             properties = content.properties.copy()
-            del properties['allowed_content']
+            del properties["allowed_content"]
             content.properties = properties
 
     def set_status(self, content: Content, new_status: str):
@@ -1479,28 +1374,25 @@ class ContentApi(object):
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
-            raise ValueError('The given value {} is not allowed'.format(new_status))
+            raise ValueError("The given value {} is not allowed".format(new_status))
 
-    def move(self,
-             item: Content,
-             new_parent: Content,
-             must_stay_in_same_workspace: bool=True,
-             new_workspace: Workspace=None,
+    def move(
+        self,
+        item: Content,
+        new_parent: Content,
+        must_stay_in_same_workspace: bool = True,
+        new_workspace: Workspace = None,
     ) -> None:
-        self._move_current(
-            item,
-            new_parent,
-            must_stay_in_same_workspace,
-            new_workspace
-        )
+        self._move_current(item, new_parent, must_stay_in_same_workspace, new_workspace)
         self.save(item)
         self._move_children_content_to_new_workspace(item, new_workspace)
 
-    def _move_current(self,
-             item: Content,
-             new_parent: Content,
-             must_stay_in_same_workspace: bool=True,
-             new_workspace: Workspace=None,
+    def _move_current(
+        self,
+        item: Content,
+        new_parent: Content,
+        must_stay_in_same_workspace: bool = True,
+        new_workspace: Workspace = None,
     ) -> None:
         """
         Move only current content, use _move_children_content_to_new_workspace
@@ -1509,25 +1401,19 @@ class ContentApi(object):
 
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
-                raise ValueError('the item should stay in the same workspace')
+                raise ValueError("the item should stay in the same workspace")
 
         if not new_workspace:
             new_workspace = new_parent.workspace
 
         if new_parent and new_parent.workspace_id != new_workspace.workspace_id:
-            raise WorkspacesDoNotMatch(
-                'new parent workspace and new workspace should be the same.'
-            )
+            raise WorkspacesDoNotMatch("new parent workspace and new workspace should be the same.")
 
         # INFO - G.M - 2018-12-11 - We allow renaming existing wrong file
         # but not adding new content of wrong type.
         if new_parent and new_parent != item.parent:
             content_type = content_type_list.get_one_by_slug(item.type)
-            self._check_valid_content_type_in_dir(
-                content_type,
-                new_parent,
-                new_workspace
-            )
+            self._check_valid_content_type_in_dir(content_type, new_parent, new_workspace)
 
         item.parent = new_parent
         if new_workspace:
@@ -1535,21 +1421,28 @@ class ContentApi(object):
         else:
             if new_parent:
                 item.workspace = new_parent.workspace
-
-        self._is_filename_available_or_raise(
-            item.file_name,
-            item.workspace,
-            item.parent,
-            exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if item.file_name:
+            self._is_filename_available_or_raise(
+                item.file_name, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
         item.revision_type = ActionDescription.MOVE
 
-
     def _get_allowed_content_type(
-            self,
-            allowed_content_dict: typing.Dict[str, str]
+        self, allowed_content_dict: typing.Dict[str, str]
     ) -> typing.List[ContentType]:
-        allowed_content_type = [] # type: typing.List[ContentType]
+        allowed_content_type = []  # type: typing.List[ContentType]
         for slug, value in allowed_content_dict.items():
             if value:
                 try:
@@ -1559,60 +1452,58 @@ class ContentApi(object):
                     pass
         return allowed_content_type
 
-    def _check_valid_content_type_in_dir(self,
-        content_type: ContentType,
-        parent: Content,
-        workspace: Workspace,
+    def _check_valid_content_type_in_dir(
+        self, content_type: ContentType, parent: Content, workspace: Workspace
     ) -> None:
         if parent:
             assert workspace == parent.workspace
-            if parent.properties and 'allowed_content' in parent.properties:
+            if parent.properties and "allowed_content" in parent.properties:
                 if content_type not in self._get_allowed_content_type(
-                        parent.properties['allowed_content']
+                    parent.properties["allowed_content"]
                 ):
                     raise UnallowedSubContent(
-                        ' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(
-                            # nopep8
-                            subcontent_type=content_type.slug,
-                            content_id=parent.content_id,
-                        ))
+                        " SubContent of type {subcontent_type}  not allowed in content {content_id}".format(
+                            subcontent_type=content_type.slug, content_id=parent.content_id
+                        )
+                    )
         if workspace:
             if content_type not in workspace.get_allowed_content_types():
                 raise UnallowedSubContent(
-                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
-                        subcontent_type=content_type.slug,
-                        content_id=workspace.workspace_id,
+                    " SubContent of type {subcontent_type}  not allowed in workspace {content_id}".format(
+                        subcontent_type=content_type.slug, content_id=workspace.workspace_id
                     )
                 )
+
     def copy(
         self,
         item: Content,
-        new_parent: Content=None,
-        new_label: str=None,
-        new_workspace: Workspace=None,
-        new_file_extension: str=None,
-        do_save: bool=True,
-        do_notify: bool=True,
+        new_parent: Content = None,
+        new_label: str = None,
+        new_workspace: Workspace = None,
+        new_file_extension: str = None,
+        do_save: bool = True,
+        do_notify: bool = True,
     ) -> Content:
         """
-        Copy nearly all content, revision included. Children not included, see
-        "copy_children" for this.
+        Copy all content, revision and children included (children are included
+        recursively).
         :param item: Item to copy
         :param new_parent: new parent of the new copied item
         :param new_label: new label of the new copied item
         :param do_notify: notify copy or not
         :return: Newly copied item
         """
-        if (not new_parent and not new_label and not new_file_extension and not new_workspace) or \
-                (new_parent == item.parent and new_label == item.label  and new_file_extension==item.file_extension and item.workspace == new_workspace):
+        if (not new_parent and not new_label and not new_file_extension and not new_workspace) or (
+            new_parent == item.parent
+            and new_label == item.label
+            and new_file_extension == item.file_extension
+            and item.workspace == new_workspace
+        ):
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
 
-        if (new_workspace and new_parent) and \
-            new_parent.workspace_id != new_workspace.workspace_id:
-            raise WorkspacesDoNotMatch(
-                'new parent workspace and new workspace should be the same.'
-            )
+        if (new_workspace and new_parent) and new_parent.workspace_id != new_workspace.workspace_id:
+            raise WorkspacesDoNotMatch("new parent workspace and new workspace should be the same.")
 
         if new_parent:
             workspace = new_parent.workspace
@@ -1634,33 +1525,149 @@ class ContentApi(object):
             file_extension = new_file_extension
         else:
             file_extension = item.file_extension
+
         filename = self._prepare_filename(label, file_extension)
-        self._is_filename_available_or_raise(filename, workspace, parent)
-        content = item.copy(parent)
-        # INFO - GM - 15-03-2018 - add "copy" revision
+        content_type_slug = item.type
+        if filename:
+            self._is_filename_available_or_raise(filename, workspace, parent)
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
+
+        copy_result = self._copy(item, parent)
+        copy_result = self._add_copy_revisions(
+            item,
+            copy_result.new_content,
+            copy_result.original_children_dict,
+            copy_result.new_children_dict,
+            parent,
+            label,
+            workspace,
+            file_extension,
+            do_save,
+            do_notify,
+        )
+        return copy_result.new_content
+
+    def _copy(self, content: Content, new_parent: Content = None) -> AddCopyRevisionsResult:
+        """
+        Create new content for content and his children, recreate all revision in order and
+        return all these new content
+        :param content: original root content of copy
+        :param new_parent: new parent of root content of copy
+        :return: new content created based on original root content,
+        dict of new children content and original children content with original content id as key.
+        """
+        new_content = Content()
+        # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
+        # to be able to retrieve them for applying new revisions on them easily. key of dict is
+        # original content_id.
+        new_content_children = {}  # type: typing.Dict[int,Content]
+        # INFO - G.M - 2019-04-30 - we store alse old content of children to allow applying new
+        # revision related to old data. key of dict is original content id.
+        original_content_children = {}  # type: typing.Dict[int,Content]
+
+        for rev in content.get_tree_revisions():
+            if rev.content_id == content.content_id:
+                related_content = new_content
+                related_parent = new_parent
+            else:
+                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                # we create it.
+                if rev.content_id not in new_content_children:
+                    new_content_children[rev.content_id] = Content()
+                    original_content_children[rev.content_id] = rev.node
+                related_content = new_content_children[rev.content_id]  # type: Content
+                if rev.parent_id == content.content_id:
+                    related_parent = new_content
+                else:
+                    related_parent = new_content_children[rev.parent_id]
+            # INFO - G.M - 2019-04-30 - copy of revision itself.
+            cpy_rev = ContentRevisionRO.copy(rev, related_parent)
+            related_content.revisions.append(cpy_rev)
+            self._session.add(related_content)
+            self._session.flush()
+        return AddCopyRevisionsResult(
+            new_content=new_content,
+            new_children_dict=new_content_children,
+            original_children_dict=original_content_children,
+        )
+
+    def _add_copy_revisions(
+        self,
+        original_content: Content,
+        new_content: Content,
+        original_content_children,
+        new_content_children,
+        new_parent: Content = None,
+        new_label: str = None,
+        new_workspace: Workspace = None,
+        new_file_extension: str = None,
+        do_save: bool = True,
+        do_notify: bool = True,
+    ) -> AddCopyRevisionsResult:
+        """
+        Add copy revision for all new content
+        :param original_content: original content of root content in copy
+        :param new_content: new content of new root content in copy
+        :param original_content_children: original contents of children of root content in copy
+        :param new_content_children: new contents of children of root content in copy
+        :param new_parent: new parent of root content
+        :param new_label: new label of root content
+        :param new_workspace: new workspace all new content
+        :param new_file_extension: new file_extension for root content
+        :return: new content created based on root content,
+        dict of new children content and original children content with original content id as key.
+        """
+        for original_content_id, new_child in new_content_children.items():
+            original_child = original_content_children[original_content_id]
+            with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=new_child,
+                force_create_new_revision=True,
+            ) as rev:
+                rev.workspace = new_workspace
+                rev.revision_type = ActionDescription.COPY
+                properties = rev.properties.copy()
+                properties["origin"] = {
+                    "content": original_child.id,
+                    "revision": original_child.last_revision.revision_id,
+                }
+                rev.properties = properties
+            self.save(new_child, ActionDescription.COPY, do_notify=False)
         with new_revision(
             session=self._session,
             tm=transaction.manager,
-            content=content,
-            force_create_new_revision=True
+            content=new_content,
+            force_create_new_revision=True,
         ) as rev:
-            rev.parent = parent
-            rev.workspace = workspace
-            rev.label = label
-            rev.file_extension = file_extension
+            rev.parent = new_parent
+            rev.workspace = new_workspace
+            rev.label = new_label
+            rev.file_extension = new_file_extension
             rev.revision_type = ActionDescription.COPY
-            rev.properties['origin'] = {
-                'content': item.id,
-                'revision': item.last_revision.revision_id,
+            properties = rev.properties.copy()
+            properties["origin"] = {
+                "content": original_content.id,
+                "revision": original_content.last_revision.revision_id,
             }
+            rev.properties = properties
         if do_save:
-            self.save(content, ActionDescription.COPY, do_notify=do_notify)
-        return content
-
-    def copy_children(self, origin_content: Content, new_content: Content):
-        for child in origin_content.children:
-            self.copy(child, new_content)
-
+            self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
+        return AddCopyRevisionsResult(
+            new_content=new_content,
+            new_children_dict=new_content_children,
+            original_children_dict=original_content_children,
+        )
 
     def _move_children_content_to_new_workspace(self, item: Content, new_workspace: Workspace):
         """
@@ -1669,27 +1676,26 @@ class ContentApi(object):
         """
         for child in item.children:
             if child.workspace_id != new_workspace.workspace_id:
-                with new_revision(
-                    session=self._session,
-                    tm=transaction.manager,
-                    content=child
-                ):
-                    self.move(child, new_parent=item, new_workspace=new_workspace, must_stay_in_same_workspace=False)
+                with new_revision(session=self._session, tm=transaction.manager, content=child):
+                    self.move(
+                        child,
+                        new_parent=item,
+                        new_workspace=new_workspace,
+                        must_stay_in_same_workspace=False,
+                    )
                     self.save(child)
                 self._move_children_content_to_new_workspace(child, new_workspace)
         return
 
     def is_editable(self, item: Content) -> bool:
-        return not item.is_readonly \
-               and item.is_active \
-               and item.get_status().is_editable()
+        return not item.is_readonly and item.is_active and item.get_status().is_editable()
 
     def update_container_content(
-            self,
-            item: Content,
-            allowed_content_type_slug_list: typing.List[str],
-            new_label: str,
-            new_content: str=None,
+        self,
+        item: Content,
+        allowed_content_type_slug_list: typing.List[str],
+        new_label: str,
+        new_content: str = None,
     ):
         """
         Update a container content like folder
@@ -1710,7 +1716,9 @@ class ContentApi(object):
 
         return item
 
-    def update_content(self, item: Content, new_label: str, new_content: str=None, force_update=False) -> Content:
+    def update_content(
+        self, item: Content, new_label: str, new_content: str = None, force_update=False
+    ) -> Content:
         """
         Update a content
         :param item: content
@@ -1720,33 +1728,51 @@ class ContentApi(object):
         :return: updated content
         """
         if not self.is_editable(item):
-            raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
+            raise ContentInNotEditableState(
+                "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
+            )
         if not force_update:
             if item.label == new_label and item.description == new_content:
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
-                raise SameValueError('The content did not changed')
+                raise SameValueError("The content did not changed")
         if not new_label:
             raise EmptyLabelNotAllowed()
 
         label = new_label or item.label
         filename = self._prepare_filename(label, item.file_extension)
-        self._is_filename_available_or_raise(
-            filename,
-            item.workspace,
-            item.parent,
-            exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if filename:
+            self._is_filename_available_or_raise(
+                filename, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
 
         item.owner = self._user
         item.label = new_label
-        item.description = new_content if new_content else item.description # TODO: convert urls into links
+        item.description = (
+            new_content if new_content else item.description
+        )  # TODO: convert urls into links
         item.revision_type = ActionDescription.EDITION
         return item
 
-    def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
+    def update_file_data(
+        self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes
+    ) -> Content:
         if not self.is_editable(item):
-            raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
+            raise ContentInNotEditableState(
+                "Can't update not editable file, you need to change his status or state (deleted/archived) before any change."
+            )
         # FIXME - G.M - 2018-09-25 - Repair and do a better same content check,
         # as pyramid behaviour use buffered object
         # new_content == item.depot_file.file.read() case cannot happened using
@@ -1757,19 +1783,25 @@ class ContentApi(object):
         #         new_content == item.depot_file.file.read():
         #     raise SameValueError('The content did not changed')
         item.owner = self._user
-        self._is_filename_available_or_raise(
-            new_filename,
-            item.workspace,
-            item.parent,
-            exclude_content_id=item.content_id
-        )
+        content_type_slug = item.type
+        if new_filename:
+            self._is_filename_available_or_raise(
+                new_filename, item.workspace, item.parent, exclude_content_id=item.content_id
+            )
+        elif self._allow_empty_label(content_type_slug):
+            # INFO - G.M - 2019-04-29 - special content like "Comment"
+            # which allow empty filename should not
+            # check filename availability
+            pass
+        else:
+            # INFO - G.M - 2019-04-29 - this case should not happened if data are correct
+            raise EmptyLabelNotAllowed(
+                "content {} of type {} should always have a label "
+                "and a valid filename".format(item.content_id, content_type_slug)
+            )
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
-        item.depot_file = FileIntent(
-            new_content,
-            new_filename,
-            new_mimetype,
-        )
+        item.depot_file = FileIntent(new_content, new_filename, new_mimetype)
         item.revision_type = ActionDescription.REVISION
         return item
 
@@ -1779,17 +1811,14 @@ class ContentApi(object):
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
         # un-archiving file.
-        label = '{label}-{action}-{date}'.format(
-            label=content.label,
-            action='archived',
-            date=current_date_for_filename()
+        label = "{label}-{action}-{date}".format(
+            label=content.label, action="archived", date=current_date_for_filename()
         )
         filename = self._prepare_filename(label, content.file_extension)
+        # INFO - G.M - 2019-04-29 - filename already exist here, for special type
+        # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
-            filename,
-            content.workspace,
-            content.parent,
-            exclude_content_id=content.content_id
+            filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
         content.file_name = filename
         content.revision_type = ActionDescription.ARCHIVING
@@ -1805,17 +1834,14 @@ class ContentApi(object):
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
         # un-deleting file.
-        label = '{label}-{action}-{date}'.format(
-            label=content.label,
-            action='deleted',
-            date=current_date_for_filename()
+        label = "{label}-{action}-{date}".format(
+            label=content.label, action="deleted", date=current_date_for_filename()
         )
         filename = self._prepare_filename(label, content.file_extension)
+        # INFO - G.M - 2019-04-29 - filename already exist here, for special type
+        # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
-            filename,
-            content.workspace,
-            content.parent,
-            exclude_content_id=content.content_id
+            filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
         content.file_name = filename
         content.revision_type = ActionDescription.DELETION
@@ -1825,27 +1851,20 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:  # nopep8
+    def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:
         try:
             file_path = self.get_one_revision_filepath(revision_id)
-            nb_pages = self.preview_manager.get_page_nb(
-                file_path,
-                file_ext=file_extension
-            )
+            nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return None
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self,
-                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             return None
         except Exception as e:
-            logger.warning(
-                self,
-                "Unknown Preview_Generator Exception Occured : {}".format(str(e))
-            )
+            logger.warning(self, "Unknown Preview_Generator Exception Occured : {}".format(str(e)))
             logger.warning(self, traceback.format_exc())
             return None
         return nb_pages
@@ -1853,56 +1872,39 @@ class ContentApi(object):
     def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
         try:
             file_path = self.get_one_revision_filepath(revision_id)
-            return self.preview_manager.has_pdf_preview(
-                file_path,
-                file_ext=file_extension
-            )
+            return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return False
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self,
-                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             return False
         except Exception as e:
-            logger.warning(
-                self,
-                "Unknown Preview_Generator Exception Occured : {}".format(str(e))
-            )
+            logger.warning(self, "Unknown Preview_Generator Exception Occured : {}".format(str(e)))
             logger.warning(self, traceback.format_exc())
             return False
 
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
         try:
             file_path = self.get_one_revision_filepath(revision_id)
-            return self.preview_manager.has_jpeg_preview(
-                file_path,
-                file_ext=file_extension
-            )
+            return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:
             return False
         except RevisionFilePathSearchFailedDepotCorrupted as exc:
             logger.warning(
-                self,
-                "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
+                self, "Unable to get revision filepath, depot is corrupted: {}".format(str(exc))
             )
             logger.warning(self, traceback.format_exc())
             return False
         except Exception as e:
-            logger.warning(
-                self,
-                "Unknown Preview_Generator Exception Occured : {}".format(str(e))
-            )
+            logger.warning(self, "Unknown Preview_Generator Exception Occured : {}".format(str(e)))
             logger.warning(self, traceback.format_exc())
             return False
 
     def mark_read__all(
-            self,
-            read_datetime: datetime=None,
-            do_flush: bool=True,
-            recursive: bool=True
+        self, read_datetime: datetime = None, do_flush: bool = True, recursive: bool = True
     ) -> None:
         """
         Read content of all workspace visible for the user.
@@ -1911,13 +1913,14 @@ class ContentApi(object):
         :param recursive: mark read subcontent too
         :return: nothing
         """
-        return self.mark_read__workspace(None, read_datetime, do_flush, recursive) # nopep8
+        return self.mark_read__workspace(None, read_datetime, do_flush, recursive)
 
-    def mark_read__workspace(self,
-                       workspace : Workspace,
-                       read_datetime: datetime=None,
-                       do_flush: bool=True,
-                       recursive: bool=True
+    def mark_read__workspace(
+        self,
+        workspace: Workspace,
+        read_datetime: datetime = None,
+        do_flush: bool = True,
+        recursive: bool = True,
     ) -> None:
         """
         Read content of a workspace visible for the user.
@@ -1932,11 +1935,11 @@ class ContentApi(object):
                 self.mark_read(item, read_datetime, do_flush, recursive)
 
     def mark_read(
-            self,
-            content: Content,
-            read_datetime: datetime=None,
-            do_flush: bool=True,
-            recursive: bool=True
+        self,
+        content: Content,
+        read_datetime: datetime = None,
+        do_flush: bool = True,
+        recursive: bool = True,
     ) -> Content:
         """
         Read content for the user.
@@ -1957,8 +1960,11 @@ class ContentApi(object):
         if not read_datetime:
             read_datetime = datetime.datetime.now()
 
-        viewed_revisions = self._session.query(ContentRevisionRO) \
-            .filter(ContentRevisionRO.content_id==content.content_id).all()
+        viewed_revisions = (
+            self._session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == content.content_id)
+            .all()
+        )
 
         for revision in viewed_revisions:
             revision.read_by[self._user] = read_datetime
@@ -1970,16 +1976,17 @@ class ContentApi(object):
             #                 then you have seen the parent)
             # - parent comments
             for child in content.get_valid_children():
-                self.mark_read(child, read_datetime=read_datetime,
-                               do_flush=False)
+                self.mark_read(child, read_datetime=read_datetime, do_flush=False)
 
             if content_type_list.Comment.slug == content.type:
-                self.mark_read(content.parent, read_datetime=read_datetime,
-                               do_flush=False, recursive=False)
+                self.mark_read(
+                    content.parent, read_datetime=read_datetime, do_flush=False, recursive=False
+                )
                 for comment in content.parent.get_comments():
                     if comment != content:
-                        self.mark_read(comment, read_datetime=read_datetime,
-                                       do_flush=False, recursive=False)
+                        self.mark_read(
+                            comment, read_datetime=read_datetime, do_flush=False, recursive=False
+                        )
 
         if do_flush:
             self.flush()
@@ -1990,8 +1997,11 @@ class ContentApi(object):
         assert self._user
         assert content
 
-        revisions = self._session.query(ContentRevisionRO) \
-            .filter(ContentRevisionRO.content_id==content.content_id).all()
+        revisions = (
+            self._session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == content.content_id)
+            .all()
+        )
 
         for revision in revisions:
             try:
@@ -2010,18 +2020,23 @@ class ContentApi(object):
     def flush(self):
         self._session.flush()
 
-    def save(self, content: Content, action_description: str=None, do_flush=True, do_notify=True):
+    def save(self, content: Content, action_description: str = None, do_flush=True, do_notify=True):
         """
         Save an object, flush the session and set the revision_type property
         :param content:
         :param action_description:
         :return:
         """
-        assert action_description is None or action_description in ActionDescription.allowed_values()
+        assert (
+            action_description is None or action_description in ActionDescription.allowed_values()
+        )
 
         if not action_description:
             # See if the last action has been modified
-            if content.revision_type==None or len(get_history(content.revision, 'revision_type'))<=0:
+            if (
+                content.revision_type is None
+                or len(get_history(content.revision, "revision_type")) <= 0
+            ):
                 # The action has not been modified, so we set it to default edition
                 action_description = ActionDescription.EDITION
 
@@ -2056,9 +2071,7 @@ class ContentApi(object):
         :return:
         """
         NotifierFactory.create(
-            config=self._config,
-            current_user=self._user,
-            session=self._session,
+            config=self._config, current_user=self._user, session=self._session
         ).notify_content_update(content)
 
     def get_keywords(self, search_string, search_string_separators=None) -> [str]:
@@ -2071,7 +2084,9 @@ class ContentApi(object):
 
         keywords = []
         if search_string:
-            keywords = [keyword.strip() for keyword in re.split(search_string_separators, search_string)]
+            keywords = [
+                keyword.strip() for keyword in re.split(search_string_separators, search_string)
+            ]
 
         return keywords
 
@@ -2080,15 +2095,21 @@ class ContentApi(object):
         :return: a sorted list of Content items
         """
 
-        if len(keywords)<=0:
+        if len(keywords) <= 0:
             return None
 
-        filter_group_label = list(Content.label.ilike('%{}%'.format(keyword)) for keyword in keywords)
-        filter_group_desc = list(Content.description.ilike('%{}%'.format(keyword)) for keyword in keywords)
-        title_keyworded_items = self._hard_filtered_base_query().\
-            filter(or_(*(filter_group_label+filter_group_desc))).\
-            options(joinedload('children_revisions')).\
-            options(joinedload('parent'))
+        filter_group_label = list(
+            Content.label.ilike("%{}%".format(keyword)) for keyword in keywords
+        )
+        filter_group_desc = list(
+            Content.description.ilike("%{}%".format(keyword)) for keyword in keywords
+        )
+        title_keyworded_items = (
+            self._hard_filtered_base_query()
+            .filter(or_(*(filter_group_label + filter_group_desc)))
+            .options(joinedload("children_revisions"))
+            .options(joinedload("parent"))
+        )
 
         return title_keyworded_items
 
@@ -2101,10 +2122,7 @@ class ContentApi(object):
         return content_types
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def exclude_unavailable(
-        self,
-        contents: typing.List[Content],
-    ) -> typing.List[Content]:
+    def exclude_unavailable(self, contents: typing.List[Content]) -> typing.List[Content]:
         """
         Update and return list with content under archived/deleted removed.
         :param contents: List of contents to parse
@@ -2134,10 +2152,7 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(
-            self,
-            property_name: str,
-            property_value: str,
-            workspace: Workspace=None,
+        self, property_name: str, property_value: str, workspace: Workspace = None
     ) -> Content:
         """
         Return Content who contains given property.
@@ -2154,19 +2169,14 @@ class ContentApi(object):
         query = self._base_query(workspace=workspace).filter(
             Content._properties.like(
                 '%"{property_name}": "{property_value}"%'.format(
-                    property_name=property_name,
-                    property_value=property_value,
+                    property_name=property_name, property_value=property_value
                 )
             )
         )
         return query.one()
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def generate_folder_label(
-            self,
-            workspace: Workspace,
-            parent: Content=None,
-    ) -> str:
+    def generate_folder_label(self, workspace: Workspace, parent: Content = None) -> str:
         """
         Generate a folder label
         :param workspace: Future folder workspace
@@ -2174,13 +2184,18 @@ class ContentApi(object):
         :return: Generated folder name
         """
         _ = self.translator.get_translation
-        query = self._base_query(workspace=workspace)\
-            .filter(Content.label.ilike('{0}%'.format(
-                _('New folder'),
-            )))
+        query = self._base_query(workspace=workspace).filter(
+            Content.label.ilike("{0}%".format(_("New folder")))
+        )
         if parent:
             query = query.filter(Content.parent == parent)
 
-        return _('New folder {0}').format(
-            query.count() + 1,
-        )
+        return _("New folder {0}").format(query.count() + 1)
+
+    def _allow_empty_label(self, content_type_slug: str) -> bool:
+        if (
+            content_type_list.get_one_by_slug(content_type_slug).slug
+            == content_type_list.Comment.slug
+        ):
+            return True
+        return False

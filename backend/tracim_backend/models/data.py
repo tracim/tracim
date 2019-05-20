@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime as datetime_root
+from datetime import datetime
+from datetime import timedelta
 import json
 import os
 import typing
-from datetime import datetime
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
@@ -14,7 +15,6 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Sequence
-from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -38,7 +38,6 @@ from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
-from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -47,18 +46,20 @@ from tracim_backend.models.roles import WorkspaceRoles
 
 class Workspace(DeclarativeBase):
 
-    __tablename__ = 'workspaces'
+    __tablename__ = "workspaces"
 
-    workspace_id = Column(Integer, Sequence('seq__workspaces__workspace_id'), autoincrement=True, primary_key=True)
+    workspace_id = Column(
+        Integer, Sequence("seq__workspaces__workspace_id"), autoincrement=True, primary_key=True
+    )
 
     # TODO - G.M - 2018-10-30 - Make workspace label unique
     # Uniqueness of label is only check in high level when workspace is created,
     # we should be sure at database level that workspace label are unique
     # nb: be careful about mysql compat with long unicode, forcing utf8 charset
     # for mysql will probably be needed, see fix in User sqlalchemy object
-    label = Column(Unicode(1024), unique=False, nullable=False, default='')
-    description = Column(Text(), unique=False, nullable=False, default='')
-    calendar_enabled = Column(Boolean, unique=False, nullable=False, default=False)
+    label = Column(Unicode(1024), unique=False, nullable=False, default="")
+    description = Column(Text(), unique=False, nullable=False, default="")
+    agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
 
     #  Default value datetime.utcnow,
     # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
@@ -72,7 +73,7 @@ class Workspace(DeclarativeBase):
     revisions = relationship("ContentRevisionRO")
 
     @hybrid_property
-    def contents(self) -> ['Content']:
+    def contents(self) -> ["Content"]:
         # Return a list of unique revisions parent content
         contents = []
         for revision in self.revisions:
@@ -85,7 +86,7 @@ class Workspace(DeclarativeBase):
 
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
-            if role.workspace.workspace_id==self.workspace_id:
+            if role.workspace.workspace_id == self.workspace_id:
                 return role.role
         return UserRoleInWorkspace.NOT_APPLICABLE
 
@@ -98,31 +99,40 @@ class Workspace(DeclarativeBase):
         return content_type_list.endpoint_allowed_types()
 
     def get_valid_children(
-            self,
-            content_types: list=None,
-            show_deleted: bool=False,
-            show_archived: bool=False,
+        self, content_types: list = None, show_deleted: bool = False, show_archived: bool = False
     ):
         for child in self.contents:
             # we search only direct children
-            if not child.parent \
-                    and (show_deleted or not child.is_deleted) \
-                    and (show_archived or not child.is_archived):
+            if (
+                not child.parent
+                and (show_deleted or not child.is_deleted)
+                and (show_archived or not child.is_archived)
+            ):
                 if not content_types or child.type in content_types:
                     yield child
 
 
 class UserRoleInWorkspace(DeclarativeBase):
 
-    __tablename__ = 'user_workspace'
+    __tablename__ = "user_workspace"
 
-    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False, default=None, primary_key=True)
-    workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), nullable=False, default=None, primary_key=True)
+    user_id = Column(
+        Integer, ForeignKey("users.user_id"), nullable=False, default=None, primary_key=True
+    )
+    workspace_id = Column(
+        Integer,
+        ForeignKey("workspaces.workspace_id"),
+        nullable=False,
+        default=None,
+        primary_key=True,
+    )
     role = Column(Integer, nullable=False, default=0, primary_key=False)
     do_notify = Column(Boolean, unique=False, nullable=False, default=False)
 
-    workspace = relationship('Workspace', remote_side=[Workspace.workspace_id], backref='roles', lazy='joined')
-    user = relationship('User', remote_side=[User.user_id], backref='roles')
+    workspace = relationship(
+        "Workspace", remote_side=[Workspace.workspace_id], backref="roles", lazy="joined"
+    )
+    user = relationship("User", remote_side=[User.user_id], backref="roles")
 
     NOT_APPLICABLE = WorkspaceRoles.NOT_APPLICABLE.level
     READER = WorkspaceRoles.READER.level
@@ -194,13 +204,14 @@ class UserRoleInWorkspace(DeclarativeBase):
         # return item in the same order as get_all_role_values
         return [role.slug for role in WorkspaceRoles.get_all_valid_role()]
 
+
 # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
 # class RoleType(object):
 #     def __init__(self, role_id):
 #         self.role_type_id = role_id
-        # self.fa_icon = UserRoleInWorkspace.ICON[role_id]
-        # self.role_label = UserRoleInWorkspace.LABEL[role_id]
-        # self.css_style = UserRoleInWorkspace.STYLE[role_id]
+# self.fa_icon = UserRoleInWorkspace.ICON[role_id]
+# self.role_label = UserRoleInWorkspace.LABEL[role_id]
+# self.css_style = UserRoleInWorkspace.STYLE[role_id]
 
 
 # TODO - G.M - 09-04-2018 [Cleanup] It this items really needed ?
@@ -219,31 +230,31 @@ class ActionDescription(object):
     - closed-deprecated
     """
 
-    COPY = 'copy'
-    ARCHIVING = 'archiving'
-    COMMENT = 'content-comment'
-    CREATION = 'creation'
-    DELETION = 'deletion'
-    EDITION = 'edition' # Default action if unknow
-    REVISION = 'revision'
-    STATUS_UPDATE = 'status-update'
-    UNARCHIVING = 'unarchiving'
-    UNDELETION = 'undeletion'
-    MOVE = 'move'
+    COPY = "copy"
+    ARCHIVING = "archiving"
+    COMMENT = "content-comment"
+    CREATION = "creation"
+    DELETION = "deletion"
+    EDITION = "edition"  # Default action if unknow
+    REVISION = "revision"
+    STATUS_UPDATE = "status-update"
+    UNARCHIVING = "unarchiving"
+    UNDELETION = "undeletion"
+    MOVE = "move"
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
-        'archiving': 'archive',
-        'content-comment': 'comment-o',
-        'creation': 'magic',
-        'deletion': 'trash',
-        'edition': 'edit',
-        'revision': 'history',
-        'status-update': 'random',
-        'unarchiving': 'file-archive-o',
-        'undeletion': 'trash-o',
-        'move': 'arrows',
-        'copy': 'files-o',
+        "archiving": "archive",
+        "content-comment": "comment-o",
+        "creation": "magic",
+        "deletion": "trash",
+        "edition": "edit",
+        "revision": "history",
+        "status-update": "random",
+        "unarchiving": "file-archive-o",
+        "undeletion": "trash-o",
+        "move": "arrows",
+        "copy": "files-o",
     }
     #
     # _LABELS = {
@@ -268,7 +279,7 @@ class ActionDescription(object):
         # find a way to not rely on this.
         self.label = self.id
         self.fa_icon = ActionDescription._ICONS[id]
-        #self.icon = self.fa_icon
+        # self.icon = self.fa_icon
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # self.label = ActionDescription._LABELS[id]
 
@@ -276,18 +287,19 @@ class ActionDescription(object):
 
     @classmethod
     def allowed_values(cls):
-        return [cls.ARCHIVING,
-                cls.COMMENT,
-                cls.CREATION,
-                cls.DELETION,
-                cls.EDITION,
-                cls.REVISION,
-                cls.STATUS_UPDATE,
-                cls.UNARCHIVING,
-                cls.UNDELETION,
-                cls.MOVE,
-                cls.COPY,
-                ]
+        return [
+            cls.ARCHIVING,
+            cls.COMMENT,
+            cls.CREATION,
+            cls.DELETION,
+            cls.EDITION,
+            cls.REVISION,
+            cls.STATUS_UPDATE,
+            cls.UNARCHIVING,
+            cls.UNDELETION,
+            cls.MOVE,
+            cls.COPY,
+        ]
 
 
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
@@ -404,7 +416,7 @@ class ActionDescription(object):
 #     #     'page': 'fa fa-file-text-o',
 #     #     'thread': 'fa fa-comments-o',
 #     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-calendar-o',
+#     #     'event': 'fa fa-agenda-o',
 #     # }
 #     #
 #     # _CSS_ICONS = {
@@ -415,7 +427,7 @@ class ActionDescription(object):
 #     #     'page': 'fa fa-file-text-o',
 #     #     'thread': 'fa fa-comments-o',
 #     #     'comment': 'fa fa-comment-o',
-#     #     'event': 'fa fa-calendar-o',
+#     #     'event': 'fa fa-agenda-o',
 #     # }
 #     #
 #     # _CSS_COLORS = {
@@ -537,29 +549,29 @@ class ActionDescription(object):
 #                     # label=self.label,
 #                     priority=self.priority)
 
-class ContentChecker(object):
 
+class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
         if item.type == content_type_list.Event.slug:
-            if 'name' not in properties.keys():
+            if "name" not in properties.keys():
                 return False
-            if 'raw' not in properties.keys():
+            if "raw" not in properties.keys():
                 return False
-            if 'start' not in properties.keys():
+            if "start" not in properties.keys():
                 return False
-            if 'end' not in properties.keys():
+            if "end" not in properties.keys():
                 return False
             return True
         else:
-            if 'allowed_content' in properties.keys():
-                for content_slug, value in properties['allowed_content'].items():  # nopep8
+            if "allowed_content" in properties.keys():
+                for content_slug, value in properties["allowed_content"].items():
                     if not isinstance(value, bool):
                         return False
-                    if not content_slug in content_type_list.endpoint_allowed_types_slug():  # nopep8
+                    if content_slug not in content_type_list.endpoint_allowed_types_slug():
                         return False
-            if 'origin' in properties.keys():
+            if "origin" in properties.keys():
                 pass
             return True
 
@@ -570,87 +582,85 @@ class ContentRevisionRO(DeclarativeBase):
     ContentRevisionUpdateError errors.
     """
 
-    __tablename__ = 'content_revisions'
+    __tablename__ = "content_revisions"
 
     revision_id = Column(Integer, primary_key=True)
-    content_id = Column(Integer, ForeignKey('content.id'), nullable=False)
+    content_id = Column(Integer, ForeignKey("content.id"), nullable=False)
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
-    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
+    owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
 
     label = Column(Unicode(1024), unique=False, nullable=False)
-    description = Column(Text(), unique=False, nullable=False, default='')
-    file_extension = Column(
-        Unicode(255),
-        unique=False,
-        nullable=False,
-        server_default='',
-    )
-    file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
-    # INFO - A.P - 2017-07-03 - Depot Doc
-    # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
+    description = Column(Text(), unique=False, nullable=False, default="")
+    file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
+    file_mimetype = Column(Unicode(255), unique=False, nullable=False, default="")
+    #  INFO - A.P - 2017-07-03 - Depot Doc
+    #  http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
     depot_file = Column(UploadedFileField, unique=False, nullable=True)
-    properties = Column('properties', Text(), unique=False, nullable=False, default='')
+    properties = Column("properties", Text(), unique=False, nullable=False, default="")
 
     type = Column(Unicode(32), unique=False, nullable=False)
-    status = Column(Unicode(32), unique=False, nullable=False, default=str(content_status_list.get_default_status().slug))
+    status = Column(
+        Unicode(32),
+        unique=False,
+        nullable=False,
+        default=str(content_status_list.get_default_status().slug),
+    )
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
     is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
-    revision_type = Column(Unicode(32), unique=False, nullable=False, default='')
+    revision_type = Column(Unicode(32), unique=False, nullable=False, default="")
 
-    workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), unique=False, nullable=True)
-    workspace = relationship('Workspace', remote_side=[Workspace.workspace_id])
+    workspace_id = Column(
+        Integer, ForeignKey("workspaces.workspace_id"), unique=False, nullable=True
+    )
+    workspace = relationship("Workspace", remote_side=[Workspace.workspace_id])
 
-    parent_id = Column(Integer, ForeignKey('content.id'), nullable=True, default=None)
+    parent_id = Column(Integer, ForeignKey("content.id"), nullable=True, default=None)
     parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
 
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
-    owner = relationship('User', remote_side=[User.user_id])
+    owner = relationship("User", remote_side=[User.user_id])
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
-        'content_id',
-        'created',
-        'description',
-        'file_mimetype',
-        'file_extension',
-        'is_archived',
-        'is_deleted',
-        'label',
-        'owner',
-        'owner_id',
-        'parent',
-        'parent_id',
-        'properties',
-        'revision_type',
-        'status',
-        'type',
-        'updated',
-        'workspace',
-        'workspace_id',
-        'is_temporary',
+        "content_id",
+        "created",
+        "description",
+        "file_mimetype",
+        "file_extension",
+        "is_archived",
+        "is_deleted",
+        "label",
+        "owner",
+        "owner_id",
+        "parent",
+        "parent_id",
+        "properties",
+        "revision_type",
+        "status",
+        "type",
+        "updated",
+        "workspace",
+        "workspace_id",
+        "is_temporary",
     )
 
     # Read by must be used like this:
     # read_datetime = revision.ready_by[<User instance>]
     # if user did not read the content, then a key error is raised
     read_by = association_proxy(
-        'revision_read_statuses',  # name of the attribute
-        'view_datetime',  # attribute the value is taken from
-        creator=lambda k, v: \
-            RevisionReadStatus(user=k, view_datetime=v)
+        "revision_read_statuses",  # name of the attribute
+        "view_datetime",  # attribute the value is taken from
+        creator=lambda k, v: RevisionReadStatus(user=k, view_datetime=v),
     )
 
     @hybrid_property
     def file_name(self) -> str:
-        return '{0}{1}'.format(
-            self.label,
-            self.file_extension,
-        )
+        return "{0}{1}".format(self.label, self.file_extension)
 
     @file_name.setter
     def file_name(self, value: str) -> None:
@@ -662,9 +672,8 @@ class ContentRevisionRO(DeclarativeBase):
     def file_name(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.label + ContentRevisionRO.file_extension
 
-
     @classmethod
-    def new_from(cls, revision: 'ContentRevisionRO') -> 'ContentRevisionRO':
+    def new_from(cls, revision: "ContentRevisionRO") -> "ContentRevisionRO":
         """
 
         Return new instance of ContentRevisionRO where properties are copied from revision parameter.
@@ -685,9 +694,7 @@ class ContentRevisionRO(DeclarativeBase):
         if revision.depot_file:
             try:
                 new_rev.depot_file = FileIntent(
-                    revision.depot_file.file.read(),
-                    revision.file_name,
-                    revision.file_mimetype,
+                    revision.depot_file.file.read(), revision.file_name, revision.file_mimetype
                 )
             except IOError as exc:
                 raise NewRevisionAbortedDepotCorrupted(
@@ -700,20 +707,17 @@ class ContentRevisionRO(DeclarativeBase):
         return new_rev
 
     @classmethod
-    def copy(
-            cls,
-            revision: 'ContentRevisionRO',
-            parent: 'Content'
-    ) -> 'ContentRevisionRO':
+    def copy(cls, revision: "ContentRevisionRO", parent: "Content") -> "ContentRevisionRO":
 
         copy_rev = cls()
         import copy
+
         copy_columns = cls._cloned_columns
         for column_name in copy_columns:
             # INFO - G-M - 15-03-2018 - set correct parent
-            if column_name == 'parent_id' and parent:
+            if column_name == "parent_id" and parent:
                 column_value = copy.copy(parent.id)
-            elif column_name == 'parent' and parent:
+            elif column_name == "parent" and parent:
                 column_value = copy.copy(parent)
             else:
                 column_value = copy.copy(getattr(revision, column_name))
@@ -723,9 +727,7 @@ class ContentRevisionRO(DeclarativeBase):
         if revision.depot_file:
             try:
                 copy_rev.depot_file = FileIntent(
-                    revision.depot_file.file.read(),
-                    revision.file_name,
-                    revision.file_mimetype,
+                    revision.depot_file.file.read(), revision.file_name, revision.file_mimetype
                 )
             except IOError as exc:
                 raise CopyRevisionAbortedDepotCorrupted(
@@ -736,24 +738,30 @@ class ContentRevisionRO(DeclarativeBase):
                 ) from exc
         return copy_rev
 
-    def __setattr__(self, key: str, value: 'mixed'):
+    def __setattr__(self, key: str, value: typing.Any):
         """
         ContentRevisionUpdateError is raised if tried to update column and revision own identity
         :param key: attribute name
         :param value: attribute value
         :return:
         """
-        if key in ('_sa_instance_state', ):  # Prevent infinite loop from SQLAlchemy code and altered set
+        if key in (
+            "_sa_instance_state",
+        ):  # Prevent infinite loop from SQLAlchemy code and altered set
             return super().__setattr__(key, value)
 
         # FIXME - G.M - 28-03-2018 - Cycling Import
         from tracim_backend.models.revision_protection import RevisionsIntegrity
-        if inspect(self).has_identity \
-                and key in self._cloned_columns \
-                and not RevisionsIntegrity.is_updatable(self):
-                raise ContentRevisionUpdateError(
-                    "Can't modify revision. To work on new revision use tracim.model.new_revision " +
-                    "context manager.")
+
+        if (
+            inspect(self).has_identity
+            and key in self._cloned_columns
+            and not RevisionsIntegrity.is_updatable(self)
+        ):
+            raise ContentRevisionUpdateError(
+                "Can't modify revision. To work on new revision use tracim.model.new_revision "
+                + "context manager."
+            )
 
         super().__setattr__(key, value)
 
@@ -768,11 +776,11 @@ class ContentRevisionRO(DeclarativeBase):
     def get_status(self) -> ContentStatus:
         try:
             return content_status_list.get_one_by_slug(self.status)
-        except ContentStatusNotExist as exc:
+        except ContentStatusNotExist:
             return content_status_list.get_default_status()
 
     def get_label(self) -> str:
-        return self.label or self.file_name or ''
+        return self.label or self.file_name or ""
 
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
@@ -791,9 +799,10 @@ class ContentRevisionRO(DeclarativeBase):
 
         return False
 
+
 # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
-Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
-Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
+Index("idx__content_revisions__owner_id", ContentRevisionRO.owner_id)
+Index("idx__content_revisions__parent_id", ContentRevisionRO.parent_id)
 
 
 class Content(DeclarativeBase):
@@ -826,9 +835,11 @@ class Content(DeclarativeBase):
               .one()
     """
 
-    __tablename__ = 'content'
+    __tablename__ = "content"
 
-    revision_to_serialize = -0  # This flag allow to serialize a given revision if required by the user
+    revision_to_serialize = (
+        -0
+    )  # This flag allow to serialize a given revision if required by the user
 
     id = Column(Integer, primary_key=True)
     # TODO - A.P - 2017-09-05 - revisions default sorting
@@ -842,13 +853,13 @@ class Content(DeclarativeBase):
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.content_id],
         back_populates="node",
-        order_by="ContentRevisionRO.revision_id"
+        order_by="ContentRevisionRO.revision_id",
     )
     children_revisions = relationship(
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.parent_id],
         back_populates="parent",
-        order_by='ContentRevisionRO.revision_id',
+        order_by="ContentRevisionRO.revision_id",
     )
 
     @hybrid_property
@@ -1096,11 +1107,11 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.parent_id
 
     @hybrid_property
-    def parent(self) -> 'Content':
+    def parent(self) -> "Content":
         return self.revision.parent
 
     @parent.setter
-    def parent(self, value: 'Content') -> None:
+    def parent(self, value: "Content") -> None:
         self.revision.parent = value
 
     @parent.expression
@@ -1108,11 +1119,11 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.parent
 
     @hybrid_property
-    def node(self) -> 'Content':
+    def node(self) -> "Content":
         return self.revision.node
 
     @node.setter
-    def node(self, value: 'Content') -> None:
+    def node(self, value: "Content") -> None:
         self.revision.node = value
 
     @node.expression
@@ -1134,26 +1145,45 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.owner
 
     @property
-    def children(self) -> ['Content']:
+    def children(self) -> ["Content"]:
         """
         :return: list of children Content
         :rtype Content
         """
         # TODO - G.M - 2019-02-08 - Refactor this code to be more efficient
-        all_childrens_revisions = object_session(self).query(ContentRevisionRO).filter( ContentRevisionRO.parent_id == self.content_id).all()
+        all_childrens_revisions = (
+            object_session(self)
+            .query(ContentRevisionRO)
+            .filter(ContentRevisionRO.parent_id == self.content_id)
+            .all()
+        )
         children_content_ids = set([cr.content_id for cr in all_childrens_revisions])
-        all_up_to_date_revisions_result = object_session(self).query(
-            func.max(ContentRevisionRO.revision_id)
-        ).filter(ContentRevisionRO.content_id.in_(children_content_ids))\
-            .group_by(ContentRevisionRO.content_id).all()
+        all_up_to_date_revisions_result = (
+            object_session(self)
+            .query(func.max(ContentRevisionRO.revision_id))
+            .filter(ContentRevisionRO.content_id.in_(children_content_ids))
+            .group_by(ContentRevisionRO.content_id)
+            .all()
+        )
 
         all_up_to_date_revisions_ids = [value[0] for value in all_up_to_date_revisions_result]
         valid_children = []
         for revision in all_childrens_revisions:
             if revision.revision_id in all_up_to_date_revisions_ids:
-               valid_children.append(revision.node)
+                valid_children.append(revision.node)
 
         return valid_children
+
+    def get_children(self, recursively: bool = False) -> ["Content"]:
+        """
+        Get all children of content recursively or not (including children of children...)
+        """
+        children = []
+        for child in self.children:
+            children.append(child)
+            if recursively:
+                children.extend(child.get_children(recursively=recursively))
+        return children
 
     @property
     def revision(self) -> ContentRevisionRO:
@@ -1210,7 +1240,7 @@ class Content(DeclarativeBase):
         self.revisions.append(new_rev)
         return new_rev
 
-    def get_valid_children(self, content_types: list=None) -> ['Content']:
+    def get_valid_children(self, content_types: list = None) -> ["Content"]:
         for child in self.children:
             if not child.is_deleted and not child.is_archived:
                 if not content_types or child.type in content_types:
@@ -1225,8 +1255,10 @@ class Content(DeclarativeBase):
         else:
             properties = json.loads(self._properties)
         if content_type_list.get_one_by_slug(self.type) != content_type_list.Event:
-            if not 'allowed_content' in properties:
-                properties['allowed_content'] = content_type_list.default_allowed_content_properties(self.type)  # nopep8
+            if "allowed_content" not in properties:
+                properties[
+                    "allowed_content"
+                ] = content_type_list.default_allowed_content_properties(self.type)
         return properties
 
     @properties.setter
@@ -1235,32 +1267,29 @@ class Content(DeclarativeBase):
         self._properties = json.dumps(properties_struct)
         ContentChecker.check_properties(self)
 
-    def created_as_delta(self, delta_from_datetime:datetime=None):
+    def created_as_delta(self, delta_from_datetime: datetime = None) -> timedelta:
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
 
-        return format_timedelta(delta_from_datetime - self.created,
-                                locale=get_locale())
+        return format_timedelta(delta_from_datetime - self.created, locale=get_locale())
 
-    def datetime_as_delta(self, datetime_object,
-                          delta_from_datetime:datetime=None):
+    def datetime_as_delta(self, datetime_object, delta_from_datetime: datetime = None) -> timedelta:
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
-        return format_timedelta(delta_from_datetime - datetime_object,
-                                locale=get_locale())
+        return format_timedelta(delta_from_datetime - datetime_object, locale=get_locale())
 
-    def get_child_nb(self, content_type: str, content_status = ''):
+    def get_child_nb(self, content_type: str, content_status: str = "") -> int:
         child_nb = 0
         for child in self.get_valid_children():
             if child.type == content_type or content_type.slug == content_type_list.Any_SLUG:
                 if not content_status:
-                    child_nb = child_nb+1
-                elif content_status==child.status:
-                    child_nb = child_nb+1
+                    child_nb = child_nb + 1
+                elif content_status == child.status:
+                    child_nb = child_nb + 1
         return child_nb
 
-    def get_label(self):
-        return self.label or self.file_name or ''
+    def get_label(self) -> str:
+        return self.label or self.file_name or ""
 
     def get_status(self) -> ContentStatus:
         return self.revision.get_status()
@@ -1316,31 +1345,35 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(self):
+    def get_comments(self) -> typing.List["Content"]:
         children = []
         for child in self.children:
-            if content_type_list.Comment.slug == child.type and not child.is_deleted and not child.is_archived:
+            if (
+                content_type_list.Comment.slug == child.type
+                and not child.is_deleted
+                and not child.is_archived
+            ):
                 children.append(child.node)
         return children
 
-    def get_last_comment_from(self, user: User) -> 'Content':
+    def get_last_comment_from(self, user: User) -> "Content":
         # TODO - Make this more efficient
         last_comment_updated = None
         last_comment = None
         for comment in self.get_comments():
             if user.user_id == comment.owner.user_id:
-                if not last_comment or last_comment_updated<comment.updated:
+                if not last_comment or last_comment_updated < comment.updated:
                     # take only the latest comment !
                     last_comment = comment
                     last_comment_updated = comment.updated
 
         return last_comment
 
-    def get_previous_revision(self) -> 'ContentRevisionRO':
+    def get_previous_revision(self) -> "ContentRevisionRO":
         rev_ids = [revision.revision_id for revision in self.revisions]
         rev_ids.sort()
 
-        if len(rev_ids)>=2:
+        if len(rev_ids) >= 2:
             revision_rev_id = rev_ids[-2]
 
             for revision in self.revisions:
@@ -1349,30 +1382,28 @@ class Content(DeclarativeBase):
 
         return None
 
-    def description_as_raw_text(self):
+    def description_as_raw_text(self) -> str:
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
-        return BeautifulSoup(self.description, 'html.parser').text
+        return BeautifulSoup(self.description, "html.parser").text
 
-    def get_allowed_content_types(self):
+    def get_allowed_content_types(self) -> typing.List[ContentType]:
         types = []
         try:
-            allowed_types = self.properties['allowed_content']
+            allowed_types = self.properties["allowed_content"]
             for type_label, is_allowed in allowed_types.items():
                 if is_allowed:
-                   types.append(
-                        content_type_list.get_one_by_slug(type_label)
-                   )
+                    types.append(content_type_list.get_one_by_slug(type_label))
         # TODO BS 2018-08-13: This try/except is not correct: except exception
         # if we know what to except.
         except Exception as e:
             print(e.__str__())
-            print('----- /*\ *****')
-            raise ValueError('Not allowed content property')
+            print("----- /*\\ *****")
+            raise ValueError("Not allowed content property")
 
         return types
 
-    def get_history(self, drop_empty_revision=False) -> '[VirtualEvent]':
+    def get_history(self, drop_empty_revision=False) -> "[VirtualEvent]":
         events = []
         for comment in self.get_comments():
             events.append(VirtualEvent.create_from_content(comment))
@@ -1384,7 +1415,7 @@ class Content(DeclarativeBase):
             # Some webdav client create empty file before uploading, we must
             # have possibility to not show the related revision
             if drop_empty_revision:
-                if revision.depot_file and revision.depot_file.file.content_length == 0:  # nopep8
+                if revision.depot_file and revision.depot_file.file.content_length == 0:
                     # INFO - G.M - 12-03-2018 -Always show the last and
                     # first revision.
                     if revision != revisions[-1] and revision != revisions[0]:
@@ -1392,48 +1423,62 @@ class Content(DeclarativeBase):
 
             events.append(VirtualEvent.create_from_content_revision(revision))
 
-        sorted_events = sorted(events,
-                               key=lambda event: event.created, reverse=True)
+        sorted_events = sorted(events, key=lambda event: event.created, reverse=True)
         return sorted_events
 
     @classmethod
-    def format_path(cls, url_template: str, content: 'Content') -> str:
+    def format_path(cls, url_template: str, content: "Content") -> str:
         wid = content.workspace.workspace_id
         fid = content.parent_id  # May be None if no parent
         ctype = content.type
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
-    def copy(self, parent):
-        cpy_content = Content()
-        for rev in self.revisions:
-            cpy_rev = ContentRevisionRO.copy(rev, parent)
-            cpy_content.revisions.append(cpy_rev)
-        return cpy_content
+    def get_tree_revisions(self) -> typing.List[ContentRevisionRO]:
+        """Get all revision sorted by id of content and all his children recursively"""
+        revisions = []  # type: typing.List[ContentRevisionRO]
+        for revision in self.revisions:
+            revisions.append(revision)
+        for child in self.get_children(recursively=True):
+            revisions.extend(child.revisions)
+        revisions = sorted(revisions, key=lambda revision: revision.revision_id)
+        return revisions
 
 
 class RevisionReadStatus(DeclarativeBase):
 
-    __tablename__ = 'revision_read_status'
+    __tablename__ = "revision_read_status"
 
-    revision_id = Column(Integer, ForeignKey('content_revisions.revision_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
+    revision_id = Column(
+        Integer,
+        ForeignKey("content_revisions.revision_id", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
+    )
     #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     view_datetime = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     content_revision = relationship(
-        'ContentRevisionRO',
+        "ContentRevisionRO",
         backref=backref(
-            'revision_read_statuses',
-            collection_class=attribute_mapped_collection('user'),
-            cascade='all, delete-orphan'
-        ))
+            "revision_read_statuses",
+            collection_class=attribute_mapped_collection("user"),
+            cascade="all, delete-orphan",
+        ),
+    )
 
-    user = relationship('User', backref=backref(
-        'revision_readers',
-        collection_class=attribute_mapped_collection('view_datetime'),
-        cascade='all, delete-orphan'
-    ))
+    user = relationship(
+        "User",
+        backref=backref(
+            "revision_readers",
+            collection_class=attribute_mapped_collection("view_datetime"),
+            cascade="all, delete-orphan",
+        ),
+    )
 
 
 class NodeTreeItem(object):
@@ -1442,11 +1487,9 @@ class NodeTreeItem(object):
         the left-panel menu items. This model is used by dbapi but
         is not directly related to sqlalchemy and database
     """
+
     def __init__(
-        self,
-        node: Content,
-        children: typing.List['NodeTreeItem'],
-        is_selected: bool = False,
+        self, node: Content, children: typing.List["NodeTreeItem"], is_selected: bool = False
     ):
         self.node = node
         self.children = children
@@ -1469,27 +1512,31 @@ class VirtualEvent(object):
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param
             # from this object ?
             # TODO - G.M - 2018-08-20 - [I18n] fix trad of this
-            label = '<strong>{}</strong> wrote:'.format(content.owner.get_display_name())
+            label = "<strong>{}</strong> wrote:".format(content.owner.get_display_name())
 
-        return VirtualEvent(id=content.content_id,
-                            created=content.created,
-                            owner=content.owner,
-                            type=ActionDescription(content.revision_type),
-                            label=label,
-                            content=content.description,
-                            ref_object=content)
+        return VirtualEvent(
+            id=content.content_id,
+            created=content.created,
+            owner=content.owner,
+            type=ActionDescription(content.revision_type),
+            label=label,
+            content=content.description,
+            ref_object=content,
+        )
 
     @classmethod
     def create_from_content_revision(cls, revision: ContentRevisionRO):
         action_description = ActionDescription(revision.revision_type)
 
-        return VirtualEvent(id=revision.revision_id,
-                            created=revision.updated,
-                            owner=revision.owner,
-                            type=action_description,
-                            label=action_description.label,
-                            content='',
-                            ref_object=revision)
+        return VirtualEvent(
+            id=revision.revision_id,
+            created=revision.updated,
+            owner=revision.owner,
+            type=action_description,
+            label=action_description.label,
+            content="",
+            ref_object=revision,
+        )
 
     def __init__(self, id, created, owner, type, label, content, ref_object):
         self.id = id
@@ -1500,20 +1547,19 @@ class VirtualEvent(object):
         self.content = content
         self.ref_object = ref_object
 
-        assert hasattr(type, 'id')
+        assert hasattr(type, "id")
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # assert hasattr(type, 'css')
         # assert hasattr(type, 'fa_icon')
         # assert hasattr(type, 'label')
 
-    def created_as_delta(self, delta_from_datetime:datetime=None):
+    def created_as_delta(self, delta_from_datetime: datetime = None):
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
-        return format_timedelta(delta_from_datetime - self.created,
-                                locale=get_locale())
+        return format_timedelta(delta_from_datetime - self.created, locale=get_locale())
 
-    def create_readable_date(self, delta_from_datetime:datetime=None):
-        aff = ''
+    def create_readable_date(self, delta_from_datetime: datetime = None):
+        aff = ""
 
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
@@ -1522,17 +1568,23 @@ class VirtualEvent(object):
 
         if delta.days > 0:
             if delta.days >= 365:
-                aff = '%d year%s ago' % (delta.days/365, 's' if delta.days/365>=2 else '')
+                aff = "%d year%s ago" % (delta.days / 365, "s" if delta.days / 365 >= 2 else "")
             elif delta.days >= 30:
-                aff = '%d month%s ago' % (delta.days/30, 's' if delta.days/30>=2 else '')
+                aff = "%d month%s ago" % (delta.days / 30, "s" if delta.days / 30 >= 2 else "")
             else:
-                aff = '%d day%s ago' % (delta.days, 's' if delta.days>=2 else '')
+                aff = "%d day%s ago" % (delta.days, "s" if delta.days >= 2 else "")
         else:
             if delta.seconds < 60:
-                aff = '%d second%s ago' % (delta.seconds, 's' if delta.seconds>1 else '')
-            elif delta.seconds/60 < 60:
-                aff = '%d minute%s ago' % (delta.seconds/60, 's' if delta.seconds/60>=2 else '')
+                aff = "%d second%s ago" % (delta.seconds, "s" if delta.seconds > 1 else "")
+            elif delta.seconds / 60 < 60:
+                aff = "%d minute%s ago" % (
+                    delta.seconds / 60,
+                    "s" if delta.seconds / 60 >= 2 else "",
+                )
             else:
-                aff = '%d hour%s ago' % (delta.seconds/3600, 's' if delta.seconds/3600>=2 else '')
+                aff = "%d hour%s ago" % (
+                    delta.seconds / 3600,
+                    "s" if delta.seconds / 3600 >= 2 else "",
+                )
 
         return aff

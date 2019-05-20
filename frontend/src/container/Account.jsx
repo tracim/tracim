@@ -1,34 +1,41 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
-// import Calendar from '../component/Account/Calendar.jsx'
-// import Timezone from '../component/Account/Timezone.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
   Delimiter,
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
   updateUserName,
   updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif
+  updateUserWorkspaceSubscriptionNotif,
+  updateUserAgendaUrl,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
   putMyselfPassword,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceDoNotify,
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
-import { editableUserAuthTypeList } from '../helper.js'
+import {
+  editableUserAuthTypeList,
+  PAGE
+} from '../helper.js'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
   constructor (props) {
@@ -38,37 +45,59 @@ class Account extends React.Component {
       name: 'personalData',
       active: true,
       label: 'My profile',
-      translationKey: props.t('My profile')
+      translationKey: props.t('My profile'),
+      display: true
     }, {
       name: 'notification',
       active: false,
       label: 'Shared spaces and notifications',
-      translationKey: props.t('Shared spaces and notifications')
+      translationKey: props.t('Shared spaces and notifications'),
+      display: props.system.config.email_notification_activated
     }, {
       name: 'password',
       active: false,
       label: 'Password',
-      translationKey: props.t('Password')
-    // }, {
-    //   name: 'timezone',
-    //   active: false,
-    //   label: 'Timezone'
-    // }, {
-    //   name: 'calendar',
-    //   label: 'Calendrier personnel',
-    //   active: false
-    }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
-      // allow pw change only for users in tracim's db (eg. not from ldap)
-      .filter(menu => editableUserAuthTypeList.includes(props.user.auth_type) ? true : menu.name !== 'password')
+      translationKey: props.t('Password'),
+      display: editableUserAuthTypeList.includes(props.user.auth_type) // allow pw change only for users in tracim's db (eg. not from ldap)
+    }, {
+      name: 'agenda',
+      active: false,
+      label: 'Agenda',
+      translationKey: props.t('Agenda'),
+      display: props.appList.some(a => a.slug === 'agenda')
+    }]
 
     this.state = {
-      subComponentMenu: builtSubComponentMenu
+      subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
+    }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
   componentDidMount () {
     const { props } = this
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
+    if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
+    this.buildBreadcrumbs()
+  }
+
+  loadAgendaUrl = async () => {
+    const { props } = this
+    const fetchUserAgenda = await props.dispatch(getLoggedUserCalendar())
+    switch (fetchUserAgenda.status) {
+      case 200:
+        const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || {agenda_url: ''}).agenda_url
+        props.dispatch(updateUserAgendaUrl(newAgendaUrl))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading your agenda'), 'warning'))
+    }
   }
 
   loadWorkspaceListMemberList = async () => {
@@ -89,6 +118,22 @@ class Account extends React.Component {
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+  }
+
+  buildBreadcrumbs = () => {
+    const { props } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: <span className='nolink'>{props.t('Manage')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      notALink: true
+    }, {
+      link: <Link to={PAGE.ACCOUNT}>{props.t('My account')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }]))
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
@@ -168,6 +213,7 @@ class Account extends React.Component {
               parentClass={'account'}
               title={props.t('My account')}
               icon='user-o'
+              breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='account'>
@@ -185,20 +231,33 @@ class Account extends React.Component {
                   {(() => {
                     switch (state.subComponentMenu.find(({active}) => active).name) {
                       case 'personalData':
-                        return <PersonalData
-                          userAuthType={props.user.auth_type}
-                          onClickSubmit={this.handleSubmitNameOrEmail}
-                        />
+                        return (
+                          <PersonalData
+                            userAuthType={props.user.auth_type}
+                            onClickSubmit={this.handleSubmitNameOrEmail}
+                          />
+                        )
 
                       case 'notification':
-                        return <Notification
-                          idUserLogged={props.user.user_id}
-                          workspaceList={props.workspaceList}
-                          onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                        />
+                        return (
+                          <Notification
+                            idUserLogged={props.user.user_id}
+                            workspaceList={props.workspaceList}
+                            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                          />
+                        )
 
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} />
+
+                      case 'agenda':
+                        return (
+                          <AgendaInfo
+                            customClass='account__agenda'
+                            introText={props.t('Use this link to access your personal agenda from anyhere')}
+                            agendaUrl={props.user.agendaUrl}
+                          />
+                        )
                     }
                   })()}
                 </div>
@@ -212,5 +271,7 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, timezone, system }) => ({ user, workspaceList, timezone, system })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
+  breadcrumbs, user, workspaceList, timezone, system, appList
+})
 export default connect(mapStateToProps)(translate()(Account))

@@ -1,44 +1,45 @@
 # -*- coding: utf-8 -*-
+from io import BytesIO
 import logging
 import multiprocessing
 import typing
 import unittest
 
-import plaster
-import requests
-import transaction
+from PIL import Image
 from depot.manager import DepotManager
+import plaster
 from pyramid import testing
+import requests
 from requests import Response
 from sqlalchemy.exc import IntegrityError
-
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.setup_models import get_engine, get_session_factory, \
-    get_tm_session
-from tracim_backend.models.meta import DeclarativeBase
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import Content
-from tracim_backend.lib.utils.logger import logger
-from tracim_backend.fixtures import FixturesLoader
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.config import CFG
-from tracim_backend.extensions import hapic
-from tracim_backend import web, CaldavAppFactory
-from tracim_backend import webdav
-from tracim_backend import WebdavAppFactory
+import transaction
 from waitress import serve
 from webtest import TestApp
-from io import BytesIO
-from PIL import Image
-import threading
+
+from tracim_backend import CaldavAppFactory
+from tracim_backend import WebdavAppFactory
+from tracim_backend import web
+from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG
+from tracim_backend.extensions import hapic
+from tracim_backend.fixtures import FixturesLoader
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.logger import logger
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import Workspace
+from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.setup_models import get_tm_session
 
 
 def eq_(a, b, msg=None) -> None:
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
     assert a == b, msg or "%r != %r" % (a, b)
+
 
 # TODO - G.M - 2018-06-179 - Refactor slug change function
 #  as a kind of pytest fixture ?
@@ -51,70 +52,67 @@ def set_html_document_slug_to_legacy(session_factory) -> None:
     :param session_factory: session factory of the test
     :return: Nothing.
     """
-    dbsession = get_tm_session(
-        session_factory,
-        transaction.manager
+    dbsession = get_tm_session(session_factory, transaction.manager)
+    content_query = (
+        dbsession.query(ContentRevisionRO)
+        .filter(ContentRevisionRO.type == "page")
+        .filter(ContentRevisionRO.content_id == 6)
     )
-    content_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'page').filter(ContentRevisionRO.content_id == 6)  # nopep8
     assert content_query.count() == 0
-    html_documents_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'html-document')  # nopep8
-    html_documents_query.update({ContentRevisionRO.type: 'page'})
+    html_documents_query = dbsession.query(ContentRevisionRO).filter(
+        ContentRevisionRO.type == "html-document"
+    )
+    html_documents_query.update({ContentRevisionRO.type: "page"})
     transaction.commit()
     assert content_query.count() > 0
 
 
 def create_1000px_png_test_image() -> None:
     file = BytesIO()
-    image = Image.new('RGBA', size=(1000, 1000), color=(0, 0, 0))
-    image.save(file, 'png')
-    file.name = 'test_image.png'
+    image = Image.new("RGBA", size=(1000, 1000), color=(0, 0, 0))
+    image.save(file, "png")
+    file.name = "test_image.png"
     file.seek(0)
     return file
 
+
 class AbstractMailHogTest(object):
 
-    MAILHOG_BASE_URL = 'http://127.0.0.1:8025'
-    MAILHOG_MESSAGES_ENDPOINT = '/api/v1/messages'
-
+    MAILHOG_BASE_URL = "http://127.0.0.1:8025"
+    MAILHOG_MESSAGES_ENDPOINT = "/api/v1/messages"
 
     def cleanup_mailhog(self) -> Response:
-        logger.debug(self, 'Cleanup MailHog Mails...')
-        return requests.delete('{}{}'.format(
-            self.MAILHOG_BASE_URL,
-            self.MAILHOG_MESSAGES_ENDPOINT
-        ))
+        logger.debug(self, "Cleanup MailHog Mails...")
+        return requests.delete("{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT))
 
     def get_mailhog_mails(self) -> typing.List[typing.Any]:
-        logger.debug(self, 'gets MailHog messages...')
-        return requests.get('{}{}'.format(
-            self.MAILHOG_BASE_URL,
-            self.MAILHOG_MESSAGES_ENDPOINT
-        )).json()
+        logger.debug(self, "gets MailHog messages...")
+        return requests.get(
+            "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
+        ).json()
+
 
 class FunctionalTest(unittest.TestCase):
 
     fixtures = [BaseFixture]
-    config_uri = 'tests_configs.ini'
-    config_section = 'functional_test'
+    config_uri = "tests_configs.ini"
+    config_section = "functional_test"
 
     def _set_logger(self) -> None:
         """
         Set all logger to a high level to avoid getting too much noise for tests
         """
-        logger._logger.setLevel('ERROR')
-        logging.getLogger().setLevel('ERROR')
-        logging.getLogger('sqlalchemy').setLevel('ERROR')
-        logging.getLogger('txn').setLevel('ERROR')
-        logging.getLogger('cliff').setLevel('ERROR')
-        logging.getLogger('_jb_pytest_runner').setLevel('ERROR')
+        logger._logger.setLevel("ERROR")
+        logging.getLogger().setLevel("ERROR")
+        logging.getLogger("sqlalchemy").setLevel("ERROR")
+        logging.getLogger("txn").setLevel("ERROR")
+        logging.getLogger("cliff").setLevel("ERROR")
+        logging.getLogger("_jb_pytest_runner").setLevel("ERROR")
 
     def setUp(self) -> None:
         self._set_logger()
         DepotManager._clear()
-        settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
+        settings = plaster.get_settings(self.config_uri, self.config_section)
         self.settings = self.override_settings(settings)
         # INFO - G.M - 2019-03-19 - Reset all hapic context: PyramidContext
         # and controllers
@@ -123,7 +121,7 @@ class FunctionalTest(unittest.TestCase):
         # https://github.com/algoo/hapic/issues/144
         hapic._controllers = []
         self.connect_database(create_tables=True)
-        self.app_config = CFG(self.settings)
+        self.app_config = CFG(self.settings)  # type: CFG
         self.app_config.configure_filedepot()
         self.init_database(self.settings)
         DepotManager._clear()
@@ -136,7 +134,9 @@ class FunctionalTest(unittest.TestCase):
         self.session_factory = get_session_factory(self.engine)
         self.session = get_tm_session(self.session_factory, transaction.manager)
 
-    def override_settings(self, settings: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:  # nopep8
+    def override_settings(
+        self, settings: typing.Dict[str, typing.Any]
+    ) -> typing.Dict[str, typing.Any]:
         """
         Allow to override some setting by code.
         by default : do nothing.
@@ -153,14 +153,18 @@ class FunctionalTest(unittest.TestCase):
                 fixtures_loader = FixturesLoader(self.session, self.app_config)
                 fixtures_loader.loads(self.fixtures)
                 transaction.commit()
-                logger.info(self,"Database initialized.")
+                logger.info(self, "Database initialized.")
             except IntegrityError:
-                logger.error(self,'Warning, there was a problem when adding default data'  # nopep8
-                               ', it may have already been added:')
+                logger.error(
+                    self,
+                    "Warning, there was a problem when adding default data"
+                    ", it may have already been added:",
+                )
                 import traceback
+
                 logger.error(self, traceback.format_exc())
                 transaction.abort()
-                logger.error(self, 'Database initialization failed')
+                logger.error(self, "Database initialization failed")
 
     def disconnect_database(self, remove_tables: bool = False) -> None:
         self.session.rollback()
@@ -172,51 +176,42 @@ class FunctionalTest(unittest.TestCase):
         DepotManager._clear()
 
     def tearDown(self) -> None:
-        logger.debug(self, 'TearDown Test...')
+        logger.debug(self, "TearDown Test...")
         self.disconnect_database(remove_tables=True)
         testing.tearDown()
 
 
 class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):
-
     def setUp(self):
         self.cleanup_mailhog()
         super().setUp()
 
     def tearDown(self):
-       super().tearDown()
-       self.cleanup_mailhog()
-
+        super().tearDown()
+        self.cleanup_mailhog()
 
 
 class WebdavFunctionalTest(FunctionalTest):
-    config_uri = 'tests_configs.ini'
-    config_section = 'functional_webdav_test'
+    config_uri = "tests_configs.ini"
+    config_section = "functional_webdav_test"
 
     def run_app(self) -> None:
-        settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
+        settings = plaster.get_settings(self.config_uri, self.config_section)
         app_factory = WebdavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
         self.testapp = TestApp(app)
 
+
 class CaldavRadicaleProxyFunctionalTest(FunctionalTest):
-    config_section = 'functional_caldav_radicale_proxy_test'
+    config_section = "functional_caldav_radicale_proxy_test"
     radicale_server = None
 
     def start_radicale_server(self):
-        settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
+        settings = plaster.get_settings(self.config_uri, self.config_section)
         app_factory = CaldavAppFactory(**settings)
         app = app_factory.get_wsgi_app()
-        self.radicale_server = multiprocessing.Process(target=serve, kwargs={
-            'app': app,
-            'listen': 'localhost:5232'
-            }
+        self.radicale_server = multiprocessing.Process(
+            target=serve, kwargs={"app": app, "listen": "localhost:5232"}
         )
         self.radicale_server.daemon = True
         self.radicale_server.start()
@@ -224,14 +219,14 @@ class CaldavRadicaleProxyFunctionalTest(FunctionalTest):
     def stop_radicale_server(self):
         if self.radicale_server:
             self.radicale_server.terminate()
+
     def setUp(self):
         super().setUp()
         self.start_radicale_server()
 
-
     def tearDown(self):
-       super().tearDown()
-       self.stop_radicale_server()
+        super().tearDown()
+        self.stop_radicale_server()
 
 
 class FunctionalTestEmptyDB(FunctionalTest):
@@ -242,14 +237,17 @@ class FunctionalTestNoDB(FunctionalTest):
     """
     Special test case when sqlalchemy.url is not correct
     """
-    config_section = 'functional_test_no_db'
 
-    def override_settings(self, settings: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:  # nopep8
+    config_section = "functional_test_no_db"
+
+    def override_settings(
+        self, settings: typing.Dict[str, typing.Any]
+    ) -> typing.Dict[str, typing.Any]:
         """
         Disable sqlalchemy.url with wrong value
         :return new settings dict
         """
-        settings['sqlalchemy.url'] = 'sqlite://'
+        settings["sqlalchemy.url"] = "sqlite://"
         return settings
 
     def init_database(self, settings: typing.Dict[str, typing.Any]) -> None:
@@ -257,10 +255,9 @@ class FunctionalTestNoDB(FunctionalTest):
 
 
 class CommandFunctionalTest(FunctionalTest):
-
     def _set_logger(self):
         super()._set_logger()
-        logging.getLogger('_jb_pytest_runner').setLevel('CRITICAL')
+        logging.getLogger("_jb_pytest_runner").setLevel("CRITICAL")
 
     def run_app(self):
         """ Disable run pyramid app for command functional test"""
@@ -271,20 +268,21 @@ class BaseTest(unittest.TestCase):
     """
     Pyramid default test.
     """
+
     fixtures = []
-    config_uri = 'tests_configs.ini'
-    config_section = 'base_test'
+    config_uri = "tests_configs.ini"
+    config_section = "base_test"
 
     def _set_logger(self) -> None:
         """
         Set all logger to a high level to avoid getting too much noise for tests
         """
-        logger._logger.setLevel('ERROR')
-        logging.getLogger().setLevel('ERROR')
-        logging.getLogger('sqlalchemy').setLevel('ERROR')
-        logging.getLogger('txn').setLevel('ERROR')
-        logging.getLogger('cliff').setLevel('ERROR')
-        logging.getLogger('_jb_pytest_runner').setLevel('ERROR')
+        logger._logger.setLevel("ERROR")
+        logging.getLogger().setLevel("ERROR")
+        logging.getLogger("sqlalchemy").setLevel("ERROR")
+        logging.getLogger("txn").setLevel("ERROR")
+        logging.getLogger("cliff").setLevel("ERROR")
+        logging.getLogger("_jb_pytest_runner").setLevel("ERROR")
 
     def init_database(self) -> None:
         session = get_tm_session(self.session_factory, transaction.manager)
@@ -295,28 +293,27 @@ class BaseTest(unittest.TestCase):
                 fixtures_loader = FixturesLoader(session, self.app_config)
                 fixtures_loader.loads(self.fixtures)
                 transaction.commit()
-                logger.info(self,"Database initialized.")
+                logger.info(self, "Database initialized.")
             except IntegrityError:
-                logger.error(self,'Warning, there was a problem when adding default data'  # nopep8
-                               ', it may have already been added:')
+                logger.error(
+                    self,
+                    "Warning, there was a problem when adding default data"
+                    ", it may have already been added:",
+                )
                 import traceback
+
                 logger.error(self, traceback.format_exc())
                 transaction.abort()
-                logger.error(self, 'Database initialization failed')
+                logger.error(self, "Database initialization failed")
 
     def setUp(self) -> None:
         self._set_logger()
-        logger.debug(self, 'Setup Test...')
-        self.settings = plaster.get_settings(
-            self.config_uri,
-            self.config_section
-        )
-        self.config = testing.setUp(settings = self.settings)
-        self.config.include('tracim_backend.models.setup_models')
+        logger.debug(self, "Setup Test...")
+        self.settings = plaster.get_settings(self.config_uri, self.config_section)
+        self.config = testing.setUp(settings=self.settings)
+        self.config.include("tracim_backend.models.setup_models")
         DepotManager._clear()
-        DepotManager.configure(
-            'test', {'depot.backend': 'depot.io.memory.MemoryFileStorage'}
-        )
+        DepotManager.configure("test", {"depot.backend": "depot.io.memory.MemoryFileStorage"})
         settings = self.config.get_settings()
         self.app_config = CFG(settings)
         from tracim_backend.models.setup_models import (
@@ -331,7 +328,7 @@ class BaseTest(unittest.TestCase):
         self.session = get_tm_session(self.session_factory, transaction.manager)
 
     def tearDown(self) -> None:
-        logger.debug(self, 'TearDown Test...')
+        logger.debug(self, "TearDown Test...")
         from tracim_backend.models.meta import DeclarativeBase
 
         self.session.rollback()
@@ -347,39 +344,24 @@ class StandardTest(BaseTest):
     """
     BaseTest with default fixtures
     """
+
     fixtures = [BaseFixture]
 
 
 class DefaultTest(StandardTest):
-
     def _create_workspace_and_test(self, name, user) -> Workspace:
         """
         All extra parameters (*args, **kwargs) are for Workspace init
         :return: Created workspace instance
         """
         WorkspaceApi(
-            current_user=user,
-            session=self.session,
-            config=self.app_config,
+            current_user=user, session=self.session, config=self.app_config
         ).create_workspace(name, save_now=True)
 
-        eq_(
-            1,
-            self.session.query(Workspace).filter(
-                Workspace.label == name
-            ).count()
-        )
-        return self.session.query(Workspace).filter(
-            Workspace.label == name
-        ).one()
+        eq_(1, self.session.query(Workspace).filter(Workspace.label == name).count())
+        return self.session.query(Workspace).filter(Workspace.label == name).one()
 
-    def _create_content_and_test(
-            self,
-            name,
-            workspace,
-            *args,
-            **kwargs
-    ) -> Content:
+    def _create_content_and_test(self, name, workspace, *args, **kwargs) -> Content:
         """
         All extra parameters (*args, **kwargs) are for Content init
         :return: Created Content instance
@@ -390,41 +372,22 @@ class DefaultTest(StandardTest):
         self.session.add(content)
         self.session.flush()
 
-        content_api = ContentApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
-        )
-        eq_(
-            1,
-            content_api.get_canonical_query().filter(
-                Content.label == name
-            ).count()
-        )
-        return content_api.get_canonical_query().filter(
-            Content.label == name
-        ).one()
+        content_api = ContentApi(current_user=None, session=self.session, config=self.app_config)
+        eq_(1, content_api.get_canonical_query().filter(Content.label == name).count())
+        return content_api.get_canonical_query().filter(Content.label == name).one()
 
-    def _create_thread_and_test(self,
-                                user,
-                                workspace_name='workspace_1',
-                                folder_name='folder_1',
-                                thread_name='thread_1') -> Content:
+    def _create_thread_and_test(
+        self, user, workspace_name="workspace_1", folder_name="folder_1", thread_name="thread_1"
+    ) -> Content:
         """
         :return: Thread
         """
         workspace = self._create_workspace_and_test(workspace_name, user)
         folder = self._create_content_and_test(
-            folder_name, workspace,
-            type=content_type_list.Folder.slug,
-            owner=user
+            folder_name, workspace, type=content_type_list.Folder.slug, owner=user
         )
         thread = self._create_content_and_test(
-            thread_name,
-            workspace,
-            type=content_type_list.Thread.slug,
-            parent=folder,
-            owner=user
+            thread_name, workspace, type=content_type_list.Thread.slug, parent=folder, owner=user
         )
         return thread
 
@@ -433,7 +396,8 @@ class MailHogTest(DefaultTest, AbstractMailHogTest):
     """
     Theses test need a working mailhog
     """
-    config_section = 'mail_test'
+
+    config_section = "mail_test"
 
     def setUp(self):
         self.cleanup_mailhog()

@@ -10,12 +10,12 @@ from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
 from zope.interface import implementer
 
-from tracim_backend.models.auth import AuthType
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
-from tracim_backend.config import CFG
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
@@ -30,8 +30,8 @@ class TracimAuthenticationPolicy(object):
     def _get_auth_unsafe_user(
         self,
         request: Request,
-        email: typing.Optional[str]=None,
-        user_id: typing.Optional[int]=None,
+        email: typing.Optional[str] = None,
+        user_id: typing.Optional[int] = None,
     ) -> typing.Optional[User]:
         """
         Helper to get user from email or user_id in pyramid request
@@ -41,7 +41,7 @@ class TracimAuthenticationPolicy(object):
         :param user_id: user_id of the user, optional
         :return: User or None
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         try:
             _, user = uapi.find(user_id=user_id, email=email)
@@ -50,10 +50,7 @@ class TracimAuthenticationPolicy(object):
             return None
 
     def _authenticate_user(
-        self,
-        request: Request,
-        email: typing.Optional[str],
-        password: typing.Optional[str],
+        self, request: Request, email: typing.Optional[str], password: typing.Optional[str]
     ) -> typing.Optional[User]:
         """
         Helper to authenticate user in pyramid request
@@ -61,27 +58,19 @@ class TracimAuthenticationPolicy(object):
         :param request: pyramid request
         :return: User or None
         """
-        app_config = request.registry.settings['CFG']
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         ldap_connector = None
         if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
-            user = uapi.authenticate(
-                email=email,
-                password=password,
-                ldap_connector=ldap_connector
-            )
+            user = uapi.authenticate(email=email, password=password, ldap_connector=ldap_connector)
             return user
         except AuthenticationFailed:
             return None
 
-    def _remote_authenticated_user(
-        self,
-        request: Request,
-        email: str
-    ):
-        app_config = request.registry.settings['CFG'] # type: 'CFG'
+    def _remote_authenticated_user(self, request: Request, email: str):
+        app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         if not app_config.REMOTE_USER_HEADER:
             return None
@@ -89,6 +78,8 @@ class TracimAuthenticationPolicy(object):
             return uapi.remote_authenticate(email)
         except AuthenticationFailed:
             return None
+
+
 ###
 # Pyramid HTTP Basic Auth
 ###
@@ -96,10 +87,8 @@ class TracimAuthenticationPolicy(object):
 
 @implementer(IAuthenticationPolicy)
 class TracimBasicAuthAuthenticationPolicy(
-    BasicAuthAuthenticationPolicy,
-    TracimAuthenticationPolicy
+    BasicAuthAuthenticationPolicy, TracimAuthenticationPolicy
 ):
-
     def __init__(self, realm):
         BasicAuthAuthenticationPolicy.__init__(self, check=None, realm=realm)
         # TODO - G.M - 2018-09-21 - Disable callback is needed to have BasicAuth
@@ -115,13 +104,12 @@ class TracimBasicAuthAuthenticationPolicy(
             return None
 
         user = self._authenticate_user(
-            request=request,
-            email=credentials.username,
-            password=credentials.password,
+            request=request, email=credentials.username, password=credentials.password
         )
         if not user:
             return None
         return user.user_id
+
 
 ###
 # Pyramid cookie auth policy
@@ -129,11 +117,7 @@ class TracimBasicAuthAuthenticationPolicy(
 
 
 @implementer(IAuthenticationPolicy)
-class CookieSessionAuthentificationPolicy(
-    SessionAuthenticationPolicy,
-    TracimAuthenticationPolicy
-):
-
+class CookieSessionAuthentificationPolicy(SessionAuthenticationPolicy, TracimAuthenticationPolicy):
     def __init__(self, reissue_time: int, debug: bool = False):
         SessionAuthenticationPolicy.__init__(self, debug=debug, callback=None)
         self._reissue_time = reissue_time
@@ -148,7 +132,7 @@ class CookieSessionAuthentificationPolicy(
         if not isinstance(request.unauthenticated_userid, int):
             request.session.delete()
             return None
-        user = self._get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)  # nopep8
+        user = self._get_auth_unsafe_user(request, user_id=request.unauthenticated_userid)
         # do not allow invalid_user + ask for cleanup of session cookie
         if not user or not user.is_active or user.is_deleted:
             request.session.delete()
@@ -156,9 +140,9 @@ class CookieSessionAuthentificationPolicy(
         # recreate session if need renew
         if not request.session.new:
             now = datetime.datetime.now()
-            last_access_datetime = datetime.datetime.utcfromtimestamp(request.session.last_accessed)  # nopep8
-            reissue_limit = last_access_datetime + datetime.timedelta(seconds=self._reissue_time)  # nopep8
-            if now > reissue_limit:  # nopep8
+            last_access_datetime = datetime.datetime.utcfromtimestamp(request.session.last_accessed)
+            reissue_limit = last_access_datetime + datetime.timedelta(seconds=self._reissue_time)
+            if now > reissue_limit:
                 request.session.regenerate_id()
         return user.user_id
 
@@ -168,23 +152,21 @@ class CookieSessionAuthentificationPolicy(
             request.session.delete()
         return []
 
+
 ###
 # RemoteUser auth
 ###
 
+
 @implementer(IAuthenticationPolicy)
-class RemoteAuthentificationPolicy(
-    CallbackAuthenticationPolicy,
-    TracimAuthenticationPolicy,
-):
+class RemoteAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
     def __init__(self, remote_user_email_login_header: str):
         self.remote_user_email_login_header = remote_user_email_login_header
         self.callback = None
 
     def authenticated_userid(self, request):
         user = self._remote_authenticated_user(
-            request=request,
-            email=self.unauthenticated_userid(request)
+            request=request, email=self.unauthenticated_userid(request)
         )
         if not user:
             return None
@@ -192,10 +174,13 @@ class RemoteAuthentificationPolicy(
 
     def unauthenticated_userid(self, request):
         return request.environ.get(self.remote_user_email_login_header)
+
     def remember(self, request, userid, **kw):
         return []
+
     def forget(self, request):
         return []
+
 
 ###
 # Pyramid API key auth
@@ -203,19 +188,15 @@ class RemoteAuthentificationPolicy(
 
 
 @implementer(IAuthenticationPolicy)
-class ApiTokenAuthentificationPolicy(
-    CallbackAuthenticationPolicy,
-    TracimAuthenticationPolicy,
-):
-
+class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
     def __init__(self, api_key_header: str, api_user_email_login_header: str):
         self.api_key_header = api_key_header
         self.api_user_email_login_header = api_user_email_login_header
         self.callback = None
 
     def authenticated_userid(self, request):
-        app_config = request.registry.settings['CFG']  # type:'CFG'
-        valid_api_key = app_config.API_KEY
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        valid_api_key = app_config.API__KEY
         api_key = request.headers.get(self.api_key_header)
         if not api_key or not valid_api_key:
             return None

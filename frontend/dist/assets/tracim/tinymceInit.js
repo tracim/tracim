@@ -46,6 +46,11 @@
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
       content_style: 'div {height: 100%;}',
       setup: function ($editor) {
+        $editor.on('init', function (e) {
+          const event = new CustomEvent('tinymceLoaded', {detail: {}, editor: this})
+          document.dispatchEvent(event)
+        })
+
         $editor.on('change keyup', function (e) {
           handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
         })

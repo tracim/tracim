@@ -20,6 +20,8 @@ const wsAdvancedEnTranslation = require('../dist/app/workspace_advanced_en_trans
 const wsAdvancedFrTranslation = require('../dist/app/workspace_advanced_fr_translation.json') || {}
 const wsEnTranslation = require('../dist/app/workspace_en_translation.json')
 const wsFrTranslation = require('../dist/app/workspace_fr_translation.json')
+const agendaEnTranslation = require('../dist/app/agenda_en_translation.json')
+const agendaFrTranslation = require('../dist/app/agenda_fr_translation.json')
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
@@ -52,7 +54,8 @@ i18n
           ...folderEnTranslation, // folder
           ...wsAdvancedEnTranslation, // advanced workspace
           ...adminWsUserEnTranslation, // admin workspace user
-          ...wsEnTranslation // workspace
+          ...wsEnTranslation, // workspace
+          ...agendaEnTranslation // agenda
         }
       },
       fr: {
@@ -65,7 +68,8 @@ i18n
           ...folderFrTranslation, // folder
           ...wsAdvancedFrTranslation, // advanced workspace
           ...adminWsUserFrTranslation, // admin workspace user
-          ...wsFrTranslation // workspace
+          ...wsFrTranslation, // workspace
+          ...agendaFrTranslation // agenda
         }
       }
     }

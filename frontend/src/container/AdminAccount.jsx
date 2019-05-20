@@ -1,22 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
-// import Calendar from '../component/Account/Calendar.jsx'
-// import Timezone from '../component/Account/Timezone.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
   Delimiter,
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
-  newFlashMessage
+  newFlashMessage,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getUser,
@@ -27,7 +27,10 @@ import {
   putUserPassword,
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
-import { editableUserAuthTypeList } from '../helper.js'
+import {
+  editableUserAuthTypeList,
+  PAGE
+} from '../helper.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -45,14 +48,6 @@ class Account extends React.Component {
       name: 'password',
       active: false,
       label: props.t('Password')
-      // }, {
-      //   name: 'timezone',
-      //   active: false,
-      //   label: 'Timezone'
-      // }, {
-      //   name: 'calendar',
-      //   label: 'Calendrier personnel',
-      //   active: false
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
 
     this.state = {
@@ -64,11 +59,20 @@ class Account extends React.Component {
       userToEditWorkspaceList: [],
       subComponentMenu: builtSubComponentMenu
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+    }
   }
 
   async componentDidMount () {
-    this.getUserDetail()
+    await this.getUserDetail()
     this.getUserWorkspaceList()
+    this.buildBreadcrumbs()
   }
 
   getUserDetail = async () => {
@@ -97,6 +101,26 @@ class Account extends React.Component {
       case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
+  }
+
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: <span>{props.t('Manage')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      notALink: true
+    }, {
+      link: (
+        <Link to={PAGE.ADMIN.USER_EDIT(state.userToEdit.user_id)}>
+          {state.userToEdit.public_name}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE
+    }]))
   }
 
   getUserWorkspaceListMemberList = async (wsList) => {
@@ -206,6 +230,7 @@ class Account extends React.Component {
               parentClass={'account'}
               title={props.t('{{userName}} account edition', {userName: state.userToEdit.public_name})}
               icon='user-o'
+              breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='account'>
@@ -251,5 +276,5 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, timezone, system }) => ({ user, workspaceList, timezone, system })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system }) => ({ breadcrumbs, user, workspaceList, timezone, system })
 export default withRouter(connect(mapStateToProps)(translate()(Account)))

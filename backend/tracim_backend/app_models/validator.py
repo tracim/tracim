@@ -3,21 +3,21 @@ import typing
 
 from marshmallow import ValidationError
 from marshmallow.validate import Length
-from marshmallow.validate import Regexp
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
+from marshmallow.validate import Regexp
 
+# TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
+# of tracim_backend, Be careful all_content_types_validator is a global_var !
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
-# TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
-# of tracim_backend, Be careful all_content_types_validator is a global_var !
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.views.calendar_api.models import CalendarType
+from tracim_backend.views.agenda_api.models import AgendaType
 
 
 class TracimValidator(object):
@@ -26,14 +26,14 @@ class TracimValidator(object):
     """
 
     def __init__(self):
-        self.validators = {}  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]  # nopep8
+        self.validators = {}  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]
         self.values = {}  # type: typing.Dict[str, str]
 
     def add_validator(
-            self,
-            field: str,
-            value: typing.Optional[str],
-            validator: typing.Callable[[typing.Any], None]
+        self,
+        field: str,
+        value: typing.Optional[str],
+        validator: typing.Callable[[typing.Any], None],
     ) -> bool:
         """
         Add validator, doesn't accept None as field value
@@ -63,10 +63,7 @@ class TracimValidator(object):
                 self.validators[field](value)
             except ValidationError as e:
                 errors.append(
-                    'Validation of {field} failed : {msg}'.format(
-                        field=field,
-                        msg=str(e)
-                    )
+                    "Validation of {field} failed : {msg}".format(field=field, msg=str(e))
                 )
         if errors:
             raise TracimValidationFailed(str(errors))
@@ -84,9 +81,9 @@ positive_int_validator = Range(min=0, error="Value must be positive or 0")
 
 # String
 # string matching list of int separated by ','
-regex_string_as_list_of_int = Regexp(regex=(re.compile('^(\d+(,\d+)*)?$')))
+regex_string_as_list_of_int = Regexp(regex=(re.compile("^(\d+(,\d+)*)?$")))  # noqa: W605
 # string matching list of string (without',') separated by ','
-regex_string_as_list_of_string = Regexp(regex=(re.compile('^([^,]+(,[^,]+)*)?$')))
+regex_string_as_list_of_string = Regexp(regex=(re.compile("^([^,]+(,[^,]+)*)?$")))  # noqa: W605
 
 acp_validator = Length(min=2)
 not_empty_string_validator = Length(min=1)
@@ -94,28 +91,19 @@ action_description_validator = OneOf(ActionDescription.allowed_values())
 content_global_status_validator = OneOf([status.value for status in GlobalStatus])
 content_status_validator = OneOf(content_status_list.get_all_slugs_values())
 user_profile_validator = OneOf(Profile._NAME)
-calendar_type_validator = OneOf([calendar_type.value for calendar_type in CalendarType])
+agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
-user_email_validator = Length(
-    min=User.MIN_EMAIL_LENGTH,
-    max=User.MAX_EMAIL_LENGTH
-)
-user_password_validator = Length(
-    min=User.MIN_PASSWORD_LENGTH,
-    max=User.MAX_PASSWORD_LENGTH
-)
+user_email_validator = Length(min=User.MIN_EMAIL_LENGTH, max=User.MAX_EMAIL_LENGTH)
+user_password_validator = Length(min=User.MIN_PASSWORD_LENGTH, max=User.MAX_PASSWORD_LENGTH)
 user_public_name_validator = Length(
-    min=User.MIN_PUBLIC_NAME_LENGTH,
-    max=User.MAX_PUBLIC_NAME_LENGTH
+    min=User.MIN_PUBLIC_NAME_LENGTH, max=User.MAX_PUBLIC_NAME_LENGTH
 )
-user_lang_validator = Length(
-    min=User.MIN_LANG_LENGTH,
-    max=User.MAX_LANG_LENGTH
-)
+user_lang_validator = Length(min=User.MIN_LANG_LENGTH, max=User.MAX_LANG_LENGTH)
 user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
 
 # Dynamic validator #
 all_content_types_validator = OneOf(choices=[])
 
+
 def update_validators():
-    all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()  # nopep8
+    all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()

@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
   PageContent,
-  convertBackslashNToBr
+  convertBackslashNToBr,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -17,7 +18,8 @@ import {
   postWorkspaceMember,
   putMyselfWorkspaceRead,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceDoNotify,
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -27,7 +29,9 @@ import {
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
   removeWorkspaceMember,
-  updateUserWorkspaceSubscriptionNotif
+  updateUserWorkspaceSubscriptionNotif,
+  setWorkspaceAgendaUrl,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -40,7 +44,8 @@ import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-// import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
+import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
+import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -60,8 +65,7 @@ class Dashboard extends React.Component {
       searchedKnownMemberList: [],
       autoCompleteClicked: false,
       displayNotifBtn: false,
-      displayWebdavBtn: false,
-      displayCalendarBtn: false
+      displayWebdavBtn: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -71,13 +75,15 @@ class Dashboard extends React.Component {
     switch (type) {
       case 'refreshDashboardMemberList': this.loadMemberList(); break
       case 'refreshWorkspaceList': this.loadWorkspaceDetail(); break
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
 
-  componentDidMount () {
-    this.loadWorkspaceDetail()
+  async componentDidMount () {
+    await this.loadWorkspaceDetail()
     this.loadMemberList()
     this.loadRecentActivity()
+    this.buildBreadcrumbs()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -113,12 +119,31 @@ class Dashboard extends React.Component {
 
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
-      case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
+          this.loadCalendarDetail()
+        }
+        break
       case 400:
         props.history.push(PAGE.HOME)
         props.dispatch(newFlashMessage('Unknown shared space'))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
+    }
+  }
+
+  loadCalendarDetail = async () => {
+    const { props } = this
+
+    const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
+    switch (fetchCalendar.status) {
+      case 200:
+        const idCurrentWorkspace = parseInt(props.match.params.idws)
+        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === idCurrentWorkspace) || {agenda_url: ''}).agenda_url
+        this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
+        break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
     }
   }
 
@@ -152,6 +177,31 @@ class Dashboard extends React.Component {
     }
   }
 
+  buildBreadcrumbs = () => {
+    const { props, state } = this
+
+    const breadcrumbsList = [{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+          {props.curWs.label}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: (
+        <Link to={PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl)}>
+          {props.t('Dashboard')}
+        </Link>
+      ),
+      type: BREADCRUMBS_TYPE.CORE
+    }]
+
+    props.dispatch(setBreadcrumbs(breadcrumbsList))
+  }
+
   handleClickAddMemberBtn = () => this.setState({displayNewMemberForm: true})
 
   handleClickCloseAddMemberBtn = () => this.setState({displayNewMemberForm: false})
@@ -159,10 +209,6 @@ class Dashboard extends React.Component {
   handleToggleNotifBtn = () => this.setState(prevState => ({displayNotifBtn: !prevState.displayNotifBtn}))
 
   handleToggleWebdavBtn = () => this.setState(prevState => ({displayWebdavBtn: !prevState.displayWebdavBtn}))
-
-  handleToggleCalendarBtn = () => this.setState(prevState => ({displayCalendarBtn: !prevState.displayCalendarBtn}))
-
-  handleClickRecentContent = (idContent, typeContent) => this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.curWs.id, typeContent, idContent))
 
   handleClickMarkRecentActivityAsRead = async () => {
     const { props } = this
@@ -369,16 +415,16 @@ class Dashboard extends React.Component {
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
-        .filter(app => app.slug === 'calendar' ? props.curWs.calendarEnabled : true)
+        .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-          // INFO - CH - 2019-04-03 - hard coding some calendar properties for now since some end points requires some clarifications
+          // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
           return {
             ...app,
-            creationLabel: app.slug === 'calendar' ? props.t('Open the calendar') : contentType.creationLabel,
-            route: app.slug === 'calendar'
-              ? PAGE.WORKSPACE.CALENDAR(props.curWs.id)
+            creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,
+            route: app.slug === 'agenda'
+              ? PAGE.WORKSPACE.AGENDA(props.curWs.id)
               : `${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`
           }
         })
@@ -386,28 +432,32 @@ class Dashboard extends React.Component {
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
+      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overriden but it avoid a unique key warning
       ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id)
+      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
+      hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          <PageWrapper customeClass='dashboard'>
+          <PageWrapper customClass='dashboard'>
             <PageTitle
               parentClass='dashboard__header'
               title={props.t('Dashboard')}
               subtitle={''}
               icon='home'
+              breadcrumbsList={props.breadcrumbs}
             >
-              <div className='dashboard__header__advancedmode ml-3'>
+              <div className='dashboard__header__advancedmode'>
                 {idRoleUserWorkspace >= 8 &&
                   <button
                     type='button'
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickOpenAdvancedDashboard}
                   >
+                    <i className='fa fa-fw fa-cog' />
                     {props.t('Open advanced Dashboard')}
                   </button>
                 }
@@ -436,7 +486,7 @@ class Dashboard extends React.Component {
                           faIcon={app.faIcon}
                           // TODO - Côme - 2018/09/12 - translation key below is a little hacky:
                           // The creation label comes from api but since there is no translation in backend
-                          // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                          // every files has a 'externalTranslationList' array just to generate the translation key in the json files through i18n.scanner
                           creationLabel={props.t(app.creationLabel)}
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}
@@ -461,10 +511,11 @@ class Dashboard extends React.Component {
               <div className='dashboard__workspaceInfo'>
                 <RecentActivity
                   customClass='dashboard__activity'
+                  workspaceId={props.curWs.id}
+                  roleIdForLoggedUser={idRoleUserWorkspace}
                   recentActivityList={props.curWs.recentActivityList}
                   readByUserList={props.curWs.contentReadStatusList}
                   contentTypeList={props.contentType}
-                  onClickRecentContent={this.handleClickRecentContent}
                   onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
                   onClickSeeMore={this.handleClickSeeMore}
                   t={props.t}
@@ -499,17 +550,23 @@ class Dashboard extends React.Component {
                 />
               </div>
 
-              {/*
-                AC - 11/09/2018 - not included in v2.0 roadmap
-                <MoreInfo
-                  onClickToggleWebdav={this.handleToggleWebdavBtn}
-                  displayWebdavBtn={state.displayWebdavBtn}
-                  onClickToggleCalendar={this.handleToggleCalendarBtn}
-                  displayCalendarBtn={state.displayCalendarBtn}
-                  t={props.t}
+              {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
+                <AgendaInfo
+                  customClass='dashboard__section'
+                  introText={props.t("Use this link to integrate this shared space's agenda to your")}
+                  caldavText={props.t('CalDAV compatible software')}
+                  agendaUrl={props.curWs.agendaUrl}
                 />
-              */}
+              )}
 
+              {props.system.config.webdav_enabled && (
+                <WebdavInfo
+                  customClass='dashboard__section'
+                  introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                  webdavText={props.t('(protocole WebDAV)')}
+                  webdavUrl={props.system.config.webdav_url}
+                />
+              )}
             </PageContent>
           </PageWrapper>
         </div>
@@ -518,5 +575,7 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType, appList, currentWorkspace, system }) => ({ user, contentType, appList, curWs: currentWorkspace, system })
+const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
+  breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
+})
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

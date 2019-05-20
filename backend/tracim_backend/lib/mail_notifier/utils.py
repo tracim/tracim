@@ -16,18 +16,11 @@ class EST(object):
     in email subjects
     """
 
-    WEBSITE_TITLE = '{website_title}'
-    WORKSPACE_LABEL = '{workspace_label}'
-    CONTENT_LABEL = '{content_label}'
-    CONTENT_STATUS_LABEL = '{content_status_label}'
+    WEBSITE_TITLE = "{website_title}"
+    WORKSPACE_LABEL = "{workspace_label}"
+    CONTENT_LABEL = "{content_label}"
+    CONTENT_STATUS_LABEL = "{content_status_label}"
 
     @classmethod
     def all(cls):
-        return [
-            cls.CONTENT_LABEL,
-            cls.CONTENT_STATUS_LABEL,
-            cls.WEBSITE_TITLE,
-            cls.WORKSPACE_LABEL
-        ]
-
-
+        return [cls.CONTENT_LABEL, cls.CONTENT_STATUS_LABEL, cls.WEBSITE_TITLE, cls.WORKSPACE_LABEL]

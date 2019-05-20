@@ -16,12 +16,13 @@ import {
   getWorkspaceMember,
   putLabel,
   putDescription,
-  putCalendarEnabled,
+  putAgendaEnabled,
   putMemberRole,
   deleteMember,
   getMyselfKnownMember,
   postWorkspaceMember,
-  deleteWorkspace
+  deleteWorkspace,
+  getAppList
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -118,23 +119,28 @@ class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
     const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id))
+    const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
-    const [resDetail, resMember] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember])
+    const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
 
     if (resDetail.apiResponse.status !== 200) {
       this.sendGlobalFlashMessage(props.t('Error while loading shared space details', 'warning'))
       resDetail.body = {}
     }
-
     if (resMember.apiResponse.status !== 200) {
       this.sendGlobalFlashMessage(props.t('Error while loading members list', 'warning'))
       resMember.body = []
+    }
+    if (resAppList.apiResponse.status !== 200) {
+      this.sendGlobalFlashMessage(props.t('Error while loading app list', 'warning'))
+      resAppList.body = []
     }
 
     this.setState({
       content: {
         ...resDetail.body,
-        memberList: resMember.body
+        memberList: resMember.body,
+        appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda')
       }
     })
   }
@@ -195,28 +201,28 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleToggleCalendarEnabled = async () => {
+  handleToggleAgendaEnabled = async () => {
     const { props, state } = this
-    const oldCalendarEnabledValue = state.content.calendar_enabled
-    const newCalendarEnabledValue = !state.content.calendar_enabled
+    const oldAgendaEnabledValue = state.content.agenda_enabled
+    const newAgendaEnabledValue = !state.content.agenda_enabled
 
-    this.setState(prev => ({content: {...prev.content, calendar_enabled: newCalendarEnabledValue}}))
-    const fetchToggleCalendarEnabled = await handleFetchResult(await putCalendarEnabled(state.config.apiUrl, state.content, newCalendarEnabledValue))
+    this.setState(prev => ({content: {...prev.content, agenda_enabled: newAgendaEnabledValue}}))
+    const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
 
-    switch (fetchToggleCalendarEnabled.apiResponse.status) {
+    switch (fetchToggleAgendaEnabled.apiResponse.status) {
       case 200:
         this.sendGlobalFlashMessage(
-          newCalendarEnabledValue ? props.t('Calendar activated') : props.t('Calendar deactivated'),
+          newAgendaEnabledValue ? props.t('Agenda activated') : props.t('Agenda deactivated'),
           'info'
         )
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // @INFO - CH - 2018-04-01 - for sidebar and dashboard and admin workspace
         break
       default:
-        this.setState(prev => ({content: {...prev.content, calendar_enabled: oldCalendarEnabledValue}}))
+        this.setState(prev => ({content: {...prev.content, agenda_enabled: oldAgendaEnabledValue}}))
         this.sendGlobalFlashMessage(
-          newCalendarEnabledValue
-            ? props.t('Error while activating calendar')
-            : props.t('Error while deactivating calendar'),
+          newAgendaEnabledValue
+            ? props.t('Error while activating agenda')
+            : props.t('Error while deactivating agenda'),
           'warning'
         )
     }
@@ -414,7 +420,8 @@ class WorkspaceAdvanced extends React.Component {
             description={state.content.description}
             roleList={state.config.roleList}
             memberList={state.content.memberList}
-            calendarEnabled={state.content.calendar_enabled}
+            agendaEnabled={state.content.agenda_enabled}
+            appAgendaAvailable={state.content.appAgendaAvailable}
             displayFormNewMember={state.displayFormNewMember}
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
             newMemberName={state.newMember.nameOrEmail}
@@ -442,7 +449,7 @@ class WorkspaceAdvanced extends React.Component {
             onClickAutoComplete={this.handleClickAutoComplete}
             onChangeDescription={this.handleChangeDescription}
             onChangeNewMemberName={this.handleChangeNewMemberName}
-            onToggleCalendarEnabled={this.handleToggleCalendarEnabled}
+            onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>

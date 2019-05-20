@@ -24,7 +24,7 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic[marshmallow]==0.73',
+    'hapic[marshmallow]==0.75',
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
@@ -65,6 +65,7 @@ requires = [
     'requests',
     # caldav support
     'radicale',
+    'caldav'
 ]
 
 tests_require = [
@@ -140,7 +141,7 @@ setup(
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav_calendar_create = tracim_backend.command.caldav:CaldavCreateCalendarsCommand'
+            'caldav_agenda_create = tracim_backend.command.caldav:CaldavCreateAgendasCommand'
         ]
     },
     message_extractors={'tracim_backend': [

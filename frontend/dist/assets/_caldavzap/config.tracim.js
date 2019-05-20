@@ -1,9 +1,9 @@
 // Values copied from caldavzap config.js file.
 
-var importedConfig = window.parent.document.getElementById('calendarIframe').getAttribute('data-config')
+var importedConfig = window.parent.document.getElementById('agendaIframe').getAttribute('data-config')
 var configObj = JSON.parse(importedConfig)
 
-var globalAccountSettings = configObj.globalAccountSettings.calendarList.map(c => ({
+var globalAccountSettings = configObj.globalAccountSettings.agendaList.map(c => ({
   href: c.href,
   userAuth: {
     userName: 'notaname',
@@ -19,8 +19,12 @@ var globalAccountSettings = configObj.globalAccountSettings.calendarList.map(c =
   forceReadOnly: null,
   ignoreAlarms: false,
   backgroundCalendars: [],
-  basehref: c.href.split('/')[2] // const [protocol, empty, hostname, ...path] = c.href.split('/')
+  basehref: c.href.split('/')[2], // const [protocol, empty, hostname, ...path] = c.href.split('/')
+  idWorkspace: c.idWorkspace,
+  loggedUserRole: c.loggedUserRole
 }))
+
+var globalShouldShowSidebar = configObj.shouldShowCaldavzapSidebar || configObj.globalAccountSettings.agendaList.length > 1
 
 var globalBackgroundSync=true
 var globalSyncResourcesInterval=120000

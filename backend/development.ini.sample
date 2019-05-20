@@ -39,7 +39,8 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Lang ###
 ## default lang used in backend if user doesn't provided any lang.
-# default_lang = en
+# Available parameter: en, fr
+; default_lang = en
 
 ### Apps ###
 ## app enabled explicit list:
@@ -193,10 +194,11 @@ frontend.serve = True
 
 ### Webdav ###
 # webdav url for client
-# url can be extended like localhost/webdav
+# url can be extended like localhost/webdav by setting webdav.root_path
 # in this case, you have to create your own proxy behind this url.
 # Do not set http:// prefix.
-; wsgidav.client.base_url = localhost:<WSGIDAV_PORT>
+webdav.base_url = http://localhost:3030
+webdav.ui.enabled = True
 
 ####
 # EMAIL-COMMON

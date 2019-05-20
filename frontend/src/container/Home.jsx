@@ -4,7 +4,9 @@ import classnames from 'classnames'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
-import { workspaceConfig } from '../helper.js'
+import {
+  workspaceConfig
+} from '../helper.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -25,21 +27,23 @@ class Home extends React.Component {
 
     const styleHomepage = {
       display: 'flex',
-      width: '100%',
+      alignItems: 'center',
+      flexDirection: 'column',
+      justifyContent: 'center',
       height: '100%'
     }
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
-        <section
-          className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
-          style={styleHomepage}
-        >
-          <div className='container-fluid nopadding'>
+        <div className='tracim__content-scrollview fullWidthFullHeight'>
+          <section
+            className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
+            style={styleHomepage}
+          >
             <Card customClass='homepagecard'>
               <CardHeader displayHeader={false} />
 
-              <CardBody customClass='homepagecard'>
+              <CardBody formClass='homepagecard__body'>
                 {props.workspaceList.length > 0
                   ? <HomeHasWorkspace user={props.user} />
                   : <HomeNoWorkspace
@@ -49,8 +53,8 @@ class Home extends React.Component {
                 }
               </CardBody>
             </Card>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     )
   }

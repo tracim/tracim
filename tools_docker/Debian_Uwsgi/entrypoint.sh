@@ -70,7 +70,6 @@ a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
 
 # starting services
 service redis-server start  # async email sending
-service apache2 restart
 supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
 
 # Activate daemon for reply by email
@@ -83,16 +82,43 @@ if [ "$EMAIL_MODE_ASYNC" = "1" ];then
     supervisorctl start tracim_mail_notifier
 fi
 
-# Start tracim with webdav or not
+# Activate or deactivate webdav
 if [ "$START_WEBDAV" = "1" ]; then
-    set +e
-    service uwsgi restart
-    set -e
-    tail -f /var/log/dpkg.log
+    if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
+        ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
+    fi
+    sed -i "s|^\s*#ProxyPass /webdav http://127.0.0.1:3030/webdav|    ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
-    set +e
-    service uwsgi restart
-    set -e
-    tail -f /var/log/dpkg.log
+    sed -i "s|^\s*ProxyPass /webdav http://127.0.0.1:3030/webdav|    #ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi
+
+# Activate or deactivate caldav
+if [ "$START_CALDAV" = "1" ]; then
+    if [ ! -L /etc/uwsgi/apps-enabled/tracim_caldav.ini ]; then
+        ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
+    fi
+    sed -i "s|caldav.enabled = .*|caldav.enabled = True|g" /etc/tracim/development.ini
+    sed -i "s|^\s*#ProxyPass /agenda http://127.0.0.1:8080/agenda|    ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*#ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+else
+    rm -f /etc/uwsgi/apps-enabled/tracim_caldav.ini
+    sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
+    sed -i "s|^\s*ProxyPass /agenda http://127.0.0.1:8080/agenda|    #ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+    sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+fi
+
+# Reload apache config
+service apache2 restart
+
+# Start tracim
+set +e
+service uwsgi restart
+set -e
+if [ "$START_CALDAV" = "1" ]; then
+    cd /tracim/backend/
+    tracimcli caldav agenda create -c /etc/tracim/development.ini
+fi
+tail -f /var/log/dpkg.log

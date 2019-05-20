@@ -1,4 +1,4 @@
-describe('account :: main_page', function () {
+describe('Account page', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -8,9 +8,9 @@ describe('account :: main_page', function () {
     cy.loginAs('users')
     cy.visit('/')
   })
-  it('', function () {
-    cy.get('#dropdownMenuButton').click()
-    cy.get('a.setting__link[href="/ui/account"]').click()
+  it("should be able it access it through header's button", function () {
+    cy.get('[data-cy=menuprofil__dropdown__button]').click()
+    cy.get('[data-cy=menuprofil__dropdown__account__link]').click()
     cy.get('.userinfo')
   })
 })

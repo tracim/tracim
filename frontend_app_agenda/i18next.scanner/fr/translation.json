@@ -1,0 +1,11 @@
+{
+  "Error while loading shared space list": "Erreur lors du chargement de la liste des espaces partagés",
+  "User": "Utilisateur",
+  "Shared spaces": "Espaces partagés",
+  "Shared space": "Espace partagé",
+  "All my agendas": "Tous mes agendas",
+  "Agenda of shared space {{workspaceLabel}}": "Agenda de l'espace partagé {{workspaceLabel}}",
+  "Agenda": "Agenda",
+  "Some agenda could not be loaded": "Certains agendas n'ont pas pu être chargés",
+  "Home": "Accueil"
+}

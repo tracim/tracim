@@ -1,142 +1,209 @@
+---
 env:
   global:
     - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
 
 sudo: false
 language: python
+dist: trusty
 python:
   - "3.6"
 
+_install_backend: &_install_backend
+  addons:
+    postgresql: "9.3"
+    apt:
+      packages:
+        - libreoffice
+        - imagemagick
+        - libmagickwand-dev
+        - ghostscript
+        - libfile-mimeinfo-perl
+        - poppler-utils
+        - qpdf
+        - libldap2-dev
+        - libsasl2-dev
+        - docker-ce
+        - libimage-exiftool-perl
+  services:
+    - redis-server
+    - mysql
+  before_install:
+    - docker pull mailhog/mailhog
+    - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+    - docker pull rroemhild/test-openldap
+    - docker run -d -p 3890:389 rroemhild/test-openldap
+  install:
+    - cd $TRAVIS_BUILD_DIR/backend
+    - pip install --upgrade pip setuptools
+    # using old version of pytest-cov to avoid
+    # version conflict with python-coveralls
+    # see https://github.com/z4r/python-coveralls/issues/66
+    - pip install 'pytest-cov<2.6'
+    - pip install python-coveralls
+    - pip install -r "requirements.txt"
+    # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
+    # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
+    # sqlite
+    - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    - cd $TRAVIS_BUILD_DIR
+  before_script:
+    - cd $TRAVIS_BUILD_DIR/backend
+    # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
+    - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+    # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
+    - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+    # sqlite : do nothing, default config is sqlite based.
+    - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
+    - cd $TRAVIS_BUILD_DIR
+  after_success:
+    - coveralls
+
+_install_full_tracim: &_install_full_tracim
+  <<: *_install_backend
+  install:
+    - cd $TRAVIS_BUILD_DIR/backend
+    - pip install --upgrade pip setuptools
+    # using old version of pytest-cov to avoid
+    # version conflict with python-coveralls
+    # see https://github.com/z4r/python-coveralls/issues/66
+    - pip install 'pytest-cov<2.6'
+    - pip install python-coveralls
+    - pip install -r "requirements.txt"
+    # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
+    # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
+    # sqlite
+    - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    - cp ../color.json.sample ../color.json
+    - tracimcli db init -c $TRACIM_BACKEND_TEST_CONFIG_FILE
+    - alembic -c $TRACIM_BACKEND_TEST_CONFIG_FILE stamp head
+    - cd $TRAVIS_BUILD_DIR
+    - ./install_frontend_dependencies.sh root
+    - ./build_full_frontend.sh root
+    - ./setup_functionnal_tests.sh root
+
+_backend_quick_test: &_backend_quick_test
+  <<: *_install_backend
+  # INFO - G.M - 2019-04-25 - override docker usage by overriding
+  addons:
+    apt:
+      packages:
+        - libimage-exiftool-perl
+  services:
+  before_install:
+  script:
+    - cd $TRAVIS_BUILD_DIR/backend/
+    - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
+    - cd $TRAVIS_BUILD_DIR
+
+_backend_test: &_backend_test
+  <<: *_install_backend
+  script:
+    - cd $TRAVIS_BUILD_DIR/backend/
+    - pytest --cov tracim_backend
+    - cd $TRAVIS_BUILD_DIR
+
+
 jobs:
   include:
-# TODO BS 2018-10-12: Re-enable this test when setup.py list deps as strict
-#  - stage: quick-tests
-#    name: Check requirement.txt
-#    python:
-#    - "3.5"
-#    addons:
-#    services:
-#    before_install:
-#      # TODO - GM - 2018-10-12  find a better way to install exiftool
-#      # download exiftool and compile it to have a working exiftool command (used by preview_generator)
-#      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
-#      - cd backend
-#    install:
-#      - pip install --upgrade pip setuptools
-#      - pip install pip-tools
-#    before_script:
-#      - mv requirements.txt requirements_from_source.txt
-#    script:
-#      - pip-compile
-#      - diff -u requirements.txt requirements_from_source.txt
-#    after_success: true
-  - stage: quick-tests
-    name : Quick Unit-Test for Backend
-    env:
-    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
-    python:
-      - "3.5"
-      - "3.6"
-      - "3.7"
-    script:
-    - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
-  - stage: backend-sqlite
-    name: Test Backend with sqlite
-    env:
-    - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
-    script:
-    - pytest --cov tracim_backend
-  - stage: backend-postgresql
-    name: Test Backend with postgresql
-    env:
-    - DB=postgres
-    script:
-    - pytest tracim_backend
-  - stage: backend-mysql
-    name: Test Backend with mysql
-    env:
-    - DB=mysql
-    script:
-    - pytest tracim_backend
-  - stage: functional
-    name: Functional tests using Cypress
-    env:
-      - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
-      - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
-      - TRAVIS_NODE_VERSION="10"
-    before_install:
-      - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
-    install:
-      - pip install --upgrade pip setuptools
-      - ./setup_default_backend.sh root
-      - ./install_frontend_dependencies.sh root
-      - ./build_full_frontend.sh root
-      - ./setup_functionnal_tests.sh root
-    before_script:
-      - cd backend
-      - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-      - nohup pserve cypress_test.ini&
-      - cd ../functionnal_tests
+    # TODO BS 2018-10-12: Re-enable this test when setup.py list deps as strict
+    #  - stage: quick-tests
+    #    name: Check requirement.txt
+    #    python:
+    #    - "3.5"
+    #    addons:
+    #    services:
+    #    before_install:
+    #      - cd backend
+    #    install:
+    #      - pip install --upgrade pip setuptools
+    #      - pip install pip-tools
+    #    before_script:
+    #      - mv requirements.txt requirements_from_source.txt
+    #    script:
+    #      - pip-compile
+    #      - diff -u requirements.txt requirements_from_source.txt
+    #    after_success: true
 
-    script:
-      - $(npm bin)/cypress run
+    # INFO - G.M - 2019-04-25 - Stage: Static tests ###
+    - stage: static-tests
+      name: fmt
+      install:
+        - pip install black isort
+      script:
+        - black --version
+        - echo -n "isort " & isort --version-number
+        - black -l 100 --exclude '/(\..*)/' --diff --check $TRAVIS_BUILD_DIR/backend/tracim_backend
+        - isort -df -c $TRAVIS_BUILD_DIR/backend/tracim_backend/**/*.py
+    - stage: static-tests
+      name: flake8
+      install:
+        - pip install flake8
+      script:
+        - flake8 --version
+        - flake8 $TRAVIS_BUILD_DIR/backend/tracim_backend
+
+    # INFO - G.M - 2019-04-25 - Stage: Quick Tests ###
+    - stage: quick-tests
+      name: "Python: 3.6"
+      <<: *_backend_quick_test
+      env:
+        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      python:
+        - "3.6"
+    - stage: quick-tests
+      name: "Python: 3.5"
+      <<: *_backend_quick_test
+      env:
+        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      python:
+        - "3.5"
+    - stage: quick-tests
+      name: "Python: 3.7"
+      dist: xenial
+      <<: *_backend_quick_test
+      env:
+        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+      python:
+        - "3.7"
+
+    # INFO - G.M - 2019-04-25 - Stage: Backend ###
+    - stage: backend
+      <<: *_backend_test
+      env:
+        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+    - stage: backend
+      <<: *_backend_test
+      env:
+        - DB=postgres
+    - stage: backend
+      <<: *_backend_test
+      env:
+        - DB=mysql
+
+    # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
+    - stage: functional
+      name: Functional tests using Cypress
+      <<: *_install_full_tracim
+      env:
+        - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
+        - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
+        - TRAVIS_NODE_VERSION="10"
+      script:
+        - cd $TRAVIS_BUILD_DIR/backend
+        - nohup pserve $TRACIM_BACKEND_TEST_CONFIG_FILE&
+        - cd $TRAVIS_BUILD_DIR/functionnal_tests
+        - $(npm bin)/cypress run
+        - cd $TRAVIS_BUILD_DIR
 
 stages:
+  - static-tests
   - quick-tests
-  - backend-sqlite
-  - backend-postgresql
-  - backend-mysql
+  - backend
   - functional
-
-
-addons:
-  postgresql: "9.3"
-  apt:
-    packages:
-    - libreoffice
-    - imagemagick
-    - libmagickwand-dev
-    - ghostscript
-    - libfile-mimeinfo-perl
-    - poppler-utils
-    - qpdf
-    - libldap2-dev
-    - libsasl2-dev
-    - docker-ce
-services:
-  - redis-server
-  - mysql
-before_install:
-  # TODO - GM - 2018-10-12  find a better way to install exiftool
-  # download exiftool and compile it to have a working exiftool command (used by preview_generator)
-  - wget https://sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.11.tar.gz && gzip -dc Image-ExifTool-11.11.tar.gz | tar -xf - && cd Image-ExifTool-11.11 && perl Makefile.PL && sudo make install && cd ..
-  - docker pull mailhog/mailhog
-  - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-  - docker pull rroemhild/test-openldap
-  - docker run -d -p 3890:389 rroemhild/test-openldap
-  - cd backend
-install:
-  - pip install --upgrade pip setuptools
-  # using old version of pytest-cov to avoid
-  # version conflict with python-coveralls
-  # see https://github.com/z4r/python-coveralls/issues/66
-  - pip install 'pytest-cov<2.6'
-  - pip install python-coveralls
-  - pip install -r "requirements.txt"
-  # postgresql
-  - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
-  # mysql
-  - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
-  # sqlite
-  - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
-before_script:
-  # postgresql
-  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-  # mysql
-  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-  - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-  # sqlite : do nothing, default config is sqlite based.
-  - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-after_success:
-  - coveralls

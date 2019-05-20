@@ -1,3 +1,5 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
@@ -17,7 +19,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
   position relative
   transition all sidebar-animate-speed
   width sidebar-width
-  height calc(100vh - 90px)
+  height "calc(100vh - %s)" % headerHeight
   overflow hidden
   background-image url('../img/applat.png')
   background-repeat repeat
@@ -144,6 +146,7 @@ sidebarColorDarken = darken(sidebarColor, 15%)
                 height 100%
                 font-size 18px
                 opacity 0.95
+                color fontColor
               .dropdown__title
                 white-space nowrap
                 overflow hidden
@@ -161,42 +164,34 @@ sidebarColorDarken = darken(sidebarColor, 15%)
             text-decoration underline
             color fourthColor
 
-// MEDIAQUERIES
-
 @media (min-width: min-lg) and (max-width: max-lg)
-
   .sidebarpagecontainer
     position relative
 
   .sidebar
     position absolute
-    min-height calc(100% - 88px)
+    min-height "calc(100% - %s)" % headerHeight
 
 @media (min-width: min-md) and (max-width: max-md)
-
   .sidebarpagecontainer
     position relative
 
   .sidebar
     position absolute
-    min-height calc(100% - 88px)
+    min-height "calc(100% - %s)" % headerHeight
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
   .sidebarpagecontainer
     position relative
-    padding-top 69px
 
   .sidebar
     position absolute
-    min-height calc(100% - 69px)
+    min-height "calc(100% - %s)" % headerHeight
 
 @media (max-width: 575px)
-
   .sidebarpagecontainer
     position relative
-    padding-top 69px
 
   .sidebar
     position absolute
-    min-height calc(100% - 69px)
+    min-height "calc(100% - %s)" % headerHeight

@@ -80,6 +80,7 @@ class PopinFixedHeader extends React.Component {
         <div
           className={classnames('wsContentGeneric__header__close', `${customClass}__header__close iconBtn`)}
           onClick={onClickCloseBtn}
+          data-cy='popinFixed__header__button__close'
         >
           <i className='fa fa-times' />
         </div>
