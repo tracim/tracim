@@ -223,16 +223,19 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickEditContentItem = (e, content) => {
+    e.preventDefault()
     e.stopPropagation()
     this.handleClickContentItem(content)
   }
 
   handleClickMoveContentItem = (e, content) => {
+    e.preventDefault()
     e.stopPropagation()
     console.log('%c<WorkspaceContent> move nyi', 'color: #c17838', content)
   }
 
   handleClickDownloadContentItem = (e, content) => {
+    e.preventDefault()
     e.stopPropagation()
     console.log('%c<WorkspaceContent> download nyi', 'color: #c17838', content)
   }
@@ -240,6 +243,7 @@ class WorkspaceContent extends React.Component {
   handleClickArchiveContentItem = async (e, content) => {
     const { props, state } = this
 
+    e.preventDefault()
     e.stopPropagation()
 
     const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(content.idWorkspace, content.id))
@@ -255,6 +259,7 @@ class WorkspaceContent extends React.Component {
   handleClickDeleteContentItem = async (e, content) => {
     const { props, state } = this
 
+    e.preventDefault()
     e.stopPropagation()
 
     const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(content.idWorkspace, content.id))
