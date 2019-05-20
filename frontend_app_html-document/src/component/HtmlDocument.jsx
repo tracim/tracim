@@ -28,6 +28,12 @@ const HtmlDocument = props => {
           />
         )}
 
+        {props.isDeprecated && (
+          <DisplayState
+            msg={props.t('This content is deprecated')}
+            icon='warning'
+          />
+        )}
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}

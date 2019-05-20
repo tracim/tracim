@@ -456,6 +456,7 @@ class Thread extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchived}
             isDeleted={content.is_deleted}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            isDeprecated={content.status === config.availableStatuses[3].slug}
           />
         </PopinFixedContent>
       </PopinFixed>

@@ -38,6 +38,15 @@ export const FileComponent = props =>
       </div>
     }
 
+    {props.isDeprecated &&
+      <div className='file__contentpage__preview__state'>
+        <div className='file__contentpage__preview__state__msg'>
+          <i className='fa fa-fw fa-warning' />
+          {props.t('This content is deprecated')}
+        </div>
+      </div>
+    }
+
     {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
       <PreviewComponent
         color={props.customColor}

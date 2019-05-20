@@ -67,6 +67,15 @@ class Timeline extends React.Component {
           </div>
         }
 
+        {props.isDeprecated && !props.isArchived && !props.isDeleted &&
+          <div className='timeline__info'>
+            <div className='timeline__info__msg'>
+              <i className='fa fa-fw fa-warning' />
+              {props.t('This content is deprecated')}
+            </div>
+          </div>
+        }
+
         {props.isArchived &&
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
