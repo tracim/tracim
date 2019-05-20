@@ -44,7 +44,8 @@ import {
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
-  appendBreadcrumbs
+  appendBreadcrumbs,
+  resetBreadcrumbsAppFeature
 } from '../action-creator.sync.js'
 
 class Tracim extends React.Component {
@@ -83,6 +84,10 @@ class Tracim extends React.Component {
       case 'appendBreadcrumbs':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
+        break
+      case 'resetBreadcrumbsAppFeature':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(resetBreadcrumbsAppFeature())
         break
     }
   }

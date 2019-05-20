@@ -83,7 +83,10 @@ class File extends React.Component {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) this.setState({isVisible: true})
+        if (isSameContentId) {
+          this.setState({isVisible: true})
+          this.buildBreadcrumbs()
+        }
         break
 
       case 'file_hideApp':
@@ -278,7 +281,8 @@ class File extends React.Component {
     }
 
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
+    GLOBAL_dispatchEvent({type: 'resetBreadcrumbsAppFeature', data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
