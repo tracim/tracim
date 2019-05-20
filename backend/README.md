@@ -81,19 +81,24 @@ For mySQL:
 
     pip install -e ".[testing,mysql]"
 
-### Configure Tracim_backend ###
+Configuration
+---------------
 
 Create [configuration file](doc/setting.md) for a development environment:
 
     cp development.ini.sample development.ini
 
+default configuration given is correct for local-test, if you need to run tracim
+over network, check [configuration file documentation](doc/setting.md)
+
+you need to create a color.json file at root of tracim :
+
+    cp ../color.json.sample ../color.json
+
 You should also create available dir for radicale, according to `caldav_storage_dir`
 parameter:
 
      mkdir radicale_storage
-
-default configuration given is correct for local-test, if you need to run tracim
-over network, check [configuration file documentation](doc/setting.md)
 
 Initialize the database using [tracimcli](doc/cli.md) tool
 
@@ -103,11 +108,14 @@ Stamp current version of database to last (useful for migration):
 
     alembic -c development.ini stamp head
 
-## Run Tracim_backend web services With Uwsgi : great for production ##
+Running Tracim Backend WSGI APP
+---------------
 
-if not did before, you need to create a color.json file at root of tracim :
-   
-    cp ../color.json.sample ../color.json
+You can run Tracim wsgi apps with many wsgi server. We provided here example to run them:
+- with UWSGI using wsgi/* script.
+- with pserve command of pyramid which rely only on development.ini pastedeploy config.
+
+### With Uwsgi : great for production ###
 
 #### Install Uwsgi
 
@@ -121,7 +129,7 @@ or on debian 9 :
     # install uwsgi on debian 9
     sudo apt install uwsgi uwsgi-plugin-python3
 
-### All in terminal way ###
+#### All in terminal way ####
 
 
 Run all web services with uwsgi
@@ -145,7 +153,7 @@ to stop them:
     # caldav radicale server
     uwsgi --stop /tmp/tracim_caldav.pid
 
-## With Uwsgi ini script file ##
+#### With Uwsgi ini script file ####
 
 You can also preset uwsgi config for tracim, this way, creating this kind of .ini file:
 
@@ -186,7 +194,10 @@ You can then run the process this way :
     # You need to replace <WSGI_CONF_CALDAV> with correct path
     uwsgi --ini <WSGI_CONF_CALDAV>.ini --http-socket localhost:5232
 
-### Run Tracim_Backend with Waitress : legacy way, usefull for debug and dev ###
+### With Pserve : legacy way, usefull for debug and dev ###
+
+This method rely on development.ini configuration. default web server used is _Waitress_
+in` development.ini.sample`
 
 run tracim_backend web api:
 
@@ -200,14 +211,16 @@ run caldav server
 
     tracimcli caldav start
 
-## Run daemons according to your config
+Running Tracim Backend Daemon
+---------------
 
 Feature such as async email notification and email reply system need additional
 daemons to work correctly.
 
 ### python way
 
-#### Run
+#### Run daemons
+
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
     ## DAEMONS SERVICES
@@ -216,7 +229,7 @@ daemons to work correctly.
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
 
-### STOP
+#### Stop daemons
 
     # email notifier
     killall python3 daemons/mail_notifier.py

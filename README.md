@@ -80,17 +80,57 @@ You can run also with root if you add root in parameter of this script.
   
 You can add "-d" to build_full_frontend.sh to disabled obfuscation and reduce build time. 
 
-### Run tracim (using pserve)
+### Run tracim
+
+Tracim is made of multiples services, some are web wsgi application and some others
+are daemons (server not web related to do some task like sending email).
+
+#### Easy start (with pserve and pastedeploy)
+
+An easy way to run tracim wsgi app with pastedeploy(config in development.ini):
 
     cd backend/
     source env/bin/activate
+
+    # running web server
     pserve development.ini
+
+You can run some other wsgi service with pastedeploy using tracimcli command:
+
+    # running webdav server
+    tracimcli webdav start
+
+    # running caldav server
+    tracimcli caldav start
+    tracimcli caldav sync  # sync tracim data with radicale caldav server
+
+You can run some tracim daemon too if you want those feature:
+
+    # set tracim_conf_file path
+    export TRACIM_CONF_PATH="$(pwd)/development.ini"
+
+    ## DAEMONS SERVICES
+    # email notifier (if async email notification is enabled)
+    python3 daemons/mail_notifier.py &
+
+    # email fetcher (if email reply is enabled)
+    python3 daemons/mail_fetcher.py &
 
 You can now enter the application at
 [http://127.0.0.1:6543](http://127.0.0.1:6543) and login with admin user:
 
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
+
+
+#### More documentation about running tracim and tracim services
+
+
+Full documentation about it and about running tracim services with uwsgi/supervisor
+is available in [Backend Readme file doc](backend/README.md) section `Running Tracim Backend Daemon`
+and `Running Tracim Backend WSGI APP` .
+
+
 
 ### Running tests with Cypress
 
