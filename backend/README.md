@@ -87,6 +87,11 @@ Create [configuration file](doc/setting.md) for a development environment:
 
     cp development.ini.sample development.ini
 
+You should also create available dir for radicale, according to `caldav_storage_dir`
+parameter:
+
+     mkdir radicale_storage
+
 default configuration given is correct for local-test, if you need to run tracim
 over network, check [configuration file documentation](doc/setting.md)
 
