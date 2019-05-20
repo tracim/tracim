@@ -35,11 +35,12 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     beforeEach(() => {
       cy.wait(200)
       cy.loginAs('administrators')
-      cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
     })
 
     describe('From app Htmldoc to app File', () => {
       it('should close the app Htmldoc and open the app File', () => {
+        cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
+
         cy.get(contentHtmlDocGetter).click('left')
         cy.waitForTinyMCELoaded().then(() => {
           cy.get(contentFileGetter).click('left')
@@ -52,6 +53,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('From app File to app Thread', () => {
       it('should close the app File and open the app Thread', () => {
+        cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
+
         cy.get(contentFileGetter).click('left')
         cy.get(contentThreadGetter).click('left')
 
@@ -62,6 +65,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('From app Thread to app Htmldoc', () => {
       it('should close the app Thread and open the app Htmldoc', () => {
+        cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
+
         cy.get(contentThreadGetter).click('left')
         cy.get(contentHtmlDocGetter).click('left')
         cy.waitForTinyMCELoaded().then(() => {
@@ -73,6 +78,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('Closing the app Htmldoc and reopening it', () => {
       it("should hide the app Htmldoc and set it visible back", () => {
+        cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
+
         cy.get(contentHtmlDocGetter).click('left')
         cy.waitForTinyMCELoaded().then(() => {
           cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
@@ -88,6 +95,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('Closing the app File and reopening it', () => {
       it("should hide the app File and set it visible back", () => {
+        cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
+
         cy.get(contentFileGetter).click('left')
 
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
@@ -100,6 +109,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
     describe('Closing the app Thread and reopening it', () => {
       it("should hide the app Thread and set it visible back", () => {
+        cy.visit(`/ui/workspaces/${workspaceId}/contents`, {retryOnStatusCodeFailure: true})
+
         cy.get(contentThreadGetter).click('left')
 
         cy.get('[data-cy="popinFixed__header__button__close"]').should('be.visible').click()
