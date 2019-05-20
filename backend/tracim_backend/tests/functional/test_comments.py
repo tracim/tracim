@@ -455,4 +455,3 @@ class TestCommentsEndpoint(FunctionalTest):
             status=200
         )
         assert '<span style="display: none;">' in response.json_body['raw_content']
-
