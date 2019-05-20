@@ -19,8 +19,10 @@
       width auto
       &__text
         margin 0
-    &__advancedmode__button .fa
-      margin-right 8px
+    &__advancedmode__button
+      margin-left 40px
+      & .fa
+        margin-right 8px
   &__workspace
     display flex
     flex-wrap wrap
@@ -54,8 +56,10 @@
     padding 30px
     min-height 100%
     background-color lightGrey
-  &__agenda
+  &__section
     padding 30px
+    &:nth-child(even)
+      background-color lightGrey
 
 @media (min-width: min-md) and (max-width: max-md)
   .dashboard

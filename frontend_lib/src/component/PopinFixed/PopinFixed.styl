@@ -105,7 +105,10 @@
   //.wsContentGeneric__content__right
   //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
 
-
+@media (max-width: max-lg)
+  .rightPartClose
+    .wsContentGeneric__content__left
+      width calc(100% - 20px) // 20px => margin
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .wsContentGeneric

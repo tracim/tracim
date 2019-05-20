@@ -34,6 +34,7 @@ from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.setup_models import init_models
 
 
 def eq_(a, b, msg=None) -> None:
@@ -120,15 +121,16 @@ class FunctionalTest(unittest.TestCase):
         # TODO - G.M - 2019-03-19 - Replace this code by something better, see
         # https://github.com/algoo/hapic/issues/144
         hapic._controllers = []
-        self.connect_database(create_tables=True)
         self.app_config = CFG(self.settings)  # type: CFG
+        self.app_config = self.override_app_config(self.app_config)
         self.app_config.configure_filedepot()
-        self.init_database(self.settings)
+        self.connect_database(create_tables=True)
+        self.init_database()
         DepotManager._clear()
         self.run_app()
 
     def connect_database(self, create_tables: bool = False) -> None:
-        self.engine = get_engine(self.settings)
+        self.engine = get_engine(self.app_config)
         if create_tables:
             DeclarativeBase.metadata.create_all(self.engine)
         self.session_factory = get_session_factory(self.engine)
@@ -143,11 +145,18 @@ class FunctionalTest(unittest.TestCase):
         """
         return settings
 
+    def override_app_config(self, app_config: CFG) -> CFG:
+        """
+        Allow to override app_config parameter for tests
+        by default : do nothing.
+        """
+        return app_config
+
     def run_app(self) -> None:
         app = web({}, **self.settings)
         self.testapp = TestApp(app)
 
-    def init_database(self, settings: typing.Dict[str, typing.Any]):
+    def init_database(self):
         with transaction.manager:
             try:
                 fixtures_loader = FixturesLoader(self.session, self.app_config)
@@ -250,8 +259,16 @@ class FunctionalTestNoDB(FunctionalTest):
         settings["sqlalchemy.url"] = "sqlite://"
         return settings
 
-    def init_database(self, settings: typing.Dict[str, typing.Any]) -> None:
-        self.engine = get_engine(settings)
+    def override_app_config(self, app_config: CFG) -> CFG:
+        """
+        Override CFG parameter
+        Disable sqlalchemy.url app config parameter with wrong value
+        """
+        app_config.SQLALCHEMY__URL = "sqlite://"
+        return app_config
+
+    def init_database(self) -> None:
+        self.engine = get_engine(self.app_config)
 
 
 class CommandFunctionalTest(FunctionalTest):
@@ -311,18 +328,18 @@ class BaseTest(unittest.TestCase):
         logger.debug(self, "Setup Test...")
         self.settings = plaster.get_settings(self.config_uri, self.config_section)
         self.config = testing.setUp(settings=self.settings)
-        self.config.include("tracim_backend.models.setup_models")
         DepotManager._clear()
         DepotManager.configure("test", {"depot.backend": "depot.io.memory.MemoryFileStorage"})
         settings = self.config.get_settings()
         self.app_config = CFG(settings)
+        init_models(self.config, self.app_config)
         from tracim_backend.models.setup_models import (
             get_engine,
             get_session_factory,
             get_tm_session,
         )
 
-        self.engine = get_engine(settings)
+        self.engine = get_engine(self.app_config)
         self.session_factory = get_session_factory(self.engine)
         self.init_database()
         self.session = get_tm_session(self.session_factory, transaction.manager)

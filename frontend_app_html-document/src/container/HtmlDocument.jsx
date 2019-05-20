@@ -15,9 +15,15 @@ import {
   SelectStatus,
   displayDistanceDate,
   convertBackslashNToBr,
-  generateLocalStorageContentId
+  generateLocalStorageContentId,
+  BREADCRUMBS_TYPE,
+  appFeatureCustomEventHandlerShowApp
 } from 'tracim_frontend_lib'
-import { MODE, debug } from '../helper.js'
+import {
+  MODE,
+  debug,
+  initWysiwyg
+} from '../helper.js'
 import {
   getHtmlDocContent,
   getHtmlDocComment,
@@ -42,9 +48,13 @@ class HtmlDocument extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
-      externalTradList: [
-        props.t('Write a document'),
-        props.t('Text Documents')
+      externalTranslationList: [
+        props.t('Text Document'),
+        props.t('Text Documents'),
+        props.t('Text document'),
+        props.t('text document'),
+        props.t('text documents'),
+        props.t('Write a document')
       ],
       rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,
@@ -65,7 +75,8 @@ class HtmlDocument extends React.Component {
     switch (type) {
       case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
+        const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
+        if (isSameContentId) this.setState({isVisible: true})
         break
 
       case 'html-document_hideApp':
@@ -93,14 +104,7 @@ class HtmlDocument extends React.Component {
       case 'allApp_changeLang':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
 
-        if (state.timelineWysiwyg) {
-          tinymce.remove('#wysiwygTimelineComment')
-          wysiwyg('#wysiwygTimelineComment', data, this.handleChangeNewComment)
-        }
-        if (state.mode === MODE.EDIT) {
-          tinymce.remove('#wysiwygNewVersion')
-          wysiwyg('#wysiwygNewVersion', data, this.handleChangeText)
-        }
+        initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
 
         this.setState(prev => ({
           loggedUser: {
@@ -114,21 +118,23 @@ class HtmlDocument extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
-    this.loadContent()
+    await this.loadContent()
+    this.buildBreadcrumbs()
   }
 
   async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<HtmlDocument> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
+      this.buildBreadcrumbs()
       tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
@@ -140,6 +146,11 @@ class HtmlDocument extends React.Component {
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+
+    // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
+    if (!prevState.isVisible && state.isVisible) {
+      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+    }
   }
 
   componentWillUnmount () {
@@ -183,6 +194,22 @@ class HtmlDocument extends React.Component {
       generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, type),
       value
     )
+  }
+
+  buildBreadcrumbs = () => {
+    const { state } = this
+
+    GLOBAL_dispatchEvent({
+      type: 'appendBreadcrumbs',
+      data: {
+        breadcrumbs: [{
+          url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
+          label: state.content.label,
+          link: null,
+          type: BREADCRUMBS_TYPE.APP_FEATURE
+        }]
+      }
+    })
   }
 
   loadContent = async () => {
@@ -294,7 +321,6 @@ class HtmlDocument extends React.Component {
 
   handleClickNewVersion = () => {
     const previouslyUnsavedRawContent = this.getLocalStorageItem('rawContent')
-    console.log('handleClickNewVersion(), previouslyUnsavedRawContent', previouslyUnsavedRawContent)
 
     this.setState(prev => ({
       content: {
@@ -588,7 +614,6 @@ class HtmlDocument extends React.Component {
 
         <PopinFixedContent
           customClass={`${config.slug}__contentpage`}
-          showRightPartOnLoad={mode === MODE.VIEW}
         >
           <HtmlDocumentComponent
             mode={mode}

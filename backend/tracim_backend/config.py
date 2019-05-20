@@ -148,6 +148,7 @@ class CFG(object):
         ###
         # General
         ###
+        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", "")
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_v2_folder = os.path.dirname(backend_folder)
@@ -190,6 +191,8 @@ class CFG(object):
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         self.SESSION__REISSUE_TIME = int(self.get_raw_config("session.reissue_time", "120"))
+        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir")
+        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir")
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "TRACIM")
 
         # base url of the frontend
@@ -416,6 +419,8 @@ class CFG(object):
         wsgidav_website = "https://github.com/mar10/wsgidav/"
         wsgidav_name = "WsgiDAV"
 
+        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "true"))
+        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "")
         self.WEBDAV__VERBOSE__LEVEL = int(self.get_raw_config("webdav.verbose.level", "1"))
         self.WEBDAV__ROOT_PATH = self.get_raw_config("webdav.root_path", "/")
         self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config("webdav.block_size", "8192"))

@@ -12,7 +12,6 @@ from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
-from tracim_backend.exceptions import InvalidSettingFile
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
@@ -44,7 +43,7 @@ class TestCommands(CommandFunctionalTest):
         assert output.find("db delete") > 0
         assert output.find("webdav start") > 0
         assert output.find("caldav start") > 0
-        assert output.find("caldav agenda create") > 0
+        assert output.find("caldav sync") > 0
 
     def test_func__user_create_command__ok__nominal_case(self) -> None:
         """
@@ -344,24 +343,6 @@ class TestCommands(CommandFunctionalTest):
         result = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test"])
         assert result == 1
 
-    def test__init__db__no_sqlalchemy_url(self):
-        """
-        Test database initialisation
-        """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        user = api.get_one_by_email("admin@admin.admin")
-        assert user.email == "admin@admin.admin"
-        assert user.validate_password("admin@admin.admin")
-        assert not user.validate_password("new_password")
-        self.disconnect_database()
-        app = TracimCLI()
-        with pytest.raises(InvalidSettingFile):
-            app.run(
-                ["db", "init", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url", "--debug"]
-            )
-        result = app.run(["db", "init", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url"])
-        assert result == 1
-
     def test__delete__db__ok_nominal_case(self):
         """
         Test database deletion
@@ -408,28 +389,4 @@ class TestCommands(CommandFunctionalTest):
         with pytest.raises(FileNotFoundError):
             app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])
         result = app.run(["db", "delete", "-c", "donotexist.ini#command_test"])
-        assert result == 1
-
-    def test__delete__db__err_no_sqlalchemy_url(self):
-        """
-        Test database deletion
-        """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        user = api.get_one_by_email("admin@admin.admin")
-        assert user.email == "admin@admin.admin"
-        assert user.validate_password("admin@admin.admin")
-        assert not user.validate_password("new_password")
-        self.disconnect_database()
-        app = TracimCLI()
-        with pytest.raises(InvalidSettingFile):
-            app.run(
-                [
-                    "db",
-                    "delete",
-                    "-c",
-                    "tests_configs.ini#command_test_no_sqlalchemy_url",
-                    "--debug",
-                ]
-            )
-        result = app.run(["db", "delete", "-c", "tests_configs.ini#command_test_no_sqlalchemy_url"])
         assert result == 1

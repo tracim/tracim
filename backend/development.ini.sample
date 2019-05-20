@@ -15,7 +15,7 @@
 # search for "%(param)s" to check where those param are used and why
 
 ## global info (need for email and links)
-basic_setup.website_title = TRACIM
+basic_setup.website_title = Tracim
 basic_setup.website_base_url =  http://localhost:6543
 basic_setup.listen = localhost:6543
 ## storage path/connection
@@ -194,10 +194,11 @@ frontend.serve = True
 
 ### Webdav ###
 # webdav url for client
-# url can be extended like localhost/webdav
+# url can be extended like localhost/webdav by setting webdav.root_path
 # in this case, you have to create your own proxy behind this url.
 # Do not set http:// prefix.
-; wsgidav.client.base_url = localhost:<WSGIDAV_PORT>
+webdav.base_url = http://localhost:3030
+webdav.ui.enabled = True
 
 ####
 # EMAIL-COMMON

@@ -90,10 +90,8 @@ class Header extends React.Component {
 
     return (
       <header className='header'>
-        <nav className='navbar navbar-expand-md navbar-light bg-light'>
+        <nav className='navbar navbar-expand-lg navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
-
-          <div className='header__breadcrumb d-none d-lg-block ml-4' />
 
           <NavbarToggler />
 
@@ -124,7 +122,7 @@ class Header extends React.Component {
                     onClick={this.handleClickAgendaButton}
                   >
                     <i className='fa fa-fw fa-calendar' />
-                    {props.t('Agenda')}
+                    {props.t('Agendas')}
                   </button>
                 </li>
               )}

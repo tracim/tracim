@@ -72,6 +72,7 @@ tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
     'pytest-cov',
+    'pytest-dotenv',
     'parameterized',
     'responses',
     'mock',
@@ -145,14 +146,13 @@ setup(
             'tracimcli = tracim_backend.command:main',
         ],
         'tracimcli': [
-            'test = tracim_backend.command:TestTracimCommand',
             'user_create = tracim_backend.command.user:CreateUserCommand',
             'user_update = tracim_backend.command.user:UpdateUserCommand',
             'db_init = tracim_backend.command.database:InitializeDBCommand',
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav_agenda_create = tracim_backend.command.caldav:CaldavCreateAgendasCommand'
+            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand'
         ]
     },
     message_extractors={'tracim_backend': [

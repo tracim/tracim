@@ -12,7 +12,16 @@ export const AgendaInfo = props => (
 
     <div className='agendaInfo__content'>
       <div className='agendaInfo__content__text'>
-        {props.introText}
+        <div>
+          {props.introText}
+          <a
+            className='agendaInfo__content__text__help primaryColorFont primaryColorFontDarkenHover'
+            href='https://github.com/tracim/tracim/issues/1673'
+            target='_blank'
+          >
+            {props.caldavText}
+          </a>
+        </div>
       </div>
 
       <div className='agendaInfo__content__link'>
@@ -32,6 +41,7 @@ export default translate()(AgendaInfo)
 
 AgendaInfo.propTypes = {
   introText: PropTypes.string,
+  caldavText: PropTypes.string,
   agendaUrl: PropTypes.string
 }
 

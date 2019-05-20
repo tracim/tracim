@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
@@ -10,23 +11,30 @@ import {
   Delimiter,
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setWorkspaceListMemberList,
   updateUserName,
   updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif, updateUserAgendaUrl
+  updateUserWorkspaceSubscriptionNotif,
+  updateUserAgendaUrl,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getWorkspaceMemberList,
   putMyselfName,
   putMyselfEmail,
   putMyselfPassword,
-  putMyselfWorkspaceDoNotify, getLoggedUserCalendar
+  putMyselfWorkspaceDoNotify,
+  getLoggedUserCalendar
 } from '../action-creator.async.js'
-import { editableUserAuthTypeList } from '../helper.js'
+import {
+  editableUserAuthTypeList,
+  PAGE
+} from '../helper.js'
 import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 class Account extends React.Component {
@@ -62,12 +70,21 @@ class Account extends React.Component {
     this.state = {
       subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+    }
   }
 
   componentDidMount () {
     const { props } = this
     if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
     if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
+    this.buildBreadcrumbs()
   }
 
   loadAgendaUrl = async () => {
@@ -101,6 +118,22 @@ class Account extends React.Component {
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+  }
+
+  buildBreadcrumbs = () => {
+    const { props } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: <span className='nolink'>{props.t('Administration')}</span>,
+      type: BREADCRUMBS_TYPE.CORE,
+      notALink: true
+    }, {
+      link: <Link to={PAGE.ACCOUNT}>{props.t('My account')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }]))
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
@@ -180,6 +213,7 @@ class Account extends React.Component {
               parentClass={'account'}
               title={props.t('My account')}
               icon='user-o'
+              breadcrumbsList={props.breadcrumbs}
             />
 
             <PageContent parentClass='account'>
@@ -220,7 +254,8 @@ class Account extends React.Component {
                         return (
                           <AgendaInfo
                             customClass='account__agenda'
-                            introText={props.t('Use this link to access your personal agenda from anyhere')}
+                            introText={props.t('Use this link to integrate this agenda to your')}
+                            caldavText={props.t('CalDAV compatible software')}
                             agendaUrl={props.user.agendaUrl}
                           />
                         )
@@ -237,5 +272,7 @@ class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, timezone, system, appList }) => ({ user, workspaceList, timezone, system, appList })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
+  breadcrumbs, user, workspaceList, timezone, system, appList
+})
 export default connect(mapStateToProps)(translate()(Account))

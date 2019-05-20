@@ -1,8 +1,16 @@
 ---
 env:
   global:
-    - TRACIM_BACKEND_TEST_CONFIG_FILE=tests_configs.ini
-
+    - BACKEND_TEST_CONFIG_FILE=tests_configs.ini
+    - DEFAULT_SQLITE_SQLALCHEMY__URL=sqlite:////tmp/tracim.sqlite
+    - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracim_test
+    - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
+    - DB=sqlite
+    - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
+    - TRACIM_DEPOT_STORAGE_NAME=test
+    - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
+    - TRACIM_PREVIEW_CACHE_DIR=/tmp/test/preview_cache
+    - TRACIM_COLOR__CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/color-test.json
 sudo: false
 language: python
 dist: trusty
@@ -43,23 +51,19 @@ _install_backend: &_install_backend
     - pip install python-coveralls
     - pip install -r "requirements.txt"
     # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
     - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
     # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
     - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
     # sqlite
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
     - cd $TRAVIS_BUILD_DIR
   before_script:
-    - cd $TRAVIS_BUILD_DIR/backend
-    # postgresql
-    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-    - sh -c "if [ '$DB' = 'postgres' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-    # mysql
-    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-    - sh -c "if [ '$DB' = 'mysql' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1mysql+pymysql:\/\/root@localhost\/tracim_test/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-    # sqlite : do nothing, default config is sqlite based.
-    - sh -c "if [ '$DB' = 'sqlite' ]; then sed -i \"s/\(basic_setup.sqlalchemy_url *= *\).*/\1sqlite:\/\/\/${TRACIM_DB_FILENAME}/\" ${TRACIM_BACKEND_TEST_CONFIG_FILE}; fi"
-    - cd $TRAVIS_BUILD_DIR
+    # INFO - G.M - 2019-05-02 - some useful debug information
+    - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
+    - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
+    - echo "$TRACIM_SQLALCHEMY__URL"
   after_success:
     - coveralls
 
@@ -75,14 +79,18 @@ _install_full_tracim: &_install_full_tracim
     - pip install python-coveralls
     - pip install -r "requirements.txt"
     # postgresql
+    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
     - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
     # mysql
+    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
     - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
     # sqlite
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    # setup backend for running
     - cp ../color.json.sample ../color.json
-    - tracimcli db init -c $TRACIM_BACKEND_TEST_CONFIG_FILE
-    - alembic -c $TRACIM_BACKEND_TEST_CONFIG_FILE stamp head
+    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE
+    - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
+    # install frontend
     - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh root
     - ./build_full_frontend.sh root
@@ -153,23 +161,17 @@ jobs:
     - stage: quick-tests
       name: "Python: 3.6"
       <<: *_backend_quick_test
-      env:
-        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
       python:
         - "3.6"
     - stage: quick-tests
       name: "Python: 3.5"
       <<: *_backend_quick_test
-      env:
-        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
       python:
         - "3.5"
     - stage: quick-tests
       name: "Python: 3.7"
       dist: xenial
       <<: *_backend_quick_test
-      env:
-        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
       python:
         - "3.7"
 
@@ -177,27 +179,30 @@ jobs:
     - stage: backend
       <<: *_backend_test
       env:
-        - DB=sqlite; TRACIM_DB_FILENAME=tracim_test.sqlite;
+        - DB=postgres
+        - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
     - stage: backend
       <<: *_backend_test
       env:
         - DB=postgres
+        - TRACIM_SQLALCHEMY__URL=$DEFAULT_POSTGRES_SQLALCHEMY__URL
     - stage: backend
       <<: *_backend_test
       env:
         - DB=mysql
-
+        - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: functional
       name: Functional tests using Cypress
       <<: *_install_full_tracim
       env:
-        - DB=sqlite; TRACIM_DB_FILENAME=tracim_cypress.sqlite;
-        - TRACIM_BACKEND_TEST_CONFIG_FILE=cypress_test.ini
+        - DB=sqlite;
+        - TRACIM_SQLALCHEMY__URL=sqlite:////tmp/tracim_cypress.sqlite
+        - BACKEND_TEST_CONFIG_FILE=cypress_test.ini
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
-        - nohup pserve $TRACIM_BACKEND_TEST_CONFIG_FILE&
+        - nohup pserve $BACKEND_TEST_CONFIG_FILE&
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR

@@ -1,0 +1,29 @@
+@import "../../css/Variable.styl"
+
+.breadcrumbs
+  position absolute
+  top 40px
+  left 35px
+  display flex
+  margin 0
+  padding 0
+  list-style none
+  font-size 0.75rem
+  flex-wrap wrap
+  &__item
+    white-space nowrap
+    &:not(:first-child)::before
+      content '>'
+      margin 0 5px
+      color #777
+    & > a
+      color inherit !important
+      &:hover
+        border-bottom 1px solid
+    & i
+        margin-right 5px
+        color #777
+
+@media (max-width: max-xs)
+  .breadcrumbs
+    position static
