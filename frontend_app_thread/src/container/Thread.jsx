@@ -233,7 +233,6 @@ class Thread extends React.Component {
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
-    GLOBAL_dispatchEvent({type: 'resetBreadcrumbsAppFeature', data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {

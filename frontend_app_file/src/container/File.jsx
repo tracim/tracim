@@ -282,7 +282,6 @@ class File extends React.Component {
 
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
-    GLOBAL_dispatchEvent({type: 'resetBreadcrumbsAppFeature', data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
