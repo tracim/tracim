@@ -54,8 +54,7 @@ export const RecentActivity = props =>
                 {recentActivityItemName}
               </div>
             )
-          }
-          else {
+          } else {
             return (
               <Link
                 className={classnames('recentactivity__list__item primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}

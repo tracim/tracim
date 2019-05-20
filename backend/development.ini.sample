@@ -15,7 +15,7 @@
 # search for "%(param)s" to check where those param are used and why
 
 ## global info (need for email and links)
-basic_setup.website_title = TRACIM
+basic_setup.website_title = Tracim
 basic_setup.website_base_url =  http://localhost:6543
 basic_setup.listen = localhost:6543
 ## storage path/connection
