@@ -170,12 +170,44 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
 
+    def test_api__update_workspace__err_400__workspace_label_already_used(self) -> None:
+        """
+        Test update workspace with empty label
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"label": "business", "description": "mysuperdescription", "agenda_enabled": False}
+        res = self.testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        workspace1_id = res.json_body["workspace_id"]
+
+        params = {
+            "label": "business2",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+        }
+        res = self.testapp.post_json("/api/v2/workspaces", status=200, params=params)
+        workspace2_id = res.json_body["workspace_id"]
+
+        assert workspace1_id != workspace2_id
+
+        params = {"label": "business", "description": "mysuperdescription"}
+        # INFO - G.M - 2019-05-21 - we can update to same value
+        self.testapp.put_json(
+            "/api/v2/workspaces/{}".format(workspace1_id), status=200, params=params
+        )
+        # INFO - G.M - 2019-05-21 - updating one workspace to another workspace name is not allowed
+        res = self.testapp.put_json(
+            "/api/v2/workspaces/{}".format(workspace2_id), status=400, params=params
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_LABEL_ALREADY_USED
+
     def test_api__update_workspace__err_400__empty_label(self) -> None:
         """
         Test update workspace with empty label
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "", "description": "mysuperdescription"}
+        params = {"label": "business", "description": "mysuperdescription"}
         res = self.testapp.put_json("/api/v2/workspaces/1", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
