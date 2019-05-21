@@ -8,7 +8,7 @@ describe('Workspace', () => {
     cy.visit('/ui')
   })
 
-  it('should create a new workspace while others are created', () => {
+  it('should create a new workspace while no others are created', () => {
     const workspaceTitle = 'first workspace'
 
     cy.get('[data-cy=homepagecard__btn]').click()
