@@ -13,6 +13,12 @@ from elasticsearch_dsl import Text
 from elasticsearch_dsl import analyzer
 
 folding = analyzer("folding", tokenizer="standard", filter=["lowercase", "asciifolding"])
+html_folding = analyzer(
+    "html_folding",
+    tokenizer="standard",
+    filter=["lowercase", "asciifolding"],
+    char_filter="html_strip",
+)
 INDEX_DOCUMENTS_ALIAS = "documents"
 INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_ALIAS + "-*"
 
@@ -38,7 +44,7 @@ class DigestContent(InnerDoc):
 class DigestComments(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    raw_content = Text(analyzer=folding)
+    raw_content = Text(analyzer=html_folding)
 
 
 class IndexedContent(Document):
@@ -85,4 +91,4 @@ class IndexedContent(Document):
     modified = Date()
     created = Date()
     current_revision_id = Integer()
-    raw_content = Text(analyzer=folding)
+    raw_content = Text(analyzer=html_folding)
