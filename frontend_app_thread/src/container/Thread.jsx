@@ -66,7 +66,10 @@ class Thread extends React.Component {
       case 'thread_showApp':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) this.setState({isVisible: true})
+        if (isSameContentId) {
+          this.setState({isVisible: true})
+          this.buildBreadcrumbs()
+        }
         break
 
       case 'thread_hideApp':
@@ -229,7 +232,7 @@ class Thread extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
