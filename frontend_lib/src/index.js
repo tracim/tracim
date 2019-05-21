@@ -9,6 +9,7 @@ import {
   appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE
 } from './helper.js'
+import { CUSTOM_EVENT } from './customEvent.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
@@ -83,6 +84,7 @@ export {
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
+  CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp
 }

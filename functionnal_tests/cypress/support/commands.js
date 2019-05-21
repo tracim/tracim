@@ -1,8 +1,11 @@
+import 'cypress-wait-until'
+
 let LOGIN_URL = '/api/v2/auth/login'
 
 Cypress.Commands.add('create_file', () => {
 })
 
+// DEPRECATED - CH - 2019-05-15 - Best way is to create a similar function to createHtmlDocument from support/db_commands.js
 Cypress.Commands.add('create_thread', () => {
   cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
@@ -21,6 +24,7 @@ Cypress.Commands.add('create_thread', () => {
   cy.get('.thread.visible').should('not.be.visible')
 })
 
+// DEPRECATED - CH - 2019-05-15 - Best way is to use the function in support/db_commands.js
 Cypress.Commands.add('create_htmldocument', () => {
   cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
@@ -91,23 +95,28 @@ Cypress.Commands.add('delete_htmldocument', () => {
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
   cy.getUserByRole(role)
-    .then(user => cy.request({
-      method: 'POST',
-      url: LOGIN_URL,
-      body: {
-        'email': user.email,
-        'password': user.password
-      }
-    }))
-    .then(response => cy.request({
-      method: 'PUT',
-      url: '/api/v2/users/' + response.body.user_id,
-      body: {
-        lang: 'en',
-        public_name: response.body.public_name,
-        timezone: 'Europe/Paris'
-      }
-    }))
+    .then(user => {
+      return cy.request({
+        method: 'POST',
+        url: LOGIN_URL,
+        body: {
+          'email': user.email,
+          'password': user.password
+        }
+      })
+    })
+    .then(response => {
+      cy.waitUntil(() => cy.getCookie('session_key').then(cookie => Boolean(cookie && cookie.value)))
+      return cy.request({
+        method: 'PUT',
+        url: '/api/v2/users/' + response.body.user_id,
+        body: {
+          lang: 'en',
+          public_name: response.body.public_name,
+          timezone: 'Europe/Paris'
+        }
+      })
+    })
     .then(response => response.body)
 })
 
@@ -142,6 +151,7 @@ Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
   )
 })
 
+// INFO - CH - 2019-05-20 - see https://github.com/cypress-io/cypress/issues/170
 Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector, fileTitle) => {
   const dropEvent = { dataTransfer: { files: [] } }
   cy.fixture(fixturePath, 'base64').then(fixture => {

@@ -21,6 +21,7 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -64,13 +65,13 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
-      case 'refreshWorkspaceList':
+      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
         break
       case 'disconnectedFromApi':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
+        if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
         break
       case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
         await this.loadWorkspaceList()
