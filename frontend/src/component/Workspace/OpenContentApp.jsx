@@ -4,6 +4,8 @@ import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 import { ROLE, findIdRoleUserWorkspace } from '../../helper.js'
 
+const CUSTOM_EVENT_UNMOUNT_APP = 'unmount_app'
+
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
@@ -23,7 +25,7 @@ export class OpenContentApp extends React.Component {
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
-      this.props.dispatchCustomEvent('unmount_app')
+      this.props.dispatchCustomEvent(CUSTOM_EVENT_UNMOUNT_APP)
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),

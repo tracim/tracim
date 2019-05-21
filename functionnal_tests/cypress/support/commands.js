@@ -5,6 +5,7 @@ let LOGIN_URL = '/api/v2/auth/login'
 Cypress.Commands.add('create_file', () => {
 })
 
+// DEPRECATED - CH - 2019-05-15 - Best way is to create a similar function to createHtmlDocument from support/db_commands.js
 Cypress.Commands.add('create_thread', () => {
   cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
@@ -23,7 +24,7 @@ Cypress.Commands.add('create_thread', () => {
   cy.get('.thread.visible').should('not.be.visible')
 })
 
-// DEPRECATED - CH - 2019-05-15 - Best way is to use the function in helpers/htmldoc.js
+// DEPRECATED - CH - 2019-05-15 - Best way is to use the function in support/db_commands.js
 Cypress.Commands.add('create_htmldocument', () => {
   cy.visit('/ui/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')

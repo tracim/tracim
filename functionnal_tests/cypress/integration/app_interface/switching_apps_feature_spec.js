@@ -33,7 +33,7 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     const contentFileGetter = `.workspace__content__fileandfolder > .content[title="${fileTitle}"]`
 
     beforeEach(() => {
-      cy.wait(200)
+      cy.wait(200) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
       cy.loginAs('administrators')
     })
 

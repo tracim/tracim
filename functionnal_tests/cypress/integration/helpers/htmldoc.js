@@ -1,6 +1,7 @@
 import { assertPopupCreateContent } from './index.js'
 
 // INFO - CH - 2019-05-15 - The function bellow assumes you already is on a workspace's content list page
+// it is better to use commands from support/db_commands.js (write it if not exists)
 export const create_htmldocument = (cy, htmlDocTitle = 'Html document 1') => {
   cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
   cy.get('.show .subdropdown__link__html-document__icon').should('be.visible').click()
