@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import pytest
 
+from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -145,3 +147,26 @@ class TestThread(DefaultTest):
         rapi.delete_one(u.user_id, w2.workspace_id)
         rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         eq_([w1, w2], wapi.get_all_manageable())
+
+    def test_unit__create_workspace_same__error__same_workspace_name_unallowed(self):
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
+        wapi.create_workspace(label="business", save_now=True)
+        with pytest.raises(WorkspaceLabelAlreadyUsed):
+            wapi.create_workspace(label="business", save_now=True)
+
+    def test_unit__rename_workspace_same_name_same_file__ok__nominal_case(self):
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
+        workspace1 = wapi.create_workspace(label="business", save_now=True)
+        wapi.update_workspace(workspace=workspace1, label="business", description="")
+
+    def test_unit__rename_workspace_same_name_other_file__err__same_workspace_name_unallowed(self):
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
+        wapi.create_workspace(label="business", save_now=True)
+        workspace2 = wapi.create_workspace(label="meeting", save_now=True)
+        with pytest.raises(WorkspaceLabelAlreadyUsed):
+            wapi.update_workspace(
+                workspace=workspace2, label="business", save_now=True, description=""
+            )

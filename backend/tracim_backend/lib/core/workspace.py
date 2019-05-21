@@ -126,6 +126,16 @@ class WorkspaceApi(object):
         """
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
+        if (
+            self._session.query(Workspace)
+            .filter(Workspace.label == label)
+            .filter(Workspace.workspace_id != workspace.workspace_id)
+            .count()
+            > 0
+        ):
+            raise WorkspaceLabelAlreadyUsed(
+                "A workspace with label {} already exist.".format(label)
+            )
         workspace.label = label
         workspace.description = description
         if agenda_enabled is not None:
