@@ -34,6 +34,8 @@ export function create_thread (cy) {
   cy.get('.thread.visible').should('not.be.visible')
 }
 
+// DEPRECATED - CH - 2019-05-15 - Best way is to use the function in helpers/htmldoc.js
+// the function in helpers/htmldoc.js is the same as this one minus the cy.visit
 export function create_htmldocument (cy) {
   cy.visit('/workspaces/1/dashboard')
   cy.get('.dashboard__workspace__detail').should('be.visible')
@@ -108,4 +110,12 @@ export function loginAsAdmin (cy) {
     'password': 'admin@admin.admin'
   }
   cy.request('POST', '/api/v2/sessions/login', body)
+}
+
+export function assertPopupCreateContent (cy) {
+  cy.get('.cardPopup__container').should('be.visible')
+  cy.get('.cardPopup__container .cardPopup__header').should('be.visible')
+  cy.get('.cardPopup__container .cardPopup__close').should('be.visible')
+  cy.get('.cardPopup__container .cardPopup__body').should('be.visible')
+  cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
 }

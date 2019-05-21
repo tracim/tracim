@@ -39,7 +39,8 @@ import {
   setWorkspaceReadStatusList,
   toggleFolderOpen,
   setWorkspaceContentRead,
-  setBreadcrumbs
+  setBreadcrumbs,
+  resetBreadcrumbsAppFeature
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -84,6 +85,8 @@ class WorkspaceContent extends React.Component {
 
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
         this.setState({appOpenedType: false})
+
+        this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
       case 'allApp_changeLang': this.buildBreadcrumbs(); break
