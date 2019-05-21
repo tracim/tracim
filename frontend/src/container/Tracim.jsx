@@ -21,6 +21,7 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   PAGE,
   COOKIE_FRONTEND,
@@ -64,7 +65,7 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
-      case 'refreshWorkspaceList':
+      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
         break
