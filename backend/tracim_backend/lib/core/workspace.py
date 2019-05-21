@@ -13,6 +13,7 @@ from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
@@ -218,6 +219,10 @@ class WorkspaceApi(object):
 
     def delete(self, workspace: Workspace, flush=True):
         workspace.is_deleted = True
+        label = "{label}-{action}-{date}".format(
+            label=workspace.label, action="deleted", date=current_date_for_filename()
+        )
+        workspace.label = label
 
         if flush:
             self._session.flush()
