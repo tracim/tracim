@@ -45,9 +45,7 @@ class ContentSearchResponse(object):
             if source.get("comments"):
                 for comment in source["comments"]:
                     comment = SearchedDigestComment(
-                        content_id=comment["content_id"],
-                        parent_id=comment.get("parent_id"),
-                        raw_content=comment["raw_content"],
+                        content_id=comment["content_id"], parent_id=comment.get("parent_id")
                     )
                     comments.append(comment)
 
@@ -86,7 +84,6 @@ class ContentSearchResponse(object):
                 filename=source["filename"],
                 modified=parse(source["modified"]),
                 created=parse(source["created"]),
-                raw_content=source["raw_content"],
                 score=hit["_score"],
                 current_revision_id=source["current_revision_id"],
             )
@@ -117,10 +114,9 @@ class SearchedDigestContent(object):
 
 
 class SearchedDigestComment(object):
-    def __init__(self, content_id: int, parent_id: int, raw_content: str) -> None:
+    def __init__(self, content_id: int, parent_id: int) -> None:
         self.content_id = content_id
         self.parent_id = parent_id
-        self.raw_content = raw_content
 
 
 class SearchedContent(object):
@@ -152,7 +148,6 @@ class SearchedContent(object):
         filename: str,
         modified: datetime,
         created: datetime,
-        raw_content: str,
         score: float,
         current_revision_id: int,
         workspace_id: int,
@@ -183,5 +178,4 @@ class SearchedContent(object):
         self.modified = modified
         self.created = created
 
-        self.raw_content = raw_content
         self.score = score

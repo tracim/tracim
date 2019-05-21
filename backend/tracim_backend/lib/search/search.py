@@ -239,6 +239,9 @@ class SearchApi(object):
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
         search = search.response_class(ContentSearchResponse)
+        # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
+        # result
+        search = search.source(exclude=["raw_content", "*.raw_content"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
         if filtered_workspace_ids is not None:
