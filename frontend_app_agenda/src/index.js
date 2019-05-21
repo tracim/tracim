@@ -6,7 +6,7 @@ import Agenda from './container/Agenda.jsx'
 require('./css/index.styl')
 
 const appInterface = {
-  name: 'calendar',
+  name: 'agenda',
   isRendered: false,
   renderAppFullscreen: data => {
     return ReactDOM.render(
