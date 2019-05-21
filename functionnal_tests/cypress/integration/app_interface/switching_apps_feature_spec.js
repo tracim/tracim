@@ -33,7 +33,6 @@ describe('App Interface (the mechanism to open and close apps)', () => {
     const contentFileGetter = `.workspace__content__fileandfolder > .content[title="${fileTitle}"]`
 
     beforeEach(() => {
-      cy.wait(200) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
       cy.loginAs('administrators')
     })
 
@@ -47,6 +46,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
           cy.get('[data-cy="popinFixed"].html-document').should('be.not.visible')
           cy.get('[data-cy="popinFixed"].file').should('be.visible')
+
+          cy.wait(400) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
         })
       })
     })
@@ -60,6 +61,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
         cy.get('[data-cy="popinFixed"].file').should('be.not.visible')
         cy.get('[data-cy="popinFixed"].thread').should('be.visible')
+
+        cy.wait(400) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
       })
     })
 
@@ -72,6 +75,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
         cy.waitForTinyMCELoaded().then(() => {
           cy.get('[data-cy="popinFixed"].thread').should('be.not.visible')
           cy.get('[data-cy="popinFixed"].html-document').should('be.visible')
+
+          cy.wait(400) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
         })
       })
     })
@@ -88,6 +93,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
           cy.get(contentHtmlDocGetter).click('left')
           cy.waitForTinyMCELoaded().then(() => {
             cy.get('[data-cy="popinFixed"].html-document').should('be.visible')
+
+            cy.wait(400) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
           })
         })
       })
@@ -104,6 +111,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
         cy.get(contentFileGetter).click('left')
         cy.get('[data-cy="popinFixed"].file').should('be.visible')
+
+        cy.wait(400) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
       })
     })
 
@@ -118,6 +127,8 @@ describe('App Interface (the mechanism to open and close apps)', () => {
 
         cy.get(contentThreadGetter).click('left')
         cy.get('[data-cy="popinFixed"].thread').should('be.visible')
+
+        cy.wait(400) // FIXME - CH - 2019-05-21 - that wait should be removed see https://github.com/tracim/tracim/issues/1767
       })
     })
   })
