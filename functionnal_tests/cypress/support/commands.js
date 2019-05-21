@@ -142,11 +142,14 @@ Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
   )
 })
 
-Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector) => {
+Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector, fileTitle) => {
   const dropEvent = { dataTransfer: { files: [] } }
   cy.fixture(fixturePath, 'base64').then(fixture => {
-    return Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
-      dropEvent.dataTransfer.files.push(blob)
+    cy.window().then(window => {
+      Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
+        const testFile = new window.File([blob], fileTitle)
+        dropEvent.dataTransfer.files = [testFile]
+      })
     })
   })
 

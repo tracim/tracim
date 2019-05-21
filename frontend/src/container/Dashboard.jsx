@@ -553,7 +553,7 @@ class Dashboard extends React.Component {
               {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
                 <AgendaInfo
                   customClass='dashboard__section'
-                  introText={props.t("Use this link to integrate this shared space's agenda to your")}
+                  introText={props.t('Use this link to integrate this agenda to your')}
                   caldavText={props.t('CalDAV compatible software')}
                   agendaUrl={props.curWs.agendaUrl}
                 />

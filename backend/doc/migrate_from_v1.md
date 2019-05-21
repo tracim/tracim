@@ -1,3 +1,105 @@
+# Migration from Tracim v2.1 to Tracim v2.2
+
+**:warning:** Agenda is now available. You can now migrate your Tracim v1 calendar to Tracim v2.2 agenda.
+
+## How to migrate your calendar/agenda
+
+### Reminder
+- data/file about all calendar (Tracim v1) are in this folder `radicale_data/` in your instance server.
+Files is in format of radicale 1.1.1
+- data/file about all agenda (Tracim v2.2) are in this folder `radicale_storage/` in path `/tracim/backend/` by default.
+Files is in format of radicale 2.0.0
+
+### Migration stage by stage
+
+**:warning:** Current user must have read/write access on tracim v1 folder and read/write access for migration output folder.
+
+
+Create folder in your system to make migration of files. ex:
+
+    mkdir /your/migration/folder/path/
+
+Create venv with python >= 3.3 in this folder
+
+    python3 -m venv env
+
+Activate this venv
+
+    source env/bin/activate
+
+Install radicale 1.1.6 in this venv with this command:
+
+    pip install --upgrade radicale==1.1.6
+
+Copy folder `radicale_data/` from Tracim v1 to folder `/<your>/<migration>/<folder>/<path>/`
+
+    cp -r /your/tracimv1/path/radicale_data /<your>/<migration>/<folder>/<path>/
+
+Make a config file (ex: conf.ini) for migration in `/<your>/<migration>/<folder>/<path>/` with this parameter:
+
+
+    [storage]
+    filesystem_folder = /<your>/<migration>/<folder>/<path>/radicale_data
+
+
+Convert file with this command:
+
+    radicale --export-storage export -C conf.ini --debug \
+        && cd export/collection-root/ \
+        && mv collections/ agenda/ \
+        && cd agenda/user/ \
+        && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done \
+        && cd ../workspace/ \
+        && for i in $(find [0-9]* -type d); do mv "$i" `echo $i | sed -E 's/^([0-9]+)(\.ics)/\1/g'`;done
+
+After migration, file is accessible in:
+
+    /<your>/<migration>/<folder>/<path>/export/
+
+Copy folder `collection-root/agenda/` in `radicale_storage/`.
+
+    cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
+
+After starting caldav server you need to synchronize tracim with radicale. For that you need to use this command:
+
+    tracimcli caldav sync
+    
+Now all of your agendas are visible in tracim.
+
+## Parameter changed from v2.1 to v2.2
+
+### Caldav
+
+New alias parameter: `basic_setup.caldav_storage_dir = %(here)s/radicale_storage/`
+
+New block of parameters: `caldav.*` (Radicale)
+
+New app caldav:
+
+- "[pipeline:caldav]"
+- "[app:tracim_caldav]"
+- "[server:caldav]"
+
+### Webdav
+
+This parameter not exist anymore: `wsgidav.client.base_url = localhost:<WSGIDAV_PORT>`
+
+Replaced by: `webdav.base_url = http://localhost:3030` (Syntaxe is not the same than oldest version)
+
+New parameter: `webdav.ui.enabled = True`
+
+### Other
+New parameter: `default_lang = en`
+
+Parameter `user.reset_password.validity` replaced by `user.reset_password.token_lifetime`
+
+Remove unused parameter: `email.notification.processing_mode`
+
+This is not new parameter but not visible in config file in 2.1:
+`preview.jpg.allowed_dims = 256x256,512x512,1024x1024`
+`preview.jpg.restricted_dims = True`
+
+
 # Migration from Tracim v1 to Tracim v2.1
 
 **:warning:**  2.0 version of Tracim doesn't support folder and ldap. If you want to migrate from tracim v1, you should use 2.1 or latest.
