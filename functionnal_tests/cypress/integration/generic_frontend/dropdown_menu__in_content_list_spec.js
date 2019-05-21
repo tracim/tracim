@@ -1,20 +1,16 @@
-const filename = 'Linux-Free-PNG'
-const fullFilename = 'Linux-Free-PNG.png'
-const contentType = 'image/png'
 const TITLE = 'Title'
 
 const EDIT_LABEL = 'Edit'
 const ARCHIVE_LABEL = 'Archive'
 const DELETE_LABEL = 'Delete'
 
-context('Content list -', function () {
+describe('Content list', function () {
   beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
-    
   })
-  describe('dropdown menu -', function() {
-    context('as admin -', function () {
+  describe('dropdown menu', function () {
+    context('as admin', function () {
       beforeEach(function () {
         cy.loginAs('administrators')
         cy
@@ -25,84 +21,83 @@ context('Content list -', function () {
           })
       })
 
-      it('button edit should open edit tab without reload', function() {
-      cy.on('window:before:load', (error, runnable) => {
-        assert.isNotOk(true, 'Page reload when clicking and it should not')
-      })
-      cy
-        .get(`a[title=${TITLE}] .dropdown`)
-        .click()
-      cy
-        .get(`a[title=${TITLE}] .dropdown`)
-        .contains(EDIT_LABEL).click()
-      cy.get('[data-cy=popinFixed]')
-      })
-      it('button delete should delete content without reload', function() {
+      it('button edit should open edit tab without reload', function () {
         cy.on('window:before:load', (error, runnable) => {
           assert.isNotOk(true, 'Page reload when clicking and it should not')
         })
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
+          .contains(EDIT_LABEL).click()
+        cy.get('[data-cy=popinFixed]')
+      })
+      it('button delete should delete content without reload', function () {
+        cy.on('window:before:load', (error, runnable) => {
+          assert.isNotOk(true, 'Page reload when clicking and it should not')
+        })
+        cy
+          .get(`a[title="${TITLE}"] .dropdown`)
+          .click()
+        cy
+          .get(`a[title="${TITLE}"] .dropdown`)
           .contains(DELETE_LABEL).click()
         cy
-          .get(`a[title=${TITLE}]`)
+          .get(`a[title="${TITLE}"]`)
           .should('not.exist')
       })
-      it('button achive should archive content without reload', function() {
+      it('button achive should archive content without reload', function () {
         cy.on('window:before:load', (error, runnable) => {
           assert.isNotOk(true, 'Page reload when clicking and it should not')
         })
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
           .contains(ARCHIVE_LABEL).click()
         cy
-          .get(`a[title=${TITLE}]`)
+          .get(`a[title="${TITLE}"]`)
           .should('not.exist')
       })
     })
-    context('as user -', function () {
+    describe('as user', function () {
       beforeEach(function () {
         cy.loginAs('users')
         cy
-          cy
           .fixture('baseWorkspace').as('workspace')
           .then((workspace) => {
             cy.createHtmlDocument(TITLE, workspace.workspace_id)
             cy.visit(`/ui/workspaces/${workspace.workspace_id}/contents`)
           })
       })
-      it('button edit should open edit tab without reload', function() {
-      cy.on('window:before:load', (error, runnable) => {
-        assert.isNotOk(true, 'Page reload when clicking and it should not')
-      })
-      cy
-        .get(`a[title=${TITLE}] .dropdown`)
-        .click()
-      cy
-        .get(`a[title=${TITLE}] .dropdown`)
-        .contains(EDIT_LABEL).click()
-      cy.get('[data-cy=popinFixed]')
-      })
-      it('button delete should not exists', function() {
+      it('button edit should open edit tab without reload', function () {
+        cy.on('window:before:load', (error, runnable) => {
+          assert.isNotOk(true, 'Page reload when clicking and it should not')
+        })
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
+          .contains(EDIT_LABEL).click()
+        cy.get('[data-cy=popinFixed]')
+      })
+      it('button delete should not exists', function () {
+        cy
+          .get(`a[title="${TITLE}"] .dropdown`)
+          .click()
+        cy
+          .get(`a[title="${TITLE}"] .dropdown`)
           .contains(DELETE_LABEL).should('not.exist')
       })
-      it('button archive should not exists', function() {
+      it('button archive should not exists', function () {
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`a[title=${TITLE}] .dropdown`)
+          .get(`a[title="${TITLE}"] .dropdown`)
           .contains(ARCHIVE_LABEL).should('not.exist')
       })
     })
