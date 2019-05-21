@@ -70,7 +70,7 @@ class Tracim extends React.Component {
         break
       case 'disconnectedFromApi':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        if (document.location.pathname.contains('/login') && document.location.pathname !== '/') document.location.href = `${PAGE.LOGIN}?dc=1`
+        if (!document.location.pathname.includes('/login') && document.location.pathname !== '/ui') document.location.href = `${PAGE.LOGIN}?dc=1`
         break
       case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
         await this.loadWorkspaceList()
