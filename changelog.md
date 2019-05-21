@@ -1,34 +1,32 @@
-## Next version x.x.x /xxxx-xx-xx
-
-### Known issues
-
-### REST API Changes
-
-- Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
 
 ## 2.2.0 / 2019-05-XX
 
 ### New Features
 
 - Agenda is available
-- Migration agenda from tracim_v1 to tracim_v2 is now available
--  
+- Migration of agenda from tracim_v1 to tracim_v2 is now available
+- Breadcrumbs to know exactly where you are
+- Links for webdav and agenda are visible in dashboard
+- Link for personal agenda is visible in My account
+- Timeline's revisions now shows its author
 
 ### Known issues
 
-- Search & filtering not yet migrated from tracim v1
-- Duplicated creation of content may appear on slow network (issue #1361)
-- if you create shared spaces while radicale server is not running (tracimcli caldav start), the agendas are not available (issue #1537)
+- Search & filters not yet migrated from tracim v1
+- Creating a content may appear duplicated on slow network (issue #1361)
+- It's possible to rename a content or workspace with an already in use label in some special cases (issue #1770)
+- If you create shared spaces while radicale server is not running (tracimcli caldav start), the agendas are not available (issue #1537)
 - Changing parameter caldav.radicale.server.host in development.ini with specific IP address show wrong url after starting caldav (issue #1535)
+- File extension is not visible in recent activity after click on See More (issue #1774)
 
 ### Fixed issues
 
 - Documentation: #1493, #1612, #1672, #1751
 - Agenda: #1181, #1250, #1486, #1498, #1527, #1532, #1533, #1536, #1539, #1540, #1545, #1556, #1573, #1575, #1577, #1584, #1600, #1605, #1608, #1631, #1644, #1700, #1723, #1730
-- UX: #1374, #1602, #1718, #1726, #1731, #1736
+- UX: #1374, #1602, #1718, #1726, #1731, #1736, #1746
 - Timeline: #727, #869, #1371, #1686 
-- Dashbord: #1084, #1488, #1641 
-- Header: #681, #669, #860, #1074, #1621
+- Dashbord: #1084, #1488, #1641, #1769
+- Header: #681, #669, #860, #1074, #1621, #1688
 - Contents: #818, #827, #1067, #1097, #1105, #1507, #1563, #1624, #1648, #1693, #1712,#1745
 - Sidebar: #1177, #1571
 - Backend config file: #987, #1475, #1495, #1550, #1626, #1665, #1689, #1690, #1696, #1752
@@ -37,12 +35,15 @@
 - Preview-generator: #1126, #1472
 - Webdav: #1335, #1499, #1652
 - Docker image: #1387, #1565, #1567, #1681, #1763
-- Other: #660, #819, #1006, #1012, #1030, #1514, #1610, #1627, #1630, #1658, #1679, #1698, #1705, #1742, #1755
+- Other: #660, #819, #1006, #1012, #1030, #1514, #1610, #1627, #1630, #1658, #1679, #1685, #1698, #1705, #1742, #1755
 
 ### Others Changes
 
-- rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config,
-old parameter is now deprecated. (issue #970)
+- Rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config, old parameter is now deprecated. (issue #970)
+
+### REST API Changes
+
+- Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
 
 
 ## 2.1.0 / 2019-02-15
