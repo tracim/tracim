@@ -3,7 +3,10 @@ import typing
 import marshmallow
 from marshmallow import post_load
 
-from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.app_models.validator import positive_int_validator
+from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import StrippedString
 
 
@@ -22,9 +25,28 @@ class SearchFilterQuerySchema(marshmallow.Schema):
         return SearchFilterQuery(**data)
 
 
-class ContentSearchSchema(ContentDigestSchema):
+class WorkspaceSearchSchema(marshmallow.Schema):
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    slug = StrippedString(example="intranet")
+    label = StrippedString(example="Intranet")
+
+
+class ContentDigestSearchSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    slug = StrippedString(example="intervention-report-12")
+    parent_id = marshmallow.fields.Int(
+        example=34, allow_none=True, default=None, validate=positive_int_validator
+    )
+    workspace_id = marshmallow.fields.Int(example=19, validate=strictly_positive_int_validator)
+    label = StrippedString(example="Intervention Report 12")
+    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+
+
+class ContentSearchSchema(ContentSchema):
     score = marshmallow.fields.Float()
-    raw_content = marshmallow.fields.Str()
+    workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
+    parents = marshmallow.fields.List(marshmallow.fields.Nested(ContentDigestSearchSchema))
+    parent = marshmallow.fields.Nested(ContentDigestSearchSchema, allow_none=True)
 
 
 class ContentSearchResultSchema(marshmallow.Schema):

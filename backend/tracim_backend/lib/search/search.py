@@ -5,11 +5,16 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
+from tracim_backend.lib.search.es_models import DigestComments
+from tracim_backend.lib.search.es_models import DigestContent
+from tracim_backend.lib.search.es_models import DigestUser
+from tracim_backend.lib.search.es_models import DigestWorkspace
 from tracim_backend.lib.search.es_models import IndexedContent
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.utils.logger import logger
@@ -119,14 +124,59 @@ class SearchApi(object):
         """
         Index/update a content into elastic_search engine
         """
+        if content.content_type == content_type_list.Comment.slug:
+            content = content.parent
+            # INFO - G.M - 2019-05-20 - we currently do not support comment without parent
+            assert content
         logger.info(self, "Indexing content {}".format(content.content_id))
+        author = DigestUser(user_id=content.author.user_id, public_name=content.author.public_name)
+        last_modifier = DigestUser(
+            user_id=content.last_modifier.user_id, public_name=content.last_modifier.public_name
+        )
+        workspace = DigestWorkspace(
+            workspace_id=content.workspace.workspace_id, label=content.workspace.label
+        )
+        parents = []
+        parent = None
+        if content.parent:
+            parent = DigestContent(
+                content_id=content.parent.content_id,
+                parent_id=content.parent.parent_id,
+                label=content.parent.label,
+                slug=content.parent.slug,
+                content_type=content.parent.content_type,
+            )
+            for parent_ in content.parents:
+                digest_parent = DigestContent(
+                    content_id=parent_.content_id,
+                    parent_id=parent_.parent_id,
+                    label=parent_.label,
+                    slug=parent_.slug,
+                    content_type=parent_.content_type,
+                )
+                parents.append(digest_parent)
+        comments = []
+        for comment in content.comments:
+            digest_comment = DigestComments(
+                content_id=comment.content_id,
+                parent_id=comment.parent_id,
+                content_type=comment.content_type,
+                raw_content=comment.raw_content,
+            )
+            comments.append(digest_comment)
         indexed_content = IndexedContent(
             content_id=content.content_id,
-            workspace_id=content.workspace_id,
-            parent_id=content.parent_id,
             label=content.label,
             slug=content.slug,
             status=content.status,
+            workspace_id=content.workspace_id,
+            workspace=workspace,
+            parent_id=content.parent_id or None,
+            parent=parent,
+            parents=parents or None,
+            author=author,
+            comments=comments or None,
+            last_modifier=last_modifier,
             content_type=content.content_type,
             sub_content_types=content.sub_content_types,
             is_deleted=content.is_deleted,
@@ -138,6 +188,7 @@ class SearchApi(object):
             modified=content.modified,
             created=content.created,
             raw_content=content.raw_content,
+            current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
         indexed_content.save(using=self.es)

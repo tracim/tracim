@@ -793,6 +793,57 @@ class ContentInContext(object):
         return self.content.workspace_id
 
     @property
+    def workspace(self) -> Workspace:
+        return self.content.workspace
+
+    @property
+    def parent(self) -> typing.Optional["ContentInContext"]:
+        if self.content.parent:
+            from tracim_backend.lib.core.content import ContentApi
+
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
+            )
+            return content_api.get_content_in_context(self.content.parent)
+        return None
+
+    @property
+    def parents(self) -> typing.List["ContentInContext"]:
+        parents = []
+        if self.parent:
+            parents.append(self.parent)
+            parent = self.parent
+            while parent.parent is not None:
+                parents.append(parent.parent)
+                parent = parent.parent
+        return parents
+
+    @property
+    def comments(self) -> typing.List["ContentInContext"]:
+        comments_in_context = []
+        for comment in self.content.get_comments():
+            from tracim_backend.lib.core.content import ContentApi
+
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
+            )
+            comment_in_context = content_api.get_content_in_context(comment)
+            comments_in_context.append(comment_in_context)
+        return comments_in_context
+
+    @property
     def label(self) -> str:
         return self.content.label
 
