@@ -204,11 +204,11 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/backend
         - nohup pserve $BACKEND_TEST_CONFIG_FILE&
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - $(npm bin)/cypress run --record --key bf78a1c6-a4c3-4da6-956a-a82a236e02d2
+        - $(npm bin)/cypress run
         - cd $TRAVIS_BUILD_DIR
 
 stages:
-#  - static-tests
-#  - quick-tests
-#  - backend
+  - static-tests
+  - quick-tests
+  - backend
   - functional
