@@ -1,4 +1,5 @@
 # coding=utf-8
+import base64
 import cgi
 from datetime import datetime
 from enum import Enum
@@ -1056,6 +1057,11 @@ class ContentInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.content.file_name)
+
+    def get_b64_file(self) -> typing.Optional[str]:
+        if self.content.depot_file:
+            return base64.b64encode(self.content.depot_file.file.read()).decode("ascii")
+        return None
 
 
 class RevisionInContext(object):

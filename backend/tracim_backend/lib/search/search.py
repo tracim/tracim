@@ -2,6 +2,7 @@ from datetime import datetime
 import typing
 
 from elasticsearch import Elasticsearch
+from elasticsearch.client import IngestClient
 from elasticsearch_dsl import Search
 from sqlalchemy.orm import Session
 
@@ -40,6 +41,16 @@ class SearchApi(object):
             ]
         )
 
+    def create_ingest_pipeline(self) -> None:
+        p = IngestClient(self.es)
+        p.put_pipeline(
+            id="attachment",
+            body={
+                "description": "Extract attachment information",
+                "processors": [{"attachment": {"field": "file"}}],
+            },
+        )
+
     def create_index_template(self) -> None:
         """
         Create the index template in elasticsearch specifying the mappings and any
@@ -50,6 +61,7 @@ class SearchApi(object):
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
         logger.info(self, "Create index settings ...")
+        self.create_ingest_pipeline()
         # create an index template
         index_template = IndexedContent._index.as_template(
             INDEX_DOCUMENTS_ALIAS, INDEX_DOCUMENTS_PATTERN
@@ -191,7 +203,11 @@ class SearchApi(object):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
-        indexed_content.save(using=self.es)
+        indexed_content.file = content.get_b64_file()
+        if indexed_content.file:
+            indexed_content.save(using=self.es, pipeline="attachment")
+        else:
+            indexed_content.save(using=self.es)
 
     def index_all_content(self) -> None:
         """
@@ -232,7 +248,9 @@ class SearchApi(object):
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
         if search_string:
             search = Search(using=self.es, doc_type=IndexedContent).query(
-                "query_string", query=search_string, fields=["title", "raw_content", "comments.raw_content"]
+                "query_string",
+                query=search_string,
+                fields=["label", "raw_content", "comments.raw_content", "attachment.content"],
             )
         else:
             search = Search(using=self.es, doc_type=IndexedContent).query("match_all")
@@ -241,7 +259,7 @@ class SearchApi(object):
         search = search.response_class(ContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result
-        search = search.source(exclude=["raw_content", "*.raw_content"])
+        search = search.source(exclude=["raw_content", "*.raw_content", "attachment.*", "file"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
         if filtered_workspace_ids is not None:

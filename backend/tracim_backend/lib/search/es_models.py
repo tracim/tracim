@@ -92,3 +92,4 @@ class IndexedContent(Document):
     created = Date()
     current_revision_id = Integer()
     raw_content = Text(analyzer=html_folding)
+    file = Text()
