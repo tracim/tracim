@@ -88,6 +88,7 @@ class ManageActions(object):
         try:
             with new_revision(session=self.session, tm=transaction.manager, content=self.content):
                 self._actions[self._type](self.content)
+                self.content_api.execute_update_content_actions(self.content)
                 self.content_api.save(self.content, self._type)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
@@ -895,13 +896,14 @@ class FileResource(DAVNonCollection):
         except ContentNotFound:
             destination_parent = None
         try:
-            self.content_api.copy(
+            new_content = self.content_api.copy(
                 item=self.content,
                 new_label=new_label,
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
             )
+            self.content_api.execute_created_content_actions(new_content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
         transaction.commit()
