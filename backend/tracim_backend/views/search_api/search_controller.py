@@ -3,7 +3,8 @@ from pyramid.config import Configurator
 
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.search.search import SearchApi
+from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
@@ -19,9 +20,11 @@ class SearchController(Controller):
     @check_right(is_user)
     @hapic.input_query(SearchFilterQuerySchema())
     @hapic.output_body(ContentSearchResultSchema())
-    def search_content(self, context, request: TracimRequest, hapic_data: HapicData = None):
+    def search_content(
+        self, context, request: TracimRequest, hapic_data: HapicData = None
+    ) -> ContentSearchResponse:
         app_config = request.registry.settings["CFG"]  # type: CFG
-        search_api = SearchApi(
+        search_api = SearchFactory.get_search_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         search = search_api.search_content(hapic_data.query.search_string)
@@ -39,3 +42,11 @@ class SearchController(Controller):
             "search_content", "/search/content", request_method="GET"
         )  # noqa: W605
         configurator.add_view(self.search_content, route_name="search_content")
+
+
+class ESSearchController(SearchController):
+    pass
+
+
+class SimpleSearchController(SearchController):
+    pass

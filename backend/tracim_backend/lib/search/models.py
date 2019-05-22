@@ -1,3 +1,4 @@
+from abc import ABC
 from datetime import datetime
 import typing
 
@@ -6,7 +7,16 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.response import Response
 
 
-class ContentSearchResponse(object):
+class ContentSearchResponse(ABC):
+    def __init__(self, contents: typing.List["SearchedContent"]):
+        self.contents = contents
+
+
+class SimpleContentSearchResponse(ContentSearchResponse):
+    pass
+
+
+class ESContentSearchResponse(ContentSearchResponse):
     """
     Response of search using LibSearch
     This is both an seriable content and a Custom Response object
@@ -16,7 +26,7 @@ class ContentSearchResponse(object):
     def __init__(self, search: Search, response: Response) -> None:
         self._response = response
         self._search = search
-        self.contents = []
+        contents = []
         for hit in response["hits"]["hits"]:
             source = hit["_source"]
             parent = None
@@ -87,7 +97,8 @@ class ContentSearchResponse(object):
                 score=hit["_score"],
                 current_revision_id=source["current_revision_id"],
             )
-            self.contents.append(content)
+            contents.append(content)
+            super().__init__(contents=contents)
 
 
 class SearchedDigestUser(object):

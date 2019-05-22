@@ -47,6 +47,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
@@ -619,13 +620,11 @@ class ContentApi(object):
         This method do post-create user actions
         """
         if self._config.SEARCH__ENABLED:
-            from tracim_backend.lib.search.search import SearchApi
-
             try:
                 content_in_context = ContentInContext(
                     content, config=self._config, dbsession=self._session
                 )
-                search_api = SearchApi(
+                search_api = SearchFactory.get_search_lib(
                     current_user=self._user, config=self._config, session=self._session
                 )
                 search_api.index_content(content_in_context)
@@ -641,13 +640,12 @@ class ContentApi(object):
         This method do post-create user actions
         """
         if self._config.SEARCH__ENABLED:
-            from tracim_backend.lib.search.search import SearchApi
 
             try:
                 content_in_context = ContentInContext(
                     content, config=self._config, dbsession=self._session
                 )
-                search_api = SearchApi(
+                search_api = SearchFactory.get_search_lib(
                     current_user=self._user, config=self._config, session=self._session
                 )
                 search_api.index_content(content_in_context)

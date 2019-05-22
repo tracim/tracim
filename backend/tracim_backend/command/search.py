@@ -5,7 +5,7 @@ from pyramid.scripting import AppEnvironment
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.command import AppContextCommand
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.search.search import SearchApi
+from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.models.context_models import ContentInContext
 
 
@@ -29,10 +29,10 @@ class SearchIndexInitCommand(AppContextCommand):
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self.search_api = SearchApi(
+        self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.create_index_template()
+        self.search_api.create_index()
         print("Index template was created")
         if not parsed_args.empty:
             print("Indexing all content")
@@ -49,10 +49,10 @@ class SearchIndexUpdateCommand(AppContextCommand):
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self.search_api = SearchApi(
+        self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
-        self.search_api.migrate()
+        self.search_api.migrate_index()
 
 
 class SearchIndexAddCommand(AppContextCommand):
@@ -76,7 +76,7 @@ class SearchIndexAddCommand(AppContextCommand):
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self.search_api = SearchApi(
+        self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
         if parsed_args.content_id:
@@ -105,9 +105,9 @@ class SearchIndexDeleteCommand(AppContextCommand):
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self.search_api = SearchApi(
+        self.search_api = SearchFactory.get_search_lib(
             current_user=None, session=self._session, config=self._app_config
         )
         print("delete index")
-        self.search_api.delete()
+        self.search_api.delete_index()
         print("Index where deleted")

@@ -225,9 +225,9 @@ def web(global_config, **local_settings):
         # import is here because import SearchController without adding it to
         # pyramid make trouble in hapic which try to get view related
         # to controller but failed.
-        from tracim_backend.views.search_api.search_controller import SearchController
+        from tracim_backend.lib.search.search_factory import SearchFactory
 
-        search_controller = SearchController()
+        search_controller = SearchFactory.get_search_controller(app_config)
         configurator.include(search_controller.bind, route_prefix=BASE_API_V2)
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")

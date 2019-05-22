@@ -1,3 +1,5 @@
+from abc import ABC
+from abc import abstractmethod
 from datetime import datetime
 import typing
 
@@ -18,19 +20,88 @@ from tracim_backend.lib.search.es_models import DigestUser
 from tracim_backend.lib.search.es_models import DigestWorkspace
 from tracim_backend.lib.search.es_models import IndexedContent
 from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.models import ESContentSearchResponse
+from tracim_backend.lib.search.models import SimpleContentSearchResponse
+from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
 
-class SearchApi(object):
+class SearchApi(ABC):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
-        assert config.SEARCH__ENABLED
-        assert config.SEARCH__ENGINE == "elasticsearch"
         self._user = current_user
         self._session = session
         self._config = config
+
+    @abstractmethod
+    def create_index(self) -> None:
+        pass
+
+    @abstractmethod
+    def migrate_index(self, move_data=True, update_alias=True) -> None:
+        pass
+
+    @abstractmethod
+    def delete_index(self) -> None:
+        pass
+
+    @abstractmethod
+    def index_content(self, content: ContentInContext):
+        pass
+
+    def index_all_content(self) -> None:
+        """
+        Index/update all content in current index of ElasticSearch
+        """
+        content_api = ContentApi(
+            session=self._session,
+            config=self._config,
+            current_user=self._user,
+            show_archived=True,
+            show_active=True,
+            show_deleted=True,
+        )
+        contents = content_api.get_all()
+        for content in contents:
+            content_in_context = ContentInContext(
+                content, config=self._config, dbsession=self._session
+            )
+            self.index_content(content_in_context)
+
+    def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
+        """
+        Get user workspace list or None if no user set
+        """
+        if self._user:
+            rapi = RoleApi(config=self._config, session=self._session, current_user=self._user)
+            return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
+        return None
+
+
+class SimpleSearchApi(SearchApi):
+    def create_index(self):
+        pass
+
+    def migrate_index(self, move_data=True, update_alias=True):
+        pass
+
+    def delete_index(self):
+        pass
+
+    def index_content(self, content: ContentInContext):
+        pass
+
+    def search_content(self, search_string: str) -> ContentSearchResponse:
+        return SimpleContentSearchResponse(contents=[])
+
+
+class ESSearchApi(SearchApi):
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
+        super().__init__(session, current_user, config)
+        assert config.SEARCH__ENABLED
+        assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
         self.es = Elasticsearch(
             hosts=[
                 (
@@ -42,17 +113,7 @@ class SearchApi(object):
             ]
         )
 
-    def create_ingest_pipeline(self) -> None:
-        p = IngestClient(self.es)
-        p.put_pipeline(
-            id="attachment",
-            body={
-                "description": "Extract attachment information",
-                "processors": [{"attachment": {"field": "file"}}],
-            },
-        )
-
-    def create_index_template(self) -> None:
+    def create_index(self) -> None:
         """
         Create the index template in elasticsearch specifying the mappings and any
         settings to be used. This can be run at any time, ideally at every new code
@@ -63,7 +124,7 @@ class SearchApi(object):
         # Configure index with our indexing preferences
         logger.info(self, "Create index settings ...")
         if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
-            self.create_ingest_pipeline()
+            self._create_ingest_pipeline()
         # create an index template
         index_template = IndexedContent._index.as_template(
             INDEX_DOCUMENTS_ALIAS, INDEX_DOCUMENTS_PATTERN
@@ -74,16 +135,16 @@ class SearchApi(object):
 
         # create the first index if it doesn't exist
         if not IndexedContent._index.exists(using=self.es):
-            self.migrate(move_data=False)
+            self.migrate_index(move_data=False)
 
         logger.info(self, "ES index is ready")
 
-    def delete(self):
+    def delete_index(self):
         logger.info(self, "delete index with pattern {}".format(INDEX_DOCUMENTS_PATTERN))
         self.es.indices.delete(INDEX_DOCUMENTS_PATTERN, allow_no_indices=True)
         self.es.indices.delete_template(INDEX_DOCUMENTS_ALIAS)
 
-    def migrate(self, move_data=True, update_alias=True) -> None:
+    def migrate_index(self, move_data=True, update_alias=True) -> None:
         """
         Upgrade function that creates a new index for the data. Optionally it also can
         (and by default will) reindex previous copy of the data into the new index
@@ -211,34 +272,6 @@ class SearchApi(object):
         else:
             indexed_content.save(using=self.es)
 
-    def index_all_content(self) -> None:
-        """
-        Index/update all content in current index of ElasticSearch
-        """
-        content_api = ContentApi(
-            session=self._session,
-            config=self._config,
-            current_user=self._user,
-            show_archived=True,
-            show_active=True,
-            show_deleted=True,
-        )
-        contents = content_api.get_all()
-        for content in contents:
-            content_in_context = ContentInContext(
-                content, config=self._config, dbsession=self._session
-            )
-            self.index_content(content_in_context)
-
-    def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
-        """
-        Get user workspace list or None if no user set
-        """
-        if self._user:
-            rapi = RoleApi(config=self._config, session=self._session, current_user=self._user)
-            return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
-        return None
-
     def search_content(self, search_string: str) -> ContentSearchResponse:
         """
         Search content into elastic search server:
@@ -258,7 +291,7 @@ class SearchApi(object):
             search = Search(using=self.es, doc_type=IndexedContent).query("match_all")
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
-        search = search.response_class(ContentSearchResponse)
+        search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result
         search = search.source(exclude=["raw_content", "*.raw_content", "attachment.*", "file"])
@@ -268,3 +301,13 @@ class SearchApi(object):
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
         res = search.execute()
         return res
+
+    def _create_ingest_pipeline(self) -> None:
+        p = IngestClient(self.es)
+        p.put_pipeline(
+            id="attachment",
+            body={
+                "description": "Extract attachment information",
+                "processors": [{"attachment": {"field": "file"}}],
+            },
+        )
