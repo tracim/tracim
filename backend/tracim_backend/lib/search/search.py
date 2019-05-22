@@ -232,7 +232,7 @@ class SearchApi(object):
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
         if search_string:
             search = Search(using=self.es, doc_type=IndexedContent).query(
-                "query_string", query=search_string, fields=["title", "raw_content"]
+                "query_string", query=search_string, fields=["title", "raw_content", "comments.raw_content"]
             )
         else:
             search = Search(using=self.es, doc_type=IndexedContent).query("match_all")

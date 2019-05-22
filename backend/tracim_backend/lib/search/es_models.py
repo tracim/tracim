@@ -76,7 +76,7 @@ class IndexedContent(Document):
     parent_id = Integer()
     parent = Object(DigestContent)
     parents = Nested(DigestContent)
-    comments = Nested(DigestContent)
+    comments = Nested(DigestContent, include_in_parent=True)
     author = Object(DigestUser)
     last_modifier = Object(DigestUser)
 
