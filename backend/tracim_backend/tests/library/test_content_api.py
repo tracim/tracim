@@ -2975,7 +2975,7 @@ class TestContentApi(DefaultTest):
         api.save(p)
         original_id = p.content_id
 
-        res = api.search(["randomized"])
+        res = api._search_query(["randomized"])
         eq_(1, len(res.all()))
         item = res.all()[0]
         eq_(original_id, item.content_id)
@@ -3013,7 +3013,7 @@ class TestContentApi(DefaultTest):
         api.save(p)
         original_id = p.content_id
 
-        res = api.search(["dummy"])
+        res = api._search_query(["dummy"])
         eq_(1, len(res.all()))
         item = res.all()[0]
         eq_(original_id, item.content_id)
@@ -3104,7 +3104,7 @@ class TestContentApi(DefaultTest):
             .count(),
         )
 
-        res = api.search(["dummy", "jon"])
+        res = api._search_query(["dummy", "jon"])
         eq_(2, len(res.all()))
 
         eq_(True, id1 in [o.content_id for o in res.all()])
@@ -3128,11 +3128,11 @@ class TestContentApi(DefaultTest):
 
         api = ContentApi(current_user=admin, session=self.session, config=self.app_config)
 
-        foo_result = api.search(["foo"]).all()
+        foo_result = api._search_query(["foo"]).all()
         eq_(1, len(foo_result))
         assert page_1 in foo_result
 
-        bar_result = api.search(["bar"]).all()
+        bar_result = api._search_query(["bar"]).all()
         eq_(1, len(bar_result))
         assert page_2 in bar_result
 
@@ -3142,20 +3142,20 @@ class TestContentApi(DefaultTest):
             api.archive(folder_2)
 
         # Actually ContentApi.search don't filter it
-        foo_result = api.search(["foo"]).all()
+        foo_result = api._search_query(["foo"]).all()
         eq_(1, len(foo_result))
         assert page_1 in foo_result
 
-        bar_result = api.search(["bar"]).all()
+        bar_result = api._search_query(["bar"]).all()
         eq_(1, len(bar_result))
         assert page_2 in bar_result
 
         # ContentApi offer exclude_unavailable method to do it
-        foo_result = api.search(["foo"]).all()
+        foo_result = api._search_query(["foo"]).all()
         api.exclude_unavailable(foo_result)
         eq_(0, len(foo_result))
 
-        bar_result = api.search(["bar"]).all()
+        bar_result = api._search_query(["bar"]).all()
         api.exclude_unavailable(bar_result)
         eq_(0, len(bar_result))
 

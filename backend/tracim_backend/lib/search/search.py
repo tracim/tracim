@@ -94,7 +94,18 @@ class SimpleSearchApi(SearchApi):
         pass
 
     def search_content(self, search_string: str) -> ContentSearchResponse:
-        return SimpleContentSearchResponse(contents=[])
+        content_api = ContentApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
+        if search_string:
+            keywords = content_api.get_keywords(search_string)
+            content_list = content_api._search_query(keywords=keywords)
+        else:
+            content_list = []
+        content_in_context_list = []
+        for content in content_list:
+            content_in_context_list.append(content_api.get_content_in_context(content))
+        return SimpleContentSearchResponse(content_in_context_list)
 
 
 class ESSearchApi(SearchApi):

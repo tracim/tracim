@@ -16,9 +16,7 @@ import sqlalchemy
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
-from sqlalchemy.orm import Query
-from sqlalchemy.orm import aliased
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Query, joinedload
 from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
@@ -322,45 +320,7 @@ class ContentApi(object):
 
         return result
 
-    def _hard_filtered_base_query(self, workspace: Workspace = None) -> Query:
-        """
-        If set to True, then filterign on is_deleted and is_archived will also
-        filter parent properties. This is required for search() function which
-        also search in comments (for example) which may be 'not deleted' while
-        the associated content is deleted
-
-        :param hard_filtering:
-        :return:
-        """
-        result = self.__real_base_query(workspace)
-
-        if not self._show_deleted:
-            parent = aliased(Content)
-            result = (
-                result.join(parent, Content.parent)
-                .filter(Content.is_deleted == False)  # noqa: E711
-                .filter(parent.is_deleted == False)  # noqa: E711
-            )
-
-        if not self._show_archived:
-            parent = aliased(Content)
-            result = (
-                result.join(parent, Content.parent)
-                .filter(Content.is_archived == False)  # noqa: E711
-                .filter(parent.is_archived == False)  # noqa: E711
-            )
-
-        if not self._show_temporary:
-            parent = aliased(Content)
-            result = (
-                result.join(parent, Content.parent)
-                .filter(Content.is_temporary == False)  # noqa: E711
-                .filter(parent.is_temporary == False)  # noqa: E711
-            )
-
-        return result
-
-    def get_base_query(self, workspace: Workspace) -> Query:
+    def get_base_query(self, workspace: typing.Optional[Workspace]) -> Query:
         return self._base_query(workspace)
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
@@ -2122,13 +2082,16 @@ class ContentApi(object):
 
         return keywords
 
-    def search(self, keywords: [str]) -> Query:
+    def search(self, keywords: [str], include_comments=False) -> typing.List[Content]:
+        return self._search_query(keywords=keywords, include_comments=include_comments).all()
+
+    def _search_query(self, keywords: [str], include_comments=False) -> Query:
         """
         :return: a sorted list of Content items
         """
 
         if len(keywords) <= 0:
-            return None
+            return []
 
         filter_group_label = list(
             Content.label.ilike("%{}%".format(keyword)) for keyword in keywords
@@ -2137,11 +2100,16 @@ class ContentApi(object):
             Content.description.ilike("%{}%".format(keyword)) for keyword in keywords
         )
         title_keyworded_items = (
-            self._hard_filtered_base_query()
+            self.get_base_query(None)
             .filter(or_(*(filter_group_label + filter_group_desc)))
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
+            .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))
         )
+
+        comment_type = content_type_list.Comment
+        comments_slugs = [comment_type.slug]
+        title_keyworded_items = title_keyworded_items.filter(~Content.type.in_(comments_slugs))
 
         return title_keyworded_items
 
