@@ -1,17 +1,18 @@
 import React from 'react'
-import { TextAreaApp } from 'tracim_frontend_lib'
+import {
+  TextAreaApp,
+  DisplayState
+} from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
 import { translate } from 'react-i18next'
-import DisplayState from './DisplayState.jsx'
 
 const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
-      <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
-        {props.isArchived && (
+      {props.isArchived && (
           <DisplayState
             msg={props.t('This content is archived')}
-            type='button'
+            btnType='button'
             icon='archive'
             btnLabel={props.t('Restore')}
             onClickBtn={props.onClickRestoreArchived}
@@ -21,7 +22,7 @@ const HtmlDocument = props => {
         {props.isDeleted && (
           <DisplayState
             msg={props.t('This content is deleted')}
-            type='button'
+            btnType='button'
             icon='trash'
             btnLabel={props.t('Restore')}
             onClickBtn={props.onClickRestoreDeleted}
@@ -34,6 +35,8 @@ const HtmlDocument = props => {
             icon='warning'
           />
         )}
+
+      <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
