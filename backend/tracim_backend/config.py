@@ -506,6 +506,10 @@ class CFG(object):
 
     def _load_search_config(self):
         self.SEARCH__ENABLED = asbool(self.get_raw_config("search.enabled", "False"))
+        self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
+        self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
+            self.get_raw_config("search.elasticsearch.use_ingest", "False")
+        )
         self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
             "search.elasticsearch.host", "localhost"
         )

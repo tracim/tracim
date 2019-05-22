@@ -388,8 +388,16 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # SEARCH (ElasticSearch)
 ####
 search.enabled = False
-search.elasticsearch.host = localhost
-search.elasticsearch.port = 9200
+# choose search engine to use, available value are: simple, elasticsearch.
+# simple need nothing more than tracim but features are limited,
+# elasticsearch is more effective but need an elasticsearch server.
+search.engine = simple
+# elasticsearch configuration
+;search.elasticsearch.host = localhost
+;search.elasticsearch.port = 9200
+# if you use ingest mode in elasticsearch, you can activate file content ingest
+# for search (default as false)
+; search.elasticsearch.use_ingest = false
 
 
 ##############################

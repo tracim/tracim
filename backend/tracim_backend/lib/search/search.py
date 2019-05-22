@@ -27,6 +27,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 class SearchApi(object):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         assert config.SEARCH__ENABLED
+        assert config.SEARCH__ENGINE == "elasticsearch"
         self._user = current_user
         self._session = session
         self._config = config
@@ -61,7 +62,8 @@ class SearchApi(object):
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
         logger.info(self, "Create index settings ...")
-        self.create_ingest_pipeline()
+        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
+            self.create_ingest_pipeline()
         # create an index template
         index_template = IndexedContent._index.as_template(
             INDEX_DOCUMENTS_ALIAS, INDEX_DOCUMENTS_PATTERN
@@ -203,8 +205,8 @@ class SearchApi(object):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
-        indexed_content.file = content.get_b64_file()
-        if indexed_content.file:
+        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST and indexed_content.file:
+            indexed_content.file = content.get_b64_file()
             indexed_content.save(using=self.es, pipeline="attachment")
         else:
             indexed_content.save(using=self.es)
