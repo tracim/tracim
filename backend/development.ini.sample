@@ -194,9 +194,8 @@ frontend.serve = True
 
 ### Webdav ###
 # webdav url for client
-# url can be extended like localhost/webdav by setting webdav.root_path
+# url can be extended like localhost/webdav by setting webdav.root_path parameter
 # in this case, you have to create your own proxy behind this url.
-# Do not set http:// prefix.
 webdav.base_url = http://localhost:3030
 webdav.ui.enabled = True
 
