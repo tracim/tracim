@@ -57,7 +57,7 @@ const AdminWorkspace = props =>
                   >
                     {ws.label}
                   </td>
-                  <td>{ws.description}</td>
+                  <td className='adminWorkspace__workspaceTable__tr__td-description'>{ws.description}</td>
                   {/*
                     <td className='d-flex align-items-center flex-wrap'>
                       <div className='adminWorkspace__workspaceTable__calendaricon mr-2'>
