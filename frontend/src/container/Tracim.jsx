@@ -24,6 +24,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   PAGE,
+  APP_FULLSCREEN_LIST,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile
@@ -252,7 +253,7 @@ class Tracim extends React.Component {
           <div
             id='appFullscreenContainer'
             className={classnames({
-              'fullWidthFullHeight': [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA].includes(props.location.pathname)
+              'fullWidthFullHeight': APP_FULLSCREEN_LIST.includes(props.location.pathname)
             })}
           />
           <div id='appFeatureContainer' />
