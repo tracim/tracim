@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.lib.core.content import SEARCH_DEFAULT_RESULT_NB
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
@@ -20,6 +21,7 @@ from tracim_backend.lib.search.es_models import DigestUser
 from tracim_backend.lib.search.es_models import DigestWorkspace
 from tracim_backend.lib.search.es_models import IndexedContent
 from tracim_backend.lib.search.models import ContentSearchResponse
+from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.models import ESContentSearchResponse
 from tracim_backend.lib.search.models import SimpleContentSearchResponse
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
@@ -93,19 +95,21 @@ class SimpleSearchApi(SearchApi):
     def index_content(self, content: ContentInContext):
         pass
 
-    def search_content(self, search_string: str) -> ContentSearchResponse:
+    def search_content(
+        self, search_string: str, size=SEARCH_DEFAULT_RESULT_NB, offset=None
+    ) -> ContentSearchResponse:
+        if not search_string:
+            return EmptyContentSearchResponse()
         content_api = ContentApi(
             session=self._session, current_user=self._user, config=self._config
         )
-        if search_string:
-            keywords = content_api.get_keywords(search_string)
-            content_list = content_api._search_query(keywords=keywords)
-        else:
-            content_list = []
+        total_hits = 0
+        keywords = content_api.get_keywords(search_string)
+        content_list, total_hits = content_api.search(keywords=keywords, size=size, offset=offset)
         content_in_context_list = []
         for content in content_list:
             content_in_context_list.append(content_api.get_content_in_context(content))
-        return SimpleContentSearchResponse(content_in_context_list)
+        return SimpleContentSearchResponse(content_in_context_list, total_hits)
 
 
 class ESSearchApi(SearchApi):
@@ -283,23 +287,24 @@ class ESSearchApi(SearchApi):
         else:
             indexed_content.save(using=self.es)
 
-    def search_content(self, search_string: str) -> ContentSearchResponse:
+    def search_content(
+        self, search_string: str, size: typing.Optional[int], offset: typing.Optional[int]
+    ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
+        if not search_string:
+            return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
         # Add wildcard at end of each word (only at end for performances)
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
-        if search_string:
-            search = Search(using=self.es, doc_type=IndexedContent).query(
-                "query_string",
-                query=search_string,
-                fields=["label", "raw_content", "comments.raw_content", "attachment.content"],
-            )
-        else:
-            search = Search(using=self.es, doc_type=IndexedContent).query("match_all")
+        search = Search(using=self.es, doc_type=IndexedContent).query(
+            "query_string",
+            query=search_string,
+            fields=["label", "raw_content", "comments.raw_content", "attachment.content"],
+        )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
         search = search.response_class(ESContentSearchResponse)
@@ -308,6 +313,10 @@ class ESSearchApi(SearchApi):
         search = search.source(exclude=["raw_content", "*.raw_content", "attachment.*", "file"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
+        if size:
+            search = search.extra(size=size)
+        if offset:
+            search = search.extra(from_=offset)
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
         res = search.execute()

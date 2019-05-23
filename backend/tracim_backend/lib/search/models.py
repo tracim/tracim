@@ -10,15 +10,27 @@ from tracim_backend.models.context_models import ContentInContext
 
 
 class ContentSearchResponse(ABC):
-    def __init__(self, contents: typing.List["SearchedContent"]):
+    def __init__(
+        self,
+        contents: typing.List["SearchedContent"],
+        total_hits: int = 0,
+        is_total_hits_accurate=True,
+    ):
         self.contents = contents
+        self.total_hits = total_hits
+        self.is_total_hits_accurate = is_total_hits_accurate
+
+
+class EmptyContentSearchResponse(ContentSearchResponse):
+    def __init__(self):
+        super().__init__(contents=[], total_hits=0)
 
 
 class SimpleContentSearchResponse(ContentSearchResponse):
 
     DEFAULT_SCORE = 1
 
-    def __init__(self, content_list: typing.List[ContentInContext]):
+    def __init__(self, content_list: typing.List[ContentInContext], total_hits: int):
         contents = []
         for content in content_list:
             parent = None
@@ -83,7 +95,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 current_revision_id=content.current_revision_id,
             )
             contents.append(content)
-        super().__init__(contents=contents)
+        super().__init__(contents=contents, total_hits=total_hits)
 
 
 class ESContentSearchResponse(ContentSearchResponse):
@@ -96,6 +108,8 @@ class ESContentSearchResponse(ContentSearchResponse):
     def __init__(self, search: Search, response: Response) -> None:
         self._response = response
         self._search = search
+        total_hits = self._response["hits"]["total"]["value"]
+        is_total_hit_accurate = self._response["hits"]["total"]["relation"] == "eq"
         contents = []
         for hit in response["hits"]["hits"]:
             source = hit["_source"]
@@ -168,7 +182,9 @@ class ESContentSearchResponse(ContentSearchResponse):
                 current_revision_id=source["current_revision_id"],
             )
             contents.append(content)
-            super().__init__(contents=contents)
+        super().__init__(
+            contents=contents, total_hits=total_hits, is_total_hits_accurate=is_total_hit_accurate
+        )
 
 
 class SearchedDigestUser(object):

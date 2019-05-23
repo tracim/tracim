@@ -16,7 +16,8 @@ import sqlalchemy
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
-from sqlalchemy.orm import Query, joinedload
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
@@ -122,10 +123,11 @@ class AddCopyRevisionsResult(object):
         self.original_children_dict = original_children_dict  # dict key is original content id
 
 
-class ContentApi(object):
+SEARCH_SEPARATORS = ",| "
+SEARCH_DEFAULT_RESULT_NB = 10
 
-    SEARCH_SEPARATORS = ",| "
-    SEARCH_DEFAULT_RESULT_NB = 50
+
+class ContentApi(object):
 
     # DISPLAYABLE_CONTENTS = (
     #     content_type_list.Folder.slug,
@@ -2072,7 +2074,7 @@ class ContentApi(object):
         :return: a list of str (each keyword = 1 entry
         """
 
-        search_string_separators = search_string_separators or ContentApi.SEARCH_SEPARATORS
+        search_string_separators = search_string_separators or SEARCH_SEPARATORS
 
         keywords = []
         if search_string:
@@ -2082,10 +2084,23 @@ class ContentApi(object):
 
         return keywords
 
-    def search(self, keywords: [str], include_comments=False) -> typing.List[Content]:
-        return self._search_query(keywords=keywords, include_comments=include_comments).all()
+    def search(
+        self,
+        keywords: [str],
+        include_comments: bool = False,
+        size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
+        offset: typing.Optional[int] = None,
+    ) -> typing.Tuple[typing.List[Content], int]:
+        query = self._search_query(keywords=keywords, include_comments=include_comments)
+        total_hits = query.count()
+        if size:
+            query = query.limit(size)
+        if offset:
+            query = query.offset(offset)
+        # TODO - G.M - 2019-05-23 - return object instead of tuple
+        return query.all(), total_hits
 
-    def _search_query(self, keywords: [str], include_comments=False) -> Query:
+    def _search_query(self, keywords: [str], include_comments: bool = False) -> Query:
         """
         :return: a sorted list of Content items
         """

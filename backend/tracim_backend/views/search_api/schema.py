@@ -11,14 +11,20 @@ from tracim_backend.views.core_api.schemas import StrippedString
 
 
 class SearchFilterQuery(object):
-    def __init__(self, search_string: str = ""):
+    def __init__(self, size: int = 10, offset: int = 0, search_string: str = ""):
         self.search_string = search_string
+        self.size = size
+        self.offset = offset
 
 
 class SearchFilterQuerySchema(marshmallow.Schema):
     search_string = StrippedString(
         example="test", description="just a search string", required=False
     )
+    size = marshmallow.fields.Int(
+        required=False, default=10, validate=strictly_positive_int_validator
+    )
+    offset = marshmallow.fields.Int(required=False, default=0, validate=positive_int_validator)
 
     @post_load
     def make_search_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -51,3 +57,5 @@ class ContentSearchSchema(ContentSchema):
 
 class ContentSearchResultSchema(marshmallow.Schema):
     contents = marshmallow.fields.Nested(ContentSearchSchema, many=True)
+    total_hits = marshmallow.fields.Integer()
+    is_total_hits_accurate = marshmallow.fields.Boolean()
