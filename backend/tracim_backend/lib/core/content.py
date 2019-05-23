@@ -2111,12 +2111,12 @@ class ContentApi(object):
         filter_group_label = list(
             Content.label.ilike("%{}%".format(keyword)) for keyword in keywords
         )
-        filter_group_desc = list(
-            Content.description.ilike("%{}%".format(keyword)) for keyword in keywords
+        filter_group_filename = list(
+            Content.file_name.ilike("%{}%".format(keyword)) for keyword in keywords
         )
         title_keyworded_items = (
             self.get_base_query(None)
-            .filter(or_(*(filter_group_label + filter_group_desc)))
+            .filter(or_(*(filter_group_label + filter_group_filename)))
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
             .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))

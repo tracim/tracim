@@ -303,7 +303,13 @@ class ESSearchApi(SearchApi):
         search = Search(using=self.es, doc_type=IndexedContent).query(
             "query_string",
             query=search_string,
-            fields=["label", "raw_content", "comments.raw_content", "attachment.content"],
+            fields=[
+                "label",
+                "filename",
+                "raw_content",
+                "comments.raw_content",
+                "attachment.content",
+            ],
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
         search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
