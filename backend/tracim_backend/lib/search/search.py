@@ -301,7 +301,7 @@ class ESSearchApi(SearchApi):
         # Add wildcard at end of each word (only at end for performances)
         search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
         search = Search(using=self.es, doc_type=IndexedContent).query(
-            "query_string",
+            "simple_query_search",
             query=search_string,
             fields=[
                 "label",
