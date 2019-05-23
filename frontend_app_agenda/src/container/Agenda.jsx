@@ -72,9 +72,6 @@ class Agenda extends React.Component {
 
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
-    // FIXME - CH - 2019-04-08 - line below should not exist. See https://github.com/tracim/tracim/issues/1572
-    document.getElementById('appFullscreenContainer').style.flex = '1'
-
     this.loadAgendaList(state.config.appConfig.idWorkspace)
     if (state.config.appConfig.idWorkspace !== null) await this.loadWorkspaceData()
     this.buildBreadcrumbs()
@@ -92,7 +89,6 @@ class Agenda extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.getElementById('appFullscreenContainer').style.flex = 'none'
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
