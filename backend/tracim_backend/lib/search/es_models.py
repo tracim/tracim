@@ -10,15 +10,27 @@ from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Nested
 from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
+from elasticsearch_dsl import analysis
 from elasticsearch_dsl import analyzer
 
+edge_ngram_token_filter = analysis.token_filter(
+    "edge_ngram_filter", type="edge_ngram", min_ngram=2, max_gram=20
+)
+# INFO - G.M - 2019-05-23 - search_analyser: do search for content given an some similar word
 folding = analyzer("folding", tokenizer="standard", filter=["lowercase", "asciifolding"])
+# INFO - G.M - 2019-05-23 -  index_analysers, index edge ngram for autocompletion and strip html for indexing
+edge_ngram_folding = analyzer(
+    "edge_ngram_folding",
+    tokenizer="standard",
+    filter=["lowercase", "asciifolding", edge_ngram_token_filter],
+)
 html_folding = analyzer(
     "html_folding",
     tokenizer="standard",
-    filter=["lowercase", "asciifolding"],
+    filter=["lowercase", "asciifolding", edge_ngram_token_filter],
     char_filter="html_strip",
 )
+
 INDEX_DOCUMENTS_ALIAS = "documents"
 INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_ALIAS + "-*"
 
@@ -36,7 +48,7 @@ class DigestWorkspace(InnerDoc):
 class DigestContent(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    label = Text(analyzer=folding)
+    label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
     slug = Keyword()
     content_type = Keyword()
 
@@ -44,7 +56,7 @@ class DigestContent(InnerDoc):
 class DigestComments(InnerDoc):
     content_id = Integer()
     parent_id = Integer()
-    raw_content = Text(analyzer=html_folding)
+    raw_content = Text(analyzer=html_folding, search_analyzer=folding)
 
 
 class IndexedContent(Document):
@@ -67,7 +79,7 @@ class IndexedContent(Document):
         name = INDEX_DOCUMENTS_ALIAS
 
     content_id = Integer()
-    label = Text(analyzer=folding)
+    label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
     slug = Keyword()
     content_type = Keyword()
 
@@ -86,10 +98,10 @@ class IndexedContent(Document):
     is_deleted = Boolean()
     is_editable = Boolean()
     show_in_ui = Boolean()
-    file_extension = Text(analyzer=folding)
-    filename = Text(analyzer=folding)
+    file_extension = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    filename = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
     modified = Date()
     created = Date()
     current_revision_id = Integer()
-    raw_content = Text(analyzer=html_folding)
+    raw_content = Text(analyzer=html_folding, search_analyzer=folding)
     file = Text()

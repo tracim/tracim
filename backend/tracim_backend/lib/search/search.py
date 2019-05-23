@@ -298,14 +298,13 @@ class ESSearchApi(SearchApi):
         if not search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
-        # Add wildcard at end of each word (only at end for performances)
-        search_string = " ".join(map(lambda w: w + "*", search_string.split(" ")))
         search = Search(using=self.es, doc_type=IndexedContent).query(
-            "simple_query_search",
+            "simple_query_string",
             query=search_string,
             fields=[
                 "label",
                 "filename",
+                "file_extension",
                 "raw_content",
                 "comments.raw_content",
                 "attachment.content",
