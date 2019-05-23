@@ -8,6 +8,9 @@ describe('content :: workspace > dashbord', function () {
     cy.loginAs('administrators')
     cy.visit('/ui/workspaces/1/dashboard')
   })
+  afterEach(() => {
+    cy.cancelXHR()
+  })
   it('part of dashbord', function () {
     cy.get('.dashboard.pageWrapperGeneric').should('be.visible')
     cy.get('.dashboard__header.pageTitleGeneric').should('be.visible')
