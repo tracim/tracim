@@ -281,11 +281,10 @@ class ESSearchApi(SearchApi):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
-        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
-            file_ = content.get_b64_file()
-            if file_:
-                indexed_content.file = file_
-                indexed_content.save(using=self.es, pipeline="attachment")
+        file_ = content.get_b64_file()
+        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST and file_:
+            indexed_content.file = file_
+            indexed_content.save(using=self.es, pipeline="attachment")
         else:
             indexed_content.save(using=self.es)
 
