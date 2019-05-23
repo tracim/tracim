@@ -1,0 +1,43 @@
+import typing
+
+from sqlalchemy.orm import Session
+
+from tracim_backend import CFG
+from tracim_backend.models.auth import User
+
+ELASTICSEARCH__SEARCH_ENGINE_SLUG = "elasticsearch"
+SIMPLE__SEARCH_ENGINE_SLUG = "simple"
+
+
+class SearchFactory(object):
+    @classmethod
+    def get_search_controller(cls, config: CFG):
+        if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
+            # TODO - G.M - 2019-05-22 - fix circular import
+            from tracim_backend.views.search_api.search_controller import ESSearchController
+
+            return ESSearchController()
+        elif config.SEARCH__ENGINE == SIMPLE__SEARCH_ENGINE_SLUG:
+            # TODO - G.M - 2019-05-22 - fix circular import
+            from tracim_backend.views.search_api.search_controller import SimpleSearchController
+
+            return SimpleSearchController()
+        else:
+            # FIXME - G.M - 2019-05-22 - raise specific exception
+            raise Exception
+
+    @classmethod
+    def get_search_lib(cls, session: Session, current_user: typing.Optional[User], config: CFG):
+        if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
+            # TODO - G.M - 2019-05-22 - fix circular import
+            from tracim_backend.lib.search.search import ESSearchApi
+
+            return ESSearchApi(session=session, current_user=current_user, config=config)
+        elif config.SEARCH__ENGINE == SIMPLE__SEARCH_ENGINE_SLUG:
+            # TODO - G.M - 2019-05-22 - fix circular import
+            from tracim_backend.lib.search.search import SimpleSearchApi
+
+            return SimpleSearchApi(session=session, current_user=current_user, config=config)
+        else:
+            # FIXME - G.M - 2019-05-22 - raise specific exception
+            raise Exception
