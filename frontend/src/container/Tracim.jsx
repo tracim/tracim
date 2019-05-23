@@ -251,9 +251,9 @@ class Tracim extends React.Component {
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
           <div
             id='appFullscreenContainer'
-            className={
-              classnames({'fullWidthFullHeight': [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER].includes(props.location.pathname)})
-            }
+            className={classnames({
+              'fullWidthFullHeight': [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA].includes(props.location.pathname)
+            })}
           />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />

@@ -15,7 +15,10 @@ class AppFullscreenRouter extends React.Component {
 
   componentDidMount = () => this.setState({isMounted: true})
 
-  componentWillUnmount = () => this.props.dispatchCustomEvent('unmount_app')
+  componentWillUnmount = () => {
+    this.props.dispatchCustomEvent('unmount_app')
+    console.log('appfullscreen router unmount_app')
+  }
 
   render () {
     const { props } = this
