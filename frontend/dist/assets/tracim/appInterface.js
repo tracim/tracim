@@ -40,6 +40,7 @@
     } else {
       selectedApp.renderAppFeature(app)
       selectedApp.isRendered = true
+      ;(getSelectedApp(prevSelectedAppFeature) || {isRendered: null}).isRendered = false
       prevSelectedAppFeature = selectedApp.name
     }
   }
@@ -54,6 +55,7 @@
     } else {
       selectedApp.renderAppFullscreen(app)
       selectedApp.isRendered = true
+      ;(getSelectedApp(prevSelectedAppFullScreen) || {isRendered: null}).isRendered = false
       prevSelectedAppFullScreen = selectedApp.name
     }
   }
@@ -93,12 +95,14 @@
           selectedApp.unmountApp('appFeatureContainer')
           selectedApp.unmountApp('popupCreateContentContainer')
           selectedApp.isRendered = false
+          prevSelectedAppFeature = ''
         }
 
         if (prevSelectedAppFullScreen !== '') {
           const selectedApp = getSelectedApp(prevSelectedAppFullScreen)
           selectedApp.unmountApp('appFullscreenContainer')
           selectedApp.isRendered = false
+          prevSelectedAppFullScreen = ''
         }
         break
     }
