@@ -304,12 +304,12 @@ class ESSearchApi(SearchApi):
             "simple_query_string",
             query=search_string,
             fields=[
-                "label",
+                "label^5",
                 "filename",
                 "file_extension",
-                "raw_content",
+                "raw_content^3",
                 "comments.raw_content",
-                "attachment.content",
+                "attachment.content^3",
             ],
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
