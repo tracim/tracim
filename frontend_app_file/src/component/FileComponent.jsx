@@ -34,7 +34,7 @@ export const FileComponent = props =>
     {props.isDeprecated && (
       <DisplayState
         msg={props.t('This content is deprecated')}
-        icon='warning'
+        icon={props.deprecatedStatus.faIcon}
       />
     )}
 

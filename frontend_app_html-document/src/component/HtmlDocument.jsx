@@ -10,31 +10,31 @@ const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.isArchived && (
-          <DisplayState
-            msg={props.t('This content is archived')}
-            btnType='button'
-            icon='archive'
-            btnLabel={props.t('Restore')}
-            onClickBtn={props.onClickRestoreArchived}
-          />
-        )}
+        <DisplayState
+          msg={props.t('This content is archived')}
+          btnType='button'
+          icon='archive'
+          btnLabel={props.t('Restore')}
+          onClickBtn={props.onClickRestoreArchived}
+        />
+      )}
 
-        {props.isDeleted && (
-          <DisplayState
-            msg={props.t('This content is deleted')}
-            btnType='button'
-            icon='trash'
-            btnLabel={props.t('Restore')}
-            onClickBtn={props.onClickRestoreDeleted}
-          />
-        )}
+      {props.isDeleted && (
+        <DisplayState
+          msg={props.t('This content is deleted')}
+          btnType='button'
+          icon='trash'
+          btnLabel={props.t('Restore')}
+          onClickBtn={props.onClickRestoreDeleted}
+        />
+      )}
 
-        {props.isDeprecated && (
-          <DisplayState
-            msg={props.t('This content is deprecated')}
-            icon='warning'
-          />
-        )}
+      {props.isDeprecated && (
+        <DisplayState
+          msg={props.t('This content is deprecated')}
+          icon={props.deprecatedStatus.faIcon}
+        />
+      )}
 
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
         {props.mode === MODE.VIEW && props.isDraftAvailable && (

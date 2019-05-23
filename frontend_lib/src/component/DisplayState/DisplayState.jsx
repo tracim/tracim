@@ -10,7 +10,7 @@ const DisplayState = props => (
 
     {props.btnType === 'button' && (
       <button
-        className='displaystate__btnrestore'
+        className='displaystate__btn'
         onClick={props.onClickBtn}
       >
         <i className={`fa fa-fw fa-${props.icon}`} />
@@ -20,7 +20,7 @@ const DisplayState = props => (
 
     {props.btnType === 'link' && (
       <span
-        className='displaystate__btnrestore link'
+        className='displaystate__btn link'
         onClick={props.onClickBtn}
       >
         {props.btnLabel}

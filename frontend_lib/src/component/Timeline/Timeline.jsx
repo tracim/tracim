@@ -73,7 +73,7 @@ class Timeline extends React.Component {
             {props.isDeprecated && !props.isArchived && !props.isDeleted && (
               <DisplayState
                 msg={props.t('This content is deprecated')}
-                icon='warning'
+                icon={props.deprecatedStatus.faIcon}
               />
             )}
 
