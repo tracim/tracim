@@ -395,7 +395,7 @@ class ContentFilter(object):
         show_active: int = 1,
         content_type: str = None,
         label: str = None,
-        offset: int = None,
+        page_nb: int = None,
         limit: int = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
@@ -405,7 +405,7 @@ class ContentFilter(object):
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
         self.limit = limit
-        self.offset = offset
+        self.page_nb = page_nb
         self.label = label
         self.content_type = content_type
 

@@ -82,6 +82,10 @@ class SearchApi(ABC):
             return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
         return None
 
+    def offset_from_pagination(self, size: int, page_nb: int) -> int:
+        assert page_nb > 0
+        return (page_nb - 1) * size
+
 
 class SimpleSearchApi(SearchApi):
     def create_index(self):
@@ -97,7 +101,7 @@ class SimpleSearchApi(SearchApi):
         pass
 
     def search_content(
-        self, search_string: str, size=SEARCH_DEFAULT_RESULT_NB, offset=None
+        self, search_string: str, size=SEARCH_DEFAULT_RESULT_NB, page_nb=1
     ) -> ContentSearchResponse:
         if not search_string:
             return EmptyContentSearchResponse()
@@ -106,6 +110,7 @@ class SimpleSearchApi(SearchApi):
         )
         total_hits = 0
         keywords = content_api.get_keywords(search_string)
+        offset = self.offset_from_pagination(size, page_nb)
         content_list, total_hits = content_api.search(keywords=keywords, size=size, offset=offset)
         content_in_context_list = []
         for content in content_list:
@@ -295,7 +300,7 @@ class ESSearchApi(SearchApi):
             indexed_content.save(using=self.es)
 
     def search_content(
-        self, search_string: str, size: typing.Optional[int], offset: typing.Optional[int]
+        self, search_string: str, size: typing.Optional[int], page_nb: typing.Optional[int]
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
@@ -327,8 +332,8 @@ class ESSearchApi(SearchApi):
         # return all workspaces content, empty list mean return nothing.
         if size:
             search = search.extra(size=size)
-        if offset:
-            search = search.extra(from_=offset)
+        if page_nb:
+            search = search.extra(from_=self.offset_from_pagination(size, page_nb))
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
         res = search.execute()
