@@ -32,7 +32,7 @@ html_folding = analyzer(
     char_filter="html_strip",
 )
 
-DEFAULT_INDEX_DOCUMENTS_ALIAS = "documents"
+DEFAULT_INDEX_DOCUMENTS_ALIAS = "tracim_documents"
 DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
 # FIXME - G.M - 2019-05-24 - hack using env var only configuration of document alias and document
 # pattern now, as it's currently complex to rewrite Lib signature to get needed information (we
