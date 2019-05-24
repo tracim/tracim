@@ -576,6 +576,22 @@ class File extends React.Component {
     }))
   }
 
+  getDownloadBaseUrl = (apiUrl, content, mode) => {
+    const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    return `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${urlRevisionPart}`
+  }
+
+  // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
+  // see https://github.com/tracim/tracim/issues/1804
+  getDownloadRawUrl = ({config: {apiUrl}, content, mode}) =>
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
+
+  getDownloadPdfPageUrl = ({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
+
+  getDownloadPdfFullUrl = ({config: {apiUrl}, content, mode}) =>
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
+
   render () {
     const { props, state } = this
 
@@ -671,16 +687,10 @@ class File extends React.Component {
             isEditable={state.content.is_editable}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1`
-            )(state)}
+            downloadRawUrl={this.getDownloadRawUrl(state)}
             isPdfAvailable={state.content.has_pdf_preview}
-            downloadPdfPageUrl={(({config: {apiUrl}, content, mode, fileCurrentPage}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1`
-            )(state)}
-            downloadPdfFullUrl={(({config: {apiUrl}, content, mode}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1`
-            )(state)}
+            downloadPdfPageUrl={this.getDownloadPdfPageUrl(state)}
+            downloadPdfFullUrl={this.getDownloadPdfFullUrl(state)}
             lightboxUrlList={state.content.lightboxUrlList}
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}
