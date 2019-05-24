@@ -154,7 +154,10 @@ class ESSearchApi(SearchApi):
 
         logger.info(self, "ES index is ready")
 
-    def delete_index(self):
+    def refresh_index(self) -> None:
+        self.es.indices.refresh(INDEX_DOCUMENTS_ALIAS)
+
+    def delete_index(self) -> None:
         logger.info(self, "delete index with pattern {}".format(INDEX_DOCUMENTS_PATTERN))
         self.es.indices.delete(INDEX_DOCUMENTS_PATTERN, allow_no_indices=True)
         self.es.indices.delete_template(INDEX_DOCUMENTS_ALIAS)
