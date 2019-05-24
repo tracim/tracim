@@ -2,7 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const DisplayState = props => (
-  <div className='displaystate'>
+  <div
+    className='displaystate'
+    data-cy='displaystate'
+  >
     <div className='displaystate__msg'>
       <i className={`fa fa-fw fa-${props.icon}`} />
       {props.msg}
