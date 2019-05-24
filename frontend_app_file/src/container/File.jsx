@@ -193,7 +193,7 @@ class File extends React.Component {
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}`,
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${fetchResultFile.body.current_revision_id}`,
             lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
@@ -466,7 +466,7 @@ class File extends React.Component {
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
         // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revision.revision_id}`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
           `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
         )
@@ -571,7 +571,7 @@ class File extends React.Component {
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
       }
     }))
   }
