@@ -204,7 +204,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/backend
         - nohup pserve $BACKEND_TEST_CONFIG_FILE&
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
-        - $(npm bin) run cypress-run
+        - npm run cypress-run
         - cd $TRAVIS_BUILD_DIR
 
 stages:
