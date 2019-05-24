@@ -15,6 +15,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
 from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
+from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN_TEMPLATE
 from tracim_backend.lib.search.es_models import DigestComments
 from tracim_backend.lib.search.es_models import DigestContent
 from tracim_backend.lib.search.es_models import DigestUser
@@ -175,7 +176,9 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # construct a new index name by appending current timestamp
-        next_index = INDEX_DOCUMENTS_PATTERN.replace("*", datetime.now().strftime("%Y%m%d%H%M%S%f"))
+        next_index = INDEX_DOCUMENTS_PATTERN_TEMPLATE.replace(
+            "{index_alias}", INDEX_DOCUMENTS_ALIAS
+        ).replace("{date}", datetime.now().strftime("%Y%m%d%H%M%S%f"))
 
         logger.info(self, 'create new index "{}"'.format(next_index))
         # create new index, it will use the settings from the template

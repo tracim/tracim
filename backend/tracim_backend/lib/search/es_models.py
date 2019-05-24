@@ -1,4 +1,5 @@
 from fnmatch import fnmatch
+import os
 import typing
 
 from elasticsearch_dsl import Boolean
@@ -31,8 +32,21 @@ html_folding = analyzer(
     char_filter="html_strip",
 )
 
-INDEX_DOCUMENTS_ALIAS = "documents"
-INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_ALIAS + "-*"
+DEFAULT_INDEX_DOCUMENTS_ALIAS = "documents"
+DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
+# FIXME - G.M - 2019-05-24 - hack using env var only configuration of document alias and document
+# pattern now, as it's currently complex to rewrite Lib signature to get needed information (we
+# need to convert static IndexedContent object to something dynamic that we will pass to SearchApi)
+# this should be refactor to have a true tracim config parameter for this.
+INDEX_DOCUMENTS_ALIAS = os.environ.get(
+    "TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS", DEFAULT_INDEX_DOCUMENTS_ALIAS
+)
+INDEX_DOCUMENTS_PATTERN_TEMPLATE = os.environ.get(
+    "TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE
+)
+INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_PATTERN_TEMPLATE.replace("{date}", "*").replace(
+    "{index_alias}", INDEX_DOCUMENTS_ALIAS
+)
 
 
 class DigestUser(InnerDoc):
