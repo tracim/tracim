@@ -137,5 +137,5 @@ Cypress.Commands.add('cleanSessionCookies', () => {
 })
 
 Cypress.Commands.add('cancelXHR', () => {
-  cy.visit('/')
+  cy.visit('/api/v2/doc/')
 })

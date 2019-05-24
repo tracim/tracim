@@ -96,12 +96,9 @@ Cypress.Commands.add('setupBaseDB', () => {
 })
 
 Cypress.Commands.add('resetDB', () => {
-  cy
-    .exec('tracimcli db delete --force -c ../backend/cypress_test.ini')
-    .then(cmd => cy.log(cmd.stdout))
-    .then(cmd => cy.exec('tracimcli db init -c ../backend/cypress_test.ini'))
-    .then(cmd => cy.log(cmd.stdout))
-
+  cy.exec('rm -rf ./sessions_data')
+  cy.exec('rm -rf ./sessions_lock')
+  cy.exec('cp ../backend/tracim_cypress.sqlite.tmp ../backend/tracim_cypress.sqlite')
   cy.cleanSessionCookies()
 })
 
