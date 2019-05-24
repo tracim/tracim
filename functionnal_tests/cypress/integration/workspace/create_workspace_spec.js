@@ -5,7 +5,7 @@ describe('Workspace', () => {
 
   beforeEach(() => {
     cy.loginAs('administrators')
-    cy.visit('/')
+    cy.visit('/ui')
   })
 
   it('should create a new workspace while no others are created', () => {

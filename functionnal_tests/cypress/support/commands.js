@@ -26,7 +26,7 @@ Cypress.Commands.add('loginAs', (role = 'administrators') => {
       })
     })
     .then(response => {
-      cy.waitUntil(() => cy.getCookie('session_key').then(async cookie => {
+      cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
         if (cookie && cookie.value) {
           return cy.saveCookieValue(role, cookie.value)
         }
