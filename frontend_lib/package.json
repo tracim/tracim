@@ -13,7 +13,7 @@
     "buildtracimlib-dev": "NODE_ENV=production webpack && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/ && echo Script ended at $(date +'%H:%M:%S')",
     "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
     "buildtracimlib-devwindoz": "set NODE_ENV=production&& webpack && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.lib.js > temp && mv temp dist/tracim_frontend_lib.lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.lib.js && cp ./dist/tracim_frontend_lib.style.js ../frontend/dist/app/",
-    "test": "NODE_ENV=test mocha"
+    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",

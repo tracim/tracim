@@ -3,7 +3,8 @@ import chai, { expect } from 'chai'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16.1'
 import { shallow, configure } from 'enzyme'
-import Breadcrumbs from '../src/component/Breadcrumbs/Breadcrumbs.jsx'
+import Breadcrumbs from '../../src/component/Breadcrumbs/Breadcrumbs.jsx'
+require('../../src/component/Breadcrumbs/Breadcrumbs.styl')
 
 configure({adapter: new Adapter()})
 chai.use(chaiEnzyme())

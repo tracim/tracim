@@ -1,6 +1,0 @@
---require @babel/register
---require ignore-styles
---require=test/setup
---reporter=spec
---colors
---recursive
