@@ -415,11 +415,17 @@ class WorkspaceContent extends React.Component {
                 <ContentItemHeader />
 
                 {state.contentLoaded && workspaceContentList.length === 0
-                  ? (
-                    <div className='workspace__content__fileandfolder__empty'>
-                      {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
-                    </div>
-                  )
+                  ? idRoleUserWorkspace === 1
+                    ? (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t('This shared space has no content yet')}
+                      </div>
+                    )
+                    : (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t('This shared space has no content yet') + t(", create the first content by clicking on the button 'Create'")}
+                      </div>
+                    )
                   : rootContentList.length === 0
                     ? (
                       <div className='workspace__content__fileandfolder__empty'>
