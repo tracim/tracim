@@ -870,6 +870,10 @@ class ContentInContext(object):
         return self.content.is_deleted
 
     @property
+    def is_active(self) -> bool:
+        return self.content.is_active
+
+    @property
     def is_editable(self) -> bool:
         from tracim_backend.lib.core.content import ContentApi
 

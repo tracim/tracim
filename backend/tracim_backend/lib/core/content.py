@@ -2087,11 +2087,11 @@ class ContentApi(object):
     def search(
         self,
         keywords: [str],
-        include_comments: bool = False,
         size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
         offset: typing.Optional[int] = None,
+        content_types: typing.Optional[typing.List[str]] = None,
     ) -> typing.Tuple[typing.List[Content], int]:
-        query = self._search_query(keywords=keywords, include_comments=include_comments)
+        query = self._search_query(keywords=keywords, content_types=content_types)
         total_hits = query.count()
         if size:
             query = query.limit(size)
@@ -2100,7 +2100,9 @@ class ContentApi(object):
         # TODO - G.M - 2019-05-23 - return object instead of tuple
         return query.all(), total_hits
 
-    def _search_query(self, keywords: [str], include_comments: bool = False) -> Query:
+    def _search_query(
+        self, keywords: [str], content_types: typing.Optional[typing.List[str]] = None
+    ) -> Query:
         """
         :return: a sorted list of Content items
         """
@@ -2122,9 +2124,13 @@ class ContentApi(object):
             .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))
         )
 
+        # INFO - G.M - 2019-05-27 - we remove comment from result
         comment_type = content_type_list.Comment
         comments_slugs = [comment_type.slug]
         title_keyworded_items = title_keyworded_items.filter(~Content.type.in_(comments_slugs))
+
+        if content_types:
+            title_keyworded_items = title_keyworded_items.filter(Content.type.in_(content_types))
 
         return title_keyworded_items
 

@@ -111,6 +111,7 @@ class IndexedContent(Document):
     is_archived = Boolean()
     is_deleted = Boolean()
     is_editable = Boolean()
+    is_active = Boolean()
     show_in_ui = Boolean()
     file_extension = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
     filename = Text(analyzer=edge_ngram_folding, search_analyzer=folding)

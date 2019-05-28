@@ -101,17 +101,31 @@ class SimpleSearchApi(SearchApi):
         pass
 
     def search_content(
-        self, search_string: str, size=SEARCH_DEFAULT_RESULT_NB, page_nb=1
+        self,
+        search_string: str,
+        size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
+        page_nb: typing.Optional[int] = 1,
+        content_types: typing.Optional[typing.List[str]] = None,
+        show_deleted: bool = False,
+        show_archived: bool = False,
+        show_active: bool = True,
     ) -> ContentSearchResponse:
         if not search_string:
             return EmptyContentSearchResponse()
         content_api = ContentApi(
-            session=self._session, current_user=self._user, config=self._config
+            session=self._session,
+            current_user=self._user,
+            config=self._config,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
+            show_active=show_active,
         )
         total_hits = 0
         keywords = content_api.get_keywords(search_string)
         offset = self.offset_from_pagination(size, page_nb)
-        content_list, total_hits = content_api.search(keywords=keywords, size=size, offset=offset)
+        content_list, total_hits = content_api.search(
+            keywords=keywords, size=size, offset=offset, content_types=content_types
+        )
         content_in_context_list = []
         for content in content_list:
             content_in_context_list.append(content_api.get_content_in_context(content))
@@ -283,6 +297,7 @@ class ESSearchApi(SearchApi):
             is_deleted=content.is_deleted,
             is_archived=content.is_archived,
             is_editable=content.is_editable,
+            is_active=content.is_active,
             show_in_ui=content.show_in_ui,
             file_extension=content.file_extension,
             filename=content.filename,
@@ -300,7 +315,14 @@ class ESSearchApi(SearchApi):
             indexed_content.save(using=self.es)
 
     def search_content(
-        self, search_string: str, size: typing.Optional[int], page_nb: typing.Optional[int]
+        self,
+        search_string: str,
+        size: typing.Optional[int],
+        page_nb: typing.Optional[int],
+        content_types: typing.Optional[typing.List[str]] = None,
+        show_deleted: bool = False,
+        show_archived: bool = False,
+        show_active: bool = True,
     ) -> ContentSearchResponse:
         """
         Search content into elastic search server:
@@ -323,7 +345,12 @@ class ESSearchApi(SearchApi):
             ],
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
-        search = search.exclude("term", is_deleted=True).exclude("term", is_archived=True)
+        if not show_active:
+            search = search.exclude("term", is_active=True)
+        if not show_deleted:
+            search = search.exclude("term", is_deleted=True)
+        if not show_archived:
+            search = search.exclude("term", is_archived=True)
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result
@@ -336,6 +363,8 @@ class ESSearchApi(SearchApi):
             search = search.extra(from_=self.offset_from_pagination(size, page_nb))
         if filtered_workspace_ids is not None:
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
+        if content_types:
+            search = search.filter("terms", content_type=content_types)
         res = search.execute()
         return res
 

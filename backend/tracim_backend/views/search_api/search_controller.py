@@ -28,7 +28,13 @@ class SearchController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         search = search_api.search_content(
-            hapic_data.query.search_string, hapic_data.query.size, hapic_data.query.page_nb
+            search_string=hapic_data.query.search_string,
+            size=hapic_data.query.size,
+            page_nb=hapic_data.query.page_nb,
+            show_deleted=hapic_data.query.show_deleted,
+            show_archived=hapic_data.query.show_archived,
+            show_active=hapic_data.query.show_active,
+            content_types=hapic_data.query.content_types,
         )
         # TODO - G.M - 2019-05-14 - Result should be converted to something else for frontend
         return search
