@@ -1362,6 +1362,7 @@ class ContentApi(object):
 
     def set_status(self, content: Content, new_status: str):
         if new_status in content_status_list.get_all_slugs_values():
+            content.owner = self._user
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
@@ -1405,7 +1406,7 @@ class ContentApi(object):
         if new_parent and new_parent != item.parent:
             content_type = content_type_list.get_one_by_slug(item.type)
             self._check_valid_content_type_in_dir(content_type, new_parent, new_workspace)
-
+        item.owner = self._user
         item.parent = new_parent
         if new_workspace:
             item.workspace = new_workspace
@@ -1641,6 +1642,7 @@ class ContentApi(object):
             content=new_content,
             force_create_new_revision=True,
         ) as rev:
+            rev.owner = self._user
             rev.parent = new_parent
             rev.workspace = new_workspace
             rev.label = new_label
