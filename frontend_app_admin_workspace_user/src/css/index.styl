@@ -15,20 +15,22 @@
       display flex
       align-items center
       flex-wrap wrap
-  &__workspaceTable__tr
-    &:hover, &:nth-child(even):hover
-      background-color grey-hover
-    &__td-link
-      white-space nowrap
-      overflow hidden
-      text-overflow ellipsis
-      cursor pointer
-      &:not(:hover)
-        color inherit
-    &__td-description
-      white-space nowrap
-      overflow hidden
-      text-overflow ellipsis
+  &__workspaceTable
+    table-layout fixed
+    &__tr
+      &:hover, &:nth-child(even):hover
+        background-color grey-hover
+      &__td-link
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+        cursor pointer
+        &:not(:hover)
+          color inherit
+      &__td-description
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
 
 .adminUser
   &__description
@@ -94,7 +96,6 @@
         margin-right 15px
 
 .table
-  table-layout fixed
   &__id
     width 5%
   &__sharedSpace
