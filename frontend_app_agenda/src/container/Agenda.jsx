@@ -47,8 +47,6 @@ class Agenda extends React.Component {
       case 'agenda_showApp':
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
-          // this.loadAgendaList(data.config.appConfig.idWorkspace)
-          // this.buildBreadcrumbs()
           this.setState({config: data.config})
         }
         break
