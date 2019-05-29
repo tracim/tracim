@@ -7,7 +7,8 @@ import {
   PageTitle,
   PageContent,
   convertBackslashNToBr,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -71,10 +72,13 @@ class Dashboard extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
       case 'refreshDashboardMemberList': this.loadMemberList(); break
-      case 'refreshWorkspaceList': this.loadWorkspaceDetail(); break
+      case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
+        await this.loadWorkspaceDetail()
+        this.buildBreadcrumbs()
+        break
       case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
@@ -86,7 +90,7 @@ class Dashboard extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { props } = this
 
     if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
@@ -104,9 +108,10 @@ class Dashboard extends React.Component {
         isEmail: false
       }
     })
-    this.loadWorkspaceDetail()
+    await this.loadWorkspaceDetail()
     this.loadMemberList()
     this.loadRecentActivity()
+    this.buildBreadcrumbs()
   }
 
   componentWillUnmount () {
@@ -467,7 +472,10 @@ class Dashboard extends React.Component {
             <PageContent>
               <div className='dashboard__workspace'>
                 <div className='dashboard__workspace__detail'>
-                  <div className='dashboard__workspace__detail__title primaryColorFont'>
+                  <div
+                    className='dashboard__workspace__detail__title primaryColorFont'
+                    data-cy='dashboardWorkspaceLabel'
+                  >
                     {props.curWs.label}
                   </div>
 
@@ -553,7 +561,7 @@ class Dashboard extends React.Component {
               {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
                 <AgendaInfo
                   customClass='dashboard__section'
-                  introText={props.t("Use this link to integrate this shared space's agenda to your")}
+                  introText={props.t('Use this link to integrate this agenda to your')}
                   caldavText={props.t('CalDAV compatible software')}
                   agendaUrl={props.curWs.agendaUrl}
                 />

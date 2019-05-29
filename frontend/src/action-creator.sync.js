@@ -99,6 +99,7 @@ export const FOLDER_READ = `${FOLDER}/${READ}`
 export const setWorkspaceContentRead = idFolder => ({ type: `${SET}/${FOLDER_READ}`, idFolder })
 
 export const APP = 'App'
+export const APP_FEATURE = `${APP}Feature`
 export const APP_LIST = `${APP}/List`
 export const setAppList = appList => ({ type: `${SET}/${APP_LIST}`, appList })
 

@@ -49,16 +49,16 @@ class FolderAdvanced extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'folder_advanced_showApp':
+      case 'folder_showApp':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         this.loadContent()
         break
-      case 'folder_advanced_hideApp':
+      case 'folder_hideApp':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case 'folder_advanced_reloadContent':
+      case 'folder_reloadContent':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
@@ -221,6 +221,8 @@ class FolderAdvanced extends React.Component {
 
   render () {
     const { state } = this
+
+    if (!state.isVisible) return null
 
     return (
       <PopinFixed customClass='folder_advanced'>

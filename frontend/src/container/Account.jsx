@@ -254,7 +254,7 @@ class Account extends React.Component {
                         return (
                           <AgendaInfo
                             customClass='account__agenda'
-                            introText={props.t("Use this link to integrate this shared space's agenda to your")}
+                            introText={props.t('Use this link to integrate this agenda to your')}
                             caldavText={props.t('CalDAV compatible software')}
                             agendaUrl={props.user.agendaUrl}
                           />

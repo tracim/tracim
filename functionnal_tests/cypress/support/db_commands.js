@@ -1,3 +1,9 @@
+const userFixtures = {
+  'administrators': 'defaultAdmin',
+  'trusted-users': '',
+  'users': 'baseUser'
+}
+
 function makeRandomString (length = 5) {
   var text = ''
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -90,25 +96,18 @@ Cypress.Commands.add('setupBaseDB', () => {
 })
 
 Cypress.Commands.add('resetDB', () => {
-  cy
-    .exec('tracimcli db delete --force -c ../backend/cypress_test.ini')
-    .then(cmd => cy.log(cmd.stdout))
-    .then(cmd => cy.exec('tracimcli db init -c ../backend/cypress_test.ini'))
-    .then(cmd => cy.log(cmd.stdout))
+  cy.exec('rm -rf ./sessions_data')
+  cy.exec('rm -rf ./sessions_lock')
+  cy.exec('cp /tmp/tracim_cypress.sqlite.tmp /tmp/tracim_cypress.sqlite')
+  cy.cleanSessionCookies()
 })
 
 Cypress.Commands.add('getUserByRole', (role) => {
-  const userFixtures = {
-    'administrators': 'defaultAdmin',
-    'trusted-users': '',
-    'users': 'baseUser'
-  }
-
   return cy
     .fixture(userFixtures[role])
 })
 
-Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId) => {
+Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId=null) => {
   let url = `/api/v2/workspaces/${workspaceId}/contents`
   let data = {
     content_type: 'html-document',
@@ -137,4 +136,43 @@ Cypress.Commands.add('changeHtmlDocumentStatus', (contentId, workspaceId, status
   cy
     .request('PUT', url, data)
     .then(response => response.body)
+})
+
+Cypress.Commands.add('createThread', (title, workspaceId, parentId=null) => {
+  let url = `/api/v2/workspaces/${workspaceId}/contents`
+  let data = {
+    content_type: 'thread',
+    label: title,
+    parent_id: parentId
+  }
+  cy
+    .request('POST', url, data)
+    .then(response => response.body)
+})
+
+Cypress.Commands.add('createThread', (title, workspaceId, parentId=null) => {
+  let url = `/api/v2/workspaces/${workspaceId}/contents`
+  let data = {
+    content_type: 'thread',
+    label: title,
+    parent_id: parentId
+  }
+  cy
+    .request('POST', url, data)
+    .then(response => response.body)
+})
+
+Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId=null) => {
+  let url = `/api/v2/workspaces/${workspaceId}/files`
+  cy.fixture(fixturePath, 'base64').then(fixture => {
+    cy.window().then(window => {
+      Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
+        let form = new FormData()
+        form.set('files', blob, fileTitle)
+        cy
+          .form_request('POST', url, form)
+          .then(response => response)
+      })
+    })
+  })
 })

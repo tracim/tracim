@@ -76,6 +76,13 @@ function setup_config_file {
     else
         loggood "sessions_lock folder not exist"
     fi
+
+    if [ ! -d "$DEFAULTDIR/backend/radicale_storage" ]; then
+       log "create radicale storage dir"
+       mkdir "$DEFAULTDIR/backend/radicale_storage" && loggood "create radicale storage folder success" || logerror "failed to create radicale_storage folder"
+    else
+        loggood "radicale storage dir already exist"
+    fi
 }
 
 function setup_db {
