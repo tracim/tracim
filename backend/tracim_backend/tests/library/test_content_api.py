@@ -25,9 +25,7 @@ from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
