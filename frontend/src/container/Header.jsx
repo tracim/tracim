@@ -16,11 +16,15 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected
+  setUserDisconnected,
+  setResearch,
+  setNbElementsResearch,
+  setStringResearch
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
-  putUserLang
+  putUserLang,
+  getResearchString
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
@@ -28,6 +32,7 @@ import {
   PROFILE,
   unLoggedAllowedPageList
 } from '../helper.js'
+import Research from '../component/Header/Research.jsx'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -85,6 +90,24 @@ class Header extends React.Component {
     this.props.history.push(PAGE.AGENDA)
   }
 
+  handleClickResearch = async (stringResearch) => {
+    const { props } = this
+
+    const fetchGetStringResearch = await props.dispatch(getResearchString(stringResearch, 1, props.researchResultList.number_elements_by_page))
+
+    switch (fetchGetStringResearch.status) {
+      case 200:
+        props.dispatch(setNbElementsResearch(fetchGetStringResearch.json.total_hits))
+        props.dispatch(setResearch(fetchGetStringResearch.json.contents))
+        props.dispatch(setStringResearch(stringResearch))
+        props.history.push(PAGE.RESEARCH_RESULT)
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+        break
+    }
+  }
+
   render () {
     const { props } = this
 
@@ -109,6 +132,12 @@ class Header extends React.Component {
                 </li>
               )}
 
+              <li>
+                <Research
+                  className='header__menu__rightside__research'
+                  onClickResearch={this.handleClickResearch}
+                />
+              </li>
               {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
                 <li className='header__menu__rightside__adminlink'>
                   <AdminLink />
@@ -151,5 +180,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, system, appList }) => ({ lang, user, system, appList })
+const mapStateToProps = ({ researchResultList, lang, user, system, appList }) => ({ researchResultList, lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

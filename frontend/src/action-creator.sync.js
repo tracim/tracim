@@ -117,3 +117,16 @@ export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`
 export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
 export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${BREADCRUMBS}`, prependBreadcrumbs })
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
+
+export const RESEARCH = 'Research'
+export const setResearch = newResearch => ({ type: `${SET}/${RESEARCH}`, newResearch })
+export const resetResearch = () => ({ type: `${RESET}/${RESEARCH}` })
+export const appendResearch = appendResearch => ({ type: `${APPEND}/${RESEARCH}`, appendResearch })
+export const RESEARCH_ELEMENTS = 'ResearchElements'
+export const setNbElementsResearch = nbElements => ({ type: `${SET}/${RESEARCH_ELEMENTS}`, nbElements })
+export const STRING_RESEARCH = 'StringResearch'
+export const setStringResearch = strResearch => ({ type: `${SET}/${STRING_RESEARCH}`, strResearch })
+export const RESEARCH_ELEMENTS_BY_PAGE = 'ResearchElementsByPage'
+export const setNbElementsByPage = nbElementsByPage => ({ type: `${SET}/${RESEARCH_ELEMENTS_BY_PAGE}`, nbElementsByPage })
+export const RESEARCH_PAGE = 'ResearchPage'
+export const setNbPage = nbPage => ({ type: `${SET}/${RESEARCH_PAGE}`, nbPage })

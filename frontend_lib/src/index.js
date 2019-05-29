@@ -42,6 +42,8 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
+import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case 'allApp_changeLang': i18n.changeLanguage(data); break
@@ -84,5 +86,6 @@ export {
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  ListItemWrapper
 }

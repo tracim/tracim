@@ -1,12 +1,14 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import BtnExtandedAction from './BtnExtandedAction.jsx'
-import { Badge } from 'tracim_frontend_lib'
+import { Link } from 'react-router-dom'
+import { Badge, Avatar } from 'tracim_frontend_lib'
 
-const ContentItem = props => {
+require('./ContentItemResearch.styl')
+
+const ContentItemResearch = props => {
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
+
   return (
     <Link
       title={props.label}
@@ -24,14 +26,21 @@ const ContentItem = props => {
         )}
       </div>
 
-      {props.idRoleUserWorkspace >= 2 && (
-        <div className='d-none d-md-block'>
-          <BtnExtandedAction
-            idRoleUserWorkspace={props.idRoleUserWorkspace}
-            onClickExtendedAction={props.onClickExtendedAction}
-          />
-        </div>
-      )}
+      <div className='content__path'>
+        { props.path }
+      </div>
+
+      <div className='content__lastModification'>
+        <Avatar
+          width={'40px'}
+          style={{
+            display: 'inline-block',
+            marginRight: '10px'
+          }}
+          publicName={props.lastModificationAuthor}
+        />
+        { props.lastModificationTime }
+      </div>
 
       <div
         className='content__status d-sm-flex justify-content-between align-items-center'
@@ -48,25 +57,21 @@ const ContentItem = props => {
   )
 }
 
-export default translate()(ContentItem)
+export default translate()(ContentItemResearch)
 
-ContentItem.propTypes = {
+ContentItemResearch.propTypes = {
   statusSlug: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   label: PropTypes.string,
   fileName: PropTypes.string,
   fileExtension: PropTypes.string,
   contentType: PropTypes.object,
-  onClickItem: PropTypes.func,
   faIcon: PropTypes.string,
-  read: PropTypes.bool,
   urlContent: PropTypes.string
 }
 
-ContentItem.defaultProps = {
+ContentItemResearch.defaultProps = {
   label: '',
   customClass: '',
-  onClickItem: () => {},
-  read: false,
   urlContent: ''
 }

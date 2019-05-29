@@ -180,5 +180,11 @@
   "Use this link to integrate Tracim in your file explorer": "Utilisez ce lien pour intégrer Tracim à votre explorateur de fichiers",
   "CalDAV compatible software": "logiciel compatible CalDAV",
   "(protocole WebDAV)": "(protocole WebDAV)",
-  "Administration": "Administration"
+  "Administration": "Administration",
+  "Agendas": "Agendas",
+  "Research results": "Résultats de la recherche",
+  "10 best results for": "10 meilleurs résultats pour",
+  "Path": "Chemin",
+  "Last modification": "Dernère modification",
+  "Research": "Rechercher"
 }
