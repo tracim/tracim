@@ -107,7 +107,8 @@
   "shared space detail": "Détail de l'espace partagé",
   "You will create your first shared space": "Vous allez créer votre premier espace partagé",
   "create a shared space": "Créer un espace partagé",
-  "This shared space has no content yet, create the first content by clicking on the button 'Create'": "Cet espace partagé n'a pas encore de contenu, créez le premier contenu en cliquant sur le bouton 'Créer'",
+  "This shared space has no content yet": "Cet espace partagé n'a pas encore de contenu",
+  ", create the first content by clicking on the button 'Create'": ", créez le premier contenu en cliquant sur le bouton 'Créer'",
   "Shared spaces and notifications": "Espaces partagés et notifications",
   "Shared space": "Espace partagé",
   "Shared spaces": "Espaces partagés",
@@ -179,5 +180,9 @@
   "CalDAV compatible software": "logiciel compatible CalDAV",
   "(protocole WebDAV)": "(protocole WebDAV)",
   "Administration": "Administration",
-  "Agendas": "Agendas"
+  "Agendas": "Agendas",
+  "see shared space": "voir l'espace partagé",
+  "hide shared space": "masquer l'espace partagé",
+  "see sidebar": "voir la barre latérale",
+  "hide sidebar": "masquer la barre latérale"
 }

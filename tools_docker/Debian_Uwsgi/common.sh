@@ -18,7 +18,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
     sed -i "s|webdav.listen = .*|webdav.listen = 127.0.0.1:3030|g" /etc/tracim/development.ini
     sed -i "s|;webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
-    sed -i "s|; wsgidav.client.base_url = .*|wsgidav.client.base_url = 127.0.0.1:3030|g" /etc/tracim/development.ini
+    sed -i "s|webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;

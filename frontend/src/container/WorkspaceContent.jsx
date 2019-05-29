@@ -39,7 +39,8 @@ import {
   setWorkspaceReadStatusList,
   toggleFolderOpen,
   setWorkspaceContentRead,
-  setBreadcrumbs
+  setBreadcrumbs,
+  resetBreadcrumbsAppFeature
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -84,6 +85,8 @@ class WorkspaceContent extends React.Component {
 
         props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.idWorkspaceInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
         this.setState({appOpenedType: false})
+
+        this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
       case 'allApp_changeLang': this.buildBreadcrumbs(); break
@@ -412,11 +415,17 @@ class WorkspaceContent extends React.Component {
                 <ContentItemHeader />
 
                 {state.contentLoaded && workspaceContentList.length === 0
-                  ? (
-                    <div className='workspace__content__fileandfolder__empty'>
-                      {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
-                    </div>
-                  )
+                  ? idRoleUserWorkspace === 1
+                    ? (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t('This shared space has no content yet')}
+                      </div>
+                    )
+                    : (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t('This shared space has no content yet') + t(", create the first content by clicking on the button 'Create'")}
+                      </div>
+                    )
                   : rootContentList.length === 0
                     ? (
                       <div className='workspace__content__fileandfolder__empty'>

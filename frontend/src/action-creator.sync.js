@@ -99,6 +99,7 @@ export const FOLDER_READ = `${FOLDER}/${READ}`
 export const setWorkspaceContentRead = idFolder => ({ type: `${SET}/${FOLDER_READ}`, idFolder })
 
 export const APP = 'App'
+export const APP_FEATURE = `${APP}Feature`
 export const APP_LIST = `${APP}/List`
 export const setAppList = appList => ({ type: `${SET}/${APP_LIST}`, appList })
 
@@ -117,3 +118,4 @@ export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`
 export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
 export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${BREADCRUMBS}`, prependBreadcrumbs })
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
+export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS}/${APP_FEATURE}` })

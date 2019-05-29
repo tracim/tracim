@@ -14,11 +14,14 @@ More information on the website: https://www.tracim.fr (in French)
 Test  tracim on your computer with docker:
 
 ```
-TRACIM_STORAGE=~/tracim
-mkdir -p $TRACIM_STORAGE/etc
-mkdir -p $TRACIM_STORAGE/var
-docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v $TRACIM_STORAGE/etc/:/etc/tracim -v $TRACIM_STORAGE/var:/var/tracim algoo/tracim
+TRACIM_ETC_STORAGE=~/tracim/etc
+TRACIM_VAR_STORAGE=~/tracim/var
+mkdir -p $TRACIM_ETC_STORAGE
+mkdir -p $TRACIM_VAR_STORAGE
+docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v $TRACIM_ETC_STORAGE:/etc/tracim -v TRACIM_VAR_STORAGE:/var/tracim algoo/tracim
 ```
+Note: Take care to set `TRACIM_ETC_STORAGE` and `TRACIM_VAR_STORAGE` environment variables, otherwise data will be no persistent.
+
 Then visit the url http://localhost:8080 and login in to tracim:
 
 - email: `admin@admin.admin`

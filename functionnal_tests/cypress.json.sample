@@ -2,5 +2,7 @@
   "baseUrl": "http://localhost:1337",
   "viewportWidth": 1280,
   "viewportHeight": 1024,
-  "video": false
+  "defaultCommandTimeout": 30000,
+  "video": false,
+  "chromeWebSecurity": false
 }

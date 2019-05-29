@@ -148,6 +148,16 @@ class TestThread(DefaultTest):
         rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         eq_([w1, w2], wapi.get_all_manageable())
 
+    def test__unit__workspace_deletion__ok__nominal_case(self) -> None:
+        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
+        business_workspace = wapi.create_workspace(label="business")
+        assert business_workspace.label == "business"
+        wapi.delete(business_workspace)
+        assert business_workspace.is_deleted is True
+        assert business_workspace.label != "business"
+        assert business_workspace.label.startswith("business-deleted-")
+
     def test_unit__create_workspace_same__error__same_workspace_name_unallowed(self):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)

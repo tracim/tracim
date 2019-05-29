@@ -11,12 +11,6 @@ export const MenuSubComponent = props => {
     <nav className='menusubcomponent navbar'>
 
       <div className='menusubcomponent__header'>
-        <div className='menusubcomponent__responsive d-lg-none'>
-          <button className='menusubcomponent__responsive__button iconBtn' type='button'>
-            <i className='fa fa-fw fa-bars' />
-          </button>
-        </div>
-
         <div className='menusubcomponent__menutitle primaryColorFontDarken'>Menu</div>
       </div>
 
