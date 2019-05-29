@@ -47,7 +47,9 @@ class Agenda extends React.Component {
       case 'agenda_showApp':
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
-          this.loadAgendaList(data.config.appConfig.idWorkspace)
+          // this.loadAgendaList(data.config.appConfig.idWorkspace)
+          // this.buildBreadcrumbs()
+          this.setState({config: data.config})
         }
         break
       case 'allApp_changeLang':
@@ -77,12 +79,15 @@ class Agenda extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
+      if (state.config.appConfig.idWorkspace) await this.loadAgendaList(state.config.appConfig.idWorkspace)
+      await this.loadWorkspaceData()
+      this.buildBreadcrumbs()
       this.agendaIframe.contentWindow.location.reload()
     }
   }
