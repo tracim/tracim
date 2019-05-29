@@ -2943,7 +2943,7 @@ class TestContentApi(DefaultTest):
         last_actives = api.get_last_active(workspace=workspace2)
         assert len(last_actives) == 0
 
-    def test_search_in_label(self):
+    def test_unit__search_in_label__ok__nominal_case(self):
         # HACK - D.A. - 2015-03-09
         # This test is based on a bug which does NOT return results found
         # at root of a workspace (eg a folder)
@@ -2965,25 +2965,20 @@ class TestContentApi(DefaultTest):
         a = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
-        p = api.create(
-            content_type_list.Page.slug, workspace, a, "this is randomized label content", "", True
-        )
+        p = api.create(content_type_list.Page.slug, workspace, a, "this is another thing", "", True)
 
         with new_revision(session=self.session, tm=transaction.manager, content=p):
-            p.description = "This is some amazing test"
+            p.description = "This is some randomized test"
 
         api.save(p)
-        original_id = p.content_id
+        original_id = a.content_id
 
         res = api._search_query(["randomized"])
         eq_(1, len(res.all()))
         item = res.all()[0]
         eq_(original_id, item.content_id)
 
-    def test_search_in_description(self):
-        # HACK - D.A. - 2015-03-09
-        # This test is based on a bug which does NOT return results found
-        # at root of a workspace (eg a folder)
+    def test_unit__search_in_filename__nominal_case(self):
 
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
@@ -3011,104 +3006,18 @@ class TestContentApi(DefaultTest):
             p.description = "This is some amazing test"
 
         api.save(p)
-        original_id = p.content_id
+        original_id = a.content_id
 
-        res = api._search_query(["dummy"])
+        res = api._search_query(["this is randomized folder"])
         eq_(1, len(res.all()))
         item = res.all()[0]
         eq_(original_id, item.content_id)
 
-    def test_search_in_label_or_description(self):
-        # HACK - D.A. - 2015-03-09
-        # This test is based on a bug which does NOT return results found
-        # at root of a workspace (eg a folder)
-
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
-
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        a = api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=workspace,
-            parent=None,
-            label="this is randomized folder",
-            do_save=True,
-        )
-        p1 = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=a,
-            label="this is dummy label content",
-            do_save=True,
-        )
-        p2 = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=a,
-            label="Hey ! Jon !",
-            do_save=True,
-        )
-
-        with new_revision(session=self.session, tm=transaction.manager, content=p1):
-            p1.description = "This is some amazing test"
-
-        with new_revision(session=self.session, tm=transaction.manager, content=p2):
-            p2.description = "What's up?"
-
-        api.save(p1)
-        api.save(p2)
-
-        id1 = p1.content_id
-        id2 = p2.content_id
-
-        eq_(1, self.session.query(Workspace).filter(Workspace.label == "test workspace").count())
-        eq_(
-            1,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.label == "this is randomized folder")
-            .count(),
-        )
-        eq_(
-            2,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.label == "this is dummy label content")
-            .count(),
-        )
-        eq_(
-            1,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.description == "This is some amazing test")
-            .count(),
-        )
-        eq_(
-            2,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.label == "Hey ! Jon !")
-            .count(),
-        )
-        eq_(
-            1,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.description == "What's up?")
-            .count(),
-        )
-
-        res = api._search_query(["dummy", "jon"])
-        eq_(2, len(res.all()))
-
-        eq_(True, id1 in [o.content_id for o in res.all()])
-        eq_(True, id2 in [o.content_id for o in res.all()])
+        original_id = p.content_id
+        res = api._search_query(["this is dummy label content.document.html"])
+        eq_(1, len(res.all()))
+        item = res.all()[0]
+        eq_(original_id, item.content_id)
 
     def test_unit__search_exclude_content_under_deleted_or_archived_parents__ok(self):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
