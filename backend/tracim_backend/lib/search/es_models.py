@@ -58,6 +58,8 @@ INDEX_DOCUMENTS_PATTERN_TEMPLATE = os.environ.get(
 INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_PATTERN_TEMPLATE.replace("{date}", "*").replace(
     "{index_alias}", INDEX_DOCUMENTS_ALIAS
 )
+# FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
+ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
 
 
 class DigestUser(InnerDoc):

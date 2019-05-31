@@ -335,12 +335,18 @@ class ESSearchApi(SearchApi):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
-        file_ = content.get_b64_file()
-        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST and file_:
-            indexed_content.file = file_
-            indexed_content.save(using=self.es, pipeline="attachment")
-        else:
-            indexed_content.save(using=self.es)
+        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
+            if (
+                not self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
+                or content.mimetype
+                in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
+            ):
+                file_ = content.get_b64_file()
+                if file_:
+                    indexed_content.file = file_
+                    indexed_content.save(using=self.es, pipeline="attachment")
+                    return
+        indexed_content.save(using=self.es)
 
     def search_content(
         self,
