@@ -207,7 +207,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test update workspace with empty label
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "business", "description": "mysuperdescription"}
+        params = {"": "business", "description": "mysuperdescription"}
         res = self.testapp.put_json("/api/v2/workspaces/1", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
