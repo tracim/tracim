@@ -3,6 +3,7 @@ import typing
 from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
+from tracim_backend.exceptions import NoValidSearchEngine
 from tracim_backend.models.auth import User
 
 ELASTICSEARCH__SEARCH_ENGINE_SLUG = "elasticsearch"
@@ -23,8 +24,11 @@ class SearchFactory(object):
 
             return SimpleSearchController()
         else:
-            # FIXME - G.M - 2019-05-22 - raise specific exception
-            raise Exception
+            raise NoValidSearchEngine(
+                "Can't provide search controller "
+                ' because search engine provided "{}"'
+                " is not valid".format(config.SEARCH__ENGINE)
+            )
 
     @classmethod
     def get_search_lib(cls, session: Session, current_user: typing.Optional[User], config: CFG):
@@ -39,5 +43,8 @@ class SearchFactory(object):
 
             return SimpleSearchApi(session=session, current_user=current_user, config=config)
         else:
-            # FIXME - G.M - 2019-05-22 - raise specific exception
-            raise Exception
+            raise NoValidSearchEngine(
+                "Can't provide search lib"
+                ' because search engine provided "{}"'
+                " is not valid".format(config.SEARCH__ENGINE)
+            )
