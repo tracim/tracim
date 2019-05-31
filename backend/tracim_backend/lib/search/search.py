@@ -83,11 +83,21 @@ class SearchApi(ABC):
         return None
 
     def offset_from_pagination(self, size: int, page_nb: int) -> int:
+        """
+        Simple method to get an offset value from size and page_nb value
+        """
         assert page_nb > 0
         return (page_nb - 1) * size
 
 
 class SimpleSearchApi(SearchApi):
+    """
+    Simple search using sql:
+    - Do not index anything.
+    - allow pagination and filtering by content_type, deleted, archived
+    - limited feature (no ranking, no search into content, etc...)
+    """
+
     def create_index(self):
         pass
 
@@ -110,6 +120,11 @@ class SimpleSearchApi(SearchApi):
         show_archived: bool = False,
         show_active: bool = True,
     ) -> ContentSearchResponse:
+        """
+        Search content with sql
+        - do no show archived/deleted content by default
+        - filter content found according to workspace of current_user
+        """
         if not search_string:
             return EmptyContentSearchResponse()
         content_api = ContentApi(
@@ -133,10 +148,21 @@ class SimpleSearchApi(SearchApi):
 
 
 class ESSearchApi(SearchApi):
+    """
+    Search using ElasticSearch :
+    - need indexing content first
+    - allow pagination and filtering by content_type, deleted, archived
+    - support ranking
+    - search in content file for html-doc and thread
+    - search in content file for file if ingest mode activated
+    """
+
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENABLED
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
+        # TODO - G.M - 2019-05-31 - we do support only "one elasticsearch server case here in config,
+        # check how to support more complex case.
         self.es = Elasticsearch(
             hosts=[
                 (
@@ -178,6 +204,8 @@ class ESSearchApi(SearchApi):
         self.es.indices.refresh(INDEX_DOCUMENTS_ALIAS)
 
     def delete_index(self) -> None:
+        # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
+        # to be more specific here.
         logger.info(self, "delete index with pattern {}".format(INDEX_DOCUMENTS_PATTERN))
         self.es.indices.delete(INDEX_DOCUMENTS_PATTERN, allow_no_indices=True)
         self.es.indices.delete_template(INDEX_DOCUMENTS_ALIAS)
@@ -332,9 +360,16 @@ class ESSearchApi(SearchApi):
         if not search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
+        # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
+        # syntax to match complex case,
+        # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
         search = Search(using=self.es, doc_type=IndexedContent).query(
             "simple_query_string",
             query=search_string,
+            # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
+            # change score according to this boost. label is the most important, content is
+            # important too, content of comment is less important. filename and file_extension is
+            # only useful to allow matching "png" or "nameofmycontent.png".
             fields=[
                 "label^5",
                 "filename",
@@ -353,7 +388,7 @@ class ESSearchApi(SearchApi):
             search = search.exclude("term", is_archived=True)
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
-        # result
+        # result, because we do not need them and for performance reasons.
         search = search.source(exclude=["raw_content", "*.raw_content", "attachment.*", "file"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
@@ -369,7 +404,13 @@ class ESSearchApi(SearchApi):
         return res
 
     def _create_ingest_pipeline(self) -> None:
+        """
+        Create ingest pipeline to allow extract file content and use them for search.
+        """
         p = IngestClient(self.es)
+        # TODO - G.M - 2019-05-31 - check if possible to set specific analyzer for
+        # attachment content parameters. Goal :
+        # allow ngram or lang specific indexing for "in file search"
         p.put_pipeline(
             id="attachment",
             body={

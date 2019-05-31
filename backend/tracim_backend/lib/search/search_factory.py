@@ -11,6 +11,10 @@ SIMPLE__SEARCH_ENGINE_SLUG = "simple"
 
 
 class SearchFactory(object):
+    """
+    Factory to get correct objects related to search engine activated
+    """
+
     @classmethod
     def get_search_controller(cls, config: CFG):
         if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
