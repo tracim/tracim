@@ -1,6 +1,8 @@
 from parameterized import parameterized
+import pytest
 import transaction
 
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -394,3 +396,54 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert search_result["is_total_hits_accurate"] is True
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
+
+
+class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
+    config_section = "functional_test_elasticsearch_ingest_search"
+
+    @pytest.xfail(reason="Need elasticsearch ingest plugin enabled")
+    def test_api__elasticsearch_search__ok__in_file_ingest_search(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        )
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        with self.session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                label="important",
+                do_save=False,
+            )
+            api.update_file_data(
+                text_file, "test_file", "text/plain", b"we need to find stringtosearch here !"
+            )
+            api.save(text_file)
+            api.execute_created_content_actions(text_file)
+        content_id = text_file.content_id
+        transaction.commit()
+        self.refresh_elasticsearch()
+
+        params = {"search_string": "stringtosearch"}
+        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == 1
+        assert search_result["is_total_hits_accurate"] is True
+        assert len(search_result["contents"]) == 1
+        assert search_result["contents"][0]["content_id"] == content_id
