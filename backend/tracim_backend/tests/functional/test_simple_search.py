@@ -15,7 +15,7 @@ from tracim_backend.tests import FunctionalTest
 class NoSearchEnabled(FunctionalTest):
     config_section = "functional_test_no_search"
 
-    def test_api___simple_search_ok__by_filename(self) -> None:
+    def test_api___no_search__err_404__by_filename(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
         uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
