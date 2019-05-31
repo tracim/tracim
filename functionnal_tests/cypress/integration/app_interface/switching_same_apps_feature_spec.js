@@ -34,7 +34,6 @@ describe('Hot switching between the same app', () => {
   beforeEach(() => {
     cy.ignoreTinyMceError()
     cy.loginAs('administrators')
-    console.log(workspaceId)
     cy.visitPage({pageName: p.CONTENTS, params: {workspaceId: workspaceId}})
   })
 
@@ -44,7 +43,6 @@ describe('Hot switching between the same app', () => {
 
   describe('From File to File', () => {
     it('should close first file and open the second one', () => {
-      console.log(s.CONTENT_IN_LIST)
       cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: fileTitle}}).click('left')
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(fileTitle)
       cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherFileTitle}}).click('left')
