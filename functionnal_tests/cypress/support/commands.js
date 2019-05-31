@@ -10,7 +10,7 @@ const userFixtures = {
 let LOGIN_URL = '/api/v2/auth/login'
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
-  if (Cypress.env(role)) {
+  if (getCookieValueFromEnv(role)) {
     cy.setSessionCookieFromEnv(role)
     return cy.getUserByRole(role)
   }
@@ -26,7 +26,7 @@ Cypress.Commands.add('loginAs', (role = 'administrators') => {
       })
     })
     .then(response => {
-      cy.waitUntil(() => cy.getCookie('session_key').then(async cookie => {
+      cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
         if (cookie && cookie.value) {
           return cy.saveCookieValue(role, cookie.value)
         }
@@ -123,18 +123,19 @@ Cypress.Commands.add('saveCookieValue', (user, cookieValue) => {
 })
 
 Cypress.Commands.add('setSessionCookieFromEnv', (user) => {
-  cy.setCookie('session_key', 'test')
+  cy.setCookie('session_key', getCookieValueFromEnv(user))
   cy.setCookie('lastConnection', '1')
   cy.setCookie('defaultLanguage', 'en')
 })
 
+const getCookieValueFromEnv = (user) => {
+  return Cypress.env(`session_cookie_${user}`)
+}
+
 Cypress.Commands.add('cleanSessionCookies', () => {
-  Object.keys(Cypress.env).forEach(
-    (key) => {
-      if (key.startsWith('session_cookie_')) Cypress.env.set(key,'')
-  })
+  Cypress.env.reset()
 })
 
 Cypress.Commands.add('cancelXHR', () => {
-  cy.visit('/')
+  cy.visit('/api/v2/doc/')
 })

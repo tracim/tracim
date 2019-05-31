@@ -4,6 +4,7 @@ import { withRouter } from 'react-router'
 import { Route, Redirect } from 'react-router-dom'
 import { PAGE, PROFILE } from '../helper.js'
 import appFactory from '../appFactory.js'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 class AppFullscreenRouter extends React.Component {
   constructor (props) {
@@ -16,7 +17,7 @@ class AppFullscreenRouter extends React.Component {
   componentDidMount = () => this.setState({isMounted: true})
 
   componentWillUnmount = () => {
-    this.props.dispatchCustomEvent('unmount_app')
+    this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
   render () {
