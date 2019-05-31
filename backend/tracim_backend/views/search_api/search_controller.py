@@ -36,7 +36,6 @@ class SearchController(Controller):
             show_active=hapic_data.query.show_active,
             content_types=hapic_data.query.content_types,
         )
-        # TODO - G.M - 2019-05-14 - Result should be converted to something else for frontend
         return search
 
     def bind(self, configurator: Configurator) -> None:
