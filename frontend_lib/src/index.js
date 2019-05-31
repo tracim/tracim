@@ -43,6 +43,8 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
+import DisplayState from './component/DisplayState/DisplayState.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case 'allApp_changeLang': i18n.changeLanguage(data); break
@@ -86,5 +88,6 @@ export {
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  DisplayState
 }
