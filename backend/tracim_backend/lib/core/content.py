@@ -612,6 +612,7 @@ class ContentApi(object):
                 )
                 search_api.index_content(content_in_context)
                 # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
+                # see https://github.com/tracim/tracim/issues/1833
                 if content.last_revision.revision_type in (
                     ActionDescription.DELETION,
                     ActionDescription.ARCHIVING,
