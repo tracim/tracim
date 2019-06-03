@@ -401,7 +401,7 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
 class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
     config_section = "functional_test_elasticsearch_ingest_search"
 
-    @pytest.xfail(reason="Need elasticsearch ingest plugin enabled")
+    @pytest.mark.xfail(reason="Need elasticsearch ingest plugin enabled")
     def test_api__elasticsearch_search__ok__in_file_ingest_search(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
