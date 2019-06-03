@@ -95,37 +95,43 @@
       .btn:first-child
         margin-right 15px
 
-.table
-  &__id
-    width 5%
-  &__sharedSpace
-    width 15%
-  &__description
-    width 60%
-  &__memberCount
-    width 10%
-  &__delete
-    width 10%
+.adminWorkspace
+  &__workspaceTable
+    & .table
+      &__id
+        width 5%
+      &__sharedSpace
+        width 15%
+      &__description
+        width 60%
+      &__memberCount
+        width 10%
+      &__delete
+        width 10%
 
 @media (min-width: min-sm) and (max-width: max-md)
-  .table
-    &__description
-      width 50%
-    &__memberCount
-      width 15%
-    &__delete
-      width 15%
+  .adminWorkspace
+    &__workspaceTable
+      & .table
+        &__description
+          width 50%
+        &__memberCount
+          width 15%
+        &__delete
+          width 15%
 
 @media (max-width: max-xs)
-    .table
-      &__id
-        width 10%
-      &__sharedSpace
-        width 30%
-      &__description
-        width 0%
-        display none
-      &__memberCount
-        width 30%
-      &__delete
-        width 30%
+  .adminWorkspace
+    &__workspaceTable
+      & .table
+        &__id
+          width 10%
+        &__sharedSpace
+          width 30%
+        &__description
+          width 0%
+          display none
+        &__memberCount
+          width 30%
+        &__delete
+          width 30%
