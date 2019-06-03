@@ -46,6 +46,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
@@ -253,11 +254,10 @@ class ContentApi(object):
         # Security layer: if user provided, filter
         # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
-            user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
-            workspace_ids = [
-                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
-            ]
+            workspace_ids = RoleApi(
+                session=self._session, current_user=self._user, config=self._config
+            ).get_user_workspaces_ids(self._user_id, UserRoleInWorkspace.READER)
             result = result.filter(
                 or_(
                     Content.workspace_id.in_(workspace_ids),
@@ -611,6 +611,20 @@ class ContentApi(object):
                     current_user=self._user, config=self._config, session=self._session
                 )
                 search_api.index_content(content_in_context)
+                # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
+                # see https://github.com/tracim/tracim/issues/1833
+                if content.last_revision.revision_type in (
+                    ActionDescription.DELETION,
+                    ActionDescription.ARCHIVING,
+                    ActionDescription.UNARCHIVING,
+                    ActionDescription.UNDELETION,
+                ):
+                    for child_content in content.get_children(recursively=True):
+                        child_in_context = ContentInContext(
+                            child_content, config=self._config, dbsession=self._session
+                        )
+                        search_api.index_content(child_in_context)
+
             except Exception:
                 logger.exception(self, "Something goes wrong during indexing of content")
 
@@ -2087,20 +2101,31 @@ class ContentApi(object):
     def search(
         self,
         keywords: [str],
-        include_comments: bool = False,
         size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
         offset: typing.Optional[int] = None,
+        content_types: typing.Optional[typing.List[str]] = None,
     ) -> typing.Tuple[typing.List[Content], int]:
-        query = self._search_query(keywords=keywords, include_comments=include_comments)
-        total_hits = query.count()
-        if size:
-            query = query.limit(size)
-        if offset:
-            query = query.offset(offset)
-        # TODO - G.M - 2019-05-23 - return object instead of tuple
-        return query.all(), total_hits
+        query = self._search_query(keywords=keywords, content_types=content_types)
+        results = []
+        current_offset = 0
+        for content in query:
+            if len(results) >= size:
+                break
+            if not self._show_deleted:
+                if self.get_deleted_parent_id(content):
+                    continue
+            if not self._show_archived:
+                if self.get_archived_parent_id(content):
+                    continue
+            if current_offset >= offset:
+                results.append(content)
+            current_offset += 1
 
-    def _search_query(self, keywords: [str], include_comments: bool = False) -> Query:
+        return results, current_offset
+
+    def _search_query(
+        self, keywords: [str], content_types: typing.Optional[typing.List[str]] = None
+    ) -> Query:
         """
         :return: a sorted list of Content items
         """
@@ -2122,9 +2147,13 @@ class ContentApi(object):
             .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))
         )
 
+        # INFO - G.M - 2019-05-27 - we remove comment from result
         comment_type = content_type_list.Comment
         comments_slugs = [comment_type.slug]
         title_keyworded_items = title_keyworded_items.filter(~Content.type.in_(comments_slugs))
+
+        if content_types:
+            title_keyworded_items = title_keyworded_items.filter(Content.type.in_(content_types))
 
         return title_keyworded_items
 
@@ -2136,34 +2165,21 @@ class ContentApi(object):
 
         return content_types
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def exclude_unavailable(self, contents: typing.List[Content]) -> typing.List[Content]:
-        """
-        Update and return list with content under archived/deleted removed.
-        :param contents: List of contents to parse
-        """
-        for content in contents[:]:
-            if self.content_under_deleted(content) or self.content_under_archived(content):
-                contents.remove(content)
-        return contents
-
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def content_under_deleted(self, content: Content) -> bool:
+    def get_deleted_parent_id(self, content: Content) -> typing.Optional[int]:
         if content.parent:
             if content.parent.is_deleted:
-                return True
+                return content.parent_id
             if content.parent.parent:
-                return self.content_under_deleted(content.parent)
-        return False
+                return self.get_deleted_parent_id(content.parent)
+        return None
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def content_under_archived(self, content: Content) -> bool:
+    def get_archived_parent_id(self, content: Content) -> typing.Optional[int]:
         if content.parent:
             if content.parent.is_archived:
-                return True
+                return content.parent_id
             if content.parent.parent:
-                return self.content_under_archived(content.parent)
-        return False
+                return self.get_archived_parent_id(content.parent)
+        return None
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(

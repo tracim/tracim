@@ -86,6 +86,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 is_archived=content.is_archived,
                 is_deleted=content.is_deleted,
                 is_editable=content.is_editable,
+                is_active=content.is_active,
                 show_in_ui=content.show_in_ui,
                 file_extension=content.file_extension,
                 filename=content.filename,
@@ -95,7 +96,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 current_revision_id=content.current_revision_id,
             )
             contents.append(content)
-        super().__init__(contents=contents, total_hits=total_hits)
+        super().__init__(contents=contents, total_hits=total_hits, is_total_hits_accurate=False)
 
 
 class ESContentSearchResponse(ContentSearchResponse):
@@ -173,6 +174,7 @@ class ESContentSearchResponse(ContentSearchResponse):
                 is_archived=source["is_archived"],
                 is_deleted=source["is_deleted"],
                 is_editable=source["is_editable"],
+                is_active=source["is_active"],
                 show_in_ui=source["show_in_ui"],
                 file_extension=source["file_extension"],
                 filename=source["filename"],
@@ -240,6 +242,7 @@ class SearchedContent(object):
         is_archived: bool,
         is_deleted: bool,
         is_editable: bool,
+        is_active: bool,
         show_in_ui: bool,
         file_extension: str,
         filename: str,
@@ -269,6 +272,7 @@ class SearchedContent(object):
         self.is_archived = is_archived
         self.is_deleted = is_deleted
         self.is_editable = is_editable
+        self.is_active = is_active
         self.show_in_ui = show_in_ui
         self.file_extension = file_extension
         self.filename = filename

@@ -14,6 +14,7 @@ from tracim_backend.app_models.validator import update_validators
 from tracim_backend.exceptions import ConfigCodeError
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.extensions import app_list
+from tracim_backend.lib.search.es_models import ALLOWED_INGEST_DEFAULT_MIMETYPE
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -509,6 +510,14 @@ class CFG(object):
         self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
+        )
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_list(
+            self.get_raw_config(
+                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE
+            ),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
         self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
             "search.elasticsearch.host", "localhost"

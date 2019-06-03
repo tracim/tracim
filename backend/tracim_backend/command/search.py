@@ -97,8 +97,6 @@ class SearchIndexAddCommand(AppContextCommand):
 
 
 class SearchIndexDeleteCommand(AppContextCommand):
-    # TODO - G.M - 2019-05-15 - Add delete index command
-
     def get_description(self) -> str:
         return "Delete all index, alias and template of tracim document"
 
