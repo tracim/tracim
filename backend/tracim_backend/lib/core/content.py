@@ -611,6 +611,19 @@ class ContentApi(object):
                     current_user=self._user, config=self._config, session=self._session
                 )
                 search_api.index_content(content_in_context)
+                # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
+                if content.last_revision.revision_type in (
+                    ActionDescription.DELETION,
+                    ActionDescription.ARCHIVING,
+                    ActionDescription.UNARCHIVING,
+                    ActionDescription.UNDELETION,
+                ):
+                    for child_content in content.get_children(recursively=True):
+                        child_in_context = ContentInContext(
+                            child_content, config=self._config, dbsession=self._session
+                        )
+                        search_api.index_content(child_in_context)
+
             except Exception:
                 logger.exception(self, "Something goes wrong during indexing of content")
 
