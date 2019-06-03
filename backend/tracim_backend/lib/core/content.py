@@ -46,6 +46,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
@@ -255,9 +256,11 @@ class ContentApi(object):
         if self._user and not self._disable_user_workspaces_filter:
             user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
-            workspace_ids = [
-                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
-            ]
+            workspace_ids = RoleApi(
+                session=self._session,
+                current_user=self._user,
+                config=self._config,
+            ).get_user_workspaces_ids(self._user_id, UserRoleInWorkspace.READER)
             result = result.filter(
                 or_(
                     Content.workspace_id.in_(workspace_ids),
