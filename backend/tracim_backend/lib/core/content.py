@@ -254,7 +254,6 @@ class ContentApi(object):
         # Security layer: if user provided, filter
         # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
-            user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = RoleApi(
                 session=self._session, current_user=self._user, config=self._config

@@ -879,6 +879,7 @@ class ContentInContext(object):
             show_temporary=True,
         )
         return content_api.get_archived_parent_id(self.content)
+
     @property
     def is_deleted(self) -> bool:
         return self.content.is_deleted
