@@ -17,88 +17,119 @@ import {
   appendResearch
 } from '../action-creator.sync.js'
 import {
-  getResearchString
+  getResearchKeyWord
 } from '../action-creator.async.js'
+
+require('../css/ResearchResult.styl')
 
 class ResearchResult extends React.Component {
   findPath = (parentsList) => {
-    var parentPath = ''
-    parentsList.forEach(parent => {
-      parentPath = parent.label + '/' + parentPath
-    })
+    let parentPath = ''
+    if (parentsList.length > 0) {
+      parentPath = parentsList.reduce(
+        (parentPath, parent) => {
+          return `${parent.label}/${parentPath}`
+        }, ''
+      )
+    }
     return parentPath
   }
 
-  handleClickSeeMore = async () => {
-    const { researchResultList, dispatch, t } = this.props
+  putContentName = (content) => {
+    // if it's a file we use the name with its extention
+    return content.content_type === this.props.contentType[1].slug ? content.filename : content.label
+    // return content.content_type === 'file' ? content.filename : content.label
+  }
 
-    const fetchGetStringResearch = await dispatch(getResearchString(
-      researchResultList.string_research, researchResultList.number_page + 1, researchResultList.number_elements_by_page
+  handleClickSeeMore = async () => {
+    const { props } = this
+
+    const fetchGetStringResearch = await props.dispatch(getResearchKeyWord(
+      props.researchResult.keyWordResearch, props.researchResult.numberPage + 1, props.researchResult.numberElementsByPage
     ))
 
     switch (fetchGetStringResearch.status) {
       case 200:
-        dispatch(setNbPage(researchResultList.number_page + 1))
-        dispatch(appendResearch(fetchGetStringResearch.json.contents))
+        props.dispatch(setNbPage(props.researchResult.numberPage + 1))
+        props.dispatch(appendResearch(fetchGetStringResearch.json.contents))
         break
       default:
-        dispatch(newFlashMessage(t('An error has happened'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
     }
   }
 
+  hasSubititle = () => {
+    const { props } = this
+    let subtitle = ''
+    let nbResults = (props.researchResult.numberElementsByPage * props.researchResult.numberPage) > props.researchResult.totalElements
+      ? props.researchResult.totalElements
+      : props.researchResult.numberElementsByPage * props.researchResult.numberPage
+    if (props.researchResult.totalElements !== 0) {
+      subtitle = `${nbResults} ${props.t('best results for')} "${props.researchResult.keyWordResearch}"`
+    }
+    return subtitle
+  }
+
   render () {
-    const { t, contentType, researchResultList } = this.props
+    const { props } = this
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='ResearchResult'>
-            <PageTitle
-              parentClass={'ResearchResult'}
-              title={t('Research results')}
-              icon='search'
-              subtitle={t('10 best results for') + ' "' + researchResultList.string_research + '"'}
-            />
+            <div data-cy={'page__title__research'}>
+              <PageTitle
+                parentClass={'ResearchResult'}
+                title={props.t('Research results')}
+                icon='search'
+                subtitle={this.hasSubititle()}
+              />
+            </div>
 
             <PageContent parentClass='ResearchResult'>
-              <div className='folder__content'>
+              <div className='folder__content' data-cy={'research__content'}>
                 <ContentItemHeader showResearchDetails />
 
-                {researchResultList.result_list.map((researchItem, index) => (
+                {props.researchResult.totalElements === 0 && (
+                  <div className='ResearchResult__content__empty'>
+                    {props.t(`The research "${props.researchResult.keyWordResearch}" has no results. You can try using other or more general keywords.`)}
+                  </div>
+                )}
+
+                {props.researchResult.resultList.map((researchItem, index) => (
                   <ListItemWrapper
                     label={researchItem.label}
                     read={false}
-                    contentType={contentType.length ? contentType.find(ct => ct.slug === researchItem.content_type) : null}
-                    isLast={index === researchResultList.result_list.length - 1}
+                    contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === researchItem.content_type) : null}
+                    isLast={index === props.researchResult.resultList.length - 1}
                     key={researchItem.content_id}
                   >
                     <ContentItemResearch
                       label={researchItem.label}
-                      path={researchItem.workspace.label + '/' +
-                        this.findPath(researchItem.parents) +
-                        (researchItem.content_type === 'file' ? researchItem.filename : researchItem.label)
-                      }
+                      path={`${researchItem.workspace.label}/${this.findPath(researchItem.parents)}${this.putContentName(researchItem)}`}
                       lastModificationAuthor={researchItem.last_modifier.public_name}
                       lastModificationTime={displayDistanceDate(researchItem.modified, this.props.user.lang)}
                       fileExtension={researchItem.file_extension}
-                      faIcon={contentType.length ? (contentType.find(ct => ct.slug === researchItem.content_type)).faIcon : null}
+                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === researchItem.content_type)).faIcon : null}
                       statusSlug={researchItem.status}
-                      contentType={contentType.length ? contentType.find(ct => ct.slug === researchItem.content_type) : null}
+                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === researchItem.content_type) : null}
                       urlContent={`${PAGE.WORKSPACE.CONTENT(researchItem.workspace_id, researchItem.content_type, researchItem.content_id)}`}
                       key={researchItem.content_id}
                     />
                   </ListItemWrapper>
                 ))}
               </div>
-              {researchResultList.total_elements > (researchResultList.number_elements_by_page * researchResultList.number_page) && (
-                <button
-                  className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                  onClick={this.handleClickSeeMore}
-                >
-                  {t('See more')}
-                </button>
-              )}
+              <div className='ResearchResult__btnSeeMore'>
+                {props.researchResult.totalElements > (props.researchResult.numberElementsByPage * props.researchResult.numberPage) && (
+                  <button
+                    className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                    onClick={this.handleClickSeeMore}
+                  >
+                    <i className='fa fa-chevron-down' /> {props.t('See more')}
+                  </button>
+                )}
+              </div>
             </PageContent>
           </PageWrapper>
         </div>
@@ -107,5 +138,5 @@ class ResearchResult extends React.Component {
   }
 }
 
-const mapStateToProps = ({ researchResultList, contentType, user }) => ({ researchResultList, contentType, user })
+const mapStateToProps = ({ researchResult, contentType, user }) => ({ researchResult, contentType, user })
 export default connect(mapStateToProps)(translate()(ResearchResult))

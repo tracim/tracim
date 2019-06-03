@@ -19,12 +19,12 @@ import {
   setUserDisconnected,
   setResearch,
   setNbElementsResearch,
-  setStringResearch
+  setKeyWordResearch
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
   putUserLang,
-  getResearchString
+  getResearchKeyWord
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
@@ -90,16 +90,16 @@ class Header extends React.Component {
     this.props.history.push(PAGE.AGENDA)
   }
 
-  handleClickResearch = async (stringResearch) => {
+  handleClickResearch = async (keyWordResearch) => {
     const { props } = this
 
-    const fetchGetStringResearch = await props.dispatch(getResearchString(stringResearch, 1, props.researchResultList.number_elements_by_page))
+    const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(keyWordResearch, 1, props.researchResult.numberElementsByPage))
 
-    switch (fetchGetStringResearch.status) {
+    switch (fetchGetKeyWordResearch.status) {
       case 200:
-        props.dispatch(setNbElementsResearch(fetchGetStringResearch.json.total_hits))
-        props.dispatch(setResearch(fetchGetStringResearch.json.contents))
-        props.dispatch(setStringResearch(stringResearch))
+        props.dispatch(setNbElementsResearch(fetchGetKeyWordResearch.json.total_hits))
+        props.dispatch(setResearch(fetchGetKeyWordResearch.json.contents))
+        props.dispatch(setKeyWordResearch(keyWordResearch))
         props.history.push(PAGE.RESEARCH_RESULT)
         break
       default:
@@ -180,5 +180,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ researchResultList, lang, user, system, appList }) => ({ researchResultList, lang, user, system, appList })
+const mapStateToProps = ({ researchResult, lang, user, system, appList }) => ({ researchResult, lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

@@ -8,26 +8,26 @@ class Research extends React.Component {
     super(props)
 
     this.state = {
-      stringResearch: ''
+      keyWordResearch: ''
     }
   }
 
-  handleNewResearch = e => this.setState({stringResearch: e.target.value})
+  handleNewResearch = e => this.setState({keyWordResearch: e.target.value})
 
   handleClickResearch = () => {
-    this.props.onClickResearch(this.state.stringResearch)
-    document.getElementsByClassName('research__text')[0].value = ''
+    this.props.onClickResearch(this.state.keyWordResearch)
   }
 
   handleKeyDown = e => e.key === 'Enter' && this.handleClickResearch()
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     return (
       <div className='research primaryColorBorder'>
         <input
           className='research__text'
+          data-cy={'research__text'}
           type='text'
           placeholder={props.t('Research')}
           onChange={this.handleNewResearch}
@@ -35,7 +35,9 @@ class Research extends React.Component {
         />
         <button
           className='research__btn'
+          data-cy={'research__btn'}
           onClick={this.handleClickResearch}
+          disabled={state.keyWordResearch === ''}
         >
           <i className='fa fa-search' />
         </button>

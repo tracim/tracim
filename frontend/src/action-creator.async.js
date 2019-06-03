@@ -693,9 +693,9 @@ export const getLoggedUserCalendar = () => dispatch => {
   })
 }
 
-export const getResearchString = (stringResearch, pageNumber, sizePage) => dispatch => {
+export const getResearchKeyWord = (keyWordResearch, pageNumber, sizePage) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?search_string=${stringResearch}&page_nb=${pageNumber}&size=${sizePage}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?search_string=${keyWordResearch}&page_nb=${pageNumber}&size=${sizePage}`,
     param: {
       credentials: 'include',
       headers: {

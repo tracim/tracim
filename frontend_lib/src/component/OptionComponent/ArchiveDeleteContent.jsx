@@ -21,6 +21,7 @@ const ArchiveDeleteContent = props => {
         title={props.t('Archive')}
         style={styleColorBtn}
         key={'archiveDeleteContent__archive'}
+        data-cy='archive__button'
       >
         <i className='fa fa-fw fa-archive' />
       </button>
@@ -32,6 +33,7 @@ const ArchiveDeleteContent = props => {
         title={props.t('Delete')}
         style={styleColorBtn}
         key={'archiveDeleteContent__delete'}
+        data-cy='delete__button'
       >
         <i className='fa fa-fw fa-trash' />
       </button>

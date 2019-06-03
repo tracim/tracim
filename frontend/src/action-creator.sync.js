@@ -125,8 +125,8 @@ export const resetResearch = () => ({ type: `${RESET}/${RESEARCH}` })
 export const appendResearch = appendResearch => ({ type: `${APPEND}/${RESEARCH}`, appendResearch })
 export const RESEARCH_ELEMENTS = 'ResearchElements'
 export const setNbElementsResearch = nbElements => ({ type: `${SET}/${RESEARCH_ELEMENTS}`, nbElements })
-export const STRING_RESEARCH = 'StringResearch'
-export const setStringResearch = strResearch => ({ type: `${SET}/${STRING_RESEARCH}`, strResearch })
+export const KEY_WORD_RESEARCH = 'KeyWordResearch'
+export const setKeyWordResearch = keyWordResearch => ({ type: `${SET}/${KEY_WORD_RESEARCH}`, keyWordResearch })
 export const RESEARCH_ELEMENTS_BY_PAGE = 'ResearchElementsByPage'
 export const setNbElementsByPage = nbElementsByPage => ({ type: `${SET}/${RESEARCH_ELEMENTS_BY_PAGE}`, nbElementsByPage })
 export const RESEARCH_PAGE = 'ResearchPage'

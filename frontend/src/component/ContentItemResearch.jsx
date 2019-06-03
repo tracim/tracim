@@ -11,26 +11,29 @@ const ContentItemResearch = props => {
 
   return (
     <Link
-      title={props.label}
       to={props.urlContent}
       className='content__item'
+      data-cy={'content__item'}
     >
-      <div className='content__type' style={{color: props.contentType.hexcolor}}>
+      <div className='content__type' title={props.contentType.slug} style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
 
-      <div className='content__name'>
+      <div className='content__name'
+        title={props.label}
+        data-cy={'content__name'}
+      >
         { props.label }
         { props.contentType.slug === 'file' && (
           <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
         )}
       </div>
 
-      <div className='content__path'>
+      <div className='content__path' title={props.path}>
         { props.path }
       </div>
 
-      <div className='content__lastModification'>
+      <div className='content__lastModification' title={props.lastModificationTime}>
         <Avatar
           width={'40px'}
           style={{
@@ -45,6 +48,7 @@ const ContentItemResearch = props => {
       <div
         className='content__status d-sm-flex justify-content-between align-items-center'
         style={{color: status.hexcolor}}
+        title={props.t(status.label)}
       >
         <div className='content__status__text d-none d-sm-block'>
           {props.t(status.label)}
