@@ -1,6 +1,4 @@
 
-## 2.X.X / XXXX-XX-XX
-
 ## 2.2.0 / 2019-05-27
 
 ### New Features
