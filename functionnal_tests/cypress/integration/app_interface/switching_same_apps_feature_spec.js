@@ -14,19 +14,26 @@ describe('Hot switching between the same app', () => {
 
   let workspaceId
 
-  before(function () {
+  before(() => {
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
 
+      // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+      // end up with an undefined response we need to dig up to find if it's the server or cypress
+      // Issue 1836
       cy.createHtmlDocument(htmlDocTitle, workspaceId)
+      cy.wait(200)
       cy.createThread(threadTitle, workspaceId)
+      cy.wait(200)
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-
+      cy.wait(200)
       cy.createHtmlDocument(anotherHtmlDocTitle, workspaceId)
+      cy.wait(200)
       cy.createThread(anotherThreadTitle, workspaceId)
+      cy.wait(200)
       cy.createFile(fullFilename, contentType, anotherFileTitle, workspaceId)
     })
   })
