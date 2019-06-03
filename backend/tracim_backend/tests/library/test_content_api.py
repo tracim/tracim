@@ -3017,55 +3017,6 @@ class TestContentApi(DefaultTest):
         item = res.all()[0]
         eq_(original_id, item.content_id)
 
-    def test_unit__search_exclude_content_under_deleted_or_archived_parents__ok(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = self._create_workspace_and_test("workspace_1", admin)
-        folder_1 = self._create_content_and_test(
-            "folder_1", workspace=workspace, type=content_type_list.Folder.slug
-        )
-        folder_2 = self._create_content_and_test(
-            "folder_2", workspace=workspace, type=content_type_list.Folder.slug
-        )
-        page_1 = self._create_content_and_test(
-            "foo", workspace=workspace, type=content_type_list.Page.slug, parent=folder_1
-        )
-        page_2 = self._create_content_and_test(
-            "bar", workspace=workspace, type=content_type_list.Page.slug, parent=folder_2
-        )
-
-        api = ContentApi(current_user=admin, session=self.session, config=self.app_config)
-
-        foo_result = api._search_query(["foo"]).all()
-        eq_(1, len(foo_result))
-        assert page_1 in foo_result
-
-        bar_result = api._search_query(["bar"]).all()
-        eq_(1, len(bar_result))
-        assert page_2 in bar_result
-
-        with new_revision(session=self.session, tm=transaction.manager, content=folder_1):
-            api.delete(folder_1)
-        with new_revision(session=self.session, tm=transaction.manager, content=folder_2):
-            api.archive(folder_2)
-
-        # Actually ContentApi.search don't filter it
-        foo_result = api._search_query(["foo"]).all()
-        eq_(1, len(foo_result))
-        assert page_1 in foo_result
-
-        bar_result = api._search_query(["bar"]).all()
-        eq_(1, len(bar_result))
-        assert page_2 in bar_result
-
-        # ContentApi offer exclude_unavailable method to do it
-        foo_result = api._search_query(["foo"]).all()
-        api.exclude_unavailable(foo_result)
-        eq_(0, len(foo_result))
-
-        bar_result = api._search_query(["bar"]).all()
-        api.exclude_unavailable(bar_result)
-        eq_(0, len(bar_result))
-
 
 class TestContentApiSecurity(DefaultTest):
     fixtures = [FixtureTest]

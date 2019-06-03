@@ -866,8 +866,37 @@ class ContentInContext(object):
         return self.content.is_archived
 
     @property
+    def is_archived_by_parent_id(self) -> typing.Optional[int]:
+        from tracim_backend.lib.core.content import ContentApi
+
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.get_archived_parent_id(self.content)
+    @property
     def is_deleted(self) -> bool:
         return self.content.is_deleted
+
+    @property
+    def is_deleted_by_parent_id(self) -> typing.Optional[int]:
+        from tracim_backend.lib.core.content import ContentApi
+
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.get_deleted_parent_id(self.content)
 
     @property
     def is_active(self) -> bool:

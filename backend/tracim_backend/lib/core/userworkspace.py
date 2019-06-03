@@ -70,7 +70,8 @@ class RoleApi(object):
             self._session.query(UserRoleInWorkspace.workspace_id)
             .filter(UserRoleInWorkspace.user_id == user_id)
             .filter(UserRoleInWorkspace.role >= min_role)
-            .join(Workspace).filter(Workspace.is_deleted == False)
+            .join(Workspace)
+            .filter(Workspace.is_deleted == False)
             .all()
         )
         workspaces_ids = []

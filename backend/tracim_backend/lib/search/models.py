@@ -96,7 +96,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 current_revision_id=content.current_revision_id,
             )
             contents.append(content)
-        super().__init__(contents=contents, total_hits=total_hits)
+        super().__init__(contents=contents, total_hits=total_hits, is_total_hits_accurate=False)
 
 
 class ESContentSearchResponse(ContentSearchResponse):
