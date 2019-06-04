@@ -4,7 +4,9 @@ import {
   SET,
   PREPEND,
   APPEND,
-  BREADCRUMBS
+  BREADCRUMBS,
+  RESET,
+  APP_FEATURE
 } from '../action-creator.sync.js'
 import { BREADCRUMBS_TYPE } from 'tracim_frontend_lib'
 
@@ -38,13 +40,16 @@ export function breadcrumbs (state = [], action) {
 
     case `${APPEND}/${BREADCRUMBS}`:
       return orderBreadcrumbs([
-        // INFO - CH - 2019-04-16 - app features cannot set breadcrums from root so it needs to overrides itself every time
+        // INFO - CH - 2019-04-16 - app features cannot set breadcrumbs from root so it needs to overrides itself every time
         ...state.filter(crumb => crumb.type !== BREADCRUMBS_TYPE.APP_FEATURE),
         ...action.appendBreadcrumbs.map(crumb => ({
           link: crumb.link ? crumb.link : <Link to={crumb.url}>{crumb.label}</Link>,
           type: BREADCRUMBS_TYPE.APP_FEATURE
         }))
       ])
+
+    case `${RESET}/${BREADCRUMBS}/${APP_FEATURE}`:
+      return state.filter(crumb => crumb.type !== BREADCRUMBS_TYPE.APP_FEATURE)
 
     default:
       return state

@@ -7,36 +7,36 @@ import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
 import FileDropzone from './FileDropzone.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
+import { DisplayState } from 'tracim_frontend_lib'
 
 export const FileComponent = props =>
   <div className={classnames('file__contentpage__statewrapper', {'displayState': props.isArchived || props.isDeleted})}>
-    {props.isArchived &&
-      <div className='file__contentpage__preview__state'>
-        <div className='file__contentpage__preview__state__msg'>
-          <i className='fa fa-fw fa-archive' />
-          {props.t('This content is archived')}
-        </div>
+    {props.isArchived && (
+      <DisplayState
+        msg={props.t('This content is archived')}
+        btnType='button'
+        icon='archive'
+        btnLabel={props.t('Restore')}
+        onClickBtn={props.onClickRestoreArchived}
+      />
+    )}
 
-        <button className='file__contentpage__preview__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
-          <i className='fa fa-fw fa-archive' />
-          {props.t('Restore')}
-        </button>
-      </div>
-    }
+    {props.isDeleted && (
+      <DisplayState
+        msg={props.t('This content is deleted')}
+        btnType='button'
+        icon='trash'
+        btnLabel={props.t('Restore')}
+        onClickBtn={props.onClickRestoreDeleted}
+      />
+    )}
 
-    {props.isDeleted &&
-      <div className='file__contentpage__preview__state'>
-        <div className='file__contentpage__preview__state__msg'>
-          <i className='fa fa-fw fa-trash' />
-          {props.t('This content is deleted')}
-        </div>
-
-        <button className='file__contentpage__preview__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
-          <i className='fa fa-fw fa-trash' />
-          {props.t('Restore')}
-        </button>
-      </div>
-    }
+    {props.isDeprecated && (
+      <DisplayState
+        msg={props.t('This content is deprecated')}
+        icon={props.deprecatedStatus.faIcon}
+      />
+    )}
 
     {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
       <PreviewComponent
