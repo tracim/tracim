@@ -69,8 +69,11 @@ create_dir(preview_cache_dir, "preview_cache")
 session_data_dir = get_path("TRACIM_SESSION__DATA_DIR")
 create_dir(session_data_dir, "session data")
 
-session_data_dir = get_path("TRACIM_SESSION__LOCK_DIR")
-create_dir(session_data_dir, "session data")
+session_lock_dir = get_path("TRACIM_SESSION__LOCK_DIR")
+create_dir(session_lock_dir, "session lock")
+
+caldav_storage_dir = get_path("CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER")
+create_dir(caldav_storage_dir, "caldav storage dir")
 
 print("\n>>> OTHER CHECKS \n")
 migration_script_location = get_path("TEST_MIGRATION_SCRIPT_LOCATION")
