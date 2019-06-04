@@ -1,9 +1,11 @@
 const PAGES = {
+  HOME: 'home'
   CONTENTS: 'contents',
   DASHBOARD: 'dashboard'
 }
 
 const URLS = {
+  [PAGES.HOME]: () => '/ui',
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`
 }
