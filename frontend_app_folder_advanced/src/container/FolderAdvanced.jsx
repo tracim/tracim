@@ -51,8 +51,7 @@ class FolderAdvanced extends React.Component {
     switch (type) {
       case 'folder_showApp':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
-        this.loadContent()
+        this.setState({content: data.content, isVisible: true})
         break
       case 'folder_hideApp':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
@@ -78,6 +77,14 @@ class FolderAdvanced extends React.Component {
 
   componentDidMount () {
     this.loadContent()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { state } = this
+
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+    }
   }
 
   componentWillUnmount () {
