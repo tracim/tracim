@@ -16,11 +16,15 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected
+  setUserDisconnected,
+  setResearch,
+  setNbElementsResearch,
+  setKeyWordResearch
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
-  putUserLang
+  putUserLang,
+  getResearchKeyWord
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
@@ -28,6 +32,7 @@ import {
   PROFILE,
   unLoggedAllowedPageList
 } from '../helper.js'
+import Research from '../component/Header/Research.jsx'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -85,6 +90,24 @@ class Header extends React.Component {
     this.props.history.push(PAGE.AGENDA)
   }
 
+  handleClickResearch = async (keyWordResearch) => {
+    const { props } = this
+
+    const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(keyWordResearch, 1, props.researchResult.numberElementsByPage))
+
+    switch (fetchGetKeyWordResearch.status) {
+      case 200:
+        props.dispatch(setNbElementsResearch(fetchGetKeyWordResearch.json.total_hits))
+        props.dispatch(setResearch(fetchGetKeyWordResearch.json.contents))
+        props.dispatch(setKeyWordResearch(keyWordResearch))
+        props.history.push(PAGE.RESEARCH_RESULT)
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+        break
+    }
+  }
+
   render () {
     const { props } = this
 
@@ -109,6 +132,12 @@ class Header extends React.Component {
                 </li>
               )}
 
+              <li>
+                <Research
+                  className='header__menu__rightside__research'
+                  onClickResearch={this.handleClickResearch}
+                />
+              </li>
               {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
                 <li className='header__menu__rightside__adminlink'>
                   <AdminLink />
@@ -122,7 +151,7 @@ class Header extends React.Component {
                     onClick={this.handleClickAgendaButton}
                   >
                     <i className='fa fa-fw fa-calendar' />
-                    {props.t('Agenda')}
+                    {props.t('Agendas')}
                   </button>
                 </li>
               )}
@@ -151,5 +180,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, system, appList }) => ({ lang, user, system, appList })
+const mapStateToProps = ({ researchResult, lang, user, system, appList }) => ({ researchResult, lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

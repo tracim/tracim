@@ -1,118 +1,53 @@
+import 'cypress-wait-until'
+
+const userFixtures = {
+  'administrators': 'defaultAdmin',
+  'trusted-users': '',
+  'users': 'baseUser'
+}
+
+
 let LOGIN_URL = '/api/v2/auth/login'
 
-Cypress.Commands.add('create_file', () => {
-})
-
-Cypress.Commands.add('create_thread', () => {
-  cy.visit('/ui/workspaces/1/dashboard')
-  cy.get('.dashboard__workspace__detail').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-comments-o').click()
-  var titre1 = 'createthread'
-  cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
-  cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
-  cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)
-  cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'value', titre1)
-  cy.get('.cardPopup__container .createcontent button.createcontent__form__button').click()
-  cy.get('.cardPopup__container .createcontent  .createcontent__contentname').should('not.be.visible')
-  cy.get('.thread.visible').should('be.visible')
-  cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
-  cy.get('.thread.visible .thread__contentpage__header__close').click()
-  cy.get('.thread.visible').should('not.be.visible')
-})
-
-Cypress.Commands.add('create_htmldocument', () => {
-  cy.visit('/ui/workspaces/1/dashboard')
-  cy.get('.dashboard__workspace__detail').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
-  cy.get('.dashboard__calltoaction .fa-file-text-o').click()
-  var titre1 = 'createhtml-document'
-  cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
-  cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'placeholder')
-  cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)
-  cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'value', titre1)
-  cy.get('.cardPopup__container .createcontent .createcontent__form__button.btn-primary').click()
-  cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('not.be.visible')
-  cy.get('.html-document.visible').should('be.visible')
-  cy.get('.html-document.visible .html-document__contentpage__messagelist__version.revision').should('be.visible')
-  cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
-  //        cy.get('iframe#wysiwygNewVersion_ifr').should('be.visible')
-  //        const $tinymce = Cypress.$.event(document)
-  cy.wait(2000)
-  cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').should('be.visible')
-  cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').click()
-  cy.get('.html-document.visible').should('not.be.visible')
-  cy.wait(2000)
-  cy.get('.content__name').contains(titre1).should('be.visible')
-})
-
-Cypress.Commands.add('delete_file', () => {
-})
-
-Cypress.Commands.add('delete_thread', () => {
-  cy.visit('/ui/workspaces/1/contents')
-  cy.get('.pageTitleGeneric__title__icon').should('be.visible')
-  var titre1 = 'createthread'
-  cy.get('.content__name').each(($elm) => {
-    cy.wrap($elm).invoke('text').then((text) => {
-      if (text === titre1) {
-        cy.get('.content__name').contains(titre1).click()
-        cy.get('.thread.visible').should('be.visible')
-        cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
-        cy.get('.thread.visible .align-items-center button:nth-child(2)').click()
-        cy.get('.thread.visible .timeline__info__btnrestore').should('be.visible')
-        cy.get('.thread.visible .thread__contentpage__header__close').click()
-        cy.get('.thread.visible').should('not.be.visible')
-      }
-    })
-  })
-})
-
-Cypress.Commands.add('delete_htmldocument', () => {
-  cy.visit('/ui/workspaces/1/contents')
-  cy.get('.pageTitleGeneric__title__icon').should('be.visible')
-  var titre1 = 'createhtml-document'
-  cy.get('.content__name').each(($elm) => {
-    cy.wrap($elm).invoke('text').then((text) => {
-      if (text === titre1) {
-        cy.get('.content__name').contains(titre1).click()
-        cy.get('.html-document.visible').should('be.visible')
-        cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
-        cy.wait(2000)
-        cy.get('.align-items-center button:nth-child(2)').click()
-        cy.get('.html-document__contentpage__textnote__state__btnrestore').should('be.visible')
-        cy.get('.html-document__header__close').click()
-        cy.get('.html-document.visible').should('not.be.visible')
-        cy.wait(2000)
-      }
-    })
-  })
-})
-
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
+  if (getCookieValueFromEnv(role)) {
+    cy.setSessionCookieFromEnv(role)
+    return cy.getUserByRole(role)
+  }
   cy.getUserByRole(role)
-    .then(user => cy.request({
-      method: 'POST',
-      url: LOGIN_URL,
-      body: {
-        'email': user.email,
-        'password': user.password
-      }
-    }))
-    .then(response => cy.request({
-      method: 'PUT',
-      url: '/api/v2/users/' + response.body.user_id,
-      body: {
-        lang: 'en',
-        public_name: response.body.public_name,
-        timezone: 'Europe/Paris'
-      }
-    }))
+    .then(user => {
+      return cy.request({
+        method: 'POST',
+        url: LOGIN_URL,
+        body: {
+          'email': user.email,
+          'password': user.password
+        }
+      })
+    })
+    .then(response => {
+      cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
+        if (cookie && cookie.value) {
+          return cy.saveCookieValue(role, cookie.value)
+        }
+        return false
+      }))
+      return cy.request({
+        method: 'PUT',
+        url: '/api/v2/users/' + response.body.user_id,
+        body: {
+          lang: 'en',
+          public_name: response.body.public_name,
+          timezone: 'Europe/Paris'
+        }
+      })
+    })
     .then(response => response.body)
 })
 
 Cypress.Commands.add('logout', () => {
   cy.request('POST', 'api/v2/auth/logout')
+  cy.cleanSessionCookies()
 })
 
 Cypress.Commands.add('typeInTinyMCE', (content) => {
@@ -142,11 +77,15 @@ Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
   )
 })
 
-Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector) => {
+// INFO - CH - 2019-05-20 - see https://github.com/cypress-io/cypress/issues/170
+Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector, fileTitle) => {
   const dropEvent = { dataTransfer: { files: [] } }
   cy.fixture(fixturePath, 'base64').then(fixture => {
-    return Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
-      dropEvent.dataTransfer.files.push(blob)
+    cy.window().then(window => {
+      Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
+        const testFile = new window.File([blob], fileTitle)
+        dropEvent.dataTransfer.files = [testFile]
+      })
     })
   })
 
@@ -163,4 +102,40 @@ Cypress.Commands.add('waitForTinyMCELoaded', () => {
       $doc.addEventListener('tinymceLoaded', onTinyMceLoaded)
     })
   })
+})
+
+Cypress.Commands.add('form_request', (method, url, formData, done) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.send(formData);
+})
+
+Cypress.Commands.add('ignoreTinyMceError', () => {
+  Cypress.on('uncaught:exception', (err, runnable) => {
+      console.log('uncaught:exception')
+      return false
+    })
+})
+
+Cypress.Commands.add('saveCookieValue', (user, cookieValue) => {
+  Cypress.env(`session_cookie_${user}`, cookieValue)
+  return true
+})
+
+Cypress.Commands.add('setSessionCookieFromEnv', (user) => {
+  cy.setCookie('session_key', getCookieValueFromEnv(user))
+  cy.setCookie('lastConnection', '1')
+  cy.setCookie('defaultLanguage', 'en')
+})
+
+const getCookieValueFromEnv = (user) => {
+  return Cypress.env(`session_cookie_${user}`)
+}
+
+Cypress.Commands.add('cleanSessionCookies', () => {
+  Cypress.env.reset()
+})
+
+Cypress.Commands.add('cancelXHR', () => {
+  cy.visit('/api/v2/doc/')
 })

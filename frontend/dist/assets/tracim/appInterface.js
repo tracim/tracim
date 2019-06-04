@@ -1,25 +1,25 @@
 (function () {
-  let prevSelectedAppFeature = {name: ''}
-  let prevSelectedAppFullScreen = {name: ''}
+  let prevSelectedAppFeature = ''
+  let prevSelectedAppFullScreen = ''
 
   getSelectedApp = name => {
     switch (name) {
       case 'html-document':
-        return (appHtmlDocument || {defaul: {}}).default
+        return (appHtmlDocument || {default: {}}).default
       case 'thread':
-        return (appThread || {defaul: {}}).default
+        return (appThread || {default: {}}).default
       case 'file':
-        return (appFile || {defaul: {}}).default
+        return (appFile || {default: {}}).default
       case 'workspace':
-        return (appWorkspace || {defaul: {}}).default
+        return (appWorkspace || {default: {}}).default
       case 'folder':
-        return (appFolderAdvanced || {defaul: {}}).default
+        return (appFolderAdvanced || {default: {}}).default
       case 'admin_workspace_user':
-        return (appAdminWorkspaceUser || {defaul: {}}).default
+        return (appAdminWorkspaceUser || {default: {}}).default
       case 'workspace_advanced':
-        return (appWorkspaceAdvanced || {defaul: {}}).default
+        return (appWorkspaceAdvanced || {default: {}}).default
       case 'agenda':
-        return (appAgenda || {defaul: {}}).default
+        return (appAgenda || {default: {}}).default
       default:
         return null
     }
@@ -40,8 +40,8 @@
     } else {
       selectedApp.renderAppFeature(app)
       selectedApp.isRendered = true
-      prevSelectedAppFeature.isRendered = false
-      prevSelectedAppFeature = selectedApp
+      ;(getSelectedApp(prevSelectedAppFeature) || {isRendered: null}).isRendered = false
+      prevSelectedAppFeature = selectedApp.name
     }
   }
 
@@ -55,8 +55,8 @@
     } else {
       selectedApp.renderAppFullscreen(app)
       selectedApp.isRendered = true
-      prevSelectedAppFullScreen.isRendered = false
-      prevSelectedAppFullScreen = selectedApp
+      ;(getSelectedApp(prevSelectedAppFullScreen) || {isRendered: null}).isRendered = false
+      prevSelectedAppFullScreen = selectedApp.name
     }
   }
 
@@ -90,15 +90,19 @@
       case 'unmount_app':
         console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
 
-        if (prevSelectedAppFeature.name !== '') {
-          prevSelectedAppFeature.unmountApp('appFeatureContainer')
-          prevSelectedAppFeature.unmountApp('popupCreateContentContainer')
-          prevSelectedAppFeature.isRendered = false
+        if (prevSelectedAppFeature !== '') {
+          const selectedApp = getSelectedApp(prevSelectedAppFeature)
+          selectedApp.unmountApp('appFeatureContainer')
+          selectedApp.unmountApp('popupCreateContentContainer')
+          selectedApp.isRendered = false
+          prevSelectedAppFeature = ''
         }
 
-        if (prevSelectedAppFullScreen.name !== '') {
-          prevSelectedAppFullScreen.unmountApp('appFullscreenContainer')
-          prevSelectedAppFullScreen.isRendered = false
+        if (prevSelectedAppFullScreen !== '') {
+          const selectedApp = getSelectedApp(prevSelectedAppFullScreen)
+          selectedApp.unmountApp('appFullscreenContainer')
+          selectedApp.isRendered = false
+          prevSelectedAppFullScreen = ''
         }
         break
     }

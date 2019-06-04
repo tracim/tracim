@@ -27,7 +27,7 @@ describe('content :: account', () => {
     cy.get('.menusubcomponent__list').should('be.visible')
     cy.get('[data-cy=menusubcomponent__list__personalData]').should('be.visible')
     cy.get('[data-cy=menusubcomponent__list__password]').should('be.visible')
-    cy.get(':nth-child(3) > .menusubcomponent__list__item__link').should('not.exist')
+    cy.get('[data-cy=menusubcomponent__list__agenda]').should('be.visible')
   })
   it('content :: account > profile ', () => {
     //        account userpreference profile

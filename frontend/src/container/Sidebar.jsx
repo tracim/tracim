@@ -82,7 +82,10 @@ class Sidebar extends React.Component {
       <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
         <div className='sidebar__scrollview'>
           <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
-            <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
+            {sidebarClose
+              ? <i className={classnames('fa fa-chevron-right')} title={t('see sidebar')} />
+              : <i className={classnames('fa fa-chevron-left')} title={t('hide sidebar')} />
+            }
           </div>
 
           {/*
@@ -118,6 +121,7 @@ class Sidebar extends React.Component {
                 <button
                   className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
                   onClick={this.handleClickNewWorkspace}
+                  data-cy='sidebarCreateWorkspaceBtn'
                 >
                   {t('Create a shared space')}
                 </button>
@@ -127,7 +131,7 @@ class Sidebar extends React.Component {
 
           <div className='sidebar__footer mb-2'>
             <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
-              Copyright - 2013 - 2018
+              Copyright - 2013 - 2019
               <div className='sidebar__footer__text__link'>
                 <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
               </div>
