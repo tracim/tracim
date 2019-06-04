@@ -6,9 +6,9 @@ const SELECTORS = {
 
 
 const TAGS = {
-  contentFrame: () => '[data-cy="popinFixed"]',
-  contentInList: () => `.workspace__content__fileandfolder > .content`,
-  workspaceMenu: ({workspaceId}) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`
+  [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
+  [SELECTORS.CONTENT_IN_LIST]: () => `.workspace__content__fileandfolder > .content`,
+  [SELECTORS.WORKSPACE_MENU]: ({workspaceId}) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`
 }
 
 /** 
