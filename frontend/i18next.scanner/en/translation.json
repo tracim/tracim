@@ -187,8 +187,10 @@
   "hide sidebar": "hide sidebar",
   "Research results": "Research results",
   "best results for": "best results for",
+  "Research result": "Research result",
+  "best result for": "best result for",
+  "No more results": "No more results",
   "Path": "Path",
   "Last modification": "Last modification",
-  "Research": "Research",
-  "The research \"{{keyWordResearch}}\" has no results. You can try using other or more general keywords.`": "The research \"{{keyWordResearch}}\" has no results. You can try using other or more general keywords."
+  "Research": "Research"
 }

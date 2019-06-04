@@ -28,6 +28,7 @@ describe('Research page', () => {
   beforeEach(function () {
     cy.loginAs('administrators')
     cy.visit('/ui')
+    cy.ignoreTinyMceError()
   })
 
   describe('Typing HtmlDocForResearch in the input and validating', () => {
@@ -36,8 +37,8 @@ describe('Research page', () => {
       cy.get(researchButton).click()
 
       cy.get(contentName).contains(htmlDocTitle).should('be.visible')
-      // cy.get(contentName).contains(threadTitle).should('be.not.visible')
-      // cy.get(contentName).contains(fileTitle).should('be.not.visible')
+      cy.get(contentName).contains(threadTitle).should('be.not.visible')
+      cy.get(contentName).contains(fileTitle).should('be.not.visible')
       cy.get(contentName).contains(htmlDocTitleLong).should('be.visible')
     })
 
@@ -50,14 +51,11 @@ describe('Research page', () => {
           cy.get(contentName).contains(htmlDocTitleLong).click()
           cy.get('[data-cy=archive__button]').click()
 
-          // For not do the error Uncaught TypeError: Cannot read property 'setAttribute' of undefined
-          cy.visit('/ui')
-
-          cy.get(researchInput).type(htmlDocTitle)
+          cy.get('.html-document__contentpage__textnote__state')
           cy.get(researchButton).click()
 
           cy.get(contentName).contains(htmlDocTitle).should('be.visible')
-          // cy.get(contentName).contains(htmlDocTitleLong).should('be.not.visible')
+          cy.get(contentName).contains(htmlDocTitleLong).should('be.not.visible')
         })
       })
     })
@@ -71,10 +69,7 @@ describe('Research page', () => {
           cy.get(contentName).contains(htmlDocTitle).click()
           cy.get('[data-cy=delete__button]').click()
 
-          // For not do the error Uncaught TypeError: Cannot read property 'setAttribute' of undefined
-          cy.visit('/ui')
-
-          cy.get(researchInput).type(htmlDocTitle)
+          cy.get('.html-document__contentpage__textnote__state')
           cy.get(researchButton).click()
 
           cy.get('.ResearchResult__content__empty').should('be.visible')

@@ -1,12 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
   PageContent,
   ListItemWrapper,
-  displayDistanceDate
+  displayDistanceDate,
+  IconButton,
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import { PAGE } from '../helper.js'
 import ContentItemResearch from '../component/ContentItemResearch.jsx'
@@ -14,7 +17,9 @@ import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
   setNbPage,
-  appendResearch
+  appendResearch,
+  setNbElementsResearch,
+  setBreadcrumbs
 } from '../action-creator.sync.js'
 import {
   getResearchKeyWord
@@ -23,35 +28,42 @@ import {
 require('../css/ResearchResult.styl')
 
 class ResearchResult extends React.Component {
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+    }
+  }
+
+  componentDidMount () {
+    this.buildBreadcrumbs()
+  }
+
   findPath = (parentsList) => {
     let parentPath = ''
     if (parentsList.length > 0) {
-      parentPath = parentsList.reduce(
-        (parentPath, parent) => {
-          return `${parent.label}/${parentPath}`
-        }, ''
-      )
+      parentPath = parentsList.reduce((acc, currentParent) => `${currentParent.label}/${acc}`, '')
     }
     return parentPath
   }
 
   putContentName = (content) => {
-    // if it's a file we use the name with its extention
+    // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
+    // https://github.com/tracim/tracim/issues/1840
     return content.content_type === this.props.contentType[1].slug ? content.filename : content.label
-    // return content.content_type === 'file' ? content.filename : content.label
   }
 
   handleClickSeeMore = async () => {
     const { props } = this
 
-    const fetchGetStringResearch = await props.dispatch(getResearchKeyWord(
+    const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(
       props.researchResult.keyWordResearch, props.researchResult.numberPage + 1, props.researchResult.numberElementsByPage
     ))
 
-    switch (fetchGetStringResearch.status) {
+    switch (fetchGetKeyWordResearch.status) {
       case 200:
         props.dispatch(setNbPage(props.researchResult.numberPage + 1))
-        props.dispatch(appendResearch(fetchGetStringResearch.json.contents))
+        props.dispatch(appendResearch(fetchGetKeyWordResearch.json.contents))
+        props.dispatch(setNbElementsResearch(fetchGetKeyWordResearch.json.total_hits))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -61,14 +73,30 @@ class ResearchResult extends React.Component {
 
   hasSubititle = () => {
     const { props } = this
+    const { researchResult } = props
     let subtitle = ''
-    let nbResults = (props.researchResult.numberElementsByPage * props.researchResult.numberPage) > props.researchResult.totalElements
-      ? props.researchResult.totalElements
-      : props.researchResult.numberElementsByPage * props.researchResult.numberPage
-    if (props.researchResult.totalElements !== 0) {
-      subtitle = `${nbResults} ${props.t('best results for')} "${props.researchResult.keyWordResearch}"`
+    let nbResults = (researchResult.numberElementsByPage * researchResult.numberPage) > researchResult.totalElements
+      ? researchResult.totalElements
+      : researchResult.numberElementsByPage * researchResult.numberPage
+    let text = researchResult.totalElements === 1
+      ? props.t('best result for')
+      : props.t('best results for')
+    if (researchResult.totalElements !== 0) {
+      subtitle = `${nbResults} ${text} "${researchResult.keyWordResearch}"`
     }
     return subtitle
+  }
+
+  buildBreadcrumbs = () => {
+    const { props } = this
+
+    props.dispatch(setBreadcrumbs([{
+      link: <Link to={PAGE.HOME}><i className='fa fa-home' />{props.t('Home')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }, {
+      link: <Link to={PAGE.RESEARCH_RESULT}>{props.t('Research results')}</Link>,
+      type: BREADCRUMBS_TYPE.CORE
+    }]))
   }
 
   render () {
@@ -78,14 +106,16 @@ class ResearchResult extends React.Component {
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='ResearchResult'>
-            <div data-cy={'page__title__research'}>
-              <PageTitle
-                parentClass={'ResearchResult'}
-                title={props.t('Research results')}
-                icon='search'
-                subtitle={this.hasSubititle()}
-              />
-            </div>
+            <PageTitle
+              parentClass={'ResearchResult'}
+              title={props.researchResult.totalElements === 1
+                ? props.t('Research result')
+                : props.t('Research results')
+              }
+              icon='search'
+              subtitle={this.hasSubititle()}
+              breadcrumbsList={props.breadcrumbs}
+            />
 
             <PageContent parentClass='ResearchResult'>
               <div className='folder__content' data-cy={'research__content'}>
@@ -100,7 +130,7 @@ class ResearchResult extends React.Component {
                 {props.researchResult.resultList.map((researchItem, index) => (
                   <ListItemWrapper
                     label={researchItem.label}
-                    read={false}
+                    read
                     contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === researchItem.content_type) : null}
                     isLast={index === props.researchResult.resultList.length - 1}
                     key={researchItem.content_id}
@@ -121,14 +151,16 @@ class ResearchResult extends React.Component {
                 ))}
               </div>
               <div className='ResearchResult__btnSeeMore'>
-                {props.researchResult.totalElements > (props.researchResult.numberElementsByPage * props.researchResult.numberPage) && (
-                  <button
-                    className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                { props.researchResult.totalElements >= (props.researchResult.numberElementsByPage * props.researchResult.numberPage)
+                  ? <IconButton
+                    className='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickSeeMore}
-                  >
-                    <i className='fa fa-chevron-down' /> {props.t('See more')}
-                  </button>
-                )}
+                    icon='chevron-down'
+                    text={props.t('See more')}
+                  />
+                  : props.researchResult.totalElements > props.researchResult.numberElementsByPage &&
+                    props.t('No more results')
+                }
               </div>
             </PageContent>
           </PageWrapper>
@@ -138,5 +170,5 @@ class ResearchResult extends React.Component {
   }
 }
 
-const mapStateToProps = ({ researchResult, contentType, user }) => ({ researchResult, contentType, user })
+const mapStateToProps = ({ breadcrumbs, researchResult, contentType, user }) => ({ breadcrumbs, researchResult, contentType, user })
 export default connect(mapStateToProps)(translate()(ResearchResult))

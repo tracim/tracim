@@ -36,7 +36,7 @@ describe('Research page', () => {
       cy.get(contentName).contains(fileTitle).click()
 
       cy.url().should('include', `/workspaces/${workspaceId}/contents/file/`)
-      cy.get('.file__header__title').contains(fileTitle)
+      cy.get('.file__header__title').contains(fileTitle).should('be.visible')
     })
   })
 })

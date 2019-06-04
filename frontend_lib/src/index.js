@@ -45,6 +45,8 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
 import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
+import IconButton from './component/Button/IconButton.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case 'allApp_changeLang': i18n.changeLanguage(data); break
@@ -89,5 +91,6 @@ export {
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  ListItemWrapper
+  ListItemWrapper,
+  IconButton
 }

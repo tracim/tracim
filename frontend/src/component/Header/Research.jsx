@@ -18,7 +18,7 @@ class Research extends React.Component {
     this.props.onClickResearch(this.state.keyWordResearch)
   }
 
-  handleKeyDown = e => e.key === 'Enter' && this.handleClickResearch()
+  handleKeyDown = e => e.key === 'Enter' && this.state.keyWordResearch !== '' && this.handleClickResearch()
 
   render () {
     const { props, state } = this

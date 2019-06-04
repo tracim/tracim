@@ -12,7 +12,7 @@ const htmlDocTitle10 = 'HtmlDocForResearch10'
 
 const researchInput = '.research > [data-cy=research__text]'
 const researchButton = '.research > [data-cy=research__btn]'
-const seeMoreButton= '.ResearchResult__btnSeeMore'
+const seeMoreButton= '.ResearchResult__btnSeeMore button'
 
 let workspaceId
 
