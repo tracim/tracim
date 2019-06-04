@@ -83,7 +83,10 @@ class File extends React.Component {
       case 'file_showApp':
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
-        if (isSameContentId) this.setState({isVisible: true})
+        if (isSameContentId) {
+          this.setState({isVisible: true})
+          this.buildBreadcrumbs()
+        }
         break
 
       case 'file_hideApp':
@@ -190,7 +193,7 @@ class File extends React.Component {
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
-            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}`,
+            previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${fetchResultFile.body.current_revision_id}`,
             lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
@@ -278,7 +281,7 @@ class File extends React.Component {
     }
 
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -463,7 +466,7 @@ class File extends React.Component {
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
         // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1`,
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revision.revision_id}`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
           `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
         )
@@ -568,10 +571,26 @@ class File extends React.Component {
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
-        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
       }
     }))
   }
+
+  getDownloadBaseUrl = (apiUrl, content, mode) => {
+    const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    return `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${urlRevisionPart}`
+  }
+
+  // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
+  // see https://github.com/tracim/tracim/issues/1804
+  getDownloadRawUrl = ({config: {apiUrl}, content, mode}) =>
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
+
+  getDownloadPdfPageUrl = ({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
+
+  getDownloadPdfFullUrl = ({config: {apiUrl}, content, mode}) =>
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
   render () {
     const { props, state } = this
@@ -666,18 +685,14 @@ class File extends React.Component {
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isEditable={state.content.is_editable}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            downloadRawUrl={(({config: {apiUrl}, content, mode}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1`
-            )(state)}
+            downloadRawUrl={this.getDownloadRawUrl(state)}
             isPdfAvailable={state.content.has_pdf_preview}
-            downloadPdfPageUrl={(({config: {apiUrl}, content, mode, fileCurrentPage}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1`
-            )(state)}
-            downloadPdfFullUrl={(({config: {apiUrl}, content, mode}) =>
-              `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1`
-            )(state)}
+            downloadPdfPageUrl={this.getDownloadPdfPageUrl(state)}
+            downloadPdfFullUrl={this.getDownloadPdfFullUrl(state)}
             lightboxUrlList={state.content.lightboxUrlList}
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}

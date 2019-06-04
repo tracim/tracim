@@ -28,23 +28,6 @@
       text-align center
     &__title
       transform rotate(-90deg)
-  &__info
-    position absolute
-    display flex
-    align-items center
-    justify-content space-between
-    margin 10px
-    padding 5px 15px
-    width calc(100% - 20px)
-    background-color #fee498
-    border-radius 10px
-    z-index 1
-    &__msg > i
-      margin-right 8px
-    &__btnrestore
-      cursor pointer
-      & > i
-        margin-right 8px
   &__body
     display flex
     flex-direction column
@@ -86,6 +69,11 @@
           &__icon
             display inline-block
             margin-left 20px
+    &__warning
+      position absolute
+      width calc(100% - 20px)
+      padding-left 5px
+      z-index 1
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result

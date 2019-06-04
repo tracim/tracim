@@ -1,13 +1,14 @@
 describe('content :: workspace > dashbord', function () {
-  before(() => {
-    cy.resetDB()
-    cy.setupBaseDB()
-  })
+  const threadTitle = 'Thread title'
 
   beforeEach(function () {
+    cy.resetDB()
+    cy.setupBaseDB()
     cy.loginAs('administrators')
-    cy.create_thread()
-    cy.visit('/ui/workspaces/1/dashboard')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      cy.createThread(threadTitle, workspace.workspace_id)
+      cy.visit(`/ui/workspaces/${workspace.workspace_id}/dashboard`)
+    })
   })
 
   it('dashboard__workspaceInfo > recentactivity', function () {

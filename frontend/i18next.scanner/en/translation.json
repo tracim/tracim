@@ -61,7 +61,8 @@
   "Error while archiving document": "Error while archiving document",
   "Error while deleting document": "Error while deleting document",
   "List of contents": "List of contents",
-  "This shared space has no content yet, create the first content by clicking on the button 'Create'": "This shared space has no content yet, create the first content by clicking on the button 'Create'",
+  "This shared space has no content yet": "This shared space has no content yet",
+  ", create the first content by clicking on the button 'Create'": ", create the first content by clicking on the button 'Create'",
   "Calendar": "Calendar",
   "Access your personal calendar": "Access your personal calendar",
   "Shared spaces and notifications": "Shared spaces and notifications",
@@ -179,5 +180,9 @@
   "CalDAV compatible software": "CalDAV compatible software",
   "(protocole WebDAV)": "(WebDAV protocol)",
   "Administration": "Administration",
-  "Agendas": "Agendas"
+  "Agendas": "Agendas",
+  "see shared space": "see shared space",
+  "hide shared space": "hide shared space",
+  "see sidebar": "see sidebar",
+  "hide sidebar": "hide sidebar"
 }

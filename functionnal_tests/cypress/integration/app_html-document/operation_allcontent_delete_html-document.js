@@ -41,7 +41,7 @@ describe('operation :: workspace > delete > html-document', function () {
           cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
           cy.wait(2000)
           cy.get('.align-items-center button:nth-child(2)').click()
-          cy.get('.html-document__contentpage__textnote__state__btnrestore').should('be.visible')
+          cy.get('.html-document__contentpage__left__wrapper > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
           cy.get('.html-document__header__close').click()
           cy.get('.html-document.visible').should('not.be.visible')
           cy.wait(2000)
