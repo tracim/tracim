@@ -8,7 +8,8 @@ import {
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
-  PopinFixedContent
+  PopinFixedContent,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -157,7 +158,8 @@ class WorkspaceAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space label', 'warning'))
     }
@@ -177,7 +179,7 @@ class WorkspaceAdvanced extends React.Component {
     switch (fetchPutDescription.apiResponse.status) {
       case 200:
         this.sendGlobalFlashMessage(props.t('Save successful', 'info'))
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
     }
@@ -215,7 +217,7 @@ class WorkspaceAdvanced extends React.Component {
           newAgendaEnabledValue ? props.t('Agenda activated') : props.t('Agenda deactivated'),
           'info'
         )
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // @INFO - CH - 2018-04-01 - for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       default:
         this.setState(prev => ({content: {...prev.content, agenda_enabled: oldAgendaEnabledValue}}))
@@ -288,7 +290,7 @@ class WorkspaceAdvanced extends React.Component {
           }
         }))
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while removing member', 'warning'))
     }
@@ -344,7 +346,7 @@ class WorkspaceAdvanced extends React.Component {
           displayFormNewMember: false
         })
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
         break
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {

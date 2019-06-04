@@ -82,9 +82,6 @@ class AdminWorkspaceUser extends React.Component {
   async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
 
-    // FIXME - CH - 2019-04-08 - line below should not exist. See https://github.com/tracim/tracim/issues/1572
-    document.getElementById('appFullscreenContainer').style.flex = 'auto'
-
     if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
     else if (this.state.config.type === 'user') await this.loadUserContent()
 
@@ -104,7 +101,6 @@ class AdminWorkspaceUser extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<AdminWorkspaceUser> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.getElementById('appFullscreenContainer').style.flex = 'none'
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -176,7 +172,7 @@ class AdminWorkspaceUser extends React.Component {
       link: <Link to={'/ui'}><i className='fa fa-home' />{props.t('Home')}</Link>,
       type: BREADCRUMBS_TYPE.CORE
     }, {
-      link: <span>{props.t('Manage')}</span>,
+      link: <span>{props.t('Administration')}</span>,
       type: BREADCRUMBS_TYPE.CORE,
       notALink: true
     }]

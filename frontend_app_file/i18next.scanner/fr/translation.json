@@ -19,7 +19,7 @@
   "Change description": "Changer la description",
   "Error while saving new description": "Erreur lors de l'enregistrement d'une nouvelle description",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
-  "Page number": "Numéro de page",
+  "Page number": "Nombre de pages",
   "Upload a file": "Importer un fichier",
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
   "Bytes": "Octets",
@@ -46,5 +46,6 @@
   "Error while changing status": "Erreur lors du changement de statut",
   "File": "Fichier",
   "file": "fichier",
-  "files": "fichiers"
+  "files": "fichiers",
+  "This content is deprecated": "Ce contenu est obsolète"
 }

@@ -6,7 +6,10 @@ import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 const PageTitle = props => {
   return (
     <div className={classnames(props.parentClass, props.customClass, 'pageTitleGeneric')}>
-      <div className={classnames(`${props.parentClass}__title`, 'pageTitleGeneric__title')}>
+      <div
+        className={classnames(`${props.parentClass}__title`, 'pageTitleGeneric__title')}
+        data-cy='layoutPageTitle'
+      >
         <div className='pageTitleGeneric__title__icon'>
           <i className={`fa fa-fw fa-${props.icon}`} />
         </div>

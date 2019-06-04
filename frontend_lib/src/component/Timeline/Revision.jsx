@@ -45,7 +45,7 @@ const Revision = props => {
 
         <span className='revision__data__label'>{props.t(showLabel(revisionType, props.status))}</span>
 
-        <span className='revision__data__created'>{props.createdDistance}</span>
+        <span className='revision__data__created' title={props.createdFormated}>{props.createdDistance}</span>
       </span>
     </li>
   )

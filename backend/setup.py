@@ -73,13 +73,23 @@ tests_require = [
     'pytest',
     'pytest-dotenv',
     'parameterized',
-    'pep8',
-    'mypy',
     'responses',
     'mock',
     'Pillow',
-    'freezegun'
+    'freezegun',
 ]
+
+devtools_require=[
+    'flake8',
+    'isort',
+    'mypy',
+    'pre-commit',
+]
+
+
+# add black for python 3.6+
+if sys.version_info.major == 3 and sys.version_info.minor >= 6:
+    devtools_require.append('black')
 
 mysql_require = [
     'PyMySQL'
@@ -120,6 +130,7 @@ setup(
     zip_safe=False,
     extras_require={
         'testing': tests_require,
+        'dev': tests_require + devtools_require,
         'mysql': mysql_require,
         'postgresql': postgresql_require,
     },
@@ -134,14 +145,13 @@ setup(
             'tracimcli = tracim_backend.command:main',
         ],
         'tracimcli': [
-            'test = tracim_backend.command:TestTracimCommand',
             'user_create = tracim_backend.command.user:CreateUserCommand',
             'user_update = tracim_backend.command.user:UpdateUserCommand',
             'db_init = tracim_backend.command.database:InitializeDBCommand',
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav_agenda_create = tracim_backend.command.caldav:CaldavCreateAgendasCommand'
+            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand'
         ]
     },
     message_extractors={'tracim_backend': [

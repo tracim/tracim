@@ -7,6 +7,7 @@
   "Your message...": "Your message...",
   "validate the title": "validate the title",
   "edit title": "edit title",
+  "undo change in title": "undo change in title",
   "Archive": "Archive",
   "Delete": "Delete",
   "Choose the role of the member": "Choose the role of the member",
@@ -33,5 +34,6 @@
   "Error detail": "Error detail",
   "This content is archived": "This content is archived",
   "This content is deleted": "This content is deleted",
-  "Status changed to {{status}}": "Status changed to {{status}}"
+  "Status changed to {{status}}": "Status changed to {{status}}",
+  "This content is deprecated": "This content is deprecated"
 }

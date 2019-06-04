@@ -4,14 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "cypress-run": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress run",
+    "precypress-run": "npm run reset-db",
+    "cypress-run": "node_modules/cypress/bin/cypress run",
+    "precypress-open": "npm run reset-db",
     "cypress-open": "cd ../backend/ && . env/bin/activate && cd - && node_modules/cypress/bin/cypress open",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "reset-db": "cd ../backend/ && . env/bin/activate && tracimcli db delete --force -c ./cypress_test.ini && tracimcli db init -c ./cypress_test.ini && cp /tmp/tracim_cypress.sqlite /tmp/tracim_cypress.sqlite.tmp && cd - ",
+    "travis-cypress-run": "cd ../backend/ && tracimcli db delete --force -c ./cypress_test.ini && tracimcli db init -c ./cypress_test.ini && ls -la && cp /tmp/tracim_cypress.sqlite /tmp/tracim_cypress.sqlite.tmp && cd - && node_modules/cypress/bin/cypress run"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^3.1.2"
+    "cypress": "^3.3.1",
+    "cypress-wait-until": "^1.2.1"
+  },
+  "dependencies": {
+    "mocha": "^6.1.4"
   }
 }

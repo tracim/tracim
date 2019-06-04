@@ -10,6 +10,7 @@
     padding 5px
     z-index 30 // INFO - CH - 2019-04-18 - higher than .wsContentGeneric and lower than caldavzap fullscreen
     border-bottom 1px solid grey
+    min-height 61px
   &__logo
     padding 0
     cursor pointer
@@ -102,7 +103,6 @@
       &__rightside
         width 100%
 
-
 responsiveNavbarCollapseFixed =
   position fixed
   left 0
@@ -110,6 +110,7 @@ responsiveNavbarCollapseFixed =
   width 100%
   background-color #f8f9fa
   border-bottom 1px solid #ccc
+  padding-right 5px
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .header
@@ -119,8 +120,11 @@ responsiveNavbarCollapseFixed =
       &.navbar-collapse
         {responsiveNavbarCollapseFixed}
       &__rightside
+        flex-wrap wrap
         padding-left 0
         width 100%
+        & li
+          margin 2px 0
         &__itemquestion
           display none
 

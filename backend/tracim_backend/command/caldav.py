@@ -11,8 +11,8 @@ from tracim_backend.lib.agenda.agenda import AgendaApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
-from wsgi import CALDAV_APP_NAME
-from wsgi import caldav_app
+from tracim_backend.wsgi import CALDAV_APP_NAME
+from tracim_backend.wsgi import caldav_app
 
 
 class CaldavRunnerCommand(AppContextCommand):
@@ -37,9 +37,9 @@ class CaldavRunnerCommand(AppContextCommand):
         return loader.get_wsgi_server(name=CALDAV_APP_NAME)
 
 
-class CaldavCreateAgendasCommand(AppContextCommand):
+class CaldavSyncCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "create agenda for all workspaces/user"
+        return "synchronize tracim with radicale"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
