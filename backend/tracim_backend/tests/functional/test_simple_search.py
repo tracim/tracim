@@ -104,7 +104,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_content_name
 
     @parameterized.expand(
@@ -157,7 +157,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert search_result["contents"][0]["label"] == first_content_name
 
     def test_api___simple_search_ok__no_search_string(self) -> None:
@@ -246,7 +246,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 4
 
         params = {"search_string": "stringtosearch", "content_types": "html-document"}
@@ -255,7 +255,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 2
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 2
         assert search_result["contents"][0]["label"] == "stringtosearch doc 2"
         assert search_result["contents"][1]["label"] == "stringtosearch doc"
@@ -266,7 +266,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 3
         assert search_result["contents"][0]["label"] == "stringtosearch thread"
         assert search_result["contents"][1]["label"] == "stringtosearch doc 2"
@@ -278,7 +278,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"] == "stringtosearch folder"
 
@@ -346,7 +346,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 4
 
         # get only active
@@ -356,7 +356,7 @@ class TestSimpleSearch(FunctionalTest):
         default_search_result = res.json_body
         assert default_search_result
         assert default_search_result["total_hits"] == 2
-        assert default_search_result["is_total_hits_accurate"] is True
+        assert default_search_result["is_total_hits_accurate"] is False
         assert len(default_search_result["contents"]) == 2
         assert default_search_result["contents"][0]["label"] == "stringtosearch active 2"
         assert default_search_result["contents"][1]["label"] == "stringtosearch active"
@@ -383,7 +383,7 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 3
         assert search_result["contents"][0]["label"].startswith("stringtosearch deleted")
         assert search_result["contents"][1]["label"] == "stringtosearch active 2"
@@ -400,6 +400,6 @@ class TestSimpleSearch(FunctionalTest):
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
-        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
