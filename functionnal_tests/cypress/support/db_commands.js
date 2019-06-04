@@ -54,7 +54,8 @@ Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
     .then(userJSON => cy.request('POST', '/api/v2/users', userJSON))
     .then(response => {
       if (response === undefined) {
-        assert.isNotOk(true, `undefined response for request to url ${url}`)
+        cy.log(`undefined response for request to url ${url}`)
+        cy.wrap(undefined).should('be.undefined')
       }
       return response.body
     })
@@ -71,9 +72,10 @@ Cypress.Commands.add('createRandomWorkspace', () => {
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
-        assert.isNotOk(true, `undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.wrap(undefined).should('be.undefined')
       }
-      response.body
+      return response.body
     })
 })
 
@@ -84,7 +86,8 @@ Cypress.Commands.add('createWorkspace', (fixturePath = 'baseWorkspace') => {
     .then(workspaceJSON => cy.request('POST', url, workspaceJSON))
     .then(response => {
       if (response === undefined) {
-        assert.isNotOk(true, `undefined response for request to url ${url}`)
+        cy.log(`undefined response for request to url ${url}`)
+        cy.wrap(undefined).should('be.undefined')
       }
       return response.body
     })
@@ -134,9 +137,11 @@ Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId=null) =
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
-        assert.isNotOk(true, `undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.wrap(undefined).should('be.undefined')
+      } else {
+        return response.body
       }
-      response.body
     })
 })
 
@@ -170,9 +175,11 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId=null) => {
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
-        assert.isNotOk(true, `undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.wrap(undefined).should('be.undefined')
+      } else {
+        return response.body
       }
-      return response.body
     })
 })
 
@@ -188,9 +195,11 @@ Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspa
           .form_request('POST', url, form)
           .then(response => {
             if (response === undefined) {
-              assert.isNotOk(true, `undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+              cy.log(`undefined response for request to url ${url} and file title ${fileTitle}`)
+              cy.wrap(undefined).should('be.undefined')
+            } else {
+              return response.body
             }
-            return response.body
           })
       })
     })

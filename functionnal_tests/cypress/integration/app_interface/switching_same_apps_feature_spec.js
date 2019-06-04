@@ -25,15 +25,10 @@ describe('Hot switching between the same app', () => {
       // end up with an undefined response we need to dig up to find if it's the server or cypress
       // Issue 1836
       cy.createHtmlDocument(htmlDocTitle, workspaceId)
-      cy.wait(200)
       cy.createThread(threadTitle, workspaceId)
-      cy.wait(200)
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-      cy.wait(200)
       cy.createHtmlDocument(anotherHtmlDocTitle, workspaceId)
-      cy.wait(200)
       cy.createThread(anotherThreadTitle, workspaceId)
-      cy.wait(200)
       cy.createFile(fullFilename, contentType, anotherFileTitle, workspaceId)
     })
   })
