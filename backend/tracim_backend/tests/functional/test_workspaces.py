@@ -175,12 +175,12 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test update workspace with empty label
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "business", "description": "mysuperdescription", "agenda_enabled": False}
+        params = {"label": "Documentation", "description": "mysuperdescription", "agenda_enabled": False}
         res = self.testapp.post_json("/api/v2/workspaces", status=200, params=params)
         workspace1_id = res.json_body["workspace_id"]
 
         params = {
-            "label": "business2",
+            "label": "Documentation2",
             "description": "mysuperdescription",
             "agenda_enabled": False,
         }
@@ -189,7 +189,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
 
         assert workspace1_id != workspace2_id
 
-        params = {"label": "business", "description": "mysuperdescription"}
+        params = {"label": "Documentation", "description": "mysuperdescription"}
         # INFO - G.M - 2019-05-21 - we can update to same value
         self.testapp.put_json(
             "/api/v2/workspaces/{}".format(workspace1_id), status=200, params=params
@@ -207,7 +207,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test update workspace with empty label
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"": "business", "description": "mysuperdescription"}
+        params = {"label": "", "description": "mysuperdescription"}
         res = self.testapp.put_json("/api/v2/workspaces/1", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
