@@ -4,8 +4,8 @@ const PAGES = {
 }
 
 const URLS = {
-  contents: ({workspaceId}) => `/ui/workspaces/${workspaceId}/contents/`,
-  dashboard: ({workspaceId}) => `/ui/workspaces/${workspaceId}/dashboard/`
+  [PAGES.CONTENTS]: ({workspaceId}) => `/ui/workspaces/${workspaceId}/contents/`,
+  [PAGES.DASHBOARD]: ({workspaceId}) => `/ui/workspaces/${workspaceId}/dashboard/`
 }
 
 /** 
@@ -29,7 +29,12 @@ const formatUrl = ({pageName, params = {}, getters = null}) => {
   let url = reverseUrl(pageName)(params)
   if (getters) {
     url += '?'
-    Object.entries(getters).forEach(([key, value]) => url += `${key}=${value}`)
+    Object.keys(getters).forEach((key, index, array) => {
+      url += `${key}=${getters[key]}`
+      if (index !== array.length - 1) {
+        url += '&'
+      }
+    })
   }
   return url
 }
@@ -47,6 +52,6 @@ formatUrl(pageName: PAGES.CONTENTS, getters: {type: 'file'}, param: {workspaceId
 ----
 
 const lazyContentUrl = reverseUrl(PAGES.CONTENTS)
-const workspace1 = lazyContentUrl(workspaceId: 1)
-const workspace2 = lazyContentUrl(workspaceId: 2)
+const workspace1 = lazyContentUrl({workspaceId: 1})
+const workspace2 = lazyContentUrl({workspaceId: 2})
 */
