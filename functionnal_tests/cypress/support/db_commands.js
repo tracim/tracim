@@ -54,10 +54,14 @@ Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
     .then(userJSON => cy.request('POST', '/api/v2/users', userJSON))
     .then(response => {
       if (response === undefined) {
+        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // end up with an undefined response we need to dig up to find if it's the server or cypress
+        // Issue 1836
         cy.log(`undefined response for request to url ${url}`)
         cy.wrap(undefined).should('be.undefined')
+      } else {
+        return response.body
       }
-      return response.body
     })
 })
 
@@ -72,10 +76,14 @@ Cypress.Commands.add('createRandomWorkspace', () => {
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
+        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // end up with an undefined response we need to dig up to find if it's the server or cypress
+        // Issue 1836
         cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
         cy.wrap(undefined).should('be.undefined')
+      } else {
+        return response.body
       }
-      return response.body
     })
 })
 
@@ -86,10 +94,14 @@ Cypress.Commands.add('createWorkspace', (fixturePath = 'baseWorkspace') => {
     .then(workspaceJSON => cy.request('POST', url, workspaceJSON))
     .then(response => {
       if (response === undefined) {
+        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // end up with an undefined response we need to dig up to find if it's the server or cypress
+        // Issue 1836
         cy.log(`undefined response for request to url ${url}`)
         cy.wrap(undefined).should('be.undefined')
+      } else {
+        return response.body
       }
-      return response.body
     })
 })
 
@@ -126,7 +138,7 @@ Cypress.Commands.add('getUserByRole', (role) => {
     .fixture(userFixtures[role])
 })
 
-Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId=null) => {
+Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId = null) => {
   let url = `/api/v2/workspaces/${workspaceId}/contents`
   let data = {
     content_type: 'html-document',
@@ -137,6 +149,9 @@ Cypress.Commands.add('createHtmlDocument', (title, workspaceId, parentId=null) =
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
+        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // end up with an undefined response we need to dig up to find if it's the server or cypress
+        // Issue 1836
         cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
         cy.wrap(undefined).should('be.undefined')
       } else {
@@ -164,7 +179,7 @@ Cypress.Commands.add('changeHtmlDocumentStatus', (contentId, workspaceId, status
     .then(response => response.body)
 })
 
-Cypress.Commands.add('createThread', (title, workspaceId, parentId=null) => {
+Cypress.Commands.add('createThread', (title, workspaceId, parentId = null) => {
   let url = `/api/v2/workspaces/${workspaceId}/contents`
   let data = {
     content_type: 'thread',
@@ -175,6 +190,9 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId=null) => {
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
+        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // end up with an undefined response we need to dig up to find if it's the server or cypress
+        // Issue 1836
         cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
         cy.wrap(undefined).should('be.undefined')
       } else {
@@ -183,8 +201,7 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId=null) => {
     })
 })
 
-
-Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId=null) => {
+Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId = null) => {
   let url = `/api/v2/workspaces/${workspaceId}/files`
   cy.fixture(fixturePath, 'base64').then(fixture => {
     cy.window().then(window => {
@@ -195,6 +212,9 @@ Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspa
           .form_request('POST', url, form)
           .then(response => {
             if (response === undefined) {
+              // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+              // end up with an undefined response we need to dig up to find if it's the server or cypress
+              // Issue 1836
               cy.log(`undefined response for request to url ${url} and file title ${fileTitle}`)
               cy.wrap(undefined).should('be.undefined')
             } else {
@@ -206,10 +226,9 @@ Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspa
   })
 })
 
-Cypress.Commands.add('logInFile', (message, logPath='/tmp/cypress.log') => {
+Cypress.Commands.add('logInFile', (message, logPath = '/tmp/cypress.log') => {
   cy.exec(`echo "${message}" >> ${logPath}`)
   cy.exec(`echo "\n" >> ${logPath}`)
   cy.exec(`echo ---------- >> ${logPath}`)
   cy.exec(`echo "\n" >> ${logPath}`)
-
 })
