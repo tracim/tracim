@@ -2,7 +2,8 @@ import i18n, { getBrowserLang } from './i18n.js'
 
 const configEnv = require('../configEnv.json')
 
-export const TRACIM_APP_VERSION = 'v2.2'
+const versionFile = require('./version.json')
+export const TRACIM_APP_VERSION = versionFile.tracim_app_version
 
 // this function is declared in i18n to avoid cyclic imports and reexported here for consistency
 export { getBrowserLang }
