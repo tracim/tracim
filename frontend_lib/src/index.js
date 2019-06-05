@@ -9,6 +9,7 @@ import {
   appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE
 } from './helper.js'
+import { CUSTOM_EVENT } from './customEvent.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
@@ -41,6 +42,8 @@ import SelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
+
+import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
@@ -83,6 +86,8 @@ export {
   SelectStatus,
   ErrorFlashMessageTemplateHtml,
   NewMemberForm,
+  CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  DisplayState
 }
