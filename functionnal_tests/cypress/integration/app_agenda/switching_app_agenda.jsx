@@ -24,6 +24,7 @@ describe('App Agenda', () => {
   // Right now, Cypress cannot access or click inside an iframe
   // One solution would be to add custom events fired by caldavzap that would include the data it is about to display
   // and assert that it is the right data (eg. the right workspace)
+  // see https://github.com/tracim/tracim/issues/1849
 
   describe('Switching from app agenda of different workspace', () => {
     it('Should reload the iframe with the proper workspace id', () => {
