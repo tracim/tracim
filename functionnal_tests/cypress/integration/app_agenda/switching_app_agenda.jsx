@@ -20,6 +20,11 @@ describe('App Agenda', () => {
     cy.cancelXHR()
   })
 
+  // TODO - CH - 2019-06-05 - We need to add tests that checks that the agenda loaded is the proper one
+  // Right now, Cypress cannot access or click inside an iframe
+  // One solution would be to add custom events fired by caldavzap that would include the data it is about to display
+  // and assert that it is the right data (eg. the right workspace)
+
   describe('Switching from app agenda of different workspace', () => {
     it('Should reload the iframe with the proper workspace id', () => {
       cy.visitPage({pageName: PAGES.AGENDA, params: {workspaceId: workspace1.workspace_id}})
