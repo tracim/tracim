@@ -23,12 +23,13 @@ describe('Research page', () => {
       })
   })
 
-  beforeEach(function () {
-    cy.loginAs('users')
-    cy.visit('/ui')
-  })
-
   describe('Typing FileForResearch in the input, validating and clicking in the first result', () => {
+
+    beforeEach(function () {
+      cy.loginAs('users')
+      cy.visit('/ui')
+    })
+
     it('Should redirect to the content page', () => {
       cy.get(researchInput).type(fileTitle)
       cy.get(researchButton).click()
