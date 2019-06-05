@@ -21,10 +21,10 @@ from tracim_backend.exceptions import EmptyEmailBody
 from tracim_backend.exceptions import NoSpecialKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
-from tracim_backend.lib.utils.sanitizer import HtmlSanitizer  # nopep8
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizer  # nopep8
 
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 CONTENT_TYPE_TEXT_PLAIN = "text/plain"
