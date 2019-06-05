@@ -685,6 +685,8 @@ class File extends React.Component {
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isEditable={state.content.is_editable}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             downloadRawUrl={this.getDownloadRawUrl(state)}

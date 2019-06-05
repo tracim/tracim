@@ -33,7 +33,7 @@ describe('operation :: workspace > delete > thread', function () {
           cy.get('.thread.visible').should('be.visible')
           cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
           cy.get('.thread.visible .align-items-center button:nth-child(2)').click()
-          cy.get('.thread.visible .timeline__info__btnrestore').should('be.visible')
+          cy.get('.timeline__body__warning > [data-cy="displaystate"] .displaystate__btn').should('be.visible')
           cy.get('.thread.visible .thread__contentpage__header__close').click()
           cy.get('.thread.visible').should('not.be.visible')
         }

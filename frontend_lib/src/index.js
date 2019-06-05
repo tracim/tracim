@@ -46,6 +46,7 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
+import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
@@ -92,5 +93,6 @@ export {
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
-  IconButton
+  IconButton,
+  DisplayState
 }

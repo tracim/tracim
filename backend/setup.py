@@ -78,13 +78,23 @@ tests_require = [
     'pytest-cov',
     'pytest-dotenv',
     'parameterized',
-    'pep8',
-    'mypy',
     'responses',
     'mock',
     'Pillow',
-    'freezegun'
+    'freezegun',
 ]
+
+devtools_require=[
+    'flake8',
+    'isort',
+    'mypy',
+    'pre-commit',
+]
+
+
+# add black for python 3.6+
+if sys.version_info.major == 3 and sys.version_info.minor >= 6:
+    devtools_require.append('black')
 
 mysql_require = [
     'PyMySQL'
@@ -125,6 +135,7 @@ setup(
     zip_safe=False,
     extras_require={
         'testing': tests_require,
+        'dev': tests_require + devtools_require,
         'mysql': mysql_require,
         'postgresql': postgresql_require,
     },
