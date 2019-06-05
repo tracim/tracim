@@ -1,3 +1,5 @@
+import { PAGES } from '../../support/urls_commands'
+
 const htmlDocTitle = 'HtmlDocForResearch'
 const researchInput = '.research > [data-cy=research__text]'
 const researchButton = '.research > [data-cy=research__btn]'
@@ -20,7 +22,7 @@ describe('Research page', () => {
 
     beforeEach(function () {
       cy.loginAs('users')
-      cy.visit('/ui')
+      cy.visitPage({pageName: PAGES.HOME})
     })
 
     afterEach(function () {

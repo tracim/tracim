@@ -1,3 +1,5 @@
+import { PAGES } from '../../support/urls_commands'
+
 const htmlDocTitle = 'HtmlDocForResearch'
 const threadTitle = 'ThreadForResearch'
 const fileTitle = 'FileForResearch'
@@ -25,7 +27,7 @@ describe('Research page', () => {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visit('/ui')
+    cy.visitPage({pageName: PAGES.HOME})
   })
 
   describe('Typing FileForResearch in the input, validating and clicking in the first result', () => {

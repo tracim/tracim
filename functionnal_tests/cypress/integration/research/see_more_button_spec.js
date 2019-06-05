@@ -1,3 +1,5 @@
+import { PAGES } from '../../support/urls_commands'
+
 const htmlDocTitle = 'HtmlDocForResearch'
 const htmlDocTitle1 = 'HtmlDocForResearch1'
 const htmlDocTitle2 = 'HtmlDocForResearch2'
@@ -40,7 +42,7 @@ describe('Research page', () => {
 
     beforeEach(function () {
       cy.loginAs('users')
-      cy.visit('/ui')
+      cy.visitPage({pageName: PAGES.HOME})
     })
 
     describe('Typing HtmlDocForResearch in the input and validating', () => {

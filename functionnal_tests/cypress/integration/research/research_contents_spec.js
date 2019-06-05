@@ -1,3 +1,5 @@
+import { PAGES } from '../../support/urls_commands'
+
 const htmlDocTitle = 'HtmlDocForResearch'
 const htmlDocTitleLong = 'HtmlDocForResearchLong'
 const threadTitle = 'ThreadForResearch'
@@ -27,7 +29,7 @@ describe('Research page', () => {
 
   beforeEach(function () {
     cy.loginAs('administrators')
-    cy.visit('/ui')
+    cy.visitPage({pageName: PAGES.HOME})
     cy.ignoreTinyMceError()
   })
 
