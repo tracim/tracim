@@ -83,8 +83,8 @@ class Sidebar extends React.Component {
         <div className='sidebar__scrollview'>
           <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
             {sidebarClose
-              ? <i className={classnames('fa fa-chevron-right')} title={t('see sidebar')} />
-              : <i className={classnames('fa fa-chevron-left')} title={t('hide sidebar')} />
+              ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
+              : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />
             }
           </div>
 
