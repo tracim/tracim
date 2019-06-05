@@ -34,7 +34,7 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
 
 const WorkspaceListItem = props => {
   return (
-    <li className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'>
+    <li className='sidebar__content__navigation__workspace__item' data-cy={`sidebar__content__navigation__workspace__item_${props.idWorkspace}`}>
       <div
         className='sidebar__content__navigation__workspace__item__wrapper'
         onClick={props.onClickTitle}

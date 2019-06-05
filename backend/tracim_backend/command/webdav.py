@@ -4,8 +4,8 @@ import argparse
 import plaster
 
 from tracim_backend.command import AppContextCommand
-from wsgi import WEBDAV_APP_NAME
-from wsgi import webdav_app
+from tracim_backend.wsgi import WEBDAV_APP_NAME
+from tracim_backend.wsgi import webdav_app
 
 
 class WebdavRunnerCommand(AppContextCommand):
