@@ -1,26 +1,37 @@
 import typing
-from bs4 import BeautifulSoup, Tag
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.attrs_whitelist import ATTRS_WHITELIST  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.class_blacklist import CLASS_BLACKLIST  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.id_blacklist import ID_BLACKLIST  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_blacklist import TAG_BLACKLIST  # nopep8
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_whitelist import TAG_WHITELIST  # nopep8
 
+from bs4 import BeautifulSoup
+from bs4 import Tag
 
-ALLOWED_EMPTY_TAGS = ['video', 'img', 'source', 'iframe']
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.attrs_whitelist import (
+    ATTRS_WHITELIST  # nopep8,
+)
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.class_blacklist import (
+    CLASS_BLACKLIST  # nopep8,
+)
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.id_blacklist import (
+    ID_BLACKLIST  # nopep8,
+)
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_blacklist import (
+    TAG_BLACKLIST  # nopep8,
+)
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_whitelist import (
+    TAG_WHITELIST  # nopep8,
+)
+
+ALLOWED_EMPTY_TAGS = ["video", "img", "source", "iframe"]
 
 
 class HtmlSanitizerConfig(object):
-
     def __init__(
-            self,
-            tag_whitelist: list = TAG_WHITELIST,
-            attrs_whitelist: list = ATTRS_WHITELIST,
-            tag_blacklist: list = TAG_BLACKLIST,
-            class_blacklist: list = CLASS_BLACKLIST,
-            id_blacklist: list = ID_BLACKLIST,
-            allowed_empty_tags: list = ALLOWED_EMPTY_TAGS,
-            parser: str = 'html.parser'
+        self,
+        tag_whitelist: list = TAG_WHITELIST,
+        attrs_whitelist: list = ATTRS_WHITELIST,
+        tag_blacklist: list = TAG_BLACKLIST,
+        class_blacklist: list = CLASS_BLACKLIST,
+        id_blacklist: list = ID_BLACKLIST,
+        allowed_empty_tags: list = ALLOWED_EMPTY_TAGS,
+        parser: str = "html.parser",
     ):
         self.tag_whitelist = tag_whitelist
         self.attrs_whitelist = attrs_whitelist
@@ -42,12 +53,14 @@ class HtmlSanitizer(object):
       - Remove non-whitelisted attributes
     """
 
+    # TODO - B.L - make the sanitizer config from tracim ini
     def __init__(self, html_body: str, config: HtmlSanitizerConfig = None):
         if config is None:
             config = HtmlSanitizerConfig()
         self.config = config
         self.soup = BeautifulSoup(html_body, config.parser)
 
+    # INFO - B.L - 2019/05/03 - legacy code for emails do not use.
     def sanitize(self) -> typing.Optional[str]:
         for tag in self.soup.findAll():
             if self._tag_to_extract(tag):
@@ -61,7 +74,7 @@ class HtmlSanitizer(object):
                         del tag.attrs[attr]
             else:
                 # INFO - BL - 2019/4/8 - unwrap removes the tag but
-                # snot its children
+                # not its children
                 tag.unwrap()
 
         if self._is_content_empty(self.soup):
@@ -69,23 +82,25 @@ class HtmlSanitizer(object):
         else:
             return str(self.soup)
 
+    # INFO - B.L - 2019/05/03 - legacy code for emails do not use.
     def _is_content_empty(self, soup):
-        img = soup.find('img')
-        txt = soup.get_text().replace('\n', '').strip()
-        return (not img and not txt)
+        img = soup.find("img")
+        txt = soup.get_text().replace("\n", "").strip()
+        return not img and not txt
 
+    # INFO - B.L - 2019/05/03 - legacy code for emails do not use.
     def _tag_to_extract(self, tag: Tag) -> bool:
         # INFO - BL - 2019/4/8 - returns True if tag is blacklisted or
         # contains a blacklisted class or id
         if tag.name.lower() in self.config.tag_blacklist:
             return True
-        if 'class' in tag.attrs:
+        if "class" in tag.attrs:
             for elem in self.config.class_blacklist:
-                if elem in tag.attrs['class']:
+                if elem in tag.attrs["class"]:
                     return True
-        if 'id' in tag.attrs:
+        if "id" in tag.attrs:
             for elem in self.config.id_blacklist:
-                if elem in tag.attrs['id']:
+                if elem in tag.attrs["id"]:
                     return True
         return False
 
@@ -95,12 +110,12 @@ class HtmlSanitizer(object):
         for tag in ALLOWED_EMPTY_TAGS:
             if soup.find(tag):
                 return False
-        return not soup.get_text().replace('\n', '').strip()
+        return not soup.get_text().replace("\n", "").strip()
 
-    def sanitize_html(self):
-        assert not (self.config.tag_blacklist and self.soup.tag_whitelist), (
-            'You must use either whitelist or blacklist'
-        )
+    def sanitize_html(self) -> str:
+        assert not (
+            self.config.tag_blacklist and self.soup.tag_whitelist
+        ), "You must use either whitelist or blacklist"
         if self.config.tag_blacklist:
             self.soup = self._remove_black_listed_tags(self.soup)
         if self.config.tag_whitelist:
@@ -108,13 +123,13 @@ class HtmlSanitizer(object):
 
         return str(self.soup)
 
-    def _remove_black_listed_tags(self, soup: Tag):
+    def _remove_black_listed_tags(self, soup: Tag) -> Tag:
         for tag in soup.findAll():
             if tag in self.config.tag_blacklist:
                 tag.extract()
         return soup
 
-    def _keep_white_listed_tags(self, soup: Tag):
+    def _keep_white_listed_tags(self, soup: Tag) -> Tag:
         for tag in soup.findAll():
             if tag not in self.config.tag_whitelist:
                 tag.extract()

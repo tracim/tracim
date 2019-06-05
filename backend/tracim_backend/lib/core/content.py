@@ -48,12 +48,12 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.lib.utils.utils import preview_manager_page_format
-from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
-from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
@@ -597,9 +597,7 @@ class ContentApi(object):
                 "status or state (deleted/archived) before any change."
             )
 
-        config = HtmlSanitizerConfig(
-            tag_blacklist=list(), tag_whitelist=list()
-        )
+        config = HtmlSanitizerConfig(tag_blacklist=list(), tag_whitelist=list())
         sanitizer = HtmlSanitizer(html_body=content, config=config)
         if sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
