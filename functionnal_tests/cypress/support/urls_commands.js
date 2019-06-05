@@ -1,5 +1,5 @@
 const PAGES = {
-  HOME: 'home'
+  HOME: 'home',
   CONTENTS: 'contents',
   DASHBOARD: 'dashboard'
 }
