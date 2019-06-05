@@ -631,6 +631,8 @@ class HtmlDocument extends React.Component {
             onChangeText={this.handleChangeText}
             isArchived={content.is_archived}
             isDeleted={content.is_deleted}
+            isDeprecated={content.status === config.availableStatuses[3].slug}
+            deprecatedStatus={config.availableStatuses[3]}
             isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}

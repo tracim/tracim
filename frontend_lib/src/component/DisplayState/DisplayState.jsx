@@ -2,15 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const DisplayState = props => (
-  <div className='html-document__contentpage__textnote__state'>
-    <div className='html-document__contentpage__textnote__state__msg'>
+  <div
+    className='displaystate'
+    data-cy='displaystate'
+  >
+    <div className='displaystate__msg'>
       <i className={`fa fa-fw fa-${props.icon}`} />
       {props.msg}
     </div>
 
-    {props.type === 'button' && (
+    {props.btnType === 'button' && (
       <button
-        className='html-document__contentpage__textnote__state__btnrestore'
+        className='displaystate__btn'
         onClick={props.onClickBtn}
       >
         <i className={`fa fa-fw fa-${props.icon}`} />
@@ -18,9 +21,9 @@ const DisplayState = props => (
       </button>
     )}
 
-    {props.type === 'link' && (
+    {props.btnType === 'link' && (
       <span
-        className='html-document__contentpage__textnote__state__btnrestore link'
+        className='displaystate__btn link'
         onClick={props.onClickBtn}
       >
         {props.btnLabel}
@@ -33,7 +36,7 @@ export default DisplayState
 
 DisplayState.propTypes = {
   msg: PropTypes.string,
-  type: PropTypes.string,
+  btnType: PropTypes.string,
   icon: PropTypes.string,
   btnLabel: PropTypes.string,
   onClickBtn: PropTypes.func
@@ -41,7 +44,7 @@ DisplayState.propTypes = {
 
 DisplayState.defaultState = {
   msg: '',
-  type: '',
+  btnType: '',
   icon: '',
   btnLabel: '',
   onClickBtn: () => {}

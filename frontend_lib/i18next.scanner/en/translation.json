@@ -34,5 +34,6 @@
   "Error detail": "Error detail",
   "This content is archived": "This content is archived",
   "This content is deleted": "This content is deleted",
-  "Status changed to {{status}}": "Status changed to {{status}}"
+  "Status changed to {{status}}": "Status changed to {{status}}",
+  "This content is deprecated": "This content is deprecated"
 }
