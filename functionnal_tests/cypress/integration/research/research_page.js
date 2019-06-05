@@ -23,6 +23,10 @@ describe('Research page', () => {
       cy.visit('/ui')
     })
 
+    afterEach(function () {
+      cy.cancelXHR()
+    })
+
     it('Should redirect to the research result page with click', () => {
       cy.get(researchInput).type(htmlDocTitle)
       cy.get(researchButton).click()

@@ -12,24 +12,23 @@ let workspaceId
 
 describe('Research page', () => {
   before(function () {
-      cy.resetDB()
-      cy.setupBaseDB()
-      cy.loginAs('users')
-      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-        workspaceId = workspace.workspace_id
-        cy.createHtmlDocument(htmlDocTitle, workspaceId)
-        cy.createThread(threadTitle, workspaceId)
-        cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-      })
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('users')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      workspaceId = workspace.workspace_id
+      cy.createHtmlDocument(htmlDocTitle, workspaceId)
+      cy.createThread(threadTitle, workspaceId)
+      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+    })
+  })
+
+  beforeEach(function () {
+    cy.loginAs('users')
+    cy.visit('/ui')
   })
 
   describe('Typing FileForResearch in the input, validating and clicking in the first result', () => {
-
-    beforeEach(function () {
-      cy.loginAs('users')
-      cy.visit('/ui')
-    })
-
     it('Should redirect to the content page', () => {
       cy.get(researchInput).type(fileTitle)
       cy.get(researchButton).click()

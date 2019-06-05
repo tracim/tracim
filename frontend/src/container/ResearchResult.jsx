@@ -21,11 +21,7 @@ import {
   setNbElementsResearch,
   setBreadcrumbs
 } from '../action-creator.sync.js'
-import {
-  getResearchKeyWord
-} from '../action-creator.async.js'
-
-require('../css/ResearchResult.styl')
+import { getResearchKeyWord } from '../action-creator.async.js'
 
 class ResearchResult extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => {

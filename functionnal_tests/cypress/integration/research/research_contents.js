@@ -31,6 +31,10 @@ describe('Research page', () => {
     cy.ignoreTinyMceError()
   })
 
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   describe('Typing HtmlDocForResearch in the input and validating', () => {
     it('Should display the results', () => {
       cy.get(researchInput).type(htmlDocTitle)
@@ -51,7 +55,7 @@ describe('Research page', () => {
           cy.get(contentName).contains(htmlDocTitleLong).click()
           cy.get('[data-cy=archive__button]').click()
 
-          cy.get('.html-document__contentpage__textnote__state')
+          cy.get('[data-cy=displaystate]')
           cy.get(researchButton).click()
 
           cy.get(contentName).contains(htmlDocTitle).should('be.visible')
@@ -69,7 +73,7 @@ describe('Research page', () => {
           cy.get(contentName).contains(htmlDocTitle).click()
           cy.get('[data-cy=delete__button]').click()
 
-          cy.get('.html-document__contentpage__textnote__state')
+          cy.get('[data-cy=displaystate]')
           cy.get(researchButton).click()
 
           cy.get('.ResearchResult__content__empty').should('be.visible')
