@@ -201,6 +201,28 @@ Cypress.Commands.add('createThread', (title, workspaceId, parentId = null) => {
     })
 })
 
+Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
+  let url = `/api/v2/workspaces/${workspaceId}/contents`
+  let data = {
+    content_type: 'folder',
+    label: title,
+    parent_id: parentId
+  }
+  cy
+    .request('POST', url, data)
+    .then(response => {
+      if (response === undefined) {
+        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // end up with an undefined response we need to dig up to find if it's the server or cypress
+        // Issue 1836
+        cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
+        cy.wrap(undefined).should('be.undefined')
+      } else {
+        return response.body
+      }
+    })
+})
+
 Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId = null) => {
   let url = `/api/v2/workspaces/${workspaceId}/files`
   cy.fixture(fixturePath, 'base64').then(fixture => {
