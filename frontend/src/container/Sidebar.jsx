@@ -132,7 +132,7 @@ class Sidebar extends React.Component {
 
           <div className='sidebar__footer mb-2'>
             <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
-              { TRACIM_APP_VERSION }
+              {TRACIM_APP_VERSION}
             </div>
             <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
               Copyright - 2013 - 2019
