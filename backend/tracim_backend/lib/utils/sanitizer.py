@@ -4,19 +4,19 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.attrs_whitelist import (
-    ATTRS_WHITELIST  # nopep8,
+    ATTRS_WHITELIST,
 )
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.class_blacklist import (
-    CLASS_BLACKLIST  # nopep8,
+    CLASS_BLACKLIST,
 )
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.id_blacklist import (
-    ID_BLACKLIST  # nopep8,
+    ID_BLACKLIST,
 )
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_blacklist import (
-    TAG_BLACKLIST  # nopep8,
+    TAG_BLACKLIST,
 )
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_whitelist import (
-    TAG_WHITELIST  # nopep8,
+    TAG_WHITELIST,
 )
 
 ALLOWED_EMPTY_TAGS = ["video", "img", "source", "iframe"]
