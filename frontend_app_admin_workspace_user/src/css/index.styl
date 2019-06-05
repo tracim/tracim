@@ -15,13 +15,22 @@
       display flex
       align-items center
       flex-wrap wrap
-  &__workspaceTable__tr
-    &:hover, &:nth-child(even):hover
-      background-color grey-hover
-    &__td-link
-      cursor pointer
-      &:not(:hover)
-        color inherit
+  &__workspaceTable
+    table-layout fixed
+    &__tr
+      &:hover, &:nth-child(even):hover
+        background-color grey-hover
+      &__td-link
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+        cursor pointer
+        &:not(:hover)
+          color inherit
+      &__td-description
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
 
 .adminUser
   &__description
@@ -85,3 +94,44 @@
       justify-content flex-end
       .btn:first-child
         margin-right 15px
+
+.adminWorkspace
+  &__workspaceTable
+    & .table
+      &__id
+        width 5%
+      &__sharedSpace
+        width 15%
+      &__description
+        width 60%
+      &__memberCount
+        width 10%
+      &__delete
+        width 10%
+
+@media (min-width: min-sm) and (max-width: max-md)
+  .adminWorkspace
+    &__workspaceTable
+      & .table
+        &__description
+          width 50%
+        &__memberCount
+          width 15%
+        &__delete
+          width 15%
+
+@media (max-width: max-xs)
+  .adminWorkspace
+    &__workspaceTable
+      & .table
+        &__id
+          width 10%
+        &__sharedSpace
+          width 30%
+        &__description
+          width 0%
+          display none
+        &__memberCount
+          width 30%
+        &__delete
+          width 30%
