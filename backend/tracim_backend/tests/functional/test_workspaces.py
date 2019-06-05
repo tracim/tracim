@@ -175,7 +175,11 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test update workspace with empty label
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "Documentation", "description": "mysuperdescription", "agenda_enabled": False}
+        params = {
+            "label": "Documentation",
+            "description": "mysuperdescription",
+            "agenda_enabled": False,
+        }
         res = self.testapp.post_json("/api/v2/workspaces", status=200, params=params)
         workspace1_id = res.json_body["workspace_id"]
 
