@@ -820,6 +820,12 @@ class CFG(object):
         SYNC = "SYNC"
 
     def check_mandatory_param(self, param_name: str, value: typing.Any, when_str: str = "") -> None:
+        """
+        Check if param value is not falsy value, if falsy, raise ConfigurationError
+        :param param_name: name of the parameter
+        :param value: value to check for parameter
+        :param when_str: condition string to explain when parameter is mandatory
+        """
         if not value:
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
@@ -829,6 +835,14 @@ class CFG(object):
     def check_directory_path_param(
         self, param_name: str, path: str, writable: bool = False, readable: bool = True
     ) -> None:
+        """
+        Check if path exist, if it is a directory and if it is readable/writable.
+        if check fail, raise ConfigurationError
+        :param param_name: name of parameter to check
+        :param path: path (value of parameter) which is check as a directory path
+        :param writable: check if directory(according to path) is writable
+        :param readable: check if directory(according to path) is writable
+        """
         try:
             is_dir_exist(path)
             if writable:
