@@ -94,7 +94,9 @@ class Header extends React.Component {
   handleClickResearch = async (keyWordResearch) => {
     const { props } = this
 
-    const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(keyWordResearch, 1, props.researchResult.numberElementsByPage))
+    const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(
+      0, 'html-document,file,thread,folder,comment', 0, 1, keyWordResearch, 1, props.researchResult.numberElementsByPage
+    ))
 
     switch (fetchGetKeyWordResearch.status) {
       case 200:

@@ -24,6 +24,16 @@ import {
 import { getResearchKeyWord } from '../action-creator.async.js'
 
 class ResearchResult extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      showArchived: 0,
+      contentTypes: 'html-document,file,thread,folder,comment',
+      showDeleted: 0,
+      showActive: 1
+    }
+  }
+
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case 'allApp_changeLang': this.buildBreadcrumbs(); break
@@ -49,9 +59,10 @@ class ResearchResult extends React.Component {
   }
 
   handleClickSeeMore = async () => {
-    const { props } = this
+    const { props, state } = this
 
     const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(
+      state.showArchived, state.contentTypes, state.showDeleted, state.showActive,
       props.researchResult.keyWordResearch, props.researchResult.numberPage + 1, props.researchResult.numberElementsByPage
     ))
 

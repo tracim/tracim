@@ -16,7 +16,7 @@ describe('Research page', () => {
   before(function () {
       cy.resetDB()
       cy.setupBaseDB()
-      cy.loginAs('users')
+      cy.loginAs('administrators')
       cy.fixture('baseWorkspace').as('workspace').then(workspace => {
         workspaceId = workspace.workspace_id
         cy.createHtmlDocument(htmlDocTitle, workspaceId)
@@ -35,7 +35,7 @@ describe('Research page', () => {
     cy.cancelXHR()
   })
 
-  describe('Typing HtmlDocForResearch in the input and validating', () => {
+  describe('Typing ThreadForResearch in the input and validating', () => {
     it('Should display the results', () => {
       cy.get(researchInput).type(threadTitle).type('{enter}')
 
@@ -47,7 +47,7 @@ describe('Research page', () => {
     })
 
     describe('Archiving one document', () => {
-      describe('Typing HtmlDocForResearch in the input and validating again', () => {
+      describe('Typing ThreadForResearch in the input and validating again', () => {
         it('Should not display the archived document', () => {
           cy.get(researchInput).type(threadTitle).type('{enter}')
 
@@ -64,7 +64,7 @@ describe('Research page', () => {
     })
 
     describe('Deleting one document', () => {
-      describe('Typing HtmlDocForResearch in the input and validating again', () => {
+      describe('Typing ThreadForResearch in the input and validating again', () => {
         it('Should not display the deleted document', () => {
           cy.get(researchInput).type(threadTitle).type('{enter}')
 
