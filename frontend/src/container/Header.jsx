@@ -117,13 +117,13 @@ class Header extends React.Component {
 
               {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
-                  <button
+                  <a
                     className='btn outlineTextBtn primaryColorBorder nohover'
                     onClick={this.handleClickAgendaButton}
                   >
                     <i className='fa fa-fw fa-calendar' />
                     {props.t('Agendas')}
-                  </button>
+                  </a>
                 </li>
               )}
 
