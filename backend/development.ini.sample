@@ -20,9 +20,9 @@ basic_setup.website_base_url =  http://localhost:6543
 basic_setup.listen = localhost:6543
 ## storage path/connection
 basic_setup.sqlalchemy_url = sqlite:///%(here)s/tracim.sqlite
-basic_setup.depot_storage_dir = %(here)s/depot/
-basic_setup.caldav_storage_dir = %(here)s/radicale_storage/
-basic_setup.preview_cache_dir = /tmp/tracim/preview/
+basic_setup.depot_storage_dir = %(here)s/depot
+basic_setup.caldav_storage_dir = %(here)s/radicale_storage
+basic_setup.preview_cache_dir = %(here)s/previews
 basic_setup.sessions_data_root_dir = %(here)s
 ## secret
 # This is needed for some feature like reply by email

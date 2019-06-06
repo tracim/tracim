@@ -1,3 +1,5 @@
+import os
+
 from alembic import command
 from alembic.config import Config
 from alembic.runtime.environment import EnvironmentContext
@@ -13,7 +15,10 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import *  # noqa: F403,F401
+from tracim_backend.tests import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests import BaseTest
+
+TEST_MIGRATION_SCRIPT_LOCATION = os.environ.get("TEST_MIGRATION_SCRIPT_LOCATION")
 
 
 def get_revision(
@@ -38,7 +43,7 @@ class TestMigration(BaseTest):
     # mostly inspired by alembic-verify but with requirement for alembic_verify
 
     fixtures = [BaseFixture, ContentFixture]
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "migration_test"
 
     def tearDown(self) -> None:
@@ -61,7 +66,7 @@ class TestMigration(BaseTest):
         database, and also that we can remove them all.
         """
         uri = self.app_config.SQLALCHEMY__URL
-        folder = self.settings["script_location"]
+        folder = TEST_MIGRATION_SCRIPT_LOCATION
 
         alembic_config = Config()
         alembic_config.set_main_option("script_location", folder)
