@@ -1,15 +1,15 @@
 import { PAGES } from '../../support/urls_commands'
 
 const htmlDocTitle = 'HtmlDocForResearch'
-const htmlDocTitleLong = 'HtmlDocForResearchLong'
+const threadTitleLong = 'ThreadForResearchLong'
 const threadTitle = 'ThreadForResearch'
 const fileTitle = 'FileForResearch'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
-const researchInput = '.research > [data-cy=research__text]'
-const researchButton = '.research > [data-cy=research__btn]'
-const contentName= '[data-cy=research__content] [data-cy=content__item] > [data-cy=content__name]'
+const researchInput = '[data-cy=research__text]'
+const researchButton = '[data-cy=research__btn]'
+const contentName= '[data-cy=content__name]'
 
 let workspaceId
 
@@ -23,14 +23,13 @@ describe('Research page', () => {
         cy.createHtmlDocument(htmlDocTitle, workspaceId)
         cy.createThread(threadTitle, workspaceId)
         cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-        cy.createHtmlDocument(htmlDocTitleLong, workspaceId)
+        cy.createThread(threadTitleLong, workspaceId)
       })
   })
 
   beforeEach(function () {
     cy.loginAs('administrators')
     cy.visitPage({pageName: PAGES.HOME})
-    cy.ignoreTinyMceError()
   })
 
   afterEach(function () {
@@ -39,29 +38,30 @@ describe('Research page', () => {
 
   describe('Typing HtmlDocForResearch in the input and validating', () => {
     it('Should display the results', () => {
-      cy.get(researchInput).type(htmlDocTitle)
+      cy.get(researchInput).type(threadTitle)
       cy.get(researchButton).click()
 
-      cy.get(contentName).contains(htmlDocTitle).should('be.visible')
-      cy.get(contentName).contains(threadTitle).should('be.not.visible')
+
+      cy.get(contentName).contains(htmlDocTitle).should('be.not.visible')
+      cy.get(contentName).contains(threadTitle).should('be.visible')
       cy.get(contentName).contains(fileTitle).should('be.not.visible')
-      cy.get(contentName).contains(htmlDocTitleLong).should('be.visible')
+      cy.get(contentName).contains(threadTitleLong).should('be.visible')
     })
 
     describe('Archiving one document', () => {
       describe('Typing HtmlDocForResearch in the input and validating again', () => {
         it('Should not display the archived document', () => {
-          cy.get(researchInput).type(htmlDocTitle)
+          cy.get(researchInput).type(threadTitle)
           cy.get(researchButton).click()
 
-          cy.get(contentName).contains(htmlDocTitleLong).click()
+          cy.get(contentName).contains(threadTitleLong).click()
           cy.get('[data-cy=archive__button]').click()
 
           cy.get('[data-cy=displaystate]')
           cy.get(researchButton).click()
 
-          cy.get(contentName).contains(htmlDocTitle).should('be.visible')
-          cy.get(contentName).contains(htmlDocTitleLong).should('be.not.visible')
+          cy.get(contentName).contains(threadTitle).should('be.visible')
+          cy.get(contentName).contains(threadTitleLong).should('be.not.visible')
         })
       })
     })
@@ -69,10 +69,10 @@ describe('Research page', () => {
     describe('Deleting one document', () => {
       describe('Typing HtmlDocForResearch in the input and validating again', () => {
         it('Should not display the deleted document', () => {
-          cy.get(researchInput).type(htmlDocTitle)
+          cy.get(researchInput).type(threadTitle)
           cy.get(researchButton).click()
 
-          cy.get(contentName).contains(htmlDocTitle).click()
+          cy.get(contentName).contains(threadTitle).click()
           cy.get('[data-cy=delete__button]').click()
 
           cy.get('[data-cy=displaystate]')
