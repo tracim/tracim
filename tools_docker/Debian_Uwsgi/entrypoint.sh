@@ -110,19 +110,6 @@ else
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
 
-# Activate elastic search
-if [ "$START_ELASTIC" = "1" ]; then
-    sed -i "s|search.engine = .*|search.engine = elasticsearch|g" /etc/tracim/development.ini
-    sed -i "s|;search.elasticsearch.host = .*|search.elasticsearch.host = localhost|g" /etc/tracim/development.ini
-    sed -i "s|;search.elasticsearch.port = .*|search.elasticsearch.port = 9200|g" /etc/tracim/development.ini
-    sed -i "s|index = .*|index = value|g" /etc/tracim/development.ini
-else
-    sed -i "s|search.engine = .*|search.engine = simple|g" /etc/tracim/development.ini
-    sed -i "s|search.elasticsearch.host = .*|;search.elasticsearch.host = localhost|g" /etc/tracim/development.ini
-    sed -i "s|search.elasticsearch.port = .*|;search.elasticsearch.port = 9200|g" /etc/tracim/development.ini
-    sed -i "s|index = .*|index = value|g" /etc/tracim/development.ini
-fi
-
 # Reload apache config
 service apache2 restart
 
