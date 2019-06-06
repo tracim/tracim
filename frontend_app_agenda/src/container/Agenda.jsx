@@ -227,7 +227,7 @@ class Agenda extends React.Component {
 
     const pageTitle = state.config.appConfig.idWorkspace === null
       ? props.t('All my agendas')
-      : props.t('Agenda of shared space {{workspaceLabel}}', {workspaceLabel: state.content.workspaceLabel})
+      : `${props.t('Agenda of shared space')} ${state.content.workspaceLabel}`
 
     return (
       <PageWrapper customClass='agendaPage'>
