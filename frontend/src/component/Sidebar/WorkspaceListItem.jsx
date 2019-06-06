@@ -5,11 +5,13 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
+import { DropTarget } from 'react-dnd'
+import { DRAG_AND_DROP } from '../../helper.js'
 
 const qs = require('query-string')
 
-const shouldDisplayAsActive = (location, idWorkspace, activeIdWorkspace, app) => {
-  if (idWorkspace !== activeIdWorkspace) return false
+const shouldDisplayAsActive = (location, workspaceId, activeIdWorkspace, app) => {
+  if (workspaceId !== activeIdWorkspace) return false
 
   const filterType = qs.parse(location.search).type
 
@@ -18,8 +20,8 @@ const shouldDisplayAsActive = (location, idWorkspace, activeIdWorkspace, app) =>
     : location.pathname.includes(app.route)
 }
 
-const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
-  if (idWorkspace !== activeIdWorkspace) return route
+const buildLink = (route, search, workspaceId, activeIdWorkspace) => {
+  if (workspaceId !== activeIdWorkspace) return route
 
   if (search === '') return route
 
@@ -33,8 +35,13 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
 }
 
 const WorkspaceListItem = props => {
+  const dropIsActive = props.canDrop && props.isOver
+
   return (
-    <li className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'>
+    <li
+      className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'
+      ref={props.connectDropTarget}
+    >
       <div
         className='sidebar__content__navigation__workspace__item__wrapper'
         onClick={props.onClickTitle}
@@ -46,7 +53,10 @@ const WorkspaceListItem = props => {
             color: color(GLOBAL_primaryColor).light() ? '#333333' : '#fdfdfd'
           }}
         >
-          {props.label.substring(0, 2).toUpperCase()}
+          {dropIsActive
+            ? <i className='fa fa-arrow-circle-down' />
+            : props.label.substring(0, 2).toUpperCase()
+          }
         </div>
 
         <div className='sidebar__content__navigation__workspace__item__name' title={props.label}>
@@ -65,10 +75,10 @@ const WorkspaceListItem = props => {
         <ul className='sidebar__content__navigation__workspace__item__submenu'>
           {props.allowedAppList.map(aa =>
             <li key={aa.slug}>
-              <Link to={buildLink(aa.route, props.location.search, props.idWorkspace, props.activeIdWorkspace)}>
+              <Link to={buildLink(aa.route, props.location.search, props.workspaceId, props.activeIdWorkspace)}>
                 <div className={classnames(
                   'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                  {'activeFilter': shouldDisplayAsActive(props.location, props.idWorkspace, props.activeIdWorkspace, aa)}
+                  {'activeFilter': shouldDisplayAsActive(props.location, props.workspaceId, props.activeIdWorkspace, aa)}
                 )}>
                   <div className='dropdown__icon' style={{backgroundColor: aa.hexcolor}}>
                     <i className={classnames(`fa fa-${aa.faIcon}`)} />
@@ -91,10 +101,23 @@ const WorkspaceListItem = props => {
   )
 }
 
-export default withRouter(translate()(WorkspaceListItem))
+const dropAndDropTarget = {
+  drop: props => ({
+    workspaceId: props.workspaceId,
+    parentId: 0 // INFO - CH - 2019-06-05 - moving content to a different workspace is always at the root of it
+  })
+}
+
+const dropAndDropCollect = (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  canDrop: monitor.canDrop()
+})
+
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dropAndDropTarget, dropAndDropCollect)(withRouter(translate()(WorkspaceListItem)))
 
 WorkspaceListItem.propTypes = {
-  idWorkspace: PropTypes.number.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
   onClickTitle: PropTypes.func,

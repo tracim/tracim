@@ -27,7 +27,8 @@ import {
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
-  putFolderRead
+  putFolderRead,
+  putContentItemMove
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -40,7 +41,8 @@ import {
   toggleFolderOpen,
   setWorkspaceContentRead,
   setBreadcrumbs,
-  resetBreadcrumbsAppFeature
+  resetBreadcrumbsAppFeature,
+  moveWorkspaceContent
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -255,7 +257,7 @@ class WorkspaceContent extends React.Component {
         props.dispatch(setWorkspaceContentArchived(content.idWorkspace, content.id))
         this.loadContentList(state.idWorkspaceInUrl)
         break
-      default: props.dispatch(newFlashMessage(props.t('Error while archiving document')))
+      default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
     }
   }
 
@@ -271,7 +273,7 @@ class WorkspaceContent extends React.Component {
         props.dispatch(setWorkspaceContentDeleted(content.idWorkspace, content.id))
         this.loadContentList(state.idWorkspaceInUrl)
         break
-      default: props.dispatch(newFlashMessage(props.t('Error while deleting document')))
+      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
   }
 
@@ -318,6 +320,23 @@ class WorkspaceContent extends React.Component {
     if (!folderOpen) this.handleClickFolder(idFolder)
 
     props.history.push(`${PAGE.WORKSPACE.NEW(state.idWorkspaceInUrl, contentType)}?${qs.stringify(newUrlSearch, {encode: false})}&parent_id=${idFolder}`)
+  }
+
+  handleDropMoveContent = async (source, destination) => {
+    const { props, state } = this
+
+    if (source.workspaceId === destination.workspaceId && source.parentId === destination.parentId) return
+    if (source.contentId === destination.parentId) return
+
+    const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
+    switch (fetchMoveContent.status) {
+      case 200:
+        const {dropEffect, ...actionDestination} = destination
+        props.dispatch(moveWorkspaceContent(source, actionDestination))
+        this.loadContentList(state.idWorkspaceInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'warning'))
+    }
   }
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
@@ -442,6 +461,7 @@ class WorkspaceContent extends React.Component {
                             archive: this.handleClickArchiveContentItem,
                             delete: this.handleClickDeleteContentItem
                           }}
+                          onDropMoveContentItem={this.handleDropMoveContent}
                           onClickFolder={this.handleClickFolder}
                           onClickCreateContent={this.handleClickCreateContent}
                           contentType={contentType}
@@ -454,6 +474,9 @@ class WorkspaceContent extends React.Component {
                       )
                       : (
                         <ContentItem
+                          contentId={content.id}
+                          workspaceId={content.idWorkspace}
+                          parentId={content.idParent}
                           label={content.label}
                           fileName={content.fileName}
                           fileExtension={content.fileExtension}
@@ -470,6 +493,7 @@ class WorkspaceContent extends React.Component {
                             archive: e => this.handleClickArchiveContentItem(e, content),
                             delete: e => this.handleClickDeleteContentItem(e, content)
                           }}
+                          onDropMoveContentItem={this.handleDropMoveContent}
                           isLast={i === rootContentList.length - 1}
                           key={content.id}
                         />

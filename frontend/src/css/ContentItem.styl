@@ -11,6 +11,7 @@
   color outdateColor
 
 .content
+  position relative
   display flex
   align-items center
   padding 10px 0
@@ -30,9 +31,12 @@
     padding 0 25px
     font-size 30px
     text-align center
-  &__name
+  &__dragPreview
+    display flex
+    align-items center
     flex 1
-    width 0 // keep me ! without it, it breaks the design
+    width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
+  &__name
     white-space nowrap
     overflow hidden
     text-overflow ellipsis

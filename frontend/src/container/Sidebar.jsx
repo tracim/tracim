@@ -103,7 +103,7 @@ class Sidebar extends React.Component {
               <ul className='sidebar__content__navigation__workspace'>
                 { workspaceList.map(ws =>
                   <WorkspaceListItem
-                    idWorkspace={ws.id}
+                    workspaceId={ws.id}
                     label={ws.label}
                     allowedAppList={ws.sidebarEntry}
                     activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}

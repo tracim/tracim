@@ -161,6 +161,10 @@ const USER_AUTH_INTERNAL = 'internal'
 const USER_AUTH_UNKNOWN = 'unknown'
 export const editableUserAuthTypeList = [USER_AUTH_INTERNAL, USER_AUTH_UNKNOWN]
 
+export const DRAG_AND_DROP = {
+  CONTENT_ITEM: 'contentItem'
+}
+
 // Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.
 // We will later implement a better solution

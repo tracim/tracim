@@ -3,13 +3,21 @@ import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { DragSource } from 'react-dnd'
+import { DRAG_AND_DROP } from '../../helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
+import DragHandle from '../DragHandle.jsx'
 import { Badge } from 'tracim_frontend_lib'
 
 const ContentItem = props => {
   if (props.contentType === null) return null // this means the endpoint system/content_type hasn't responded yet
 
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
+
+  const dropStyle = {
+    opacity: props.isDragging ? 0.5 : 1
+  }
+
   return (
     <Link
       className={
@@ -17,16 +25,24 @@ const ContentItem = props => {
       }
       title={props.label}
       to={props.urlContent}
+      style={dropStyle}
     >
-      <div className='content__type' style={{color: props.contentType.hexcolor}}>
-        <i className={`fa fa-fw fa-${props.faIcon}`} />
-      </div>
+      <DragHandle connectDragSource={props.connectDragSource} />
 
-      <div className='content__name'>
-        { props.label }
-        { props.contentType.slug === 'file' && (
-          <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
-        )}
+      <div
+        className='content__dragPreview'
+        ref={props.connectDragPreview}
+      >
+        <div className='content__type' style={{color: props.contentType.hexcolor}}>
+          <i className={`fa fa-fw fa-${props.faIcon}`} />
+        </div>
+
+        <div className='content__name'>
+          {props.label}
+          {props.contentType.slug === 'file' && (
+            <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
+          )}
+        </div>
       </div>
 
       {props.idRoleUserWorkspace >= 2 && (
@@ -53,7 +69,28 @@ const ContentItem = props => {
   )
 }
 
-export default translate()(ContentItem)
+const contentItemDndSource = {
+  beginDrag: props => ({
+    workspaceId: props.workspaceId,
+    contentId: props.contentId,
+    parentId: props.parentId || 0
+  }),
+  endDrag (props, monitor) {
+    const item = monitor.getItem()
+    const dropResult = monitor.getDropResult()
+    if (dropResult) {
+      props.onDropMoveContentItem(item, dropResult)
+    }
+  }
+}
+
+const contentItemDndSourceCollect = (connect, monitor) => ({
+  connectDragPreview: connect.dragPreview(),
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+})
+
+export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDndSource, contentItemDndSourceCollect)(translate()(ContentItem))
 
 ContentItem.propTypes = {
   statusSlug: PropTypes.string.isRequired,

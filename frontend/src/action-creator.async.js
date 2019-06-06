@@ -40,7 +40,8 @@ import {
   CONTENT,
   WORKSPACE_CONTENT_PATH,
   newFlashMessage,
-  WORKSPACE_AGENDA_URL
+  WORKSPACE_AGENDA_URL,
+  WORKSPACE_CONTENT_MOVE
 } from './action-creator.sync.js'
 import { history } from './index.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
@@ -689,6 +690,25 @@ export const getLoggedUserCalendar = () => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE_AGENDA_URL,
+    dispatch
+  })
+}
+
+export const putContentItemMove = (source, destination) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${source.workspaceId}/contents/${source.contentId}/move`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        new_workspace_id: destination.workspaceId || 0,
+        new_parent_id: destination.parentId || 0
+      })
+    },
+    actionName: WORKSPACE_CONTENT_MOVE,
     dispatch
   })
 }

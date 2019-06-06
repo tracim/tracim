@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
 import classnames from 'classnames'
+import { DragSource, DropTarget } from 'react-dnd'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import { PAGE } from '../../helper.js'
+import DragHandle from '../DragHandle.jsx'
+import { PAGE, DRAG_AND_DROP } from '../../helper.js'
 
 require('./Folder.styl')
 
@@ -17,28 +19,48 @@ class Folder extends React.Component {
 
     const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
 
+    const dropIsActive = props.canDrop && props.isOver
+    const style = {
+      opacity: dropIsActive ? 0.75 : 1
+    }
+
     return (
-      <div className={classnames('folder', {
-        'active': props.folderData.isOpen && folderContentList.length > 0,
-        'item-last': props.isLast,
-        'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
-      })}>
+      <div
+        className={classnames('folder', {
+          'active': props.folderData.isOpen && folderContentList.length > 0,
+          'item-last': props.isLast,
+          'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
+        })}
+        style={{style}}
+      >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
           className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
           onClick={() => props.onClickFolder(props.folderData.id)}
+          ref={props.connectDropTarget}
         >
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          <div className='folder__header__icon' style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}>
-            <i className={classnames('fa fa-fw', {'fa-folder-open-o': props.folderData.isOpen, 'fa-folder-o': !props.folderData.isOpen})} />
-          </div>
+          <DragHandle connectDragSource={props.connectDragSource} />
 
-          <div className='folder__header__name'>
-            { props.folderData.label }
+          <div
+            className='folder__header__dragPreview'
+            ref={props.connectDragPreview}
+          >
+            <div className='folder__header__icon' style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}>
+              <i className={classnames('fa fa-fw', {
+                'fa-folder-open-o': !dropIsActive && props.folderData.isOpen,
+                'fa-folder-o': !dropIsActive && !props.folderData.isOpen,
+                'fa-arrow-circle-down primaryColor': dropIsActive
+              })} />
+            </div>
+
+            <div className='folder__header__name'>
+              { props.folderData.label }
+            </div>
           </div>
 
           <div className='folder__header__button'>
@@ -107,7 +129,7 @@ class Folder extends React.Component {
         <div className='folder__content'>
           {folderContentList.map((content, i) => content.type === 'folder'
             ? (
-              <Folder
+              <FolderContainer
                 availableApp={props.availableApp}
                 folderData={{
                   ...content,
@@ -117,6 +139,7 @@ class Folder extends React.Component {
                 onClickExtendedAction={props.onClickExtendedAction}
                 onClickFolder={props.onClickFolder}
                 onClickCreateContent={props.onClickCreateContent}
+                onDropMoveContentItem={props.onDropMoveContentItem}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
                 setFolderRead={props.setFolderRead}
@@ -128,6 +151,9 @@ class Folder extends React.Component {
             )
             : (
               <ContentItem
+                contentId={content.id}
+                workspaceId={content.idWorkspace}
+                parentId={content.idParent}
                 label={content.label}
                 type={content.type}
                 fileName={content.fileName}
@@ -145,6 +171,7 @@ class Folder extends React.Component {
                   archive: e => props.onClickExtendedAction.archive(e, content),
                   delete: e => props.onClickExtendedAction.delete(e, content)
                 }}
+                onDropMoveContentItem={props.onDropMoveContentItem}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
               />
@@ -156,7 +183,51 @@ class Folder extends React.Component {
   }
 }
 
-export default withRouter(Folder)
+const folderDndTarget = {
+  drop: props => ({
+    workspaceId: props.folderData.idWorkspace,
+    parentId: props.folderData.id
+  })
+}
+
+const folderDndTargetCollect = (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  canDrop: monitor.canDrop(),
+  isOver: monitor.isOver({shallow: false}),
+})
+
+const folderDndSource = {
+  beginDrag: props => ({
+    workspaceId: props.folderData.idWorkspace,
+    contentId: props.folderData.id,
+    parentId: props.folderData.idParent || 0
+  }),
+  endDrag (props, monitor) {
+    const item = monitor.getItem()
+    const dropResult = monitor.getDropResult()
+    if (dropResult) {
+      props.onDropMoveContentItem(item, dropResult)
+    }
+  }
+}
+
+const folderDndSourceCollect = (connect, monitor) => ({
+  connectDragPreview: connect.dragPreview(),
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+})
+
+// INFO - CH - 2019-06-06 - Using a container for Folder instead of exporting directly Folder because if not, you can't
+// nest drop target.
+// Note that Folder component recursively use FolderContainer (see render() above)
+// see https://github.com/react-dnd/react-dnd/issues/483
+const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDndSource, folderDndSourceCollect)(
+  DropTarget(DRAG_AND_DROP.CONTENT_ITEM, folderDndTarget, folderDndTargetCollect)(
+    withRouter(Folder)
+  )
+)
+
+export default FolderContainer
 
 Folder.propTypes = {
   folderData: PropTypes.object,
