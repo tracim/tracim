@@ -12,8 +12,7 @@ const htmlDocTitle8 = 'HtmlDocForResearch8'
 const htmlDocTitle9 = 'HtmlDocForResearch9'
 const htmlDocTitle10 = 'HtmlDocForResearch10'
 
-const researchInput = '.research > [data-cy=research__text]'
-const researchButton = '.research > [data-cy=research__btn]'
+const researchInput = '[data-cy=research__text]'
 const seeMoreButton= '.ResearchResult__btnSeeMore button'
 
 let workspaceId
@@ -47,8 +46,7 @@ describe('Research page', () => {
 
     describe('Typing HtmlDocForResearch in the input and validating', () => {
       it('Should display maximum 10 results in the page and the See more button', () => {
-        cy.get(researchInput).type(htmlDocTitle)
-        cy.get(researchButton).click()
+        cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
         cy.get('[data-cy=content__item]').its('length').should('eq', 10)
 
@@ -56,10 +54,7 @@ describe('Research page', () => {
       })
 
       it('Should display more results when clicking in the See more button', () => {
-        cy.get(researchInput).type(htmlDocTitle)
-        cy.get(researchButton).click()
-//        cy.request('http://localhost:1337/api/v2/search/content?search_string=HtmlDocForResearch&page_nb=2&size=10')
-//          .then(response => {})
+        cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
         cy.get(seeMoreButton).should('be.visible').click().then(test => {
           cy.wait(500)

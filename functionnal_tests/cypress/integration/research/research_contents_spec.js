@@ -8,7 +8,6 @@ const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
 const researchInput = '[data-cy=research__text]'
-const researchButton = '[data-cy=research__btn]'
 const contentName= '[data-cy=content__name]'
 
 let workspaceId
@@ -38,8 +37,7 @@ describe('Research page', () => {
 
   describe('Typing HtmlDocForResearch in the input and validating', () => {
     it('Should display the results', () => {
-      cy.get(researchInput).type(threadTitle)
-      cy.get(researchButton).click()
+      cy.get(researchInput).type(threadTitle).type('{enter}')
 
 
       cy.get(contentName).contains(htmlDocTitle).should('be.not.visible')
@@ -51,14 +49,13 @@ describe('Research page', () => {
     describe('Archiving one document', () => {
       describe('Typing HtmlDocForResearch in the input and validating again', () => {
         it('Should not display the archived document', () => {
-          cy.get(researchInput).type(threadTitle)
-          cy.get(researchButton).click()
+          cy.get(researchInput).type(threadTitle).type('{enter}')
 
           cy.get(contentName).contains(threadTitleLong).click()
           cy.get('[data-cy=archive__button]').click()
 
           cy.get('[data-cy=displaystate]')
-          cy.get(researchButton).click()
+          cy.get(researchInput).type('{enter}')
 
           cy.get(contentName).contains(threadTitle).should('be.visible')
           cy.get(contentName).contains(threadTitleLong).should('be.not.visible')
@@ -69,14 +66,13 @@ describe('Research page', () => {
     describe('Deleting one document', () => {
       describe('Typing HtmlDocForResearch in the input and validating again', () => {
         it('Should not display the deleted document', () => {
-          cy.get(researchInput).type(threadTitle)
-          cy.get(researchButton).click()
+          cy.get(researchInput).type(threadTitle).type('{enter}')
 
           cy.get(contentName).contains(threadTitle).click()
           cy.get('[data-cy=delete__button]').click()
 
           cy.get('[data-cy=displaystate]')
-          cy.get(researchButton).click()
+          cy.get(researchInput).type('{enter}')
 
           cy.get('.ResearchResult__content__empty').should('be.visible')
         })
@@ -86,8 +82,7 @@ describe('Research page', () => {
 
   describe('Typing DoesNotExist in the input and validating', () => {
     it('Should display the No results message', () => {
-      cy.get(researchInput).type('DoesNotExist')
-      cy.get(researchButton).click()
+      cy.get(researchInput).type('DoesNotExist').type('{enter}')
 
       cy.get('.ResearchResult__content__empty').should('be.visible')
     })

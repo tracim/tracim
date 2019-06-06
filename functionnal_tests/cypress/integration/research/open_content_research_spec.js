@@ -6,9 +6,8 @@ const fileTitle = 'FileForResearch'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
-const researchInput = '.research > [data-cy=research__text]'
-const researchButton = '.research > [data-cy=research__btn]'
-const contentName= '[data-cy=research__content] [data-cy=content__item] > [data-cy=content__name]'
+const researchInput = '[data-cy=research__text]'
+const contentName= '[data-cy=content__name]'
 
 let workspaceId
 
@@ -32,8 +31,7 @@ describe('Research page', () => {
 
   describe('Typing FileForResearch in the input, validating and clicking in the first result', () => {
     it('Should redirect to the content page', () => {
-      cy.get(researchInput).type(fileTitle)
-      cy.get(researchButton).click()
+      cy.get(researchInput).type(fileTitle).type('{enter}')
 
       cy.get(contentName).contains(fileTitle).click()
 
