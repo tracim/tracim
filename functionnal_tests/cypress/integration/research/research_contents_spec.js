@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands'
+import { SELECTORS as s, formatTag } from '../../support/generic_selector_commands'
 
 const htmlDocTitle = 'HtmlDocForResearch'
 const threadTitleLong = 'ThreadForResearchLong'
@@ -11,6 +12,11 @@ const researchInput = '[data-cy=research__text]'
 const contentName= '[data-cy=content__name]'
 
 let workspaceId
+
+const contentHtmlDocGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attrs: {title: htmlDocTitle}})
+const contentThreadGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attrs: {title: threadTitle}})
+const contentFileGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attrs: {title: fileTitle}})
+const contentThreadTitleLongGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attrs: {title: threadTitleLong}})
 
 describe('Research page', () => {
   before(function () {
@@ -40,10 +46,10 @@ describe('Research page', () => {
       cy.get(researchInput).type(threadTitle).type('{enter}')
 
 
-      cy.get(contentName).contains(htmlDocTitle).should('be.not.visible')
-      cy.get(contentName).contains(threadTitle).should('be.visible')
-      cy.get(contentName).contains(fileTitle).should('be.not.visible')
-      cy.get(contentName).contains(threadTitleLong).should('be.visible')
+      cy.get(contentHtmlDocGetter).should('be.not.visible')
+      cy.get(contentThreadGetter).should('be.visible')
+      cy.get(contentFileGetter).should('be.not.visible')
+      cy.get(contentThreadTitleLongGetter).should('be.visible')
     })
 
     describe('Archiving one document', () => {
@@ -51,14 +57,14 @@ describe('Research page', () => {
         it('Should not display the archived document', () => {
           cy.get(researchInput).type(threadTitle).type('{enter}')
 
-          cy.get(contentName).contains(threadTitleLong).click()
+          cy.get(contentThreadTitleLongGetter).click()
           cy.get('[data-cy=archive__button]').click()
 
           cy.get('[data-cy=displaystate]')
           cy.get(researchInput).type('{enter}')
 
-          cy.get(contentName).contains(threadTitle).should('be.visible')
-          cy.get(contentName).contains(threadTitleLong).should('be.not.visible')
+          cy.get(contentThreadGetter).should('be.visible')
+          cy.get(contentThreadTitleLongGetter).should('be.not.visible')
         })
       })
     })
@@ -68,7 +74,7 @@ describe('Research page', () => {
         it('Should not display the deleted document', () => {
           cy.get(researchInput).type(threadTitle).type('{enter}')
 
-          cy.get(contentName).contains(threadTitle).click()
+          cy.get(contentThreadGetter).click()
           cy.get('[data-cy=delete__button]').click()
 
           cy.get('[data-cy=displaystate]')
