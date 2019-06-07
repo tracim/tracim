@@ -16,10 +16,11 @@ class SearchIndexInitCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "--empty",
-            help="do not insered content after creating index template",
-            dest="empty",
+            "--index-all",
+            help="do index content after creating index template",
+            dest="index_all",
             required=False,
+            action="store_true",
             default=None,
         )
         return parser
@@ -34,7 +35,7 @@ class SearchIndexInitCommand(AppContextCommand):
         )
         self.search_api.create_index()
         print("Index template was created")
-        if not parsed_args.empty:
+        if parsed_args.index_all:
             print("Indexing all content")
             self.search_api.index_all_content()
             print("All content where indexed")
