@@ -866,7 +866,7 @@ class ContentInContext(object):
         return self.content.is_archived
 
     @property
-    def is_archived_by_parent_id(self) -> typing.Optional[int]:
+    def archived_through_parent_id(self) -> typing.Optional[int]:
         from tracim_backend.lib.core.content import ContentApi
 
         content_api = ContentApi(
@@ -885,7 +885,7 @@ class ContentInContext(object):
         return self.content.is_deleted
 
     @property
-    def is_deleted_by_parent_id(self) -> typing.Optional[int]:
+    def deleted_through_parent_id(self) -> typing.Optional[int]:
         from tracim_backend.lib.core.content import ContentApi
 
         content_api = ContentApi(

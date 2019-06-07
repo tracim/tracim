@@ -328,9 +328,9 @@ class ESSearchApi(SearchApi):
             content_type=content.content_type,
             sub_content_types=content.sub_content_types,
             is_deleted=content.is_deleted,
-            is_deleted_by_parent_id=content.is_deleted_by_parent_id,
+            deleted_through_parent_id=content.deleted_through_parent_id,
             is_archived=content.is_archived,
-            is_archived_by_parent_id=content.is_archived_by_parent_id,
+            archived_through_parent_id=content.archived_through_parent_id,
             is_editable=content.is_editable,
             is_active=content.is_active,
             show_in_ui=content.show_in_ui,
@@ -397,10 +397,10 @@ class ESSearchApi(SearchApi):
             search = search.exclude("term", is_active=True)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
-            search = search.exclude("exists", field="is_deleted_by_parent_id")
+            search = search.exclude("exists", field="deleted_through_parent_id")
         if not show_archived:
             search = search.exclude("term", is_archived=True)
-            search = search.exclude("exists", field="is_archived_by_parent_id")
+            search = search.exclude("exists", field="archived_through_parent_id")
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result, because we do not need them and for performance reasons.
