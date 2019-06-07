@@ -87,7 +87,7 @@ class ResearchResult extends React.Component {
     }
   }
 
-  hasSubititle () {
+  hasSubtitle () {
     const { props } = this
     const { researchResult } = props
     let subtitle = ''
@@ -129,7 +129,7 @@ class ResearchResult extends React.Component {
                 : props.t('Research results')
               }
               icon='search'
-              subtitle={this.hasSubititle()}
+              subtitle={this.hasSubtitle()}
               breadcrumbsList={props.breadcrumbs}
             />
 

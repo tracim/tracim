@@ -33,7 +33,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == 7
         assert (
             comment["raw_content"]
-            == "<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>"
+            == "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>"
         )
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
@@ -162,6 +162,37 @@ class TestCommentsEndpoint(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
+    def test_api__post_content_comment__err_400__empty_simple_html(self) -> None:
+
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<p></p>"}
+        res = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
+    def test_api__post_content_comment__err_400__empty_nested_html(self) -> None:
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<p><p></p><p><p></p></p></p>"}
+        res = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
+    def test_api__post_content_comment__err_400__only_br_tags_nested_html(self) -> None:
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<p><p></p><p><p><br/><br/></p><br/></p></p>"}
+        res = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:
         """
         delete comment (user is workspace_manager and owner)
@@ -174,7 +205,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == 7
         assert (
             comment["raw_content"]
-            == "<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>"
+            == "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>"
         )
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
@@ -313,4 +344,70 @@ class TestCommentsEndpoint(FunctionalTest):
         res = self.testapp.delete("/api/v2/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+
+    def test_api__post_content_comment__err_400__unclosed_empty_tag(self) -> None:
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<p></i>"}
+        res = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
+
+    def test_api__post_content_comment__err_400__unclosed_tag_not_empty(self) -> None:
+        """
+        This test should raise an error if we validate the html
+        The browser will close the p tag and removes the i tag so the html is valid
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<p>Hello</i>"}
+        self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+        )
+
+    def test_api__post_content_comment__err_400__invalid_html(self) -> None:
+        """
+        This test should raise an error as the html isn't valid
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<p></p>Hello"}
+        self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+        )
+
+    def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(self) -> None:
+        """
+        Test if the html sanityzer does not remove iframes
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "raw_content": '<p><p><iframe src="//www.youtube.com/embed/_TrVid1WuE8" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p></p>'
+        }
+        response = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+        )
+        assert 'src="//www.youtube.com/embed/_TrVid1WuE8"' in response.json_body["raw_content"]
+
+    def test_api__post_content_comment__ok__200__empty_img_are_not_deleted(self) -> None:
+        """
+        Test if the html sanityzer does not remove images
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": '<p><img src="data:images/jpeg,123456789=="/></p>'}
+        response = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+        )
+        assert '<img src="data:images/jpeg,123456789=="/>' in response.json_body["raw_content"]
+
+    def test_api__post_content_comment__ok__200__style_attrs_are_not_deleted(self) -> None:
+        """
+        Test if the html sanityzer does not remove images
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": '<p><span style="display: none;"><p>test</p></span></p>'}
+        response = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+        )
+        assert '<span style="display: none;">' in response.json_body["raw_content"]
