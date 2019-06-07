@@ -84,8 +84,8 @@ describe('Author and avatar ar shown in timeline', () => {
     cy.visit(this.documentUrl)
     cy.get('[data-cy=revision_data_2]').within(() => {
       cy.get('.avatar-wrapper')
-        .should('have.attr', 'title', 'John Doe')
-      cy.get('.avatar').should('have.text', 'JD')
+        .should('have.attr', 'title', 'Global manager')
+      cy.get('.avatar').should('have.text', 'GM')
     })
   })
 })
