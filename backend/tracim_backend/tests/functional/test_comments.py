@@ -407,7 +407,7 @@ class TestCommentsEndpoint(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": '<p><span style="display: none;"><p>test</p></span></p>'}
-        response = self.testapp.post_json(
+        self.testapp.post_json(
             "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
         )
 
