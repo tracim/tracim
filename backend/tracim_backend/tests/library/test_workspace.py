@@ -165,7 +165,7 @@ class TestThread(DefaultTest):
         with pytest.raises(WorkspaceLabelAlreadyUsed):
             wapi.create_workspace(label="business", save_now=True)
 
-    def test_unit__rename_workspace_same_name_same_file__ok__nominal_case(self):
+    def test_unit__rename_workspace_same_wworkspace_same_name__ok__nominal_case(self):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
         workspace1 = wapi.create_workspace(label="business", save_now=True)
@@ -174,7 +174,7 @@ class TestThread(DefaultTest):
         assert workspace1.updated != modified_datetime
         assert workspace1.label == "business"
 
-    def test_unit__rename_workspace_same_name_other_file__err__same_workspace_name_unallowed(self):
+    def test_unit__rename_workspace_same_name_other_workspace__err__same_workspace_name_unallowed(self):
         admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         wapi = WorkspaceApi(session=self.session, current_user=admin, config=self.app_config)
         wapi.create_workspace(label="business", save_now=True)
