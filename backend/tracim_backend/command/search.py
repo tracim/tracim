@@ -40,9 +40,9 @@ class SearchIndexInitCommand(AppContextCommand):
             print("All content where indexed")
 
 
-class SearchIndexUpdateCommand(AppContextCommand):
+class SearchIndexUpgradeCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "update index of search engine"
+        return "upgrade index of search engine"
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
@@ -55,9 +55,9 @@ class SearchIndexUpdateCommand(AppContextCommand):
         self.search_api.migrate_index()
 
 
-class SearchIndexAddCommand(AppContextCommand):
+class SearchIndexIndexCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "Add content into search engine"
+        return "index content into search engine"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
