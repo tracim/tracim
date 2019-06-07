@@ -125,6 +125,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())

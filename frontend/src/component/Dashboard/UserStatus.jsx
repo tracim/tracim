@@ -20,7 +20,7 @@ export const UserStatus = props => {
 
         <div
           className='userstatus__role__text'
-          title={props.t('your role in the shared space')}
+          title={props.t('Your role in the shared space')}
           style={{color: myRole.hexcolor}}
         >
           {props.t(myRole.label)}
@@ -38,7 +38,7 @@ export const UserStatus = props => {
 
           <div
             className='userstatus__notification__text'
-            title={props.t('you can change your notification status by clicking here')}
+            title={props.t('You can change your notification status by clicking here')}
           >
             {mySelf.doNotify
               ? props.t('Click here to unsubscribe')

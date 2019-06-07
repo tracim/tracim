@@ -35,6 +35,7 @@ import {
   ALL_CONTENT_TYPES
 } from '../helper.js'
 import Research from '../component/Header/Research.jsx'
+import { Link } from 'react-router-dom'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -86,10 +87,6 @@ class Header extends React.Component {
     } else {
       dispatch(newFlashMessage(t('Disconnection error', 'danger')))
     }
-  }
-
-  handleClickAgendaButton = () => {
-    this.props.history.push(PAGE.AGENDA)
   }
 
   handleClickResearch = async (keyWordResearch) => {
@@ -155,14 +152,14 @@ class Header extends React.Component {
               )}
 
               {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
-                <li className='header__menu__rightside__agenda nav-item'>
-                  <button
+                <li className='header__menu__rightside__agenda'>
+                  <Link
                     className='btn outlineTextBtn primaryColorBorder nohover'
-                    onClick={this.handleClickAgendaButton}
+                    to={PAGE.AGENDA}
                   >
                     <i className='fa fa-fw fa-calendar' />
                     {props.t('Agendas')}
-                  </button>
+                  </Link>
                 </li>
               )}
 
