@@ -68,6 +68,7 @@ class SearchIndexAddCommand(AppContextCommand):
             dest="content_id",
             required=False,
             default=None,
+            type=int,
         )
         return parser
 
@@ -84,7 +85,7 @@ class SearchIndexAddCommand(AppContextCommand):
                 current_user=None, session=self._session, config=self._app_config
             )
             content = content_api.get_one(
-                content_id=int(parsed_args.content_id), content_type=content_type_list.Any_SLUG
+                content_id=parsed_args.content_id, content_type=content_type_list.Any_SLUG
             )
             content_in_context = ContentInContext(
                 content, dbsession=self._session, config=self._app_config
