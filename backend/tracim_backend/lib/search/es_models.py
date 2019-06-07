@@ -48,6 +48,7 @@ DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
 # pattern now, as it's currently complex to rewrite Lib signature to get needed information (we
 # need to convert static IndexedContent object to something dynamic that we will pass to SearchApi)
 # this should be refactor to have a true tracim config parameter for this.
+# see https://github.com/tracim/tracim/issues/1835
 INDEX_DOCUMENTS_ALIAS = os.environ.get("TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS", None)
 if not INDEX_DOCUMENTS_ALIAS:
     raise ConfigurationError(
