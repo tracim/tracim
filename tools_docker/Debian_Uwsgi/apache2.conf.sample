@@ -15,7 +15,7 @@
         Require all granted
         Dav On
     </Directory>
-
+    SetEnv proxy-sendcl
     ProxyPreserveHost On
 
     #ProxyPass /webdav http://127.0.0.1:3030/webdav
