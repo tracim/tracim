@@ -201,6 +201,11 @@ class ESSearchApi(SearchApi):
         logger.info(self, "ES index is ready")
 
     def refresh_index(self) -> None:
+        """
+        refresh index to obtain up to odate information instead of relying on
+        periodically refresh, usefull for automated tests
+        see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
+        """
         self.es.indices.refresh(INDEX_DOCUMENTS_ALIAS)
 
     def delete_index(self) -> None:
