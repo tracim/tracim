@@ -101,7 +101,19 @@ fi
 if [ ! -f /var/tracim/assets ]; then
     mkdir /var/tracim/assets -p
 fi
-# Create folder radicale_storage for caldav
+# Create required folder
+if [ ! -d /var/tracim/data/sessions_data ]; then
+    mkdir /var/tracim/data/sessions_data
+fi
+if [ ! -d /var/tracim/data/sessions_lock ]; then
+    mkdir /var/tracim/data/sessions_lock
+fi
+if [ ! -d /var/tracim/data/depot ]; then
+    mkdir /var/tracim/data/depot
+fi
+if [ ! -d /var/tracim/data/preview ]; then
+    mkdir /var/tracim/data/preview
+fi
 if [ ! -d /var/tracim/data/radicale_storage ]; then
     mkdir /var/tracim/data/radicale_storage
 fi
