@@ -456,10 +456,10 @@ You're elasticsearch server need to be running. You can then setup index with:
 
 You can resync data with:
 
-`tracimcli search add`
+`tracimcli search index`
 
 If there is an update of tracim, use this one to migrate index:
 
-`tracimcli search update`
+`tracimcli search upgrade`
 
 Your data are correctly indexed now, you can go to tracim ui and use search mecanism.
