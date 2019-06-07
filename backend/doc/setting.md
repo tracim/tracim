@@ -454,11 +454,15 @@ You're elasticsearch server need to be running. You can then setup index with:
 
 `tracimcli search init`
 
-You can resync data with:
+You can (re)sync data with:
 
 `tracimcli search index`
 
-If there is an update of tracim, use this one to migrate index:
+you can delete index using:
+
+`tracimcli search delete`
+
+If there is an update of tracim, use this one to migrate index (experimental, prefer delete,init,index mecanism):
 
 `tracimcli search upgrade`
 

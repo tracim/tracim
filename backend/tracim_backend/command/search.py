@@ -43,7 +43,7 @@ class SearchIndexInitCommand(AppContextCommand):
 
 class SearchIndexUpgradeCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "upgrade index of search engine"
+        return "upgrade index of search engine (experimental)"
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
