@@ -18,7 +18,7 @@ const contentThreadGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attr
 const contentFileGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attrs: {title: fileTitle}})
 const contentThreadTitleLongGetter = formatTag({selectorName: s.CONTENT_IN_RESEARCH, attrs: {title: threadTitleLong}})
 
-describe('Research page', () => {
+describe('Searching keywords', () => {
   before(function () {
       cy.resetDB()
       cy.setupBaseDB()
@@ -41,19 +41,21 @@ describe('Research page', () => {
     cy.cancelXHR()
   })
 
-  describe('Typing ThreadForResearch in the input and validating', () => {
+  describe('that match two documents and validating', () => {
     it('Should display the results', () => {
       cy.get(researchInput).type(threadTitle).type('{enter}')
 
-
-      cy.get(contentHtmlDocGetter).should('be.not.visible')
       cy.get(contentThreadGetter).should('be.visible')
-      cy.get(contentFileGetter).should('be.not.visible')
       cy.get(contentThreadTitleLongGetter).should('be.visible')
     })
 
-    describe('Archiving one document', () => {
-      describe('Typing ThreadForResearch in the input and validating again', () => {
+    it('Should not display the documents that does not match', () => {
+      cy.get(contentFileGetter).should('be.not.visible')
+      cy.get(contentHtmlDocGetter).should('be.not.visible')
+    })
+
+    describe('then archiving one document', () => {
+      describe('and searching the same keyword and validating again', () => {
         it('Should not display the archived document', () => {
           cy.get(researchInput).type(threadTitle).type('{enter}')
 
@@ -69,8 +71,8 @@ describe('Research page', () => {
       })
     })
 
-    describe('Deleting one document', () => {
-      describe('Typing ThreadForResearch in the input and validating again', () => {
+    describe('then deleting one document', () => {
+      describe('and searching the same keyword and validating', () => {
         it('Should not display the deleted document', () => {
           cy.get(researchInput).type(threadTitle).type('{enter}')
 
@@ -86,7 +88,7 @@ describe('Research page', () => {
     })
   })
 
-  describe('Typing DoesNotExist in the input and validating', () => {
+  describe('that does not match any documents and validating', () => {
     it('Should display the No results message', () => {
       cy.get(researchInput).type('DoesNotExist').type('{enter}')
 

@@ -11,7 +11,10 @@ import {
   IconButton,
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
-import { PAGE } from '../helper.js'
+import {
+  PAGE,
+  ALL_CONTENT_TYPES
+} from '../helper.js'
 import ContentItemResearch from '../component/ContentItemResearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
@@ -28,7 +31,7 @@ class ResearchResult extends React.Component {
     super(props)
     this.state = {
       showArchived: 0,
-      contentTypes: 'html-document,file,thread,folder,comment',
+      contentTypes: ALL_CONTENT_TYPES,
       showDeleted: 0,
       showActive: 1
     }
@@ -55,7 +58,13 @@ class ResearchResult extends React.Component {
   putContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
     // https://github.com/tracim/tracim/issues/1840
-    return content.content_type === this.props.contentType[1].slug ? content.filename : content.label
+    const { props } = this
+
+    if (props.contentType.length > 1) {
+      return content.content_type === props.contentType[1].slug ? content.filename : content.label
+    } else {
+      props.dispatch(newFlashMessage(props.t('An error has happened'), 'error'))
+    }
   }
 
   handleClickSeeMore = async () => {
@@ -78,7 +87,7 @@ class ResearchResult extends React.Component {
     }
   }
 
-  hasSubititle = () => {
+  hasSubititle () {
     const { props } = this
     const { researchResult } = props
     let subtitle = ''
@@ -130,7 +139,7 @@ class ResearchResult extends React.Component {
 
                 {props.researchResult.totalElements === 0 && (
                   <div className='ResearchResult__content__empty'>
-                    {props.t(`The research "${props.researchResult.keyWordResearch}" has no results. You can try using other or more general keywords.`)}
+                    {`${props.t('No documents found for the specified search terms')}: "${props.researchResult.keyWordResearch}"`}
                   </div>
                 )}
 

@@ -31,7 +31,8 @@ import {
   COOKIE_FRONTEND,
   PAGE,
   PROFILE,
-  unLoggedAllowedPageList
+  unLoggedAllowedPageList,
+  ALL_CONTENT_TYPES
 } from '../helper.js'
 import Research from '../component/Header/Research.jsx'
 
@@ -94,8 +95,10 @@ class Header extends React.Component {
   handleClickResearch = async (keyWordResearch) => {
     const { props } = this
 
+    // INFO - GB - 2019-06-07 - When we do a research, the parameters need to be in default mode.
+    // Respectively, show_archived=0, show_deleted=0, show_active=1, page_nb=1
     const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(
-      0, 'html-document,file,thread,folder,comment', 0, 1, keyWordResearch, 1, props.researchResult.numberElementsByPage
+      0, ALL_CONTENT_TYPES, 0, 1, keyWordResearch, 1, props.researchResult.numberElementsByPage
     ))
 
     switch (fetchGetKeyWordResearch.status) {
