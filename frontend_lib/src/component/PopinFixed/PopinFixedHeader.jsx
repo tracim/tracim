@@ -80,7 +80,7 @@ class PopinFixedHeader extends React.Component {
             onClick={this.handleClickUndoChangeTitleBtn}
             disabled={disableChangeTitle}
           >
-            <i className='fa fa-undo' title={t('undo change in title')} />
+            <i className='fa fa-undo' title={t('Undo change in title')} />
           </button>
         }
 
@@ -90,7 +90,7 @@ class PopinFixedHeader extends React.Component {
             onClick={this.handleClickChangeTitleBtn}
             disabled={disableChangeTitle}
           >
-            {state.editTitle ? <i className='fa fa-check' title={t('validate the title')} /> : <i className='fa fa-pencil' title={t('edit title')} />}
+            {state.editTitle ? <i className='fa fa-check' title={t('Validate the title')} /> : <i className='fa fa-pencil' title={t('Edit title')} />}
           </button>
         }
 
