@@ -48,6 +48,8 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
@@ -591,9 +593,13 @@ class ContentApi(object):
         assert parent and parent.type != FOLDER_TYPE
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
-                "Can't create comment on content, you need to change his status or state (deleted/archived) before any change."
+                "Can't create comment on content, you need to change his"
+                "status or state (deleted/archived) before any change."
             )
-        if not content:
+
+        config = HtmlSanitizerConfig(tag_blacklist=list(), tag_whitelist=list())
+        sanitizer = HtmlSanitizer(html_body=content, config=config)
+        if sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
 
         item = self.create(
