@@ -181,9 +181,9 @@ jobs:
         - COVERAGE=1
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
       after_success:
-      - cd $TRAVIS_BUILD_DIR
-      - cat .coverage
-      - coveralls
+        - cd $TRAVIS_BUILD_DIR
+        - cat .coverage
+        - coveralls
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
