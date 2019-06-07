@@ -187,8 +187,10 @@
   "hide sidebar": "masquer la barre latérale",
   "Research results": "Résultats de la recherche",
   "best results for": "meilleurs résultats pour",
+  "Research result": "Résultat de la recherche",
+  "best result for": "meilleur résultat pour",
+  "No more results": "Pas d'autres résultats",
   "Path": "Chemin",
   "Last modification": "Dernère modification",
-  "Research": "Rechercher",
-  "The research \"{{keyWordResearch}}\" has no results. You can try using other or more general keywords.": "La recherche \"{{keyWordResearch}}\" n'a aucun résultat. Vous pouvez essayer d'utiliser d'autres mots-clés ou des mots-clés plus généraux."
+  "Research": "Rechercher"
 }

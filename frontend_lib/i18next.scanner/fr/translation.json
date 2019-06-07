@@ -34,5 +34,6 @@
   "Error detail": "Détail de l'erreur",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
-  "Status changed to {{status}}": "Statut changé en {{status}}"
+  "Status changed to {{status}}": "Statut changé en {{status}}",
+  "This content is deprecated": "Ce contenu est obsolète"
 }

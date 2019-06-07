@@ -1,3 +1,5 @@
+import { PAGES } from '../../support/urls_commands'
+
 const htmlDocTitle = 'HtmlDocForResearch'
 const htmlDocTitle1 = 'HtmlDocForResearch1'
 const htmlDocTitle2 = 'HtmlDocForResearch2'
@@ -10,9 +12,8 @@ const htmlDocTitle8 = 'HtmlDocForResearch8'
 const htmlDocTitle9 = 'HtmlDocForResearch9'
 const htmlDocTitle10 = 'HtmlDocForResearch10'
 
-const researchInput = '.research > [data-cy=research__text]'
-const researchButton = '.research > [data-cy=research__btn]'
-const seeMoreButton= '.ResearchResult__btnSeeMore'
+const researchInput = '[data-cy=research__text]'
+const seeMoreButton= '.ResearchResult__btnSeeMore button'
 
 let workspaceId
 
@@ -40,13 +41,12 @@ describe('Research page', () => {
 
     beforeEach(function () {
       cy.loginAs('users')
-      cy.visit('/ui')
+      cy.visitPage({pageName: PAGES.HOME})
     })
 
     describe('Typing HtmlDocForResearch in the input and validating', () => {
       it('Should display maximum 10 results in the page and the See more button', () => {
-        cy.get(researchInput).type(htmlDocTitle)
-        cy.get(researchButton).click()
+        cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
         cy.get('[data-cy=content__item]').its('length').should('eq', 10)
 
@@ -54,11 +54,12 @@ describe('Research page', () => {
       })
 
       it('Should display more results when clicking in the See more button', () => {
-        cy.get(researchInput).type(htmlDocTitle)
-        cy.get(researchButton).click()
+        cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
-        cy.get(seeMoreButton).click()
-        cy.get('[data-cy=content__item]').its('length').should('gt', 10)
+        cy.get(seeMoreButton).should('be.visible').click().then(test => {
+          cy.wait(500)
+          cy.get('[data-cy=content__item]').its('length').should('gt', 10)
+        })
       })
     })
   })

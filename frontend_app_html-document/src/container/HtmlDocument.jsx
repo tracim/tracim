@@ -618,6 +618,8 @@ class HtmlDocument extends React.Component {
         <PopinFixedContent
           customClass={`${config.slug}__contentpage`}
         >
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using config.availableStatuses[3].slug
+            https://github.com/tracim/tracim/issues/1840 */}
           <HtmlDocumentComponent
             mode={mode}
             customColor={config.hexcolor}
@@ -631,6 +633,8 @@ class HtmlDocument extends React.Component {
             onChangeText={this.handleChangeText}
             isArchived={content.is_archived}
             isDeleted={content.is_deleted}
+            isDeprecated={content.status === config.availableStatuses[3].slug}
+            deprecatedStatus={config.availableStatuses[3]}
             isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}

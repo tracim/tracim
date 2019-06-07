@@ -1,6 +1,8 @@
+import { PAGES } from '../../support/urls_commands'
+
 const htmlDocTitle = 'HtmlDocForResearch'
-const researchInput = '.research > [data-cy=research__text]'
-const researchButton = '.research > [data-cy=research__btn]'
+const researchInput = '[data-cy=research__text]'
+const researchButton = '[data-cy=research__btn]'
 const htmlDocTitleLong = 'HtmlDocForResearchLong'
 
 let workspaceId
@@ -20,7 +22,11 @@ describe('Research page', () => {
 
     beforeEach(function () {
       cy.loginAs('users')
-      cy.visit('/ui')
+      cy.visitPage({pageName: PAGES.HOME})
+    })
+
+    afterEach(function () {
+      cy.cancelXHR()
     })
 
     it('Should redirect to the research result page with click', () => {
@@ -43,29 +49,26 @@ describe('Research page', () => {
 
     describe('Typing HtmlDocForResearch and validating', () => {
       it('Should display HtmlDocForResearch in the research input', () => {
-        cy.get(researchInput).type(htmlDocTitle)
-        cy.get(researchButton).click()
+        cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
         cy.get(researchInput).should('have.value', htmlDocTitle)
       })
 
       describe('The subtitle', () => {
-        const pageTitle = '[data-cy=page__title__research]'
+        const pageSubTitle = '[data-cy=layoutPageSubTitle]'
 
         it('Should display the message with HtmlDocForResearch', () => {
-          cy.get(researchInput).type(htmlDocTitle)
-          cy.get(researchButton).click()
+          cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
-          cy.get(pageTitle).contains(`best results for "${htmlDocTitle}"`)
+          cy.get(pageSubTitle).contains(`best results for "${htmlDocTitle}"`).should('be.visible')
         })
 
         it('Should display the message with the same number as result contents', () => {
-          cy.get(researchInput).type(htmlDocTitle)
-          cy.get(researchButton).click()
+          cy.get(researchInput).type(htmlDocTitle).type('{enter}')
 
-          // TODO make this test variable for the number of results (don't put "2" as a constant)
+          // TODO - GB - 2019-06-04 - make this test variable for the number of results (don't put "2" as a constant), maybe using a table
           cy.get('[data-cy=content__item]').its('length').should('eq', 2)
-          cy.get(pageTitle).contains(`2 best results for "${htmlDocTitle}"`)
+          cy.get(pageSubTitle).contains(`2 best results for "${htmlDocTitle}"`).should('be.visible')
         })
       })
     })

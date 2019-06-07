@@ -166,17 +166,20 @@ jobs:
       <<: *_backend_quick_test
       python:
         - "3.6"
+      if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.5"
       <<: *_backend_quick_test
       python:
         - "3.5"
+      if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.7"
       dist: xenial
       <<: *_backend_quick_test
       python:
         - "3.7"
+      if: commit_message !~ /(\[skip ci pytest\])/
 
     # INFO - G.M - 2019-04-25 - Stage: Backend ###
     - stage: backend
@@ -184,16 +187,19 @@ jobs:
       env:
         - DB=postgres
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
+      if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
       env:
         - DB=postgres
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_POSTGRES_SQLALCHEMY__URL
+      if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
       env:
         - DB=mysql
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_MYSQL_SQLALCHEMY__URL
+      if: commit_message !~ /(\[skip ci pytest\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: functional
       name: Functional tests using Cypress
@@ -209,11 +215,12 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - npm run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
+      if: commit_message !~ /(\[skip ci cypress\])/
       after_failure:
         - cat $TRAVIS_BUILD_DIR/backend/pserve.log
 
 stages:
-  - functional
   - static-tests
   - quick-tests
   - backend
+  - functional
