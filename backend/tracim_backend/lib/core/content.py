@@ -2174,7 +2174,7 @@ class ContentApi(object):
                 return content.parent_id
             if content.parent.parent:
                 return self.get_deleted_parent_id(content.parent)
-        return None
+        return 0
 
     def get_archived_parent_id(self, content: Content) -> typing.Optional[int]:
         if content.parent:
@@ -2182,7 +2182,7 @@ class ContentApi(object):
                 return content.parent_id
             if content.parent.parent:
                 return self.get_archived_parent_id(content.parent)
-        return None
+        return 0
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(

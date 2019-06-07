@@ -397,10 +397,10 @@ class ESSearchApi(SearchApi):
             search = search.exclude("term", is_active=True)
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
-            search = search.exclude("exists", field="deleted_through_parent_id")
+            search = search.filter("term", deleted_through_parent_id=0)
         if not show_archived:
             search = search.exclude("term", is_archived=True)
-            search = search.exclude("exists", field="archived_through_parent_id")
+            search = search.filter("term", archived_through_parent_id=0)
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result, because we do not need them and for performance reasons.
