@@ -7,6 +7,7 @@ env:
     - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
     - DB=sqlite
     - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
+    - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
     - TRACIM_DEPOT_STORAGE_NAME=test
     - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
     - TRACIM_PREVIEW_CACHE_DIR=/tmp/test/preview_cache
