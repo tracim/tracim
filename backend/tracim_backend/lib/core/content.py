@@ -2082,7 +2082,7 @@ class ContentApi(object):
             config=self._config, current_user=self._user, session=self._session
         ).notify_content_update(content)
 
-    def get_keywords(self, search_string, search_string_separators=None) -> [str]:
+    def get_keywords(self, search_string, search_string_separators=None) -> typing.List[str]:
         """
         :param search_string: a list of coma-separated keywords
         :return: a list of str (each keyword = 1 entry
@@ -2100,7 +2100,7 @@ class ContentApi(object):
 
     def search(
         self,
-        keywords: [str],
+        keywords: typing.List[str],
         size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
         offset: typing.Optional[int] = None,
         content_types: typing.Optional[typing.List[str]] = None,
