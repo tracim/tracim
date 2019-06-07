@@ -567,8 +567,8 @@ class ContentApi(object):
                 raise EmptyLabelNotAllowed(
                     "Content of type {} should have a valid label".format(content_type_slug)
                 )
-
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.parent = parent
 
         content.workspace = workspace
@@ -1369,6 +1369,8 @@ class ContentApi(object):
 
     def set_status(self, content: Content, new_status: str):
         if new_status in content_status_list.get_all_slugs_values():
+            if self._user:
+                content.owner = self._user
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
@@ -1412,7 +1414,8 @@ class ContentApi(object):
         if new_parent and new_parent != item.parent:
             content_type = content_type_list.get_one_by_slug(item.type)
             self._check_valid_content_type_in_dir(content_type, new_parent, new_workspace)
-
+        if self._user:
+            item.owner = self._user
         item.parent = new_parent
         if new_workspace:
             item.workspace = new_workspace
@@ -1648,6 +1651,8 @@ class ContentApi(object):
             content=new_content,
             force_create_new_revision=True,
         ) as rev:
+            if self._user:
+                rev.owner = self._user
             rev.parent = new_parent
             rev.workspace = new_workspace
             rev.label = new_label
@@ -1755,8 +1760,8 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
-
-        item.owner = self._user
+        if self._user:
+            item.owner = self._user
         item.label = new_label
         item.description = (
             new_content if new_content else item.description
@@ -1780,7 +1785,8 @@ class ContentApi(object):
         # if new_mimetype == item.file_mimetype and \
         #         new_content == item.depot_file.file.read():
         #     raise SameValueError('The content did not changed')
-        item.owner = self._user
+        if self._user:
+            item.owner = self._user
         content_type_slug = item.type
         if new_filename:
             self._is_filename_available_or_raise(
@@ -1804,7 +1810,8 @@ class ContentApi(object):
         return item
 
     def archive(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_archived = True
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
@@ -1822,12 +1829,14 @@ class ContentApi(object):
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_archived = False
         content.revision_type = ActionDescription.UNARCHIVING
 
     def delete(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_deleted = True
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
@@ -1845,7 +1854,8 @@ class ContentApi(object):
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 

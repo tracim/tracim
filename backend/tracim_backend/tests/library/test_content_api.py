@@ -874,7 +874,7 @@ class TestContentApi(DefaultTest):
             with pytest.raises(ValueError):
                 api.set_status(c, "unknown-status")
 
-    def test_set_status_ok(self):
+    def test_unit__set_status__ok__nominal_case(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
         groups = [
@@ -884,12 +884,18 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="another@user", groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
+            current_user=user2, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
+        rapi = RoleApi(current_user=user2, session=self.session, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        c = api2.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
+        assert c.owner_id == user2.user_id
+        assert c.get_current_revision().owner_id == user2.user_id
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        c = api.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
         with new_revision(session=self.session, tm=transaction.manager, content=c):
             for new_status in [
                 "open",
@@ -898,9 +904,11 @@ class TestContentApi(DefaultTest):
                 "closed-deprecated",
             ]:
                 api.set_status(c, new_status)
+        api.save(c)
 
-                eq_(new_status, c.status)
-                eq_(ActionDescription.STATUS_UPDATE, c.revision_type)
+        assert new_status == c.status
+        assert ActionDescription.STATUS_UPDATE == c.revision_type
+        assert c.get_current_revision().owner_id == user.user_id
 
     def test_create_comment_ok(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -967,15 +975,17 @@ class TestContentApi(DefaultTest):
         )
         folderb = api.create(content_type_list.Folder.slug, workspace, None, "folder b", "", True)
         comment_before_move_id = text_file.children[0].id
-        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
-            api.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
-            api.save(text_file)
-        transaction.commit()
         api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
+            api2.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
+            api2.save(text_file)
+        transaction.commit()
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
         comment_after_move = text_file_after_move.children[0]
         assert text_file == text_file_after_move
         assert comment_before_move_id == comment_after_move.id
+        assert text_file_after_move.revision_type == ActionDescription.MOVE
+        assert text_file_after_move.get_current_revision().owner_id == user2.user_id
 
     def test_unit_move_file_with_comments__different_parent_different_workspace(self):
         """
@@ -1083,7 +1093,8 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
-        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.owner.user_id == user2.user_id
+        assert text_file_copy.get_current_revision().owner_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1262,7 +1273,7 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.label == text_file.label
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
-        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.owner.user_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1314,7 +1325,7 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == foldera.content_id
-        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.owner.user_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype

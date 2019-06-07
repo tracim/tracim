@@ -20,6 +20,10 @@ describe('New statuses are visible in timeline', () => {
     })
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   it('show new status open', function () {
     cy.changeHtmlDocumentStatus(
       this.document.content_id,
