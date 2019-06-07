@@ -174,3 +174,5 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Cancelled'),
   i18n.t('Deprecated')
 ]
+
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'

@@ -11,7 +11,7 @@ const contentName= '[data-cy=content__name]'
 
 let workspaceId
 
-describe('Research page', () => {
+describe('Searching keywords', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -22,6 +22,7 @@ describe('Research page', () => {
       cy.createThread(threadTitle, workspaceId)
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     })
+    cy.logout()
   })
 
   beforeEach(function () {
@@ -29,7 +30,7 @@ describe('Research page', () => {
     cy.visitPage({pageName: PAGES.HOME})
   })
 
-  describe('Typing FileForResearch in the input, validating and clicking in the first result', () => {
+  describe('and clicking in the first result', () => {
     it('Should redirect to the content page', () => {
       cy.get(researchInput).type(fileTitle).type('{enter}')
 
