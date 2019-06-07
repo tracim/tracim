@@ -825,7 +825,7 @@ class CFG(object):
             # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
             # see https://github.com/tracim/tracim/issues/1835
             if self.SEARCH__ENGINE == "elasticsearch":
-                from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
+                from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS  # noqa: F401
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
