@@ -12,7 +12,8 @@ import {
   PAGE,
   workspaceConfig,
   getUserProfile,
-  unLoggedAllowedPageList
+  unLoggedAllowedPageList,
+  TRACIM_APP_VERSION
 } from '../helper.js'
 
 class Sidebar extends React.Component {
@@ -130,6 +131,9 @@ class Sidebar extends React.Component {
           </div>
 
           <div className='sidebar__footer mb-2'>
+            <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+              {TRACIM_APP_VERSION}
+            </div>
             <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
               Copyright - 2013 - 2019
               <div className='sidebar__footer__text__link'>
