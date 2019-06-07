@@ -407,7 +407,32 @@ class TestCommentsEndpoint(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": '<p><span style="display: none;"><p>test</p></span></p>'}
+        self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
+        )
+
+    def test_api__post_content_comment__ok__200__script_is_sanitized(self) -> None:
+        """
+        Test if the html sanityzer removes script
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "raw_content": "<p>I have a script next to me <script>alert( 'Hello, world!' );</script></p>"
+        }
         response = self.testapp.post_json(
             "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
         )
-        assert '<span style="display: none;">' in response.json_body["raw_content"]
+        assert "<p>I have a script next to me </p>" in response.json_body["raw_content"]
+
+    def test_api__post_content_comment__err__400__only_script_in_comment_is_empty(self):
+        """
+        Test if the html sanityzer removes script
+        """
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"raw_content": "<script>alert( 'Hello, world!' );</script>"}
+        response = self.testapp.post_json(
+            "/api/v2/workspaces/2/contents/7/comments", params=params, status=400
+        )
+        assert response.json_body
+        assert "code" in response.json_body
+        assert response.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED

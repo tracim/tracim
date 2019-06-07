@@ -125,12 +125,12 @@ class HtmlSanitizer(object):
 
     def _remove_black_listed_tags(self, soup: Tag) -> Tag:
         for tag in soup.findAll():
-            if tag in self.config.tag_blacklist:
+            if tag.name.lower() in self.config.tag_blacklist:
                 tag.extract()
         return soup
 
     def _keep_white_listed_tags(self, soup: Tag) -> Tag:
         for tag in soup.findAll():
-            if tag not in self.config.tag_whitelist:
+            if tag.name.lower() not in self.config.tag_whitelist:
                 tag.extract()
         return soup

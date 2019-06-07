@@ -597,9 +597,10 @@ class ContentApi(object):
                 "status or state (deleted/archived) before any change."
             )
 
-        config = HtmlSanitizerConfig(tag_blacklist=list(), tag_whitelist=list())
+        config = HtmlSanitizerConfig(tag_blacklist=["script"], tag_whitelist=list())
         sanitizer = HtmlSanitizer(html_body=content, config=config)
-        if sanitizer.html_is_empty():
+        content = sanitizer.sanitize_html()
+        if (not content) or sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
 
         item = self.create(
