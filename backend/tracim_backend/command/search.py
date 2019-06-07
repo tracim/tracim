@@ -16,10 +16,11 @@ class SearchIndexInitCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "--empty",
-            help="do not insered content after creating index template",
-            dest="empty",
+            "--index-all",
+            help="do index content after creating index template",
+            dest="index_all",
             required=False,
+            action="store_true",
             default=None,
         )
         return parser
@@ -34,15 +35,15 @@ class SearchIndexInitCommand(AppContextCommand):
         )
         self.search_api.create_index()
         print("Index template was created")
-        if not parsed_args.empty:
+        if parsed_args.index_all:
             print("Indexing all content")
             self.search_api.index_all_content()
             print("All content where indexed")
 
 
-class SearchIndexUpdateCommand(AppContextCommand):
+class SearchIndexUpgradeCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "update index of search engine"
+        return "upgrade index of search engine (experimental)"
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
@@ -55,9 +56,9 @@ class SearchIndexUpdateCommand(AppContextCommand):
         self.search_api.migrate_index()
 
 
-class SearchIndexAddCommand(AppContextCommand):
+class SearchIndexIndexCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "Add content into search engine"
+        return "index content into search engine"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
@@ -68,6 +69,7 @@ class SearchIndexAddCommand(AppContextCommand):
             dest="content_id",
             required=False,
             default=None,
+            type=int,
         )
         return parser
 
@@ -84,7 +86,7 @@ class SearchIndexAddCommand(AppContextCommand):
                 current_user=None, session=self._session, config=self._app_config
             )
             content = content_api.get_one(
-                content_id=int(parsed_args.content_id), content_type=content_type_list.Any_SLUG
+                content_id=parsed_args.content_id, content_type=content_type_list.Any_SLUG
             )
             content_in_context = ContentInContext(
                 content, dbsession=self._session, config=self._app_config

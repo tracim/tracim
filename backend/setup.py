@@ -75,7 +75,6 @@ requires = [
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
-    'pytest-cov',
     'pytest-dotenv',
     'parameterized',
     'responses',
@@ -158,8 +157,8 @@ setup(
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
             'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',
             'search init = tracim_backend.command.search:SearchIndexInitCommand',
-            'search add = tracim_backend.command.search:SearchIndexAddCommand',
-            'search update = tracim_backend.command.search:SearchIndexUpdateCommand',
+            'search index = tracim_backend.command.search:SearchIndexIndexCommand',
+            'search upgrade = tracim_backend.command.search:SearchIndexUpgradeCommand',
             'search delete = tracim_backend.command.search:SearchIndexDeleteCommand',
         ]
     },

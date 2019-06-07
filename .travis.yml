@@ -1,16 +1,23 @@
 ---
 env:
   global:
-    - BACKEND_TEST_CONFIG_FILE=tests_configs.ini
     - DEFAULT_SQLITE_SQLALCHEMY__URL=sqlite:////tmp/tracim.sqlite
     - DEFAULT_MYSQL_SQLALCHEMY__URL=mysql+pymysql://root@localhost/tracim_test
     - DEFAULT_POSTGRES_SQLALCHEMY__URL=postgresql://postgres:dummy@127.0.0.1:5432/tracim_test?client_encoding=utf8
     - DB=sqlite
+    - COVERAGE=0
+    - PSERVE_LOG=/tmp/pserve_log.log
     - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
     - TRACIM_DEPOT_STORAGE_NAME=test
     - TRACIM_DEPOT_STORAGE_DIR=/tmp/test/depot
     - TRACIM_PREVIEW_CACHE_DIR=/tmp/test/preview_cache
     - TRACIM_COLOR__CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/color-test.json
+    - TRACIM_SESSION__DATA_DIR=/tmp/test/sessions/data
+    - TRACIM_SESSION__LOCK_DIR=/tmp/test/sessions/lock
+    - TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER=/tmp/test/radicale_storage
+    - TEST_CONFIG_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tests_configs.ini
+    - TEST_MIGRATION_SCRIPT_LOCATION=$TRAVIS_BUILD_DIR/backend/tracim_backend/migration
+    - TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=tracim_content_travis_test
 sudo: false
 language: python
 dist: trusty
@@ -37,20 +44,20 @@ _install_backend: &_install_backend
     - redis-server
     - mysql
   before_install:
-    - docker pull mailhog/mailhog
-    - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
-    - docker pull rroemhild/test-openldap
-    - docker run -d -p 3890:389 rroemhild/test-openldap
-    - docker pull elasticsearch:7.0.0
-    - docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
+    # INFO - G.M - 2019-05-02 - some useful debug information
+    - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
+    - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
+    - echo "$TRACIM_SQLALCHEMY__URL"
+    - mkdir -p $TRACIM_DEPOT_STORAGE_DIR
+    - mkdir -p $TRACIM_PREVIEW_CACHE_DIR
+    - mkdir -p $TRACIM_SESSION__DATA_DIR
+    - mkdir -p $TRACIM_SESSION__LOCK_DIR
+    - mkdir -p $TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
+    - ls -R /tmp/test
   install:
     - cd $TRAVIS_BUILD_DIR/backend
     - pip install --upgrade pip setuptools
-    # using old version of pytest-cov to avoid
-    # version conflict with python-coveralls
-    # see https://github.com/z4r/python-coveralls/issues/66
-    - pip install 'pytest-cov<2.6'
-    - pip install python-coveralls
+
     - pip install -r "requirements.txt"
     # postgresql
     - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
@@ -62,35 +69,25 @@ _install_backend: &_install_backend
     - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
     - cd $TRAVIS_BUILD_DIR
   before_script:
-    # INFO - G.M - 2019-05-02 - some useful debug information
-    - echo "$TRACIM_COLOR__CONFIG_FILE_PATH"
-    - cat "$TRACIM_COLOR__CONFIG_FILE_PATH"
-    - echo "$TRACIM_SQLALCHEMY__URL"
-  after_success:
-    - coveralls
-
-_install_full_tracim: &_install_full_tracim
-  <<: *_install_backend
-  install:
-    - cd $TRAVIS_BUILD_DIR/backend
-    - pip install --upgrade pip setuptools
+    - docker pull mailhog/mailhog
+    - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+    - docker pull rroemhild/test-openldap
+    - docker run -d -p 3890:389 rroemhild/test-openldap
+    - docker pull elasticsearch:7.0.0
+    - docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
     # using old version of pytest-cov to avoid
     # version conflict with python-coveralls
     # see https://github.com/z4r/python-coveralls/issues/66
-    - pip install 'pytest-cov<2.6'
-    - pip install python-coveralls
-    - pip install -r "requirements.txt"
-    # postgresql
-    - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
-    - sh -c "if [ '$DB' = 'postgres' ]; then pip install -e \".[postgresql,testing]\"; fi"
-    # mysql
-    - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-    - sh -c "if [ '$DB' = 'mysql' ]; then pip install -e \".[mysql,testing]\"; fi"
-    # sqlite
-    - sh -c "if [ '$DB' = 'sqlite' ]; then pip install -e \".[testing]\"; fi"
+    - sh -c "if [ '$COVERAGE' = '1' ]; then pip install \"pytest-cov<2.6\" \"python-coveralls\"; fi"
+
+
+_install_full_tracim: &_install_full_tracim
+  <<: *_install_backend
+  before_script:
     # setup backend for running
+    - cd $TRAVIS_BUILD_DIR/backend
     - cp ../color.json.sample ../color.json
-    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE
+    - tracimcli db init -c $BACKEND_TEST_CONFIG_FILE -d
     - alembic -c $BACKEND_TEST_CONFIG_FILE stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
@@ -106,18 +103,14 @@ _backend_quick_test: &_backend_quick_test
       packages:
         - libimage-exiftool-perl
   services:
-  before_install:
+  before_script:
   script:
-    - cd $TRAVIS_BUILD_DIR/backend/
-    - pytest tracim_backend --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
-    - cd $TRAVIS_BUILD_DIR
+    - pytest backend --ignore "backend/tracim_backend/tests/functional" --ignore "backend/tracim_backend/tests/commands"
 
 _backend_test: &_backend_test
   <<: *_install_backend
   script:
-    - cd $TRAVIS_BUILD_DIR/backend/
-    - pytest --cov tracim_backend
-    - cd $TRAVIS_BUILD_DIR
+    - sh -c "if [ '$COVERAGE' = 1 ]; then pytest --cov backend; else pytest backend; fi"
 
 
 jobs:
@@ -184,8 +177,13 @@ jobs:
     - stage: backend
       <<: *_backend_test
       env:
-        - DB=postgres
+        - DB=sqlite
+        - COVERAGE=1
         - TRACIM_SQLALCHEMY__URL=$DEFAULT_SQLITE_SQLALCHEMY__URL
+      after_success:
+        - cd $TRAVIS_BUILD_DIR
+        - cat .coverage
+        - coveralls
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
@@ -210,13 +208,14 @@ jobs:
         - TRAVIS_NODE_VERSION="10"
       script:
         - cd $TRAVIS_BUILD_DIR/backend
-        - nohup pserve $BACKEND_TEST_CONFIG_FILE >pserve.log 2>&1 &
+        - nohup pserve $BACKEND_TEST_CONFIG_FILE > $PSERVE_LOG 2>&1 &
         - cd $TRAVIS_BUILD_DIR/functionnal_tests
         - npm run travis-cypress-run
         - cd $TRAVIS_BUILD_DIR
-      if: commit_message !~ /(\[skip ci cypress\])/
       after_failure:
-        - cat $TRAVIS_BUILD_DIR/backend/pserve.log
+        - touch $PSERVE_LOG
+        - cat $PSERVE_LOG
+      if: commit_message !~ /(\[skip ci cypress\])/
 
 stages:
   - static-tests

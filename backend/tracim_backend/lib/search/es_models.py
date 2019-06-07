@@ -23,7 +23,7 @@ from elasticsearch_dsl import analyzer
 # We want that ele match elephant result, but we do not want that elephant match ele result,
 # that's why we set different analyzer for search (we search word given) and indexing (we index ngram
 # of label of content to allow autocompletion)
-
+from pyramid.exceptions import ConfigurationError
 
 edge_ngram_token_filter = analysis.token_filter(
     "edge_ngram_filter", type="edge_ngram", min_ngram=2, max_gram=20
@@ -43,23 +43,24 @@ html_folding = analyzer(
     char_filter="html_strip",
 )
 
-DEFAULT_INDEX_DOCUMENTS_ALIAS = "tracim_contents"
 DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
 # FIXME - G.M - 2019-05-24 - hack using env var only configuration of document alias and document
 # pattern now, as it's currently complex to rewrite Lib signature to get needed information (we
 # need to convert static IndexedContent object to something dynamic that we will pass to SearchApi)
 # this should be refactor to have a true tracim config parameter for this.
-INDEX_DOCUMENTS_ALIAS = os.environ.get(
-    "TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS", DEFAULT_INDEX_DOCUMENTS_ALIAS
-)
+# see https://github.com/tracim/tracim/issues/1835
+INDEX_DOCUMENTS_ALIAS = os.environ.get("TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS", None)
+if not INDEX_DOCUMENTS_ALIAS:
+    raise ConfigurationError(
+        "ERROR: you should set TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS env var for index "
+        "alias name if you want to use tracim with elasticsearch search"
+    )
 INDEX_DOCUMENTS_PATTERN_TEMPLATE = os.environ.get(
     "TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE
 )
-INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_PATTERN_TEMPLATE.replace("{date}", "*").replace(
-    "{index_alias}", INDEX_DOCUMENTS_ALIAS
+INDEX_DOCUMENTS_PATTERN = INDEX_DOCUMENTS_PATTERN_TEMPLATE.format(
+    date="*", index_alias=INDEX_DOCUMENTS_ALIAS
 )
-# FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
-ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
 
 
 class DigestUser(InnerDoc):

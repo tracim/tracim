@@ -277,6 +277,12 @@ run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 
 ### Run Tests ###
 
+Some directory are required to make tests functional, you can create them and do some other check
+with this script:
+
+    # in backend folder
+    python3 ./setup_dev_env.py
+
 Before running some functional test related to email, you need a local working *MailHog*
 see here : https://github.com/mailhog/MailHog
 
@@ -320,6 +326,26 @@ Sorting of import:
 Flake8 check(unused import, variable and many other checks):
 
     flake8 tracim_backend
+
+### About Pytest tests config ###
+
+For running tests, tracim tests need config setted:
+- specific config for specific tests is
+available in TEST_CONFIG_FILE_PATH (by default: "./tests_configs.ini" in backend folder).
+- For more general config, pytest rely on dotenv .env file (by default ".test.env" in backend folder)
+- If you want to change general config like paths used or database, you should better use env var
+instead of modifying "TEST_CONFIG_FILE_PATH" file or ".test.env".
+
+for example, if you want to use another database, you can do this:
+
+    export TRACIM_SQLALCHEMY__URL=sqlite:////tmp/mydatabase
+    python3 ./setup_dev_env.py
+    pytest
+
+Order of usage is (from less to more important, last is used if setted):
+- specific TEST_CONFIG_FILE_PATH config (different for each test)
+- default env var setting in .test.env
+- env var setted by user
 
 Tracim API
 ----------
