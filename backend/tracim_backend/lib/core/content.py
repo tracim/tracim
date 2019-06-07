@@ -789,7 +789,7 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_filename_and_parent_labels(
-        self, content_label: str, workspace: Workspace, content_parent_labels: [str] = None
+        self, content_label: str, workspace: Workspace, content_parent_labels: typing.List[str] = None
     ):
         """
         Return content with it's label, workspace and parents labels (optional)
@@ -833,7 +833,7 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
-        self, path_labels: [str], workspace: Workspace
+        self, path_labels: typing.List[str], workspace: Workspace
     ) -> Content:
         """
         Return a Content folder for given relative path.
@@ -2124,7 +2124,7 @@ class ContentApi(object):
         return results, current_offset
 
     def _search_query(
-        self, keywords: [str], content_types: typing.Optional[typing.List[str]] = None
+        self, keywords: typing.List[str], content_types: typing.Optional[typing.List[str]] = None
     ) -> Query:
         """
         :return: a sorted list of Content items
