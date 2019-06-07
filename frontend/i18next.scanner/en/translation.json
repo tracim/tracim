@@ -94,8 +94,8 @@
   "Mark everything as read": "Mark everything as read",
   "No recent activity": "No recent activity",
   "See more": "See more",
-  "your role in the shared space": "your role in the shared space",
-  "you can change your notification status by clicking here": "you can change your notification status by clicking here",
+  "Your role in the shared space": "Your role in the shared space",
+  "You can change your notification status by clicking here": "You can change your notification status by clicking here",
   "Feature": "Feature",
   "Explore": "Explore",
   "About": "About",
@@ -181,8 +181,8 @@
   "(protocole WebDAV)": "(WebDAV protocol)",
   "Administration": "Administration",
   "Agendas": "Agendas",
-  "see shared space": "see shared space",
-  "hide shared space": "hide shared space",
-  "see sidebar": "see sidebar",
-  "hide sidebar": "hide sidebar"
+  "See shared space": "See shared space",
+  "Hide shared space": "Hide shared space",
+  "See sidebar": "See sidebar",
+  "Hide sidebar": "Hide sidebar"
 }

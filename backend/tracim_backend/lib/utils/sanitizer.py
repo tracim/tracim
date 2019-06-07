@@ -53,12 +53,14 @@ class HtmlSanitizer(object):
       - Remove non-whitelisted attributes
     """
 
+    # TODO - B.L - make the sanitizer config from tracim ini
     def __init__(self, html_body: str, config: HtmlSanitizerConfig = None):
         if config is None:
             config = HtmlSanitizerConfig()
         self.config = config
         self.soup = BeautifulSoup(html_body, config.parser)
 
+    # INFO - B.L - 2019/05/03 - legacy code for emails do not use.
     def sanitize(self) -> typing.Optional[str]:
         for tag in self.soup.findAll():
             if self._tag_to_extract(tag):
@@ -72,7 +74,7 @@ class HtmlSanitizer(object):
                         del tag.attrs[attr]
             else:
                 # INFO - BL - 2019/4/8 - unwrap removes the tag but
-                # snot its children
+                # not its children
                 tag.unwrap()
 
         if self._is_content_empty(self.soup):
@@ -80,11 +82,13 @@ class HtmlSanitizer(object):
         else:
             return str(self.soup)
 
+    # INFO - B.L - 2019/05/03 - legacy code for emails do not use.
     def _is_content_empty(self, soup):
         img = soup.find("img")
         txt = soup.get_text().replace("\n", "").strip()
         return not img and not txt
 
+    # INFO - B.L - 2019/05/03 - legacy code for emails do not use.
     def _tag_to_extract(self, tag: Tag) -> bool:
         # INFO - BL - 2019/4/8 - returns True if tag is blacklisted or
         # contains a blacklisted class or id
@@ -108,7 +112,7 @@ class HtmlSanitizer(object):
                 return False
         return not soup.get_text().replace("\n", "").strip()
 
-    def sanitize_html(self):
+    def sanitize_html(self) -> str:
         assert not (
             self.config.tag_blacklist and self.soup.tag_whitelist
         ), "You must use either whitelist or blacklist"
@@ -119,13 +123,13 @@ class HtmlSanitizer(object):
 
         return str(self.soup)
 
-    def _remove_black_listed_tags(self, soup: Tag):
+    def _remove_black_listed_tags(self, soup: Tag) -> Tag:
         for tag in soup.findAll():
             if tag.name.lower() in self.config.tag_blacklist:
                 tag.extract()
         return soup
 
-    def _keep_white_listed_tags(self, soup: Tag):
+    def _keep_white_listed_tags(self, soup: Tag) -> Tag:
         for tag in soup.findAll():
             if tag.name.lower() not in self.config.tag_whitelist:
                 tag.extract()

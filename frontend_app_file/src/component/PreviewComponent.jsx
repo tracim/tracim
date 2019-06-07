@@ -142,7 +142,7 @@ export class PreviewComponent extends React.Component {
               className='previewcomponent__slider__icon btn iconBtn'
               onClick={props.onClickPreviousPage}
               style={{':hover': {color: props.color}}}
-              title={'Previous page'}
+              title={props.t('Previous page')}
               disabled={props.fileCurrentPage === 1}
               key={'file_btn_previouspage'}
             >
@@ -190,7 +190,7 @@ export class PreviewComponent extends React.Component {
               className='previewcomponent__slider__icon btn iconBtn'
               onClick={props.onClickNextPage}
               style={{':hover': {color: props.color}}}
-              title={'Next page'}
+              title={props.t('Next page')}
               disabled={props.fileCurrentPage === props.filePageNb}
               key={'file_btn_nextpage'}
             >

@@ -436,6 +436,8 @@ class Thread extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent customClass={`${config.slug}__contentpage`}>
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using config.availableStatuses[3].slug
+            https://github.com/tracim/tracim/issues/1840 */}
           <Timeline
             customClass={`${config.slug}__contentpage`}
             customColor={config.hexcolor}

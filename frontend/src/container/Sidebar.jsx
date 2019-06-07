@@ -12,7 +12,8 @@ import {
   PAGE,
   workspaceConfig,
   getUserProfile,
-  unLoggedAllowedPageList
+  unLoggedAllowedPageList,
+  TRACIM_APP_VERSION
 } from '../helper.js'
 
 class Sidebar extends React.Component {
@@ -83,8 +84,8 @@ class Sidebar extends React.Component {
         <div className='sidebar__scrollview'>
           <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
             {sidebarClose
-              ? <i className={classnames('fa fa-chevron-right')} title={t('see sidebar')} />
-              : <i className={classnames('fa fa-chevron-left')} title={t('hide sidebar')} />
+              ? <i className={classnames('fa fa-chevron-right')} title={t('See sidebar')} />
+              : <i className={classnames('fa fa-chevron-left')} title={t('Hide sidebar')} />
             }
           </div>
 
@@ -130,6 +131,9 @@ class Sidebar extends React.Component {
           </div>
 
           <div className='sidebar__footer mb-2'>
+            <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+              {TRACIM_APP_VERSION}
+            </div>
             <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
               Copyright - 2013 - 2019
               <div className='sidebar__footer__text__link'>

@@ -410,7 +410,6 @@ class TestCommentsEndpoint(FunctionalTest):
         response = self.testapp.post_json(
             "/api/v2/workspaces/2/contents/7/comments", params=params, status=200
         )
-        assert '<span style="display: none;">' in response.json_body["raw_content"]
 
     def test_api__post_content_comment__ok__200__script_is_sanitized(self) -> None:
         """

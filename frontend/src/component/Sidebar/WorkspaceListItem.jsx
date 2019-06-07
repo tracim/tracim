@@ -34,7 +34,7 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
 
 const WorkspaceListItem = props => {
   return (
-    <li className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'>
+    <li className='sidebar__content__navigation__workspace__item' data-cy={`sidebar__content__navigation__workspace__item_${props.idWorkspace}`}>
       <div
         className='sidebar__content__navigation__workspace__item__wrapper'
         onClick={props.onClickTitle}
@@ -55,8 +55,8 @@ const WorkspaceListItem = props => {
 
         <div className='sidebar__content__navigation__workspace__item__icon'>
           {props.isOpenInSidebar
-            ? <i className={classnames('fa fa-chevron-up')} title={props.t('hide shared space')} />
-            : <i className={classnames('fa fa-chevron-down')} title={props.t('see shared space')} />
+            ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide shared space')} />
+            : <i className={classnames('fa fa-chevron-down')} title={props.t('See shared space')} />
           }
         </div>
       </div>

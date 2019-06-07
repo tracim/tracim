@@ -28,6 +28,7 @@ import {
   PROFILE,
   unLoggedAllowedPageList
 } from '../helper.js'
+import { Link } from 'react-router-dom'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -81,10 +82,6 @@ class Header extends React.Component {
     }
   }
 
-  handleClickAgendaButton = () => {
-    this.props.history.push(PAGE.AGENDA)
-  }
-
   render () {
     const { props } = this
 
@@ -117,13 +114,13 @@ class Header extends React.Component {
 
               {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
-                  <button
+                  <Link
                     className='btn outlineTextBtn primaryColorBorder nohover'
-                    onClick={this.handleClickAgendaButton}
+                    to={PAGE.AGENDA}
                   >
                     <i className='fa fa-fw fa-calendar' />
                     {props.t('Agendas')}
-                  </button>
+                  </Link>
                 </li>
               )}
 
