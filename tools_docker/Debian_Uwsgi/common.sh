@@ -19,6 +19,10 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|webdav.listen = .*|webdav.listen = 127.0.0.1:3030|g" /etc/tracim/development.ini
     sed -i "s|;webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
     sed -i "s|webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
+    sed -i "s|email.processing_mode = sync|email.processing_mode = async|g" /etc/tracim/development.ini
+    sed -i "s|; email.async.redis.host = .*|email.async.redis.host = localhost|g" /etc/tracim/development.ini
+    sed -i "s|; email.async.redis.port = .*|email.async.redis.port = 6379|g" /etc/tracim/development.ini
+    sed -i "s|; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
@@ -144,4 +148,18 @@ if [ "$START_CALDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-available/tracim_caldav.ini ]; then
         ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
     fi
+fi
+
+# Activate email
+if [ "$EMAIL_NOTIFICATION" = "1" ]; then
+    sed -i "s|email.notification.activated = .*|email.notification.activated = True|g" /etc/tracim/development.ini
+else
+    sed -i "s|email.notification.activated = .*|email.notification.activated = False|g" /etc/tracim/development.ini
+fi
+
+# Activate reply by email
+if [ "$EMAIL_REPLY" = "1" ]; then
+    sed -i "s|email.reply.activated = .*|email.reply.activated = True|g" /etc/tracim/development.ini
+else
+    sed -i "s|email.reply.activated = .*|email.reply.activated = False|g" /etc/tracim/development.ini
 fi
