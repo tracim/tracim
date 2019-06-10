@@ -397,6 +397,26 @@ caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROP
 caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With, Prefer
 caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
+####
+# SEARCH (ElasticSearch)
+####
+search.enabled = False
+# choose search engine to use, available value are: simple, elasticsearch.
+# simple need nothing more than tracim but features are limited,
+# elasticsearch is more effective but need an elasticsearch server.
+search.engine = simple
+# elasticsearch configuration
+;search.elasticsearch.host = localhost
+;search.elasticsearch.port = 9200
+# if you use ingest mode in elasticsearch, you can activate file content ingest
+# for search (default as false)
+; search.elasticsearch.use_ingest = false
+# if you set ingest mimetype whitelist to list of separated mimetype by "," , you will index file
+# content for only file with those mimetype, if set to empty, allow any mimetype, default value
+# allow most text-based content type.
+; search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
+
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################

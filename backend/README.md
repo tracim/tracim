@@ -299,6 +299,12 @@ You can run it this way with docker :
     docker pull rroemhild/test-openldap
     docker run -d -p 3890:389 rroemhild/test-openldap
 
+You need also a elasticsearch server on port 9200 for elasticsearch related test
+You can run it this way with docker :
+
+    docker pull elasticsearch:7.0.0
+    docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
+
 Run your project's tests:
 
     pytest

@@ -43,6 +43,9 @@ import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplate
 
 import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 
+import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
+
+import IconButton from './component/Button/IconButton.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -89,5 +92,7 @@ export {
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
+  ListItemWrapper,
+  IconButton,
   DisplayState
 }

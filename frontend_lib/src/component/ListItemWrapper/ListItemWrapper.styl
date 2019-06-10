@@ -1,0 +1,36 @@
+.currentColor
+  color currentColor
+
+.validateColor
+  color validateColor
+
+.cancelColor
+  color cancelColor
+
+.outdateColor
+  color outdateColor
+
+.content
+  padding 10px 0
+  border-bottom 0
+  cursor pointer
+  font-weight bold
+  &__item
+    width 100%
+    display flex
+    align-items center
+  &.read
+    font-weight normal
+  &:hover
+    & > .content__name
+      color offWhite
+    & > .content__status
+      color offWhite
+    & .badgeBackgroundColor
+      background-color inherit
+
+//MEDIAQUERIES
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .content
+    border-right 1px solid grey

@@ -20,6 +20,8 @@ cmd2==0.9.6               # via cliff
 colorama==0.4.1           # via cmd2
 colour==0.1.5
 defusedxml==0.5.0         # via wsgidav
+elasticsearch-dsl==7.0.0
+elasticsearch==7.0.1
 email-reply-parser==0.5.9
 filedepot==0.5.2
 filelock==3.0.10
@@ -61,7 +63,7 @@ pyramid-multiauth==0.9.0
 pyramid-retry==1.0
 pyramid-tm==2.2.1
 pyramid==1.10.1
-python-dateutil==2.7.5    # via alembic, radicale, vobject
+python-dateutil==2.7.5
 python-editor==1.0.3      # via alembic
 python-magic==0.4.15      # via preview-generator
 python-slugify==1.2.6
@@ -72,14 +74,14 @@ redis==2.10.6
 repoze.lru==0.7           # via pyramid-debugtoolbar
 requests==2.21.0
 rq==0.12.0
-six==1.11.0               # via caldav, cliff, imapclient, packaging, python-dateutil, stevedore
+six==1.11.0               # via caldav, cliff, elasticsearch-dsl, imapclient, packaging, python-dateutil, stevedore
 sqlalchemy==1.2.14
 stevedore==1.30.0         # via cliff
 transaction==2.4.0
 translationstring==1.3    # via pyramid
 tzlocal==1.5.1            # via caldav
 unidecode==1.0.23         # via filedepot, python-slugify
-urllib3==1.24.1           # via requests
+urllib3==1.24.1           # via elasticsearch, requests
 venusian==1.1.0           # via pyramid
 vobject==0.9.6.1          # via caldav, radicale
 waitress==1.1.0

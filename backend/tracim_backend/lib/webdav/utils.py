@@ -137,6 +137,7 @@ class FakeFileStream(object):
                     util.guessMimeType(self._file_name),
                     self._file_stream.read(),
                 )
+                self._api.execute_created_content_actions(file)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
         self._api.save(file, ActionDescription.CREATION)
