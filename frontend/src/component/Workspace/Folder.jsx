@@ -89,7 +89,7 @@ class Folder extends React.Component {
                       idRoleUserWorkspace={props.idRoleUserWorkspace}
                       onClickExtendedAction={{
                         edit: e => props.onClickExtendedAction.edit(e, props.folderData),
-                        move: null, // e => props.onClickExtendedAction.move(e, props.folderData),
+                        move: null,
                         download: e => props.onClickExtendedAction.download(e, props.folderData),
                         archive: e => props.onClickExtendedAction.archive(e, props.folderData),
                         delete: e => props.onClickExtendedAction.delete(e, props.folderData)

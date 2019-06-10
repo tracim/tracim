@@ -2,13 +2,13 @@ const SELECTORS = {
   CONTENT_FRAME: 'contentFrame',
   CONTENT_IN_LIST: 'contentInList',
   WORKSPACE_MENU: 'workspaceMenu',
-  CONTENT_IN_RESEARCH: 'contentInResearch'
+  CONTENT_IN_SEARCH: 'contentInSearch'
 }
 
 const TAGS = {
   [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
   [SELECTORS.CONTENT_IN_LIST]: () => `.content__item`,
-  [SELECTORS.CONTENT_IN_RESEARCH]: () => `.content__name`,
+  [SELECTORS.CONTENT_IN_SEARCH]: () => `.content__name`,
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`
 }
 
