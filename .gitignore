@@ -12,3 +12,5 @@ functionnal_tests/node_modules/
 functionnal_tests/cypress/videos
 functionnal_tests/cypress/screenshots
 
+#ignore preview files as it is by default in backend folder
+previews
