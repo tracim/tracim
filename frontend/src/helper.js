@@ -47,7 +47,8 @@ export const PAGE = {
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
     USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
-  }
+  },
+  RESEARCH_RESULT: '/ui/research-result'
 }
 
 export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA]
@@ -176,3 +177,5 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Cancelled'),
   i18n.t('Deprecated')
 ]
+
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'

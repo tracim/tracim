@@ -27,6 +27,7 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.search.search import ESSearchApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
@@ -191,6 +192,26 @@ class FunctionalTest(unittest.TestCase):
         logger.debug(self, "TearDown Test...")
         self.disconnect_database(remove_tables=True)
         testing.tearDown()
+
+
+class FunctionalElasticSearchTest(FunctionalTest):
+
+    elastic_search_api = None
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.elastic_search_api = ESSearchApi(
+            config=self.app_config, current_user=None, session=self.session
+        )
+        self.elastic_search_api.create_index()
+
+    def refresh_elasticsearch(self) -> None:
+        self.elastic_search_api.refresh_index()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        if self.elastic_search_api:
+            self.elastic_search_api.delete_index()
 
 
 class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):

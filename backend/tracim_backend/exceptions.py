@@ -102,6 +102,10 @@ class NotFound(TracimException):
     pass
 
 
+class NoValidSearchEngine(TracimException):
+    pass
+
+
 class SameValueError(ValueError):
     error_code = ErrorCode.SAME_VALUE_ERROR
 

@@ -184,5 +184,14 @@
   "See shared space": "Voir l'espace partagé",
   "Hide shared space": "Masquer l'espace partagé",
   "See sidebar": "Voir la barre latérale",
-  "Hide sidebar": "Masquer la barre latérale"
+  "Hide sidebar": "Masquer la barre latérale",
+  "Research results": "Résultats de la recherche",
+  "best results for": "meilleurs résultats pour",
+  "Research result": "Résultat de la recherche",
+  "best result for": "meilleur résultat pour",
+  "No more results": "Pas d'autres résultats",
+  "Path": "Chemin",
+  "Last modification": "Dernère modification",
+  "Research": "Rechercher",
+  "No documents found for the specified search terms": "Aucun document trouvé pour les termes de recherche spécifiés"
 }

@@ -16,18 +16,25 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected
+  setUserDisconnected,
+  setResearch,
+  setNbElementsResearch,
+  setKeyWordResearch,
+  setNbPage
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
-  putUserLang
+  putUserLang,
+  getResearchKeyWord
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
   PAGE,
   PROFILE,
-  unLoggedAllowedPageList
+  unLoggedAllowedPageList,
+  ALL_CONTENT_TYPES
 } from '../helper.js'
+import Research from '../component/Header/Research.jsx'
 import { Link } from 'react-router-dom'
 
 class Header extends React.Component {
@@ -82,6 +89,29 @@ class Header extends React.Component {
     }
   }
 
+  handleClickResearch = async (keyWordResearch) => {
+    const { props } = this
+
+    // INFO - GB - 2019-06-07 - When we do a research, the parameters need to be in default mode.
+    // Respectively, show_archived=0, show_deleted=0, show_active=1, page_nb=1
+    const fetchGetKeyWordResearch = await props.dispatch(getResearchKeyWord(
+      0, ALL_CONTENT_TYPES, 0, 1, keyWordResearch, 1, props.researchResult.numberElementsByPage
+    ))
+
+    switch (fetchGetKeyWordResearch.status) {
+      case 200:
+        props.dispatch(setNbElementsResearch(fetchGetKeyWordResearch.json.total_hits))
+        props.dispatch(setResearch(fetchGetKeyWordResearch.json.contents))
+        props.dispatch(setKeyWordResearch(keyWordResearch))
+        props.dispatch(setNbPage(1))
+        props.history.push(PAGE.RESEARCH_RESULT)
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+        break
+    }
+  }
+
   render () {
     const { props } = this
 
@@ -95,7 +125,7 @@ class Header extends React.Component {
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
               {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
-                <li className='header__menu__rightside__emailwarning'>
+                <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <i className='header__menu__system__icon slowblink fa fa-warning' />
 
@@ -106,8 +136,17 @@ class Header extends React.Component {
                 </li>
               )}
 
+              {props.user.logged &&
+                <li className='research__nav'>
+                  <Research
+                    className='header__menu__rightside__research'
+                    onClickResearch={this.handleClickResearch}
+                  />
+                </li>
+              }
+
               {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
-                <li className='header__menu__rightside__adminlink'>
+                <li className='header__menu__rightside__adminlink nav-item'>
                   <AdminLink />
                 </li>
               )}
@@ -148,5 +187,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, system, appList }) => ({ lang, user, system, appList })
+const mapStateToProps = ({ researchResult, lang, user, system, appList }) => ({ researchResult, lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))
