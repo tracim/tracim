@@ -145,6 +145,7 @@ class CFG(object):
         self._load_ldap_config()
         self._load_webdav_config()
         self._load_caldav_config()
+        self._load_search_config()
 
     def _load_global_config(self) -> None:
         """
@@ -511,6 +512,29 @@ class CFG(object):
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
         self.LDAP_GET_INFO = None
 
+    def _load_search_config(self):
+        self.SEARCH__ENABLED = asbool(self.get_raw_config("search.enabled", "False"))
+        self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
+        self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
+            self.get_raw_config("search.elasticsearch.use_ingest", "False")
+        )
+        # FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
+        ALLOWED_INGEST_DEFAULT_MIMETYPE = ""
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_list(
+            self.get_raw_config(
+                "search.elasticsearch.ingest.mimetype_whitelist", ALLOWED_INGEST_DEFAULT_MIMETYPE
+            ),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+        self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
+            "search.elasticsearch.host", "localhost"
+        )
+        self.SEARCH__ELASTICSEARCH__PORT = int(
+            self.get_raw_config("search.elasticsearch.port", "9200")
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -520,6 +544,7 @@ class CFG(object):
         self._check_global_config_validity()
         self._check_email_config_validity()
         self._check_caldav_config_validity()
+        self._check_search_config_validity()
 
     def _check_global_config_validity(self) -> None:
         """
@@ -785,6 +810,22 @@ class CFG(object):
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.
         update_validators()
+
+    def _check_search_config_validity(self):
+        if self.SEARCH__ENABLED:
+            search_engine_valid = ["elasticsearch", "simple"]
+            if self.SEARCH__ENGINE not in search_engine_valid:
+
+                search_engine_list_str = ", ".join(
+                    '"{}"'.format(engine) for engine in search_engine_valid
+                )
+                raise ConfigurationError(
+                    "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
+                )
+            # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
+            # see https://github.com/tracim/tracim/issues/1835
+            if self.SEARCH__ENGINE == "elasticsearch":
+                from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS  # noqa: F401
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):

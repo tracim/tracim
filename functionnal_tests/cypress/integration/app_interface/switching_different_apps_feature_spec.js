@@ -1,3 +1,5 @@
+import { SELECTORS as s, formatTag } from '../../support/generic_selector_commands'
+
 describe('App Interface (the mechanism to open and close apps)', () => {
   const htmlDocTitle = 'HtmlDocForSwitch'
   const threadTitle = 'ThreadForSwitch'
@@ -28,9 +30,9 @@ describe('App Interface (the mechanism to open and close apps)', () => {
   })
 
   describe('Switching between 2 different apps feature', () => {
-    const contentHtmlDocGetter = `.workspace__content__fileandfolder > .content[title="${htmlDocTitle}"]`
-    const contentThreadGetter = `.workspace__content__fileandfolder > .content[title="${threadTitle}"]`
-    const contentFileGetter = `.workspace__content__fileandfolder > .content[title="${fileTitle}"]`
+    const contentHtmlDocGetter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: htmlDocTitle}})
+    const contentThreadGetter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: threadTitle}})
+    const contentFileGetter = formatTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: fileTitle}})
 
     beforeEach(function () {
       cy.loginAs('administrators')

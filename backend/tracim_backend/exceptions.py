@@ -102,6 +102,10 @@ class NotFound(TracimException):
     pass
 
 
+class NoValidSearchEngine(TracimException):
+    pass
+
+
 class SameValueError(ValueError):
     error_code = ErrorCode.SAME_VALUE_ERROR
 
@@ -248,7 +252,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
-    pass
+    error_code = ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
 
 class EmptyEmailBody(EmptyValueNotAllowed):

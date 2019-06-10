@@ -125,6 +125,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceLabelAlreadyUsed, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
@@ -445,6 +446,7 @@ class WorkspaceController(Controller):
             parent=parent,
         )
         api.save(content, ActionDescription.CREATION)
+        api.execute_created_content_actions(content)
         content = api.get_content_in_context(content)
         return content
 
@@ -531,6 +533,7 @@ class WorkspaceController(Controller):
                 new_workspace=new_workspace,
                 must_stay_in_same_workspace=False,
             )
+            api.execute_update_content_actions(content)
         updated_content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         return api.get_content_in_context(updated_content)
 
@@ -556,6 +559,7 @@ class WorkspaceController(Controller):
         content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.delete(content)
+            api.execute_update_content_actions(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])
@@ -578,6 +582,7 @@ class WorkspaceController(Controller):
         content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.undelete(content)
+            api.execute_update_content_actions(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])
@@ -604,6 +609,7 @@ class WorkspaceController(Controller):
         content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.archive(content)
+            api.execute_update_content_actions(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS])
@@ -626,6 +632,7 @@ class WorkspaceController(Controller):
         content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.unarchive(content)
+            api.execute_update_content_actions(content)
         return
 
     def bind(self, configurator: Configurator) -> None:

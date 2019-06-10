@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import typing
 
 from sqlalchemy.orm import Query
@@ -93,7 +94,8 @@ class WorkspaceApi(object):
         workspace.label = label
         workspace.description = description
         workspace.agenda_enabled = agenda_enabled
-
+        workspace.created = datetime.utcnow()
+        workspace.updated = datetime.utcnow()
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
         role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
@@ -127,8 +129,19 @@ class WorkspaceApi(object):
         """
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
+        if (
+            self._session.query(Workspace)
+            .filter(Workspace.label == label)
+            .filter(Workspace.workspace_id != workspace.workspace_id)
+            .count()
+            > 0
+        ):
+            raise WorkspaceLabelAlreadyUsed(
+                "A workspace with label {} already exist.".format(label)
+            )
         workspace.label = label
         workspace.description = description
+        workspace.updated = datetime.utcnow()
         if agenda_enabled is not None:
             workspace.agenda_enabled = agenda_enabled
         if save_now:

@@ -104,6 +104,20 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 advanced_setup.session_data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
 advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 
+### pyramid_beaker parameters ###
+session.type = file
+session.data_dir = %(advanced_setup.session_data_dir)s
+session.lock_dir = %(advanced_setup.session_lock_dir)s
+session.key = session_key
+session.secret = %(basic_setup.session_secret)s
+session.save_accessed_time = True
+## Delay in seconds
+session.cookie_expires = 604800
+session.timeout = 604800
+session.cookie_on_exception = True
+## custom tracim pyramid_beaker parameter
+; session.reissue_time = 120
+
 ####
 # AUTH
 ####
@@ -383,6 +397,26 @@ caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROP
 caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With, Prefer
 caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
+####
+# SEARCH (ElasticSearch)
+####
+search.enabled = False
+# choose search engine to use, available value are: simple, elasticsearch.
+# simple need nothing more than tracim but features are limited,
+# elasticsearch is more effective but need an elasticsearch server.
+search.engine = simple
+# elasticsearch configuration
+;search.elasticsearch.host = localhost
+;search.elasticsearch.port = 9200
+# if you use ingest mode in elasticsearch, you can activate file content ingest
+# for search (default as false)
+; search.elasticsearch.use_ingest = false
+# if you set ingest mimetype whitelist to list of separated mimetype by "," , you will index file
+# content for only file with those mimetype, if set to empty, allow any mimetype, default value
+# allow most text-based content type.
+; search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
+
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################
@@ -405,20 +439,6 @@ pyramid.debug_routematch = False
 pyramid.default_locale_name = en
 ## More info here:
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#localization-deployment-settings
-
-### pyramid_beaker parameters ###
-session.type = file
-session.data_dir = %(advanced_setup.session_data_dir)s
-session.lock_dir = %(advanced_setup.session_lock_dir)s
-session.key = session_key
-session.secret = %(basic_setup.session_secret)s
-session.save_accessed_time = True
-## Delay in seconds
-session.cookie_expires = 604800
-session.timeout = 604800
-session.cookie_on_exception = True
-## custom tracim pyramid_beaker parameter
-; session.reissue_time = 120
 
 ### pyramid optionals plugins ###
 #required plugin are imported directly in tracim source code

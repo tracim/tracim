@@ -21,10 +21,10 @@ from tracim_backend.exceptions import EmptyEmailBody
 from tracim_backend.exceptions import NoSpecialKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizer  # nopep8
 
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 CONTENT_TYPE_TEXT_PLAIN = "text/plain"
@@ -91,13 +91,13 @@ class DecodedMail(object):
                 if use_txt_parsing:
                     txt_body = EmailReplyParser.parse_reply(txt_body)
                 html_body = markdown.markdown(txt_body)
-                body = HtmlSanitizer.sanitize(html_body)
+                body = HtmlSanitizer(html_body).sanitize()
 
             elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(charset)
                 if use_html_parsing:
                     html_body = str(ParsedHTMLMail(html_body))
-                body = HtmlSanitizer.sanitize(html_body)
+                body = HtmlSanitizer(html_body).sanitize()
             if not body:
                 raise EmptyEmailBody()
         return body
