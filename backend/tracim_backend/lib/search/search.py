@@ -13,14 +13,6 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import SEARCH_DEFAULT_RESULT_NB
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
-from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
-from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN_TEMPLATE
-from tracim_backend.lib.search.es_models import DigestComments
-from tracim_backend.lib.search.es_models import DigestContent
-from tracim_backend.lib.search.es_models import DigestUser
-from tracim_backend.lib.search.es_models import DigestWorkspace
-from tracim_backend.lib.search.es_models import IndexedContent
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.models import ESContentSearchResponse
@@ -180,6 +172,11 @@ class ESSearchApi(SearchApi):
         settings to be used. This can be run at any time, ideally at every new code
         deploy
         """
+        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
+        from tracim_backend.lib.search.es_models import IndexedContent
+
         # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # Configure index with our indexing preferences
@@ -206,9 +203,16 @@ class ESSearchApi(SearchApi):
         periodically refresh, usefull for automated tests
         see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
         """
+        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
+
         self.es.indices.refresh(INDEX_DOCUMENTS_ALIAS)
 
     def delete_index(self) -> None:
+        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
+
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
         logger.info(self, "delete index with pattern {}".format(INDEX_DOCUMENTS_PATTERN))
@@ -225,6 +229,11 @@ class ESSearchApi(SearchApi):
         any and all searches without any loss of functionality. It should, however,
         not perform any writes at this time as those might be lost.
         """
+        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
+        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN_TEMPLATE
+
         # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # construct a new index name by appending current timestamp
@@ -272,6 +281,13 @@ class ESSearchApi(SearchApi):
         """
         Index/update a content into elastic_search engine
         """
+        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
+        from tracim_backend.lib.search.es_models import DigestComments
+        from tracim_backend.lib.search.es_models import DigestContent
+        from tracim_backend.lib.search.es_models import DigestUser
+        from tracim_backend.lib.search.es_models import DigestWorkspace
+        from tracim_backend.lib.search.es_models import IndexedContent
+
         if content.content_type == content_type_list.Comment.slug:
             content = content.parent
             # INFO - G.M - 2019-05-20 - we currently do not support comment without parent
@@ -370,6 +386,9 @@ class ESSearchApi(SearchApi):
         - do no show archived/deleted content by default
         - filter content found according to workspace of current_user
         """
+        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
+        from tracim_backend.lib.search.es_models import IndexedContent
+
         if not search_string:
             return EmptyContentSearchResponse()
         filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
