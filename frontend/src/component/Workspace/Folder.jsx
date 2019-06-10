@@ -193,7 +193,7 @@ const folderDndTarget = {
 const folderDndTargetCollect = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   canDrop: monitor.canDrop(),
-  isOver: monitor.isOver({shallow: false}),
+  isOver: monitor.isOver({shallow: false})
 })
 
 const folderDndSource = {
