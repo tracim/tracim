@@ -120,15 +120,16 @@ export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${B
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
 export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS}/${APP_FEATURE}` })
 
-export const RESEARCH = 'Research'
-export const setResearch = newResearch => ({ type: `${SET}/${RESEARCH}`, newResearch })
-export const resetResearch = () => ({ type: `${RESET}/${RESEARCH}` })
-export const appendResearch = appendResearch => ({ type: `${APPEND}/${RESEARCH}`, appendResearch })
-export const RESEARCH_ELEMENTS = 'ResearchElements'
-export const setNbElementsResearch = nbElements => ({ type: `${SET}/${RESEARCH_ELEMENTS}`, nbElements })
-export const KEY_WORD_RESEARCH = 'KeyWordResearch'
-export const setKeyWordResearch = keyWordResearch => ({ type: `${SET}/${KEY_WORD_RESEARCH}`, keyWordResearch })
-export const RESEARCH_ELEMENTS_BY_PAGE = 'ResearchElementsByPage'
-export const setNbElementsByPage = nbElementsByPage => ({ type: `${SET}/${RESEARCH_ELEMENTS_BY_PAGE}`, nbElementsByPage })
-export const RESEARCH_PAGE = 'ResearchPage'
-export const setNbPage = nbPage => ({ type: `${SET}/${RESEARCH_PAGE}`, nbPage })
+export const SEARCH = 'Search'
+export const resetSearch = () => ({ type: `${RESET}/${SEARCH}` })
+export const SEARCH_RESULTS_LIST = 'SearchResultsList'
+export const setSearchResultsList = newSearchResultsList => ({ type: `${SET}/${SEARCH_RESULTS_LIST}`, newSearchResultsList })
+export const appendSearchResultsList = appendSearchResultsList => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST}`, appendSearchResultsList })
+export const CURRENT_NUMBER_SEARCH_RESULTS = 'CurrentNumberSearchResults'
+export const setCurrentNumberSearchResults = currentNumberSearchResults => ({ type: `${SET}/${CURRENT_NUMBER_SEARCH_RESULTS}`, currentNumberSearchResults })
+export const SEARCHED_KEYWORDS = 'SearchedKeywords'
+export const setSearchedKeywords = searchedKeywords => ({ type: `${SET}/${SEARCHED_KEYWORDS}`, searchedKeywords })
+export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
+export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
+export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
+export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })

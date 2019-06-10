@@ -48,7 +48,7 @@ export const PAGE = {
     USER: '/ui/admin/user',
     USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
   },
-  RESEARCH_RESULT: '/ui/research-result'
+  SEARCH_RESULT: '/ui/search-result'
 }
 
 export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA]

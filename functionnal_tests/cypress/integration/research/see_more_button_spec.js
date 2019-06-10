@@ -1,19 +1,19 @@
 import { PAGES } from '../../support/urls_commands'
 
-const htmlDocTitle = 'HtmlDocForResearch'
-const htmlDocTitle1 = 'HtmlDocForResearch1'
-const htmlDocTitle2 = 'HtmlDocForResearch2'
-const htmlDocTitle3 = 'HtmlDocForResearch3'
-const htmlDocTitle4 = 'HtmlDocForResearch4'
-const htmlDocTitle5 = 'HtmlDocForResearch5'
-const htmlDocTitle6 = 'HtmlDocForResearch6'
-const htmlDocTitle7 = 'HtmlDocForResearch7'
-const htmlDocTitle8 = 'HtmlDocForResearch8'
-const htmlDocTitle9 = 'HtmlDocForResearch9'
-const htmlDocTitle10 = 'HtmlDocForResearch10'
+const htmlDocTitle = 'HtmlDocForSearch'
+const htmlDocTitle1 = 'HtmlDocForSearch1'
+const htmlDocTitle2 = 'HtmlDocForSearch2'
+const htmlDocTitle3 = 'HtmlDocForSearch3'
+const htmlDocTitle4 = 'HtmlDocForSearch4'
+const htmlDocTitle5 = 'HtmlDocForSearch5'
+const htmlDocTitle6 = 'HtmlDocForSearch6'
+const htmlDocTitle7 = 'HtmlDocForSearch7'
+const htmlDocTitle8 = 'HtmlDocForSearch8'
+const htmlDocTitle9 = 'HtmlDocForSearch9'
+const htmlDocTitle10 = 'HtmlDocForSearch10'
 
-const researchInput = '[data-cy=research__text]'
-const seeMoreButton= '.ResearchResult__btnSeeMore button'
+const searchInput = '[data-cy=search__text]'
+const seeMoreButton= '.searchResult__btnSeeMore button'
 
 let workspaceId
 
@@ -45,7 +45,7 @@ describe('Searching keywords', () => {
 
   describe('that match more than 10 contents', () => {
     it('Should display maximum 10 results in the page and the See more button', () => {
-      cy.get(researchInput).type(htmlDocTitle).type('{enter}')
+      cy.get(searchInput).type(htmlDocTitle).type('{enter}')
 
       cy.get('[data-cy=content__item]').its('length').should('eq', 10)
 
@@ -53,7 +53,7 @@ describe('Searching keywords', () => {
     })
 
     it('Should display more results when clicking in the See more button', () => {
-      cy.get(researchInput).type(htmlDocTitle).type('{enter}')
+      cy.get(searchInput).type(htmlDocTitle).type('{enter}')
 
       cy.get(seeMoreButton).should('be.visible').click().then(test => {
         cy.wait(500)

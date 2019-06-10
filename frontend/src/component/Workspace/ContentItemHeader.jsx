@@ -10,12 +10,12 @@ const FileItemHeader = props => {
       <div className='content__header__name'>
         {props.t('Title')}
       </div>
-      {props.showResearchDetails && (
-        <div className='content__header__research'>
-          <div className='content__header__research__path'>
+      {props.showSearchDetails && (
+        <div className='content__header__search'>
+          <div className='content__header__search__path'>
             {props.t('Path')}
           </div>
-          <div className='content__header__research__modif'>
+          <div className='content__header__search__modif'>
             {props.t('Last modification')}
           </div>
         </div>
