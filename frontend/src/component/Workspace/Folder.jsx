@@ -1,17 +1,31 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
+import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import { PAGE, DRAG_AND_DROP } from '../../helper.js'
+import { PAGE, ROLE_OBJECT, DRAG_AND_DROP } from '../../helper.js'
 
 require('./Folder.styl')
 
 class Folder extends React.Component {
+  calculateIcon = (folder, isDropActive, draggedItem = null) => {
+    const isHoveringSelfParent = draggedItem && draggedItem.parentId === folder.id
+    const isHoveringSelf = draggedItem && draggedItem.contentId === folder.id
+
+    if (!isDropActive || isHoveringSelf) {
+      if (folder.isOpen) return 'fa-folder-open-o'
+      else return 'fa-folder-o'
+    }
+
+    if (isHoveringSelfParent) return 'fa-times-circle primaryColorFont'
+    else return 'fa-arrow-circle-down primaryColorFont'
+  }
+
   render () {
     const { props } = this
 
@@ -19,10 +33,7 @@ class Folder extends React.Component {
 
     const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
 
-    const dropIsActive = props.canDrop && props.isOver
-    const style = {
-      opacity: dropIsActive ? 0.75 : 1
-    }
+    const isDropActive = props.canDrop && props.isOver
 
     return (
       <div
@@ -31,7 +42,6 @@ class Folder extends React.Component {
           'item-last': props.isLast,
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
-        style={{style}}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
@@ -44,18 +54,19 @@ class Folder extends React.Component {
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          <DragHandle connectDragSource={props.connectDragSource} />
+          {props.idRoleUserWorkspace >= ROLE_OBJECT.contentManager.id && (
+            <DragHandle
+              connectDragSource={props.connectDragSource}
+              title={props.t('Move this folder')}
+            />
+          )}
 
           <div
             className='folder__header__dragPreview'
             ref={props.connectDragPreview}
           >
             <div className='folder__header__icon' style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}>
-              <i className={classnames('fa fa-fw', {
-                'fa-folder-open-o': !dropIsActive && props.folderData.isOpen,
-                'fa-folder-o': !dropIsActive && !props.folderData.isOpen,
-                'fa-arrow-circle-down primaryColor': dropIsActive
-              })} />
+              <i className={classnames('fa fa-fw', this.calculateIcon(props.folderData, isDropActive, props.draggedItem))} />
             </div>
 
             <div className='folder__header__name'>
@@ -193,7 +204,8 @@ const folderDndTarget = {
 const folderDndTargetCollect = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   canDrop: monitor.canDrop(),
-  isOver: monitor.isOver({shallow: false})
+  isOver: monitor.isOver({shallow: false}),
+  draggedItem: monitor.getItem()
 })
 
 const folderDndSource = {
@@ -227,7 +239,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDndSource, 
   )
 )
 
-export default FolderContainer
+export default translate()(FolderContainer)
 
 Folder.propTypes = {
   folderData: PropTypes.object,

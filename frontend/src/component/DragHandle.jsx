@@ -6,9 +6,10 @@ require('./DragHandle.styl')
 export const DragHandle = props => (
   <div
     className={`dragHandle ${props.customClass}`}
+    title={props.title}
     ref={props.connectDragSource}
   >
-    <i className='fa fa-ellipsis-v' />
+    <i className='fa fa-arrows' />
   </div>
 )
 
@@ -16,9 +17,11 @@ export default DragHandle
 
 DragHandle.propTypes = {
   connectDragSource: PropTypes.func.isRequired,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  title: PropTypes.string
 }
 
 DragHandle.defaultProps = {
-  customClass: ''
+  customClass: '',
+  title: ''
 }

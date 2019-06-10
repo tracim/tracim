@@ -84,7 +84,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
         }
         return ''
       }
-      if (status >= 400 && status <= 499) return ''
+      if (status >= 400 && status <= 499) return fetchResult.json()
       if (status >= 500 && status <= 599) {
         dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger', 8000))
         return

@@ -38,7 +38,7 @@ import appFactory from '../appFactory.js'
 import {
   ROLE,
   PAGE,
-  findIdRoleUserWorkspace,
+  findUserWorkspaceRoleId,
   PROFILE
 } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
@@ -384,7 +384,7 @@ class Dashboard extends React.Component {
           creationLabel: ''
         },
         props.user,
-        findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
+        findUserWorkspaceRoleId(props.user.user_id, props.curWs.memberList, ROLE),
         {...props.curWs, workspace_id: props.curWs.id}
       )
     } else {
@@ -415,7 +415,7 @@ class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
+    const idRoleUserWorkspace = findUserWorkspaceRoleId(props.user.user_id, props.curWs.memberList, ROLE)
 
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList

@@ -58,8 +58,6 @@
   "Password": "Password",
   "Forgotten password ?": "Forgotten password ?",
   "Error while loading read status list": "Error while loading read status list",
-  "Error while archiving document": "Error while archiving document",
-  "Error while deleting document": "Error while deleting document",
   "List of contents": "List of contents",
   "This shared space has no content yet, create the first content by clicking on the button 'Create'": "This shared space has no content yet, create the first content by clicking on the button 'Create'",
   "Calendar": "Calendar",
@@ -183,5 +181,12 @@
   "see shared space": "see shared space",
   "hide shared space": "hide shared space",
   "see sidebar": "see sidebar",
-  "hide sidebar": "hide sidebar"
+  "hide sidebar": "hide sidebar",
+  "Error while archiving content": "Error while archiving content",
+  "Error while deleting content": "Error while deleting content",
+  "Error while moving content": "Error while moving content",
+  "Move this content": "Move this content",
+  "Move this folder": "Move this folder",
+  "A content with same name already exists": "A content with same name already exists",
+  "The destination folder doesn't allow this content type": "The destination folder doesn't allow this content type"
 }

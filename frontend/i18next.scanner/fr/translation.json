@@ -41,8 +41,6 @@
   "Please set a name or email": "Entrez un nom, s'il vous plaît",
   "Please set a role": "Choisissez un rôle s'il vous plaît",
   "Thank you for trusting us and using our collaborative tool": "Merci de nous faire confiance et d'utiliser notre outil collaboratif.",
-  "Error while archiving document": "Erreur lors de l'archivage d'un document",
-  "Error while deleting document": "Erreur lors de la suppression d'un document",
   "Feature": "Fonctionnalité",
   "Explore": "Explorer",
   "About": "A propos",
@@ -183,5 +181,12 @@
   "see shared space": "voir l'espace partagé",
   "hide shared space": "masquer l'espace partagé",
   "see sidebar": "voir la barre latérale",
-  "hide sidebar": "masquer la barre latérale"
+  "hide sidebar": "masquer la barre latérale",
+  "Error while archiving content": "Erreur lors de l'archivage du contenu",
+  "Error while deleting content": "Erreur lors de la suppression du contenu",
+  "Error while moving content": "Erreur lors du déplacement du contenu",
+  "Move this content": "Déplacer ce contenu",
+  "Move this folder": "Déplacer ce dossier",
+  "A content with same name already exists": "Un contenu avec le même nom existe déjà",
+  "The destination folder doesn't allow this content type": "Le dossier de destination n'autorise pas ce type de contenu"
 }

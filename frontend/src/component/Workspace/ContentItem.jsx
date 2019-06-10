@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { DragSource } from 'react-dnd'
-import { DRAG_AND_DROP } from '../../helper.js'
+import { ROLE_OBJECT, DRAG_AND_DROP } from '../../helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import DragHandle from '../DragHandle.jsx'
 import { Badge } from 'tracim_frontend_lib'
@@ -27,7 +27,12 @@ const ContentItem = props => {
       to={props.urlContent}
       style={dropStyle}
     >
-      <DragHandle connectDragSource={props.connectDragSource} />
+      {props.idRoleUserWorkspace >= ROLE_OBJECT.contentManager.id && (
+        <DragHandle
+          connectDragSource={props.connectDragSource}
+          title={props.t('Move this content')}
+        />
+      )}
 
       <div
         className='content__dragPreview'

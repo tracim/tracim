@@ -6,7 +6,7 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   ROLE,
-  findIdRoleUserWorkspace
+  findUserWorkspaceRoleId
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -335,6 +335,13 @@ class WorkspaceContent extends React.Component {
         props.dispatch(moveWorkspaceContent(source, actionDestination))
         this.loadContentList(state.idWorkspaceInUrl)
         break
+      case 400:
+        switch (fetchMoveContent.json.code) {
+          case 3002: props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'warning')); break
+          case 2038: props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'warning')); break
+          default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'warning'))
+        }
+        break
       default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'warning'))
     }
   }
@@ -383,7 +390,7 @@ class WorkspaceContent extends React.Component {
 
     const rootContentList = filteredWorkspaceContentList.filter(c => c.idParent === null) // .sort((a, b) => a.type !== 'folder' && b.type === 'folder')
 
-    const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
+    const idRoleUserWorkspace = findUserWorkspaceRoleId(user.user_id, currentWorkspace.memberList, ROLE)
 
     const createContentAvailableApp = contentType
       .filter(ct => ct.slug !== 'comment')

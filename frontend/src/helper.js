@@ -81,13 +81,12 @@ export const ROLE = [{
   label: 'Reader' // label must be used in components
 }]
 
-export const findIdRoleUserWorkspace = (idUser, memberList, roleList) => {
+export const findUserWorkspaceRoleId = (idUser, memberList, roleList) => {
   const myself = memberList.find(u => u.id === idUser) || {role: 'reader'}
   return (roleList.find(r => myself.role === r.slug) || {id: 1}).id
 }
 
-// Côme - 2018/08/21 - useful ?
-export const ROLE2 = {
+export const ROLE_OBJECT = {
   reader: {
     id: 1,
     sluf: 'reader',
