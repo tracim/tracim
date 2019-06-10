@@ -18,7 +18,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  ListItemWrapper
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -459,26 +460,32 @@ class WorkspaceContent extends React.Component {
                         />
                       )
                       : (
-                        <ContentItem
+                        <ListItemWrapper
                           label={content.label}
-                          fileName={content.fileName}
-                          fileExtension={content.fileExtension}
-                          faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                          statusSlug={content.statusSlug}
                           read={currentWorkspace.contentReadStatusList.includes(content.id)}
                           contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                          urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
-                          idRoleUserWorkspace={idRoleUserWorkspace}
-                          onClickExtendedAction={{
-                            edit: e => this.handleClickEditContentItem(e, content),
-                            move: null, // e => this.handleClickMoveContentItem(e, content),
-                            download: e => this.handleClickDownloadContentItem(e, content),
-                            archive: e => this.handleClickArchiveContentItem(e, content),
-                            delete: e => this.handleClickDeleteContentItem(e, content)
-                          }}
                           isLast={i === rootContentList.length - 1}
                           key={content.id}
-                        />
+                        >
+                          <ContentItem
+                            label={content.label}
+                            fileName={content.fileName}
+                            fileExtension={content.fileExtension}
+                            faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                            statusSlug={content.statusSlug}
+                            contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
+                            urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
+                            idRoleUserWorkspace={idRoleUserWorkspace}
+                            onClickExtendedAction={{
+                              edit: e => this.handleClickEditContentItem(e, content),
+                              move: null, // e => this.handleClickMoveContentItem(e, content),
+                              download: e => this.handleClickDownloadContentItem(e, content),
+                              archive: e => this.handleClickArchiveContentItem(e, content),
+                              delete: e => this.handleClickDeleteContentItem(e, content)
+                            }}
+                            key={content.id}
+                          />
+                        </ListItemWrapper>
                       )
                     )
                 }

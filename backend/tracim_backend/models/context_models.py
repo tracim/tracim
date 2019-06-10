@@ -1,4 +1,5 @@
 # coding=utf-8
+import base64
 import cgi
 from datetime import datetime
 from enum import Enum
@@ -48,11 +49,13 @@ class ConfigModel(object):
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
         webdav_url: str,
+        search_enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
         self.webdav_enabled = webdav_enabled
         self.webdav_url = webdav_url
+        self.search_enabled = search_enabled
 
 
 class ErrorCodeModel(object):
@@ -392,7 +395,7 @@ class ContentFilter(object):
         show_active: int = 1,
         content_type: str = None,
         label: str = None,
-        offset: int = None,
+        page_nb: int = None,
         limit: int = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
@@ -402,7 +405,7 @@ class ContentFilter(object):
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
         self.limit = limit
-        self.offset = offset
+        self.page_nb = page_nb
         self.label = label
         self.content_type = content_type
 
@@ -791,6 +794,57 @@ class ContentInContext(object):
         return self.content.workspace_id
 
     @property
+    def workspace(self) -> Workspace:
+        return self.content.workspace
+
+    @property
+    def parent(self) -> typing.Optional["ContentInContext"]:
+        if self.content.parent:
+            from tracim_backend.lib.core.content import ContentApi
+
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
+            )
+            return content_api.get_content_in_context(self.content.parent)
+        return None
+
+    @property
+    def parents(self) -> typing.List["ContentInContext"]:
+        parents = []
+        if self.parent:
+            parents.append(self.parent)
+            parent = self.parent
+            while parent.parent is not None:
+                parents.append(parent.parent)
+                parent = parent.parent
+        return parents
+
+    @property
+    def comments(self) -> typing.List["ContentInContext"]:
+        comments_in_context = []
+        for comment in self.content.get_comments():
+            from tracim_backend.lib.core.content import ContentApi
+
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config,
+                show_deleted=True,
+                show_archived=True,
+                show_active=True,
+                show_temporary=True,
+            )
+            comment_in_context = content_api.get_content_in_context(comment)
+            comments_in_context.append(comment_in_context)
+        return comments_in_context
+
+    @property
     def label(self) -> str:
         return self.content.label
 
@@ -812,8 +866,42 @@ class ContentInContext(object):
         return self.content.is_archived
 
     @property
+    def archived_through_parent_id(self) -> typing.Optional[int]:
+        from tracim_backend.lib.core.content import ContentApi
+
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.get_archived_parent_id(self.content)
+
+    @property
     def is_deleted(self) -> bool:
         return self.content.is_deleted
+
+    @property
+    def deleted_through_parent_id(self) -> typing.Optional[int]:
+        from tracim_backend.lib.core.content import ContentApi
+
+        content_api = ContentApi(
+            current_user=self._user,
+            session=self.dbsession,
+            config=self.config,
+            show_deleted=True,
+            show_archived=True,
+            show_active=True,
+            show_temporary=True,
+        )
+        return content_api.get_deleted_parent_id(self.content)
+
+    @property
+    def is_active(self) -> bool:
+        return self.content.is_active
 
     @property
     def is_editable(self) -> bool:
@@ -1003,6 +1091,11 @@ class ContentInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.content.file_name)
+
+    def get_b64_file(self) -> typing.Optional[str]:
+        if self.content.depot_file:
+            return base64.b64encode(self.content.depot_file.file.read()).decode("ascii")
+        return None
 
 
 class RevisionInContext(object):
