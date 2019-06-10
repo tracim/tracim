@@ -104,6 +104,20 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 advanced_setup.session_data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
 advanced_setup.session_lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
 
+### pyramid_beaker parameters ###
+session.type = file
+session.data_dir = %(advanced_setup.session_data_dir)s
+session.lock_dir = %(advanced_setup.session_lock_dir)s
+session.key = session_key
+session.secret = %(basic_setup.session_secret)s
+session.save_accessed_time = True
+## Delay in seconds
+session.cookie_expires = 604800
+session.timeout = 604800
+session.cookie_on_exception = True
+## custom tracim pyramid_beaker parameter
+; session.reissue_time = 120
+
 ####
 # AUTH
 ####
@@ -405,20 +419,6 @@ pyramid.debug_routematch = False
 pyramid.default_locale_name = en
 ## More info here:
 ## https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/i18n.html#localization-deployment-settings
-
-### pyramid_beaker parameters ###
-session.type = file
-session.data_dir = %(advanced_setup.session_data_dir)s
-session.lock_dir = %(advanced_setup.session_lock_dir)s
-session.key = session_key
-session.secret = %(basic_setup.session_secret)s
-session.save_accessed_time = True
-## Delay in seconds
-session.cookie_expires = 604800
-session.timeout = 604800
-session.cookie_on_exception = True
-## custom tracim pyramid_beaker parameter
-; session.reissue_time = 120
 
 ### pyramid optionals plugins ###
 #required plugin are imported directly in tracim source code
