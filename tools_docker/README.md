@@ -25,23 +25,31 @@ Used port in container:
 
 * 80 (Tracim HTTP API and web user interface)
 
-If you want to use webdav:
+You can also use this list of [supported var](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md) (this var are from development.ini.sample conf file)
 
-* START_WEBDAV=1
+If you want to activate notification by email:
 
-If you want to use reply_by_email function:
+* EMAIL_NOTIFICATION=1 (In this case you need to give some smtp parameter visible in (develoment.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
 
-* REPLY_BY_EMAIL=1 (if email reply is enabled)
+If you want to use reply_by_email feature:
 
-If you want to use async for sendinf email:
+* REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in (develoment.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
 
-* EMAIL_MODE_ASYNC=1 (for async email notification)
+If you don't want to use webdav:
 
-If you want to use caldav:
+* START_WEBDAV=0 (to deactivate webdav in tracim)
 
-* START_CALDAV=1 (to activate agenda in tracim)
+If you don't want to use caldav:
+
+* START_CALDAV=0 (to deactivate agenda in tracim)
 
 #### Example commands
+
+Exemple with basic instance of tracim (local usage with webdav and caldav):
+
+        docker run -e DATABASE_TYPE=sqlite \
+               -p 8080:80 \
+               -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
 
 To run tracim container with MySQL or PostgreSQL, you must set environment ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` variable.
 
@@ -65,18 +73,23 @@ Example with SQLite
                -p 8080:80 \
                -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
                
-Exemple with SQlite, webdav, reply_by_email, email_mode_async and caldav:
+Exemple with SQlite, email_notification and some small instance personnalisation:
 
     docker run -e DATABASE_TYPE=sqlite \
-               -e START_WEBDAV=1 \
-               -e REPLY_BY_EMAIL=1 \
-               -e EMAIL_MODE_ASYNC=1 \
-               -e START_CALDAV=1 \
+               -e EMAIL_NOTIFICATION=1 \
+               -e TRACIM_EMAIL__NOTIFICATION__SMTP__SERVER=xxxx.servermail.xx \
+               -e TRACIM_EMAIL__NOTIFICATION__SMTP__PORT=25 \
+               -e TRACIM_EMAIL__NOTIFICATION__SMTP__USER=xxxxxxxxxx \
+               -e TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD=xxxxxxxxxx \
+               -e TRACIM_WEBSITE__TITLE=xxxxxx
+               -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain}
                -p 8080:80 \
                -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+               
+With this exemple, tracim is now accessible on my network and I can send notification by email when content change.
 
 
-After execute one of these command, tracim will be available on your system on port 8080.
+⚠ After execute one of these command, tracim will be available on your system on port 8080.
 
 ### Build images
 

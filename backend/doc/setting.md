@@ -33,8 +33,6 @@ Priority order is (from less to most priority):
  | WEBSITE__BASE_URL | TRACIM_WEBSITE__BASE_URL | website.base_url |
  | API__BASE_URL | TRACIM_API__BASE_URL | api.base_url |
  | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN | cors.access-control-allowed-origin |
- | WEBSITE__SERVER_NAME | TRACIM_WEBSITE__SERVER_NAME | website.server_name |
- | WEBSITE__SERVER_NAME | TRACIM_WEBSITE__SERVER_NAME | website.server_name |
  | USER__AUTH_TOKEN__VALIDITY | TRACIM_USER__AUTH_TOKEN__VALIDITY | user.auth_token.validity |
  | USER__RESET_PASSWORD__VALIDITY | TRACIM_USER__RESET_PASSWORD__VALIDITY | user.reset_password.validity |
  | USER__RESET_PASSWORD__TOKEN_LIFETIME | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME | user.reset_password.token_lifetime |
@@ -46,7 +44,6 @@ Priority order is (from less to most priority):
  | FRONTEND__DIST_FOLDER_PATH | TRACIM_FRONTEND__DIST_FOLDER_PATH | frontend.dist_folder_path |
  | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION | TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION | email.notification.enabled_on_invitation |
  | EMAIL__NOTIFICATION__FROM__EMAIL | TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL | email.notification.from.email |
- | EMAIL__NOTIFICATION__FROM | TRACIM_EMAIL__NOTIFICATION__FROM | email.notification.from |
  | EMAIL__NOTIFICATION__FROM | TRACIM_EMAIL__NOTIFICATION__FROM | email.notification.from |
  | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL | TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL | email.notification.from.default_label |
  | EMAIL__NOTIFICATION__REPLY_TO__EMAIL | TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL | email.notification.reply_to.email |
@@ -440,6 +437,10 @@ for default config file.
 
 # Search method using elastic_search (tracim 2.3+) #
 
+⚠ Be careful: if you use elasticsearch with tracim you need to export this variable first
+
+    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
+
 First, you need an elastic_search server. An easy way to have one with docker can be (don't use for production):
 
 `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
@@ -447,6 +448,7 @@ First, you need an elastic_search server. An easy way to have one with docker ca
 You then need to setup config file:
 
     search.enabled = True
+    search.engine = elasticsearch
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
 
