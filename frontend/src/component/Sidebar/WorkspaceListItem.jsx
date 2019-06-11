@@ -35,9 +35,9 @@ const buildLink = (route, search, workspaceId, activeIdWorkspace) => {
 }
 
 const WorkspaceListItem = props => {
-  const dropIsActive = props.canDrop && props.isOver
+  const isDropActive = props.canDrop && props.isOver
   const isDropAllowed = props.userWorkspaceRoleId >= ROLE_OBJECT.contributor.id
-  const isHoveringSelfWorkspace = props.draggedItem && props.draggedItem.workspaceId === props.workspaceId
+  const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
   return (
     <li
@@ -55,8 +55,8 @@ const WorkspaceListItem = props => {
             color: color(GLOBAL_primaryColor).light() ? '#333333' : '#fdfdfd'
           }}
         >
-          {dropIsActive
-            ? isDropAllowed && !isHoveringSelfWorkspace
+          {isDropActive
+            ? isDropAllowed && isDropAllowedOnWorkspaceRoot
               ? <i className='fa fa-arrow-circle-down' />
               : <i className='fa fa-times-circle' />
             : props.label.substring(0, 2).toUpperCase()

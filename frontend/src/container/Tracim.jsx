@@ -47,7 +47,8 @@ import {
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
-  appendBreadcrumbs, setWorkspaceListMemberList
+  appendBreadcrumbs,
+  setWorkspaceListMemberList
 } from '../action-creator.sync.js'
 
 class Tracim extends React.Component {
