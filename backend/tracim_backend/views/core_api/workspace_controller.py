@@ -6,6 +6,8 @@ import transaction
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ConflictingMoveInChild
+from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
@@ -501,6 +503,8 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ConflictingMoveInItself, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ConflictingMoveInChild, HTTPStatus.BAD_REQUEST)
     @check_right(can_move_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())

@@ -453,3 +453,11 @@ class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
 
 class ContentStatusException(TracimError):
     error_code = ErrorCode.INVALID_STATUS_CHANGE
+
+
+class ConflictingMoveInItself(TracimException):
+    error_code = ErrorCode.CONFLICTING_MOVE_IN_ITSELF
+
+
+class ConflictingMoveInChild(TracimException):
+    error_code = ErrorCode.CONFLICTING_MOVE_IN_CHILD
