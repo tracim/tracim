@@ -6,7 +6,8 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   ROLE,
-  findUserWorkspaceRoleId
+  findUserWorkspaceRoleId,
+  ROLE_OBJECT
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -329,6 +330,12 @@ class WorkspaceContent extends React.Component {
     if (source.workspaceId === destination.workspaceId && source.parentId === destination.parentId) return
     if (source.contentId === destination.parentId) return
     if (source.subFolderIdList && source.subFolderIdList.some(subFolderId => destination.parentId === subFolderId)) return
+
+    if (source.workspaceId !== destination.workspaceId) {
+      const destinationMemberList = props.workspaceList.find(ws => ws.id === destination.workspaceId).memberList
+      const userRoleIdInDestination = findUserWorkspaceRoleId(props.user.user_id, destinationMemberList, ROLE)
+      if (userRoleIdInDestination < ROLE_OBJECT.contributor.id) return
+    }
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     switch (fetchMoveContent.status) {
