@@ -325,8 +325,6 @@ class WorkspaceContent extends React.Component {
   handleDropMoveContent = async (source, destination) => {
     const { props, state } = this
 
-    console.log('source', source, 'destination', destination)
-
     if (source.workspaceId === destination.workspaceId && source.parentId === destination.parentId) return
     if (source.contentId === destination.parentId) return
     if (source.subFolderIdList && source.subFolderIdList.some(subFolderId => destination.parentId === subFolderId)) return

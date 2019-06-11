@@ -41,7 +41,8 @@ const WorkspaceListItem = props => {
 
   return (
     <li
-      className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'
+      className='sidebar__content__navigation__workspace__item'
+      data-cy='sidebar__content__navigation__workspace__item'
       ref={props.connectDropTarget}
     >
       <div
