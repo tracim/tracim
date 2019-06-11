@@ -33,7 +33,7 @@ class searchResult extends React.Component {
       contentTypes: ALL_CONTENT_TYPES,
       showArchived: 0,
       showDeleted: 0,
-      showActive: 0
+      showActive: 1
     }
   }
 
