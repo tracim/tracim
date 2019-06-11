@@ -693,9 +693,9 @@ export const getLoggedUserCalendar = () => dispatch => {
   })
 }
 
-export const getSearchedKeywords = (showArchived, contentTypes, showDeleted, showActive, searchedKeywords, pageNumber, sizePage) => dispatch => {
+export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived}&content_types=${contentTypes}&show_deleted=${showDeleted}&show_active=${showActive}&search_string=${searchedKeywords}&page_nb=${pageNumber}&size=${sizePage}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived}&content_types=${contentTypes}&show_deleted=${showDeleted}&show_active=${showActive}&search_string=${searchedKeywords}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {

@@ -120,8 +120,6 @@ export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${B
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
 export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS}/${APP_FEATURE}` })
 
-export const SEARCH = 'Search'
-export const resetSearch = () => ({ type: `${RESET}/${SEARCH}` })
 export const SEARCH_RESULTS_LIST = 'SearchResultsList'
 export const setSearchResultsList = newSearchResultsList => ({ type: `${SET}/${SEARCH_RESULTS_LIST}`, newSearchResultsList })
 export const appendSearchResultsList = appendSearchResultsList => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST}`, appendSearchResultsList })

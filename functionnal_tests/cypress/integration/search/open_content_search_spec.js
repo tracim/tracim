@@ -21,9 +21,9 @@ describe('Searching keywords', () => {
     cy.loginAs('users')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
+      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
       cy.createHtmlDocument(htmlDocTitle, workspaceId)
       cy.createThread(threadTitle, workspaceId)
-      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     })
     cy.logout()
   })
@@ -31,6 +31,7 @@ describe('Searching keywords', () => {
   beforeEach(function () {
     cy.loginAs('users')
     cy.visitPage({pageName: PAGES.HOME})
+    cy.ignoreTinyMceError()
   })
 
   describe('and clicking in a thread result', () => {

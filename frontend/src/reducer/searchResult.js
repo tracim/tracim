@@ -1,13 +1,11 @@
 import {
   SET,
-  RESET,
   APPEND,
   SEARCH_RESULTS_LIST,
   CURRENT_NUMBER_SEARCH_RESULTS,
   SEARCHED_KEYWORDS,
   SEARCH_RESULTS_BY_PAGE,
-  SEARCH_CURRENT_PAGE,
-  SEARCH
+  SEARCH_CURRENT_PAGE
 } from '../action-creator.sync.js'
 
 const defaultResult = {
@@ -25,9 +23,6 @@ export default function searchResult (state = defaultResult, action) {
 
     case `${APPEND}/${SEARCH_RESULTS_LIST}`:
       return {...state, resultsList: [...state.resultsList, ...action.appendSearchResultsList]}
-
-    case `${RESET}/${SEARCH}`:
-      return defaultResult
 
     case `${SET}/${SEARCHED_KEYWORDS}`:
       return {...state, searchedKeywords: action.searchedKeywords}

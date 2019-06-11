@@ -30,10 +30,10 @@ class searchResult extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showArchived: 0,
       contentTypes: ALL_CONTENT_TYPES,
+      showArchived: 0,
       showDeleted: 0,
-      showActive: 1
+      showActive: 0
     }
   }
 
@@ -55,24 +55,26 @@ class searchResult extends React.Component {
     return parentPath
   }
 
-  putContentName = (content) => {
+  getContentName = (content) => {
     // FIXME - GB - 2019-06-04 - we need to have a better way to check if it is a file than using contentType[1]
     // https://github.com/tracim/tracim/issues/1840
     const { props } = this
+    let contentName = ''
 
     if (props.contentType.length > 1) {
-      return content.content_type === props.contentType[1].slug ? content.filename : content.label
+      contentName = content.content_type === props.contentType[1].slug ? content.filename : content.label
     } else {
-      props.dispatch(newFlashMessage(props.t('An error has happened'), 'error'))
+      props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
     }
+    return contentName
   }
 
   handleClickSeeMore = async () => {
     const { props, state } = this
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      state.showArchived, state.contentTypes, state.showDeleted, state.showActive,
-      props.searchResult.searchedKeywords, props.searchResult.currentNumberPage + 1, props.searchResult.numberResultsByPage
+      state.contentTypes, props.searchResult.searchedKeywords, props.searchResult.currentNumberPage + 1,
+      props.searchResult.numberResultsByPage, state.showArchived, state.showDeleted, state.showActive
     ))
 
     switch (fetchGetSearchedKeywords.status) {
@@ -165,7 +167,7 @@ class searchResult extends React.Component {
                   >
                     <ContentItemSearch
                       label={searchItem.label}
-                      path={`${searchItem.workspace.label}/${this.findPath(searchItem.parents)}${this.putContentName(searchItem)}`}
+                      path={`${searchItem.workspace.label}/${this.findPath(searchItem.parents)}${this.getContentName(searchItem)}`}
                       lastModificationAuthor={searchItem.last_modifier.public_name}
                       lastModificationTime={displayDistanceDate(searchItem.modified, this.props.user.lang)}
                       fileExtension={searchItem.file_extension}
