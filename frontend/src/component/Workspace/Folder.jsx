@@ -8,13 +8,17 @@ import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import { PAGE, ROLE_OBJECT, DRAG_AND_DROP } from '../../helper.js'
+import {
+  PAGE,
+  ROLE_OBJECT,
+  DRAG_AND_DROP,
+  CONTENT_TYPE
+} from '../../helper.js'
 
 require('./Folder.styl')
 
 class Folder extends React.Component {
   calculateIcon = (folder, isDropActive, draggedItem = null) => {
-    const isHoveringSelfParent = draggedItem && draggedItem.parentId === folder.id
     const isHoveringSelf = draggedItem && draggedItem.contentId === folder.id
 
     if (!isDropActive || isHoveringSelf) {
@@ -22,7 +26,10 @@ class Folder extends React.Component {
       else return 'fa-folder-o'
     }
 
-    if (isHoveringSelfParent) return 'fa-times-circle primaryColorFont'
+    const isHoveringSelfParent = draggedItem && draggedItem.parentId === folder.id
+    const isHoveringChildrenFolder = draggedItem.subFolderIdList && draggedItem.subFolderIdList.some(subFolderId => folder.id === subFolderId)
+
+    if (isHoveringSelfParent || isHoveringChildrenFolder) return 'fa-times-circle primaryColorFont'
     else return 'fa-arrow-circle-down primaryColorFont'
   }
 
@@ -212,7 +219,8 @@ const folderDndSource = {
   beginDrag: props => ({
     workspaceId: props.folderData.idWorkspace,
     contentId: props.folderData.id,
-    parentId: props.folderData.idParent || 0
+    parentId: props.folderData.idParent || 0,
+    subFolderIdList: props.folderData.content.filter(c => c.type === CONTENT_TYPE.FOLDER).map(c => c.id)
   }),
   endDrag (props, monitor) {
     const item = monitor.getItem()
