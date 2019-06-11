@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands.js'
+import {SELECTORS as s} from '../../support/generic_selector_commands.js'
 
 describe('App Agenda', () => {
   let workspace1 = {}
@@ -40,8 +41,8 @@ describe('App Agenda', () => {
       cy.get(`.sidebar__content__navigation__workspace__item__name[title="${workspace2.label}"]`)
         .click()
 
-      cy.get(`[data-cy="sidebar__content__navigation__workspace__item_${workspace2.workspace_id}"]`)
-        .find('[data-cy="sidebarSubdropdown-agenda"]')
+      cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: workspace2.workspace_id } })
+        .find('[data-cy="sidebar_subdropdown-agenda"]')
         .click()
 
       cy.get('[data-cy="layoutPageTitle"]')
