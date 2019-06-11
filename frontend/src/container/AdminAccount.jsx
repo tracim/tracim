@@ -219,16 +219,15 @@ class Account extends React.Component {
 
   handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
 
-  // INFO - GB - 2019-06-06 - This function is needed because i18next do not handle special characters and the phrase order change depending of the language
+  // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
   // https://github.com/tracim/tracim/issues/1847
-  setTitleAccordingToLang = () => {
+  setTitle () {
     const { props, state } = this
 
-    if (props.user.lang === 'en') {
-      return `${state.userToEdit.public_name} ${props.t('account edition')}`
-    } else {
-      return `${props.t('account edition')} ${state.userToEdit.public_name}`
-    }
+    return <div dangerouslySetInnerHTML={
+      {__html: props.t('{{userName}} account edition',
+        {userName: state.userToEdit.public_name, interpolation: {escapeValue: false}}
+      )}} />
   }
 
   render () {
@@ -240,7 +239,7 @@ class Account extends React.Component {
           <PageWrapper customClass='account'>
             <PageTitle
               parentClass={'account'}
-              title={this.setTitleAccordingToLang()}
+              title={this.setTitle()}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
             />

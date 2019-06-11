@@ -225,9 +225,13 @@ class Agenda extends React.Component {
       shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
     }
 
+    // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
+    // https://github.com/tracim/tracim/issues/1847
     const pageTitle = state.config.appConfig.idWorkspace === null
       ? props.t('All my agendas')
-      : `${props.t('Agenda of shared space')} ${state.content.workspaceLabel}`
+      : <div dangerouslySetInnerHTML={
+        {__html: props.t('Agenda of shared space {{workspaceLabel}}', {workspaceLabel: state.content.workspaceLabel, interpolation: {escapeValue: false}})}
+        } />
 
     return (
       <PageWrapper customClass='agendaPage'>
