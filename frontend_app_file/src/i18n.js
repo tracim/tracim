@@ -9,6 +9,8 @@ i18n
     ns: ['translation'], // namespace
     defaultNS: 'translation',
     debug: false,
+    nsSeparator: false,
+    keySeparator: false,
     // interpolation: {
     //   escapeValue: false, // not needed for react!!
     // },

@@ -9,6 +9,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UserCantRemoveHisOwnRoleInWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
+from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -18,6 +19,10 @@ __author__ = "damien"
 
 
 class RoleApi(object):
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
+        self._session = session
+        self._user = current_user
+        self._config = config
 
     # TODO - G.M - 29-06-2018 - [Cleanup] Drop this
     # ALL_ROLE_VALUES = UserRoleInWorkspace.get_all_role_values()
@@ -59,6 +64,21 @@ class RoleApi(object):
     #         return tested_role in cls.members_read_rights[reader_role]
     #     return False
 
+    def get_user_workspaces_ids(self, user_id: int, min_role: int) -> typing.List[int]:
+        assert self._user.profile == Group.TIM_ADMIN or self._user.user_id == user_id
+        workspaces_ids_tuples = (
+            self._session.query(UserRoleInWorkspace.workspace_id)
+            .filter(UserRoleInWorkspace.user_id == user_id)
+            .filter(UserRoleInWorkspace.role >= min_role)
+            .join(Workspace)
+            .filter(Workspace.is_deleted == False)  # noqa: E711
+            .all()
+        )
+        workspaces_ids = []
+        for workspace_tuple in workspaces_ids_tuples:
+            workspaces_ids.append(workspace_tuple[0])
+        return workspaces_ids
+
     def get_user_role_workspace_with_context(
         self, user_role: UserRoleInWorkspace, newly_created: bool = None, email_sent: bool = None
     ) -> UserRoleWorkspaceInContext:
@@ -74,11 +94,6 @@ class RoleApi(object):
             email_sent=email_sent,
         )
         return workspace
-
-    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
-        self._session = session
-        self._user = current_user
-        self._config = config
 
     def _get_one_rsc(self, user_id: int, workspace_id: int) -> Query:
         """

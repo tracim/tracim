@@ -518,7 +518,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     show_active = marshmallow.fields.Int(
         example=1,
         default=1,
-        description="f set to 1, then show active contents. "
+        description="if set to 1, then show active contents. "
         "Default is 1 - show active content."
         " Note: active content are content "
         "that is neither archived nor deleted. "
@@ -766,6 +766,7 @@ class ConfigSchema(marshmallow.Schema):
     new_user_invitation_do_notify = marshmallow.fields.Bool()
     webdav_enabled = marshmallow.fields.Bool()
     webdav_url = marshmallow.fields.String()
+    search_enabled = marshmallow.fields.Bool()
 
 
 class ErrorCodeSchema(marshmallow.Schema):

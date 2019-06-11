@@ -42,6 +42,7 @@ requires = [
     'python-slugify',
     'preview-generator>=0.10',
     'colour',
+    'python-dateutil',
     # mail-notifier
     'mako',
     'lxml',
@@ -65,13 +66,15 @@ requires = [
     'requests',
     # caldav support
     'radicale',
-    'caldav'
+    'caldav',
+    # search support
+    'elasticsearch',
+    'elasticsearch-dsl'
 ]
 
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
-    'pytest-cov',
     'pytest-dotenv',
     'parameterized',
     'responses',
@@ -152,7 +155,11 @@ setup(
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand'
+            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',
+            'search init = tracim_backend.command.search:SearchIndexInitCommand',
+            'search index = tracim_backend.command.search:SearchIndexIndexCommand',
+            'search upgrade = tracim_backend.command.search:SearchIndexUpgradeCommand',
+            'search delete = tracim_backend.command.search:SearchIndexDeleteCommand',
         ]
     },
     message_extractors={'tracim_backend': [

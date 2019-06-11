@@ -199,7 +199,7 @@ def web(global_config, **local_settings):
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
     if app_config.CALDAV__ENABLED:
-        # FIXME - G.M - 2019-03-18 - check if possible to avoid this import here,
+        # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to
         # pyramid make trouble in hapic which try to get view related
         # to controller but failed.
@@ -220,6 +220,15 @@ def web(global_config, **local_settings):
         configurator.include(agenda_controller.bind, route_prefix=BASE_API_V2)
         configurator.include(radicale_proxy_controller.bind)
 
+    if app_config.SEARCH__ENABLED:
+        # TODO - G.M - 2019-05-17 - check if possible to avoid this import here,
+        # import is here because import SearchController without adding it to
+        # pyramid make trouble in hapic which try to get view related
+        # to controller but failed.
+        from tracim_backend.lib.search.search_factory import SearchFactory
+
+        search_controller = SearchFactory.get_search_controller(app_config)
+        configurator.include(search_controller.bind, route_prefix=BASE_API_V2)
     if app_config.FRONTEND__SERVE:
         configurator.include("pyramid_mako")
         frontend_controller = FrontendController(app_config.FRONTEND__DIST_FOLDER_PATH)
