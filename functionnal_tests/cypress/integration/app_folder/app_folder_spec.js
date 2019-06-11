@@ -32,11 +32,11 @@ describe('App Folder Advanced', function () {
     cy.visitPage({pageName: PAGES.CONTENTS, params: {workspaceId: workspaceId}})
 
     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
-      .find('.extandedaction.dropdown')
+      .find('[data-cy="extended_action"]')
       .click()
 
     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
-      .find('.extandedaction.dropdown .fa.fa-pencil')
+      .find('[data-cy="extended_action_edit"]')
       .click()
 
     cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
@@ -57,6 +57,29 @@ describe('App Folder Advanced', function () {
     cy.get('#appFeatureContainer').children().should('have.length', 0)
   })
 
+  it('should reopen itself after being closed', () => {
+    cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
+
+    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+      .find('[data-cy="popinFixed__header__button__close"]')
+      .click()
+
+    cy.get('#appFeatureContainer').children().should('have.length', 0)
+
+    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+      .find('[data-cy="extended_action"]')
+      .click()
+
+    cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder1.content_id}})
+      .find('[data-cy="extended_action_edit"]')
+      .click()
+
+    cy.get('#appFeatureContainer').children().should('have.length', 1)
+    cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')
+      .find('.folderAdvanced__header__title')
+      .contains(folder1.label)
+  })
+
   it('should reopen and reload data when opening a different folder', () => {
     cy.visitPage({pageName: PAGES.EDIT_FOLDER, params: {workspaceId: workspaceId, folderId: folder1.content_id}})
 
@@ -69,11 +92,11 @@ describe('App Folder Advanced', function () {
       .click()
 
     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder2.content_id}})
-      .find('.extandedaction.dropdown')
+      .find('[data-cy="extended_action"]')
       .click()
 
     cy.getTag({selectorName: s.FOLDER_IN_LIST, params: {folderId: folder2.content_id}})
-      .find('.extandedaction.dropdown .fa.fa-pencil')
+      .find('[data-cy="extended_action_edit"]')
       .click()
 
     cy.get('#appFeatureContainer > [data-cy=popinFixed].folder_advanced')

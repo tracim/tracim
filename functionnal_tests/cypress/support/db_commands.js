@@ -212,7 +212,7 @@ Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
     .request('POST', url, data)
     .then(response => {
       if (response === undefined) {
-        // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
+        // FIXME -  CH - 2019/05/03 - when we send simultaneous request to create contents we
         // end up with an undefined response we need to dig up to find if it's the server or cypress
         // Issue 1836
         cy.log(`undefined response for request to url ${url} and body ${JSON.stringify(data)}`)
