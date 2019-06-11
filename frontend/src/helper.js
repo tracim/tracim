@@ -2,6 +2,9 @@ import i18n, { getBrowserLang } from './i18n.js'
 
 const configEnv = require('../configEnv.json')
 
+const versionFile = require('./version.json')
+export const TRACIM_APP_VERSION = versionFile.tracim_app_version
+
 // this function is declared in i18n to avoid cyclic imports and reexported here for consistency
 export { getBrowserLang }
 
@@ -44,7 +47,8 @@ export const PAGE = {
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
     USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
-  }
+  },
+  RESEARCH_RESULT: '/ui/research-result'
 }
 
 export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA]
@@ -184,3 +188,5 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Cancelled'),
   i18n.t('Deprecated')
 ]
+
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'

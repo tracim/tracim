@@ -42,6 +42,7 @@ requires = [
     'python-slugify',
     'preview-generator>=0.10',
     'colour',
+    'python-dateutil',
     # mail-notifier
     'mako',
     'lxml',
@@ -65,22 +66,34 @@ requires = [
     'requests',
     # caldav support
     'radicale',
-    'caldav'
+    'caldav',
+    # search support
+    'elasticsearch',
+    'elasticsearch-dsl'
 ]
 
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
-    'pytest-cov',
     'pytest-dotenv',
     'parameterized',
-    'pep8',
-    'mypy',
     'responses',
     'mock',
     'Pillow',
-    'freezegun'
+    'freezegun',
 ]
+
+devtools_require=[
+    'flake8',
+    'isort',
+    'mypy',
+    'pre-commit',
+]
+
+
+# add black for python 3.6+
+if sys.version_info.major == 3 and sys.version_info.minor >= 6:
+    devtools_require.append('black')
 
 mysql_require = [
     'PyMySQL'
@@ -121,6 +134,7 @@ setup(
     zip_safe=False,
     extras_require={
         'testing': tests_require,
+        'dev': tests_require + devtools_require,
         'mysql': mysql_require,
         'postgresql': postgresql_require,
     },
@@ -141,7 +155,11 @@ setup(
             'db_delete = tracim_backend.command.database:DeleteDBCommand',
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
-            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand'
+            'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',
+            'search init = tracim_backend.command.search:SearchIndexInitCommand',
+            'search index = tracim_backend.command.search:SearchIndexIndexCommand',
+            'search upgrade = tracim_backend.command.search:SearchIndexUpgradeCommand',
+            'search delete = tracim_backend.command.search:SearchIndexDeleteCommand',
         ]
     },
     message_extractors={'tracim_backend': [

@@ -18,7 +18,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  ListItemWrapper
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -442,11 +443,17 @@ class WorkspaceContent extends React.Component {
                 <ContentItemHeader />
 
                 {state.contentLoaded && workspaceContentList.length === 0
-                  ? (
-                    <div className='workspace__content__fileandfolder__empty'>
-                      {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
-                    </div>
-                  )
+                  ? idRoleUserWorkspace === 1
+                    ? (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t('This shared space has no content yet')}
+                      </div>
+                    )
+                    : (
+                      <div className='workspace__content__fileandfolder__empty'>
+                        {t('This shared space has no content yet') + t(", create the first content by clicking on the button 'Create'")}
+                      </div>
+                    )
                   : rootContentList.length === 0
                     ? (
                       <div className='workspace__content__fileandfolder__empty'>
@@ -481,30 +488,36 @@ class WorkspaceContent extends React.Component {
                         />
                       )
                       : (
-                        <ContentItem
-                          contentId={content.id}
-                          workspaceId={content.idWorkspace}
-                          parentId={content.idParent}
+                        <ListItemWrapper
                           label={content.label}
-                          fileName={content.fileName}
-                          fileExtension={content.fileExtension}
-                          faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                          statusSlug={content.statusSlug}
                           read={currentWorkspace.contentReadStatusList.includes(content.id)}
                           contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                          urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
-                          idRoleUserWorkspace={idRoleUserWorkspace}
-                          onClickExtendedAction={{
-                            edit: e => this.handleClickEditContentItem(e, content),
-                            move: null, // e => this.handleClickMoveContentItem(e, content),
-                            download: e => this.handleClickDownloadContentItem(e, content),
-                            archive: e => this.handleClickArchiveContentItem(e, content),
-                            delete: e => this.handleClickDeleteContentItem(e, content)
-                          }}
-                          onDropMoveContentItem={this.handleDropMoveContent}
                           isLast={i === rootContentList.length - 1}
                           key={content.id}
-                        />
+                        >
+                          <ContentItem
+                            contentId={content.id}
+                            workspaceId={content.idWorkspace}
+                            parentId={content.idParent}
+                            label={content.label}
+                            fileName={content.fileName}
+                            fileExtension={content.fileExtension}
+                            faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                            statusSlug={content.statusSlug}
+                            contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
+                            urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
+                            idRoleUserWorkspace={idRoleUserWorkspace}
+                            onClickExtendedAction={{
+                              edit: e => this.handleClickEditContentItem(e, content),
+                              move: null, // e => this.handleClickMoveContentItem(e, content),
+                              download: e => this.handleClickDownloadContentItem(e, content),
+                              archive: e => this.handleClickArchiveContentItem(e, content),
+                              delete: e => this.handleClickDeleteContentItem(e, content)
+                            }}
+                            onDropMoveContentItem={this.handleDropMoveContent}
+                            key={content.id}
+                          />
+                        </ListItemWrapper>
                       )
                     )
                 }

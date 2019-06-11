@@ -10,6 +10,7 @@ import appList from './appList.js'
 import contentType from './contentType.js'
 import timezone from './timezone.js'
 import system from './system.js'
+import researchResult from './researchResult.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -22,7 +23,8 @@ const rootReducer = combineReducers({
   appList,
   contentType,
   timezone,
-  system
+  system,
+  researchResult
 })
 
 export default rootReducer

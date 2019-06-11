@@ -1,3 +1,5 @@
+import { SELECTORS as s } from '../../support/generic_selector_commands'
+
 describe('Workspace', () => {
   before(() => {
     cy.resetDB()
@@ -14,7 +16,7 @@ describe('Workspace', () => {
     cy.get('[data-cy=homepagecard__btn]').click()
       .get('[data-cy=createcontent__form__input]').type(workspaceTitle)
       .get('[data-cy=popup__createcontent__form__button]').click()
-      .get('[data-cy=sidebar__content__navigation__workspace__item]')
+    cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: 1 } })
       .get('.dashboard')
       .get('[data-cy="dashboardWorkspaceLabel"]')
       .contains(workspaceTitle)

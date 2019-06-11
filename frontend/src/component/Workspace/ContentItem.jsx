@@ -10,8 +10,6 @@ import DragHandle from '../DragHandle.jsx'
 import { Badge } from 'tracim_frontend_lib'
 
 const ContentItem = props => {
-  if (props.contentType === null) return null // this means the endpoint system/content_type hasn't responded yet
-
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
 
   const dropStyle = {
@@ -20,11 +18,9 @@ const ContentItem = props => {
 
   return (
     <Link
-      className={
-        classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
-      }
       title={props.label}
       to={props.urlContent}
+      className='content__item'
       style={dropStyle}
     >
       {props.idRoleUserWorkspace >= ROLE_OBJECT.contentManager.id && (

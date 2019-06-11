@@ -667,6 +667,8 @@ class File extends React.Component {
         <PopinFixedContent
           customClass={`${state.config.slug}__contentpage`}
         >
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
+            https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
@@ -685,6 +687,8 @@ class File extends React.Component {
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isEditable={state.content.is_editable}
+            isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             downloadRawUrl={this.getDownloadRawUrl(state)}

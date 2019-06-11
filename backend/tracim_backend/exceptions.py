@@ -14,6 +14,14 @@ class RunTimeError(TracimError):
     pass
 
 
+class NotWritableDirectory(Exception):
+    pass
+
+
+class NotReadableDirectory(Exception):
+    pass
+
+
 class ContentRevisionUpdateError(RuntimeError):
     pass
 
@@ -91,6 +99,10 @@ class UnknownAgendaType(AgendaException):
 
 
 class NotFound(TracimException):
+    pass
+
+
+class NoValidSearchEngine(TracimException):
     pass
 
 
@@ -240,7 +252,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
-    pass
+    error_code = ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
 
 class EmptyEmailBody(EmptyValueNotAllowed):

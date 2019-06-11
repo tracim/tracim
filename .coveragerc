@@ -1,6 +1,14 @@
-[report]
+[run]
+include = *.py
 omit =
-frontend/*
-backend/tracim_backend/tests/*
-*/python?.?/*
-*/site-packages/nose/*
+    frontend/*
+    backend/tracim_backend/tests/*
+    */python?.?/*
+
+[report]
+include = *.py
+omit =
+    frontend/*
+    backend/tracim_backend/tests/*
+    */python?.?/*
+    */site-packages/nose/*

@@ -14,6 +14,7 @@ import {
   DRAG_AND_DROP,
   CONTENT_TYPE
 } from '../../helper.js'
+import { ListItemWrapper } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
@@ -168,31 +169,39 @@ class Folder extends React.Component {
               />
             )
             : (
-              <ContentItem
-                contentId={content.id}
-                workspaceId={content.idWorkspace}
-                parentId={content.idParent}
+              <ListItemWrapper
                 label={content.label}
-                type={content.type}
-                fileName={content.fileName}
-                fileExtension={content.fileExtension}
-                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
-                statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
-                onClickExtendedAction={{
-                  edit: e => props.onClickExtendedAction.edit(e, content),
-                  move: null, // e => props.onClickExtendedAction.move(e, content),
-                  download: e => props.onClickExtendedAction.download(e, content),
-                  archive: e => props.onClickExtendedAction.archive(e, content),
-                  delete: e => props.onClickExtendedAction.delete(e, content)
-                }}
-                onDropMoveContentItem={props.onDropMoveContentItem}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
-              />
+              >
+                <ContentItem
+                  contentId={content.id}
+                  workspaceId={content.idWorkspace}
+                  parentId={content.idParent}
+                  label={content.label}
+                  type={content.type}
+                  fileName={content.fileName}
+                  fileExtension={content.fileExtension}
+                  faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                  statusSlug={content.statusSlug}
+                  read={props.readStatusList.includes(content.id)}
+                  contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
+                  urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
+                  idRoleUserWorkspace={props.idRoleUserWorkspace}
+                  onClickExtendedAction={{
+                    edit: e => props.onClickExtendedAction.edit(e, content),
+                    move: null, // e => props.onClickExtendedAction.move(e, content),
+                    download: e => props.onClickExtendedAction.download(e, content),
+                    archive: e => props.onClickExtendedAction.archive(e, content),
+                    delete: e => props.onClickExtendedAction.delete(e, content)
+                  }}
+                  onDropMoveContentItem={props.onDropMoveContentItem}
+                  isLast={props.isLast && i === folderContentList.length - 1}
+                  key={content.id}
+                />
+              </ListItemWrapper>
             )
           )}
         </div>
