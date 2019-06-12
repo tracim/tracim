@@ -38,7 +38,7 @@ describe('Searching keywords', () => {
     cy.cancelXHR()
   })
 
-  describe('and clicking in a thread result', () => {
+  describe('and clicking on a thread result', () => {
     it('Should redirect to the content page', () => {
       cy.get(searchInput).type(threadTitle).type('{enter}')
 
@@ -49,7 +49,7 @@ describe('Searching keywords', () => {
     })
   })
 
-  describe('and clicking in a file result', () => {
+  describe('and clicking on a file result', () => {
     it('Should redirect to the content page', () => {
       cy.get(searchInput).type(fileTitle).type('{enter}')
 
@@ -60,7 +60,7 @@ describe('Searching keywords', () => {
     })
   })
 
-  describe('and clicking in a html-document result', () => {
+  describe('and clicking on a html-document result', () => {
     it('Should redirect to the content page', () => {
       cy.get(searchInput).type(htmlDocTitle).type('{enter}')
 

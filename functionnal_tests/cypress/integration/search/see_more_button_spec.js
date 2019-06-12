@@ -19,23 +19,23 @@ let workspaceId
 
 describe('Searching keywords', () => {
   before(function () {
-      cy.resetDB()
-      cy.setupBaseDB()
-      cy.loginAs('users')
-      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-        workspaceId = workspace.workspace_id
-        cy.createHtmlDocument(htmlDocTitle, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle1, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle2, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle3, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle4, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle5, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle6, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle7, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle8, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle9, workspaceId)
-        cy.createHtmlDocument(htmlDocTitle10, workspaceId)
-      })
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('users')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      workspaceId = workspace.workspace_id
+      cy.createHtmlDocument(htmlDocTitle, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle1, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle2, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle3, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle4, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle5, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle6, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle7, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle8, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle9, workspaceId)
+      cy.createHtmlDocument(htmlDocTitle10, workspaceId)
+    })
   })
 
   beforeEach(function () {

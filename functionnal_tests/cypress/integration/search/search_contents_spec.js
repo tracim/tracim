@@ -19,16 +19,16 @@ const contentThreadTitleLongGetter = formatTag({selectorName: s.CONTENT_IN_SEARC
 
 describe('Searching keywords', () => {
   before(function () {
-      cy.resetDB()
-      cy.setupBaseDB()
-      cy.loginAs('administrators')
-      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-        workspaceId = workspace.workspace_id
-        cy.createHtmlDocument(htmlDocTitle, workspaceId)
-        cy.createThread(threadTitle, workspaceId)
-        cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-        cy.createThread(threadTitleLong, workspaceId)
-      })
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      workspaceId = workspace.workspace_id
+      cy.createHtmlDocument(htmlDocTitle, workspaceId)
+      cy.createThread(threadTitle, workspaceId)
+      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+      cy.createThread(threadTitleLong, workspaceId)
+    })
   })
 
   beforeEach(function () {

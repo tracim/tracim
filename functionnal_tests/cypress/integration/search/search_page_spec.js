@@ -12,14 +12,14 @@ let workspaceId
 describe('Searching keywords', () => {
   describe('in the input', () => {
     before(function () {
-        cy.resetDB()
-        cy.setupBaseDB()
-        cy.loginAs('users')
-        cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-          workspaceId = workspace.workspace_id
-          cy.createHtmlDocument(htmlDocTitle, workspaceId)
-          cy.createHtmlDocument(htmlDocTitleLong, workspaceId)
-        })
+      cy.resetDB()
+      cy.setupBaseDB()
+      cy.loginAs('users')
+      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+        workspaceId = workspace.workspace_id
+        cy.createHtmlDocument(htmlDocTitle, workspaceId)
+        cy.createHtmlDocument(htmlDocTitleLong, workspaceId)
+      })
     })
 
     beforeEach(function () {
