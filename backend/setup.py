@@ -160,6 +160,7 @@ setup(
             'search index = tracim_backend.command.search:SearchIndexIndexCommand',
             'search upgrade = tracim_backend.command.search:SearchIndexUpgradeCommand',
             'search delete = tracim_backend.command.search:SearchIndexDeleteCommand',
+            'dev parameters list = tracim_backend.command.devtools:ParametersListCommand'
         ]
     },
     message_extractors={'tracim_backend': [
