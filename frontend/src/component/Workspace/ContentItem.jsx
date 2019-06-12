@@ -9,7 +9,6 @@ const ContentItem = props => {
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
   return (
     <Link
-      title={props.label}
       to={props.urlContent}
       className='content__item'
     >
