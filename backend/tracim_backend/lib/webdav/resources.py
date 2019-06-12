@@ -703,11 +703,7 @@ class FileResource(DAVNonCollection):
 
     @webdav_check_right(is_reader)
     def getContent(self) -> typing.BinaryIO:
-        filestream = compat.BytesIO()
-        filestream.write(self.content.depot_file.file.read())
-        filestream.seek(0)
-
-        return filestream
+        return self.content.depot_file.file
 
     def beginWrite(self, contentType: str = None) -> FakeFileStream:
         return FakeFileStream(
