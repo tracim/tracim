@@ -1401,14 +1401,10 @@ class ContentApi(object):
     def move(
         self,
         item: Content,
-        new_parent: Content,
+        new_parent: Content = None,
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
     ) -> None:
-        if item.content_id == new_parent.content_id:
-            raise ConflictingMoveInItself("You can't move a content into itself")
-        if new_parent in item.get_children(recursively=True):
-            raise ConflictingMoveInChild("You can't move a content into one of its children")
         self._move_current(item, new_parent, must_stay_in_same_workspace, new_workspace)
         self.save(item)
         self._move_children_content_to_new_workspace(item, new_workspace)
@@ -1416,7 +1412,7 @@ class ContentApi(object):
     def _move_current(
         self,
         item: Content,
-        new_parent: Content,
+        new_parent: Content = None,
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
     ) -> None:
@@ -1424,6 +1420,8 @@ class ContentApi(object):
         Move only current content, use _move_children_content_to_new_workspace
         to fix workspace_id of children.
         """
+
+        self._check_move_conflicts(item, new_parent)
 
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
@@ -1500,6 +1498,14 @@ class ContentApi(object):
                         subcontent_type=content_type.slug, content_id=workspace.workspace_id
                     )
                 )
+
+    def _check_move_conflicts(self, content: Content, new_parent: Content = None):
+        if new_parent:
+            if content.content_id == new_parent.content_id:
+                raise ConflictingMoveInItself("You can't move a content into itself")
+            if new_parent in content.get_children(recursively=True):
+                raise ConflictingMoveInChild("You can't move a content into one of its children")
+
 
     def copy(
         self,
