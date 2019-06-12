@@ -48,7 +48,7 @@ export const PAGE = {
     USER: '/ui/admin/user',
     USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
   },
-  RESEARCH_RESULT: '/ui/research-result'
+  SEARCH_RESULT: '/ui/search-result'
 }
 
 export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
