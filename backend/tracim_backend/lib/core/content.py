@@ -1506,7 +1506,6 @@ class ContentApi(object):
             if new_parent in content.get_children(recursively=True):
                 raise ConflictingMoveInChild("You can't move a content into one of its children")
 
-
     def copy(
         self,
         item: Content,
