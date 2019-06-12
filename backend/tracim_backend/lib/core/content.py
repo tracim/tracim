@@ -1406,9 +1406,9 @@ class ContentApi(object):
         new_workspace: Workspace = None,
     ) -> None:
         if item.content_id == new_parent.content_id:
-            raise ConflictingMoveInItself("You cannot copy a folder into itself")
-        if new_parent in item.children:
-            raise ConflictingMoveInChild("The destination folder is in the source folder")
+            raise ConflictingMoveInItself("You can't move a content into itself")
+        if new_parent in item.get_children(recursively=True):
+            raise ConflictingMoveInChild("You can't move a content into one of its children")
         self._move_current(item, new_parent, must_stay_in_same_workspace, new_workspace)
         self.save(item)
         self._move_children_content_to_new_workspace(item, new_workspace)
