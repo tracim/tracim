@@ -1,13 +1,17 @@
 const PAGES = {
   HOME: 'home',
   CONTENTS: 'contents',
-  DASHBOARD: 'dashboard'
+  DASHBOARD: 'dashboard',
+  AGENDA: 'agenda',
+  EDIT_FOLDER: 'editFolder'
 }
 
 const URLS = {
   [PAGES.HOME]: () => '/ui',
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
-  [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`
+  [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
+  [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
+  [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`
 }
 
 /**

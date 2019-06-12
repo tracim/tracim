@@ -17,7 +17,6 @@ const ContentItem = props => {
 
   return (
     <Link
-      title={props.label}
       to={props.urlContent}
       className='content__item'
       style={dropStyle}

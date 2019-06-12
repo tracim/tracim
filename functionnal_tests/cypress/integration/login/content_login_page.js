@@ -25,7 +25,7 @@ describe('Login page', function () {
 })
 // @philippe 08/08/2018 - Not implemented in Tracim_V2.0
 //
-// describe('Content :: homepage > login > research', function () {
+// describe('Content :: homepage > login > search', function () {
 //    before(function () {
 //        cy.visit('/')
 //    })

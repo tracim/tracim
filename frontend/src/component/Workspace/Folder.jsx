@@ -50,6 +50,7 @@ class Folder extends React.Component {
           'item-last': props.isLast,
           'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
+        data-cy={`folder_${props.folderData.id}`}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
@@ -129,7 +130,7 @@ class Folder extends React.Component {
                       idRoleUserWorkspace={props.idRoleUserWorkspace}
                       onClickExtendedAction={{
                         edit: e => props.onClickExtendedAction.edit(e, props.folderData),
-                        move: null, // e => props.onClickExtendedAction.move(e, props.folderData),
+                        move: null,
                         download: e => props.onClickExtendedAction.download(e, props.folderData),
                         archive: e => props.onClickExtendedAction.archive(e, props.folderData),
                         delete: e => props.onClickExtendedAction.delete(e, props.folderData)

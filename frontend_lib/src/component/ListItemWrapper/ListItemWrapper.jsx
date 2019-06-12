@@ -4,13 +4,14 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 const ListItemWrapper = props => {
-  if (props.contentType === null) return null // this means the endpoint system/content_type hasn't responded yet
+  if (props.contentType === null) return null // INFO - CH - 2019-06-10 - this means the endpoint system/content_type hasn't responded yet
 
   return (
     <div
       className={
         classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
       }
+      title={props.label}
     >
       {props.children}
     </div>

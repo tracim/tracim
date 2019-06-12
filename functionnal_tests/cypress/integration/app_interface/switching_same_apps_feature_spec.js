@@ -45,27 +45,45 @@ describe('Hot switching between the same app', () => {
 
   describe('From File to File', () => {
     it('should close first file and open the second one', () => {
-      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: fileTitle}}).click('left')
+      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: fileTitle}})
+        .find('.content__item')
+        .click('left')
+
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(fileTitle)
-      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherFileTitle}}).click('left')
+      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherFileTitle}})
+        .find('.content__item')
+        .click('left')
+
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(anotherFileTitle)
     })
   })
 
   describe('From HtmlDoc to HtmlDoc', () => {
     it('should close first file and open the second one', () => {
-      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: htmlDocTitle}}).click('left')
+      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: htmlDocTitle}})
+        .find('.content__item')
+        .click('left')
+
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(htmlDocTitle)
-      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherHtmlDocTitle}}).click('left')
+      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherHtmlDocTitle}})
+        .find('.content__item')
+        .click('left')
+
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(anotherHtmlDocTitle)
     })
   })
 
     describe('From Thread to Thread', () => {
     it('should close first file and open the second one', () => {
-      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: threadTitle}}).click('left')
+      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: threadTitle}})
+        .find('.content__item')
+        .click('left')
+
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(threadTitle)
-      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherThreadTitle}}).click('left')
+      cy.getTag({selectorName: s.CONTENT_IN_LIST, attrs: {title: anotherThreadTitle}})
+        .find('.content__item')
+        .click('left')
+
       cy.getTag({selectorName: s.CONTENT_FRAME}).contains(anotherThreadTitle)
     })
   })
