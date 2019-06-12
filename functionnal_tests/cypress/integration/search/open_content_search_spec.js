@@ -34,6 +34,10 @@ describe('Searching keywords', () => {
     cy.ignoreTinyMceError()
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   describe('and clicking in a thread result', () => {
     it('Should redirect to the content page', () => {
       cy.get(searchInput).type(threadTitle).type('{enter}')
