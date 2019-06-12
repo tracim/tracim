@@ -31,9 +31,9 @@ class searchResult extends React.Component {
     super(props)
     this.state = {
       contentTypes: ALL_CONTENT_TYPES,
-      showArchived: 0,
-      showDeleted: 0,
-      showActive: 1
+      showArchived: false,
+      showDeleted: false,
+      showActive: true
     }
   }
 

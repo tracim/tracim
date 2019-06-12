@@ -94,9 +94,9 @@ class Header extends React.Component {
     const FIRST_PAGE = 1
 
     // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
-    // Respectively, show_archived=0, show_deleted=0, show_active=1
+    // Respectively, show_archived=0 (false), show_deleted=0 (false), show_active=1 (true)
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      ALL_CONTENT_TYPES, searchedKeywords, FIRST_PAGE, props.searchResult.numberResultsByPage, 0, 0, 1
+      ALL_CONTENT_TYPES, searchedKeywords, FIRST_PAGE, props.searchResult.numberResultsByPage, false, false, true
     ))
 
     switch (fetchGetSearchedKeywords.status) {
