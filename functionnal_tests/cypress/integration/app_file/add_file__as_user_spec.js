@@ -15,7 +15,7 @@ context('Upload a file using drop zone', function () {
   it('Adds a known member to a workspace using public name', function () {
     cy.get('[data-cy="contentTypeBtn_contents/file"]').click()
 
-    cy.dropFixtureInDropZone('Linux-Free-PNG.png', 'image/png', '.filecontent__form')
+    cy.dropFixtureInDropZone('Linux-Free-PNG.png', 'image/png', '.filecontent__form', 'file_exemple.png')
     cy.get('[data-cy=popup__createcontent__form__button]').click()
     cy.get('.previewcomponent__dloption__icon').should('have.length', 1)
     cy.get('#dropdownMenu2').contains('Open')
