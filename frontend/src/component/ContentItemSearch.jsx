@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Badge, Avatar } from 'tracim_frontend_lib'
 
-require('./ContentItemResearch.styl')
+require('./ContentItemSearch.styl')
 
-const ContentItemResearch = props => {
+const ContentItemSearch = props => {
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
 
   return (
@@ -61,9 +61,9 @@ const ContentItemResearch = props => {
   )
 }
 
-export default translate()(ContentItemResearch)
+export default translate()(ContentItemSearch)
 
-ContentItemResearch.propTypes = {
+ContentItemSearch.propTypes = {
   statusSlug: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   label: PropTypes.string,
@@ -74,7 +74,7 @@ ContentItemResearch.propTypes = {
   urlContent: PropTypes.string
 }
 
-ContentItemResearch.defaultProps = {
+ContentItemSearch.defaultProps = {
   label: '',
   customClass: '',
   urlContent: ''

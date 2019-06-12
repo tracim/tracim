@@ -3,7 +3,7 @@ const SELECTORS = {
   CONTENT_IN_LIST: 'contentInList',
   FOLDER_IN_LIST: 'folderInList',
   WORKSPACE_MENU: 'workspaceMenu',
-  CONTENT_IN_RESEARCH: 'contentInResearch'
+  CONTENT_IN_SEARCH: 'contentInSearch'
 }
 
 const TAGS = {

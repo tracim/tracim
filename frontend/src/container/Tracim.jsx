@@ -46,7 +46,7 @@ import {
   setBreadcrumbs,
   appendBreadcrumbs
 } from '../action-creator.sync.js'
-import ResearchResult from './ResearchResult.jsx'
+import SearchResult from './SearchResult.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -248,7 +248,7 @@ class Tracim extends React.Component {
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
-          <Route path={PAGE.RESEARCH_RESULT} component={ResearchResult} />
+          <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />
