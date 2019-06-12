@@ -11,6 +11,7 @@ const ListItemWrapper = props => {
       className={
         classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
       }
+      title={props.label}
     >
       {props.children}
     </div>
