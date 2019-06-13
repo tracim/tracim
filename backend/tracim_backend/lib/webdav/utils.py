@@ -67,6 +67,7 @@ class FakeFileStream(object):
         # instead of a true streaming mecanism we use
         # a temporary file to avoid big file in memory without needing to refactor all
         # upload mecanism of webdav
+        # see https://github.com/tracim/tracim/issues/1911
         self.temp_file = tempfile.NamedTemporaryFile(suffix="tracim_webdav_upload_")
         self._session = session
         self._file_name = file_name if file_name != "" else self._content.file_name
