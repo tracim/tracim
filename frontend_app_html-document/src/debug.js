@@ -18,10 +18,10 @@ export const debug = {
     roleList: ROLE,
     system: SYSTEM_CONFIG,
     domContainer: DOM_CONTAINER,
-    slug: 'file',
-    faIcon: 'paperclip',
-    hexcolor: '#ffa500',
-    creationLabel: 'Upload a file',
+    slug: 'html-document',
+    faIcon: 'file-text-o',
+    hexcolor: '#00CC00',
+    creationLabel: 'Write a document',
     translation: {
       en: {
         translation: {
@@ -32,12 +32,12 @@ export const debug = {
         }
       }
     },
-    label: 'File'
+    label: 'Text Document'
   },
   content: {
-    content_id: 27,
+    content_id: 1,
     content_type: 'file',
-    workspace_id: 5
+    workspace_id: 2
   },
   loggedUser: LOGGED_USER
 }
