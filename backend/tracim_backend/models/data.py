@@ -694,7 +694,7 @@ class ContentRevisionRO(DeclarativeBase):
         if revision.depot_file:
             try:
                 new_rev.depot_file = FileIntent(
-                    revision.depot_file.file.read(), revision.file_name, revision.file_mimetype
+                    revision.depot_file.file, revision.file_name, revision.file_mimetype
                 )
             except IOError as exc:
                 raise NewRevisionAbortedDepotCorrupted(
@@ -727,7 +727,7 @@ class ContentRevisionRO(DeclarativeBase):
         if revision.depot_file:
             try:
                 copy_rev.depot_file = FileIntent(
-                    revision.depot_file.file.read(), revision.file_name, revision.file_mimetype
+                    revision.depot_file.file, revision.file_name, revision.file_mimetype
                 )
             except IOError as exc:
                 raise CopyRevisionAbortedDepotCorrupted(

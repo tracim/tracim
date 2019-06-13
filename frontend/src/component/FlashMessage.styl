@@ -4,7 +4,7 @@
   position fixed
   display flex
   justify-content center
-  width 100%
+  margin-left calc(50% - 400px)
   z-index 60
   &__container
     margin-top 50px
@@ -36,3 +36,10 @@
           font-weight bold
         &__paragraph
           padding-right 20px
+
+@media (max-width: max-sm)
+  .flashmessage
+    margin-left 0px
+    width 100%
+    &__container
+      width 100%

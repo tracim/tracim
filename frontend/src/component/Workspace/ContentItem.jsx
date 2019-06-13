@@ -2,21 +2,15 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import { Badge } from 'tracim_frontend_lib'
 
 const ContentItem = props => {
-  if (props.contentType === null) return null // this means the endpoint system/content_type hasn't responded yet
-
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
   return (
     <Link
-      className={
-        classnames('content primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
-      }
-      title={props.label}
       to={props.urlContent}
+      className='content__item'
     >
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />

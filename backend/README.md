@@ -62,9 +62,9 @@ Upgrade packaging tools:
 
     pip install -r requirements.txt
 
-Install the project in editable mode with its testing requirements :
+Install the project in editable mode with its develop requirements :
 
-    pip install -e ".[testing]"
+    pip install -e ".[dev]"
 
 If you want to use postgresql, mysql or other databases
 than the default one: sqlite, you need to install python driver for those databases
@@ -75,11 +75,11 @@ specific driver.
 
 For PostgreSQL:
 
-    pip install -e ".[testing,postgresql]"
+    pip install -e ".[dev,postgresql]"
 
 For mySQL:
 
-    pip install -e ".[testing,mysql]"
+    pip install -e ".[dev,mysql]"
 
 Configuration
 ---------------
@@ -133,7 +133,7 @@ or on debian 9 :
 
 
 Run all web services with uwsgi
-    
+
     ## UWSGI SERVICES
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
@@ -143,7 +143,7 @@ Run all web services with uwsgi
     uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --plugin python3 --wsgi-file wsgi/webdav.py -H env --pidfile /tmp/tracim_webdav.pid
     # caldav radicale server (used behind pyramid webserver for auth)
     uwsgi -d /tmp/tracim_caldav.log --http-socket localhost:5232 --plugin python3 --wsgi-file wsgi/caldav.py -H env --pidfile /tmp/tracim_caldav.pid
-    
+
 to stop them:
 
     # pyramid webserver
@@ -277,6 +277,12 @@ run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 
 ### Run Tests ###
 
+Some directory are required to make tests functional, you can create them and do some other check
+with this script:
+
+    # in backend folder
+    python3 ./setup_dev_env.py
+
 Before running some functional test related to email, you need a local working *MailHog*
 see here : https://github.com/mailhog/MailHog
 
@@ -293,6 +299,12 @@ You can run it this way with docker :
     docker pull rroemhild/test-openldap
     docker run -d -p 3890:389 rroemhild/test-openldap
 
+You need also a elasticsearch server on port 9200 for elasticsearch related test
+You can run it this way with docker :
+
+    docker pull elasticsearch:7.0.0
+    docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
+
 Run your project's tests:
 
     pytest
@@ -301,11 +313,39 @@ Run your project's tests:
 
 Run mypy checks:
 
-    mypy --ignore-missing-imports --disallow-untyped-defs tracim
+    mypy --ignore-missing-imports --disallow-untyped-defs tracim_backend
 
-Run pep8 checks:
+Code formatting using black:
 
-    pep8 tracim
+    black -l 100 tracim_backend
+
+Sorting of import:
+
+    isort tracim_backend/**/*.py
+
+Flake8 check(unused import, variable and many other checks):
+
+    flake8 tracim_backend
+
+### About Pytest tests config ###
+
+For running tests, tracim tests need config setted:
+- specific config for specific tests is
+available in TEST_CONFIG_FILE_PATH (by default: "./tests_configs.ini" in backend folder).
+- For more general config, pytest rely on dotenv .env file (by default ".test.env" in backend folder)
+- If you want to change general config like paths used or database, you should better use env var
+instead of modifying "TEST_CONFIG_FILE_PATH" file or ".test.env".
+
+for example, if you want to use another database, you can do this:
+
+    export TRACIM_SQLALCHEMY__URL=sqlite:////tmp/mydatabase
+    python3 ./setup_dev_env.py
+    pytest
+
+Order of usage is (from less to more important, last is used if setted):
+- specific TEST_CONFIG_FILE_PATH config (different for each test)
+- default env var setting in .test.env
+- env var setted by user
 
 Tracim API
 ----------

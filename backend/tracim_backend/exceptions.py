@@ -14,6 +14,14 @@ class RunTimeError(TracimError):
     pass
 
 
+class NotWritableDirectory(Exception):
+    pass
+
+
+class NotReadableDirectory(Exception):
+    pass
+
+
 class ContentRevisionUpdateError(RuntimeError):
     pass
 
@@ -91,6 +99,10 @@ class UnknownAgendaType(AgendaException):
 
 
 class NotFound(TracimException):
+    pass
+
+
+class NoValidSearchEngine(TracimException):
     pass
 
 
@@ -240,7 +252,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
-    pass
+    error_code = ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
 
 class EmptyEmailBody(EmptyValueNotAllowed):
@@ -441,3 +453,11 @@ class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
 
 class ContentStatusException(TracimError):
     error_code = ErrorCode.INVALID_STATUS_CHANGE
+
+
+class ConflictingMoveInItself(TracimException):
+    error_code = ErrorCode.CONFLICTING_MOVE_IN_ITSELF
+
+
+class ConflictingMoveInChild(TracimException):
+    error_code = ErrorCode.CONFLICTING_MOVE_IN_CHILD

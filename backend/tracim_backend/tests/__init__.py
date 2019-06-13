@@ -2,6 +2,7 @@
 from io import BytesIO
 import logging
 import multiprocessing
+import os
 import typing
 import unittest
 
@@ -26,6 +27,7 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.search.search import ESSearchApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
@@ -35,6 +37,8 @@ from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.models.setup_models import init_models
+
+TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")
 
 
 def eq_(a, b, msg=None) -> None:
@@ -96,7 +100,7 @@ class AbstractMailHogTest(object):
 class FunctionalTest(unittest.TestCase):
 
     fixtures = [BaseFixture]
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "functional_test"
 
     def _set_logger(self) -> None:
@@ -190,6 +194,26 @@ class FunctionalTest(unittest.TestCase):
         testing.tearDown()
 
 
+class FunctionalElasticSearchTest(FunctionalTest):
+
+    elastic_search_api = None
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.elastic_search_api = ESSearchApi(
+            config=self.app_config, current_user=None, session=self.session
+        )
+        self.elastic_search_api.create_index()
+
+    def refresh_elasticsearch(self) -> None:
+        self.elastic_search_api.refresh_index()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        if self.elastic_search_api:
+            self.elastic_search_api.delete_index()
+
+
 class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):
     def setUp(self):
         self.cleanup_mailhog()
@@ -201,7 +225,7 @@ class MailHogFunctionalTest(FunctionalTest, AbstractMailHogTest):
 
 
 class WebdavFunctionalTest(FunctionalTest):
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "functional_webdav_test"
 
     def run_app(self) -> None:
@@ -287,7 +311,7 @@ class BaseTest(unittest.TestCase):
     """
 
     fixtures = []
-    config_uri = "tests_configs.ini"
+    config_uri = TEST_CONFIG_FILE_PATH
     config_section = "base_test"
 
     def _set_logger(self) -> None:

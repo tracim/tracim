@@ -6,6 +6,7 @@ import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import { PAGE } from '../../helper.js'
+import { ListItemWrapper } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
@@ -18,11 +19,14 @@ class Folder extends React.Component {
     const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
 
     return (
-      <div className={classnames('folder', {
-        'active': props.folderData.isOpen && folderContentList.length > 0,
-        'item-last': props.isLast,
-        'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
-      })}>
+      <div
+        className={classnames('folder', {
+          'active': props.folderData.isOpen && folderContentList.length > 0,
+          'item-last': props.isLast,
+          'read': true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
+        })}
+        data-cy={`folder_${props.folderData.id}`}
+      >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
@@ -88,7 +92,7 @@ class Folder extends React.Component {
                       idRoleUserWorkspace={props.idRoleUserWorkspace}
                       onClickExtendedAction={{
                         edit: e => props.onClickExtendedAction.edit(e, props.folderData),
-                        move: null, // e => props.onClickExtendedAction.move(e, props.folderData),
+                        move: null,
                         download: e => props.onClickExtendedAction.download(e, props.folderData),
                         archive: e => props.onClickExtendedAction.archive(e, props.folderData),
                         delete: e => props.onClickExtendedAction.delete(e, props.folderData)
@@ -127,27 +131,35 @@ class Folder extends React.Component {
               />
             )
             : (
-              <ContentItem
+              <ListItemWrapper
                 label={content.label}
-                type={content.type}
-                fileName={content.fileName}
-                fileExtension={content.fileExtension}
-                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
-                statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
-                onClickExtendedAction={{
-                  edit: e => props.onClickExtendedAction.edit(e, content),
-                  move: null, // e => props.onClickExtendedAction.move(e, content),
-                  download: e => props.onClickExtendedAction.download(e, content),
-                  archive: e => props.onClickExtendedAction.archive(e, content),
-                  delete: e => props.onClickExtendedAction.delete(e, content)
-                }}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
-              />
+              >
+                <ContentItem
+                  label={content.label}
+                  type={content.type}
+                  fileName={content.fileName}
+                  fileExtension={content.fileExtension}
+                  faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                  statusSlug={content.statusSlug}
+                  read={props.readStatusList.includes(content.id)}
+                  contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
+                  urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
+                  idRoleUserWorkspace={props.idRoleUserWorkspace}
+                  onClickExtendedAction={{
+                    edit: e => props.onClickExtendedAction.edit(e, content),
+                    move: null, // e => props.onClickExtendedAction.move(e, content),
+                    download: e => props.onClickExtendedAction.download(e, content),
+                    archive: e => props.onClickExtendedAction.archive(e, content),
+                    delete: e => props.onClickExtendedAction.delete(e, content)
+                  }}
+                  isLast={props.isLast && i === folderContentList.length - 1}
+                  key={content.id}
+                />
+              </ListItemWrapper>
             )
           )}
         </div>

@@ -1,8 +1,3 @@
----
-name: Merge request
-about: Default template for a pull request
----
-
 *Please indicate here a summary of pull request content or if related issue exist, please indicate issue reference here*
 
 ## Checkpoints

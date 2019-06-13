@@ -119,3 +119,15 @@ export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
 export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${BREADCRUMBS}`, prependBreadcrumbs })
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
 export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS}/${APP_FEATURE}` })
+
+export const SEARCH_RESULTS_LIST = 'SearchResultsList'
+export const setSearchResultsList = newSearchResultsList => ({ type: `${SET}/${SEARCH_RESULTS_LIST}`, newSearchResultsList })
+export const appendSearchResultsList = appendSearchResultsList => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST}`, appendSearchResultsList })
+export const CURRENT_NUMBER_SEARCH_RESULTS = 'CurrentNumberSearchResults'
+export const setCurrentNumberSearchResults = currentNumberSearchResults => ({ type: `${SET}/${CURRENT_NUMBER_SEARCH_RESULTS}`, currentNumberSearchResults })
+export const SEARCHED_KEYWORDS = 'SearchedKeywords'
+export const setSearchedKeywords = searchedKeywords => ({ type: `${SET}/${SEARCHED_KEYWORDS}`, searchedKeywords })
+export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
+export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
+export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
+export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })

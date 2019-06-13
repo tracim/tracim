@@ -21,9 +21,12 @@ const PageTitle = props => {
         ? <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />
         : <div />
       }
-
-      {props.subtitle}
-
+      <div
+        className={classnames(`${props.parentClass}__subtitle`, 'pageTitleGeneric__subtitle')}
+        data-cy='layoutPageSubTitle'
+      >
+        {props.subtitle}
+      </div>
       {props.children}
     </div>
   )
