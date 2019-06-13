@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+import tempfile
 
 from sqlalchemy.orm import Session
 import transaction
-from wsgidav import compat
 from wsgidav import util
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import DAVError
@@ -63,7 +63,12 @@ class FakeFileStream(object):
         :param content:
         :param parent:
         """
-        self._file_stream = compat.BytesIO()
+        # TODO - G.M - 2019-06-13 - use true streaming mecanism,
+        # instead of a true streaming mecanism we use
+        # a temporary file to avoid big file in memory without needing to refactor all
+        # upload mecanism of webdav
+        # see https://github.com/tracim/tracim/issues/1911
+        self.temp_file = tempfile.NamedTemporaryFile(suffix="tracim_webdav_upload_")
         self._session = session
         self._file_name = file_name if file_name != "" else self._content.file_name
         self._content = content
@@ -98,7 +103,7 @@ class FakeFileStream(object):
         """
         Called by request_server when writing content to files, we put it inside a filestream
         """
-        self._file_stream.write(s)
+        self.temp_file.write(s)
 
     def close(self):
         """
@@ -106,7 +111,7 @@ class FakeFileStream(object):
         a new revision
         """
 
-        self._file_stream.seek(0)
+        self.temp_file.seek(0)
 
         if self._content is None:
             self.create_file()
@@ -114,6 +119,7 @@ class FakeFileStream(object):
             self.update_file()
 
         transaction.commit()
+        self.temp_file.close()
 
     def create_file(self):
         """
@@ -132,10 +138,7 @@ class FakeFileStream(object):
                     do_save=False,
                 )
                 self._api.update_file_data(
-                    file,
-                    self._file_name,
-                    util.guessMimeType(self._file_name),
-                    self._file_stream.read(),
+                    file, self._file_name, util.guessMimeType(self._file_name), self.temp_file
                 )
                 self._api.execute_created_content_actions(file)
         except TracimException as exc:
@@ -152,7 +155,7 @@ class FakeFileStream(object):
                     self._content,
                     self._file_name,
                     util.guessMimeType(self._content.file_name),
-                    self._file_stream.read(),
+                    self.temp_file,
                 )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
