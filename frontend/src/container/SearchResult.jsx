@@ -47,10 +47,10 @@ class searchResult extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  findPath = (parentsList) => {
+  getPath = (parentsList) => {
     let parentPath = ''
     if (parentsList.length > 0) {
-      parentPath = parentsList.reduce((acc, currentParent) => `${currentParent.label}/${acc}`, '')
+      parentPath = parentsList.reduce((acc, currentParent) => `${currentParent.label} / ${acc}`, '')
     }
     return parentPath
   }
@@ -167,7 +167,7 @@ class searchResult extends React.Component {
                   >
                     <ContentItemSearch
                       label={searchItem.label}
-                      path={`${searchItem.workspace.label}/${this.findPath(searchItem.parents)}${this.getContentName(searchItem)}`}
+                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
                       lastModificationAuthor={searchItem.last_modifier.public_name}
                       lastModificationTime={displayDistanceDate(searchItem.modified, this.props.user.lang)}
                       fileExtension={searchItem.file_extension}
