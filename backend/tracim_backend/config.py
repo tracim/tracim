@@ -3,7 +3,6 @@ from collections import OrderedDict
 import json
 import os
 import typing
-from urllib.parse import urlparse
 
 from depot.manager import DepotManager
 from paste.deploy.converters import asbool
@@ -217,17 +216,6 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-
-        self.WEBSITE__SERVER_NAME = self.get_raw_config("website.server_name")
-        if not self.WEBSITE__SERVER_NAME:
-            self.WEBSITE__SERVER_NAME = self.get_raw_config(
-                "website.server_name", default_value=urlparse(self.WEBSITE__BASE_URL).hostname
-            )
-            logger.warning(
-                self,
-                "NOTE: Generated website.server_name parameter from "
-                "website.base_url parameter -> {0}".format(self.WEBSITE__SERVER_NAME),
-            )
 
         self.USER__AUTH_TOKEN__VALIDITY = int(
             self.get_raw_config("user.auth_token.validity", "604800")
