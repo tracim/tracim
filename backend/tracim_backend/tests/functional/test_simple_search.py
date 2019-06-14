@@ -51,7 +51,7 @@ class TestSimpleSearch(FunctionalTest):
 
     @parameterized.expand(
         [
-            # created_content_name, search_string, nb_content_result, first_result_content_name
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
             ("testdocument", "testdocument", 1, "testdocument"),
             # autocomplete
@@ -63,7 +63,11 @@ class TestSimpleSearch(FunctionalTest):
         ]
     )
     def test_api___simple_search_ok__by_label(
-        self, created_content_name, search_string, nb_content_result, first_result_content_name
+        self,
+        created_content_name,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -108,11 +112,11 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_result_content_name
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @parameterized.expand(
         [
-            # created_content_name, search_string, nb_content_result, first_result_content_name
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
             ("good practices", "good practices.document.html", 1, "good practices"),
             # autocomplete
@@ -122,7 +126,11 @@ class TestSimpleSearch(FunctionalTest):
         ]
     )
     def test_api___simple_search_ok__by_filename(
-        self, created_content_name, search_string, nb_content_result, first_result_content_name
+        self,
+        created_content_name,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -164,11 +172,11 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_result_content_name
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @parameterized.expand(
         [
-            # created_content_name, created_content_body, search_string, nb_content_result, first_result_content_name
+            # created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
             (
                 "good practices",
@@ -200,7 +208,7 @@ class TestSimpleSearch(FunctionalTest):
         created_content_body,
         search_string,
         nb_content_result,
-        first_result_content_name,
+        first_search_result_content_name,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -247,11 +255,11 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_result_content_name
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @parameterized.expand(
         [
-            # created_content_name, search_string, nb_content_result, first_result_content_name, first_created_comment_content, second_created_comment_content
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
             (
                 "good practices",
@@ -285,7 +293,7 @@ class TestSimpleSearch(FunctionalTest):
         created_content_name,
         search_string,
         nb_content_result,
-        first_result_content_name,
+        first_search_result_content_name,
         first_created_comment_content,
         second_created_comment_content,
     ) -> None:
@@ -338,7 +346,7 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_result_content_name
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     def test_api___simple_search_ok__no_search_string(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
