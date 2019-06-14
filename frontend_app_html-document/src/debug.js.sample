@@ -1,43 +1,21 @@
-import {
-  FETCH_CONFIG,
-  ROLE,
-  PROFILE,
-  STATUSES,
-  API_URL,
-  SYSTEM_CONFIG,
-  DOM_CONTAINER,
-  LOGGED_USER
-} from 'tracim_frontend_lib'
+import { defaultDebug } from 'tracim_frontend_lib'
 
 export const debug = {
   config: {
-    apiHeader: FETCH_CONFIG.headers,
-    apiUrl: API_URL,
-    availableStatuses: STATUSES,
-    profileObject: PROFILE,
-    roleList: ROLE,
-    system: SYSTEM_CONFIG,
-    domContainer: DOM_CONTAINER,
+    ...defaultDebug.config,
     slug: 'html-document',
     faIcon: 'file-text-o',
     hexcolor: '#00CC00',
     creationLabel: 'Write a document',
-    translation: {
-      en: {
-        translation: {
-        }
-      },
-      fr: {
-        translation: {
-        }
-      }
-    },
     label: 'Text Document'
   },
   content: {
-    content_id: 1,
-    content_type: 'file',
-    workspace_id: 2
+    ...defaultDebug.content,
+    content_id: 0,
+    content_type: 'html-document',
+    workspace_id: 0
   },
-  loggedUser: LOGGED_USER
+  loggedUser: {
+    ...defaultDebug.loggedUser
+  }
 }

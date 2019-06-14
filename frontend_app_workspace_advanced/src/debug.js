@@ -1,12 +1,5 @@
 import {
-  FETCH_CONFIG,
-  ROLE,
-  PROFILE,
-  STATUSES,
-  API_URL,
-  SYSTEM_CONFIG,
-  DOM_CONTAINER,
-  LOGGED_USER
+  defaultDebug
 } from 'tracim_frontend_lib'
 
 const workspaceId = 4
@@ -51,30 +44,15 @@ const SIDEBAR = [{
 
 export const debug = {
   config: {
-    apiHeader: FETCH_CONFIG.headers,
-    apiUrl: API_URL,
-    availableStatuses: STATUSES,
-    profileObject: PROFILE,
-    roleList: ROLE,
-    system: SYSTEM_CONFIG,
-    domContainer: DOM_CONTAINER,
+    ...defaultDebug.config,
     slug: 'workspace_advanced',
     faIcon: 'bank',
     hexcolor: '#7d4e24',
     creationLabel: '',
-    translation: {
-      en: {
-        translation: {
-        }
-      },
-      fr: {
-        translation: {
-        }
-      }
-    },
     label: 'Advanced dashboard'
   },
   content: {
+    ...defaultDebug.content,
     agendaEnabled: true,
     agendaUrl: `http://192.168.1.121:6543/agenda/workspace/${workspaceId}/`,
     contentReadStatusList: [1, 21, 20, 19, 17, 12, 8, 7, 6, 5, 4, 3, 2],
@@ -129,5 +107,7 @@ export const debug = {
     slug: 'test1',
     workspace_id: workspaceId
   },
-  loggedUser: LOGGED_USER
+  loggedUser: {
+    ...defaultDebug.loggedUser
+  }
 }

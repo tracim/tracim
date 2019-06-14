@@ -1,43 +1,23 @@
 import {
-  FETCH_CONFIG,
-  ROLE,
-  PROFILE,
-  STATUSES,
-  SYSTEM_CONFIG,
-  DOM_CONTAINER,
-  API_URL,
-  LOGGED_USER
+  defaultDebug
 } from 'tracim_frontend_lib'
 
 export const debug = {
   config: {
-    apiHeader: FETCH_CONFIG.headers,
-    apiUrl: API_URL,
-    availableStatuses: STATUSES,
-    profileObject: PROFILE,
-    roleList: ROLE,
-    system: SYSTEM_CONFIG,
-    domContainer: DOM_CONTAINER,
+    ...defaultDebug.config,
     slug: 'file',
     faIcon: 'paperclip',
     hexcolor: '#ffa500',
     creationLabel: 'Upload a file',
-    translation: {
-      en: {
-        translation: {
-        }
-      },
-      fr: {
-        translation: {
-        }
-      }
-    },
     label: 'File'
   },
   content: {
-    content_id: 27,
+    ...defaultDebug.content,
+    content_id: 0,
     content_type: 'file',
-    workspace_id: 5
+    workspace_id: 0
   },
-  loggedUser: LOGGED_USER
+  loggedUser: {
+    ...defaultDebug.loggedUser
+  }
 }

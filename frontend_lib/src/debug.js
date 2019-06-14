@@ -105,19 +105,50 @@ export const SYSTEM_CONFIG = {
 
 export const DOM_CONTAINER = 'appFeatureContainer'
 
-export const LOGGED_USER = {
-  agendaUrl: '',
-  auth_type: 'internal',
-  user_id: 1,
-  public_name: 'Global manager',
-  email: 'osef@algoo.fr',
-  lang: 'fr',
-  avatar_url: null,
-  idRoleUserWorkspace: 8,
-  created: '2019-06-03T14:28:14Z',
-  is_active: true,
-  is_deleted: false,
-  logged: true,
-  profile: 'administrators',
-  timezone: ''
+export const defaultDebug = {
+  config: {
+    apiHeader: FETCH_CONFIG.headers,
+    apiUrl: API_URL,
+    availableStatuses: STATUSES,
+    profileObject: PROFILE,
+    roleList: ROLE,
+    system: SYSTEM_CONFIG,
+    domContainer: DOM_CONTAINER,
+    slug: '',
+    faIcon: '',
+    hexcolor: '',
+    creationLabel: '',
+    translation: {
+      en: {
+        translation: {
+        }
+      },
+      fr: {
+        translation: {
+        }
+      }
+    },
+    label: ''
+  },
+  content: {
+    content_id: 0,
+    content_type: '',
+    workspace_id: 0
+  },
+  loggedUser: {
+    agendaUrl: '',
+    auth_type: 'internal',
+    user_id: 1,
+    public_name: 'Global manager',
+    email: 'osef@algoo.fr',
+    lang: 'fr',
+    avatar_url: null,
+    idRoleUserWorkspace: 8,
+    created: '2019-06-03T14:28:14Z',
+    is_active: true,
+    is_deleted: false,
+    logged: true,
+    profile: 'administrators',
+    timezone: ''
+  }
 }

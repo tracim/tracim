@@ -19,7 +19,7 @@ import {
   STATUSES,
   SYSTEM_CONFIG,
   DOM_CONTAINER,
-  LOGGED_USER
+  defaultDebug
 } from './debug.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
@@ -109,7 +109,7 @@ export {
   STATUSES,
   SYSTEM_CONFIG,
   DOM_CONTAINER,
-  LOGGED_USER,
+  defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,
