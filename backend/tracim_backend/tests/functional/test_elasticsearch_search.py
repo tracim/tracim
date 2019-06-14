@@ -138,6 +138,144 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         if first_content_name:
             assert search_result["contents"][0]["label"] == first_content_name
 
+    @parameterized.expand(
+        [
+            # content_name, search_string, nb_content_result, first_content_name, content_body
+            # exact syntax
+            ("good practices", "texttosearch", 1, "good practices", "texttosearch")
+        ]
+    )
+    def test_api___elasticsearch_search_ok__by_description(
+        self, content_name, search_string, nb_content_result, first_content_name, content_body
+    ) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        )
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        content = api.create(
+            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+        )
+        with new_revision(session=dbsession, tm=transaction.manager, content=content):
+            api.update_content(content, new_label=content_name, new_content=content_body)
+            api.save(content)
+        api.execute_created_content_actions(content)
+        report = api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.execute_created_content_actions(report)
+        thread = api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        api.execute_created_content_actions(thread)
+        transaction.commit()
+        self.refresh_elasticsearch()
+
+        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string}
+        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == nb_content_result
+        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["contents"][0]["label"] == first_content_name
+
+    @parameterized.expand(
+        [
+            # content_name, search_string, nb_content_result, first_content_name, first_comment_content, second_comment_content
+            # exact syntax
+            (
+                "good practices",
+                "texttosearch",
+                1,
+                "good practices",
+                "texttosearch",
+                "another_comment",
+            ),
+            (
+                "good practices",
+                "texttosearch",
+                1,
+                "good practices",
+                "texttosearch",
+                "another comment texttosearch",
+            ),
+        ]
+    )
+    def test_api___elasticsearch_search_ok__by_comment_content(
+        self,
+        content_name,
+        search_string,
+        nb_content_result,
+        first_content_name,
+        first_comment_content,
+        second_comment_content,
+    ) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        )
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        content = api.create(
+            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+        )
+        api.execute_created_content_actions(content)
+        comment = api.create_comment(
+            workspace=workspace, parent=content, content=first_comment_content, do_save=True
+        )
+        api.execute_created_content_actions(comment)
+        comment2 = api.create_comment(
+            workspace=workspace, parent=content, content=second_comment_content, do_save=True
+        )
+        api.execute_created_content_actions(comment2)
+        report = api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.execute_created_content_actions(report)
+        thread = api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        api.execute_created_content_actions(thread)
+        transaction.commit()
+        self.refresh_elasticsearch()
+
+        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string}
+        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == nb_content_result
+        assert search_result["is_total_hits_accurate"] is True
+        assert search_result["contents"][0]["label"] == first_content_name
+
     def test_api___elasticsearch_search_ok__no_search_string(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
