@@ -219,6 +219,17 @@ class Account extends React.Component {
 
   handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
 
+  // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
+  // https://github.com/tracim/tracim/issues/1847
+  setTitle () {
+    const { props, state } = this
+
+    return <div dangerouslySetInnerHTML={
+      {__html: props.t('{{userName}} account edition',
+        {userName: state.userToEdit.public_name, interpolation: {escapeValue: false}}
+      )}} />
+  }
+
   render () {
     const { props, state } = this
 
@@ -228,7 +239,7 @@ class Account extends React.Component {
           <PageWrapper customClass='account'>
             <PageTitle
               parentClass={'account'}
-              title={props.t('{{userName}} account edition', {userName: state.userToEdit.public_name})}
+              title={this.setTitle()}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
             />
