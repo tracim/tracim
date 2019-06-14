@@ -318,17 +318,35 @@ class WorkspaceContent extends React.Component {
     props.history.push(`${PAGE.WORKSPACE.NEW(state.idWorkspaceInUrl, contentType)}?${qs.stringify(newUrlSearch, {encode: false})}&parent_id=${idFolder}`)
   }
 
+  getContentParentList = (content, contentList) => {
+    const parent = contentList.find(c => c.id === content.idParent)
+    if (!parent) return []
+
+    return [parent.id, ...this.getContentParentList(parent, contentList)]
+  }
+
   handleDropMoveContent = async (source, destination) => {
     const { props, state } = this
 
-    if (source.workspaceId === destination.workspaceId && source.parentId === destination.parentId) return
-    if (source.contentId === destination.parentId) return
-    if (source.subFolderIdList && source.subFolderIdList.some(subFolderId => destination.parentId === subFolderId)) return
+    if (source.contentId === destination.contentId) return
 
+    // INFO - CH - 2019-06-14 - Check that not moving a folder into one of its sub folder
+    if (source.workspaceId === destination.workspaceId && destination.parentId !== 0) {
+      const destinationContent = props.workspaceContentList.find(c => c.id === destination.contentId)
+      const parentIdList = this.getContentParentList(destinationContent, props.workspaceContentList)
+
+      if (parentIdList.includes(source.contentId)) return
+    }
+
+    // INFO - CH - 2019-06-14 - Check user is allowed to drop in the different destination workspace
     if (source.workspaceId !== destination.workspaceId) {
       const destinationMemberList = props.workspaceList.find(ws => ws.id === destination.workspaceId).memberList
       const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.user_id, destinationMemberList, ROLE)
-      if (userRoleIdInDestination < ROLE_OBJECT.contributor.id) return
+
+      if (userRoleIdInDestination < ROLE_OBJECT.contributor.id) {
+        props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'warning'))
+        return
+      }
     }
 
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
@@ -476,10 +494,9 @@ class WorkspaceContent extends React.Component {
                     ? (
                       <Folder
                         availableApp={createContentAvailableApp}
-                        folderData={{
-                          ...content,
-                          content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
-                        }}
+                        folderData={content}
+                        workspaceContentList={filteredWorkspaceContentList}
+                        getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         onClickExtendedAction={{
                           edit: this.handleClickEditContentItem,

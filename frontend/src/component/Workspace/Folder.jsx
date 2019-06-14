@@ -11,37 +11,40 @@ import DragHandle from '../DragHandle.jsx'
 import {
   PAGE,
   ROLE_OBJECT,
-  DRAG_AND_DROP,
-  CONTENT_TYPE
+  DRAG_AND_DROP
 } from '../../helper.js'
 import { ListItemWrapper } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
 class Folder extends React.Component {
-  calculateIcon = (folder, isDropActive, draggedItem = null) => {
-    const isHoveringSelf = draggedItem && draggedItem.contentId === folder.id
+  calculateIcon = () => {
+    const { props } = this
+
+    const isDropActive = props.canDrop && props.isOver
+    const isHoveringSelf = props.draggedItem && props.draggedItem.contentId === props.folderData.id
 
     if (!isDropActive || isHoveringSelf) {
-      if (folder.isOpen) return 'fa-folder-open-o'
+      if (props.folderData.isOpen) return 'fa-folder-open-o'
       return 'fa-folder-o'
     }
 
-    const isHoveringSelfParent = draggedItem && draggedItem.parentId === folder.id
-    const isHoveringChildrenFolder = draggedItem.subFolderIdList && draggedItem.subFolderIdList.some(subFolderId => folder.id === subFolderId)
+    const isHoveringSelfParent = props.draggedItem && props.draggedItem.parentId === props.folderData.id
+    if (isHoveringSelfParent) return 'fa-times-circle primaryColorFont'
 
-    if (isHoveringSelfParent || isHoveringChildrenFolder) return 'fa-times-circle primaryColorFont'
+    const parentIdList = props.getContentParentList(props.folderData, props.workspaceContentList)
+    const isHoveringChildrenFolder = parentIdList.includes(props.draggedItem.contentId)
+    if (isHoveringChildrenFolder) return 'fa-times-circle primaryColorFont'
+
     return 'fa-arrow-circle-down primaryColorFont'
   }
 
   render () {
     const { props } = this
 
-    const folderContentList = props.folderData.content.filter(c => c.idParent === props.folderData.id)
+    const folderContentList = props.workspaceContentList.filter(c => c.idParent === props.folderData.id)
 
     const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
-
-    const isDropActive = props.canDrop && props.isOver
 
     return (
       <div
@@ -75,7 +78,7 @@ class Folder extends React.Component {
             ref={props.connectDragPreview}
           >
             <div className='folder__header__icon' style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}>
-              <i className={classnames('fa fa-fw', this.calculateIcon(props.folderData, isDropActive, props.draggedItem))} />
+              <i className={classnames('fa fa-fw', this.calculateIcon())} />
             </div>
 
             <div className='folder__header__name'>
@@ -109,6 +112,7 @@ class Folder extends React.Component {
                       <span className='folder__header__button__addbtn__text-desktop'>
                         {`${props.t('Create in folder')}...`}
                       </span>
+
                       <span className='folder__header__button__addbtn__text-responsive'>
                         <i className='folder__header__button__addbtn__text-responsive__iconplus fa fa-plus' />
                       </span>
@@ -151,10 +155,9 @@ class Folder extends React.Component {
             ? (
               <FolderContainer
                 availableApp={props.availableApp}
-                folderData={{
-                  ...content,
-                  content: props.folderData.content.filter(c => c.idParent !== props.folderData.id)
-                }}
+                folderData={content}
+                workspaceContentList={props.workspaceContentList}
+                getContentParentList={props.getContentParentList}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
                 onClickFolder={props.onClickFolder}
@@ -213,7 +216,8 @@ class Folder extends React.Component {
 const folderDragAndDropTarget = {
   drop: props => ({
     workspaceId: props.folderData.idWorkspace,
-    parentId: props.folderData.id
+    contentId: props.folderData.id,
+    parentId: props.folderData.idParent
   })
 }
 
@@ -228,8 +232,7 @@ const folderDragAndDropSource = {
   beginDrag: props => ({
     workspaceId: props.folderData.idWorkspace,
     contentId: props.folderData.id,
-    parentId: props.folderData.idParent || 0,
-    subFolderIdList: props.folderData.content.filter(c => c.type === CONTENT_TYPE.FOLDER).map(c => c.id)
+    parentId: props.folderData.idParent || 0
   }),
   endDrag: (props, monitor) => {
     const item = monitor.getItem()

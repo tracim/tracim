@@ -720,7 +720,7 @@ export const putContentItemMove = (source, destination) => dispatch => {
       method: 'PUT',
       body: JSON.stringify({
         new_workspace_id: destination.workspaceId || 0,
-        new_parent_id: destination.parentId || 0
+        new_parent_id: destination.contentId || 0
       })
     },
     actionName: WORKSPACE_CONTENT_MOVE,

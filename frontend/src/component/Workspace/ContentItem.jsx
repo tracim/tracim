@@ -68,7 +68,7 @@ const ContentItem = props => {
   )
 }
 
-const contentItemDndSource = {
+const contentItemDragAndDropSource = {
   beginDrag: props => ({
     workspaceId: props.workspaceId,
     contentId: props.contentId,
@@ -83,13 +83,13 @@ const contentItemDndSource = {
   }
 }
 
-const contentItemDndSourceCollect = (connect, monitor) => ({
+const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
   connectDragPreview: connect.dragPreview(),
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
 })
 
-export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDndSource, contentItemDndSourceCollect)(translate()(ContentItem))
+export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(translate()(ContentItem))
 
 ContentItem.propTypes = {
   statusSlug: PropTypes.string.isRequired,
