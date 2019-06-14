@@ -55,7 +55,7 @@ class AdminWorkspaceUser extends React.Component {
     switch (type) {
       case 'admin_workspace_user_showApp':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({...prev.config, config: data.config}))
+        this.setState({config: data.config})
         break
       case 'refreshWorkspaceList':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
