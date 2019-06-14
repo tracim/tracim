@@ -550,6 +550,7 @@ class CFG(object):
         """
         Check config for global stuff
         """
+        self.check_mandatory_param("SQLALCHEMY__URL", self.SQLALCHEMY__URL)
         self.check_mandatory_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR)
         self.check_directory_path_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True)
 
