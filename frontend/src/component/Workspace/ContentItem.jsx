@@ -21,7 +21,7 @@ const ContentItem = props => {
       className='content__item'
       style={dropStyle}
     >
-      {props.idRoleUserWorkspace >= ROLE_OBJECT.contentManager.id && (
+      {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
         <DragHandle
           connectDragSource={props.connectDragSource}
           title={props.t('Move this content')}
@@ -44,10 +44,10 @@ const ContentItem = props => {
         </div>
       </div>
 
-      {props.idRoleUserWorkspace >= 2 && (
+      {props.userRoleIdInWorkspace >= 2 && (
         <div className='d-none d-md-block'>
           <BtnExtandedAction
-            idRoleUserWorkspace={props.idRoleUserWorkspace}
+            userRoleIdInWorkspace={props.userRoleIdInWorkspace}
             onClickExtendedAction={props.onClickExtendedAction}
           />
         </div>
@@ -101,7 +101,8 @@ ContentItem.propTypes = {
   onClickItem: PropTypes.func,
   faIcon: PropTypes.string,
   read: PropTypes.bool,
-  urlContent: PropTypes.string
+  urlContent: PropTypes.string,
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 ContentItem.defaultProps = {
@@ -109,5 +110,6 @@ ContentItem.defaultProps = {
   customClass: '',
   onClickItem: () => {},
   read: false,
-  urlContent: ''
+  urlContent: '',
+  userRoleIdInWorkspace: 0
 }

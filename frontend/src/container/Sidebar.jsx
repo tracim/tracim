@@ -13,7 +13,7 @@ import {
   workspaceConfig,
   getUserProfile,
   unLoggedAllowedPageList,
-  findUserWorkspaceRoleId,
+  findUserRoleIdInWorkspace,
   ROLE,
   TRACIM_APP_VERSION
 } from '../helper.js'
@@ -107,7 +107,7 @@ class Sidebar extends React.Component {
                 { workspaceList.map(ws =>
                   <WorkspaceListItem
                     workspaceId={ws.id}
-                    userWorkspaceRoleId={findUserWorkspaceRoleId(user.user_id, ws.memberList, ROLE)}
+                    userWorkspaceRoleId={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE)}
                     label={ws.label}
                     allowedAppList={ws.sidebarEntry}
                     activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}

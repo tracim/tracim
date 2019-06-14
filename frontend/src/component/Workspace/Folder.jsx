@@ -24,14 +24,14 @@ class Folder extends React.Component {
 
     if (!isDropActive || isHoveringSelf) {
       if (folder.isOpen) return 'fa-folder-open-o'
-      else return 'fa-folder-o'
+      return 'fa-folder-o'
     }
 
     const isHoveringSelfParent = draggedItem && draggedItem.parentId === folder.id
     const isHoveringChildrenFolder = draggedItem.subFolderIdList && draggedItem.subFolderIdList.some(subFolderId => folder.id === subFolderId)
 
     if (isHoveringSelfParent || isHoveringChildrenFolder) return 'fa-times-circle primaryColorFont'
-    else return 'fa-arrow-circle-down primaryColorFont'
+    return 'fa-arrow-circle-down primaryColorFont'
   }
 
   render () {
@@ -63,7 +63,7 @@ class Folder extends React.Component {
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          {props.idRoleUserWorkspace >= ROLE_OBJECT.contentManager.id && (
+          {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
@@ -84,7 +84,7 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-            {props.idRoleUserWorkspace >= 2 &&
+            {props.userRoleIdInWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 {folderAvailableApp.length > 0 && (
                   <div>
@@ -97,7 +97,7 @@ class Folder extends React.Component {
                         primaryColorBgHover
                         primaryColorBorderDarkenHover
                         dropdown-toggle
-                        ${props.idRoleUserWorkspace === 2 ? 'no-margin-right' : ''}
+                        ${props.userRoleIdInWorkspace === 2 ? 'no-margin-right' : ''}
                       `}
                       type='button'
                       id='dropdownMenuButton'
@@ -125,9 +125,9 @@ class Folder extends React.Component {
                 )}
 
                 <div className='d-none d-md-flex'>
-                  {props.idRoleUserWorkspace >= 4 && (
+                  {props.userRoleIdInWorkspace >= 4 && (
                     <BtnExtandedAction
-                      idRoleUserWorkspace={props.idRoleUserWorkspace}
+                      userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                       onClickExtendedAction={{
                         edit: e => props.onClickExtendedAction.edit(e, props.folderData),
                         move: null,
@@ -155,7 +155,7 @@ class Folder extends React.Component {
                   ...content,
                   content: props.folderData.content.filter(c => c.idParent !== props.folderData.id)
                 }}
-                idRoleUserWorkspace={props.idRoleUserWorkspace}
+                userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
                 onClickFolder={props.onClickFolder}
                 onClickCreateContent={props.onClickCreateContent}
@@ -190,10 +190,9 @@ class Folder extends React.Component {
                   read={props.readStatusList.includes(content.id)}
                   contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
                   urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
-                  idRoleUserWorkspace={props.idRoleUserWorkspace}
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   onClickExtendedAction={{
                     edit: e => props.onClickExtendedAction.edit(e, content),
-                    move: null, // e => props.onClickExtendedAction.move(e, content),
                     download: e => props.onClickExtendedAction.download(e, content),
                     archive: e => props.onClickExtendedAction.archive(e, content),
                     delete: e => props.onClickExtendedAction.delete(e, content)
@@ -211,28 +210,28 @@ class Folder extends React.Component {
   }
 }
 
-const folderDndTarget = {
+const folderDragAndDropTarget = {
   drop: props => ({
     workspaceId: props.folderData.idWorkspace,
     parentId: props.folderData.id
   })
 }
 
-const folderDndTargetCollect = (connect, monitor) => ({
+const folderDragAndDropTargetCollect = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   canDrop: monitor.canDrop(),
   isOver: monitor.isOver({shallow: false}),
   draggedItem: monitor.getItem()
 })
 
-const folderDndSource = {
+const folderDragAndDropSource = {
   beginDrag: props => ({
     workspaceId: props.folderData.idWorkspace,
     contentId: props.folderData.id,
     parentId: props.folderData.idParent || 0,
     subFolderIdList: props.folderData.content.filter(c => c.type === CONTENT_TYPE.FOLDER).map(c => c.id)
   }),
-  endDrag (props, monitor) {
+  endDrag: (props, monitor) => {
     const item = monitor.getItem()
     const dropResult = monitor.getDropResult()
     if (dropResult) {
@@ -241,7 +240,7 @@ const folderDndSource = {
   }
 }
 
-const folderDndSourceCollect = (connect, monitor) => ({
+const folderDragAndDropSourceCollect = (connect, monitor) => ({
   connectDragPreview: connect.dragPreview(),
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
@@ -251,8 +250,8 @@ const folderDndSourceCollect = (connect, monitor) => ({
 // nest drop target.
 // Note that Folder component recursively use FolderContainer (see render() above)
 // see https://github.com/react-dnd/react-dnd/issues/483
-const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDndSource, folderDndSourceCollect)(
-  DropTarget(DRAG_AND_DROP.CONTENT_ITEM, folderDndTarget, folderDndTargetCollect)(
+const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDropSource, folderDragAndDropSourceCollect)(
+  DropTarget(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDropTarget, folderDragAndDropTargetCollect)(
     withRouter(Folder)
   )
 )

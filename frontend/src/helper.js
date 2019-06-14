@@ -83,9 +83,9 @@ export const ROLE = [{
   label: 'Reader' // label must be used in components
 }]
 
-export const findUserWorkspaceRoleId = (idUser, memberList, roleList) => {
-  const myself = memberList.find(u => u.id === idUser) || {role: 'reader'}
-  return (roleList.find(r => myself.role === r.slug) || {id: 1}).id
+export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
+  const user = memberList.find(u => u.id === userId) || {role: 'reader'}
+  return (roleList.find(r => user.role === r.slug) || {id: 1}).id
 }
 
 export const ROLE_OBJECT = {
@@ -155,7 +155,8 @@ export const CONTENT_TYPE = {
   HTML_DOCUMENT: 'html-document',
   FILE: 'file',
   THREAD: 'thread',
-  FOLDER: 'folder'
+  FOLDER: 'folder',
+  COMMENT: 'comment'
 }
 
 export const COOKIE_FRONTEND = {
