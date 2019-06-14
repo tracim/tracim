@@ -343,7 +343,7 @@ class WorkspaceContent extends React.Component {
       const destinationMemberList = props.workspaceList.find(ws => ws.id === destination.workspaceId).memberList
       const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.user_id, destinationMemberList, ROLE)
 
-      if (userRoleIdInDestination < ROLE_OBJECT.contributor.id) {
+      if (userRoleIdInDestination <= ROLE_OBJECT.contributor.id) {
         props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'warning'))
         return
       }
