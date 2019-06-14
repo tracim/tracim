@@ -33,8 +33,6 @@ Priority order is (from less to most priority):
  | WEBSITE__BASE_URL | TRACIM_WEBSITE__BASE_URL | website.base_url |
  | API__BASE_URL | TRACIM_API__BASE_URL | api.base_url |
  | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN | cors.access-control-allowed-origin |
- | WEBSITE__SERVER_NAME | TRACIM_WEBSITE__SERVER_NAME | website.server_name |
- | WEBSITE__SERVER_NAME | TRACIM_WEBSITE__SERVER_NAME | website.server_name |
  | USER__AUTH_TOKEN__VALIDITY | TRACIM_USER__AUTH_TOKEN__VALIDITY | user.auth_token.validity |
  | USER__RESET_PASSWORD__VALIDITY | TRACIM_USER__RESET_PASSWORD__VALIDITY | user.reset_password.validity |
  | USER__RESET_PASSWORD__TOKEN_LIFETIME | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME | user.reset_password.token_lifetime |
@@ -121,19 +119,16 @@ To have a working tracim instance, you need to explicitly define where backend a
 If backend serve frontend or if you do not need frontend at all, you can just set:
 
     website.base_url = http://mysuperdomainame.ndd
-    # website.server_name = mysuperdomainename.ndd
 
 or (non-default http port):
 
     website.base_url = http://mysuperdomainame.ndd:8080
-    # website.server_name = mysuperdomainename.ndd
 
 or (for https):
 
     website.base_url = https://mysuperdomainame.ndd
-    # website.server_name = mysuperdomainename.ndd
 
-you also need to NOT set website.server_name and api.base_url
+you also need to NOT set api.base_url
 
 ## Configure URL for tracim access - complex case ##
 
@@ -200,8 +195,8 @@ Thoses special auth mecanism are not linked to `auth_types` in config.
 
 :heavy_exclamation_mark: Unlike other mecanism of auth, this mecanism is not build
 for normal user auth but for administrators or daemon like email reply daemon. This
-auth mecanism is the only one that bypass auth mecanism check (user are linked 
-one specific mecanism and can't connect with an other one), so 
+auth mecanism is the only one that bypass auth mecanism check (user are linked
+one specific mecanism and can't connect with an other one), so
 you can impersonate any user linked to any auth mecanisms.
 
 API key is a auth mecanism of tracim which allow user with the key to have
@@ -437,3 +432,33 @@ to have more/less log about something.
 You can change default color of apps by setting color.json file, by default,
 placed at root of tracim dir, see [color.json.sample](../../color.json.sample)
 for default config file.
+
+# Search method using elastic_search (tracim 2.3+) #
+
+First, you need an elastic_search server. An easy way to have one with docker can be (don't use for production):
+
+`docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
+
+You then need to setup config file:
+
+    search.enabled = True
+    search.elasticsearch.host = localhost
+    search.elasticsearch.port = 9200
+
+You're elasticsearch server need to be running. You can then setup index with:
+
+`tracimcli search init`
+
+You can (re)sync data with:
+
+`tracimcli search index`
+
+you can delete index using:
+
+`tracimcli search delete`
+
+If there is an update of tracim, use this one to migrate index (experimental, prefer delete,init,index mecanism):
+
+`tracimcli search upgrade`
+
+Your data are correctly indexed now, you can go to tracim ui and use search mecanism.

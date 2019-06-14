@@ -1,12 +1,16 @@
 const SELECTORS = {
   CONTENT_FRAME: 'contentFrame',
   CONTENT_IN_LIST: 'contentInList',
-  WORKSPACE_MENU: 'workspaceMenu'
+  FOLDER_IN_LIST: 'folderInList',
+  WORKSPACE_MENU: 'workspaceMenu',
+  CONTENT_IN_SEARCH: 'contentInSearch'
 }
 
 const TAGS = {
   [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
   [SELECTORS.CONTENT_IN_LIST]: () => `.workspace__content__fileandfolder > .content`,
+  [SELECTORS.CONTENT_IN_SEARCH]: () => `.content__name`,
+  [SELECTORS.FOLDER_IN_LIST]: ({ folderId }) => `[data-cy=folder_${folderId}]`,
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`
 }
 

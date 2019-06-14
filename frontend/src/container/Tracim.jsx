@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import classnames from 'classnames'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
 import {
@@ -24,7 +23,6 @@ import WIPcomponent from './WIPcomponent.jsx'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   PAGE,
-  APP_FULLSCREEN_LIST,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile
@@ -48,6 +46,7 @@ import {
   setBreadcrumbs,
   appendBreadcrumbs
 } from '../action-creator.sync.js'
+import SearchResult from './SearchResult.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -249,13 +248,10 @@ class Tracim extends React.Component {
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
+          <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
+
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
-          <div
-            id='appFullscreenContainer'
-            className={classnames({
-              'fullWidthFullHeight': APP_FULLSCREEN_LIST.includes(props.location.pathname)
-            })}
-          />
+          <div id='appFullscreenContainer' />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />
         </div>

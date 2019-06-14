@@ -3758,6 +3758,7 @@ function translate()
 	$('#showUnloadedCalendarsTODO').attr({title:capitalize(localization[globalInterfaceLanguage].txtEnabledTodoLists),alt:capitalize(localization[globalInterfaceLanguage].txtEnabledTodoLists)});
 	$('#loadUnloadedCalendars, #loadUnloadedCalendarsTODO').val(localization[globalInterfaceLanguage].buttonSave);
 	$('#loadUnloadedCalendarsCancel, #loadUnloadedCalendarsTODOCancel').val(localization[globalInterfaceLanguage].buttonCancel);
+	$('[data-type="fullscreenBtn"]').attr({'title':localization[globalInterfaceLanguage].fullscreenBtn});
 // TODOS
 	$('.resourceCalDAVTODO_text[data-type="resourcesCalDAV_txt"]').text(localization[globalInterfaceLanguage].txtTodoLists);
 	$('[data-type="name_TODO"]').attr('placeholder',localization[globalInterfaceLanguage].pholderNameTODO);

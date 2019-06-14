@@ -88,6 +88,7 @@ class ManageActions(object):
         try:
             with new_revision(session=self.session, tm=transaction.manager, content=self.content):
                 self._actions[self._type](self.content)
+                self.content_api.execute_update_content_actions(self.content)
                 self.content_api.save(self.content, self._type)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
@@ -332,6 +333,7 @@ class WorkspaceResource(DAVCollection):
                 label=folder_label,
                 parent=self.content,
             )
+            self.content_api.execute_created_content_actions(folder)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
@@ -592,6 +594,7 @@ class FolderResource(WorkspaceResource):
                         new_workspace=destination_workspace,
                         must_stay_in_same_workspace=False,
                     )
+                self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
@@ -700,11 +703,7 @@ class FileResource(DAVNonCollection):
 
     @webdav_check_right(is_reader)
     def getContent(self) -> typing.BinaryIO:
-        filestream = compat.BytesIO()
-        filestream.write(self.content.depot_file.file.read())
-        filestream.seek(0)
-
-        return filestream
+        return self.content.depot_file.file
 
     def beginWrite(self, contentType: str = None) -> FakeFileStream:
         return FakeFileStream(
@@ -851,6 +850,7 @@ class FileResource(DAVNonCollection):
                         must_stay_in_same_workspace=False,
                         new_workspace=destination_workspace,
                     )
+                self.content_api.execute_update_content_actions(self.content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
 
@@ -892,13 +892,14 @@ class FileResource(DAVNonCollection):
         except ContentNotFound:
             destination_parent = None
         try:
-            self.content_api.copy(
+            new_content = self.content_api.copy(
                 item=self.content,
                 new_label=new_label,
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
             )
+            self.content_api.execute_created_content_actions(new_content)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc
         transaction.commit()
@@ -959,6 +960,8 @@ class OtherFileResource(FileResource):
 
     @webdav_check_right(is_reader)
     def getContent(self):
+        # TODO - G.M - 2019-06-13 - find solution to handle properly big file here without having
+        # big file in memory. see https://github.com/tracim/tracim/issues/1913
         filestream = compat.BytesIO()
 
         filestream.write(bytes(self.content_designed, "utf-8"))
@@ -970,6 +973,8 @@ class OtherFileResource(FileResource):
         return {"type": self.content.type.capitalize()}
 
     def design(self):
+        # TODO - G.M - 2019-06-13 - find solution to handle properly big file here without having
+        # big file in memory. see https://github.com/tracim/tracim/issues/1913
         if content_type_list.get_one_by_slug(self.content.type) == content_type_list.Page:
             return design_page(self.content, self.content_revision)
         if content_type_list.get_one_by_slug(self.content.type) == content_type_list.Thread:

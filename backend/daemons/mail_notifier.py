@@ -7,7 +7,7 @@ from pyramid.paster import setup_logging
 from tracim_backend.config import CFG
 from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 
-config_uri = os.environ['TRACIM_CONF_PATH']
+config_uri = os.environ["TRACIM_CONF_PATH"]
 
 setup_logging(config_uri)
 settings = get_appsettings(config_uri)

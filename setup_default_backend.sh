@@ -85,6 +85,29 @@ function setup_config_file {
     fi
 }
 
+function create_require_dirs {
+   log "create requires directories"
+   if [ ! -d "$DEFAULTDIR/backend/sessions_data/" ]; then
+     log "create session data dir ..."
+     mkdir "$DEFAULTDIR/backend/sessions_data/" && loggood "creation session data dir success" || logerror "failed to create session data dir"
+   fi
+   if [ ! -d "$DEFAULTDIR/backend/sessions_lock/" ]; then
+     log "create session lock dir ..."
+     mkdir "$DEFAULTDIR/backend/sessions_lock/" && loggood "creation session lock dir success" || logerror "failed to create session lock dir"
+   fi
+   if [ ! -d "$DEFAULTDIR/backend/depot/" ]; then
+     log "create depot dir ..."
+     mkdir "$DEFAULTDIR/backend/depot/" && loggood "creation depot dir success" || logerror "failed to create depot dir"
+   fi
+   if [ ! -d "$DEFAULTDIR/backend/previews/" ]; then
+     log "create preview dir ..."
+     mkdir "$DEFAULTDIR/backend/previews/" && loggood "creation preview dir success" || logerror "failed to create preview dir"
+   fi
+   if [ ! -d $DEFAULTDIR/backend/radicale_storage ]; then
+     log "create radicale storage dir ..."
+     mkdir $DEFAULTDIR/backend/radicale_storage && loggood "creation radicale storage dir success" || logerror "failed to create radicale storage dir"
+   fi
+}
 function setup_db {
     log "check if database exist"
     result=$(alembic -c development.ini current)
@@ -158,6 +181,7 @@ install_backend_system_dep
 setup_pyenv
 install_backend_python_packages
 setup_config_file
+create_require_dirs
 setup_db
 translate_email
 

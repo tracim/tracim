@@ -17,7 +17,6 @@ from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
-from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
@@ -31,6 +30,8 @@ from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ConflictingMoveInChild
+from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNotFound
@@ -47,7 +48,11 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
+from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
@@ -123,10 +128,11 @@ class AddCopyRevisionsResult(object):
         self.original_children_dict = original_children_dict  # dict key is original content id
 
 
-class ContentApi(object):
+SEARCH_SEPARATORS = ",| "
+SEARCH_DEFAULT_RESULT_NB = 10
 
-    SEARCH_SEPARATORS = ",| "
-    SEARCH_DEFAULT_RESULT_NB = 50
+
+class ContentApi(object):
 
     # DISPLAYABLE_CONTENTS = (
     #     content_type_list.Folder.slug,
@@ -252,11 +258,10 @@ class ContentApi(object):
         # Security layer: if user provided, filter
         # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
-            user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
-            workspace_ids = [
-                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
-            ]
+            workspace_ids = RoleApi(
+                session=self._session, current_user=self._user, config=self._config
+            ).get_user_workspaces_ids(self._user_id, UserRoleInWorkspace.READER)
             result = result.filter(
                 or_(
                     Content.workspace_id.in_(workspace_ids),
@@ -321,45 +326,7 @@ class ContentApi(object):
 
         return result
 
-    def _hard_filtered_base_query(self, workspace: Workspace = None) -> Query:
-        """
-        If set to True, then filterign on is_deleted and is_archived will also
-        filter parent properties. This is required for search() function which
-        also search in comments (for example) which may be 'not deleted' while
-        the associated content is deleted
-
-        :param hard_filtering:
-        :return:
-        """
-        result = self.__real_base_query(workspace)
-
-        if not self._show_deleted:
-            parent = aliased(Content)
-            result = (
-                result.join(parent, Content.parent)
-                .filter(Content.is_deleted == False)  # noqa: E711
-                .filter(parent.is_deleted == False)  # noqa: E711
-            )
-
-        if not self._show_archived:
-            parent = aliased(Content)
-            result = (
-                result.join(parent, Content.parent)
-                .filter(Content.is_archived == False)  # noqa: E711
-                .filter(parent.is_archived == False)  # noqa: E711
-            )
-
-        if not self._show_temporary:
-            parent = aliased(Content)
-            result = (
-                result.join(parent, Content.parent)
-                .filter(Content.is_temporary == False)  # noqa: E711
-                .filter(parent.is_temporary == False)  # noqa: E711
-            )
-
-        return result
-
-    def get_base_query(self, workspace: Workspace) -> Query:
+    def get_base_query(self, workspace: typing.Optional[Workspace]) -> Query:
         return self._base_query(workspace)
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
@@ -565,8 +532,8 @@ class ContentApi(object):
                 raise EmptyLabelNotAllowed(
                     "Content of type {} should have a valid label".format(content_type_slug)
                 )
-
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.parent = parent
 
         content.workspace = workspace
@@ -591,9 +558,14 @@ class ContentApi(object):
         assert parent and parent.type != FOLDER_TYPE
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
-                "Can't create comment on content, you need to change his status or state (deleted/archived) before any change."
+                "Can't create comment on content, you need to change his"
+                "status or state (deleted/archived) before any change."
             )
-        if not content:
+
+        config = HtmlSanitizerConfig(tag_blacklist=["script"], tag_whitelist=list())
+        sanitizer = HtmlSanitizer(html_body=content, config=config)
+        content = sanitizer.sanitize_html()
+        if (not content) or sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
 
         item = self.create(
@@ -606,10 +578,64 @@ class ContentApi(object):
         )
         item.description = content
         item.revision_type = ActionDescription.COMMENT
-
         if do_save:
             self.save(item, ActionDescription.COMMENT, do_notify=do_notify)
         return item
+
+    def execute_created_content_actions(self, content: Content) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post-create user actions
+        """
+        if self._config.SEARCH__ENABLED:
+            try:
+                content_in_context = ContentInContext(
+                    content, config=self._config, dbsession=self._session
+                )
+                search_api = SearchFactory.get_search_lib(
+                    current_user=self._user, config=self._config, session=self._session
+                )
+                search_api.index_content(content_in_context)
+            except Exception:
+                logger.exception(self, "Something goes wrong during indexing of new content")
+
+    def execute_update_content_actions(self, content: Content) -> None:
+        """
+        WARNING ! This method Will be Deprecated soon, see
+        https://github.com/tracim/tracim/issues/1589 and
+        https://github.com/tracim/tracim/issues/1487
+
+        This method do post-create user actions
+        """
+        if self._config.SEARCH__ENABLED:
+
+            try:
+                content_in_context = ContentInContext(
+                    content, config=self._config, dbsession=self._session
+                )
+                search_api = SearchFactory.get_search_lib(
+                    current_user=self._user, config=self._config, session=self._session
+                )
+                search_api.index_content(content_in_context)
+                # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
+                # see https://github.com/tracim/tracim/issues/1833
+                if content.last_revision.revision_type in (
+                    ActionDescription.DELETION,
+                    ActionDescription.ARCHIVING,
+                    ActionDescription.UNARCHIVING,
+                    ActionDescription.UNDELETION,
+                ):
+                    for child_content in content.get_children(recursively=True):
+                        child_in_context = ContentInContext(
+                            child_content, config=self._config, dbsession=self._session
+                        )
+                        search_api.index_content(child_in_context)
+
+            except Exception:
+                logger.exception(self, "Something goes wrong during indexing of content")
 
     def get_one_from_revision(
         self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None
@@ -772,7 +798,10 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_filename_and_parent_labels(
-        self, content_label: str, workspace: Workspace, content_parent_labels: [str] = None
+        self,
+        content_label: str,
+        workspace: Workspace,
+        content_parent_labels: typing.List[str] = None,
     ):
         """
         Return content with it's label, workspace and parents labels (optional)
@@ -816,7 +845,7 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
-        self, path_labels: [str], workspace: Workspace
+        self, path_labels: typing.List[str], workspace: Workspace
     ) -> Content:
         """
         Return a Content folder for given relative path.
@@ -1362,6 +1391,8 @@ class ContentApi(object):
 
     def set_status(self, content: Content, new_status: str):
         if new_status in content_status_list.get_all_slugs_values():
+            if self._user:
+                content.owner = self._user
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
@@ -1370,7 +1401,7 @@ class ContentApi(object):
     def move(
         self,
         item: Content,
-        new_parent: Content,
+        new_parent: Content = None,
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
     ) -> None:
@@ -1381,7 +1412,7 @@ class ContentApi(object):
     def _move_current(
         self,
         item: Content,
-        new_parent: Content,
+        new_parent: Content = None,
         must_stay_in_same_workspace: bool = True,
         new_workspace: Workspace = None,
     ) -> None:
@@ -1389,6 +1420,8 @@ class ContentApi(object):
         Move only current content, use _move_children_content_to_new_workspace
         to fix workspace_id of children.
         """
+
+        self._check_move_conflicts(item, new_parent)
 
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
@@ -1405,7 +1438,8 @@ class ContentApi(object):
         if new_parent and new_parent != item.parent:
             content_type = content_type_list.get_one_by_slug(item.type)
             self._check_valid_content_type_in_dir(content_type, new_parent, new_workspace)
-
+        if self._user:
+            item.owner = self._user
         item.parent = new_parent
         if new_workspace:
             item.workspace = new_workspace
@@ -1464,6 +1498,13 @@ class ContentApi(object):
                         subcontent_type=content_type.slug, content_id=workspace.workspace_id
                     )
                 )
+
+    def _check_move_conflicts(self, content: Content, new_parent: Content = None):
+        if new_parent:
+            if content.content_id == new_parent.content_id:
+                raise ConflictingMoveInItself("You can't move a content into itself")
+            if new_parent in content.get_children(recursively=True):
+                raise ConflictingMoveInChild("You can't move a content into one of its children")
 
     def copy(
         self,
@@ -1641,6 +1682,8 @@ class ContentApi(object):
             content=new_content,
             force_create_new_revision=True,
         ) as rev:
+            if self._user:
+                rev.owner = self._user
             rev.parent = new_parent
             rev.workspace = new_workspace
             rev.label = new_label
@@ -1748,8 +1791,8 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
-
-        item.owner = self._user
+        if self._user:
+            item.owner = self._user
         item.label = new_label
         item.description = (
             new_content if new_content else item.description
@@ -1773,7 +1816,8 @@ class ContentApi(object):
         # if new_mimetype == item.file_mimetype and \
         #         new_content == item.depot_file.file.read():
         #     raise SameValueError('The content did not changed')
-        item.owner = self._user
+        if self._user:
+            item.owner = self._user
         content_type_slug = item.type
         if new_filename:
             self._is_filename_available_or_raise(
@@ -1797,7 +1841,8 @@ class ContentApi(object):
         return item
 
     def archive(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_archived = True
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
@@ -1815,12 +1860,14 @@ class ContentApi(object):
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_archived = False
         content.revision_type = ActionDescription.UNARCHIVING
 
     def delete(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_deleted = True
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
@@ -1838,7 +1885,8 @@ class ContentApi(object):
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
-        content.owner = self._user
+        if self._user:
+            content.owner = self._user
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
@@ -2065,13 +2113,13 @@ class ContentApi(object):
             config=self._config, current_user=self._user, session=self._session
         ).notify_content_update(content)
 
-    def get_keywords(self, search_string, search_string_separators=None) -> [str]:
+    def get_keywords(self, search_string, search_string_separators=None) -> typing.List[str]:
         """
         :param search_string: a list of coma-separated keywords
         :return: a list of str (each keyword = 1 entry
         """
 
-        search_string_separators = search_string_separators or ContentApi.SEARCH_SEPARATORS
+        search_string_separators = search_string_separators or SEARCH_SEPARATORS
 
         keywords = []
         if search_string:
@@ -2081,26 +2129,76 @@ class ContentApi(object):
 
         return keywords
 
-    def search(self, keywords: [str]) -> Query:
+    def search(
+        self,
+        keywords: typing.List[str],
+        size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
+        offset: typing.Optional[int] = None,
+        content_types: typing.Optional[typing.List[str]] = None,
+    ) -> typing.Tuple[typing.List[Content], int]:
+        query = self._search_query(keywords=keywords, content_types=content_types)
+        results = []
+        current_offset = 0
+        parsed_content_ids = []
+        for content in query:
+            if len(results) >= size:
+                break
+            if not self._show_deleted:
+                if self.get_deleted_parent_id(content):
+                    continue
+            if not self._show_archived:
+                if self.get_archived_parent_id(content):
+                    continue
+            if content.type == content_type_list.Comment.slug:
+                # INFO - G.M - 2019-06-13 -  filter by content_types of parent for comment
+                # if correct content_type, content is parent.
+                if content.parent.type in content_types:
+                    content = content.parent
+                else:
+                    continue
+            if content.content_id in parsed_content_ids:
+                # INFO - G.M - 2019-06-13 - avoid duplication of same content in result list
+                continue
+            if current_offset >= offset:
+                parsed_content_ids.append(content.content_id)
+                results.append(content)
+            current_offset += 1
+
+        return results, current_offset
+
+    def _search_query(
+        self, keywords: typing.List[str], content_types: typing.Optional[typing.List[str]] = None
+    ) -> Query:
         """
         :return: a sorted list of Content items
         """
 
         if len(keywords) <= 0:
-            return None
+            return []
 
         filter_group_label = list(
             Content.label.ilike("%{}%".format(keyword)) for keyword in keywords
         )
-        filter_group_desc = list(
+        filter_group_filename = list(
+            Content.file_name.ilike("%{}%".format(keyword)) for keyword in keywords
+        )
+        filter_group_description = list(
             Content.description.ilike("%{}%".format(keyword)) for keyword in keywords
         )
         title_keyworded_items = (
-            self._hard_filtered_base_query()
-            .filter(or_(*(filter_group_label + filter_group_desc)))
+            self.get_base_query(None)
+            .filter(or_(*(filter_group_label + filter_group_filename + filter_group_description)))
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
+            .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))
         )
+
+        # INFO - G.M - 2019-06-13 - we add comment to content_types checked
+        if content_types:
+            searched_content_types = set(content_types + [content_type_list.Comment.slug])
+            title_keyworded_items = title_keyworded_items.filter(
+                Content.type.in_(searched_content_types)
+            )
 
         return title_keyworded_items
 
@@ -2112,34 +2210,21 @@ class ContentApi(object):
 
         return content_types
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def exclude_unavailable(self, contents: typing.List[Content]) -> typing.List[Content]:
-        """
-        Update and return list with content under archived/deleted removed.
-        :param contents: List of contents to parse
-        """
-        for content in contents[:]:
-            if self.content_under_deleted(content) or self.content_under_archived(content):
-                contents.remove(content)
-        return contents
-
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def content_under_deleted(self, content: Content) -> bool:
+    def get_deleted_parent_id(self, content: Content) -> typing.Optional[int]:
         if content.parent:
             if content.parent.is_deleted:
-                return True
+                return content.parent_id
             if content.parent.parent:
-                return self.content_under_deleted(content.parent)
-        return False
+                return self.get_deleted_parent_id(content.parent)
+        return 0
 
-    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
-    def content_under_archived(self, content: Content) -> bool:
+    def get_archived_parent_id(self, content: Content) -> typing.Optional[int]:
         if content.parent:
             if content.parent.is_archived:
-                return True
+                return content.parent_id
             if content.parent.parent:
-                return self.content_under_archived(content.parent)
-        return False
+                return self.get_archived_parent_id(content.parent)
+        return 0
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(

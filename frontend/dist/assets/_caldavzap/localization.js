@@ -75,7 +75,9 @@ localization['en_US']=	/* Jan Mate <jan.mate@inf-it.com> */
 	loadingCollectionList: 'Loading resource list',
 
 	txtCacheText: 'There is an update available on the server, please reload the page!',
-	txtCacheButton: 'Reload'
+	txtCacheButton: 'Reload',
+
+	fullscreenBtn: 'Fullscreen'
 };
 
 localization['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
@@ -103,7 +105,9 @@ localization['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	loadingCollectionList: 'Chargement de la liste des ressources',
 
 	txtCacheText: 'Il y a une mise à jour disponible sur le serveur, veuillez recharger la page s\'il vous plaît !',
-	txtCacheButton: 'Recharger'
+	txtCacheButton: 'Recharger',
+
+	fullscreenBtn: 'Plein écran'
 };
 
 localization['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */

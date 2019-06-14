@@ -34,7 +34,10 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
 
 const WorkspaceListItem = props => {
   return (
-    <li className='sidebar__content__navigation__workspace__item' data-cy={`sidebar__content__navigation__workspace__item_${props.idWorkspace}`}>
+    <li
+      className='sidebar__content__navigation__workspace__item'
+      data-cy={`sidebar__content__navigation__workspace__item_${props.idWorkspace}`}
+    >
       <div
         className='sidebar__content__navigation__workspace__item__wrapper'
         onClick={props.onClickTitle}
@@ -55,29 +58,32 @@ const WorkspaceListItem = props => {
 
         <div className='sidebar__content__navigation__workspace__item__icon'>
           {props.isOpenInSidebar
-            ? <i className={classnames('fa fa-chevron-up')} title={props.t('hide shared space')} />
-            : <i className={classnames('fa fa-chevron-down')} title={props.t('see shared space')} />
+            ? <i className={classnames('fa fa-chevron-up')} title={props.t('Hide shared space')} />
+            : <i className={classnames('fa fa-chevron-down')} title={props.t('See shared space')} />
           }
         </div>
       </div>
 
       <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
         <ul className='sidebar__content__navigation__workspace__item__submenu'>
-          {props.allowedAppList.map(aa =>
-            <li key={aa.slug}>
-              <Link to={buildLink(aa.route, props.location.search, props.idWorkspace, props.activeIdWorkspace)}>
+          {props.allowedAppList.map(allowedApp =>
+            <li
+              data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
+              key={allowedApp.slug}
+            >
+              <Link to={buildLink(allowedApp.route, props.location.search, props.idWorkspace, props.activeIdWorkspace)}>
                 <div className={classnames(
                   'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                  {'activeFilter': shouldDisplayAsActive(props.location, props.idWorkspace, props.activeIdWorkspace, aa)}
+                  {'activeFilter': shouldDisplayAsActive(props.location, props.idWorkspace, props.activeIdWorkspace, allowedApp)}
                 )}>
-                  <div className='dropdown__icon' style={{backgroundColor: aa.hexcolor}}>
-                    <i className={classnames(`fa fa-${aa.faIcon}`)} />
+                  <div className='dropdown__icon' style={{backgroundColor: allowedApp.hexcolor}}>
+                    <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
                   </div>
 
                   <div className='sidebar__content__navigation__workspace__item__submenu__dropdown__showdropdown'>
                     <div className='dropdown__title' id='navbarDropdown'>
                       <div className='dropdown__title__text'>
-                        {props.t(aa.label)}
+                        {props.t(allowedApp.label)}
                       </div>
                     </div>
                   </div>
