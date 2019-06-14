@@ -29,11 +29,11 @@ You can also use this list of [supported var](https://github.com/tracim/tracim/b
 
 If you want to activate notification by email:
 
-* EMAIL_NOTIFICATION=1 (In this case you need to give some smtp parameter visible in (develoment.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
+* EMAIL_NOTIFICATION=1 (In this case you need to give some smtp parameter visible in (development.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
 
 If you want to use reply_by_email feature:
 
-* REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in (develoment.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
+* REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in (development.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
 
 If you don't want to use webdav:
 
@@ -49,7 +49,7 @@ Exemple with basic instance of tracim (local usage with webdav and caldav):
 
         docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
-               -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
 To run tracim container with MySQL or PostgreSQL, you must set environment ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` variable.
 
@@ -58,20 +58,20 @@ Example with PostgreSQL:
     docker run -e DATABASE_TYPE=postgresql -e DATABASE_HOST=192.168.1.2 -e DATABASE_PORT=5432 \
                -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_NAME=tracim \
                -p 8080:80 \
-               -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
 Example with MySQL
 
     docker run -e DATABASE_TYPE=mysql -e DATABASE_HOST=192.168.1.2 -e DATABASE_PORT=3306 \
                -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_NAME=tracim \
                -p 8080:80 \
-               -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
 Example with SQLite
 
     docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
-               -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
                
 Exemple with SQlite, email_notification and some small instance personnalisation:
 
@@ -84,7 +84,7 @@ Exemple with SQlite, email_notification and some small instance personnalisation
                -e TRACIM_WEBSITE__TITLE=xxxxxx
                -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain}
                -p 8080:80 \
-               -v /var/tracim/etc/:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
                
 With this exemple, tracim is now accessible on my network and I can send notification by email when content change.
 
