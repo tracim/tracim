@@ -51,7 +51,7 @@ class TestSimpleSearch(FunctionalTest):
 
     @parameterized.expand(
         [
-            # content_name, search_string, nb_content_result, first_content_name
+            # created_content_name, search_string, nb_content_result, first_result_content_name
             # exact syntax
             ("testdocument", "testdocument", 1, "testdocument"),
             # autocomplete
@@ -63,7 +63,7 @@ class TestSimpleSearch(FunctionalTest):
         ]
     )
     def test_api___simple_search_ok__by_label(
-        self, content_name, search_string, nb_content_result, first_content_name
+        self, created_content_name, search_string, nb_content_result, first_result_content_name
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -85,7 +85,10 @@ class TestSimpleSearch(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
         )
         api.create(
             content_type_slug="html-document",
@@ -105,11 +108,11 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_content_name
+        assert search_result["contents"][0]["label"] == first_result_content_name
 
     @parameterized.expand(
         [
-            # content_name, search_string, nb_content_result, first_content_name
+            # created_content_name, search_string, nb_content_result, first_result_content_name
             # exact syntax
             ("good practices", "good practices.document.html", 1, "good practices"),
             # autocomplete
@@ -119,7 +122,7 @@ class TestSimpleSearch(FunctionalTest):
         ]
     )
     def test_api___simple_search_ok__by_filename(
-        self, content_name, search_string, nb_content_result, first_content_name
+        self, created_content_name, search_string, nb_content_result, first_result_content_name
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -141,7 +144,10 @@ class TestSimpleSearch(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
         )
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
@@ -158,18 +164,43 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_content_name
+        assert search_result["contents"][0]["label"] == first_result_content_name
 
     @parameterized.expand(
         [
-            # content_name, search_string, nb_content_result, first_content_name, content_body
+            # created_content_name, created_content_body, search_string, nb_content_result, first_result_content_name
             # exact syntax
-            ("good practices", "texttosearch", 1, "good practices", "texttosearch"),
-            ("good practices", "search", 1, "good practices", "texttosearch"),
+            (
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "subpart",
+                1,
+                "good practices",
+            ),
+            # autocompletion search
+            (
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "sub",
+                1,
+                "good practices",
+            ),
+            (
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "part",
+                1,
+                "good practices",
+            ),
         ]
     )
     def test_api___simple_search_ok__by_content(
-        self, content_name, search_string, nb_content_result, first_content_name, content_body
+        self,
+        created_content_name,
+        created_content_body,
+        search_string,
+        nb_content_result,
+        first_result_content_name,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -191,10 +222,15 @@ class TestSimpleSearch(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
         content = api.create(
-            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
         )
         with new_revision(session=dbsession, tm=transaction.manager, content=content):
-            api.update_content(content, new_label=content_name, new_content=content_body)
+            api.update_content(
+                content, new_label=created_content_name, new_content=created_content_body
+            )
             api.save(content)
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
@@ -211,38 +247,47 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_content_name
+        assert search_result["contents"][0]["label"] == first_result_content_name
 
     @parameterized.expand(
         [
-            # content_name, search_string, nb_content_result, first_content_name, first_comment_content, second_comment_content
+            # created_content_name, search_string, nb_content_result, first_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
             (
                 "good practices",
-                "texttosearch",
+                "eureka",
                 1,
                 "good practices",
-                "texttosearch",
-                "another_comment",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content",
+            ),
+            # autocompletion
+            (
+                "good practices",
+                "eur",
+                1,
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content containing eureka string",
             ),
             (
                 "good practices",
-                "texttosearch",
+                "reka",
                 1,
                 "good practices",
-                "texttosearch",
-                "another comment texttosearch",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content containing eureka string",
             ),
         ]
     )
     def test_api___simple_search_ok__by_comment_content(
         self,
-        content_name,
+        created_content_name,
         search_string,
         nb_content_result,
-        first_content_name,
-        first_comment_content,
-        second_comment_content,
+        first_result_content_name,
+        first_created_comment_content,
+        second_created_comment_content,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -264,13 +309,19 @@ class TestSimpleSearch(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
         content = api.create(
-            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=first_comment_content, do_save=True
+            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=second_comment_content, do_save=True
+            workspace=workspace,
+            parent=content,
+            content=second_created_comment_content,
+            do_save=True,
         )
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
@@ -287,7 +338,7 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_content_name
+        assert search_result["contents"][0]["label"] == first_result_content_name
 
     def test_api___simple_search_ok__no_search_string(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
