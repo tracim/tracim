@@ -95,10 +95,13 @@ you need to create a color.json file at root of tracim :
 
     cp ../color.json.sample ../color.json
 
-You should also create available dir for radicale, according to `caldav_storage_dir`
-parameter:
+You should also create requested folder for running tracim:
 
-     mkdir radicale_storage
+    mkdir sessions_data
+    mkdir sessions_lock
+    mkdir depot
+    mkdir previews
+    mkdir radicale_storage
 
 Initialize the database using [tracimcli](doc/cli.md) tool
 
@@ -116,6 +119,10 @@ You can run Tracim wsgi apps with many wsgi server. We provided here example to 
 - with pserve command of pyramid which rely only on development.ini pastedeploy config.
 
 ### With Uwsgi : great for production ###
+
+⚠ Be careful: if you use elasticsearch with tracim you need to add this variable in all uwsgi ini file
+
+    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
 
 #### Install Uwsgi
 
@@ -164,6 +171,8 @@ You can also preset uwsgi config for tracim, this way, creating this kind of .in
     module = wsgi.web:application
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+    
+With elasticsearch add: `env = TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}`
 
 and for webdav :
 
@@ -175,6 +184,8 @@ and for webdav :
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
+With elasticsearch add: `env = TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}`
+
 and for caldav :
 
     # You need to replace <PATH> with correct absolute path
@@ -184,6 +195,8 @@ and for caldav :
     module = wsgi.caldav:application
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+    
+With elasticsearch add: `env = TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}`
 
 You can then run the process this way :
 
@@ -195,6 +208,10 @@ You can then run the process this way :
     uwsgi --ini <WSGI_CONF_CALDAV>.ini --http-socket localhost:5232
 
 ### With Pserve : legacy way, usefull for debug and dev ###
+
+⚠ Be careful: if you use elasticsearch with tracim you need to export this variable first
+
+    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
 
 This method rely on development.ini configuration. default web server used is _Waitress_
 in` development.ini.sample`
@@ -276,6 +293,10 @@ run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 ## Run Tests and others checks ##
 
 ### Run Tests ###
+
+⚠ Be careful: if you use elasticsearch with tracim you need to export this variable first
+
+    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
 
 Some directory are required to make tests functional, you can create them and do some other check
 with this script:
