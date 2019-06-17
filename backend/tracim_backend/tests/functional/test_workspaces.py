@@ -170,6 +170,163 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is False
 
+    def test_api__update_workspace__ok_200__partial_change_label_only(self) -> None:
+        """
+        Test update workspace
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+
+        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(app_list)
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace
+        )  # nope8
+
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # Before
+        res = self.testapp.get("/api/v2/workspaces/1", status=200)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
+        # 1. modify workspace label only
+        params = {"label": "superworkspace"}
+        res = self.testapp.put_json("/api/v2/workspaces/1", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "superworkspace"
+        assert workspace["label"] == "superworkspace"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
+        # after
+        res = self.testapp.get("/api/v2/workspaces/1", status=200)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "superworkspace"
+        assert workspace["label"] == "superworkspace"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
+    def test_api__update_workspace__ok_200__partial_change_agenda_enabled_only(self) -> None:
+        """
+        Test update workspace
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+
+        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(app_list)
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace
+        )  # nope8
+
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # Before
+        res = self.testapp.get("/api/v2/workspaces/1", status=200)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
+        # modify agenda enabled only
+        params = {"agenda_enabled": False}
+        res = self.testapp.put_json("/api/v2/workspaces/1", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is False
+
+        # after
+        res = self.testapp.get("/api/v2/workspaces/1", status=200)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is False
+
+    def test_api__update_workspace__ok_200__partial_change_description_only(self) -> None:
+        """
+        Test update workspace
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+
+        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(app_list)
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(
+            workspace=workspace
+        )  # nope8
+
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        # Before
+        res = self.testapp.get("/api/v2/workspaces/1", status=200)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "All importants documents"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
+        # modify workspace description only
+        params = {"description": "mysuperdescription"}
+        res = self.testapp.put_json("/api/v2/workspaces/1", status=200, params=params)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "mysuperdescription"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
+        # after
+        res = self.testapp.get("/api/v2/workspaces/1", status=200)
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace["workspace_id"] == 1
+        assert workspace["slug"] == "business"
+        assert workspace["label"] == "Business"
+        assert workspace["description"] == "mysuperdescription"
+        assert len(workspace["sidebar_entries"]) == len(default_sidebar_entry)
+        assert workspace["is_deleted"] is False
+        assert workspace["agenda_enabled"] is True
+
     def test_api__update_workspace__err_400__workspace_label_already_used(self) -> None:
         """
         Test update workspace with empty label

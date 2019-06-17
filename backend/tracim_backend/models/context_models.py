@@ -453,7 +453,9 @@ class WorkspaceUpdate(object):
     Update workspace
     """
 
-    def __init__(self, label: str, description: str, agenda_enabled: bool = True) -> None:
+    def __init__(
+        self, label: str = None, description: str = None, agenda_enabled: bool = None
+    ) -> None:
         self.label = label
         self.description = description
         self.agenda_enabled = agenda_enabled

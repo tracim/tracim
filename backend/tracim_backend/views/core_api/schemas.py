@@ -660,11 +660,23 @@ class LoginOutputHeaders(marshmallow.Schema):
 
 class WorkspaceModifySchema(marshmallow.Schema):
     label = StrippedString(
-        required=True, example="My Workspace", validate=not_empty_string_validator
+        required=False,
+        example="My Workspace",
+        validate=not_empty_string_validator,
+        default=None,
+        allow_none=True,
     )
-    description = StrippedString(required=True, example="A super description of my workspace.")
+    description = StrippedString(
+        required=False,
+        example="A super description of my workspace.",
+        default=None,
+        allow_none=True,
+    )
     agenda_enabled = marshmallow.fields.Bool(
-        required=False, default=True, description="has workspace has an associated agenda ?"
+        required=False,
+        default=None,
+        description="has workspace has an associated agenda ?",
+        allow_none=True,
     )
 
     @post_load
