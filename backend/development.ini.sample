@@ -412,6 +412,7 @@ search.engine = simple
 ;search.elasticsearch.index_alias = tracim_contents
 # template_name for all index created currently only {index_alias} and {date} variable are usable.
 # be carefull this template is use to find all index to delete with tracimcli search delete command
+# default value is "{index_alias}-{date}"
 ;search.elasticsearch.index_pattern_template = {index_alias}-{date}
 # if you use ingest mode in elasticsearch, you can activate file content ingest
 # for search (default as false)
