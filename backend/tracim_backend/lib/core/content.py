@@ -609,32 +609,31 @@ class ContentApi(object):
 
         This method do post-create user actions
         """
-        if self._config.SEARCH__ENABLED:
 
-            try:
-                content_in_context = ContentInContext(
-                    content, config=self._config, dbsession=self._session
-                )
-                search_api = SearchFactory.get_search_lib(
-                    current_user=self._user, config=self._config, session=self._session
-                )
-                search_api.index_content(content_in_context)
-                # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
-                # see https://github.com/tracim/tracim/issues/1833
-                if content.last_revision.revision_type in (
-                    ActionDescription.DELETION,
-                    ActionDescription.ARCHIVING,
-                    ActionDescription.UNARCHIVING,
-                    ActionDescription.UNDELETION,
-                ):
-                    for child_content in content.get_children(recursively=True):
-                        child_in_context = ContentInContext(
-                            child_content, config=self._config, dbsession=self._session
-                        )
-                        search_api.index_content(child_in_context)
+        try:
+            content_in_context = ContentInContext(
+                content, config=self._config, dbsession=self._session
+            )
+            search_api = SearchFactory.get_search_lib(
+                current_user=self._user, config=self._config, session=self._session
+            )
+            search_api.index_content(content_in_context)
+            # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
+            # see https://github.com/tracim/tracim/issues/1833
+            if content.last_revision.revision_type in (
+                ActionDescription.DELETION,
+                ActionDescription.ARCHIVING,
+                ActionDescription.UNARCHIVING,
+                ActionDescription.UNDELETION,
+            ):
+                for child_content in content.get_children(recursively=True):
+                    child_in_context = ContentInContext(
+                        child_content, config=self._config, dbsession=self._session
+                    )
+                    search_api.index_content(child_in_context)
 
-            except Exception:
-                logger.exception(self, "Something goes wrong during indexing of content")
+        except Exception:
+            logger.exception(self, "Something goes wrong during indexing of content")
 
     def get_one_from_revision(
         self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None
