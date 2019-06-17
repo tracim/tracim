@@ -44,20 +44,3 @@ class ParametersListCommand(AppContextCommand):
                     env_var_name=config.env_var_name,
                 )
             )
-        # FIXME - G.M - 2019-06-12 - remove this hardcoded code when
-        # index alias and index pattern template will be normals tracim parameters.
-        # https://github.com/tracim/tracim/issues/1835
-        print(
-            parsed_args.template.format(
-                config_name="SEARCH__ELASTICSEARCH__INDEX_ALIAS",
-                config_file_name="N/A",
-                env_var_name="TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS",
-            )
-        )
-        print(
-            parsed_args.template.format(
-                config_name="SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE",
-                config_file_name="N/A",
-                env_var_name="TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE",
-            )
-        )

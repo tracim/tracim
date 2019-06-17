@@ -98,12 +98,12 @@ Priority order is (from less to most priority):
 |TRACIM_CALDAV__RADICALE_PROXY__BASE_URL|caldav.radicale_proxy.base_url|CALDAV__RADICALE_PROXY__BASE_URL|
 |TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|caldav.radicale.storage.filesystem_folder|CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|
 |TRACIM_SEARCH__ENGINE         |search.engine                 |SEARCH__ENGINE                |
+|TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias|SEARCH__ELASTICSEARCH__INDEX_ALIAS|
+|TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template|SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
 |TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST|search.elasticsearch.use_ingest|SEARCH__ELASTICSEARCH__USE_INGEST|
 |TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|search.elasticsearch.ingest.mimetype_whitelist|SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|
 |TRACIM_SEARCH__ELASTICSEARCH__HOST|search.elasticsearch.host     |SEARCH__ELASTICSEARCH__HOST   |
 |TRACIM_SEARCH__ELASTICSEARCH__PORT|search.elasticsearch.port     |SEARCH__ELASTICSEARCH__PORT   |
-|TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias                           |SEARCH__ELASTICSEARCH__INDEX_ALIAS|
-|TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template   |SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
 
 ### Currently config-file only params:
 
