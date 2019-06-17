@@ -1,6 +1,4 @@
-from fnmatch import fnmatch
 import os
-import typing
 
 # INFO - G.M - 2019-05-31 - Analyzer/indexing explained:
 # Instead of relying of wildcard for autocompletion which is costly and make some feature doesn't
@@ -91,19 +89,6 @@ class IndexedContent(Document):
     ElasticSearch Content Models.
     Used for index creation.
     """
-
-    @classmethod
-    def _matches(cls, hit: typing.Dict[str, typing.Any]) -> bool:
-        # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
-        # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
-        # override _matches to match indices in a pattern instead of just ALIAS
-        # hit is the raw dict as returned by elasticsearch
-
-        return fnmatch(hit["_index"], INDEX_DOCUMENTS_PATTERN)
-
-    class Index:
-        # we will use an alias instead of the index
-        name = INDEX_DOCUMENTS_ALIAS
 
     content_id = Integer()
     label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)

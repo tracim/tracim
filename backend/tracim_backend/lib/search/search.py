@@ -5,6 +5,7 @@ import typing
 
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IngestClient
+from elasticsearch_dsl import Index
 from elasticsearch_dsl import Search
 from sqlalchemy.orm import Session
 
@@ -13,6 +14,7 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import SEARCH_DEFAULT_RESULT_NB
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.models import ESContentSearchResponse
@@ -192,7 +194,8 @@ class ESSearchApi(SearchApi):
         index_template.save(using=self.es)
 
         # create the first index if it doesn't exist
-        if not IndexedContent._index.exists(using=self.es):
+        current_index = Index(INDEX_DOCUMENTS_ALIAS)
+        if not current_index.exists(using=self.es):
             self.migrate_index(move_data=False)
 
         logger.info(self, "ES index is ready")
@@ -367,9 +370,11 @@ class ESSearchApi(SearchApi):
                 file_ = content.get_b64_file()
                 if file_:
                     indexed_content.file = file_
-                    indexed_content.save(using=self.es, pipeline="attachment")
+                    indexed_content.save(
+                        using=self.es, pipeline="attachment", index=INDEX_DOCUMENTS_ALIAS
+                    )
                     return
-        indexed_content.save(using=self.es)
+        indexed_content.save(using=self.es, index=INDEX_DOCUMENTS_ALIAS)
 
     def search_content(
         self,
