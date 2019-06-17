@@ -5,6 +5,7 @@ import typing
 
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IngestClient
+from elasticsearch_dsl import Index
 from elasticsearch_dsl import Search
 from sqlalchemy.orm import Session
 
@@ -165,6 +166,11 @@ class ESSearchApi(SearchApi):
                 )
             ]
         )
+        self.index_document_pattern = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE.format(
+            date="*", index_alias=config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
+        )
+        self.index_document_pattern_template = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE
+        self.index_document_alias = config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
 
     def create_index(self) -> None:
         """
@@ -173,8 +179,6 @@ class ESSearchApi(SearchApi):
         deploy
         """
         # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
         from tracim_backend.lib.search.es_models import IndexedContent
 
         # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
@@ -185,14 +189,15 @@ class ESSearchApi(SearchApi):
             self._create_ingest_pipeline()
         # create an index template
         index_template = IndexedContent._index.as_template(
-            INDEX_DOCUMENTS_ALIAS, INDEX_DOCUMENTS_PATTERN
+            self.index_document_alias, self.index_document_pattern
         )
         # upload the template into elasticsearch
         # potentially overriding the one already there
         index_template.save(using=self.es)
 
         # create the first index if it doesn't exist
-        if not IndexedContent._index.exists(using=self.es):
+        current_index = Index(self.index_document_alias)
+        if not current_index.exists(using=self.es):
             self.migrate_index(move_data=False)
 
         logger.info(self, "ES index is ready")
@@ -203,21 +208,16 @@ class ESSearchApi(SearchApi):
         periodically refresh, usefull for automated tests
         see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html
         """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
 
-        self.es.indices.refresh(INDEX_DOCUMENTS_ALIAS)
+        self.es.indices.refresh(self.index_document_alias)
 
     def delete_index(self) -> None:
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
 
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
-        logger.info(self, "delete index with pattern {}".format(INDEX_DOCUMENTS_PATTERN))
-        self.es.indices.delete(INDEX_DOCUMENTS_PATTERN, allow_no_indices=True)
-        self.es.indices.delete_template(INDEX_DOCUMENTS_ALIAS)
+        logger.info(self, "delete index with pattern {}".format(self.index_document_pattern))
+        self.es.indices.delete(self.index_document_pattern, allow_no_indices=True)
+        self.es.indices.delete_template(self.index_document_alias)
 
     def migrate_index(self, move_data=True, update_alias=True) -> None:
         """
@@ -229,16 +229,11 @@ class ESSearchApi(SearchApi):
         any and all searches without any loss of functionality. It should, however,
         not perform any writes at this time as those might be lost.
         """
-        # FIXME BS 2019-06-10: Load ES model only when ES search (see #1892)
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN
-        from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_PATTERN_TEMPLATE
-
         # INFO - G.M - 2019-05-15 - alias migration mecanism to allow easily updatable index.
         # from https://github.com/elastic/elasticsearch-dsl-py/blob/master/examples/alias_migration.py
         # construct a new index name by appending current timestamp
-        next_index = INDEX_DOCUMENTS_PATTERN_TEMPLATE.replace(
-            "{index_alias}", INDEX_DOCUMENTS_ALIAS
+        next_index = self.index_document_pattern_template.replace(
+            "{index_alias}", self.index_document_alias
         ).replace("{date}", datetime.now().strftime("%Y%m%d%H%M%S%f"))
 
         logger.info(self, 'create new index "{}"'.format(next_index))
@@ -247,11 +242,14 @@ class ESSearchApi(SearchApi):
 
         if move_data:
             logger.info(
-                self, 'reindex data from "{}" to "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index)
+                self, 'reindex data from "{}" to "{}"'.format(self.index_document_alias, next_index)
             )
             # move data from current alias to the new index
             self.es.reindex(
-                body={"source": {"index": INDEX_DOCUMENTS_ALIAS}, "dest": {"index": next_index}},
+                body={
+                    "source": {"index": self.index_document_alias},
+                    "dest": {"index": next_index},
+                },
                 request_timeout=3600,
             )
             # refresh the index to make the changes visible
@@ -260,7 +258,9 @@ class ESSearchApi(SearchApi):
         if update_alias:
             logger.info(
                 self,
-                'set alias "{}" to point on index "{}"'.format(INDEX_DOCUMENTS_ALIAS, next_index),
+                'set alias "{}" to point on index "{}"'.format(
+                    self.index_document_alias, next_index
+                ),
             )
             # repoint the alias to point to the newly created index
             self.es.indices.update_aliases(
@@ -268,11 +268,11 @@ class ESSearchApi(SearchApi):
                     "actions": [
                         {
                             "remove": {
-                                "alias": INDEX_DOCUMENTS_ALIAS,
-                                "index": INDEX_DOCUMENTS_PATTERN,
+                                "alias": self.index_document_alias,
+                                "index": self.index_document_pattern,
                             }
                         },
-                        {"add": {"alias": INDEX_DOCUMENTS_ALIAS, "index": next_index}},
+                        {"add": {"alias": self.index_document_alias, "index": next_index}},
                     ]
                 }
             )
@@ -367,9 +367,11 @@ class ESSearchApi(SearchApi):
                 file_ = content.get_b64_file()
                 if file_:
                     indexed_content.file = file_
-                    indexed_content.save(using=self.es, pipeline="attachment")
+                    indexed_content.save(
+                        using=self.es, pipeline="attachment", index=self.index_document_alias
+                    )
                     return
-        indexed_content.save(using=self.es)
+        indexed_content.save(using=self.es, index=self.index_document_alias)
 
     def search_content(
         self,
@@ -395,7 +397,9 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
         # syntax to match complex case,
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
-        search = Search(using=self.es, doc_type=IndexedContent).query(
+        search = Search(
+            using=self.es, doc_type=IndexedContent, index=self.index_document_alias
+        ).query(
             "simple_query_string",
             query=search_string,
             # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and

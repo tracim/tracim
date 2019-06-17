@@ -32,15 +32,21 @@ export function workspaceList (state = [], action) {
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({
         ...ws,
-        memberList: action.workspaceListMemberList.find(wlml => wlml.idWorkspace === ws.id).memberList
+        memberList: action.workspaceListMemberList.find(wlml => wlml.idWorkspace === ws.id).memberList.map(m => ({
+          id: m.user_id,
+          publicName: m.user.public_name,
+          role: m.role,
+          isActive: m.is_active,
+          doNotify: m.do_notify
+        }))
       }))
 
     case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
       return state.map(ws => ws.id === action.idWorkspace
         ? {
           ...ws,
-          memberList: ws.memberList.map(u => u.user_id === action.idUser
-            ? {...u, do_notify: action.doNotify}
+          memberList: ws.memberList.map(u => u.id === action.idUser
+            ? {...u, doNotify: action.doNotify}
             : u
           )
         }

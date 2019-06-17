@@ -2977,7 +2977,7 @@ class TestContentApi(DefaultTest):
         p = api.create(content_type_list.Page.slug, workspace, a, "this is another thing", "", True)
 
         with new_revision(session=self.session, tm=transaction.manager, content=p):
-            p.description = "This is some randomized test"
+            p.description = "This is some other test"
 
         api.save(p)
         original_id = a.content_id

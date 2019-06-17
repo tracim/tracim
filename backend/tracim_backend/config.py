@@ -503,6 +503,14 @@ class CFG(object):
     def _load_search_config(self):
         self.SEARCH__ENABLED = asbool(self.get_raw_config("search.enabled", "False"))
         self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
+
+        DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
+        self.SEARCH__ELASTICSEARCH__INDEX_ALIAS = self.get_raw_config(
+            "search.elasticsearch.index_alias"
+        )
+        self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
+            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE
+        )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
         )
@@ -538,6 +546,7 @@ class CFG(object):
         """
         Check config for global stuff
         """
+        self.check_mandatory_param("SQLALCHEMY__URL", self.SQLALCHEMY__URL)
         self.check_mandatory_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR)
         self.check_directory_path_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True)
 
@@ -813,7 +822,11 @@ class CFG(object):
             # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
             # see https://github.com/tracim/tracim/issues/1835
             if self.SEARCH__ENGINE == "elasticsearch":
-                from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS  # noqa: F401
+                self.check_mandatory_param(
+                    "SEARCH__ELASTICSEARCH__INDEX_ALIAS",
+                    self.SEARCH__ELASTICSEARCH__INDEX_ALIAS,
+                    when_str="if elasticsearch search feature is enabled",
+                )
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
@@ -858,7 +871,7 @@ class CFG(object):
         if not value:
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
-                "Set it before continuing.".format(param_name, when_str="")
+                "Set it before continuing.".format(param_name, when_str=when_str)
             )
 
     def check_directory_path_param(
