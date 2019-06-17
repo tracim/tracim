@@ -13,7 +13,6 @@ import {
   ROLE_OBJECT,
   DRAG_AND_DROP
 } from '../../helper.js'
-import { ListItemWrapper } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
@@ -70,6 +69,7 @@ class Folder extends React.Component {
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
+              style={{top: '18px', left: '-2px', padding: '0 7px'}}
             />
           )}
 
@@ -173,38 +173,30 @@ class Folder extends React.Component {
               />
             )
             : (
-              <ListItemWrapper
+              <ContentItem
+                contentId={content.id}
+                workspaceId={content.idWorkspace}
+                parentId={content.idParent}
                 label={content.label}
+                type={content.type}
+                fileName={content.fileName}
+                fileExtension={content.fileExtension}
+                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
+                urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
+                userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                onClickExtendedAction={{
+                  edit: e => props.onClickExtendedAction.edit(e, content),
+                  download: e => props.onClickExtendedAction.download(e, content),
+                  archive: e => props.onClickExtendedAction.archive(e, content),
+                  delete: e => props.onClickExtendedAction.delete(e, content)
+                }}
+                onDropMoveContentItem={props.onDropMoveContentItem}
                 isLast={props.isLast && i === folderContentList.length - 1}
                 key={content.id}
-              >
-                <ContentItem
-                  contentId={content.id}
-                  workspaceId={content.idWorkspace}
-                  parentId={content.idParent}
-                  label={content.label}
-                  type={content.type}
-                  fileName={content.fileName}
-                  fileExtension={content.fileExtension}
-                  faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
-                  statusSlug={content.statusSlug}
-                  read={props.readStatusList.includes(content.id)}
-                  contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                  urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
-                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                  onClickExtendedAction={{
-                    edit: e => props.onClickExtendedAction.edit(e, content),
-                    download: e => props.onClickExtendedAction.download(e, content),
-                    archive: e => props.onClickExtendedAction.archive(e, content),
-                    delete: e => props.onClickExtendedAction.delete(e, content)
-                  }}
-                  onDropMoveContentItem={props.onDropMoveContentItem}
-                  isLast={props.isLast && i === folderContentList.length - 1}
-                  key={content.id}
-                />
-              </ListItemWrapper>
+              />
             )
           )}
         </div>
@@ -214,26 +206,32 @@ class Folder extends React.Component {
 }
 
 const folderDragAndDropTarget = {
-  drop: props => ({
-    workspaceId: props.folderData.idWorkspace,
-    contentId: props.folderData.id,
-    parentId: props.folderData.idParent
-  })
+  drop: props => {
+    return {
+      workspaceId: props.folderData.idWorkspace,
+      contentId: props.folderData.id,
+      parentId: props.folderData.idParent
+    }
+  }
 }
 
-const folderDragAndDropTargetCollect = (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  canDrop: monitor.canDrop(),
-  isOver: monitor.isOver({shallow: false}),
-  draggedItem: monitor.getItem()
-})
+const folderDragAndDropTargetCollect = (connect, monitor) => {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    canDrop: monitor.canDrop(),
+    isOver: monitor.isOver({shallow: false}),
+    draggedItem: monitor.getItem()
+  }
+}
 
 const folderDragAndDropSource = {
-  beginDrag: props => ({
-    workspaceId: props.folderData.idWorkspace,
-    contentId: props.folderData.id,
-    parentId: props.folderData.idParent || 0
-  }),
+  beginDrag: props => {
+    return {
+      workspaceId: props.folderData.idWorkspace,
+      contentId: props.folderData.id,
+      parentId: props.folderData.idParent || 0
+    }
+  },
   endDrag: (props, monitor) => {
     const item = monitor.getItem()
     const dropResult = monitor.getDropResult()

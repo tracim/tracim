@@ -8,6 +8,7 @@ export const DragHandle = props => (
     className={`dragHandle ${props.customClass}`}
     title={props.title}
     ref={props.connectDragSource}
+    style={props.style}
   >
     <i className='fa fa-arrows' />
   </div>
@@ -18,10 +19,12 @@ export default DragHandle
 DragHandle.propTypes = {
   connectDragSource: PropTypes.func.isRequired,
   customClass: PropTypes.string,
-  title: PropTypes.string
+  title: PropTypes.string,
+  style: PropTypes.object
 }
 
 DragHandle.defaultProps = {
   customClass: '',
-  title: ''
+  title: '',
+  style: {}
 }
