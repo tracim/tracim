@@ -443,9 +443,6 @@ for default config file.
 
 # Search method using elastic_search (tracim 2.3+) #
 
-⚠ Be careful: if you use elasticsearch with tracim you need to export this variable first
-
-    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
 
 First, you need an elastic_search server. An easy way to have one with docker can be (don't use for production):
 
@@ -456,6 +453,7 @@ You then need to setup config file:
     search.engine = elasticsearch
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
+    search.elasticsearch.index_alias = tracim_contents
 
 You're elasticsearch server need to be running. You can then setup index with:
 
