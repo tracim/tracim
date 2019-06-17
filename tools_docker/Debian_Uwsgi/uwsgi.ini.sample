@@ -8,6 +8,6 @@ socket-timeout = 360
 #workers = 1
 #threads = 8
 logto = /var/tracim/logs/tracim_web.log
-for-readline = /var/data/tracim_env_variable
+for-readline = /var/tracim/data/tracim_env_variable
   env = %(_)
 endfor =
