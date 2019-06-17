@@ -128,11 +128,9 @@ class Header extends React.Component {
               {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                    <div>
-                      <i className='header__menu__system__icon slowblink fa fa-envelope'>
-                        <i className='header__menu__system__icon__top slowblink fa fa-warning text-danger' />
-                      </i>
-                    </div>
+                    <i className='header__menu__system__icon slowblink fa fa-envelope'>
+                      <i className='header__menu__system__icon__warning slowblink fa fa-warning text-danger' />
+                    </i>
                   </div>
                 </li>
               )}
