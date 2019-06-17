@@ -24,7 +24,7 @@ export const Notification = props =>
         <tbody>
           {props.workspaceList.length > 0
             ? props.workspaceList.map(ws => {
-              const mySelf = ws.memberList.find(u => u.user_id === props.idUserLogged)
+              const mySelf = ws.memberList.find(u => u.id === props.idUserLogged)
               const myRole = ROLE.find(r => r.slug === mySelf.role)
               return (
                 <tr key={`ws_${ws.id}`}>
@@ -47,8 +47,8 @@ export const Notification = props =>
 
                   <td>
                     <BtnSwitch
-                      checked={mySelf.do_notify}
-                      onChange={() => props.onChangeSubscriptionNotif(ws.id, !mySelf.do_notify)}
+                      checked={mySelf.doNotify}
+                      onChange={() => props.onChangeSubscriptionNotif(ws.id, !mySelf.doNotify)}
                     />
                   </td>
                 </tr>
