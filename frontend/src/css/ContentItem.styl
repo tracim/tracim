@@ -1,8 +1,14 @@
 .content
+  position relative
   &__type
     padding 0 25px
     font-size 30px
     text-align center
+  &__dragPreview
+    display flex
+    align-items center
+    flex 1
+    width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
   &__name
     padding 5px
     flex 1
@@ -22,6 +28,10 @@
       font-size 18px
     &__icon
       font-size 20px
+  & .dragHandle
+    display none
+  &:hover > &__item > .dragHandle
+    display block
 
 //MEDIAQUERIES
 
