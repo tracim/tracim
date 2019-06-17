@@ -454,7 +454,10 @@ class WorkspaceUpdate(object):
     """
 
     def __init__(
-        self, label: str = None, description: str = None, agenda_enabled: bool = None
+        self,
+        label: typing.Optional[str] = None,
+        description: typing.Optional[str] = None,
+        agenda_enabled: typing.Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
