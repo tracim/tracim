@@ -590,17 +590,16 @@ class ContentApi(object):
 
         This method do post-create user actions
         """
-        if self._config.SEARCH__ENABLED:
-            try:
-                content_in_context = ContentInContext(
-                    content, config=self._config, dbsession=self._session
-                )
-                search_api = SearchFactory.get_search_lib(
-                    current_user=self._user, config=self._config, session=self._session
-                )
-                search_api.index_content(content_in_context)
-            except Exception:
-                logger.exception(self, "Something goes wrong during indexing of new content")
+        try:
+            content_in_context = ContentInContext(
+                content, config=self._config, dbsession=self._session
+            )
+            search_api = SearchFactory.get_search_lib(
+                current_user=self._user, config=self._config, session=self._session
+            )
+            search_api.index_content(content_in_context)
+        except Exception:
+            logger.exception(self, "Something goes wrong during indexing of new content")
 
     def execute_update_content_actions(self, content: Content) -> None:
         """

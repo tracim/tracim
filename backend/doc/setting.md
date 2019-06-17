@@ -441,7 +441,6 @@ First, you need an elastic_search server. An easy way to have one with docker ca
 
 You then need to setup config file:
 
-    search.enabled = True
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
 
