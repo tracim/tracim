@@ -486,7 +486,9 @@ class WorkspaceContent extends React.Component {
 
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__fileandfolder folder__content active'>
-                <ContentItemHeader />
+                {workspaceContentList.length > 0 &&
+                  <ContentItemHeader />
+                }
 
                 {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)

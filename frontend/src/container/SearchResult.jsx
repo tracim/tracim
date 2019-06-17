@@ -112,8 +112,7 @@ class searchResult extends React.Component {
 
   getSubtitle () {
     let subtitle = ''
-
-    if (searchResult.currentNumberSearchResults !== 0) {
+    if (this.props.searchResult.currentNumberSearchResults > 0) {
       subtitle = this.setSubtitle()
     }
 
@@ -157,7 +156,9 @@ class searchResult extends React.Component {
 
             <PageContent parentClass='searchResult'>
               <div className='folder__content' data-cy={'search__content'}>
-                <ContentItemHeader showSearchDetails />
+                {props.searchResult.currentNumberSearchResults > 0 &&
+                  <ContentItemHeader showSearchDetails />
+                }
 
                 {props.searchResult.currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
