@@ -397,7 +397,9 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-05-31 - search using simple_query_string, which mean user-friendly
         # syntax to match complex case,
         # see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
-        search = Search(using=self.es, doc_type=IndexedContent).query(
+        search = Search(
+            using=self.es, doc_type=IndexedContent, index=self.index_document_alias
+        ).query(
             "simple_query_string",
             query=search_string,
             # INFO - G.M - 2019-05-31 - "^5" means x5 boost on field, this will reorder result and
