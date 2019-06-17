@@ -859,7 +859,7 @@ class CFG(object):
         if not value:
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
-                "Set it before continuing.".format(param_name, when_str="")
+                "Set it before continuing.".format(param_name, when_str=when_str)
             )
 
     def check_directory_path_param(
