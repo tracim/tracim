@@ -35,16 +35,24 @@ class searchResult extends React.Component {
       showDeleted: false,
       showActive: true
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case 'allApp_changeLang':
+        console.log('%c<Search> Custom event', 'color: #28a745', type, data)
+        this.buildBreadcrumbs(); break
     }
   }
 
   componentDidMount () {
     this.buildBreadcrumbs()
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   getPath = (parentsList) => {
