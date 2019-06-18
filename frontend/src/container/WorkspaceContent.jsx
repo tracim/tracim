@@ -531,6 +531,7 @@ class WorkspaceContent extends React.Component {
                         isLast={i === rootContentList.length - 1}
                         urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
+                        read={currentWorkspace.contentReadStatusList.includes(content.id)}
                         onClickExtendedAction={{
                           edit: e => this.handleClickEditContentItem(e, content),
                           download: e => this.handleClickDownloadContentItem(e, content),
