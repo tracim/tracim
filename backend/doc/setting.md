@@ -456,18 +456,18 @@ You then need to setup config file:
 
 You're elasticsearch server need to be running. You can then setup index with:
 
-`tracimcli search init`
+`tracimcli search index-create`
 
 You can (re)sync data with:
 
-`tracimcli search index`
+`tracimcli search index-populate`
 
 you can delete index using:
 
-`tracimcli search delete`
+`tracimcli search index-drop`
 
 If there is an update of tracim, use this one to migrate index (experimental, prefer delete,init,index mecanism):
 
-`tracimcli search upgrade`
+`tracimcli search index-upgrade-experimental`
 
 Your data are correctly indexed now, you can go to tracim ui and use search mecanism.

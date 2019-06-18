@@ -25,20 +25,11 @@ class Home extends React.Component {
 
     if (!props.system.workspaceListLoaded) return null
 
-    const styleHomepage = {
-      display: 'flex',
-      alignItems: 'center',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      height: '100%'
-    }
-
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview fullWidthFullHeight'>
           <section
             className={classnames('homepage', props.workspaceList.length === 0 ? 'primaryColorBg' : '')}
-            style={styleHomepage}
           >
             <Card customClass='homepagecard'>
               <CardHeader displayHeader={false} />
