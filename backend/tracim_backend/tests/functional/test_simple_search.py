@@ -13,39 +13,6 @@ from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 
 
-class NoSearchEnabled(FunctionalTest):
-    config_section = "functional_test_no_search"
-
-    def test_api___no_search__err_404__by_filename(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
-        user = uapi.create_user(
-            "test@test.test",
-            password="test@test.test",
-            do_save=True,
-            do_notify=False,
-            groups=groups,
-        )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
-        workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
-        api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
-        )
-        transaction.commit()
-
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        params = {"search_string": "test"}
-        self.testapp.get("/api/v2/search/content".format(), status=404, params=params)
-
-
 class TestSimpleSearch(FunctionalTest):
     config_section = "functional_test_simple_search"
 

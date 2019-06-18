@@ -28,7 +28,6 @@ class SystemApi(object):
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,
             webdav_enabled=self._config.WEBDAV__UI__ENABLED,
             webdav_url=urljoin(self._config.WEBDAV__BASE_URL, self._config.WEBDAV__ROOT_PATH),
-            search_enabled=self._config.SEARCH__ENABLED,
         )
 
     def get_error_codes(self) -> typing.List[ErrorCodeModel]:

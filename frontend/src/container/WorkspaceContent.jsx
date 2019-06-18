@@ -7,7 +7,8 @@ import {
   PAGE,
   ROLE,
   findUserRoleIdInWorkspace,
-  ROLE_OBJECT, CONTENT_TYPE
+  ROLE_OBJECT,
+  CONTENT_TYPE
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -19,8 +20,7 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE,
-  ListItemWrapper
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -486,7 +486,9 @@ class WorkspaceContent extends React.Component {
 
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__fileandfolder folder__content active'>
-                <ContentItemHeader />
+                {workspaceContentList.length > 0 &&
+                  <ContentItemHeader />
+                }
 
                 {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
@@ -516,35 +518,29 @@ class WorkspaceContent extends React.Component {
                       />
                     )
                     : (
-                      <ListItemWrapper
+                      <ContentItem
+                        contentId={content.id}
+                        workspaceId={content.idWorkspace}
+                        parentId={content.idParent}
                         label={content.label}
-                        read={currentWorkspace.contentReadStatusList.includes(content.id)}
+                        fileName={content.fileName}
+                        fileExtension={content.fileExtension}
+                        faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                        statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}
+                        urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
+                        userRoleIdInWorkspace={userRoleIdInWorkspace}
+                        read={currentWorkspace.contentReadStatusList.includes(content.id)}
+                        onClickExtendedAction={{
+                          edit: e => this.handleClickEditContentItem(e, content),
+                          download: e => this.handleClickDownloadContentItem(e, content),
+                          archive: e => this.handleClickArchiveContentItem(e, content),
+                          delete: e => this.handleClickDeleteContentItem(e, content)
+                        }}
+                        onDropMoveContentItem={this.handleDropMoveContent}
                         key={content.id}
-                      >
-                        <ContentItem
-                          contentId={content.id}
-                          workspaceId={content.idWorkspace}
-                          parentId={content.idParent}
-                          label={content.label}
-                          fileName={content.fileName}
-                          fileExtension={content.fileExtension}
-                          faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                          statusSlug={content.statusSlug}
-                          contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                          urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
-                          userRoleIdInWorkspace={userRoleIdInWorkspace}
-                          onClickExtendedAction={{
-                            edit: e => this.handleClickEditContentItem(e, content),
-                            download: e => this.handleClickDownloadContentItem(e, content),
-                            archive: e => this.handleClickArchiveContentItem(e, content),
-                            delete: e => this.handleClickDeleteContentItem(e, content)
-                          }}
-                          onDropMoveContentItem={this.handleDropMoveContent}
-                          key={content.id}
-                        />
-                      </ListItemWrapper>
+                      />
                     )
                   )
                 }
