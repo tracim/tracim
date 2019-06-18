@@ -49,6 +49,7 @@ class TestCommands(CommandFunctionalTest):
         assert output.find("search index-populate") > 0
         assert output.find("search index-upgrade-experimental") > 0
         assert output.find("search index-drop") > 0
+        assert output.find("dev parameters list") > 0
 
     def test_func__user_create_command__ok__nominal_case(self) -> None:
         """

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Create file with all docker variable about TRACIM parameter
+printenv |grep TRACIM > /var/tracim/data/tracim_env_variables
+
 # Default values
 CONFIG_FILE_IS_NEW=0
 export PYTHON_EGG_CACHE=/tmp 

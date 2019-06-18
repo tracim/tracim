@@ -95,10 +95,13 @@ you need to create a color.json file at root of tracim :
 
     cp ../color.json.sample ../color.json
 
-You should also create available dir for radicale, according to `caldav_storage_dir`
-parameter:
+You should also create requested folder for running tracim:
 
-     mkdir radicale_storage
+    mkdir sessions_data
+    mkdir sessions_lock
+    mkdir depot
+    mkdir previews
+    mkdir radicale_storage
 
 Initialize the database using [tracimcli](doc/cli.md) tool
 
@@ -196,6 +199,7 @@ You can then run the process this way :
 
 ### With Pserve : legacy way, usefull for debug and dev ###
 
+
 This method rely on development.ini configuration. default web server used is _Waitress_
 in` development.ini.sample`
 
@@ -276,6 +280,7 @@ run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 ## Run Tests and others checks ##
 
 ### Run Tests ###
+
 
 Some directory are required to make tests functional, you can create them and do some other check
 with this script:
