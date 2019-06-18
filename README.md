@@ -24,9 +24,9 @@ Then visit the url http://localhost:8080 and login in to tracim:
 - email: `admin@admin.admin`
 - password: `admin@admin.admin`
 
-For advanced docker-based usage, look at the full [tracim docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker), 
+For advanced docker-based usage, look at the full [tracim docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker),
 
-## Licence 
+## Licence
 
 Tracim is distributed under the terms of the MIT License.
 
@@ -77,8 +77,8 @@ and [Backend setting file doc](backend/doc/setting.md).
 
 This script use command with sudo, make sure you have installed and configured sudo.
 You can run also with root if you add root in parameter of this script.
-  
-You can add "-d" to build_full_frontend.sh to disabled obfuscation and reduce build time. 
+
+You can add "-d" to build_full_frontend.sh to disabled obfuscation and reduce build time.
 
 ### Run tracim
 
@@ -152,17 +152,17 @@ If you need to run cypress with external server of tracim, modify "baseurl" in c
     cd backend/
     source env/bin/activate
     pserve cypress_test.ini
-    
+
 #### If you are running tests in a development environment
 
-You must change the apiUrl property in `frontend/configEnv.json` to 
+You must change the apiUrl property in `frontend/configEnv.json` to
 
     http://localhost:1337/api/v2
 
 Then rebuild the frontend
-    
+
     cd frontend/
-    npm run build 
+    npm run build
 
 #### Run tests with command line ##
 
