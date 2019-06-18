@@ -39,6 +39,15 @@
       &__icon
         margin-right 5px
         opacity 1
+        position relative
+        &__warning
+          position absolute
+          bottom 0
+          right 0
+          height 80%
+          width 50%
+          transform translate(50%, 50%)
+          font-size 12px
       &__text
         margin-right 5px
         font-size 12px
@@ -102,6 +111,7 @@
       margin-left 0
     &__menu
       &__rightside
+        flex-wrap wrap
         width 100%
 
 responsiveNavbarCollapseFixed =
@@ -113,7 +123,7 @@ responsiveNavbarCollapseFixed =
   border-bottom 1px solid #ccc
   padding-right 5px
 
-@media (min-width: min-sm) and (max-width: max-sm)
+@media (min-width: min-sm) and (max-width: max-md)
   .header
     &__logo__img
       margin-left 0
