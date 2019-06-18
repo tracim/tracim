@@ -87,11 +87,6 @@ are daemons (server not web related to do some task like sending email).
 
 #### Easy start (with pserve and pastedeploy)
 
-⚠ Be careful: if you use elasticsearch with tracim you need to export this variable first
-
-    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
-    
-
 An easy way to run tracim wsgi app with pastedeploy(config in development.ini):
 
     cd backend/

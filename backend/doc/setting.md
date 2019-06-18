@@ -97,7 +97,6 @@ Priority order is (from less to most priority):
 |TRACIM_CALDAV__ENABLED        |caldav.enabled                |CALDAV__ENABLED               |
 |TRACIM_CALDAV__RADICALE_PROXY__BASE_URL|caldav.radicale_proxy.base_url|CALDAV__RADICALE_PROXY__BASE_URL|
 |TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|caldav.radicale.storage.filesystem_folder|CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER|
-|TRACIM_SEARCH__ENABLED        |search.enabled                |SEARCH__ENABLED               |
 |TRACIM_SEARCH__ENGINE         |search.engine                 |SEARCH__ENGINE                |
 |TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST|search.elasticsearch.use_ingest|SEARCH__ELASTICSEARCH__USE_INGEST|
 |TRACIM_SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|search.elasticsearch.ingest.mimetype_whitelist|SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST|
@@ -444,18 +443,12 @@ for default config file.
 
 # Search method using elastic_search (tracim 2.3+) #
 
-⚠ Be careful: if you use elasticsearch with tracim you need to export this variable first
-
-    export TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}
-
 First, you need an elastic_search server. An easy way to have one with docker can be (don't use for production):
 
 `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0`
 
 You then need to setup config file:
 
-    search.enabled = True
-    search.engine = elasticsearch
     search.elasticsearch.host = localhost
     search.elasticsearch.port = 9200
 

@@ -501,7 +501,6 @@ class CFG(object):
         self.LDAP_GET_INFO = None
 
     def _load_search_config(self):
-        self.SEARCH__ENABLED = asbool(self.get_raw_config("search.enabled", "False"))
         self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
 
         DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
@@ -809,24 +808,23 @@ class CFG(object):
         update_validators()
 
     def _check_search_config_validity(self):
-        if self.SEARCH__ENABLED:
-            search_engine_valid = ["elasticsearch", "simple"]
-            if self.SEARCH__ENGINE not in search_engine_valid:
+        search_engine_valid = ["elasticsearch", "simple"]
+        if self.SEARCH__ENGINE not in search_engine_valid:
 
-                search_engine_list_str = ", ".join(
-                    '"{}"'.format(engine) for engine in search_engine_valid
-                )
-                raise ConfigurationError(
-                    "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
-                )
-            # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
-            # see https://github.com/tracim/tracim/issues/1835
-            if self.SEARCH__ENGINE == "elasticsearch":
-                self.check_mandatory_param(
-                    "SEARCH__ELASTICSEARCH__INDEX_ALIAS",
-                    self.SEARCH__ELASTICSEARCH__INDEX_ALIAS,
-                    when_str="if elasticsearch search feature is enabled",
-                )
+            search_engine_list_str = ", ".join(
+                '"{}"'.format(engine) for engine in search_engine_valid
+            )
+            raise ConfigurationError(
+                "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
+            )
+        # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
+        # see https://github.com/tracim/tracim/issues/1835
+        if self.SEARCH__ENGINE == "elasticsearch":
+            self.check_mandatory_param(
+                "SEARCH__ELASTICSEARCH__INDEX_ALIAS",
+                self.SEARCH__ELASTICSEARCH__INDEX_ALIAS,
+                when_str="if elasticsearch search feature is enabled",
+            )
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Create file with all docker variable about TRACIM parameter
-printenv |grep TRACIM > /var/data/tracim_env_variable
+printenv |grep TRACIM > /var/tracim/data/tracim_env_variable
 
 # Default values
 CONFIG_FILE_IS_NEW=0
@@ -113,15 +113,16 @@ else
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
 
-# Activate elastic search
-if [ "$START_ELASTIC" = "1" ]; then
-    sed -i "s|search.engine = .*|search.engine = elasticsearch|g" /etc/tracim/development.ini
-    sed -i "s|;search.elasticsearch.host = .*|search.elasticsearch.host = localhost|g" /etc/tracim/development.ini
-    sed -i "s|;search.elasticsearch.port = .*|search.elasticsearch.port = 9200|g" /etc/tracim/development.ini
-else
-    sed -i "s|search.engine = .*|search.engine = simple|g" /etc/tracim/development.ini
-    sed -i "s|search.elasticsearch.host = .*|;search.elasticsearch.host = localhost|g" /etc/tracim/development.ini
-    sed -i "s|search.elasticsearch.port = .*|;search.elasticsearch.port = 9200|g" /etc/tracim/development.ini
+# Init, create index if search with elasticsearch
+if [ "$INIT_ELASTICSEARCH" = "1" ]; then
+    cd /tracim/backend/
+    tracimcli search init -c /etc/tracim/development.ini
+fi
+if [ "$UPDATE_INDEX_ELASTICSEARCH" = "1" ]; then
+    cd /tracim/backend/
+    tracimcli search delete -c /etc/tracim/development.ini
+    tracimcli search init -c /etc/tracim/development.ini
+    tracimcli search index -c /etc/tracim/development.ini
 fi
 
 # Reload apache config
