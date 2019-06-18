@@ -81,8 +81,8 @@ Exemple with SQlite, email_notification and some small instance personnalisation
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__PORT=25 \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__USER=xxxxxxxxxx \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD=xxxxxxxxxx \
-               -e TRACIM_WEBSITE__TITLE=xxxxxx
-               -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain}
+               -e TRACIM_WEBSITE__TITLE=xxxxxx \
+               -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain} \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
                
@@ -93,7 +93,7 @@ Exemple to use tracim with ElasticSearch: (you need to start elasticsearch conta
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
                -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
-               -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200
+               -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
                -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=test_tracim \
                -e CREATE_INDEX_ELASTICSEARCH=1 \ 
                -p 8080:80 \

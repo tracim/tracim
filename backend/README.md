@@ -167,8 +167,6 @@ You can also preset uwsgi config for tracim, this way, creating this kind of .in
     module = wsgi.web:application
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
-    
-With elasticsearch add: `env = TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}`
 
 and for webdav :
 
@@ -180,8 +178,6 @@ and for webdav :
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-With elasticsearch add: `env = TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}`
-
 and for caldav :
 
     # You need to replace <PATH> with correct absolute path
@@ -191,8 +187,6 @@ and for caldav :
     module = wsgi.caldav:application
     home = <PATH>/tracim/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
-    
-With elasticsearch add: `env = TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS={name_of_elasticsearch_index}`
 
 You can then run the process this way :
 

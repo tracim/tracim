@@ -11,7 +11,7 @@ from tracim_backend.models.context_models import ContentInContext
 
 class SearchIndexInitCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "init index of search engine"
+        return "create index of search engine"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
@@ -43,7 +43,7 @@ class SearchIndexInitCommand(AppContextCommand):
 
 class SearchIndexUpgradeCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "upgrade index of search engine (experimental)"
+        return "upgrade index: create a copy of current index with updated index template (useful for migration), set index alias to this new index (experimental)"
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
@@ -58,7 +58,7 @@ class SearchIndexUpgradeCommand(AppContextCommand):
 
 class SearchIndexIndexCommand(AppContextCommand):
     def get_description(self) -> str:
-        return "index content into search engine"
+        return "index content(s) into search engine"
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)

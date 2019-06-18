@@ -156,10 +156,10 @@ setup(
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
             'caldav start = tracim_backend.command.caldav:CaldavRunnerCommand',
             'caldav sync = tracim_backend.command.caldav:CaldavSyncCommand',
-            'search init = tracim_backend.command.search:SearchIndexInitCommand',
-            'search index = tracim_backend.command.search:SearchIndexIndexCommand',
-            'search upgrade = tracim_backend.command.search:SearchIndexUpgradeCommand',
-            'search delete = tracim_backend.command.search:SearchIndexDeleteCommand',
+            'search index-create = tracim_backend.command.search:SearchIndexInitCommand',
+            'search index-populate = tracim_backend.command.search:SearchIndexIndexCommand',
+            'search index-upgrade-experimental = tracim_backend.command.search:SearchIndexUpgradeCommand',
+            'search index-drop = tracim_backend.command.search:SearchIndexDeleteCommand',
             'dev parameters list = tracim_backend.command.devtools:ParametersListCommand'
         ]
     },
