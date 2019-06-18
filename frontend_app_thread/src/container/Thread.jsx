@@ -289,7 +289,14 @@ class Thread extends React.Component {
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+      case 400:
+        switch (fetchResultSaveNewComment.body.code) {
+          case 2003:
+            console.log('here')
+            this.sendGlobalFlashMessage(props.t('You can\'t send an empty comment')); break
+        }
+        break
+      default: console.log('or here'); this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
     }
   }
 
