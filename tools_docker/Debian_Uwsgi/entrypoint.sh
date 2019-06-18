@@ -114,7 +114,7 @@ else
 fi
 
 # Create-index or Update-index for elasticsearch
-export SEARCH__ENGINE_TYPE=$(cat development.ini |grep "search.engine = " | cut -c17-)
+export SEARCH__ENGINE_TYPE=$(cat /etc/tracim/development.ini |grep "search.engine = " | cut -c17-)
 if [ "$TRACIM_SEARCH__ENGINE" = "elasticsearch" ]; then
     cd /tracim/backend/
     tracimcli search index-create -c /etc/tracim/development.ini
