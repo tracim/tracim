@@ -63,6 +63,7 @@ from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentRevisionPath
 from tracim_backend.models.context_models import WorkspaceAndUserPath
+from tracim_backend.models.context_models import WorkspaceCreate
 from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
@@ -685,7 +686,24 @@ class WorkspaceModifySchema(marshmallow.Schema):
 
 
 class WorkspaceCreationSchema(WorkspaceModifySchema):
-    pass
+    label = StrippedString(
+        required=True,
+        example="My Workspace",
+        validate=not_empty_string_validator,
+        default=None,
+        allow_none=True,
+    )
+    description = StrippedString(required=True, example="A super description of my workspace.")
+    agenda_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="has workspace has an associated agenda ?",
+        default=True,
+        allow_none=True,
+    )
+
+    @post_load
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
+        return WorkspaceCreate(**data)
 
 
 class NoContentSchema(marshmallow.Schema):
