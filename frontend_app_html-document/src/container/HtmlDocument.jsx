@@ -412,8 +412,11 @@ class HtmlDocument extends React.Component {
       case 400:
         switch (fetchResultSaveNewComment.apiResponse.body.code) {
           case 2003:
-            this.sendGlobalFlashMessage(props.t('You can\'t send an empty comment')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"));
+            break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while saving new comment'));
+            break
         }
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
