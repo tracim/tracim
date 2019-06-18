@@ -35,16 +35,24 @@ class searchResult extends React.Component {
       showDeleted: false,
       showActive: true
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case 'allApp_changeLang':
+        console.log('%c<Search> Custom event', 'color: #28a745', type, data)
+        this.buildBreadcrumbs(); break
     }
   }
 
   componentDidMount () {
     this.buildBreadcrumbs()
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   getPath = (parentsList) => {
@@ -104,8 +112,7 @@ class searchResult extends React.Component {
 
   getSubtitle () {
     let subtitle = ''
-
-    if (searchResult.currentNumberSearchResults !== 0) {
+    if (this.props.searchResult.currentNumberSearchResults > 0) {
       subtitle = this.setSubtitle()
     }
 
@@ -149,7 +156,9 @@ class searchResult extends React.Component {
 
             <PageContent parentClass='searchResult'>
               <div className='folder__content' data-cy={'search__content'}>
-                <ContentItemHeader showSearchDetails />
+                {props.searchResult.currentNumberSearchResults > 0 &&
+                  <ContentItemHeader showSearchDetails />
+                }
 
                 {props.searchResult.currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
