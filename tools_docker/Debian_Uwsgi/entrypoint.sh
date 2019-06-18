@@ -113,16 +113,16 @@ else
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
 
-# Init, create index if search with elasticsearch
-if [ "$INIT_ELASTICSEARCH" = "1" ]; then
+# Create-index or Update-index for elasticsearch
+if [ "$CREATE_INDEX_ELASTICSEARCH" = "1" ]; then
     cd /tracim/backend/
-    tracimcli search init -c /etc/tracim/development.ini
+    tracimcli search index-create -c /etc/tracim/development.ini
 fi
 if [ "$UPDATE_INDEX_ELASTICSEARCH" = "1" ]; then
     cd /tracim/backend/
-    tracimcli search delete -c /etc/tracim/development.ini
-    tracimcli search init -c /etc/tracim/development.ini
-    tracimcli search index -c /etc/tracim/development.ini
+    tracimcli search index-drop -c /etc/tracim/development.ini
+    tracimcli search index-create -c /etc/tracim/development.ini
+    tracimcli search index-populate -c /etc/tracim/development.ini
 fi
 
 # Reload apache config
