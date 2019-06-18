@@ -47,8 +47,6 @@ export const PAGE = {
   }
 }
 
-export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA]
-
 export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
 
 export const ROLE = [{
