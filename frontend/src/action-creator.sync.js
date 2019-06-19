@@ -127,8 +127,6 @@ export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS
 export const SEARCH_RESULTS_LIST = 'SearchResultsList'
 export const setSearchResultsList = newSearchResultsList => ({ type: `${SET}/${SEARCH_RESULTS_LIST}`, newSearchResultsList })
 export const appendSearchResultsList = appendSearchResultsList => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST}`, appendSearchResultsList })
-export const CURRENT_NUMBER_SEARCH_RESULTS = 'CurrentNumberSearchResults'
-export const setCurrentNumberSearchResults = currentNumberSearchResults => ({ type: `${SET}/${CURRENT_NUMBER_SEARCH_RESULTS}`, currentNumberSearchResults })
 export const SEARCHED_KEYWORDS = 'SearchedKeywords'
 export const setSearchedKeywords = searchedKeywords => ({ type: `${SET}/${SEARCHED_KEYWORDS}`, searchedKeywords })
 export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
