@@ -4,7 +4,7 @@ var APP_NOT_LOADED = 'appNotLoaded'
 var TIME_TO_RETRY = 500
 var RETRY_TIMEOUT = 5000
 
-function getSelectedApp (appName) {
+var getSelectedApp = function (appName) {
   // FIXME - CH - 2019-06-18 - The try/catch is a temporary solution to solve the frontend, apps and appInterface.js
   // loading and execution order. If getSelectedApp return APP_NOT_LOADED, GLOBAL_renderAppFeature and GLOBAL_renderAppFullscreen
   // will retry every TIME_TO_RETRY ms for RETRY_TIMEOUT ms
@@ -27,7 +27,7 @@ function getSelectedApp (appName) {
       case 'agenda':
         return (appAgenda || {default: {}}).default
       default:
-        return null
+        return APP_NOT_LOADED
     }
   } catch (e) {
     return APP_NOT_LOADED
@@ -100,13 +100,23 @@ function GLOBAL_renderAppFullscreen (app, retryCount) {
   }
 }
 
-function GLOBAL_renderAppPopupCreation (app) {
+function GLOBAL_renderAppPopupCreation (app, retryCount) {
   console.log('%cGLOBAL_renderAppPopupCreation', 'color: #5cebeb', app)
 
   var selectedApp = getSelectedApp(app.config.slug)
 
-  if (!selectedApp) {
-    console.log('Error in GLOBAL_renderAppPopupCreation, selectedApp is undefined', app)
+  if (selectedApp === APP_NOT_LOADED) {
+    retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
+
+    console.log(app.config.slug + ' does not exists. Maybe it hasn\'t finished loading yet ? Retrying in ' + TIME_TO_RETRY + 'ms')
+    var retryTime = retryCount + TIME_TO_RETRY
+
+    if (retryTime < RETRY_TIMEOUT) {
+      setTimeout(function () {GLOBAL_renderAppPopupCreation(app, retryTime)}, TIME_TO_RETRY)
+      return
+    }
+
+    console.error('Timed out waiting for app ' + app.config.slug + ' to exists')
     return
   }
 
