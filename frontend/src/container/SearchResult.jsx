@@ -26,7 +26,7 @@ import {
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
 
-class searchResult extends React.Component {
+class SearchResult extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -81,8 +81,13 @@ class searchResult extends React.Component {
     const { props, state } = this
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      state.contentTypes, props.searchResult.searchedKeywords, props.searchResult.currentNumberPage + 1,
-      props.searchResult.numberResultsByPage, state.showArchived, state.showDeleted, state.showActive
+      state.contentTypes,
+      props.searchResult.searchedKeywords,
+      props.searchResult.currentNumberPage + 1,
+      props.searchResult.numberResultsByPage,
+      state.showArchived,
+      state.showDeleted,
+      state.showActive
     ))
 
     switch (fetchGetSearchedKeywords.status) {
@@ -210,4 +215,4 @@ class searchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, user }) => ({ breadcrumbs, searchResult, contentType, user })
-export default connect(mapStateToProps)(translate()(searchResult))
+export default connect(mapStateToProps)(translate()(SearchResult))

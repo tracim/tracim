@@ -41,7 +41,8 @@ import {
   WORKSPACE_CONTENT_PATH,
   newFlashMessage,
   WORKSPACE_AGENDA_URL,
-  WORKSPACE_CONTENT_MOVE
+  WORKSPACE_CONTENT_MOVE,
+  SEARCHED_KEYWORDS
 } from './action-creator.sync.js'
 import { history } from './index.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
@@ -704,7 +705,7 @@ export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, 
       },
       method: 'GET'
     },
-    actionName: '',
+    actionName: SEARCHED_KEYWORDS,
     dispatch
   })
 }
