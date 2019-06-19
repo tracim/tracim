@@ -1,8 +1,8 @@
-var prevSelectedAppFeature = ''
-var prevSelectedAppFullScreen = ''
+var previouslySelectedAppFeature = ''
+var previouslySelectedAppFullScreen = ''
 var APP_NOT_LOADED = 'appNotLoaded'
 var TIME_TO_RETRY = 500
-var RETRY_TIMEOUT = 5000
+var RETRY_TIMEOUT = 60000
 
 var getSelectedApp = function (appName) {
   // FIXME - CH - 2019-06-18 - The try/catch is a temporary solution to solve the frontend, apps and appInterface.js
@@ -66,8 +66,8 @@ function GLOBAL_renderAppFeature (app, retryCount) {
   } else {
     selectedApp.renderAppFeature(app)
     selectedApp.isRendered = true
-    ;(getSelectedApp(prevSelectedAppFeature) || {isRendered: null}).isRendered = false
-    prevSelectedAppFeature = selectedApp.name
+    ;(getSelectedApp(previouslySelectedAppFeature) || {isRendered: null}).isRendered = false
+    previouslySelectedAppFeature = selectedApp.name
   }
 }
 
@@ -97,8 +97,8 @@ function GLOBAL_renderAppFullscreen (app, retryCount) {
   } else {
     selectedApp.renderAppFullscreen(app)
     selectedApp.isRendered = true
-    ;(getSelectedApp(prevSelectedAppFullScreen) || {isRendered: null}).isRendered = false
-    prevSelectedAppFullScreen = selectedApp.name
+    ;(getSelectedApp(previouslySelectedAppFullScreen) || {isRendered: null}).isRendered = false
+    previouslySelectedAppFullScreen = selectedApp.name
   }
 }
 
@@ -149,19 +149,19 @@ function GLOBAL_eventReducer (event) {
 
       var selectedApp
 
-      if (prevSelectedAppFeature !== '') {
-        selectedApp = getSelectedApp(prevSelectedAppFeature)
+      if (previouslySelectedAppFeature !== '') {
+        selectedApp = getSelectedApp(previouslySelectedAppFeature)
         selectedApp.unmountApp('appFeatureContainer')
         selectedApp.unmountApp('popupCreateContentContainer')
         selectedApp.isRendered = false
-        prevSelectedAppFeature = ''
+        previouslySelectedAppFeature = ''
       }
 
-      if (prevSelectedAppFullScreen !== '') {
-        selectedApp = getSelectedApp(prevSelectedAppFullScreen)
+      if (previouslySelectedAppFullScreen !== '') {
+        selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
         selectedApp.unmountApp('appFullscreenContainer')
         selectedApp.isRendered = false
-        prevSelectedAppFullScreen = ''
+        previouslySelectedAppFullScreen = ''
       }
       break
   }
