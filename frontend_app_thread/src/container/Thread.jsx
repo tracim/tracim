@@ -292,10 +292,10 @@ class Thread extends React.Component {
       case 400:
         switch (fetchResultSaveNewComment.body.code) {
           case 2003:
-            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"));
+            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"))
             break
           default:
-            this.sendGlobalFlashMessage(props.t('Error while saving new comment'));
+            this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
             break
         }
         break
