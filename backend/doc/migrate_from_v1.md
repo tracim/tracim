@@ -60,14 +60,11 @@ Copy folder `collection-root/agenda/` in `radicale_storage/`.
 
     cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
     
-Make sure this file `.Radicale.props` is not exist in this two folder:
+Make sure `.Radicale.props` file does not exist in the following folders (otherwise delete them):
   
-  `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/user/`
-  
-  `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/workspace/`
+- `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/user/`
+- `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/workspace/`
 
-:warning: If this file exist, please rename or delete this file because this file can break creation of new agenda for user or for sharedspace.
-  
 After starting caldav server you need to synchronize tracim with radicale. For that you need to use this command:
 
     tracimcli caldav sync
