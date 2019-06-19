@@ -60,7 +60,7 @@ Copy folder `collection-root/agenda/` in `radicale_storage/`.
 
     cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
     
-Make sure this file ".Radicale.props" is not exist in this two folder:
+Make sure this file `.Radicale.props` is not exist in this two folder:
   
   `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/user/`
   
