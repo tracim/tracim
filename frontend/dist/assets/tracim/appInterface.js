@@ -8,6 +8,7 @@ var getSelectedApp = function (appName) {
   // FIXME - CH - 2019-06-18 - The try/catch is a temporary solution to solve the frontend, apps and appInterface.js
   // loading and execution order. If getSelectedApp return APP_NOT_LOADED, GLOBAL_renderAppFeature and GLOBAL_renderAppFullscreen
   // will retry every TIME_TO_RETRY ms for RETRY_TIMEOUT ms
+  // see https://github.com/tracim/tracim/issues/1954
   try {
     switch (appName) {
       case 'html-document':
@@ -34,10 +35,11 @@ var getSelectedApp = function (appName) {
   }
 }
 
-//@TODO make a file action.tracimCustomEvent.js that will contains all customEvent that tracim_frontend call
+// FIXME - CH - 2019-06-09 - make a file action.tracimCustomEvent.js that will contains all customEvent that tracim_frontend call
 // => pb with that is that appInterface cant use import since it is not part of the build webpack
 // use module.export and require
 // doesn't work, cant resolve a file outside of the build dir
+// see https://github.com/tracim/tracim/issues/1956
 
 function GLOBAL_renderAppFeature (app, retryCount) {
   console.log('%cGLOBAL_renderAppFeature', 'color: #5cebeb', app)
