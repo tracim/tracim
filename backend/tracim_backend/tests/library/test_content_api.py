@@ -688,6 +688,98 @@ class TestContentApi(DefaultTest):
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
 
+    def test_unit__delete__ok__do_not_change_file_extension(self):
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        html_doc = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdoc",
+            do_save=True,
+        )
+        thread = api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdiscussion",
+            do_save=True,
+        )
+        assert html_doc.label == "superdoc"
+        assert html_doc.file_extension == ".document.html"
+        assert html_doc.file_name == "superdoc.document.html"
+
+        assert thread.label == "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+        assert thread.file_name == "superdiscussion.thread.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=html_doc):
+            api.delete(html_doc)
+        assert html_doc.label != "superdoc"
+        assert html_doc.file_extension == ".document.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=thread):
+            api.delete(thread)
+        assert thread.label != "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+
+    def test_unit__archive__ok__do_not_change_file_extension(self):
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        html_doc = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdoc",
+            do_save=True,
+        )
+        thread = api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdiscussion",
+            do_save=True,
+        )
+        assert html_doc.label == "superdoc"
+        assert html_doc.file_extension == ".document.html"
+        assert html_doc.file_name == "superdoc.document.html"
+
+        assert thread.label == "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+        assert thread.file_name == "superdiscussion.thread.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=html_doc):
+            api.archive(html_doc)
+        assert html_doc.label != "superdoc"
+        assert html_doc.file_extension == ".document.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=thread):
+            api.archive(thread)
+        assert thread.label != "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+
     def test_archive(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
