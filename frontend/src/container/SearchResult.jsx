@@ -20,7 +20,6 @@ import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
   setCurrentNumberPage,
-  setCurrentNumberSearchResults,
   appendSearchResultsList,
   setBreadcrumbs
 } from '../action-creator.sync.js'
@@ -94,7 +93,6 @@ class SearchResult extends React.Component {
       case 200:
         props.dispatch(setCurrentNumberPage(props.searchResult.currentNumberPage + 1))
         props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        props.dispatch(setCurrentNumberSearchResults(fetchGetSearchedKeywords.json.total_hits))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -107,7 +105,7 @@ class SearchResult extends React.Component {
     const { searchResult } = props
 
     let subtitle
-    let numberResults = searchResult.currentNumberSearchResults
+    let numberResults = searchResult.resultsList.length
     let text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
     subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
@@ -117,7 +115,8 @@ class SearchResult extends React.Component {
 
   getSubtitle () {
     let subtitle = ''
-    if (this.props.searchResult.currentNumberSearchResults > 0) {
+    const currentNumberSearchResults = this.props.searchResult.resultsList.length
+    if (currentNumberSearchResults > 0) {
       subtitle = this.setSubtitle()
     }
 
@@ -126,7 +125,8 @@ class SearchResult extends React.Component {
 
   hasMoreResults () {
     const { props } = this
-    return props.searchResult.currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
+    const currentNumberSearchResults = props.searchResult.resultsList.length
+    return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
   }
 
   buildBreadcrumbs = () => {
@@ -143,6 +143,7 @@ class SearchResult extends React.Component {
 
   render () {
     const { props } = this
+    const currentNumberSearchResults = props.searchResult.resultsList.length
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -150,7 +151,7 @@ class SearchResult extends React.Component {
           <PageWrapper customClass='searchResult'>
             <PageTitle
               parentClass={'searchResult'}
-              title={props.searchResult.currentNumberSearchResults === 1
+              title={currentNumberSearchResults === 1
                 ? props.t('Search result')
                 : props.t('Search results')
               }
@@ -161,11 +162,11 @@ class SearchResult extends React.Component {
 
             <PageContent parentClass='searchResult'>
               <div className='folder__content' data-cy={'search__content'}>
-                {props.searchResult.currentNumberSearchResults > 0 &&
+                {currentNumberSearchResults > 0 &&
                   <ContentItemHeader showSearchDetails />
                 }
 
-                {props.searchResult.currentNumberSearchResults === 0 && (
+                {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
                     {`${props.t('No documents found for the specified search terms')}: "${props.searchResult.searchedKeywords}"`}
                   </div>
@@ -202,7 +203,7 @@ class SearchResult extends React.Component {
                     icon='chevron-down'
                     text={props.t('See more')}
                   />
-                  : props.searchResult.currentNumberSearchResults > props.searchResult.numberResultsByPage &&
+                  : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
                     props.t('No more results')
                 }
               </div>

@@ -18,7 +18,6 @@ import {
   setUserLang,
   setUserDisconnected,
   setSearchResultsList,
-  setCurrentNumberSearchResults,
   setSearchedKeywords,
   setCurrentNumberPage
 } from '../action-creator.sync.js'
@@ -104,7 +103,6 @@ class Header extends React.Component {
         props.dispatch(setSearchedKeywords(searchedKeywords))
         props.dispatch(setCurrentNumberPage(FIRST_PAGE))
         props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        props.dispatch(setCurrentNumberSearchResults(fetchGetSearchedKeywords.json.total_hits))
         props.history.push(PAGE.SEARCH_RESULT)
         break
       default:
