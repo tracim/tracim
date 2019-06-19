@@ -685,7 +685,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
         return WorkspaceUpdate(**data)
 
 
-class WorkspaceCreationSchema(WorkspaceModifySchema):
+class WorkspaceCreationSchema(marshmallow.Schema):
     label = StrippedString(
         required=True,
         example="My Workspace",
