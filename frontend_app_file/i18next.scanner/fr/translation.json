@@ -49,5 +49,6 @@
   "files": "fichiers",
   "This content is deprecated": "Ce contenu est obsolète",
   "Previous page": "Page précédente",
-  "Next page": "Page suivante"
+  "Next page": "Page suivante",
+  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide"
 }

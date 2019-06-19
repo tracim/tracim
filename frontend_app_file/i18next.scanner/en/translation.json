@@ -49,5 +49,6 @@
   "files": "files",
   "This content is deprecated": "This content is deprecated",
   "Previous page": "Previous page",
-  "Next page": "Next page"
+  "Next page": "Next page",
+  "You can't send an empty comment": "You can't send an empty comment"
 }
