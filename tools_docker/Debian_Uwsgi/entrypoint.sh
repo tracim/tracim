@@ -113,17 +113,10 @@ else
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
 
-# Create-index or Update-index for elasticsearch
-export SEARCH__ENGINE_TYPE=$(cat /etc/tracim/development.ini |grep "search.engine = " | cut -c17-)
-if [ "$TRACIM_SEARCH__ENGINE" = "elasticsearch" ]; then
-    cd /tracim/backend/
-    tracimcli search index-create -c /etc/tracim/development.ini
-else
-    if [ "$SEARCH__ENGINE_TYPE" = "elasticsearch" ]; then
-        cd /tracim/backend/
-        tracimcli search index-create -c /etc/tracim/development.ini
-    fi
-fi
+# TODO PA 2019-06-19 Issue https://github.com/tracim/tracim/issues/1961
+# Make sure index is created
+cd /tracim/backend/
+tracimcli search index-create -c /etc/tracim/development.ini
 
 if [ "$UPDATE_INDEX_ELASTICSEARCH" = "1" ]; then
     cd /tracim/backend/
