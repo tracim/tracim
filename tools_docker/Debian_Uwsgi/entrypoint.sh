@@ -113,6 +113,18 @@ else
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
 fi
 
+# TODO PA 2019-06-19 Rework the index-create part according to https://github.com/tracim/tracim/issues/1961
+# Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
+cd /tracim/backend/
+tracimcli search index-create -c /etc/tracim/development.ini
+
+if [ "$UPDATE_INDEX_ELASTICSEARCH" = "1" ]; then
+    cd /tracim/backend/
+    tracimcli search index-drop -c /etc/tracim/development.ini
+    tracimcli search index-create -c /etc/tracim/development.ini
+    tracimcli search index-populate -c /etc/tracim/development.ini
+fi
+
 # Reload apache config
 service apache2 restart
 

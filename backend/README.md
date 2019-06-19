@@ -199,7 +199,6 @@ You can then run the process this way :
 
 ### With Pserve : legacy way, usefull for debug and dev ###
 
-
 This method rely on development.ini configuration. default web server used is _Waitress_
 in` development.ini.sample`
 
@@ -280,7 +279,6 @@ run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 ## Run Tests and others checks ##
 
 ### Run Tests ###
-
 
 Some directory are required to make tests functional, you can create them and do some other check
 with this script:
