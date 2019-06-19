@@ -26,7 +26,7 @@ msgstr ""
 
 #: tracim_backend/config.py:295
 msgid "[{website_title}] Someone created an account for you"
-msgstr "[{website_title}] Quelqu'un vous à créé un compte"
+msgstr "[{website_title}] Quelqu'un vous a créé un compte"
 
 #: tracim_backend/config.py:304
 msgid "[{website_title}] A password reset has been requested"
@@ -119,7 +119,7 @@ msgstr "Bonjour {username},"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:4
 msgid "Someone invited you to join <i>{website_title}</i>."
-msgstr "Quelqu'un vous à invité à rejoindre <i>{website_title}<i>."
+msgstr "Quelqu'un vous a invité à rejoindre <i>{website_title}<i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:6
 msgid "Your credentials are:"
@@ -138,7 +138,7 @@ msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your shared space: {a_link}"
 msgstr ""
-"Commençez à discuter, partager des fichiers, agendas et documentations "
+"Commencez à discuter, partager des fichiers, agendas et documentations "
 "avec vos collaborateurs en vous connectant dans votre espace partagé : "
 "{a_link}"
 
@@ -147,7 +147,7 @@ msgid ""
 "note: as soon as you are connected, we strongly recommend that you change"
 " your password and delete this email."
 msgstr ""
-"note: nous vous recommendons fortement de changer votre mot de passe et "
+"note: nous vous recommandons fortement de changer votre mot de passe et "
 "de supprimer cet email dès que vous êtes connecté."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:17
@@ -174,7 +174,7 @@ msgid ""
 "Someone has requested to reset the password for your account on "
 "<i>{website_title}</i>."
 msgstr ""
-"Quelqu'un à demandé la réinitialisation du mot de passe de votre compte "
+"Quelqu'un a demandé la réinitialisation du mot de passe de votre compte "
 "sur <i>{website_title}</i>"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:6
