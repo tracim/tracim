@@ -1854,7 +1854,7 @@ class ContentApi(object):
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
-        content.file_name = filename
+        content.label = label
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
@@ -1879,7 +1879,7 @@ class ContentApi(object):
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
-        content.file_name = filename
+        content.label = label
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
