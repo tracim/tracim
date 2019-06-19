@@ -63,6 +63,7 @@ from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentPath
 from tracim_backend.models.context_models import WorkspaceAndContentRevisionPath
 from tracim_backend.models.context_models import WorkspaceAndUserPath
+from tracim_backend.models.context_models import WorkspaceCreate
 from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
@@ -660,11 +661,23 @@ class LoginOutputHeaders(marshmallow.Schema):
 
 class WorkspaceModifySchema(marshmallow.Schema):
     label = StrippedString(
-        required=True, example="My Workspace", validate=not_empty_string_validator
+        required=False,
+        example="My Workspace",
+        validate=not_empty_string_validator,
+        default=None,
+        allow_none=True,
     )
-    description = StrippedString(required=True, example="A super description of my workspace.")
+    description = StrippedString(
+        required=False,
+        example="A super description of my workspace.",
+        default=None,
+        allow_none=True,
+    )
     agenda_enabled = marshmallow.fields.Bool(
-        required=False, default=True, description="has workspace has an associated agenda ?"
+        required=False,
+        default=None,
+        description="has workspace has an associated agenda ?",
+        allow_none=True,
     )
 
     @post_load
@@ -672,8 +685,18 @@ class WorkspaceModifySchema(marshmallow.Schema):
         return WorkspaceUpdate(**data)
 
 
-class WorkspaceCreationSchema(WorkspaceModifySchema):
-    pass
+class WorkspaceCreationSchema(marshmallow.Schema):
+    label = StrippedString(
+        required=True, example="My Workspace", validate=not_empty_string_validator
+    )
+    description = StrippedString(required=True, example="A super description of my workspace.")
+    agenda_enabled = marshmallow.fields.Bool(
+        required=False, description="has workspace has an associated agenda ?", default=True
+    )
+
+    @post_load
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
+        return WorkspaceCreate(**data)
 
 
 class NoContentSchema(marshmallow.Schema):

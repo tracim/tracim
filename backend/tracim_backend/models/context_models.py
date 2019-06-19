@@ -451,6 +451,22 @@ class WorkspaceUpdate(object):
     Update workspace
     """
 
+    def __init__(
+        self,
+        label: typing.Optional[str] = None,
+        description: typing.Optional[str] = None,
+        agenda_enabled: typing.Optional[bool] = None,
+    ) -> None:
+        self.label = label
+        self.description = description
+        self.agenda_enabled = agenda_enabled
+
+
+class WorkspaceCreate(object):
+    """
+    Update workspace
+    """
+
     def __init__(self, label: str, description: str, agenda_enabled: bool = True) -> None:
         self.label = label
         self.description = description

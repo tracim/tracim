@@ -114,10 +114,10 @@ class WorkspaceApi(object):
     def update_workspace(
         self,
         workspace: Workspace,
-        label: str,
-        description: str,
+        label: typing.Optional[str] = None,
+        description: typing.Optional[str] = None,
         save_now: bool = False,
-        agenda_enabled: bool = None,
+        agenda_enabled: typing.Optional[bool] = None,
     ) -> Workspace:
         """
         Update workspace
@@ -127,23 +127,25 @@ class WorkspaceApi(object):
         :param save_now: database flush
         :return: updated workspace
         """
-        if not label:
-            raise EmptyLabelNotAllowed("Workspace label cannot be empty")
-        if (
-            self._session.query(Workspace)
-            .filter(Workspace.label == label)
-            .filter(Workspace.workspace_id != workspace.workspace_id)
-            .count()
-            > 0
-        ):
-            raise WorkspaceLabelAlreadyUsed(
-                "A workspace with label {} already exist.".format(label)
-            )
-        workspace.label = label
-        workspace.description = description
-        workspace.updated = datetime.utcnow()
+        if label is not None:
+            if label == "":
+                raise EmptyLabelNotAllowed("Workspace label cannot be empty")
+            if (
+                self._session.query(Workspace)
+                .filter(Workspace.label == label)
+                .filter(Workspace.workspace_id != workspace.workspace_id)
+                .count()
+                > 0
+            ):
+                raise WorkspaceLabelAlreadyUsed(
+                    "A workspace with label {} already exist.".format(label)
+                )
+            workspace.label = label
+        if description is not None:
+            workspace.description = description
         if agenda_enabled is not None:
             workspace.agenda_enabled = agenda_enabled
+        workspace.updated = datetime.utcnow()
         if save_now:
             self.save(workspace)
 
