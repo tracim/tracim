@@ -687,18 +687,11 @@ class WorkspaceModifySchema(marshmallow.Schema):
 
 class WorkspaceCreationSchema(marshmallow.Schema):
     label = StrippedString(
-        required=True,
-        example="My Workspace",
-        validate=not_empty_string_validator,
-        default=None,
-        allow_none=True,
+        required=True, example="My Workspace", validate=not_empty_string_validator
     )
     description = StrippedString(required=True, example="A super description of my workspace.")
     agenda_enabled = marshmallow.fields.Bool(
-        required=False,
-        description="has workspace has an associated agenda ?",
-        default=True,
-        allow_none=True,
+        required=False, description="has workspace has an associated agenda ?", default=True
     )
 
     @post_load
