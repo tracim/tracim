@@ -46,6 +46,7 @@ import NewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
 import ListItemWrapper from './component/ListItemWrapper/ListItemWrapper.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
+import WarningIcon from './component/Icon/WarningIcon.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -94,5 +95,6 @@ export {
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,
+  WarningIcon,
   DisplayState
 }
