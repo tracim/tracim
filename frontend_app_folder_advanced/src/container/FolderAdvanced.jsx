@@ -155,7 +155,7 @@ class FolderAdvanced extends React.Component {
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')
