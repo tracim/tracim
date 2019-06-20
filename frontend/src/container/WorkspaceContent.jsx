@@ -344,7 +344,7 @@ class WorkspaceContent extends React.Component {
       const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.user_id, destinationMemberList, ROLE)
 
       if (userRoleIdInDestination <= ROLE_OBJECT.contributor.id) {
-        props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'warning'))
+        props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'danger'))
         return
       }
     }
@@ -359,17 +359,17 @@ class WorkspaceContent extends React.Component {
       case 400:
         switch (fetchMoveContent.json.code) {
           case 3002:
-            props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
             break
           case 2038:
-            props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'warning'))
+            props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'danger'))
             break
           default:
-            props.dispatch(newFlashMessage(props.t('Error while moving content'), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
             break
         }
         break
-      default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'warning'))
+      default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
     }
   }
 
