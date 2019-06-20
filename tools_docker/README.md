@@ -43,6 +43,10 @@ If you don't want to use caldav:
 
 * START_CALDAV=0 (to deactivate agenda in tracim)
 
+If you want to update ElasticSearch index:
+
+* UPDATE_INDEX_ELASTICSEARCH=1 (execute: drop, create and populate index)
+
 #### Example commands
 
 Exemple with basic instance of tracim (local usage with webdav and caldav):
@@ -95,7 +99,6 @@ Exemple to use tracim with ElasticSearch: (you need to start elasticsearch conta
                -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
                -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
                -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=test_tracim \
-               -e CREATE_INDEX_ELASTICSEARCH=1 \ 
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
