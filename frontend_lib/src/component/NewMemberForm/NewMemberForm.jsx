@@ -98,7 +98,9 @@ export const NewMemberForm = props => {
               )
               : (
                 <div className='name__adminmsg'>
-                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
+                  <i className='name__adminmsg__icon fa fa-fw fa fa-envelope'>
+                    <i className='name__adminmsg__icon__warning fa fa-fw fa-warning text-danger' />
+                  </i>
                   {props.t("Email notifications are disabled, you can't create new users from here")}
                 </div>
               )

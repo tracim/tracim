@@ -124,7 +124,9 @@ export class AdminUser extends React.Component {
             <div className='adminUser__adduser__emailstate'>
               {!props.emailNotifActivated && (
                 <div>
-                  <i className='primaryColorFont fa fa-fw fa-warning' />
+                  <i className='adminUser__adduser__emailstate__icon primaryColorFont fa fa-fw fa fa-envelope'>
+                    <i className='adminUser__adduser__emailstate__icon__warning fa fa-fw fa-warning text-danger' />
+                  </i>
                   {props.t('Email notification are disabled, please manually notify users of any change')}
                 </div>
               )}

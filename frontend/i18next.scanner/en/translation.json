@@ -202,5 +202,6 @@
   "A content with same name already exists": "A content with same name already exists",
   "The destination folder doesn't allow this content type": "The destination folder doesn't allow this content type",
   ", create the first content of that type by clicking on the button 'Create'": ", create the first content of that type by clicking on the button 'Create'",
-  "This shared space has no content of that type yet": "This shared space has no content of that type yet"
+  "This shared space has no content of that type yet": "This shared space has no content of that type yet",
+  "Insufficient rights": "Insufficient rights"
 }
