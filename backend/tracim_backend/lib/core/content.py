@@ -2158,8 +2158,8 @@ class ContentApi(object):
                 # INFO - G.M - 2019-06-13 - avoid duplication of same content in result list
                 continue
             if current_offset >= offset:
-                parsed_content_ids.append(content.content_id)
                 results.append(content)
+            parsed_content_ids.append(content.content_id)
             current_offset += 1
 
         return results, current_offset
