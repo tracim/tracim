@@ -94,7 +94,7 @@ class Folder extends React.Component {
             {props.userRoleIdInWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 {folderAvailableApp.length > 0 && (
-                  <div  title={props.t('Create in folder')}>
+                  <div title={props.t('Create in folder')}>
                     <button
                       className={`
                         folder__header__button__addbtn__text
