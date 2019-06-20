@@ -10,7 +10,8 @@ import {
   handleFetchResult,
   addAllResourceI18n,
   // SelectStatus,
-  ArchiveDeleteContent
+  ArchiveDeleteContent,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -131,7 +132,7 @@ class FolderAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
     }
@@ -153,7 +154,9 @@ class FolderAdvanced extends React.Component {
     )
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
-      case 200: break
+      case 200:
+        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        break
       default:
         this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')
         this.setState(prev => ({content: {...prev.content, sub_content_types: oldAvailableAppList}}))
