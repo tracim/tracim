@@ -33,7 +33,7 @@ const ContentItemSearch = props => {
         { props.path }
       </div>
 
-      <div className='content__lastModification' title={props.lastModificationTime}>
+      <div className='content__lastModification' title={props.lastModificationFormated}>
         <Avatar
           width={'40px'}
           style={{
