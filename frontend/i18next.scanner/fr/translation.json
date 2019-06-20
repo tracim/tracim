@@ -202,5 +202,6 @@
   "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "The destination folder doesn't allow this content type": "Le dossier de destination n'autorise pas ce type de contenu",
   ", create the first content of that type by clicking on the button 'Create'": ", créez le premier contenu de ce type en cliquant sur le bouton 'Créer'",
-  "This shared space has no content of that type yet": "Cet espace partagé n'a pas encore de contenu de ce type"
+  "This shared space has no content of that type yet": "Cet espace partagé n'a pas encore de contenu de ce type",
+  "Insufficient rights": "Droits insuffisants"
 }
