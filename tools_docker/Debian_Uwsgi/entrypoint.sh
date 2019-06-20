@@ -18,7 +18,7 @@ if [ ! "$?" = 0 ]; then
 fi
 
 # Create file with all docker variable about TRACIM parameter
-printenv |grep TRACIM > /var/tracim/data/tracim_env_variables
+printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 
 case "$DATABASE_TYPE" in
   mysql)
