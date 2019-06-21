@@ -168,7 +168,7 @@ class SearchResult extends React.Component {
 
                 {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
-                    {`${props.t('No documents found for the specified search terms')}: "${props.searchResult.searchedKeywords}"`}
+                    {`${props.t('No results for the search terms')}: "${props.searchResult.searchedKeywords}"`}
                   </div>
                 )}
 
