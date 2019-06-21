@@ -27,7 +27,6 @@ from tracim_backend.lib.utils.authorization import ContentTypeCreationChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
-from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
@@ -87,7 +86,6 @@ class FileController(Controller):
         """
         Create a file .This will create 2 new revision.
         """
-        logger.debug("CREATING NEW FILE")
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -110,12 +108,6 @@ class FileController(Controller):
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(parent_id)
                 ) from exc
-        logger.debug(
-            self,
-            'creating new file named "{}" in workspace "{}"'.format(
-                _file.filename, request.current_workspace.workspace_id
-            ),
-        )
         content = api.create(
             filename=_file.filename,
             content_type_slug=FILE_TYPE,
@@ -123,12 +115,6 @@ class FileController(Controller):
             parent=parent,
         )
         api.save(content, ActionDescription.CREATION)
-        logger.debug(
-            self,
-            'adding file content to new file "{}" in workspace "{}"'.format(
-                content.content_id, request.current_workspace.workspace_id
-            ),
-        )
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(
                 content,
@@ -136,12 +122,6 @@ class FileController(Controller):
                 new_mimetype=_file.type,
                 new_content=_file.file,
             )
-        logger.debug(
-            self,
-            'execute post-creation action on new file "{}" in workspace "{}"'.format(
-                content.content_id, request.current_workspace.workspace_id
-            ),
-        )
         api.execute_created_content_actions(content)
         return api.get_content_in_context(content)
 
@@ -169,12 +149,6 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         _file = hapic_data.files.files
-        logger.debug(
-            self,
-            'update file content of file "{}" in workspace "{}"'.format(
-                content.content_id, request.current_workspace.workspace_id
-            ),
-        )
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(
                 content,
@@ -183,12 +157,6 @@ class FileController(Controller):
                 new_content=_file.file,
             )
         api.save(content)
-        logger.debug(
-            self,
-            'execute post-update action on file "{}" in workspace "{}"'.format(
-                content.content_id, request.current_workspace.workspace_id
-            ),
-        )
         api.execute_update_content_actions(content)
         return
 
