@@ -28,7 +28,11 @@ For advanced docker-based usage, look at the full [tracim docker documentation](
 
 ## Licence
 
-Tracim is distributed under the terms of the MIT License.
+Tracim is distributed under the terms of 3 distinct licenses:
+
+- AGPLv3 for the Agenda application (`frontend_app_agenda` folder)
+- LGPL for other frontend parts (`frontend` and `frontend_xxx` folders)
+- MIT License for the rest (backend stuff, functionnal tests, docker recipe, documentation, etc).
 
 ## Contribute
 
