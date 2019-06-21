@@ -60,6 +60,7 @@ class Folder extends React.Component {
           className='folder__header align-items-center primaryColorBgLightenHover primaryColorBorderLightenHover'
           onClick={() => props.onClickFolder(props.folderData.id)}
           ref={props.connectDropTarget}
+          title={props.folderData.label}
         >
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
@@ -77,7 +78,10 @@ class Folder extends React.Component {
             className='folder__header__dragPreview'
             ref={props.connectDragPreview}
           >
-            <div className='folder__header__icon' style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}>
+            <div className='folder__header__icon'
+              title={props.t('Folder')}
+              style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}
+            >
               <i className={classnames('fa fa-fw', this.calculateIcon())} />
             </div>
 
@@ -90,7 +94,7 @@ class Folder extends React.Component {
             {props.userRoleIdInWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 {folderAvailableApp.length > 0 && (
-                  <div>
+                  <div title={props.t('Create in folder')}>
                     <button
                       className={`
                         folder__header__button__addbtn__text
@@ -128,7 +132,7 @@ class Folder extends React.Component {
                   </div>
                 )}
 
-                <div className='d-none d-md-flex'>
+                <div className='d-none d-md-flex' title={props.t('Actions')}>
                   {props.userRoleIdInWorkspace >= 4 && (
                     <BtnExtandedAction
                       userRoleIdInWorkspace={props.userRoleIdInWorkspace}

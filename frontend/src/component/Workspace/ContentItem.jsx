@@ -50,11 +50,14 @@ class ContentItem extends React.Component {
             className='content__dragPreview'
             ref={props.connectDragPreview}
           >
-            <div className='content__type' style={{color: props.contentType.hexcolor}}>
+            <div className='content__type'
+              title={props.t(props.contentType.label)}
+              style={{color: props.contentType.hexcolor}}
+            >
               <i className={`fa fa-fw fa-${props.faIcon}`} />
             </div>
 
-            <div className='content__name'>
+            <div className='content__name' title={props.label}>
               {props.label}
               {props.contentType.slug === 'file' && (
                 <Badge text={props.fileExtension} customClass='badgeBackgroundColor' />
@@ -63,7 +66,7 @@ class ContentItem extends React.Component {
           </div>
 
           {props.userRoleIdInWorkspace >= 2 && (
-            <div className='d-none d-md-block'>
+            <div className='d-none d-md-block' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={props.onClickExtendedAction}
@@ -74,6 +77,7 @@ class ContentItem extends React.Component {
           <div
             className='content__status d-sm-flex justify-content-between align-items-center'
             style={{color: status.hexcolor}}
+            title={props.t(status.label)}
           >
             <div className='content__status__text d-none d-sm-block'>
               {props.t(status.label)}
