@@ -2,20 +2,28 @@ const statusMessage = 'Status changed to'
 
 describe('New statuses are visible in timeline', () => {
   beforeEach(function () {
-    cy.resetDB()
-    cy.setupBaseDB()
-    let title = 'A title'
-    cy.loginAs('users').as('user')
-    cy.fixture('baseWorkspace').as('workspace')
-      .then((workspace) => {
-        cy.createHtmlDocument(title, workspace.workspace_id)
-      }).then((document) => {
-        cy.wrap(document).as('document')
-        cy
-          .wrap(`/ui/workspaces/${document.workspace_id}/contents/html-document/${document.content_id}`)
-          .as('documentUrl')
+    cy.resetDB().then(() => {
+      let title = 'A title'
+      cy.setupBaseDB().then(() => {
+        cy.loginAs('users').as('user').then(user => {
+          cy.fixture('baseWorkspace').as('workspace')
+            .then((workspace) => {
+              return cy.createHtmlDocument(title, workspace.workspace_id)
+            }).then((document) => {
+              cy.wrap(document).as('document')
+              cy
+                .wrap(`/ui/workspaces/${document.workspace_id}/contents/html-document/${document.content_id}`)
+                .as('documentUrl')
+            })
+        })
       })
+    })
   })
+
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   it('show new status open', function () {
     cy.changeHtmlDocumentStatus(
       this.document.content_id,

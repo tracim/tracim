@@ -29,6 +29,26 @@ class TestFolder(FunctionalTest):
 
     fixtures = [BaseFixture]
 
+    def _setup_basics(self) -> None:
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        self.dbsession = get_tm_session(self.session_factory, transaction.manager)
+        self.admin = self.dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        self.workspace_api = WorkspaceApi(
+            current_user=self.admin, session=self.dbsession, config=self.app_config
+        )
+        self.content_api = ContentApi(
+            current_user=self.admin, session=self.dbsession, config=self.app_config
+        )
+        self.workspace = self.workspace_api.create_workspace(label="test", save_now=True)
+        self.folder = self.content_api.create(
+            label="test_folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=self.workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+
     def test_api__get_folder__ok_200__nominal_case(self) -> None:
         """
         Get one folder content

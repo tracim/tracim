@@ -16,18 +16,26 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected
+  setUserDisconnected,
+  setSearchResultsList,
+  setSearchedKeywords,
+  setCurrentNumberPage
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
-  putUserLang
+  putUserLang,
+  getSearchedKeywords
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
   PAGE,
   PROFILE,
-  unLoggedAllowedPageList
+  unLoggedAllowedPageList,
+  ALL_CONTENT_TYPES
 } from '../helper.js'
+import Search from '../component/Header/Search.jsx'
+import { Link } from 'react-router-dom'
+import { IconWithWarning } from 'tracim_frontend_lib'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -81,8 +89,27 @@ class Header extends React.Component {
     }
   }
 
-  handleClickAgendaButton = () => {
-    this.props.history.push(PAGE.AGENDA)
+  handleClickSearch = async (searchedKeywords) => {
+    const { props } = this
+    const FIRST_PAGE = 1
+
+    // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
+    // Respectively, show_archived=0 (false), show_deleted=0 (false), show_active=1 (true)
+    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
+      ALL_CONTENT_TYPES, searchedKeywords, FIRST_PAGE, props.searchResult.numberResultsByPage, false, false, true
+    ))
+
+    switch (fetchGetSearchedKeywords.status) {
+      case 200:
+        props.dispatch(setSearchedKeywords(searchedKeywords))
+        props.dispatch(setCurrentNumberPage(FIRST_PAGE))
+        props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
+        props.history.push(PAGE.SEARCH_RESULT)
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+        break
+    }
   }
 
   render () {
@@ -98,32 +125,40 @@ class Header extends React.Component {
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
               {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
-                <li className='header__menu__rightside__emailwarning'>
+                <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                    <i className='header__menu__system__icon slowblink fa fa-warning' />
-
-                    <span className='header__menu__system__text d-none d-xl-block'>
-                      {props.t('Email notifications are disabled')}
-                    </span>
+                    <IconWithWarning
+                      icon='envelope'
+                      customClass='slowblink'
+                    />
                   </div>
                 </li>
               )}
 
+              {props.user.logged &&
+                <li className='search__nav'>
+                  <Search
+                    className='header__menu__rightside__search'
+                    onClickSearch={this.handleClickSearch}
+                  />
+                </li>
+              }
+
               {props.user.profile === PROFILE.ADMINISTRATOR.slug && (
-                <li className='header__menu__rightside__adminlink'>
+                <li className='header__menu__rightside__adminlink nav-item'>
                   <AdminLink />
                 </li>
               )}
 
               {!unLoggedAllowedPageList.includes(props.location.pathname) && props.appList.some(a => a.slug === 'agenda') && (
                 <li className='header__menu__rightside__agenda'>
-                  <button
+                  <Link
                     className='btn outlineTextBtn primaryColorBorder nohover'
-                    onClick={this.handleClickAgendaButton}
+                    to={PAGE.AGENDA}
                   >
                     <i className='fa fa-fw fa-calendar' />
                     {props.t('Agendas')}
-                  </button>
+                  </Link>
                 </li>
               )}
 
@@ -151,5 +186,5 @@ class Header extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, system, appList }) => ({ lang, user, system, appList })
+const mapStateToProps = ({ searchResult, lang, user, system, appList }) => ({ searchResult, lang, user, system, appList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))

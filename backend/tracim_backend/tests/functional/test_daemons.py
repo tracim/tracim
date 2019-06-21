@@ -1,9 +1,12 @@
+import pytest
+
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.mail_fetcher.daemon import MailFetcherDaemon
 from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 from tracim_backend.tests import MailHogTest
 
@@ -12,6 +15,7 @@ class TestMailNotifyDaemon(MailHogTest):
     fixtures = [BaseFixture, ContentFixture]
     config_section = "mail_test_async"
 
+    @pytest.mark.mail
     def test_func__create_user_with_mail_notification__ok__nominal_case(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u = api.create_user(
@@ -38,6 +42,7 @@ class TestMailNotifyDaemon(MailHogTest):
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
+    @pytest.mark.mail
     def test_func__create_new_content_with_notification__ok__nominal_case(self):
         uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
         current_user = uapi.get_one_by_email("admin@admin.admin")
@@ -68,3 +73,33 @@ class TestMailNotifyDaemon(MailHogTest):
             headers["Reply-to"][0]
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
         )
+
+
+class TestMailFetcherDaemon(MailHogTest):
+    @pytest.mark.mail
+    def test_func__mail_fetcher_daemon__ok__run(self):
+        """
+        simple test to check only if mail fetcher daemon can be runned without
+        raising exception, particularly attribute error related to bad config
+        parameter naming
+        """
+        try:
+            mail_fetcher = MailFetcherDaemon(config=self.app_config, burst=True)
+            mail_fetcher.run()
+        except AttributeError:
+            pytest.fail("Mail Fetcher raise attribute error")
+
+
+class TestMailSenderDaemon(MailHogTest):
+    @pytest.mark.mail
+    def test_func__mail_sender_daemon__ok__run(self):
+        """
+        simple test to check only if mail notifier daemonc an be runned without
+        raising exception, particularly attribute error related to bad config
+        parameter naming
+        """
+        try:
+            mail_fetcher = MailSenderDaemon(config=self.app_config, burst=True)
+            mail_fetcher.run()
+        except AttributeError:
+            pytest.fail("Mail sender raise attribute error")

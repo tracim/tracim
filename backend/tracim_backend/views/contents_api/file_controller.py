@@ -122,7 +122,7 @@ class FileController(Controller):
                 new_mimetype=_file.type,
                 new_content=_file.file,
             )
-
+        api.execute_created_content_actions(content)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -157,6 +157,7 @@ class FileController(Controller):
                 new_content=_file.file,
             )
         api.save(content)
+        api.execute_update_content_actions(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -613,6 +614,7 @@ class FileController(Controller):
                 new_content=hapic_data.body.raw_content,
             )
             api.save(content)
+            api.execute_update_content_actions(content)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -666,6 +668,7 @@ class FileController(Controller):
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
+            api.execute_update_content_actions(content)
         return
 
     def bind(self, configurator: Configurator) -> None:

@@ -1,33 +1,42 @@
 import React from 'react'
-import { TextAreaApp } from 'tracim_frontend_lib'
+import {
+  TextAreaApp,
+  DisplayState
+} from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
 import { translate } from 'react-i18next'
-import DisplayState from './DisplayState.jsx'
 
 const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
+      {props.isArchived && (
+        <DisplayState
+          msg={props.t('This content is archived')}
+          btnType='button'
+          icon='archive'
+          btnLabel={props.t('Restore')}
+          onClickBtn={props.onClickRestoreArchived}
+        />
+      )}
+
+      {props.isDeleted && (
+        <DisplayState
+          msg={props.t('This content is deleted')}
+          btnType='button'
+          icon='trash'
+          btnLabel={props.t('Restore')}
+          onClickBtn={props.onClickRestoreDeleted}
+        />
+      )}
+
+      {props.isDeprecated && (
+        <DisplayState
+          msg={props.t('This content is deprecated')}
+          icon={props.deprecatedStatus.faIcon}
+        />
+      )}
+
       <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
-        {props.isArchived && (
-          <DisplayState
-            msg={props.t('This content is archived')}
-            type='button'
-            icon='archive'
-            btnLabel={props.t('Restore')}
-            onClickBtn={props.onClickRestoreArchived}
-          />
-        )}
-
-        {props.isDeleted && (
-          <DisplayState
-            msg={props.t('This content is deleted')}
-            type='button'
-            icon='trash'
-            btnLabel={props.t('Restore')}
-            onClickBtn={props.onClickRestoreDeleted}
-          />
-        )}
-
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}

@@ -17,6 +17,7 @@ from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
+from tracim_backend.tests import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests import CommandFunctionalTest
 
 
@@ -44,6 +45,11 @@ class TestCommands(CommandFunctionalTest):
         assert output.find("webdav start") > 0
         assert output.find("caldav start") > 0
         assert output.find("caldav sync") > 0
+        assert output.find("search index-create") > 0
+        assert output.find("search index-populate") > 0
+        assert output.find("search index-upgrade-experimental") > 0
+        assert output.find("search index-drop") > 0
+        assert output.find("dev parameters list") > 0
 
     def test_func__user_create_command__ok__nominal_case(self) -> None:
         """
@@ -59,7 +65,7 @@ class TestCommands(CommandFunctionalTest):
                 "user",
                 "create",
                 "-c",
-                "tests_configs.ini#command_test",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "command_test@user",
                 "-p",
@@ -89,7 +95,7 @@ class TestCommands(CommandFunctionalTest):
                 "user",
                 "create",
                 "-c",
-                "tests_configs.ini#command_test",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "command_test@user",
                 "-p",
@@ -119,7 +125,7 @@ class TestCommands(CommandFunctionalTest):
                     "user",
                     "create",
                     "-c",
-                    "tests_configs.ini#command_test",
+                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                     "-l",
                     "command_test@user",
                     "-p",
@@ -143,7 +149,7 @@ class TestCommands(CommandFunctionalTest):
                     "user",
                     "create",
                     "-c",
-                    "tests_configs.ini#command_test",
+                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                     "-l",
                     "admin@admin.admin",
                     "-p",
@@ -165,7 +171,7 @@ class TestCommands(CommandFunctionalTest):
                     "user",
                     "create",
                     "-c",
-                    "tests_configs.ini#command_test",
+                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                     "-l",
                     "pof@pof.pof",
                     "-p",
@@ -188,7 +194,7 @@ class TestCommands(CommandFunctionalTest):
                     "user",
                     "create",
                     "-c",
-                    "tests_configs.ini#command_test",
+                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                     "-l",
                     "admin@admin.admin",
                     "--debug",
@@ -211,7 +217,7 @@ class TestCommands(CommandFunctionalTest):
                 "user",
                 "update",
                 "-c",
-                "tests_configs.ini#command_test",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "admin@admin.admin",
                 "-p",
@@ -251,7 +257,7 @@ class TestCommands(CommandFunctionalTest):
                     "user",
                     "update",
                     "-c",
-                    "tests_configs.ini#command_test",
+                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                     "-l",
                     "admin@admin.admin",
                     "-p",
@@ -277,7 +283,7 @@ class TestCommands(CommandFunctionalTest):
                 "user",
                 "update",
                 "-c",
-                "tests_configs.ini#command_test",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "admin@admin.admin",
                 "-p",
@@ -308,7 +314,9 @@ class TestCommands(CommandFunctionalTest):
         self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(DatabaseInitializationFailed):
-            app.run(["db", "init", "-c", "tests_configs.ini#command_test", "--debug"])
+            app.run(
+                ["db", "init", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
+            )
 
     def test__init__db__ok_nominal_case(self):
         """
@@ -322,8 +330,19 @@ class TestCommands(CommandFunctionalTest):
         self.disconnect_database()
         app = TracimCLI()
         # delete config to be sure command will work
-        app.run(["db", "delete", "--force", "-c", "tests_configs.ini#command_test", "--debug"])
-        result = app.run(["db", "init", "-c", "tests_configs.ini#command_test", "--debug"])
+        app.run(
+            [
+                "db",
+                "delete",
+                "--force",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "--debug",
+            ]
+        )
+        result = app.run(
+            ["db", "init", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
+        )
         assert result == 0
 
     def test__init__db__no_config_file(self):
@@ -355,7 +374,14 @@ class TestCommands(CommandFunctionalTest):
         self.disconnect_database()
         app = TracimCLI()
         result = app.run(
-            ["db", "delete", "--force", "-c", "tests_configs.ini#command_test", "--debug"]
+            [
+                "db",
+                "delete",
+                "--force",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "--debug",
+            ]
         )
         assert result == 0
 
@@ -371,8 +397,10 @@ class TestCommands(CommandFunctionalTest):
         self.disconnect_database()
         app = TracimCLI()
         with pytest.raises(ForceArgumentNeeded):
-            app.run(["db", "delete", "-c", "tests_configs.ini#command_test", "--debug"])
-        result = app.run(["db", "delete", "-c", "tests_configs.ini#command_test"])
+            app.run(
+                ["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
+            )
+        result = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
         assert result == 1
 
     def test__delete__db__err_no_config_file(self):

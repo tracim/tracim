@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import classnames from 'classnames'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
 import {
@@ -24,7 +23,6 @@ import WIPcomponent from './WIPcomponent.jsx'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   PAGE,
-  APP_FULLSCREEN_LIST,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   getUserProfile
@@ -35,7 +33,8 @@ import {
   getContentTypeList,
   getUserIsConnected,
   getMyselfWorkspaceList,
-  putUserLang
+  putUserLang,
+  getWorkspaceMemberList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -46,8 +45,10 @@ import {
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
-  appendBreadcrumbs
+  appendBreadcrumbs,
+  setWorkspaceListMemberList
 } from '../action-creator.sync.js'
+import SearchResult from './SearchResult.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -144,11 +145,30 @@ class Tracim extends React.Component {
       const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
 
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
+      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
       this.setState({workspaceListLoaded: true})
 
       return true
     }
     return false
+  }
+
+  loadWorkspaceListMemberList = async workspaceList => {
+    const { props } = this
+
+    const fetchWorkspaceListMemberList = await Promise.all(
+      workspaceList.map(async ws => ({
+        idWorkspace: ws.workspace_id,
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+      }))
+    )
+
+    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
+      idWorkspace: memberList.idWorkspace,
+      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+    }))
+
+    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   setDefaultUserLang = async loggedUser => {
@@ -249,13 +269,10 @@ class Tracim extends React.Component {
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
+          <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
+
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
-          <div
-            id='appFullscreenContainer'
-            className={classnames({
-              'fullWidthFullHeight': APP_FULLSCREEN_LIST.includes(props.location.pathname)
-            })}
-          />
+          <div id='appFullscreenContainer' />
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />
         </div>

@@ -6,6 +6,7 @@ export const REMOVE = 'Remove'
 export const PREPEND = 'Prepend'
 export const APPEND = 'Append'
 export const RESET = 'Reset'
+export const MOVE = 'Move'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -59,6 +60,9 @@ export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
 export const setWorkspaceContentArchived = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, idWorkspace, idContent })
 export const setWorkspaceContentDeleted = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, idWorkspace, idContent })
+
+export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
+export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
@@ -119,3 +123,13 @@ export const resetBreadcrumbs = () => ({ type: `${RESET}/${BREADCRUMBS}` })
 export const prependBreadcrumbs = prependBreadcrumbs => ({ type: `${PREPEND}/${BREADCRUMBS}`, prependBreadcrumbs })
 export const appendBreadcrumbs = appendBreadcrumbs => ({ type: `${APPEND}/${BREADCRUMBS}`, appendBreadcrumbs })
 export const resetBreadcrumbsAppFeature = () => ({ type: `${RESET}/${BREADCRUMBS}/${APP_FEATURE}` })
+
+export const SEARCH_RESULTS_LIST = 'SearchResultsList'
+export const setSearchResultsList = newSearchResultsList => ({ type: `${SET}/${SEARCH_RESULTS_LIST}`, newSearchResultsList })
+export const appendSearchResultsList = appendSearchResultsList => ({ type: `${APPEND}/${SEARCH_RESULTS_LIST}`, appendSearchResultsList })
+export const SEARCHED_KEYWORDS = 'SearchedKeywords'
+export const setSearchedKeywords = searchedKeywords => ({ type: `${SET}/${SEARCHED_KEYWORDS}`, searchedKeywords })
+export const SEARCH_RESULTS_BY_PAGE = 'SearchResultsByPage'
+export const setNumberResultsByPage = numberResultsByPage => ({ type: `${SET}/${SEARCH_RESULTS_BY_PAGE}`, numberResultsByPage })
+export const SEARCH_CURRENT_PAGE = 'SearchCurrentPage'
+export const setCurrentNumberPage = currentNumberPage => ({ type: `${SET}/${SEARCH_CURRENT_PAGE}`, currentNumberPage })

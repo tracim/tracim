@@ -17,6 +17,9 @@ if [ ! "$?" = 0 ]; then
     exit 1
 fi
 
+# Create file with all docker variable about TRACIM parameter
+printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
+
 case "$DATABASE_TYPE" in
   mysql)
     # Ensure DATABASE_PORT is set
@@ -72,14 +75,12 @@ a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
 service redis-server start  # async email sending
 supervisord -c /tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf
 
+# Start daemon for async email
+supervisorctl start tracim_mail_notifier
+
 # Activate daemon for reply by email
 if [ "$REPLY_BY_EMAIL" = "1" ];then
     supervisorctl start tracim_mail_fetcher
-fi
-
-# Activate daemon for sending email in async
-if [ "$EMAIL_MODE_ASYNC" = "1" ];then
-    supervisorctl start tracim_mail_notifier
 fi
 
 # Activate or deactivate webdav
@@ -87,10 +88,12 @@ if [ "$START_WEBDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
         ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
     fi
+    sed -i "s|webdav.ui.enabled = .*|webdav.ui.enabled = True|g" /etc/tracim/development.ini
     sed -i "s|^\s*#ProxyPass /webdav http://127.0.0.1:3030/webdav|    ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*#ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 else
     rm -f /etc/uwsgi/apps-enabled/tracim_webdav.ini
+    sed -i "s|webdav.ui.enabled = .*|webdav.ui.enabled = False|g" /etc/tracim/development.ini
     sed -i "s|^\s*ProxyPass /webdav http://127.0.0.1:3030/webdav|    #ProxyPass /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|    #ProxyPassReverse /webdav http://127.0.0.1:3030/webdav|g" /etc/tracim/apache2.conf
 fi
@@ -108,6 +111,18 @@ else
     sed -i "s|caldav.enabled = .*|caldav.enabled = False|g" /etc/tracim/development.ini
     sed -i "s|^\s*ProxyPass /agenda http://127.0.0.1:8080/agenda|    #ProxyPass /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
     sed -i "s|^\s*ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|    #ProxyPassReverse /agenda http://127.0.0.1:8080/agenda|g" /etc/tracim/apache2.conf
+fi
+
+# TODO PA 2019-06-19 Rework the index-create part according to https://github.com/tracim/tracim/issues/1961
+# Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
+cd /tracim/backend/
+tracimcli search index-create -c /etc/tracim/development.ini
+
+if [ "$UPDATE_INDEX_ELASTICSEARCH" = "1" ]; then
+    cd /tracim/backend/
+    tracimcli search index-drop -c /etc/tracim/development.ini
+    tracimcli search index-create -c /etc/tracim/development.ini
+    tracimcli search index-populate -c /etc/tracim/development.ini
 fi
 
 # Reload apache config

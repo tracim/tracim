@@ -15,5 +15,6 @@
   "Error while changing status": "Erreur lors de la sauvegarde du statut",
   "Thread": "Discussion",
   "thread": "discussion",
-  "threads": "discussions"
+  "threads": "discussions",
+  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide"
 }

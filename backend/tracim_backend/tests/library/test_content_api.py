@@ -25,9 +25,7 @@ from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
@@ -690,6 +688,98 @@ class TestContentApi(DefaultTest):
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
 
+    def test_unit__delete__ok__do_not_change_file_extension(self):
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        html_doc = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdoc",
+            do_save=True,
+        )
+        thread = api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdiscussion",
+            do_save=True,
+        )
+        assert html_doc.label == "superdoc"
+        assert html_doc.file_extension == ".document.html"
+        assert html_doc.file_name == "superdoc.document.html"
+
+        assert thread.label == "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+        assert thread.file_name == "superdiscussion.thread.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=html_doc):
+            api.delete(html_doc)
+        assert html_doc.label != "superdoc"
+        assert html_doc.file_extension == ".document.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=thread):
+            api.delete(thread)
+        assert thread.label != "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+
+    def test_unit__archive__ok__do_not_change_file_extension(self):
+        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
+        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        groups = [
+            group_api.get_one(Group.TIM_USER),
+            group_api.get_one(Group.TIM_MANAGER),
+            group_api.get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user, session=self.session, config=self.app_config
+        ).create_workspace("test workspace", save_now=True)
+        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        html_doc = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdoc",
+            do_save=True,
+        )
+        thread = api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            parent=None,
+            label="superdiscussion",
+            do_save=True,
+        )
+        assert html_doc.label == "superdoc"
+        assert html_doc.file_extension == ".document.html"
+        assert html_doc.file_name == "superdoc.document.html"
+
+        assert thread.label == "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+        assert thread.file_name == "superdiscussion.thread.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=html_doc):
+            api.archive(html_doc)
+        assert html_doc.label != "superdoc"
+        assert html_doc.file_extension == ".document.html"
+
+        with new_revision(session=self.session, tm=transaction.manager, content=thread):
+            api.archive(thread)
+        assert thread.label != "superdiscussion"
+        assert thread.file_extension == ".thread.html"
+
     def test_archive(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
@@ -874,7 +964,7 @@ class TestContentApi(DefaultTest):
             with pytest.raises(ValueError):
                 api.set_status(c, "unknown-status")
 
-    def test_set_status_ok(self):
+    def test_unit__set_status__ok__nominal_case(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
         groups = [
@@ -884,12 +974,18 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+        user2 = uapi.create_minimal_user(email="another@user", groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
+            current_user=user2, session=self.session, config=self.app_config
         ).create_workspace("test workspace", save_now=True)
+        rapi = RoleApi(current_user=user2, session=self.session, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        c = api2.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
+        assert c.owner_id == user2.user_id
+        assert c.get_current_revision().owner_id == user2.user_id
         api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        c = api.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
         with new_revision(session=self.session, tm=transaction.manager, content=c):
             for new_status in [
                 "open",
@@ -898,9 +994,11 @@ class TestContentApi(DefaultTest):
                 "closed-deprecated",
             ]:
                 api.set_status(c, new_status)
+        api.save(c)
 
-                eq_(new_status, c.status)
-                eq_(ActionDescription.STATUS_UPDATE, c.revision_type)
+        assert new_status == c.status
+        assert ActionDescription.STATUS_UPDATE == c.revision_type
+        assert c.get_current_revision().owner_id == user.user_id
 
     def test_create_comment_ok(self):
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
@@ -967,15 +1065,17 @@ class TestContentApi(DefaultTest):
         )
         folderb = api.create(content_type_list.Folder.slug, workspace, None, "folder b", "", True)
         comment_before_move_id = text_file.children[0].id
-        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
-            api.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
-            api.save(text_file)
-        transaction.commit()
         api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
+            api2.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
+            api2.save(text_file)
+        transaction.commit()
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
         comment_after_move = text_file_after_move.children[0]
         assert text_file == text_file_after_move
         assert comment_before_move_id == comment_after_move.id
+        assert text_file_after_move.revision_type == ActionDescription.MOVE
+        assert text_file_after_move.get_current_revision().owner_id == user2.user_id
 
     def test_unit_move_file_with_comments__different_parent_different_workspace(self):
         """
@@ -1083,7 +1183,8 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
-        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.owner.user_id == user2.user_id
+        assert text_file_copy.get_current_revision().owner_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1262,7 +1363,7 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.label == text_file.label
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == folderb.content_id
-        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.owner.user_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -1314,7 +1415,7 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.label == "test_file_copy"
         assert text_file_copy.type == text_file.type
         assert text_file_copy.parent.content_id == foldera.content_id
-        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.owner.user_id == user2.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
@@ -2943,7 +3044,7 @@ class TestContentApi(DefaultTest):
         last_actives = api.get_last_active(workspace=workspace2)
         assert len(last_actives) == 0
 
-    def test_search_in_label(self):
+    def test_unit__search_in_label__ok__nominal_case(self):
         # HACK - D.A. - 2015-03-09
         # This test is based on a bug which does NOT return results found
         # at root of a workspace (eg a folder)
@@ -2965,25 +3066,20 @@ class TestContentApi(DefaultTest):
         a = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
-        p = api.create(
-            content_type_list.Page.slug, workspace, a, "this is randomized label content", "", True
-        )
+        p = api.create(content_type_list.Page.slug, workspace, a, "this is another thing", "", True)
 
         with new_revision(session=self.session, tm=transaction.manager, content=p):
-            p.description = "This is some amazing test"
+            p.description = "This is some other test"
 
         api.save(p)
-        original_id = p.content_id
+        original_id = a.content_id
 
-        res = api.search(["randomized"])
+        res = api._search_query(["randomized"])
         eq_(1, len(res.all()))
         item = res.all()[0]
         eq_(original_id, item.content_id)
 
-    def test_search_in_description(self):
-        # HACK - D.A. - 2015-03-09
-        # This test is based on a bug which does NOT return results found
-        # at root of a workspace (eg a folder)
+    def test_unit__search_in_filename__nominal_case(self):
 
         uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
         group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
@@ -3011,153 +3107,18 @@ class TestContentApi(DefaultTest):
             p.description = "This is some amazing test"
 
         api.save(p)
-        original_id = p.content_id
+        original_id = a.content_id
 
-        res = api.search(["dummy"])
+        res = api._search_query(["this is randomized folder"])
         eq_(1, len(res.all()))
         item = res.all()[0]
         eq_(original_id, item.content_id)
 
-    def test_search_in_label_or_description(self):
-        # HACK - D.A. - 2015-03-09
-        # This test is based on a bug which does NOT return results found
-        # at root of a workspace (eg a folder)
-
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
-
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        a = api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=workspace,
-            parent=None,
-            label="this is randomized folder",
-            do_save=True,
-        )
-        p1 = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=a,
-            label="this is dummy label content",
-            do_save=True,
-        )
-        p2 = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=a,
-            label="Hey ! Jon !",
-            do_save=True,
-        )
-
-        with new_revision(session=self.session, tm=transaction.manager, content=p1):
-            p1.description = "This is some amazing test"
-
-        with new_revision(session=self.session, tm=transaction.manager, content=p2):
-            p2.description = "What's up?"
-
-        api.save(p1)
-        api.save(p2)
-
-        id1 = p1.content_id
-        id2 = p2.content_id
-
-        eq_(1, self.session.query(Workspace).filter(Workspace.label == "test workspace").count())
-        eq_(
-            1,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.label == "this is randomized folder")
-            .count(),
-        )
-        eq_(
-            2,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.label == "this is dummy label content")
-            .count(),
-        )
-        eq_(
-            1,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.description == "This is some amazing test")
-            .count(),
-        )
-        eq_(
-            2,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.label == "Hey ! Jon !")
-            .count(),
-        )
-        eq_(
-            1,
-            self.session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.description == "What's up?")
-            .count(),
-        )
-
-        res = api.search(["dummy", "jon"])
-        eq_(2, len(res.all()))
-
-        eq_(True, id1 in [o.content_id for o in res.all()])
-        eq_(True, id2 in [o.content_id for o in res.all()])
-
-    def test_unit__search_exclude_content_under_deleted_or_archived_parents__ok(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = self._create_workspace_and_test("workspace_1", admin)
-        folder_1 = self._create_content_and_test(
-            "folder_1", workspace=workspace, type=content_type_list.Folder.slug
-        )
-        folder_2 = self._create_content_and_test(
-            "folder_2", workspace=workspace, type=content_type_list.Folder.slug
-        )
-        page_1 = self._create_content_and_test(
-            "foo", workspace=workspace, type=content_type_list.Page.slug, parent=folder_1
-        )
-        page_2 = self._create_content_and_test(
-            "bar", workspace=workspace, type=content_type_list.Page.slug, parent=folder_2
-        )
-
-        api = ContentApi(current_user=admin, session=self.session, config=self.app_config)
-
-        foo_result = api.search(["foo"]).all()
-        eq_(1, len(foo_result))
-        assert page_1 in foo_result
-
-        bar_result = api.search(["bar"]).all()
-        eq_(1, len(bar_result))
-        assert page_2 in bar_result
-
-        with new_revision(session=self.session, tm=transaction.manager, content=folder_1):
-            api.delete(folder_1)
-        with new_revision(session=self.session, tm=transaction.manager, content=folder_2):
-            api.archive(folder_2)
-
-        # Actually ContentApi.search don't filter it
-        foo_result = api.search(["foo"]).all()
-        eq_(1, len(foo_result))
-        assert page_1 in foo_result
-
-        bar_result = api.search(["bar"]).all()
-        eq_(1, len(bar_result))
-        assert page_2 in bar_result
-
-        # ContentApi offer exclude_unavailable method to do it
-        foo_result = api.search(["foo"]).all()
-        api.exclude_unavailable(foo_result)
-        eq_(0, len(foo_result))
-
-        bar_result = api.search(["bar"]).all()
-        api.exclude_unavailable(bar_result)
-        eq_(0, len(bar_result))
+        original_id = p.content_id
+        res = api._search_query(["this is dummy label content.document.html"])
+        eq_(1, len(res.all()))
+        item = res.all()[0]
+        eq_(original_id, item.content_id)
 
 
 class TestContentApiSecurity(DefaultTest):

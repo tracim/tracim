@@ -10,7 +10,8 @@ import {
   handleFetchResult,
   addAllResourceI18n,
   // SelectStatus,
-  ArchiveDeleteContent
+  ArchiveDeleteContent,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -51,8 +52,7 @@ class FolderAdvanced extends React.Component {
     switch (type) {
       case 'folder_showApp':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: true})
-        this.loadContent()
+        this.setState(prev => ({content: {...prev.content, ...data.content}, isVisible: true}))
         break
       case 'folder_hideApp':
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
@@ -78,6 +78,14 @@ class FolderAdvanced extends React.Component {
 
   componentDidMount () {
     this.loadContent()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { state } = this
+
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+    }
   }
 
   componentWillUnmount () {
@@ -124,7 +132,7 @@ class FolderAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
     }
@@ -146,7 +154,9 @@ class FolderAdvanced extends React.Component {
     )
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
-      case 200: break
+      case 200:
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
+        break
       default:
         this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')
         this.setState(prev => ({content: {...prev.content, sub_content_types: oldAvailableAppList}}))

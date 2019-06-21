@@ -1,4 +1,46 @@
 
+## 2.3.0 / 2019-06-21
+
+### New Features
+
+- Search:
+  - lite search similar to tracim v1
+  - smart search base on ElasticSearch (full text) ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#search-method-using-elastic_search-tracim-23))
+- Easy content move using Drag & Drop
+- Lots of UX improvement
+
+### New Features (technical)
+
+- It's now possible to configure tracim using environment variables ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#tracim-22-fully-supported-var))
+- New licence: combination of MIT, LGPLv3 and AGPLv3
+- Since 2.3 version, following services are automatically launched when tracim start with docker:
+  - Radicale (agenda)
+  - WebDAV
+
+### Known issues
+
+- Debian 9 is released with Firefox ESR v60.x.x. In this version, there is a known bug with the drag & drop feature: when hovering a content over a workspace in the sidebar, only the first one gets to have its icon updated (issue #1997)
+
+### Fixed issues
+
+- Search: #1667, #1668, #1671, #1904, #1914, #1923, #1955
+- Drag & Drop: #789, #1669, #1958, #1974
+- UX: #1512, #1521, #1743, #1757, #1758, #1776, #1781, #1802, #1843, #1844, #1845, #1926, #1939, #1943, #1962, #1964, #1970, #1972, #1981, #1983, #1990
+- Agenda: #1663, #1811, #1819, #1847, #1852, #1929
+- Sharedspace: #1770, #1977
+- Content: #1154, #1553, #1815, #1818
+- Backend config: #1525, #1835, #1888, #1896, #1902, #1930
+- Backend: #1109, #1524, #1661, #1676, #1812, #1880, #1866, #1937
+- WebDAV: #1734
+- Docker: #1311, #1441, #1670, #1860, #1874, #1933, #1965
+- Performance: #696, #1900
+- Other: #1045, #1908
+
+### Other Changes
+
+website.server_name parameter is now deleted in config file and code. Not more used in Tracim.
+
+
 ## 2.2.0 / 2019-05-27
 
 ### New Features
@@ -37,7 +79,7 @@
 - Docker image: #1387, #1565, #1567, #1681, #1763
 - Other: #660, #819, #872, #1006, #1012, #1030, #1514, #1610, #1627, #1630, #1658, #1679, #1698, #1705, #1742, #1755
 
-### Others Changes
+### Other Changes
 
 - Rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config, old parameter is now deprecated. (issue #970)
 
