@@ -4,19 +4,22 @@
 ### New Features
 
 - Search:
-  - lite search similar to Tracim v1
-  - smart search base on ElasticSearch (full text)
+  - lite search similar to tracim v1
+  - smart search base on ElasticSearch (full text) ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#search-method-using-elastic_search-tracim-23))
 - Easy content move using Drag & Drop
-- Lot's of UX improvement
+- Lots of UX improvement
 
 ### New Features (technical)
 
-- Its now possible to configure Tracim using environment variables
+- It's now possible to configure tracim using environment variables ([Documentation here](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md#tracim-22-fully-supported-var))
 - New licence: combination of MIT, LGPLv3 and AGPLv3
+- Since 2.3 version, following services are automatically launched when tracim start with docker:
+  - Radicale (agenda)
+  - WebDAV
 
 ### Known issues
 
-- Debian 9 is released with Firefox ESR v60.x.x. In this version, there is a known bug with the drag & drop feature: when hovering a content over a workspace in the sidebar, only the first one gets to have its icon updated (issue #)
+- Debian 9 is released with Firefox ESR v60.x.x. In this version, there is a known bug with the drag & drop feature: when hovering a content over a workspace in the sidebar, only the first one gets to have its icon updated (issue #1997)
 
 ### Fixed issues
 
@@ -28,12 +31,12 @@
 - Content: #1154, #1553, #1815, #1818
 - Backend config: #1525, #1835, #1888, #1896, #1902, #1930
 - Backend: #1109, #1524, #1661, #1676, #1812, #1880, #1866, #1937
-- Webdav: #1734
+- WebDAV: #1734
 - Docker: #1311, #1441, #1670, #1860, #1874, #1933, #1965
 - Performance: #696, #1900
 - Other: #1045, #1908
 
-### Others Changes
+### Other Changes
 
 website.server_name parameter is now deleted in config file and code. Not more used in Tracim.
 
@@ -76,7 +79,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 - Docker image: #1387, #1565, #1567, #1681, #1763
 - Other: #660, #819, #872, #1006, #1012, #1030, #1514, #1610, #1627, #1630, #1658, #1679, #1698, #1705, #1742, #1755
 
-### Others Changes
+### Other Changes
 
 - Rename 'user.reset_password.validity' to 'user.reset_password.token_lifetime' in config, old parameter is now deprecated. (issue #970)
 
