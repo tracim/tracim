@@ -62,7 +62,6 @@
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .file
-    overflow-Y auto
     &__contentpage
       display block
       &__preview
@@ -91,7 +90,6 @@
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .file
-    overflow-Y auto
     &__contentpage__content__left
       min-height 250px
 
@@ -102,15 +100,13 @@
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .file
-    height calc(100% - 69px) // 69px => top rules
-    overflow-Y scroll
+    height calc(100% - headerHeight)
     &__contentpage__content__left
       min-height 250px
 
 @media (max-width: max-xs)
   .file
-    height calc(100% - 69px) // 69px => top rules
-    overflow-Y scroll
+    height calc(100% - headerHeight)
     &__option__menu__addversion
       padding 8px 5px
       & > i
