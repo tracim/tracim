@@ -378,27 +378,66 @@ class ESSearchApi(SearchApi):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
-        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
-            if (
-                not self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
-                or content.mimetype
-                in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
-            ):
-                file_ = content.get_b64_file()
-                if file_:
-                    indexed_content.file = file_
-                    indexed_content.save(
-                        using=self.es,
-                        pipeline="attachment",
-                        index=self.index_document_alias,
-                        request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
-                    )
-                    return
+        if self._can_index_content(content):
+            file_ = content.get_b64_file()
+            if file_:
+                indexed_content.file = file_
+                indexed_content.save(
+                    using=self.es,
+                    pipeline="attachment",
+                    index=self.index_document_alias,
+                    request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+                )
+                return
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed: no content'.format(
+                    content.content_id
+                ),
+            )
         indexed_content.save(
             using=self.es,
             index=self.index_document_alias,
             request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
         )
+
+    def _can_index_content(self, content: ContentInContext) -> bool:
+        if not self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed: ingest mode disabled'.format(
+                    content.content_id
+                ),
+            )
+            return False
+
+        # INFO - G.M - 2019-06-24 - check mimetype validity
+        if (
+            self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
+            and content.mimetype
+            not in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
+        ):
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed'.format(
+                    content.content_id, content.mimetype
+                ),
+            )
+            return False
+
+        # INFO - G.M - 2019-06-24 - check content size
+        if content.size > self._config.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT:
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed: size "{}" is  bigger than size limit ({})'.format(
+                    content.content_id,
+                    content.size,
+                    self._config.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT,
+                ),
+            )
+            return False
+
+        return True
 
     def search_content(
         self,

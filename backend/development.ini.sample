@@ -422,6 +422,11 @@ search.engine = simple
 # content for only file with those mimetype, if set to empty, allow any mimetype, default value
 # allow most text-based content type.
 ; search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
+# add size limit (in bytes) for elasticsearch ingest activation
+# if file content like a pdf of a content type file is bigger than the limit, it's content will
+# not be indexed using ingest mode.
+# default value to 52428800 = 50Mo
+;search.elasticsearch.ingest.size_limit = 52428800
 
 
 ##############################

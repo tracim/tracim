@@ -523,6 +523,9 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
+        self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
+            self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
+        )
         self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
             "search.elasticsearch.host", "localhost"
         )
