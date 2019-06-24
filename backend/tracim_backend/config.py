@@ -523,6 +523,12 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_list(
+            self.get_raw_config("search.elasticsearch.ingest.mimetype_blacklist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
         self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
             self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
         )
