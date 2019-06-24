@@ -6,11 +6,14 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import {DRAG_AND_DROP, ROLE_OBJECT} from '../../helper.js'
+import {
+  DRAG_AND_DROP,
+  ROLE_OBJECT
+} from '../../helper.js'
 
 const qs = require('query-string')
 
-class WorkspaceListItem extends React.Component {
+export class WorkspaceListItem extends React.Component {
   shouldDisplayAsActive = (location, workspaceId, activeIdWorkspace, app) => {
     if (workspaceId !== activeIdWorkspace) return false
 
@@ -137,19 +140,19 @@ export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAnd
 
 WorkspaceListItem.propTypes = {
   workspaceId: PropTypes.number.isRequired,
+  userWorkspaceRoleId: PropTypes.number,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
   onClickTitle: PropTypes.func,
-  onClickAllContent: PropTypes.func,
   isOpenInSidebar: PropTypes.bool,
-  activeFilterList: PropTypes.array,
   activeIdWorkspace: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
+  userWorkspaceRoleId: 1,
+  label: '',
+  allowedAppList: [],
   onClickTitle: () => {},
-  onClickAllContent: () => {},
   isOpenInSidebar: false,
-  activeFilterList: [],
   activeIdWorkspace: -1
 }
