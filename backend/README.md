@@ -95,10 +95,13 @@ you need to create a color.json file at root of tracim :
 
     cp ../color.json.sample ../color.json
 
-You should also create available dir for radicale, according to `caldav_storage_dir`
-parameter:
+You should also create requested folder for running tracim:
 
-     mkdir radicale_storage
+    mkdir sessions_data
+    mkdir sessions_lock
+    mkdir depot
+    mkdir previews
+    mkdir radicale_storage
 
 Initialize the database using [tracimcli](doc/cli.md) tool
 

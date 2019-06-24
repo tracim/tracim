@@ -36,9 +36,6 @@
       justify-content flex-end
       align-items center
       height 100%
-      &__icon
-        margin-right 5px
-        opacity 1
       &__text
         margin-right 5px
         font-size 12px
@@ -102,6 +99,7 @@
       margin-left 0
     &__menu
       &__rightside
+        flex-wrap wrap
         width 100%
 
 responsiveNavbarCollapseFixed =
@@ -113,7 +111,7 @@ responsiveNavbarCollapseFixed =
   border-bottom 1px solid #ccc
   padding-right 5px
 
-@media (min-width: min-sm) and (max-width: max-sm)
+@media (min-width: min-sm) and (max-width: max-md)
   .header
     &__logo__img
       margin-left 0
@@ -143,3 +141,5 @@ responsiveNavbarCollapseFixed =
           margin 2px 0
         &__itemquestion
           display none
+      &__system
+        margin-bottom 4px

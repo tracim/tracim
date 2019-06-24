@@ -25,11 +25,13 @@ ListItemWrapper.propTypes = {
   customClass: PropTypes.string,
   label: PropTypes.string,
   contentType: PropTypes.object,
+  isLast: PropTypes.bool,
   read: PropTypes.bool
 }
 
 ListItemWrapper.defaultProps = {
   label: '',
   customClass: '',
+  isLast: false,
   read: false
 }

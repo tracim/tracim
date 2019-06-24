@@ -590,17 +590,16 @@ class ContentApi(object):
 
         This method do post-create user actions
         """
-        if self._config.SEARCH__ENABLED:
-            try:
-                content_in_context = ContentInContext(
-                    content, config=self._config, dbsession=self._session
-                )
-                search_api = SearchFactory.get_search_lib(
-                    current_user=self._user, config=self._config, session=self._session
-                )
-                search_api.index_content(content_in_context)
-            except Exception:
-                logger.exception(self, "Something goes wrong during indexing of new content")
+        try:
+            content_in_context = ContentInContext(
+                content, config=self._config, dbsession=self._session
+            )
+            search_api = SearchFactory.get_search_lib(
+                current_user=self._user, config=self._config, session=self._session
+            )
+            search_api.index_content(content_in_context)
+        except Exception:
+            logger.exception(self, "Something goes wrong during indexing of new content")
 
     def execute_update_content_actions(self, content: Content) -> None:
         """
@@ -610,32 +609,31 @@ class ContentApi(object):
 
         This method do post-create user actions
         """
-        if self._config.SEARCH__ENABLED:
 
-            try:
-                content_in_context = ContentInContext(
-                    content, config=self._config, dbsession=self._session
-                )
-                search_api = SearchFactory.get_search_lib(
-                    current_user=self._user, config=self._config, session=self._session
-                )
-                search_api.index_content(content_in_context)
-                # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
-                # see https://github.com/tracim/tracim/issues/1833
-                if content.last_revision.revision_type in (
-                    ActionDescription.DELETION,
-                    ActionDescription.ARCHIVING,
-                    ActionDescription.UNARCHIVING,
-                    ActionDescription.UNDELETION,
-                ):
-                    for child_content in content.get_children(recursively=True):
-                        child_in_context = ContentInContext(
-                            child_content, config=self._config, dbsession=self._session
-                        )
-                        search_api.index_content(child_in_context)
+        try:
+            content_in_context = ContentInContext(
+                content, config=self._config, dbsession=self._session
+            )
+            search_api = SearchFactory.get_search_lib(
+                current_user=self._user, config=self._config, session=self._session
+            )
+            search_api.index_content(content_in_context)
+            # FIXME - G.M - 2019-06-03 - reindex children to avoid trouble when deleting, archiving
+            # see https://github.com/tracim/tracim/issues/1833
+            if content.last_revision.revision_type in (
+                ActionDescription.DELETION,
+                ActionDescription.ARCHIVING,
+                ActionDescription.UNARCHIVING,
+                ActionDescription.UNDELETION,
+            ):
+                for child_content in content.get_children(recursively=True):
+                    child_in_context = ContentInContext(
+                        child_content, config=self._config, dbsession=self._session
+                    )
+                    search_api.index_content(child_in_context)
 
-            except Exception:
-                logger.exception(self, "Something goes wrong during indexing of content")
+        except Exception:
+            logger.exception(self, "Something goes wrong during indexing of content")
 
     def get_one_from_revision(
         self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None
@@ -1856,7 +1854,7 @@ class ContentApi(object):
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
-        content.file_name = filename
+        content.label = label
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
@@ -1881,7 +1879,7 @@ class ContentApi(object):
         self._is_filename_available_or_raise(
             filename, content.workspace, content.parent, exclude_content_id=content.content_id
         )
-        content.file_name = filename
+        content.label = label
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
@@ -2139,6 +2137,7 @@ class ContentApi(object):
         query = self._search_query(keywords=keywords, content_types=content_types)
         results = []
         current_offset = 0
+        parsed_content_ids = []
         for content in query:
             if len(results) >= size:
                 break
@@ -2148,7 +2147,18 @@ class ContentApi(object):
             if not self._show_archived:
                 if self.get_archived_parent_id(content):
                     continue
+            if content.type == content_type_list.Comment.slug:
+                # INFO - G.M - 2019-06-13 -  filter by content_types of parent for comment
+                # if correct content_type, content is parent.
+                if content.parent.type in content_types:
+                    content = content.parent
+                else:
+                    continue
+            if content.content_id in parsed_content_ids:
+                # INFO - G.M - 2019-06-13 - avoid duplication of same content in result list
+                continue
             if current_offset >= offset:
+                parsed_content_ids.append(content.content_id)
                 results.append(content)
             current_offset += 1
 
@@ -2170,21 +2180,23 @@ class ContentApi(object):
         filter_group_filename = list(
             Content.file_name.ilike("%{}%".format(keyword)) for keyword in keywords
         )
+        filter_group_description = list(
+            Content.description.ilike("%{}%".format(keyword)) for keyword in keywords
+        )
         title_keyworded_items = (
             self.get_base_query(None)
-            .filter(or_(*(filter_group_label + filter_group_filename)))
+            .filter(or_(*(filter_group_label + filter_group_filename + filter_group_description)))
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
             .order_by(desc(Content.updated), desc(Content.revision_id), desc(Content.content_id))
         )
 
-        # INFO - G.M - 2019-05-27 - we remove comment from result
-        comment_type = content_type_list.Comment
-        comments_slugs = [comment_type.slug]
-        title_keyworded_items = title_keyworded_items.filter(~Content.type.in_(comments_slugs))
-
+        # INFO - G.M - 2019-06-13 - we add comment to content_types checked
         if content_types:
-            title_keyworded_items = title_keyworded_items.filter(Content.type.in_(content_types))
+            searched_content_types = set(content_types + [content_type_list.Comment.slug])
+            title_keyworded_items = title_keyworded_items.filter(
+                Content.type.in_(searched_content_types)
+            )
 
         return title_keyworded_items
 

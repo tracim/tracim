@@ -8,6 +8,7 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.models.meta import metadata
 from tracim_backend.models.setup_models import *  # noqa: F403,F401
 
@@ -21,6 +22,8 @@ config = context.config
 env_sqlalchemy_url = os.environ.get("TRACIM_SQLALCHEMY__URL")
 if env_sqlalchemy_url:
     config.set_main_option("sqlalchemy.url", env_sqlalchemy_url)
+if not config.get_main_option("sqlalchemy.url"):
+    raise ConfigurationError("SQLALCHEMY__URL is mandatory")
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 # fileConfig(config.config_file_name)

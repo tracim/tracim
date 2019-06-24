@@ -33,7 +33,8 @@ import {
   getContentTypeList,
   getUserIsConnected,
   getMyselfWorkspaceList,
-  putUserLang
+  putUserLang,
+  getWorkspaceMemberList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -44,7 +45,8 @@ import {
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
-  appendBreadcrumbs
+  appendBreadcrumbs,
+  setWorkspaceListMemberList
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 
@@ -143,11 +145,30 @@ class Tracim extends React.Component {
       const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
 
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
+      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
       this.setState({workspaceListLoaded: true})
 
       return true
     }
     return false
+  }
+
+  loadWorkspaceListMemberList = async workspaceList => {
+    const { props } = this
+
+    const fetchWorkspaceListMemberList = await Promise.all(
+      workspaceList.map(async ws => ({
+        idWorkspace: ws.workspace_id,
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+      }))
+    )
+
+    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
+      idWorkspace: memberList.idWorkspace,
+      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+    }))
+
+    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   setDefaultUserLang = async loggedUser => {

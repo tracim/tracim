@@ -6,7 +6,9 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   ROLE,
-  findIdRoleUserWorkspace
+  findUserRoleIdInWorkspace,
+  ROLE_OBJECT,
+  CONTENT_TYPE
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -18,8 +20,7 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE,
-  ListItemWrapper
+  BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -28,7 +29,8 @@ import {
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
-  putFolderRead
+  putFolderRead,
+  putContentItemMove
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -41,7 +43,8 @@ import {
   toggleFolderOpen,
   setWorkspaceContentRead,
   setBreadcrumbs,
-  resetBreadcrumbsAppFeature
+  resetBreadcrumbsAppFeature,
+  moveWorkspaceContent
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 
@@ -185,7 +188,7 @@ class WorkspaceContent extends React.Component {
 
     const idContentInUrl = (props.match && props.match.params.idcts) || null
 
-    if (idContentInUrl && idContentInUrl !== 'new' && props.match && props.match.params.type === 'folder') idFolderInUrl.push(idContentInUrl)
+    if (idContentInUrl && idContentInUrl !== 'new' && props.match && props.match.params.type === CONTENT_TYPE.FOLDER) idFolderInUrl.push(idContentInUrl)
 
     let fetchContentList
     if (idContentInUrl && !isNaN(idContentInUrl)) fetchContentList = await props.dispatch(getContentPathList(idWorkspace, idContentInUrl, idFolderInUrl))
@@ -232,12 +235,6 @@ class WorkspaceContent extends React.Component {
     this.handleClickContentItem(content)
   }
 
-  handleClickMoveContentItem = (e, content) => {
-    e.preventDefault()
-    e.stopPropagation()
-    console.log('%c<WorkspaceContent> move nyi', 'color: #c17838', content)
-  }
-
   handleClickDownloadContentItem = (e, content) => {
     e.preventDefault()
     e.stopPropagation()
@@ -256,7 +253,7 @@ class WorkspaceContent extends React.Component {
         props.dispatch(setWorkspaceContentArchived(content.idWorkspace, content.id))
         this.loadContentList(state.idWorkspaceInUrl)
         break
-      default: props.dispatch(newFlashMessage(props.t('Error while archiving document')))
+      default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
     }
   }
 
@@ -272,7 +269,7 @@ class WorkspaceContent extends React.Component {
         props.dispatch(setWorkspaceContentDeleted(content.idWorkspace, content.id))
         this.loadContentList(state.idWorkspaceInUrl)
         break
-      default: props.dispatch(newFlashMessage(props.t('Error while deleting document')))
+      default: props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
   }
 
@@ -321,6 +318,61 @@ class WorkspaceContent extends React.Component {
     props.history.push(`${PAGE.WORKSPACE.NEW(state.idWorkspaceInUrl, contentType)}?${qs.stringify(newUrlSearch, {encode: false})}&parent_id=${idFolder}`)
   }
 
+  getContentParentList = (content, contentList) => {
+    const parent = contentList.find(c => c.id === content.idParent)
+    if (!parent) return []
+
+    return [parent.id, ...this.getContentParentList(parent, contentList)]
+  }
+
+  handleDropMoveContent = async (source, destination) => {
+    const { props, state } = this
+
+    if (source.contentId === destination.contentId) return
+
+    // INFO - CH - 2019-06-14 - Check that not moving a folder into one of its sub folder
+    if (source.workspaceId === destination.workspaceId && destination.parentId !== 0) {
+      const destinationContent = props.workspaceContentList.find(c => c.id === destination.contentId)
+      const parentIdList = this.getContentParentList(destinationContent, props.workspaceContentList)
+
+      if (parentIdList.includes(source.contentId)) return
+    }
+
+    // INFO - CH - 2019-06-14 - Check user is allowed to drop in the different destination workspace
+    if (source.workspaceId !== destination.workspaceId) {
+      const destinationMemberList = props.workspaceList.find(ws => ws.id === destination.workspaceId).memberList
+      const userRoleIdInDestination = findUserRoleIdInWorkspace(props.user.user_id, destinationMemberList, ROLE)
+
+      if (userRoleIdInDestination <= ROLE_OBJECT.contributor.id) {
+        props.dispatch(newFlashMessage(props.t('Insufficient rights'), 'danger'))
+        return
+      }
+    }
+
+    const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
+    switch (fetchMoveContent.status) {
+      case 200:
+        const {dropEffect, ...actionDestination} = destination
+        props.dispatch(moveWorkspaceContent(source, actionDestination))
+        this.loadContentList(state.idWorkspaceInUrl)
+        break
+      case 400:
+        switch (fetchMoveContent.json.code) {
+          case 3002:
+            props.dispatch(newFlashMessage(props.t('A content with same name already exists'), 'danger'))
+            break
+          case 2038:
+            props.dispatch(newFlashMessage(props.t("The destination folder doesn't allow this content type"), 'danger'))
+            break
+          default:
+            props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
+            break
+        }
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while moving content'), 'danger'))
+    }
+  }
+
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   handleSetFolderRead = async idFolder => {
@@ -351,7 +403,25 @@ class WorkspaceContent extends React.Component {
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
     ? contentList
-    : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
+    : contentList.filter(c => c.type === CONTENT_TYPE.FOLDER || filter.includes(c.type)) // keep unfiltered files and folders
+
+  displayWorkspaceEmptyMessage = (userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty) => {
+    const { props } = this
+
+    const creationAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
+      ? props.t('This shared space has no content of that type yet') + props.t(", create the first content of that type by clicking on the button 'Create'")
+      : props.t('This shared space has no content yet') + props.t(", create the first content by clicking on the button 'Create'")
+
+    const creationNotAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
+      ? props.t('This shared space has no content of that type yet')
+      : props.t('This shared space has no content yet')
+
+    return (
+      <div className='workspace__content__fileandfolder__empty'>
+        {userRoleIdInWorkspace > 1 ? creationAllowedMessage : creationNotAllowedMessage}
+      </div>
+    )
+  }
 
   render () {
     const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
@@ -365,25 +435,28 @@ class WorkspaceContent extends React.Component {
 
     const rootContentList = filteredWorkspaceContentList.filter(c => c.idParent === null) // .sort((a, b) => a.type !== 'folder' && b.type === 'folder')
 
-    const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
     const createContentAvailableApp = contentType
-      .filter(ct => ct.slug !== 'comment')
-      .filter(ct => idRoleUserWorkspace === 2 ? ct.slug !== 'folder' : true)
+      .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
+      .filter(ct => userRoleIdInWorkspace === 2 ? ct.slug !== CONTENT_TYPE.FOLDER : true)
+
+    const isWorkspaceEmpty = workspaceContentList.length === 0
+    const isFilteredWorkspaceEmpty = rootContentList.length === 0
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight'>
         <div className='WorkspaceContent'>
-          {state.contentLoaded &&
+          {state.contentLoaded && (
             <OpenContentApp
               // automatically open the app for the idContent in url
               idWorkspace={state.idWorkspaceInUrl}
               appOpenedType={state.appOpenedType}
               updateAppOpenedType={this.handleUpdateAppOpenedType}
             />
-          }
+          )}
 
-          {state.contentLoaded &&
+          {state.contentLoaded && (
             <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
               <OpenCreateContentApp
                 // automatically open the popup create content of the app in url
@@ -391,7 +464,7 @@ class WorkspaceContent extends React.Component {
                 appOpenedType={state.appOpenedType}
               />
             } />
-          }
+          )}
 
           <PageWrapper customClass='workspace'>
             <PageTitle
@@ -401,103 +474,85 @@ class WorkspaceContent extends React.Component {
               icon={this.getIcon(urlFilter)}
               breadcrumbsList={breadcrumbs}
             >
-              {idRoleUserWorkspace >= 2 &&
+              {userRoleIdInWorkspace >= 2 && (
                 <DropdownCreateButton
                   parentClass='workspace__header__btnaddcontent'
                   idFolder={null} // null because it is workspace root content
                   onClickCreateContent={this.handleClickCreateContent}
                   availableApp={createContentAvailableApp}
                 />
-              }
+              )}
             </PageTitle>
 
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__fileandfolder folder__content active'>
-                <ContentItemHeader />
-
-                {state.contentLoaded && workspaceContentList.length === 0
-                  ? idRoleUserWorkspace === 1
-                    ? (
-                      <div className='workspace__content__fileandfolder__empty'>
-                        {t('This shared space has no content yet')}
-                      </div>
-                    )
-                    : (
-                      <div className='workspace__content__fileandfolder__empty'>
-                        {t('This shared space has no content yet') + t(", create the first content by clicking on the button 'Create'")}
-                      </div>
-                    )
-                  : rootContentList.length === 0
-                    ? (
-                      <div className='workspace__content__fileandfolder__empty'>
-                        {t("This shared space has no content of that type yet, create the first content of that type by clicking on the button 'Create'")}
-                      </div>
-                    )
-                    : rootContentList.map((content, i) => content.type === 'folder'
-                      ? (
-                        <Folder
-                          availableApp={createContentAvailableApp}
-                          folderData={{
-                            ...content,
-                            content: filteredWorkspaceContentList.filter(c => c.idParent !== null)
-                          }}
-                          idRoleUserWorkspace={idRoleUserWorkspace}
-                          onClickExtendedAction={{
-                            edit: this.handleClickEditContentItem,
-                            move: null, // this.handleClickMoveContentItem,
-                            download: this.handleClickDownloadContentItem,
-                            archive: this.handleClickArchiveContentItem,
-                            delete: this.handleClickDeleteContentItem
-                          }}
-                          onClickFolder={this.handleClickFolder}
-                          onClickCreateContent={this.handleClickCreateContent}
-                          contentType={contentType}
-                          readStatusList={currentWorkspace.contentReadStatusList}
-                          setFolderRead={this.handleSetFolderRead}
-                          isLast={i === rootContentList.length - 1}
-                          key={content.id}
-                          t={t}
-                        />
-                      )
-                      : (
-                        <ListItemWrapper
-                          label={content.label}
-                          read={currentWorkspace.contentReadStatusList.includes(content.id)}
-                          contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                          isLast={i === rootContentList.length - 1}
-                          key={content.id}
-                        >
-                          <ContentItem
-                            label={content.label}
-                            fileName={content.fileName}
-                            fileExtension={content.fileExtension}
-                            faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                            statusSlug={content.statusSlug}
-                            contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                            urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
-                            idRoleUserWorkspace={idRoleUserWorkspace}
-                            onClickExtendedAction={{
-                              edit: e => this.handleClickEditContentItem(e, content),
-                              move: null, // e => this.handleClickMoveContentItem(e, content),
-                              download: e => this.handleClickDownloadContentItem(e, content),
-                              archive: e => this.handleClickArchiveContentItem(e, content),
-                              delete: e => this.handleClickDeleteContentItem(e, content)
-                            }}
-                            key={content.id}
-                          />
-                        </ListItemWrapper>
-                      )
-                    )
+                {workspaceContentList.length > 0 &&
+                  <ContentItemHeader />
                 }
 
-                {idRoleUserWorkspace >= 2 && workspaceContentList.length >= 10 &&
+                {state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty)
+                  ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
+                  : rootContentList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
+                    ? (
+                      <Folder
+                        availableApp={createContentAvailableApp}
+                        folderData={content}
+                        workspaceContentList={filteredWorkspaceContentList}
+                        getContentParentList={this.getContentParentList}
+                        userRoleIdInWorkspace={userRoleIdInWorkspace}
+                        onClickExtendedAction={{
+                          edit: this.handleClickEditContentItem,
+                          download: this.handleClickDownloadContentItem,
+                          archive: this.handleClickArchiveContentItem,
+                          delete: this.handleClickDeleteContentItem
+                        }}
+                        onDropMoveContentItem={this.handleDropMoveContent}
+                        onClickFolder={this.handleClickFolder}
+                        onClickCreateContent={this.handleClickCreateContent}
+                        contentType={contentType}
+                        readStatusList={currentWorkspace.contentReadStatusList}
+                        setFolderRead={this.handleSetFolderRead}
+                        isLast={i === rootContentList.length - 1}
+                        key={content.id}
+                        t={t}
+                      />
+                    )
+                    : (
+                      <ContentItem
+                        contentId={content.id}
+                        workspaceId={content.idWorkspace}
+                        parentId={content.idParent}
+                        label={content.label}
+                        fileName={content.fileName}
+                        fileExtension={content.fileExtension}
+                        faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                        statusSlug={content.statusSlug}
+                        contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
+                        isLast={i === rootContentList.length - 1}
+                        urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${location.search}`}
+                        userRoleIdInWorkspace={userRoleIdInWorkspace}
+                        read={currentWorkspace.contentReadStatusList.includes(content.id)}
+                        onClickExtendedAction={{
+                          edit: e => this.handleClickEditContentItem(e, content),
+                          download: e => this.handleClickDownloadContentItem(e, content),
+                          archive: e => this.handleClickArchiveContentItem(e, content),
+                          delete: e => this.handleClickDeleteContentItem(e, content)
+                        }}
+                        onDropMoveContentItem={this.handleDropMoveContent}
+                        key={content.id}
+                      />
+                    )
+                  )
+                }
+
+                {userRoleIdInWorkspace >= 2 && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
                     customClass='workspace__content__button'
                     idFolder={null}
                     onClickCreateContent={this.handleClickCreateContent}
                     availableApp={createContentAvailableApp}
                   />
-                }
+                )}
               </div>
             </PageContent>
           </PageWrapper>

@@ -49,13 +49,11 @@ class ConfigModel(object):
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
         webdav_url: str,
-        search_enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
         self.webdav_enabled = webdav_enabled
         self.webdav_url = webdav_url
-        self.search_enabled = search_enabled
 
 
 class ErrorCodeModel(object):
@@ -449,6 +447,22 @@ class WorkspaceMemberInvitation(object):
 
 
 class WorkspaceUpdate(object):
+    """
+    Update workspace
+    """
+
+    def __init__(
+        self,
+        label: typing.Optional[str] = None,
+        description: typing.Optional[str] = None,
+        agenda_enabled: typing.Optional[bool] = None,
+    ) -> None:
+        self.label = label
+        self.description = description
+        self.agenda_enabled = agenda_enabled
+
+
+class WorkspaceCreate(object):
     """
     Update workspace
     """

@@ -15,5 +15,6 @@
   "Error while changing status": "Error while changing status",
   "Thread": "Thread",
   "thread": "thread",
-  "threads": "threads"
+  "threads": "threads",
+  "You can't send an empty comment": "You can't send an empty comment"
 }
