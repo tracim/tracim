@@ -391,7 +391,20 @@ class ESSearchApi(SearchApi):
         ):
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed'.format(
+                'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed (whitelist rule)'.format(
+                    content.content_id, content.mimetype
+                ),
+            )
+            return False
+
+        # INFO - G.M - 2019-06-24 - check mimetype validity
+        if (
+            self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
+            and content.mimetype in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
+        ):
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed (blacklist rule)'.format(
                     content.content_id, content.mimetype
                 ),
             )
