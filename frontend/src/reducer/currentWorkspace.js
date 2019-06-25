@@ -85,6 +85,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
             slug: ra.slug,
             label: ra.label,
             type: ra.content_type,
+            fileExtension: ra.file_extension,
             idParent: ra.parent_id,
             showInUi: ra.show_in_ui,
             isArchived: ra.is_archived,
