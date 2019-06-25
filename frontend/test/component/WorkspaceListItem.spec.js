@@ -1,12 +1,12 @@
 import React from 'react'
-import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import {expect, assert} from 'chai'
+import {mount,configure} from 'enzyme'
 import {WorkspaceListItem as WorkspaceListItemWithoutHOC} from '../../src/component/Sidebar/WorkspaceListItem.jsx'
 import {dropTargetMock} from '../hocMock/dragAndDrop.js'
-import {withRouterMock} from '../hocMock/withRouter.js'
+import {RouterMock, withRouterMock} from '../hocMock/withRouter.js'
 import {translateMock} from '../hocMock/translate.js'
 import {firstWorkspace} from '../fixture/workspace/firstWorkspace.js'
-import {shallowUntilTarget} from '../hocMock/helper.js'
+import {GLOBAL_primaryColor} from '../setup.js'
 
 describe('<WorkspaceListItem />', () => {
   const props = {
@@ -39,7 +39,7 @@ describe('<WorkspaceListItem />', () => {
     )
   )
 
-  const wrapper = shallowUntilTarget(
+  const wrapper = mount(
     <ComponentWithMockHOC
       workspaceId={props.workspaceId}
       userWorkspaceRoleId={props.userWorkspaceRoleId}
@@ -49,10 +49,19 @@ describe('<WorkspaceListItem />', () => {
       isOpenInSidebar={props.isOpenInSidebar}
       activeIdWorkspace={props.activeIdWorkspace}
     />,
-    WorkspaceListItemWithoutHOC
+    {wrappingComponent: RouterMock}
   )
 
   it(`should display "${props.label}"`, () =>
     expect(wrapper.find('.sidebar__content__navigation__workspace__item__name')).to.have.text().equal(props.label)
+  )
+  it(`should display the first 2 letters of the label in uppercase`, () =>
+    expect(wrapper.find('.sidebar__content__navigation__workspace__item__number')).to.have.text().equal(props.label.substring(0, 2).toUpperCase())
+  )
+  it(`should display the first 2 letters on the background color ${GLOBAL_primaryColor}`, () =>
+    expect(wrapper.find('.sidebar__content__navigation__workspace__item__number').prop('style')).to.include({backgroundColor: GLOBAL_primaryColor})
+  )
+  it(`should have ${firstWorkspace.sidebarEntry.length} children`, () =>
+    expect(wrapper.find('.sidebar__content__navigation__workspace__item__submenu li')).to.have.lengthOf(6)
   )
 })

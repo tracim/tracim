@@ -35,6 +35,6 @@ describe('<Badge />', () => {
   )
 
   it(`should display its text in color ${props.style.color}`, () =>
-    expect(wrapper.find('.badge')).to.have.style('color', props.style.color)
+    expect(wrapper.find('.badge').prop('style')).to.deep.equal(props.style)
   )
 })

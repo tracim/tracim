@@ -1,4 +1,14 @@
 import React from 'react'
+import { Router } from 'react-router'
+
+export const RouterMock = props => {
+  const history = require('history').createBrowserHistory()
+  return (
+    <Router history={history}>
+      {props.children}
+    </Router>
+  )
+}
 
 // mock taken from a route /ui/workspaces/:id/contents?folder_open=
 
