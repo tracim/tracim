@@ -1,13 +1,8 @@
 import React from 'react'
-import chai, { expect } from 'chai'
-import chaiEnzyme from 'chai-enzyme'
-import Adapter from 'enzyme-adapter-react-16.1'
+import { expect } from 'chai'
 import { shallow, configure } from 'enzyme'
 import Badge from '../../src/component/Badge/Badge.jsx'
 require('../../src/component/Badge/Badge.styl')
-
-configure({adapter: new Adapter()})
-chai.use(chaiEnzyme())
 
 describe('<Badge />', () => {
   const props = {
