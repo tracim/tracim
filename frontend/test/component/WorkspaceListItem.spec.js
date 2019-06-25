@@ -15,7 +15,6 @@ describe('<WorkspaceListItem />', () => {
     label: firstWorkspace.label,
     allowedAppList: firstWorkspace.sidebarEntry,
     onClickTitle: () => {},
-    onClickAllContent: () => {},
     isOpenInSidebar: true,
     activeIdWorkspace: 1
   }
@@ -40,15 +39,7 @@ describe('<WorkspaceListItem />', () => {
   )
 
   const wrapper = mount(
-    <ComponentWithMockHOC
-      workspaceId={props.workspaceId}
-      userWorkspaceRoleId={props.userWorkspaceRoleId}
-      label={props.label}
-      allowedAppList={props.allowedAppList}
-      onClickTitle={props.onClickTitle}
-      isOpenInSidebar={props.isOpenInSidebar}
-      activeIdWorkspace={props.activeIdWorkspace}
-    />,
+    <ComponentWithMockHOC {...props} />,
     {wrappingComponent: RouterMock}
   )
 
@@ -58,8 +49,8 @@ describe('<WorkspaceListItem />', () => {
   it(`should display the first 2 letters of the label in uppercase`, () =>
     expect(wrapper.find('.sidebar__content__navigation__workspace__item__number')).to.have.text().equal(props.label.substring(0, 2).toUpperCase())
   )
-  it(`should display the first 2 letters on the background color ${GLOBAL_primaryColor}`, () =>
-    expect(wrapper.find('.sidebar__content__navigation__workspace__item__number').prop('style')).to.include({backgroundColor: GLOBAL_primaryColor})
+  it(`should display the first 2 letters on the background color ${GLOBAL_primaryColor.hex}`, () =>
+    expect(wrapper.find('.sidebar__content__navigation__workspace__item__number')).to.have.style('background-color').equal(GLOBAL_primaryColor.rgb)
   )
   it(`should have ${firstWorkspace.sidebarEntry.length} children`, () =>
     expect(wrapper.find('.sidebar__content__navigation__workspace__item__submenu li')).to.have.lengthOf(6)
