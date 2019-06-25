@@ -87,7 +87,10 @@ describe('<HtmlDocument /> in VIEW mode with an archived content', () => {
   )
 
   it(`should display the archived warning`, () =>
-    expect(wrapper.find('.html-document__contentpage__left__wrapper .displaystate__msg')).html().to.contains('fa-archive')
+    expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+      .to.have.descendants(DisplayState)
+      .and
+      .have.html().to.contains('fa-archive')
   )
 })
 
@@ -100,7 +103,10 @@ describe('<HtmlDocument /> in VIEW mode with a deleted content', () => {
   )
 
   it(`should display the trash warning`, () =>
-    expect(wrapper.find('.html-document__contentpage__left__wrapper .displaystate__msg')).html().to.contains('fa-trash')
+    expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+      .to.have.descendants(DisplayState)
+      .and
+      .have.html().to.contains('fa-trash')
   )
 })
 
@@ -113,7 +119,25 @@ describe('<HtmlDocument /> in VIEW mode with a deprecated content', () => {
   )
 
   it(`should display the ${props.deprecatedStatus.faIcon} warning`, () =>
-    expect(wrapper.find('.html-document__contentpage__left__wrapper .displaystate__msg')).html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
+    expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+      .to.have.descendants(DisplayState)
+      .and
+      .have.html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
   )
 })
 
+describe('<HtmlDocument /> in VIEW mode with a draft available', () => {
+  const wrapper = mount(
+    <HtmlDocument
+      {...props}
+      isDraftAvailable={true}
+    />
+  )
+
+  it(`should display the "resume writing" button`, () =>
+    expect(wrapper.find('.html-document__contentpage__textnote'))
+      .to.have.descendants(DisplayState)
+      .and
+      .have.html().to.contains(`fa-hand-o-right`)
+  )
+})
