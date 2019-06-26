@@ -36,9 +36,11 @@ class SearchIndexInitCommand(AppContextCommand):
         self.search_api.create_index()
         print("Index template was created")
         if parsed_args.index_all:
-            print("Indexing all content")
-            self.search_api.index_all_content()
-            print("All content where indexed")
+            nb_errors = self.search_api.index_all_content()
+            if nb_errors == 0:
+                print("All content where indexed")
+            else:
+                print("Warning ! {} contents cannot be indexed properly.".format(nb_errors))
 
 
 class SearchIndexUpgradeCommand(AppContextCommand):
@@ -94,8 +96,11 @@ class SearchIndexIndexCommand(AppContextCommand):
             self.search_api.index_content(content_in_context)
         else:
             print("Indexing all content")
-            self.search_api.index_all_content()
-            print("All content where indexed")
+            nb_errors = self.search_api.index_all_content()
+            if nb_errors == 0:
+                print("All content where indexed")
+            else:
+                print("Warning ! {} contents cannot be indexed properly.".format(nb_errors))
 
 
 class SearchIndexDeleteCommand(AppContextCommand):
