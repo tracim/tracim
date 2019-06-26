@@ -36,20 +36,86 @@ const props = {
   t: () => {}
 }
 
-describe('<HtmlDocument /> in VIEW mode', () => {
-  const wrapper = shallow(
-    <HtmlDocument {...props} />
-  )
+describe('<HtmlDocument />', () => {
+  describe('in VIEW mode', () => {
+    const wrapper = shallow(
+      <HtmlDocument {...props} />
+    )
 
-  it(`should display the last version number ${props.lastVersion}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.lastVersion)
-  )
-  it(`should display the content of the document`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
-  )
+    it(`should display the last version number ${props.lastVersion}`, () =>
+      expect(wrapper.find('.html-document__contentpage__textnote__version').render().text()).to.contains(props.lastVersion)
+    )
+    it(`should display the content of the document`, () =>
+      expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
+    )
+
+    describe('with an archived content', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          isArchived={true}
+        />
+      )
+
+      it(`should display the archived warning`, () =>
+        expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+          .to.have.descendants(DisplayState)
+          .and
+          .have.html().to.contains('fa-archive')
+      )
+    })
+
+    describe('with a deleted content', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          isDeleted={true}
+        />
+      )
+
+      it(`should display the trash warning`, () =>
+        expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+          .to.have.descendants(DisplayState)
+          .and
+          .have.html().to.contains('fa-trash')
+      )
+    })
+
+    describe('with a deprecated content', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          isDeprecated={true}
+        />
+      )
+
+      it(`should display the ${props.deprecatedStatus.faIcon} warning`, () =>
+        expect(wrapper.find('.html-document__contentpage__left__wrapper'))
+          .to.have.descendants(DisplayState)
+          .and
+          .have.html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
+      )
+    })
+
+    describe('with a draft available', () => {
+      const wrapper = mount(
+        <HtmlDocument
+          {...props}
+          isDraftAvailable={true}
+        />
+      )
+
+      it(`should display the "resume writing" button`, () =>
+        expect(wrapper.find('.html-document__contentpage__textnote'))
+          .to.have.descendants(DisplayState)
+          .and
+          .have.html().to.contains(`fa-hand-o-right`)
+      )
+    })
+  })
 })
 
-describe('<HtmlDocument /> in REVISON mode', () => {
+describe('in REVISON mode', () => {
   const wrapper = shallow(
     <HtmlDocument
       {...props}
@@ -65,7 +131,7 @@ describe('<HtmlDocument /> in REVISON mode', () => {
   )
 })
 
-describe('<HtmlDocument /> in EDIT mode', () => {
+describe('in EDIT mode', () => {
   const wrapper = shallow(
     <HtmlDocument
       {...props}
@@ -78,66 +144,3 @@ describe('<HtmlDocument /> in EDIT mode', () => {
   )
 })
 
-describe('<HtmlDocument /> in VIEW mode with an archived content', () => {
-  const wrapper = mount(
-    <HtmlDocument
-      {...props}
-      isArchived={true}
-    />
-  )
-
-  it(`should display the archived warning`, () =>
-    expect(wrapper.find('.html-document__contentpage__left__wrapper'))
-      .to.have.descendants(DisplayState)
-      .and
-      .have.html().to.contains('fa-archive')
-  )
-})
-
-describe('<HtmlDocument /> in VIEW mode with a deleted content', () => {
-  const wrapper = mount(
-    <HtmlDocument
-      {...props}
-      isDeleted={true}
-    />
-  )
-
-  it(`should display the trash warning`, () =>
-    expect(wrapper.find('.html-document__contentpage__left__wrapper'))
-      .to.have.descendants(DisplayState)
-      .and
-      .have.html().to.contains('fa-trash')
-  )
-})
-
-describe('<HtmlDocument /> in VIEW mode with a deprecated content', () => {
-  const wrapper = mount(
-    <HtmlDocument
-      {...props}
-      isDeprecated={true}
-    />
-  )
-
-  it(`should display the ${props.deprecatedStatus.faIcon} warning`, () =>
-    expect(wrapper.find('.html-document__contentpage__left__wrapper'))
-      .to.have.descendants(DisplayState)
-      .and
-      .have.html().to.contains(`fa-${props.deprecatedStatus.faIcon}`)
-  )
-})
-
-describe('<HtmlDocument /> in VIEW mode with a draft available', () => {
-  const wrapper = mount(
-    <HtmlDocument
-      {...props}
-      isDraftAvailable={true}
-    />
-  )
-
-  it(`should display the "resume writing" button`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote'))
-      .to.have.descendants(DisplayState)
-      .and
-      .have.html().to.contains(`fa-hand-o-right`)
-  )
-})

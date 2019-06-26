@@ -11,7 +11,7 @@
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build-devwindoz": "set NODE_ENV=production&& webpack",
     "build-translation": "node i18next.scanner.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
@@ -30,8 +30,8 @@
     "file-loader": "^1.1.5",
     "i18next": "^10.5.0",
     "prop-types": "^15.6.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
     "react-i18next": "^7.5.0",
     "standard": "^11.0.0",
     "standard-loader": "^6.0.1",
@@ -44,7 +44,15 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "@babel/register": "^7.4.4",
+    "chai": "^4.2.0",
+    "chai-enzyme": "^1.0.0-beta.1",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
     "i18next-scanner": "^2.6.1",
+    "ignore-styles": "^5.0.1",
+    "jsdom": "^15.1.1",
+    "mocha": "^6.1.4",
     "react-router-dom": "^5.0.0",
     "script-loader": "^0.7.2",
     "webpack-dev-server": "^3.1.10"
