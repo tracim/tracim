@@ -529,6 +529,9 @@ class CFG(object):
         self.SEARCH__ELASTICSEARCH__PORT = int(
             self.get_raw_config("search.elasticsearch.port", "9200")
         )
+        self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
+            self.get_raw_config("search.elasticsearch.request_timeout", "60")
+        )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 
