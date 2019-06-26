@@ -184,8 +184,7 @@ class ESSearchApi(SearchApi):
                         "port": self._config.SEARCH__ELASTICSEARCH__PORT,
                     }
                 )
-            ],
-            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+            ]
         )
         self.index_document_pattern = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE.format(
             date="*", index_alias=config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
@@ -389,10 +388,17 @@ class ESSearchApi(SearchApi):
                 if file_:
                     indexed_content.file = file_
                     indexed_content.save(
-                        using=self.es, pipeline="attachment", index=self.index_document_alias
+                        using=self.es,
+                        pipeline="attachment",
+                        index=self.index_document_alias,
+                        request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
                     )
                     return
-        indexed_content.save(using=self.es, index=self.index_document_alias)
+        indexed_content.save(
+            using=self.es,
+            index=self.index_document_alias,
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+        )
 
     def search_content(
         self,
