@@ -411,6 +411,15 @@ class ESSearchApi(SearchApi):
             )
             return False
 
+        if not content.content.depot_file or content.size is None:
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed:  not a correct file format'.format(
+                    content.content_id
+                ),
+            )
+            return False
+
         # INFO - G.M - 2019-06-24 - check mimetype validity
         if (
             self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
@@ -434,6 +443,15 @@ class ESSearchApi(SearchApi):
                 self,
                 'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed (blacklist rule)'.format(
                     content.content_id, content.mimetype
+                ),
+            )
+            return False
+
+        if content.size == 0:
+            logger.debug(
+                self,
+                'Content file of content "{}" will be not indexed:  empty'.format(
+                    content.content_id
                 ),
             )
             return False
