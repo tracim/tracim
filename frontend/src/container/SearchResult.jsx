@@ -12,8 +12,7 @@ import {
   BREADCRUMBS_TYPE
 } from 'tracim_frontend_lib'
 import {
-  PAGE,
-  ALL_CONTENT_TYPES
+  PAGE
 } from '../helper.js'
 import ContentItemSearch from '../component/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -21,21 +20,38 @@ import {
   newFlashMessage,
   setCurrentNumberPage,
   appendSearchResultsList,
+  setSearchResultsList,
+  setSearchedKeywords,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
 
+const qs = require('query-string')
+
 class SearchResult extends React.Component {
   constructor (props) {
     super(props)
+    // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
+    // https://github.com/tracim/tracim/issues/1973
     this.state = {
-      contentTypes: ALL_CONTENT_TYPES,
-      showArchived: false,
-      showDeleted: false,
-      showActive: true
+      totalHits: 0
     }
-
     document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  parseUrl () {
+    const parsed = qs.parse(this.props.location.search)
+    const searchObject = {}
+
+    searchObject.contentTypes = parsed.t
+    searchObject.searchedKeywords = parsed.q
+    searchObject.numberResultsByPage = parseInt(parsed.nr)
+    searchObject.currentPage = parseInt(parsed.p)
+    searchObject.showArchived = !!(parseInt(parsed.arc))
+    searchObject.showDeleted = !!(parseInt(parsed.del))
+    searchObject.showActive = !!(parseInt(parsed.act))
+
+    return searchObject
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -48,10 +64,48 @@ class SearchResult extends React.Component {
 
   componentDidMount () {
     this.buildBreadcrumbs()
+    this.loadSearchUrl()
   }
 
   componentWillUnmount () {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  componentDidUpdate (prevProps) {
+    let prevSearchedKeywords = qs.parse(prevProps.location.search).q
+    let currentSearchedKeywords = this.parseUrl().searchedKeywords
+
+    if (prevSearchedKeywords !== currentSearchedKeywords) {
+      this.loadSearchUrl()
+    }
+  }
+
+  loadSearchUrl = async () => {
+    const { props } = this
+    const searchObject = this.parseUrl()
+    const FIRST_PAGE = 1
+
+    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
+      searchObject.contentTypes,
+      searchObject.searchedKeywords,
+      FIRST_PAGE,
+      (searchObject.numberResultsByPage * searchObject.currentPage),
+      searchObject.showArchived,
+      searchObject.showDeleted,
+      searchObject.showActive
+    ))
+
+    switch (fetchGetSearchedKeywords.status) {
+      case 200:
+        props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
+        props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
+        props.dispatch(setCurrentNumberPage(searchObject.currentPage))
+        this.setState({totalHits: fetchGetSearchedKeywords.json.total_hits})
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+        break
+    }
   }
 
   getPath = (parentsList) => {
@@ -77,22 +131,26 @@ class SearchResult extends React.Component {
   }
 
   handleClickSeeMore = async () => {
-    const { props, state } = this
+    const { props } = this
+    const NEXT_PAGE = props.searchResult.currentNumberPage + 1
+    const searchObject = this.parseUrl()
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      state.contentTypes,
+      searchObject.contentTypes,
       props.searchResult.searchedKeywords,
-      props.searchResult.currentNumberPage + 1,
+      NEXT_PAGE,
       props.searchResult.numberResultsByPage,
-      state.showArchived,
-      state.showDeleted,
-      state.showActive
+      searchObject.showArchived,
+      searchObject.showDeleted,
+      searchObject.showActive
     ))
 
     switch (fetchGetSearchedKeywords.status) {
       case 200:
-        props.dispatch(setCurrentNumberPage(props.searchResult.currentNumberPage + 1))
+        props.dispatch(setCurrentNumberPage(NEXT_PAGE))
         props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
+        this.setState({totalHits: fetchGetSearchedKeywords.json.total_hits})
+        props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify({...qs.parse(props.location.search), p: NEXT_PAGE}, {encode: true}))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -125,7 +183,7 @@ class SearchResult extends React.Component {
 
   hasMoreResults () {
     const { props } = this
-    const currentNumberSearchResults = props.searchResult.resultsList.length
+    const currentNumberSearchResults = this.state.totalHits
     return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
   }
 
