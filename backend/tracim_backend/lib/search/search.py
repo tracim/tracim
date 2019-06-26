@@ -47,10 +47,11 @@ class SearchApi(ABC):
     def index_content(self, content: ContentInContext):
         pass
 
-    def index_all_content(self) -> None:
+    def index_all_content(self) -> int:
         """
         Index/update all content in current index of ElasticSearch
         """
+        nb_indexation_errors = 0
         content_api = ContentApi(
             session=self._session,
             config=self._config,
@@ -64,7 +65,27 @@ class SearchApi(ABC):
             content_in_context = ContentInContext(
                 content, config=self._config, dbsession=self._session
             )
-            self.index_content(content_in_context)
+            try:
+                self.index_content(content_in_context)
+            except ConnectionError as exc:
+                logger.error(
+                    self,
+                    "connexion error issue with elasticsearch during indexing of content {}".format(
+                        content_in_context.content_id
+                    ),
+                )
+                logger.exception(self, exc)
+                nb_indexation_errors += 1
+            except Exception as exc:
+                logger.error(
+                    self,
+                    "something goes wrong during indexing of content {}".format(
+                        content_in_context.content_id
+                    ),
+                )
+                logger.exception(self, exc)
+                nb_indexation_errors += 1
+        return nb_indexation_errors
 
     def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
         """
