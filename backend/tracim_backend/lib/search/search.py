@@ -163,7 +163,8 @@ class ESSearchApi(SearchApi):
                         "port": self._config.SEARCH__ELASTICSEARCH__PORT,
                     }
                 )
-            ]
+            ],
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
         )
         self.index_document_pattern = config.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE.format(
             date="*", index_alias=config.SEARCH__ELASTICSEARCH__INDEX_ALIAS
