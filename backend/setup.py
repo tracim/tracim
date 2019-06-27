@@ -40,7 +40,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator>=0.10',
+    'preview-generator>=0.11',
     'colour',
     'python-dateutil',
     # mail-notifier
