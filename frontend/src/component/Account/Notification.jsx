@@ -1,7 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { BtnSwitch } from 'tracim_frontend_lib'
-import { ROLE } from '../../helper.js'
+import { BtnSwitch, ROLE } from 'tracim_frontend_lib'
 
 export const Notification = props =>
   <div className='account__userpreference__setting__notification'>

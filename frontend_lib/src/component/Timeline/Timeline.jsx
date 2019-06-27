@@ -8,6 +8,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
+import { ROLE_OBJECT } from '../../helper.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -132,7 +133,7 @@ class Timeline extends React.Component {
             <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
           </ul>
 
-          {props.loggedUser.idRoleUserWorkspace >= 2 &&
+          {props.loggedUser.idRoleUserWorkspace >= ROLE_OBJECT.contributor.id &&
             <form className={classnames(`${props.customClass}__texteditor`, 'timeline__body__texteditor')}>
               <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
                 <textarea
@@ -230,7 +231,7 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    idRoleUserWorkspace: 1
+    idRoleUserWorkspace: ROLE_OBJECT.reader.id
   },
   timelineData: [],
   wysiwyg: false,

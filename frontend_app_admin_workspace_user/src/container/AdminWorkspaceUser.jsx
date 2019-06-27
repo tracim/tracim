@@ -8,7 +8,8 @@ import {
   addAllResourceI18n,
   CardPopup,
   handleFetchResult,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  ROLE_OBJECT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -301,7 +302,7 @@ class AdminWorkspaceUser extends React.Component {
       GLOBAL_renderAppFeature({
         loggedUser: {
           ...state.loggedUser,
-          idRoleUserWorkspace: 8 // only global admin can see this app, he is workspace manager of any workspace. So, force idRoleUserWorkspace to 8
+          idRoleUserWorkspace: ROLE_OBJECT.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force idRoleUserWorkspace to 8
         },
         config: {
           label: 'Advanced dashboard',

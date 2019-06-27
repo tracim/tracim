@@ -5,9 +5,7 @@ import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
 import {
   PAGE,
-  ROLE,
   findUserRoleIdInWorkspace,
-  ROLE_OBJECT,
   CONTENT_TYPE
 } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
@@ -17,6 +15,8 @@ import DropdownCreateButton from '../component/common/Input/DropdownCreateButton
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
 import {
+  ROLE,
+  ROLE_OBJECT,
   PageWrapper,
   PageTitle,
   PageContent,

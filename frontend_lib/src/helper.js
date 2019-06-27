@@ -120,3 +120,95 @@ export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId
   }
   return true
 }
+
+export const ROLE = [{
+  id: 8,
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  tradKey: i18n.t('Shared space manager'), // trad key allow the parser to generate an entry in the json file
+  label: 'Shared space manager' // label must be used in components
+}, {
+  id: 4,
+  slug: 'content-manager',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  tradKey: i18n.t('Content manager'), // trad key allow the parser to generate an entry in the json file
+  label: 'Content manager' // label must be used in components
+}, {
+  id: 2,
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145f7',
+  tradKey: i18n.t('Contributor'), // trad key allow the parser to generate an entry in the json file
+  label: 'Contributor' // label must be used in components
+}, {
+  id: 1,
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15d948',
+  tradKey: i18n.t('Reader'), // trad key allow the parser to generate an entry in the json file
+  label: 'Reader' // label must be used in components
+}]
+
+export const ROLE_OBJECT = {
+  reader: {
+    id: 1,
+    sluf: 'reader',
+    faIcon: 'eye',
+    hexcolor: '#15D948',
+    tradKey: i18n.t('Reader'), // trad key allow the parser to generate an entry in the json file
+    label: 'Reader' // label must be used in components
+  },
+  contributor: {
+    id: 2,
+    slug: 'contributor',
+    faIcon: 'pencil',
+    hexcolor: '#3145f7',
+    tradKey: i18n.t('Contributor'), // trad key allow the parser to generate an entry in the json file
+    label: 'Contributor' // label must be used in components
+  },
+  contentManager: {
+    id: 4,
+    slug: 'content-manager',
+    faIcon: 'graduation-cap',
+    hexcolor: '#f2af2d',
+    tradKey: i18n.t('Content manager'), // trad key allow the parser to generate an entry in the json file
+    label: 'Content manager' // label must be used in components
+  },
+  workspaceManager: {
+    id: 8,
+    slug: 'workspace-manager',
+    faIcon: 'gavel',
+    hexcolor: '#ed0007',
+    tradKey: i18n.t('Shared space manager'), // trad key allow the parser to generate an entry in the json file
+    label: 'Shared space manager' // label must be used in components
+  }
+}
+
+export const PROFILE = {
+  ADMINISTRATOR: {
+    id: 1,
+    slug: 'administrators',
+    faIcon: 'shield',
+    hexcolor: '#ed0007',
+    tradKey: i18n.t('Administrator'), // trad key allow the parser to generate an entry in the json file
+    label: 'Administrator' // label must be used in components
+  },
+  MANAGER: {
+    id: 2,
+    slug: 'trusted-users',
+    faIcon: 'graduation-cap',
+    hexcolor: '#f2af2d',
+    tradKey: i18n.t('Trusted user'), // trad key allow the parser to generate an entry in the json file
+    label: 'Trusted user' // label must be used in components
+  },
+  USER: {
+    id: 4,
+    slug: 'users',
+    faIcon: 'user',
+    hexcolor: '#3145f7',
+    tradKey: i18n.t('User'), // trad key allow the parser to generate an entry in the json file
+    label: 'User' // label must be used in components
+  }
+}

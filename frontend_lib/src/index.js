@@ -7,7 +7,10 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   appFeatureCustomEventHandlerShowApp,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  ROLE,
+  ROLE_OBJECT,
+  PROFILE
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -92,6 +95,9 @@ export {
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
+  ROLE,
+  ROLE_OBJECT,
+  PROFILE,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,

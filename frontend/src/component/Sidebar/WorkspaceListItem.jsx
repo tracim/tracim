@@ -6,7 +6,8 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import {DRAG_AND_DROP, ROLE_OBJECT} from '../../helper.js'
+import { DRAG_AND_DROP } from '../../helper.js'
+import { ROLE_OBJECT } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 

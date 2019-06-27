@@ -1,5 +1,5 @@
 import React from 'react'
-import { ROLE } from '../../helper.js'
+import { ROLE } from 'tracim_frontend_lib'
 
 require('./UserStatus.styl')
 

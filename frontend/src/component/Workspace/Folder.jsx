@@ -8,11 +8,8 @@ import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import {
-  PAGE,
-  ROLE_OBJECT,
-  DRAG_AND_DROP
-} from '../../helper.js'
+import { PAGE, DRAG_AND_DROP } from '../../helper.js'
+import { ROLE_OBJECT } from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 

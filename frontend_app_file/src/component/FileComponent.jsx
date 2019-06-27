@@ -7,7 +7,7 @@ import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
 import FileDropzone from './FileDropzone.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
-import { DisplayState } from 'tracim_frontend_lib'
+import { DisplayState, ROLE_OBJECT } from 'tracim_frontend_lib'
 
 export const FileComponent = props =>
   <div className={classnames('file__contentpage__statewrapper', {'displayState': props.isArchived || props.isDeleted})}>
@@ -54,7 +54,7 @@ export const FileComponent = props =>
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
-        displayChangeDescriptionBtn={props.loggedUser.idRoleUserWorkspace >= 2}
+        displayChangeDescriptionBtn={props.loggedUser.idRoleUserWorkspace >= ROLE_OBJECT.contributor.id}
         disableChangeDescription={!props.isEditable}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}

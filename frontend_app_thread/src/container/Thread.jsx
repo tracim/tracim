@@ -16,7 +16,8 @@ import {
   convertBackslashNToBr,
   generateLocalStorageContentId,
   appFeatureCustomEventHandlerShowApp,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  ROLE_OBJECT
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -425,7 +426,7 @@ class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {loggedUser.idRoleUserWorkspace >= 2 &&
+            {loggedUser.idRoleUserWorkspace >= ROLE_OBJECT.contributor.id &&
               <SelectStatus
                 selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                 availableStatus={config.availableStatuses}
@@ -434,7 +435,7 @@ class Thread extends React.Component {
               />
             }
 
-            {loggedUser.idRoleUserWorkspace >= 4 &&
+            {loggedUser.idRoleUserWorkspace >= ROLE_OBJECT.contentManager.id &&
               <ArchiveDeleteContent
                 customColor={config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}

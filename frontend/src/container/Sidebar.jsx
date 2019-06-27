@@ -14,9 +14,9 @@ import {
   getUserProfile,
   unLoggedAllowedPageList,
   findUserRoleIdInWorkspace,
-  ROLE,
   TRACIM_APP_VERSION
 } from '../helper.js'
+import { ROLE } from 'tracim_frontend_lib'
 
 class Sidebar extends React.Component {
   constructor (props) {

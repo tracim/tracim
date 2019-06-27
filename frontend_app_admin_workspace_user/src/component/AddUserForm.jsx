@@ -125,7 +125,7 @@ export class AddUserForm extends React.Component {
                   <div className='userrole__role__icon mx-2' style={{color: p.hexcolor}}>
                     <i className={`fa fa-fw fa-${p.faIcon}`} />
                   </div>
-                  {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
+                  {props.t(p.label) /* this trad key is declared in frontend_lib/helper.js, object PROFILE */}
                 </div>
               </label>
             )}

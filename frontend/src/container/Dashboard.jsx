@@ -8,7 +8,9 @@ import {
   PageContent,
   convertBackslashNToBr,
   BREADCRUMBS_TYPE,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  ROLE,
+  PROFILE
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -35,12 +37,7 @@ import {
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
-import {
-  ROLE,
-  PAGE,
-  findUserRoleIdInWorkspace,
-  PROFILE
-} from '../helper.js'
+import { PAGE, findUserRoleIdInWorkspace } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'

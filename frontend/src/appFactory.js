@@ -1,8 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { FETCH_CONFIG, ROLE, PROFILE } from './helper.js'
+import { FETCH_CONFIG } from './helper.js'
 import i18n from './i18n.js'
+import { ROLE, PROFILE } from 'tracim_frontend_lib'
 
 const mapStateToProps = ({ system }) => ({ system })
 

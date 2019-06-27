@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { ROLE_OBJECT } from '../../helper.js'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -74,7 +75,7 @@ class PopinFixedHeader extends React.Component {
           }
         </div>
 
-        {idRoleUserWorkspace >= 2 && state.editTitle &&
+        {idRoleUserWorkspace >= ROLE_OBJECT.contributor.id && state.editTitle &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickUndoChangeTitleBtn}
@@ -84,7 +85,7 @@ class PopinFixedHeader extends React.Component {
           </button>
         }
 
-        {idRoleUserWorkspace >= 2 &&
+        {idRoleUserWorkspace >= ROLE_OBJECT.contributor.id &&
           <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
@@ -125,7 +126,7 @@ PopinFixedHeader.defaultProps = {
   customColor: '',
   rawTitle: '',
   componentTitle: <div />,
-  idRoleUserWorkspace: 1,
+  idRoleUserWorkspace: ROLE_OBJECT.reader.id,
   onChangeTitle: () => {},
   disableChangeTitle: false
 }

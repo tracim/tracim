@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
 import IconWithWarning from '../Icon/IconWithWarning.jsx'
+import { ROLE_OBJECT } from '../../helper.js'
 
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -89,7 +90,7 @@ export const NewMemberForm = props => {
             </div>
           )}
 
-          {(props.canSendInviteNewUser && props.idRoleUserWorkspace >= 8) && (
+          {(props.canSendInviteNewUser && props.idRoleUserWorkspace >= ROLE_OBJECT.workspaceManager.id) && (
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>
