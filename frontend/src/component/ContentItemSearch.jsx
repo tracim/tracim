@@ -15,7 +15,7 @@ const ContentItemSearch = props => {
       className='content__item'
       data-cy={'content__item'}
     >
-      <div className='content__type' title={props.contentType.slug} style={{color: props.contentType.hexcolor}}>
+      <div className='content__type' title={props.t(props.contentType.label)} style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
 
@@ -33,7 +33,7 @@ const ContentItemSearch = props => {
         { props.path }
       </div>
 
-      <div className='content__lastModification' title={props.lastModificationTime}>
+      <div className='content__lastModification' title={props.lastModificationFormated}>
         <Avatar
           width={'40px'}
           style={{

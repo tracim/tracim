@@ -7,7 +7,6 @@ if [ ! -f /etc/tracim/development.ini ]; then
     SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     cp /tracim/backend/development.ini.sample /etc/tracim/development.ini
     sed -i "s|basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/development.ini
-    sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
@@ -16,7 +15,6 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
     sed -i "s|email.template_dir = .*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
     sed -i "s|email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
-    sed -i "s|webdav.listen = .*|webdav.listen = 127.0.0.1:3030|g" /etc/tracim/development.ini
     sed -i "s|;webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
     sed -i "s|webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
     sed -i "s|email.processing_mode = sync|email.processing_mode = async|g" /etc/tracim/development.ini
@@ -158,7 +156,7 @@ else
 fi
 
 # Activate reply by email
-if [ "$EMAIL_REPLY" = "1" ]; then
+if [ "$REPLY_BY_EMAIL" = "1" ]; then
     sed -i "s|email.reply.activated = .*|email.reply.activated = True|g" /etc/tracim/development.ini
 else
     sed -i "s|email.reply.activated = .*|email.reply.activated = False|g" /etc/tracim/development.ini

@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
+import IconWithWarning from '../Icon/IconWithWarning.jsx'
 
 // require('./NewMemberForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -98,7 +99,9 @@ export const NewMemberForm = props => {
               )
               : (
                 <div className='name__adminmsg'>
-                  <i className='name__adminmsg__icon fa fa-fw fa-warning' />
+                  <IconWithWarning
+                    icon='envelope'
+                  />
                   {props.t("Email notifications are disabled, you can't create new users from here")}
                 </div>
               )

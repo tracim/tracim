@@ -3,7 +3,6 @@ from collections import OrderedDict
 import json
 import os
 import typing
-from urllib.parse import urlparse
 
 from depot.manager import DepotManager
 from paste.deploy.converters import asbool
@@ -217,17 +216,6 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-
-        self.WEBSITE__SERVER_NAME = self.get_raw_config("website.server_name")
-        if not self.WEBSITE__SERVER_NAME:
-            self.WEBSITE__SERVER_NAME = self.get_raw_config(
-                "website.server_name", default_value=urlparse(self.WEBSITE__BASE_URL).hostname
-            )
-            logger.warning(
-                self,
-                "NOTE: Generated website.server_name parameter from "
-                "website.base_url parameter -> {0}".format(self.WEBSITE__SERVER_NAME),
-            )
 
         self.USER__AUTH_TOKEN__VALIDITY = int(
             self.get_raw_config("user.auth_token.validity", "604800")
@@ -513,8 +501,15 @@ class CFG(object):
         self.LDAP_GET_INFO = None
 
     def _load_search_config(self):
-        self.SEARCH__ENABLED = asbool(self.get_raw_config("search.enabled", "False"))
         self.SEARCH__ENGINE = self.get_raw_config("search.engine", "simple")
+
+        DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE = "{index_alias}-{date}"
+        self.SEARCH__ELASTICSEARCH__INDEX_ALIAS = self.get_raw_config(
+            "search.elasticsearch.index_alias"
+        )
+        self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
+            "search.elasticsearch.index_pattern_template", DEFAULT_INDEX_DOCUMENTS_PATTERN_TEMPLATE
+        )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
         )
@@ -550,6 +545,7 @@ class CFG(object):
         """
         Check config for global stuff
         """
+        self.check_mandatory_param("SQLALCHEMY__URL", self.SQLALCHEMY__URL)
         self.check_mandatory_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR)
         self.check_directory_path_param("SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True)
 
@@ -812,20 +808,23 @@ class CFG(object):
         update_validators()
 
     def _check_search_config_validity(self):
-        if self.SEARCH__ENABLED:
-            search_engine_valid = ["elasticsearch", "simple"]
-            if self.SEARCH__ENGINE not in search_engine_valid:
+        search_engine_valid = ["elasticsearch", "simple"]
+        if self.SEARCH__ENGINE not in search_engine_valid:
 
-                search_engine_list_str = ", ".join(
-                    '"{}"'.format(engine) for engine in search_engine_valid
-                )
-                raise ConfigurationError(
-                    "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
-                )
-            # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
-            # see https://github.com/tracim/tracim/issues/1835
-            if self.SEARCH__ENGINE == "elasticsearch":
-                from tracim_backend.lib.search.es_models import INDEX_DOCUMENTS_ALIAS  # noqa: F401
+            search_engine_list_str = ", ".join(
+                '"{}"'.format(engine) for engine in search_engine_valid
+            )
+            raise ConfigurationError(
+                "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
+            )
+        # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
+        # see https://github.com/tracim/tracim/issues/1835
+        if self.SEARCH__ENGINE == "elasticsearch":
+            self.check_mandatory_param(
+                "SEARCH__ELASTICSEARCH__INDEX_ALIAS",
+                self.SEARCH__ELASTICSEARCH__INDEX_ALIAS,
+                when_str="if elasticsearch search feature is enabled",
+            )
 
     # INFO - G.M - 2019-04-05 - Others methods
     def _check_consistency(self):
@@ -870,7 +869,7 @@ class CFG(object):
         if not value:
             raise ConfigurationError(
                 'ERROR: "{}" configuration is mandatory {when_str}.'
-                "Set it before continuing.".format(param_name, when_str="")
+                "Set it before continuing.".format(param_name, when_str=when_str)
             )
 
     def check_directory_path_param(

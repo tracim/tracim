@@ -13,45 +13,12 @@ from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 
 
-class NoSearchEnabled(FunctionalTest):
-    config_section = "functional_test_no_search"
-
-    def test_api___no_search__err_404__by_filename(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
-        groups = [gapi.get_one_with_name("trusted-users")]
-        user = uapi.create_user(
-            "test@test.test",
-            password="test@test.test",
-            do_save=True,
-            do_notify=False,
-            groups=groups,
-        )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
-        workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
-        api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
-        )
-        transaction.commit()
-
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        params = {"search_string": "test"}
-        self.testapp.get("/api/v2/search/content".format(), status=404, params=params)
-
-
 class TestSimpleSearch(FunctionalTest):
     config_section = "functional_test_simple_search"
 
     @parameterized.expand(
         [
-            # content_name, search_string, nb_content_result, first_content_name
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
             ("testdocument", "testdocument", 1, "testdocument"),
             # autocomplete
@@ -63,7 +30,11 @@ class TestSimpleSearch(FunctionalTest):
         ]
     )
     def test_api___simple_search_ok__by_label(
-        self, content_name, search_string, nb_content_result, first_content_name
+        self,
+        created_content_name,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -85,7 +56,10 @@ class TestSimpleSearch(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
         )
         api.create(
             content_type_slug="html-document",
@@ -105,11 +79,11 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_content_name
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @parameterized.expand(
         [
-            # content_name, search_string, nb_content_result, first_content_name
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
             ("good practices", "good practices.document.html", 1, "good practices"),
             # autocomplete
@@ -119,7 +93,11 @@ class TestSimpleSearch(FunctionalTest):
         ]
     )
     def test_api___simple_search_ok__by_filename(
-        self, content_name, search_string, nb_content_result, first_content_name
+        self,
+        created_content_name,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
     ) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
@@ -141,7 +119,10 @@ class TestSimpleSearch(FunctionalTest):
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label=content_name, do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
         )
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
@@ -158,7 +139,181 @@ class TestSimpleSearch(FunctionalTest):
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is False
-        assert search_result["contents"][0]["label"] == first_content_name
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
+
+    @parameterized.expand(
+        [
+            # created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name
+            # exact syntax
+            (
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "subpart",
+                1,
+                "good practices",
+            ),
+            # autocompletion search
+            (
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "sub",
+                1,
+                "good practices",
+            ),
+            (
+                "good practices",
+                "this a content body we search a subpart. We hope to find it.",
+                "part",
+                1,
+                "good practices",
+            ),
+        ]
+    )
+    def test_api___simple_search_ok__by_content(
+        self,
+        created_content_name,
+        created_content_body,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
+    ) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        )
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        content = api.create(
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
+        )
+        with new_revision(session=dbsession, tm=transaction.manager, content=content):
+            api.update_content(
+                content, new_label=created_content_name, new_content=created_content_body
+            )
+            api.save(content)
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+
+        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string}
+        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == nb_content_result
+        assert search_result["is_total_hits_accurate"] is False
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
+
+    @parameterized.expand(
+        [
+            # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
+            # exact syntax
+            (
+                "good practices",
+                "eureka",
+                1,
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content",
+            ),
+            # autocompletion
+            (
+                "good practices",
+                "eur",
+                1,
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content containing eureka string",
+            ),
+            (
+                "good practices",
+                "reka",
+                1,
+                "good practices",
+                "this is a comment content containing the string: eureka.",
+                "this is another comment content containing eureka string",
+            ),
+        ]
+    )
+    def test_api___simple_search_ok__by_comment_content(
+        self,
+        created_content_name,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
+        first_created_comment_content,
+        second_created_comment_content,
+    ) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        groups = [gapi.get_one_with_name("trusted-users")]
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            groups=groups,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        )
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        content = api.create(
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
+        )
+        api.create_comment(
+            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+        )
+        api.create_comment(
+            workspace=workspace,
+            parent=content,
+            content=second_created_comment_content,
+            do_save=True,
+        )
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+
+        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string}
+        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == nb_content_result
+        assert search_result["is_total_hits_accurate"] is False
+        assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     def test_api___simple_search_ok__no_search_string(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)

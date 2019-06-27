@@ -40,7 +40,9 @@ import {
   CONTENT,
   WORKSPACE_CONTENT_PATH,
   newFlashMessage,
-  WORKSPACE_AGENDA_URL
+  WORKSPACE_AGENDA_URL,
+  WORKSPACE_CONTENT_MOVE,
+  SEARCHED_KEYWORDS
 } from './action-creator.sync.js'
 import { history } from './index.js'
 import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
@@ -83,7 +85,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
         }
         return ''
       }
-      if (status >= 400 && status <= 499) return ''
+      if (status >= 400 && status <= 499) return fetchResult.json()
       if (status >= 500 && status <= 599) {
         dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger', 8000))
         return
@@ -695,7 +697,7 @@ export const getLoggedUserCalendar = () => dispatch => {
 
 export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, pageSize, showArchived, showDeleted, showActive) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${searchedKeywords}&page_nb=${pageNumber}&size=${pageSize}`,
+    url: `${FETCH_CONFIG.apiUrl}/search/content?show_archived=${showArchived ? 1 : 0}&content_types=${contentTypes}&show_deleted=${showDeleted ? 1 : 0}&show_active=${showActive ? 1 : 0}&search_string=${encodeURIComponent(searchedKeywords)}&page_nb=${pageNumber}&size=${pageSize}`,
     param: {
       credentials: 'include',
       headers: {
@@ -703,7 +705,26 @@ export const getSearchedKeywords = (contentTypes, searchedKeywords, pageNumber, 
       },
       method: 'GET'
     },
-    actionName: '',
+    actionName: SEARCHED_KEYWORDS,
+    dispatch
+  })
+}
+
+export const putContentItemMove = (source, destination) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${source.workspaceId}/contents/${source.contentId}/move`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        new_workspace_id: destination.workspaceId || 0,
+        new_parent_id: destination.contentId || 0
+      })
+    },
+    actionName: WORKSPACE_CONTENT_MOVE,
     dispatch
   })
 }

@@ -20,13 +20,12 @@ import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import {
   newFlashMessage,
   setCurrentNumberPage,
-  setCurrentNumberSearchResults,
   appendSearchResultsList,
   setBreadcrumbs
 } from '../action-creator.sync.js'
 import { getSearchedKeywords } from '../action-creator.async.js'
 
-class searchResult extends React.Component {
+class SearchResult extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -35,16 +34,24 @@ class searchResult extends React.Component {
       showDeleted: false,
       showActive: true
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case 'allApp_changeLang':
+        console.log('%c<Search> Custom event', 'color: #28a745', type, data)
+        this.buildBreadcrumbs(); break
     }
   }
 
   componentDidMount () {
     this.buildBreadcrumbs()
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   getPath = (parentsList) => {
@@ -73,15 +80,19 @@ class searchResult extends React.Component {
     const { props, state } = this
 
     const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      state.contentTypes, props.searchResult.searchedKeywords, props.searchResult.currentNumberPage + 1,
-      props.searchResult.numberResultsByPage, state.showArchived, state.showDeleted, state.showActive
+      state.contentTypes,
+      props.searchResult.searchedKeywords,
+      props.searchResult.currentNumberPage + 1,
+      props.searchResult.numberResultsByPage,
+      state.showArchived,
+      state.showDeleted,
+      state.showActive
     ))
 
     switch (fetchGetSearchedKeywords.status) {
       case 200:
         props.dispatch(setCurrentNumberPage(props.searchResult.currentNumberPage + 1))
         props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        props.dispatch(setCurrentNumberSearchResults(fetchGetSearchedKeywords.json.total_hits))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -94,7 +105,7 @@ class searchResult extends React.Component {
     const { searchResult } = props
 
     let subtitle
-    let numberResults = searchResult.currentNumberSearchResults
+    let numberResults = searchResult.resultsList.length
     let text = numberResults === 1 ? props.t('best result for') : props.t('best results for')
 
     subtitle = `${numberResults} ${text} "${searchResult.searchedKeywords}"`
@@ -104,8 +115,8 @@ class searchResult extends React.Component {
 
   getSubtitle () {
     let subtitle = ''
-
-    if (searchResult.currentNumberSearchResults !== 0) {
+    const currentNumberSearchResults = this.props.searchResult.resultsList.length
+    if (currentNumberSearchResults > 0) {
       subtitle = this.setSubtitle()
     }
 
@@ -114,7 +125,8 @@ class searchResult extends React.Component {
 
   hasMoreResults () {
     const { props } = this
-    return props.searchResult.currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
+    const currentNumberSearchResults = props.searchResult.resultsList.length
+    return currentNumberSearchResults >= (props.searchResult.numberResultsByPage * props.searchResult.currentNumberPage)
   }
 
   buildBreadcrumbs = () => {
@@ -131,6 +143,7 @@ class searchResult extends React.Component {
 
   render () {
     const { props } = this
+    const currentNumberSearchResults = props.searchResult.resultsList.length
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -138,7 +151,7 @@ class searchResult extends React.Component {
           <PageWrapper customClass='searchResult'>
             <PageTitle
               parentClass={'searchResult'}
-              title={props.searchResult.currentNumberSearchResults === 1
+              title={currentNumberSearchResults === 1
                 ? props.t('Search result')
                 : props.t('Search results')
               }
@@ -149,11 +162,13 @@ class searchResult extends React.Component {
 
             <PageContent parentClass='searchResult'>
               <div className='folder__content' data-cy={'search__content'}>
-                <ContentItemHeader showSearchDetails />
+                {currentNumberSearchResults > 0 &&
+                  <ContentItemHeader showSearchDetails />
+                }
 
-                {props.searchResult.currentNumberSearchResults === 0 && (
+                {currentNumberSearchResults === 0 && (
                   <div className='searchResult__content__empty'>
-                    {`${props.t('No documents found for the specified search terms')}: "${props.searchResult.searchedKeywords}"`}
+                    {`${props.t('No results for the search terms')}: "${props.searchResult.searchedKeywords}"`}
                   </div>
                 )}
 
@@ -170,6 +185,7 @@ class searchResult extends React.Component {
                       path={`${searchItem.workspace.label} > ${this.getPath(searchItem.parents)}${this.getContentName(searchItem)}`}
                       lastModificationAuthor={searchItem.last_modifier.public_name}
                       lastModificationTime={displayDistanceDate(searchItem.modified, this.props.user.lang)}
+                      lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
                       fileExtension={searchItem.file_extension}
                       faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.content_type)).faIcon : null}
                       statusSlug={searchItem.status}
@@ -188,7 +204,7 @@ class searchResult extends React.Component {
                     icon='chevron-down'
                     text={props.t('See more')}
                   />
-                  : props.searchResult.currentNumberSearchResults > props.searchResult.numberResultsByPage &&
+                  : currentNumberSearchResults > props.searchResult.numberResultsByPage &&
                     props.t('No more results')
                 }
               </div>
@@ -201,4 +217,4 @@ class searchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, user }) => ({ breadcrumbs, searchResult, contentType, user })
-export default connect(mapStateToProps)(translate()(searchResult))
+export default connect(mapStateToProps)(translate()(SearchResult))

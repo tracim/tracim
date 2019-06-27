@@ -83,13 +83,12 @@ export const ROLE = [{
   label: 'Reader' // label must be used in components
 }]
 
-export const findIdRoleUserWorkspace = (idUser, memberList, roleList) => {
-  const myself = memberList.find(u => u.id === idUser) || {role: 'reader'}
-  return (roleList.find(r => myself.role === r.slug) || {id: 1}).id
+export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
+  const user = memberList.find(u => u.id === userId) || {role: 'reader'}
+  return (roleList.find(r => user.role === r.slug) || {id: 1}).id
 }
 
-// Côme - 2018/08/21 - useful ?
-export const ROLE2 = {
+export const ROLE_OBJECT = {
   reader: {
     id: 1,
     sluf: 'reader',
@@ -151,6 +150,15 @@ export const PROFILE = {
   }
 }
 
+// INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
+export const CONTENT_TYPE = {
+  HTML_DOCUMENT: 'html-document',
+  FILE: 'file',
+  THREAD: 'thread',
+  FOLDER: 'folder',
+  COMMENT: 'comment'
+}
+
 export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
@@ -162,6 +170,10 @@ export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).
 const USER_AUTH_INTERNAL = 'internal'
 const USER_AUTH_UNKNOWN = 'unknown'
 export const editableUserAuthTypeList = [USER_AUTH_INTERNAL, USER_AUTH_UNKNOWN]
+
+export const DRAG_AND_DROP = {
+  CONTENT_ITEM: 'contentItem'
+}
 
 // Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.

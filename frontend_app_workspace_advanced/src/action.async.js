@@ -30,7 +30,7 @@ export const putLabel = (apiUrl, workspace, newLabel) =>
     body: JSON.stringify({
       label: newLabel,
       description: workspace.description,
-      calendar_enabled: workspace.calendar_enabled
+      agenda_enabled: workspace.agenda_enabled
     })
   })
 
@@ -42,7 +42,7 @@ export const putDescription = (apiUrl, workspace, newDescription) =>
     body: JSON.stringify({
       label: workspace.label,
       description: newDescription,
-      calendar_enabled: workspace.calendar_enabled
+      agenda_enabled: workspace.agenda_enabled
     })
   })
 

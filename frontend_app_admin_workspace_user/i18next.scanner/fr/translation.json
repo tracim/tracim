@@ -3,7 +3,7 @@
   "Active": "Actif",
   "Administrator": "Administrateur",
   "Description": "Description",
-  "Member count": "Nombre de membres",
+  "Members": "Membres",
   "Error while loading users list": "Erreur lors du chargement de la liste des utilisateurs",
   "Error while enabling or disabling user": "Erreur lors de l'activation ou de la désactivation de l'utilisateur",
   "Error while saving new profile": "Erreur lors de l'enregistrement d'un nouveau profil",
