@@ -412,6 +412,7 @@ class ESSearchApi(SearchApi):
                 "raw_content^3",
                 "comments.raw_content",
                 "file_data.content^3",
+                "file_data.title^4",
                 "file_data.author",
                 "file_data.keywords",
             ],
