@@ -49,6 +49,7 @@ from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.search.models import SimpleContentSearchResponse
 from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
@@ -2133,7 +2134,7 @@ class ContentApi(object):
         size: typing.Optional[int] = SEARCH_DEFAULT_RESULT_NB,
         offset: typing.Optional[int] = None,
         content_types: typing.Optional[typing.List[str]] = None,
-    ) -> typing.Tuple[typing.List[Content], int]:
+    ) -> SimpleContentSearchResponse:
         query = self._search_query(keywords=keywords, content_types=content_types)
         results = []
         current_offset = 0
@@ -2162,7 +2163,12 @@ class ContentApi(object):
             parsed_content_ids.append(content.content_id)
             current_offset += 1
 
-        return results, current_offset
+        content_in_context_list = []
+        for content in results:
+            content_in_context_list.append(self.get_content_in_context(content))
+        return SimpleContentSearchResponse(
+            content_list=content_in_context_list, total_hits=current_offset
+        )
 
     def _search_query(
         self, keywords: typing.List[str], content_types: typing.Optional[typing.List[str]] = None

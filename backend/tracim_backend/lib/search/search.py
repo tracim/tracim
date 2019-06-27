@@ -17,7 +17,6 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import EmptyContentSearchResponse
 from tracim_backend.lib.search.models import ESContentSearchResponse
-from tracim_backend.lib.search.models import SimpleContentSearchResponse
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
@@ -177,16 +176,11 @@ class SimpleSearchApi(SearchApi):
             show_archived=show_archived,
             show_active=show_active,
         )
-        total_hits = 0
         keywords = content_api.get_keywords(search_string)
         offset = self.offset_from_pagination(size, page_nb)
-        content_list, total_hits = content_api.search(
+        return content_api.search(
             keywords=keywords, size=size, offset=offset, content_types=content_types
         )
-        content_in_context_list = []
-        for content in content_list:
-            content_in_context_list.append(content_api.get_content_in_context(content))
-        return SimpleContentSearchResponse(content_in_context_list, total_hits)
 
 
 class ESSearchApi(SearchApi):
