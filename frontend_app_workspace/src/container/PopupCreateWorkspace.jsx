@@ -33,8 +33,8 @@ const debug = { // outdated
     email: 'osef@algoo.fr',
     avatar: ''
   },
-  idWorkspace: 1,
-  idFolder: null
+  workspaceId: 1,
+  folderId: null
 }
 
 class PopupCreateWorkspace extends React.Component {
@@ -99,7 +99,7 @@ class PopupCreateWorkspace extends React.Component {
     switch (fetchSaveNewWorkspace.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {openIdInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
         GLOBAL_dispatchEvent({type: 'redirect', data: {url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
         break
       case 400:

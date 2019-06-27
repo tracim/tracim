@@ -167,13 +167,13 @@ class Login extends React.Component {
 
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
-        idWorkspace: ws.workspace_id,
+        workspaceId: ws.workspace_id,
         fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      idWorkspace: memberList.idWorkspace,
+      workspaceId: memberList.workspaceId,
       memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
     }))
 

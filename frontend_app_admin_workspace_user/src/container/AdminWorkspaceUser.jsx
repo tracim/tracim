@@ -213,30 +213,30 @@ class AdminWorkspaceUser extends React.Component {
     this.handleClosePopupDeleteWorkspace()
   }
 
-  handleOpenPopupDeleteWorkspace = idWorkspace => this.setState({
+  handleOpenPopupDeleteWorkspace = workspaceId => this.setState({
     popupDeleteWorkspaceDisplay: true,
-    workspaceToDelete: idWorkspace
+    workspaceToDelete: workspaceId
   })
 
   handleClosePopupDeleteWorkspace = () => this.setState({popupDeleteWorkspaceDisplay: false})
 
-  handleToggleUser = async (idUser, toggle) => {
+  handleToggleUser = async (userId, toggle) => {
     const { props, state } = this
 
     const activateOrDelete = toggle ? putUserEnable : putUserDisable
 
-    const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, idUser))
+    const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, userId))
     switch (toggleUser.status) {
       case 204: this.loadUserContent(); break
       default: this.sendGlobalFlashMsg(props.t('Error while enabling or disabling user'), 'warning')
     }
   }
 
-  handleUpdateProfile = async (idUser, newProfile) => {
+  handleUpdateProfile = async (userId, newProfile) => {
     const { props, state } = this
 
-    const endPoint = idUser === state.loggedUser.user_id ? putMyselfProfile : putUserProfile
-    const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, idUser, newProfile))
+    const endPoint = userId === state.loggedUser.user_id ? putMyselfProfile : putUserProfile
+    const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
     switch (toggleManager.status) {
       case 204: this.loadUserContent(); break
       default: this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
@@ -295,13 +295,13 @@ class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleClickWorkspace = idWorkspace => {
+  handleClickWorkspace = workspaceId => {
     const { state } = this
     if (state.workspaceIdOpened === null) {
       GLOBAL_renderAppFeature({
         loggedUser: {
           ...state.loggedUser,
-          idRoleUserWorkspace: 8 // only global admin can see this app, he is workspace manager of any workspace. So, force idRoleUserWorkspace to 8
+          userRoleIdInWorkspace: 8 // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
         },
         config: {
           label: 'Advanced dashboard',
@@ -318,12 +318,12 @@ class AdminWorkspaceUser extends React.Component {
           translation: state.config.translation
         },
         content: {
-          workspace_id: idWorkspace
+          workspace_id: workspaceId
         }
       })
-    } else GLOBAL_dispatchEvent({type: 'workspace_advanced_reloadContent', data: {workspace_id: idWorkspace}})
+    } else GLOBAL_dispatchEvent({type: 'workspace_advanced_reloadContent', data: {workspace_id: workspaceId}})
 
-    this.setState({workspaceIdOpened: idWorkspace})
+    this.setState({workspaceIdOpened: workspaceId})
   }
 
   handleClickNewWorkspace = () => {
@@ -350,7 +350,7 @@ class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'user' && (
           <AdminUser
             userList={state.content.userList}
-            idLoggedUser={state.loggedUser.user_id}
+            loggedUserId={state.loggedUser.user_id}
             profile={state.config.profileObject}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}

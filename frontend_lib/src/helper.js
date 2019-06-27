@@ -110,7 +110,7 @@ export const revisionTypeList = [{
   label: i18n.t('Item copied')
 }]
 
-export const generateLocalStorageContentId = (idWorkspace, idContent, typeContent, dataType) => `${idWorkspace}/${idContent}/${typeContent}_${dataType}`
+export const generateLocalStorageContentId = (workspaceId, contentId, contentType, dataType) => `${workspaceId}/${contentId}/${contentType}_${dataType}`
 
 export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
   if (newContent.content_id !== currentContentId) {
