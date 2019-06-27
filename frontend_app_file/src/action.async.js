@@ -1,4 +1,6 @@
-import { FETCH_CONFIG } from 'tracim_frontend_lib'
+import { defaultDebug } from 'tracim_frontend_lib'
+
+const FETCH_CONFIG = defaultDebug.fetchConfig
 
 export const getFileContent = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {

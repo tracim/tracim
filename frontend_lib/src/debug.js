@@ -1,15 +1,15 @@
 import i18n from './i18n.js'
 
-export const FETCH_CONFIG = {
+const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
 }
 
-export const API_URL = 'http://192.168.1.121:6543/api/v2'
+const API_URL = 'http://192.168.1.121:6543/api/v2'
 
-export const ROLE = [{
+const ROLE = [{
   id: 8,
   slug: 'workspace-manager',
   faIcon: 'gavel',
@@ -39,7 +39,7 @@ export const ROLE = [{
   label: 'Reader' // label must be used in components
 }]
 
-export const PROFILE = {
+const PROFILE = {
   ADMINISTRATOR: {
     id: 1,
     slug: 'administrators',
@@ -63,7 +63,7 @@ export const PROFILE = {
   }
 }
 
-export const STATUSES = [{
+const STATUSES = [{
   label: 'Open',
   slug: 'open',
   faIcon: 'square-o',
@@ -89,7 +89,7 @@ export const STATUSES = [{
   globalStatus: 'closed'
 }]
 
-export const SYSTEM_CONFIG = {
+const SYSTEM_CONFIG = {
   appListLoaded: true,
   config: {
     email_notification_activated: false,
@@ -103,9 +103,10 @@ export const SYSTEM_CONFIG = {
   workspaceListLoaded: true
 }
 
-export const DOM_CONTAINER = 'appFeatureContainer'
+const DOM_CONTAINER = 'appFeatureContainer'
 
 export const defaultDebug = {
+  fetchConfig: FETCH_CONFIG,
   config: {
     apiHeader: FETCH_CONFIG.headers,
     apiUrl: API_URL,

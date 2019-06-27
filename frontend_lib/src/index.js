@@ -11,16 +11,7 @@ import {
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
-import {
-  FETCH_CONFIG,
-  API_URL,
-  ROLE,
-  PROFILE,
-  STATUSES,
-  SYSTEM_CONFIG,
-  DOM_CONTAINER,
-  defaultDebug
-} from './debug.js'
+import { defaultDebug } from './debug.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
@@ -103,13 +94,6 @@ export {
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
-  FETCH_CONFIG,
-  API_URL,
-  ROLE,
-  PROFILE,
-  STATUSES,
-  SYSTEM_CONFIG,
-  DOM_CONTAINER,
   defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
