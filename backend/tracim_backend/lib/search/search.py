@@ -381,7 +381,7 @@ class ESSearchApi(SearchApi):
         if self._can_index_content(content):
             file_ = content.get_b64_file()
             if file_:
-                indexed_content.file = file_
+                indexed_content.b64_file = file_
                 indexed_content.save(
                     using=self.es,
                     pipeline="attachment",
@@ -509,7 +509,9 @@ class ESSearchApi(SearchApi):
                 "file_extension",
                 "raw_content^3",
                 "comments.raw_content",
-                "attachment.content^3",
+                "file_data.content^3",
+                "file_data.author",
+                "file_data.keywords",
             ],
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -524,7 +526,7 @@ class ESSearchApi(SearchApi):
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result, because we do not need them and for performance reasons.
-        search = search.source(exclude=["raw_content", "*.raw_content", "attachment.*", "file"])
+        search = search.source(exclude=["raw_content", "*.raw_content", "file_data.*", "file"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
         if size:
@@ -550,6 +552,9 @@ class ESSearchApi(SearchApi):
             id="attachment",
             body={
                 "description": "Extract attachment information",
-                "processors": [{"attachment": {"field": "file"}}],
+                "processors": [
+                    {"attachment": {"field": "b64_file", "target_field": "file_data"}},
+                    {"remove": {"field": "b64_file"}},
+                ],
             },
         )
