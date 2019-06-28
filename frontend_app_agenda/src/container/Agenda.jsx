@@ -8,7 +8,8 @@ import {
   PageContent,
   PageTitle,
   PageWrapper,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -44,13 +45,13 @@ class Agenda extends React.Component {
     const { state } = this
 
     switch (type) {
-      case 'agenda_showApp':
+      case CUSTOM_EVENT.AGENDA_SHOW_APP:
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
           this.setState({config: data.config})
         }
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {

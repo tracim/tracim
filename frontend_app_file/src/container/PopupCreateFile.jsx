@@ -2,7 +2,8 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
-  addAllResourceI18n
+  addAllResourceI18n,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
@@ -35,7 +36,7 @@ class PopupCreateFile extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<PopupCreateFile> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -86,7 +87,7 @@ class PopupCreateFile extends React.Component {
 
     if (state.progressUpload.display) {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t('Please wait until the upload ends'),
           type: 'warning',
@@ -97,7 +98,7 @@ class PopupCreateFile extends React.Component {
     }
 
     GLOBAL_dispatchEvent({
-      type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+      type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, // handled by tracim_front:dist/index.html
       data: {
         name: state.appName
       }
@@ -130,10 +131,10 @@ class PopupCreateFile extends React.Component {
             const jsonResult200 = JSON.parse(xhr.responseText)
             this.handleClose()
 
-            GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+            GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
 
             GLOBAL_dispatchEvent({
-              type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
+              type: CUSTOM_EVENT.OPEN_CONTENT_URL, // handled by tracim_front:src/container/WorkspaceContent.jsx
               data: {
                 idWorkspace: jsonResult200.workspace_id,
                 contentType: state.appName,
@@ -146,7 +147,7 @@ class PopupCreateFile extends React.Component {
             switch (jsonResult400.code) {
               case 3002:
                 GLOBAL_dispatchEvent({
-                  type: 'addFlashMsg',
+                  type: CUSTOM_EVENT.ADD_FLASH_MSG,
                   data: {
                     msg: this.props.t('A content with the same name already exists'),
                     type: 'warning',
@@ -157,7 +158,7 @@ class PopupCreateFile extends React.Component {
             }
             break
           default: GLOBAL_dispatchEvent({
-            type: 'addFlashMsg',
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
             data: {
               msg: this.props.t('Error while creating file'),
               type: 'warning',

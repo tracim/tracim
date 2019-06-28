@@ -74,12 +74,12 @@ class Dashboard extends React.Component {
 
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
-      case 'refreshDashboardMemberList': this.loadMemberList(); break
+      case CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST: this.loadMemberList(); break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_DETAIL:
         await this.loadWorkspaceDetail()
         this.buildBreadcrumbs()
         break
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: this.buildBreadcrumbs(); break
     }
   }
 
@@ -95,7 +95,7 @@ class Dashboard extends React.Component {
 
     if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
 
-    this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
+    this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
     this.setState({
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
       advancedDashboardOpenedId: null,
@@ -115,7 +115,7 @@ class Dashboard extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.dispatchCustomEvent('unmount_app') // to unmount advanced workspace
+    this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -388,7 +388,7 @@ class Dashboard extends React.Component {
         {...props.curWs, workspace_id: props.curWs.id}
       )
     } else {
-      props.dispatchCustomEvent('workspace_advanced_reloadContent', {workspace_id: props.curWs.id})
+      props.dispatchCustomEvent(CUSTOM_EVENT.WORKSPACE_ADVANCED_RELOAD_CONTENT, {workspace_id: props.curWs.id})
     }
 
     this.setState({advancedDashboardOpenedId: props.curWs.id})

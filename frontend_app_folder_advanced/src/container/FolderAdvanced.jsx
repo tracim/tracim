@@ -50,19 +50,19 @@ class FolderAdvanced extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'folder_showApp':
+      case CUSTOM_EVENT.FILE_SHOW_APP:
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data.content}, isVisible: true}))
         break
-      case 'folder_hideApp':
+      case CUSTOM_EVENT.FILE_HIDE_APP:
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case 'folder_reloadContent':
+      case CUSTOM_EVENT.FILE_RELOAD_CONTENT:
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -94,7 +94,7 @@ class FolderAdvanced extends React.Component {
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: type,
@@ -121,7 +121,7 @@ class FolderAdvanced extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -132,7 +132,7 @@ class FolderAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
     }
@@ -155,7 +155,7 @@ class FolderAdvanced extends React.Component {
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')

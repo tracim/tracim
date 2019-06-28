@@ -18,7 +18,8 @@ import {
   generateLocalStorageContentId,
   Badge,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -80,7 +81,7 @@ class File extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
-      case 'file_showApp':
+      case CUSTOM_EVENT.FILE_SHOW_APP:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
@@ -89,7 +90,7 @@ class File extends React.Component {
         }
         break
 
-      case 'file_hideApp':
+      case CUSTOM_EVENT.FILE_HIDE_APP:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         this.setState({
@@ -98,7 +99,7 @@ class File extends React.Component {
         })
         break
 
-      case 'file_reloadContent':
+      case CUSTOM_EVENT.FILE_RELOAD_CONTENT:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
 
@@ -114,7 +115,7 @@ class File extends React.Component {
         }))
         break
 
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
 
         if (state.timelineWysiwyg) {
@@ -172,7 +173,7 @@ class File extends React.Component {
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: 'warning',
@@ -206,7 +207,7 @@ class File extends React.Component {
     }
 
     await putMyselfFileRead(config.apiUrl, content.workspace_id, content.content_id)
-    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}})
   }
 
   loadTimeline = async () => {
@@ -260,7 +261,7 @@ class File extends React.Component {
     const { state } = this
 
     GLOBAL_dispatchEvent({
-      type: 'appendBreadcrumbs',
+      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
@@ -281,7 +282,7 @@ class File extends React.Component {
     }
 
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -295,7 +296,7 @@ class File extends React.Component {
       case 200:
         this.loadContent()
         this.loadTimeline()
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       case 400:
         switch (fetchResultSaveFile.body.code) {

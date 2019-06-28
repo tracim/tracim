@@ -12,7 +12,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -65,7 +66,7 @@ class Account extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: this.buildBreadcrumbs(); break
     }
   }
 

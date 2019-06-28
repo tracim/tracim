@@ -59,20 +59,20 @@ class WorkspaceAdvanced extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'workspace_advanced_showApp':
+      case CUSTOM_EVENT.WORKSPACE_ADVANCED_SHOW_APP:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         this.loadContent()
         break
-      case 'workspace_advanced_hideApp':
+      case CUSTOM_EVENT.WORKSPACE_ADVANCED_HIDE_APP:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case 'workspace_advanced_reloadContent':
+      case CUSTOM_EVENT.WORKSPACE_ADVANCED_RELOAD_CONTENT:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -107,7 +107,7 @@ class WorkspaceAdvanced extends React.Component {
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: type,
@@ -148,7 +148,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -197,7 +197,7 @@ class WorkspaceAdvanced extends React.Component {
             memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
           }
         }))
-        GLOBAL_dispatchEvent({ type: 'refreshDashboardMemberList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
     }
@@ -378,7 +378,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
     switch (fetchDeleteWorkspace.status) {
       case 204:
-        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/ui'}})
+        GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST_THEN_REDIRECT, data: {url: '/ui'}})
         // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
         this.handleClickBtnCloseApp()
         break

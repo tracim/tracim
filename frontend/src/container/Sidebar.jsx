@@ -17,6 +17,7 @@ import {
   ROLE,
   TRACIM_APP_VERSION
 } from '../helper.js'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -30,7 +31,7 @@ class Sidebar extends React.Component {
 
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
-      case 'showCreateWorkspacePopup':
+      case CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP:
         this.handleClickNewWorkspace()
         break
     }

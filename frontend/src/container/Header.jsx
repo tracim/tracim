@@ -35,7 +35,7 @@ import {
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
-import { IconWithWarning } from 'tracim_frontend_lib'
+import { IconWithWarning, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -69,7 +69,7 @@ class Header extends React.Component {
         i18n.changeLanguage(idLang)
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserLang(idLang))
-        props.dispatchCustomEvent('allApp_changeLang', idLang)
+        props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANG, idLang)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }

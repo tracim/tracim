@@ -3,7 +3,8 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
-  addAllResourceI18n
+  addAllResourceI18n,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { postFolder } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -62,7 +63,7 @@ class PopupCreateFolder extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<PopupCreateFolder> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -76,7 +77,7 @@ class PopupCreateFolder extends React.Component {
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: 'warning',
@@ -87,7 +88,7 @@ class PopupCreateFolder extends React.Component {
   handleChangeNewFolderName = e => this.setState({newFolderName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, // handled by tracim_front:dist/index.html
     data: {
       name: this.state.appName
     }
@@ -101,7 +102,7 @@ class PopupCreateFolder extends React.Component {
     switch (fetchSaveNewFolder.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         // GLOBAL_dispatchEvent({type: 'redirect', data: {url: `/ui/workspaces/${fetchSaveNewFolder.body.workspace_id}/dashboard`}})
         break
       case 400:

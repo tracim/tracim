@@ -8,7 +8,8 @@ import {
   addAllResourceI18n,
   CardPopup,
   handleFetchResult,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -53,15 +54,15 @@ class AdminWorkspaceUser extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'admin_workspace_user_showApp':
+      case CUSTOM_EVENT.ADMIN_WORKSPACE_USER_SHOW_APP:
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.setState({config: data.config})
         break
-      case 'refreshWorkspaceList':
+      case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceContent()
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -105,7 +106,7 @@ class AdminWorkspaceUser extends React.Component {
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: type,
@@ -204,7 +205,7 @@ class AdminWorkspaceUser extends React.Component {
       case 204:
         this.loadWorkspaceContent()
         GLOBAL_dispatchEvent({
-          type: 'refreshWorkspaceList',
+          type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST,
           data: {}
         })
         break
@@ -321,13 +322,13 @@ class AdminWorkspaceUser extends React.Component {
           workspace_id: idWorkspace
         }
       })
-    } else GLOBAL_dispatchEvent({type: 'workspace_advanced_reloadContent', data: {workspace_id: idWorkspace}})
+    } else GLOBAL_dispatchEvent({type: CUSTOM_EVENT.WORKSPACE_ADVANCED_RELOAD_CONTENT, data: {workspace_id: idWorkspace}})
 
     this.setState({workspaceIdOpened: idWorkspace})
   }
 
   handleClickNewWorkspace = () => {
-    GLOBAL_dispatchEvent({type: 'showCreateWorkspacePopup', data: {}})
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {}})
   }
 
   render () {

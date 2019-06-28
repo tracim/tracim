@@ -51,7 +51,7 @@ import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
-    case 'allApp_changeLang': i18n.changeLanguage(data); break
+    case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: i18n.changeLanguage(data); break
     default: break
   }
 }

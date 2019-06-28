@@ -20,7 +20,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -65,18 +66,18 @@ class WorkspaceContent extends React.Component {
   customEventReducer = async ({ detail: { type, data } }) => {
     const { props, state } = this
     switch (type) {
-      case 'refreshContentList':
+      case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
         this.loadContentList(state.idWorkspaceInUrl)
         break
 
-      case 'openContentUrl':
+      case CUSTOM_EVENT.OPEN_CONTENT_URL:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
         props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent) + props.location.search)
         break
 
-      case 'appClosed':
-      case 'hide_popupCreateContent':
+      case CUSTOM_EVENT.APP_CLOSED:
+      case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.idWorkspaceInUrl)
 
         const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
@@ -93,7 +94,7 @@ class WorkspaceContent extends React.Component {
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: this.buildBreadcrumbs(); break
     }
   }
 
@@ -136,7 +137,7 @@ class WorkspaceContent extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.dispatchCustomEvent('unmount_app')
+    this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
