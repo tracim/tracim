@@ -70,7 +70,8 @@ class IndexedContent(Document):
     """
 
     content_id = Integer()
-    label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    label = Keyword()
+    acp_label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
     slug = Keyword()
     content_type = Keyword()
 

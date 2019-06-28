@@ -379,6 +379,7 @@ class ESSearchApi(SearchApi):
         indexed_content = IndexedContent(
             content_id=content.content_id,
             label=content.label,
+            acp_label=content.label,
             slug=content.slug,
             status=content.status,
             workspace_id=content.workspace_id,
@@ -530,7 +531,8 @@ class ESSearchApi(SearchApi):
             # important too, content of comment is less important. filename and file_extension is
             # only useful to allow matching "png" or "nameofmycontent.png".
             fields=[
-                "label^5",
+                "label^8",
+                "acp_label^5",
                 "filename",
                 "file_extension",
                 "raw_content^3",
