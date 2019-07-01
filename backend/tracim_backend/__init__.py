@@ -53,6 +53,7 @@ from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController
 from tracim_backend.views.contents_api.threads_controller import ThreadController
+from tracim_backend.views.contents_api.wopi_controller import WOPIController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
@@ -187,6 +188,7 @@ def web(global_config, **local_settings):
     thread_controller = ThreadController()
     file_controller = FileController()
     folder_controller = FolderController()
+    wopi_controller = WOPIController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -198,6 +200,7 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
     if app_config.CALDAV__ENABLED:
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to

@@ -3,7 +3,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
-from marshmallow.fields import String
+from marshmallow.fields import String, Dict
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.contents import content_type_list
@@ -989,6 +989,28 @@ class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
 
 class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
     pass
+
+
+class WOPIDiscoverySchema(marshmallow.Schema):
+    urls = Dict(
+        keys=String(),
+        values=String(),
+        required=True,
+        description="Get Collabora Online URLs from file extensions",
+    )
+
+
+class WOPITokenQuerySchema(marshmallow.Schema):
+    access_token = marshmallow.fields.String(
+        required=True, description="Access token which uniquely identifies a user"
+    )
+
+
+class WOPICheckFileInfoSchema(marshmallow.Schema):
+    BaseFileName = marshmallow.fields.String(
+        required=True, description="Filename as shown in collabora Online"
+    )
+    Size = marshmallow.fields.Int(required=True, description="File length, in bytes")
 
 
 #####
