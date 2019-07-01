@@ -2,11 +2,12 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
-  addAllResourceI18n
+  addAllResourceI18n,
+  FileDropzone
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
-import FileDropzone from '../component/FileDropzone.jsx'
+// import FileDropzone from '../component/FileDropzone.jsx'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 
 class PopupCreateFile extends React.Component {

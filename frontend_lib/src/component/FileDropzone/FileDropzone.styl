@@ -1,0 +1,28 @@
+@import "../../css/Variable.styl"
+
+.filecontent
+  &__form
+    width 100%
+    border 1px dashed grey
+    padding 10px 15px
+    cursor pointer
+    &__icon
+      margin-top 15px
+      font-size 30px
+      & > label
+        cursor pointer
+    &__instruction
+      font-size 20px
+    &__text
+      margin-bottom 20px
+  &__preview
+    text-align center
+    & > img
+      max-width 340px
+      max-height 192px
+    &__nopreview
+      &-icon
+        font-size 30px
+      &-msg
+        margin-top 10px
+        word-break break-word

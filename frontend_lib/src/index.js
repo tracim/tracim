@@ -49,6 +49,8 @@ import IconButton from './component/Button/IconButton.jsx'
 import IconWithWarning from './component/Icon/IconWithWarning.jsx'
 import DisplayState from './component/DisplayState/DisplayState.jsx'
 
+import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case 'allApp_changeLang': i18n.changeLanguage(data); break
@@ -96,5 +98,6 @@ export {
   ListItemWrapper,
   IconButton,
   IconWithWarning,
-  DisplayState
+  DisplayState,
+  FileDropzone
 }

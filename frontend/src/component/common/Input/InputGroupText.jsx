@@ -44,9 +44,9 @@ InputGroupText.propTypes = {
 
 InputGroupText.defaultProps = {
   customClass: '',
-  icon: false,
+  icon: '',
   placeHolder: '',
-  invalidMsg: false,
+  invalidMsg: '',
   isInvalid: false,
   onChange: () => {},
   onKeyDown: () => {},
