@@ -54,21 +54,21 @@ class WorkspaceAdvanced extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case CUSTOM_EVENT.WORKSPACE_ADVANCED_SHOW_APP:
+      case CUSTOM_EVENT.SHOW_APP('workspace_advanced'):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         this.loadContent()
         break
-      case CUSTOM_EVENT.WORKSPACE_ADVANCED_HIDE_APP:
+      case CUSTOM_EVENT.HIDE_APP('workspace_advanced'):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case CUSTOM_EVENT.WORKSPACE_ADVANCED_RELOAD_CONTENT:
+      case CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
@@ -103,7 +103,7 @@ class WorkspaceAdvanced extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<WorkspaceAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({

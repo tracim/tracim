@@ -69,7 +69,7 @@ class Dashboard extends React.Component {
       displayWebdavBtn: false
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
@@ -116,7 +116,7 @@ class Dashboard extends React.Component {
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   loadWorkspaceDetail = async () => {
@@ -388,7 +388,7 @@ class Dashboard extends React.Component {
         {...props.curWs, workspace_id: props.curWs.id}
       )
     } else {
-      props.dispatchCustomEvent(CUSTOM_EVENT.WORKSPACE_ADVANCED_RELOAD_CONTENT, {workspace_id: props.curWs.id})
+      props.dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), {workspace_id: props.curWs.id})
     }
 
     this.setState({advancedDashboardOpenedId: props.curWs.id})

@@ -68,13 +68,13 @@ class HtmlDocument extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
-      case CUSTOM_EVENT.HTML_DOCUMENT_SHOW_APP:
+      case CUSTOM_EVENT.SHOW_APP('html-document'):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
@@ -83,7 +83,7 @@ class HtmlDocument extends React.Component {
         }
         break
 
-      case CUSTOM_EVENT.HTML_DOCUMENT_HIDE_APP:
+      case CUSTOM_EVENT.HIDE_APP('html-document'):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
@@ -93,7 +93,7 @@ class HtmlDocument extends React.Component {
         })
         break
 
-      case CUSTOM_EVENT.HTML_DOCUMENT_RELOAD_CONTENT:
+      case CUSTOM_EVENT.RELOAD_CONTENT('html-document'):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
@@ -161,7 +161,7 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     tinymce.remove('#wysiwygNewVersion')
     tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({

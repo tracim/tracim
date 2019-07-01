@@ -115,7 +115,7 @@ export const generateLocalStorageContentId = (idWorkspace, idContent, typeConten
 
 export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
   if (newContent.content_id !== currentContentId) {
-    const event = new CustomEvent('appCustomEvent', {detail: {type: `${appName}_reloadContent`, data: newContent}})
+    const event = new CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT, {detail: {type: CUSTOM_EVENT.RELOAD_CONTENT(appName), data: newContent}})
     document.dispatchEvent(event)
     return false
   }

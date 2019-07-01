@@ -56,7 +56,7 @@ const customEventReducer = ({ detail: { type, data } }) => { // action: { type: 
   }
 }
 
-document.addEventListener('appCustomEvent', customEventReducer)
+document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, customEventReducer)
 
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')

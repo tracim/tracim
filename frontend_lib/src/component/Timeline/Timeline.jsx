@@ -15,7 +15,7 @@ import { CUSTOM_EVENT } from '../../customEvent.js'
 class Timeline extends React.Component {
   constructor (props) {
     super(props)
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
@@ -37,7 +37,7 @@ class Timeline extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})

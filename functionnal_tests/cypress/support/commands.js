@@ -1,4 +1,5 @@
 import 'cypress-wait-until'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 const userFixtures = {
   'administrators': 'defaultAdmin',
@@ -103,10 +104,10 @@ Cypress.Commands.add('waitForTinyMCELoaded', () => {
   cy.document().then($doc => {
     return new Cypress.Promise(resolve => { // Cypress will wait for this Promise to resolve
       const onTinyMceLoaded = () => {
-        $doc.removeEventListener('tinymceLoaded', onTinyMceLoaded) // cleanup
+        $doc.removeEventListener(CUSTOM_EVENT.TINYMCE_LOADED, onTinyMceLoaded) // cleanup
         resolve() // resolve and allow Cypress to continue
       }
-      $doc.addEventListener('tinymceLoaded', onTinyMceLoaded)
+      $doc.addEventListener(CUSTOM_EVENT.TINYMCE_LOADED, onTinyMceLoaded)
     })
   })
 })

@@ -26,7 +26,7 @@ class Sidebar extends React.Component {
       sidebarClose: false
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
@@ -55,7 +55,7 @@ class Sidebar extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
   }
 
   shouldDisplaySidebar = props => { // pass props to allow to pass nextProps in shouldComponentUpdate
