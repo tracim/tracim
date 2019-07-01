@@ -188,7 +188,9 @@ class DecodedMail(object):
         # INFO - G.M - 2019-06-28 - RFC 3834, https://tools.ietf.org/html/rfc3834
         # standard mecanism
         auto_submitted_header = self._decode_header("Auto-submitted")
-        if auto_submitted_header and auto_submitted_header.lower() == "auto-replied":
+        if auto_submitted_header and auto_submitted_header.lower().strip().startswith(
+            "auto-replied"
+        ):
             return True
 
         # INFO - G.M - 2019-06-28 - somes not standard check for autoreply
