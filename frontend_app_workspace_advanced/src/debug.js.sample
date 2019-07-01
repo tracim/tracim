@@ -43,6 +43,7 @@ const SIDEBAR = [{
 export const debug = {
   config: {
     ...defaultDebug.config,
+    apiUrl: '',
     slug: 'workspace_advanced',
     faIcon: 'bank',
     hexcolor: '#7d4e24',

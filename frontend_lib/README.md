@@ -12,7 +12,6 @@ While working on Tracim and on tracim_lib, if you change tracim_lib, for the cha
 - run `$ npm update tracim_lib` in Tracim to get the new version
 
 The debug.js file is used for all app debug files and it's based at debug.js.sample file. To adapt the template to your system you must change the variables:
- - API_URL: string composed of http://MACHINE_ADRESS/api/v2
  - loggedUser: object in which all parameters must be changed in relation to the current user logged on in Tracim
 
 #### Alternatively you can (faster for development)

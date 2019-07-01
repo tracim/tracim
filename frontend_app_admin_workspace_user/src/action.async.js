@@ -1,6 +1,4 @@
-import { defaultDebug } from 'tracim_frontend_lib'
-
-const FETCH_CONFIG = defaultDebug.fetchConfig
+import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
 export const getWorkspaceList = (user, apiUrl) =>
   fetch(`${apiUrl}/workspaces`, {

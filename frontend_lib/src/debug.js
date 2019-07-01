@@ -1,13 +1,5 @@
 import i18n from './i18n.js'
-
-const FETCH_CONFIG = {
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
-}
-
-const API_URL = 'http://192.168.1.121:6543/api/v2'
+import { FETCH_CONFIG } from './helper.js'
 
 const ROLE = [{
   id: 8,
@@ -106,10 +98,9 @@ const SYSTEM_CONFIG = {
 const DOM_CONTAINER = 'appFeatureContainer'
 
 export const defaultDebug = {
-  fetchConfig: FETCH_CONFIG,
   config: {
     apiHeader: FETCH_CONFIG.headers,
-    apiUrl: API_URL,
+    apiUrl: '',
     availableStatuses: STATUSES,
     profileObject: PROFILE,
     roleList: ROLE,

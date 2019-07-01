@@ -5,7 +5,7 @@ import {
   addAllResourceI18n
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
-import { debug } from '../helper.js'
+import { debug } from '../debug.js'
 import FileDropzone from '../component/FileDropzone.jsx'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 
