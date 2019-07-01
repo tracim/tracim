@@ -319,7 +319,7 @@ class MailFetcher(object):
 
                     if self.use_idle and imapc.has_capability("IDLE"):
                         # IDLE_mode wait until event from server
-                        logger.debug(self, "wail for event(IDLE)")
+                        logger.debug(self, "wait for event(IDLE)")
                         imapc.idle()
                         imapc.idle_check(timeout=MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT)
                         imapc.idle_done()
