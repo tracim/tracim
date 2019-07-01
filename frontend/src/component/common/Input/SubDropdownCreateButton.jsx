@@ -13,9 +13,11 @@ const SubDropdownCreateButton = props => {
           onClick={e => {
             e.preventDefault()
             e.stopPropagation()
-            props.onClickCreateContent(e, props.idFolder, app.slug)
+            // HACK
+            props.onClickCreateContent(e, props.idFolder, app.slug === 'custom-form' ? app.slug + '/' + app.slugForm : app.slug)
           }}
-          key={app.slug}
+          // HACK
+          key={app.slug === 'custom-form' ? app.slugForm : app.slug}
         >
           <div className={`subdropdown__link__${app.slug} d-flex align-items-center`}>
             <div className={`subdropdown__link__${app.slug}__icon mr-3`}>

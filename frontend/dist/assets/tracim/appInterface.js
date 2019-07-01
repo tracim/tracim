@@ -5,7 +5,11 @@
   getSelectedApp = name => {
     switch (name) {
       case 'html-document':
+        // HACK
+        // return (appFormGenerator || {default: {}}).default
         return (appHtmlDocument || {default: {}}).default
+      case 'custom-form':
+        return (appFormGenerator || {default: {}}).default
       case 'thread':
         return (appThread || {default: {}}).default
       case 'file':
@@ -49,6 +53,7 @@
     console.log('%cGLOBAL_renderAppFullscreen', 'color: #5cebeb', app)
 
     const selectedApp = getSelectedApp(app.config.slug)
+    console.log('selectedApp', selectedApp)
 
     if (selectedApp.isRendered) {
       GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app})
@@ -64,12 +69,12 @@
     console.log('%cGLOBAL_renderAppPopupCreation', 'color: #5cebeb', app)
 
     const selectedApp = getSelectedApp(app.config.slug)
-
+    console.log('OUI3',selectedApp)
     if (!selectedApp) {
       console.log('Error in GLOBAL_renderAppPopupCreation, selectedApp is undefined', app)
       return
     }
-
+ 
     getSelectedApp(app.config.slug).renderAppPopupCreation(app)
   }
 

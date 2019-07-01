@@ -2,6 +2,7 @@
 import typing
 
 from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import CustomFormContentType
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
@@ -43,6 +44,7 @@ class Application(object):
         self.config = config
         self.main_route = main_route
         self.content_types = []
+        self.custom_form_content_types = []
 
     # TODO - G.M - 2018-08-07 - Refactor slug coherence issue like this one.
     # we probably should not have 2 kind of slug
@@ -74,6 +76,41 @@ class Application(object):
             minimal_role_content_creation=minimal_role_content_creation,
         )
         self.content_types.append(content_type)
+
+    def add_custom_form_content_type(
+        self,
+        label: str,
+        slug: str,
+        slug_form: str,
+        creation_label: str,
+        schema: str,
+        uischema: str,
+        index: int,
+        fa_icon: str,
+        hexcolor: str,
+        available_statuses: typing.List["ContentStatus"],
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
+    ):
+        custom_form_content_type = CustomFormContentType(
+            slug=slug,
+            slug_form=slug_form,
+            fa_icon=fa_icon,
+            label=label,
+            hexcolor=hexcolor,
+            creation_label=creation_label,
+            available_statuses=available_statuses,
+            slug_alias=slug_alias,
+            allow_sub_content=allow_sub_content,
+            file_extension=file_extension,
+            minimal_role_content_creation=minimal_role_content_creation,
+            schema=schema,
+            uischema=uischema,
+            index=index
+        )
+        self.custom_form_content_types.append(custom_form_content_type)
 
     def _get_hexcolor_or_default(self, slug: str, app_config: "CFG") -> str:
         assert app_config.APPS_COLORS

@@ -28,6 +28,7 @@ export const PAGE = {
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
+    CUSTOM_FORM: (idws, slugForm) => `/ui/workspaces/${idws}/contents/custom-form/${slugForm}/new`,
     AGENDA: (idws = ':idws') => `/ui/workspaces/${idws}/agenda`,
     CONTENT_LIST: (idws = ':idws') => `/ui/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
@@ -43,11 +44,12 @@ export const PAGE = {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
+    FORM: '/ui/admin/form',
     USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
   }
 }
 
-export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.AGENDA]
+export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.ADMIN.FORM, PAGE.AGENDA]
 
 export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
 

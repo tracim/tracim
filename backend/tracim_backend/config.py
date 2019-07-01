@@ -162,7 +162,8 @@ class CFG(object):
             "contents/file,"
             "contents/html-document,"
             "contents/folder,"
-            "agenda"
+            "agenda,"
+            "contents/custom-form"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -171,6 +172,9 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
+
+        # HACK G.Metzger
+        self.FORM_FILE = self.get_raw_config("form_file")
 
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
@@ -633,9 +637,9 @@ class CFG(object):
 
     # INFO - G.M - 2019-04-05 - Post Actions Methods
     def do_post_check_action(self) -> None:
-        self._set_default_app(self.APP__ENABLED)
+        self._set_default_app(self.APP__ENABLED, self.FORM_FILE)
 
-    def _set_default_app(self, enabled_app_list: typing.List[str]) -> None:
+    def _set_default_app(self, enabled_app_list: typing.List[str], form_file: str) -> None:
 
         # init applications
         html_documents = Application(
@@ -734,16 +738,46 @@ class CFG(object):
             app_config=self,
         )
 
+        # custom_form = None
+        # Custom form G.Metzger
+        print(form_file)
+        with open(form_file, "r") as json_file:
+            form_dict = json.load(json_file)
+            custom_form = Application(
+                label="Custom Form",  # TODO - G.M - 24-05-2018 - Check label
+                slug="contents/custom-form",
+                fa_icon=form_dict["faIcon"],
+                is_active=True,
+                config={},
+                main_route="/ui/workspaces/{workspace_id}/contents?type=custom-form",
+                app_config=self,
+            )
+            for f in form_dict["forms"]:
+                custom_form.add_custom_form_content_type(
+                    slug="custom-form",
+                    slug_form=f["slugForm"],
+                    label=f["label"],
+                    creation_label=f["creationLabel"],
+                    schema=f["schema"],
+                    uischema=f["uiSchema"],
+                    hexcolor=f['hexColor'],
+                    fa_icon=f['fa_icon'],
+                    index=f["id"],
+                    available_statuses=content_status_list.get_all(),
+                    file_extension=".custom.form",
+            )
+
         # process activated app list
         available_apps = OrderedDict(
-            [
-                (html_documents.slug, html_documents),
-                (_file.slug, _file),
-                (thread.slug, thread),
-                (folder.slug, folder),
-                (markdownpluspage.slug, markdownpluspage),
-                (agenda.slug, agenda),
-            ]
+             [
+                 (custom_form.slug, custom_form),
+                 (html_documents.slug, html_documents),
+                 (_file.slug, _file),
+                 (thread.slug, thread),
+                 (folder.slug, folder),
+                 (markdownpluspage.slug, markdownpluspage),
+                 (agenda.slug, agenda),
+             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var

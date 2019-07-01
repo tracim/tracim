@@ -14,6 +14,7 @@ export class OpenContentApp extends React.Component {
       user,
       currentWorkspace,
       contentType,
+      customFormContentType,
       renderAppFeature,
       dispatchCustomEvent,
       match
@@ -24,22 +25,45 @@ export class OpenContentApp extends React.Component {
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
-      const contentToOpen = {
-        content_id: parseInt(match.params.idcts),
-        workspace_id: parseInt(idWorkspace),
-        type: match.params.type
+      // HACK
+      let contentToOpen = {}
+      if (match.params.type === 'html-document') {
+        contentToOpen = {
+          content_id: parseInt(match.params.idcts),
+          workspace_id: parseInt(idWorkspace),
+          type: 'custom-form'
+        }
+      } else {
+        contentToOpen = {
+          content_id: parseInt(match.params.idcts),
+          workspace_id: parseInt(idWorkspace),
+          type: match.params.type
+        }
       }
-
+      // FINHACK
+      // const contentToOpen = {
+      //    content_id: parseInt(match.params.idcts),
+      //    workspace_id: parseInt(idWorkspace),
+      //    type: match.params.type
+      //  }
+      // ORIGINAL
+      console.log('PropsContentToOpen', this.props)
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open
+        console.log('ABCalreadyOpen')
         dispatchCustomEvent(`${contentToOpen.type}_reloadContent`, contentToOpen)
       } else { // open another app
         // if another app is already visible, hide it
+        console.log('ABCappOpenedType00', appOpenedType)
         if (appOpenedType !== false) dispatchCustomEvent(`${appOpenedType}_hideApp`, {})
-        // open app
+
+        // open
+        // Hard coding the custom-form case, he need another contentType stored in the customFormContentType props
+        let contentToOpenType = contentType.find(ct => ct.slug === contentToOpen.type)
+        if (contentToOpen.type === 'custom-form') contentToOpenType = customFormContentType.find(ct => ct.slug === contentToOpen.type)
         renderAppFeature(
-          contentType.find(ct => ct.slug === contentToOpen.type),
+          contentToOpenType,
           user,
           findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
           contentToOpen
@@ -74,7 +98,7 @@ export class OpenContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, currentWorkspace, contentType }) => ({
-  user, currentWorkspace, contentType
+const mapStateToProps = ({ user, currentWorkspace, contentType, customFormContentType }) => ({
+  user, currentWorkspace, contentType, customFormContentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

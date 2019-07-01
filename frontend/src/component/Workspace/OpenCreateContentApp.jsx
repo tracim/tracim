@@ -8,13 +8,19 @@ const qs = require('query-string')
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ? (or AppCreateContentManager)
 export class OpenCreateContentApp extends React.Component {
   openCreateContentApp = () => {
-    const { idWorkspace, user, contentType, renderAppPopupCreation, match, location } = this.props
-
+    const { idWorkspace, user, contentType, renderAppPopupCreation, match, location, customFormContentType, path } = this.props
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
     if (['idws', 'type'].every(p => p in match.params) && contentType.map(c => c.slug).includes(match.params.type)) {
       renderAppPopupCreation(
         contentType.find(ct => ct.slug === match.params.type),
+        user,
+        idWorkspace,
+        qs.parse(location.search).parent_id
+      )
+    } else if (['idws', 'slugForm'].every(p => p in match.params) && customFormContentType.map(c => c.slugForm).includes(match.params.slugForm)) {
+      renderAppPopupCreation(
+        customFormContentType.find(ct => ct.slugForm === match.params.slugForm),
         user,
         idWorkspace,
         qs.parse(location.search).parent_id
@@ -39,5 +45,5 @@ export class OpenCreateContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType }) => ({ user, contentType })
+const mapStateToProps = ({ user, contentType, customFormContentType }) => ({ user, contentType, customFormContentType })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenCreateContentApp)))

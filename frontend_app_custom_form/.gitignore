@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+.git/
+node_modules/
+dist/custom-form.app.js
+dist/custom-form.app.js.map
+dist/custom-form.app.dev.js
+dist/custom-form.app.dev.js.map

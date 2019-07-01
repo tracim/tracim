@@ -10,6 +10,7 @@ import appList from './appList.js'
 import contentType from './contentType.js'
 import timezone from './timezone.js'
 import system from './system.js'
+import customFormContentType from './customFormContentType'
 
 const rootReducer = combineReducers({
   lang,
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   workspaceContentList,
   workspaceList,
   appList,
+  customFormContentType,
   contentType,
   timezone,
   system

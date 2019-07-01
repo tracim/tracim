@@ -416,15 +416,24 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
+    // let indexCustomFormContentType = 0
 
-    const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
+    let contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
+        .filter(app => app.slug !== 'contents/custom-form')
         .map(app => {
-          const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+          let contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+          // if (app.slug === 'contents/custom-form') {
+          //   if (indexCustomFormContentType < props.customFormContentType.length) {
+          //
+          //   }
+          //   contentType = props.customFormContentType.find(ct => app.slug.includes(ct.slug))
+          // }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
+
           return {
             ...app,
             creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,
@@ -434,6 +443,18 @@ class Dashboard extends React.Component {
           }
         })
       : []
+    props.customFormContentType.forEach(c => {
+      contentTypeButtonList.push({
+        slug: 'contents/' + c.slug + c.index,
+        creationLabel: c.creationLabel,
+        // route: `${PAGE.WORKSPACE.NEW(props.curWs.id, c.slug) + c.index}?parent_id=null`,
+        route: `${PAGE.WORKSPACE.CUSTOM_FORM(props.curWs.id, c.slugForm)}?parent_id=null`,
+        hexcolor: c.hexcolor,
+        label: c.label,
+        faIcon: c.faIcon,
+        index: c.index
+      })
+    })
 
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
@@ -498,7 +519,7 @@ class Dashboard extends React.Component {
                           creationLabel={props.t(app.creationLabel)}
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}
-                          key={app.slug}
+                          key={app.slug === 'contents/custom-form' ? app.index : app.slug}
                         />
                       )}
                     </div>
@@ -583,7 +604,7 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
+const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system, customFormContentType }) => ({
+  breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system, customFormContentType
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

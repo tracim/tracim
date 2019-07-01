@@ -54,7 +54,6 @@ class WorkspaceContent extends React.Component {
       appOpenedType: false,
       contentLoaded: false
     }
-
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -68,6 +67,7 @@ class WorkspaceContent extends React.Component {
 
       case 'openContentUrl':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
+        if (data.contentType === 'custom-form') data.contentType = 'html-document' // HACK A FIX
         props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent) + props.location.search)
         break
 
@@ -353,9 +353,9 @@ class WorkspaceContent extends React.Component {
     : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t, customFormContentType } = this.props
     const { state } = this
-
+    console.log('Content_id', this.props.workspaceContentList)
     const urlFilter = qs.parse(location.search).type
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
@@ -366,9 +366,12 @@ class WorkspaceContent extends React.Component {
 
     const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
-    const createContentAvailableApp = contentType
+    let createContentAvailableApp = contentType
       .filter(ct => ct.slug !== 'comment')
       .filter(ct => idRoleUserWorkspace === 2 ? ct.slug !== 'folder' : true)
+    customFormContentType.forEach((c) => {
+      createContentAvailableApp.push(c)
+    })
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight'>
@@ -381,15 +384,26 @@ class WorkspaceContent extends React.Component {
               updateAppOpenedType={this.handleUpdateAppOpenedType}
             />
           }
-
+          {/* HACK */}
           {state.contentLoaded &&
-            <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
+            <Route path={PAGE.WORKSPACE.CUSTOM_FORM(':idws', ':slugForm')} component={() =>
               <OpenCreateContentApp
                 // automatically open the popup create content of the app in url
                 idWorkspace={state.idWorkspaceInUrl}
                 appOpenedType={state.appOpenedType}
+                path={PAGE.WORKSPACE.CUSTOM_FORM(':idws', ':slugForm')}
               />
             } />
+          }
+          {state.contentLoaded &&
+          <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
+            <OpenCreateContentApp
+              // automatically open the popup create content of the app in url
+              idWorkspace={state.idWorkspaceInUrl}
+              appOpenedType={state.appOpenedType}
+              path={PAGE.WORKSPACE.NEW(':idws', ':type') + ':id'}
+            />
+          } />
           }
 
           <PageWrapper customClass='workspace'>
@@ -500,7 +514,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType, customFormContentType }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType, customFormContentType
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))

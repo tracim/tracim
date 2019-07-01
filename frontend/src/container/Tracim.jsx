@@ -20,7 +20,6 @@ import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import Home from './Home.jsx'
-import WIPcomponent from './WIPcomponent.jsx'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import {
   PAGE,
@@ -33,6 +32,7 @@ import {
   getConfig,
   getAppList,
   getContentTypeList,
+  getCustomFormContentTypeList,
   getUserIsConnected,
   getMyselfWorkspaceList,
   putUserLang
@@ -46,7 +46,8 @@ import {
   setUserConnected,
   setWorkspaceList,
   setBreadcrumbs,
-  appendBreadcrumbs
+  appendBreadcrumbs,
+  setCustomFormContentTypeList
 } from '../action-creator.sync.js'
 
 class Tracim extends React.Component {
@@ -107,9 +108,9 @@ class Tracim extends React.Component {
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
 
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
-
-        this.loadAppConfig()
-        this.loadWorkspaceList()
+        // HACK API Add the method in then
+        this.loadAppConfig().then(() => { this.loadWorkspaceList() })
+        // this.loadWorkspaceList()
         break
       case 401: props.dispatch(setUserConnected({logged: false})); break
       default: props.dispatch(setUserConnected({logged: false})); break
@@ -127,9 +128,21 @@ class Tracim extends React.Component {
     if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
 
     const fetchGetAppList = await props.dispatch(getAppList())
+    const fetchGetCustomFormContentTypeList = await props.dispatch(getCustomFormContentTypeList())
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
+    // TODO improve this G.Metzger
+    if (fetchGetCustomFormContentTypeList.status === 200) {
+      fetchGetCustomFormContentTypeList.json.forEach((c) => {
+        const v = c.schema.replace(/'/g, '"')
+        c.schema = JSON.parse(v)
+        const y = c.uischema.replace(/'/g, '"')
+        c.uischema = JSON.parse(y)
+      })
+    }
+    if (fetchGetCustomFormContentTypeList.status === 200) props.dispatch(setCustomFormContentTypeList(fetchGetCustomFormContentTypeList.json))
+
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
 
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
@@ -138,11 +151,26 @@ class Tracim extends React.Component {
 
     const idWsToOpen = idOpenInSidebar || props.currentWorkspace.id || undefined
 
+    // HACK API
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
     if (fetchGetWorkspaceList.status === 200) {
-      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
-
+      let wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
+      wsListWithOpenedStatus.forEach(ws => {
+        let customFormContentTypeSideBar = props.customFormContentType.map((c) => {
+          return {
+            'route': '/ui/workspaces/' + ws.workspace_id + '/contents?type=html-document',
+            'label': c.label,
+            'slug': 'contents/custom-form',
+            'hexcolor': c.hexcolor,
+            'fa_icon': c.faIcon
+          }
+        })
+        customFormContentTypeSideBar.forEach((c) => {
+          ws.sidebar_entries.push(c)
+        })
+      })
+      console.log('WS', props.customFormContentType)
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.setState({workspaceListLoaded: true})
 
@@ -244,10 +272,9 @@ class Tracim extends React.Component {
           <Route exact path={[
             PAGE.ADMIN.USER,
             PAGE.ADMIN.WORKSPACE,
+            PAGE.ADMIN.FORM,
             PAGE.AGENDA
           ]} render={() => <AppFullscreenRouter />} />
-
-          <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
           <div
@@ -264,7 +291,7 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
-  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
+const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, customFormContentType }) => ({
+  breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system, customFormContentType
 })
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))

@@ -37,6 +37,14 @@ class ApplicationApi(object):
                     active_content_types.append(content_type)
         return active_content_types
 
+    def get_custom_form_content_types(self):
+        active_custom_form_content_types = []
+        for app in self.get_all():
+            if app.custom_form_content_types:
+                for custom_form_content_type in app.custom_form_content_types:
+                    active_custom_form_content_types.append(custom_form_content_type)
+        return active_custom_form_content_types
+
     def get_default_workspace_menu_entry(
         self, workspace: "Workspace"
     ) -> typing.List[WorkspaceMenuEntry]:
@@ -49,6 +57,9 @@ class ApplicationApi(object):
             # menu entry, menu entry should be added through hook in app itself
             # see issue #706, https://github.com/tracim/tracim/issues/706
             if app.slug == "agenda" and not workspace.agenda_enabled:
+                continue
+            # HACK G.Metzger
+            if app.slug == "contents/custom-form":
                 continue
 
             if app.main_route:

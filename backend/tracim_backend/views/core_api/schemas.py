@@ -824,6 +824,26 @@ class ContentTypeSchema(marshmallow.Schema):
     available_statuses = marshmallow.fields.Nested(StatusSchema, many=True)
 
 
+# G.Metzger
+class CustomFormContentTypeSchema(marshmallow.Schema):
+    slug = StrippedString(example="pagehtml")
+    slug_form = StrippedString(example="formulaire_1")
+    fa_icon = StrippedString(
+        example="fa-file-text-o",
+        description="CSS class of the icon. Example: file-o for using Fontawesome file-o icon",
+    )
+    hexcolor = StrippedString(
+        example="#FF0000",
+        description="HTML encoded color associated to the application. Example:#FF0000 for red",
+    )
+    schema = StrippedString(exemple={})
+    uischema = StrippedString(exemple={})
+    index = marshmallow.fields.Int(example={})
+    label = StrippedString(example="Text Documents")
+    creation_label = StrippedString(example="Write a document")
+    available_statuses = marshmallow.fields.Nested(StatusSchema, many=True)
+
+
 class ContentMoveSchema(marshmallow.Schema):
     # TODO - G.M - 30-05-2018 - Read and apply this note
     # Note:

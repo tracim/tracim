@@ -9,6 +9,7 @@ const appInterface = {
   name: 'admin_workspace_user',
   isRendered: false,
   renderAppFullscreen: data => {
+    console.log('pierre')
     return ReactDOM.render(
       <Router history={data.config.history}>
         <AdminWorkspaceUser data={data} />

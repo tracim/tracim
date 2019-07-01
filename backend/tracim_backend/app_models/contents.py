@@ -132,6 +132,44 @@ class ContentType(object):
         self.minimal_role_content_creation = minimal_role_content_creation
 
 
+class CustomFormContentType(object):
+    """
+    Future CustomFormContentType object class
+    """
+
+    def __init__(
+            self,
+            slug: str,
+            slug_form: str,
+            fa_icon: str,
+            hexcolor: str,
+            label: str,
+            creation_label: str,
+            schema: str,
+            uischema: str,
+            index: int,
+            available_statuses: typing.List[ContentStatus],
+            slug_alias: typing.List[str] = None,
+            allow_sub_content: bool = False,
+            file_extension: typing.Optional[str] = None,
+            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
+    ):
+        self.slug = slug
+        self.slug_form = slug_form
+        self.fa_icon = fa_icon
+        self.hexcolor = hexcolor
+        self.label = label
+        self.creation_label = creation_label
+        self.available_statuses = available_statuses
+        self.slug_alias = slug_alias
+        self.allow_sub_content = allow_sub_content
+        self.file_extension = file_extension
+        self.minimal_role_content_creation = minimal_role_content_creation
+        self.schema = schema
+        self.uischema = uischema
+        self.index = index
+
+
 THREAD_TYPE = "thread"
 FILE_TYPE = "file"
 MARKDOWNPLUSPAGE_TYPE = "markdownpage"
@@ -157,6 +195,21 @@ comment_type = ContentType(
     creation_label="Comment",
     available_statuses=content_status_list.get_all(),
 )
+
+
+class CustomFormContentTypeList(object):
+    """
+        ContentType List G.Metzger
+    """
+
+    def __init__(self, app_list: typing.List["Application"]):
+        self.app_list = app_list
+
+    # @property
+    def custom_form_content_types(self) -> typing.List[CustomFormContentType]:
+        app_api = ApplicationApi(self.app_list)
+        custom_form_content_types = app_api.get_custom_form_content_types()
+        return custom_form_content_types
 
 
 class ContentTypeList(object):
@@ -266,3 +319,4 @@ class ContentTypeList(object):
 
 
 content_type_list = ContentTypeList(app_list)
+custom_form_content_type_list = CustomFormContentTypeList(app_list)

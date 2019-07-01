@@ -1,0 +1,186 @@
+{
+  "hexColor": "#5e0c66",
+  "faIcon": "comments-o",
+  "forms": [
+    {
+      "label": "Compte rendu réunion",
+      "creationLabel": "Completer un CR de réunion",
+      "fa_icon": "users",
+      "hexColor": "#5e0c66",
+      "slug": "custom-form",
+      "slugForm": "compte_rendu_reunion",
+      "id": "0",
+      "schema": {
+        "title": "Formulaire réunion",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "odj": {
+            "title": "Ordre du jour",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lister les points à traiter durant la réunion, éventuellement avec la durée associée"
+          },
+          "date": {
+            "title": "Date et heure de la réunion",
+            "type": "string",
+            "format": "date"
+          },
+          "duree": {
+            "title": "Durée",
+            "type": "string",
+            "default": "30 minutes"
+          },
+          "participant": {
+            "title": "Liste des participants",
+            "userfrom": "workspace"
+          },
+          "compteRendu": {
+            "type": "string",
+            "title": "Compte-rendu"
+          }
+        }
+      },
+      "uiSchema": {
+        "compteRendu": {
+          "ui:field": "textRich"
+        },
+        "participant": {
+          "ui:field": "selectUsers"
+        }
+      }
+    },
+    {
+      "label": "User story",
+      "creationLabel": "Completer une user story",
+      "fa_icon": "star",
+      "hexColor": "#ed0404",
+      "slug": "custom-form",
+      "slugForm": "user_story",
+      "id": "1",
+      "schema": {
+        "title": "Formulaire User Story",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Référence"
+          },
+          "importance": {
+            "type": "integer",
+            "title": "Importance",
+            "default": 1,
+            "description": "choisir une valeur entre 0 (pas important) et 10 (obligatoire)"
+          },
+          "estimation": {
+            "type": "integer",
+            "title": "Estimation",
+            "description": "estimation du temps de développement en nombre de jours"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string",
+            "enum": [
+              "app fichier",
+              "app agenda",
+              "webdav",
+              "interaction email",
+              "gestion utilisateur"
+            ]
+          },
+          "userstory": {
+            "title": "User story",
+            "type": "string"
+          },
+          "critereacceptance": {
+            "type": "array",
+            "title": "Critères dacceptance",
+            "items": {
+              "type": "object",
+              "properties": {
+                "criterename": {
+                  "type": "string",
+                  "title": "Nom du critère"
+                },
+                "accepter": {
+                  "type": "boolean",
+                  "title": " Accepter"
+                }
+              }
+            }
+          }
+        }
+      },
+      "uiSchema": {
+        "userstory": {
+          "ui:field": "textRich"
+        },
+        "critereacceptance": {
+          "items": {
+            "criterename": {
+              "ui:widget": "textarea"
+            }
+          }
+        }
+      }
+    },
+    {
+      "label": "Persona",
+      "creationLabel": "Completer un Persona",
+      "fa_icon": "user",
+      "hexColor": "#1d9c19",
+      "slug": "custom-form",
+      "slugForm": "personna",
+      "id": "3",
+      "schema": {
+        "title": "Formulaire persona",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "job": {
+            "type": "string",
+            "title": "Référence",
+            "default": "métier"
+          },
+          "age": {
+            "type": "string",
+            "title": "Age",
+            "default": "25"
+          },
+          "photo": {
+            "title": "Photo"
+          },
+          "societe": {
+            "type": "string",
+            "title": "Société"
+          },
+          "profil": {
+            "title": "Profil",
+            "type": "string",
+            "enum": [
+              "directeur SI",
+              "administrateur système",
+              "utilisateur standard",
+              "poweruser"
+            ]
+          },
+          "presentation": {
+            "title": "Présentation",
+            "type": "string"
+          }
+        }
+      },
+      "uiSchema": {
+        "presentation": {
+          "ui:field": "markdownField"
+        },
+        "photo": {
+          "ui:field": "imageField"
+        }
+      }
+    }
+  ]
+}

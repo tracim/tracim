@@ -25,6 +25,9 @@ import {
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
+import {AdminForm} from "../component/AdminForm";
+import HTML5Backend from 'react-dnd-html5-backend'
+import { DragDropContext } from 'react-dnd'
 
 require('../css/index.styl')
 
@@ -35,7 +38,8 @@ class AdminWorkspaceUser extends React.Component {
     this.state = {
       appName: 'admin_workspace_user',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
+      // config: props.data ? props.data.config : debug.config,
+      config: debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       popupDeleteWorkspaceDisplay: false,
@@ -84,7 +88,7 @@ class AdminWorkspaceUser extends React.Component {
 
     if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
     else if (this.state.config.type === 'user') await this.loadUserContent()
-
+    //else if (state.config.type === 'form') this.loadUserContent()
     this.buildBreadcrumbs()
   }
 
@@ -95,6 +99,7 @@ class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
+      //else if (state.config.type === 'form') this.loadUserContent()
       this.buildBreadcrumbs()
     }
   }
@@ -142,6 +147,29 @@ class AdminWorkspaceUser extends React.Component {
     }
   }
 
+  loadFormContent = async () => {
+    const { props, state } = this
+
+    const userList = await handleFetchResult(await getUserList(state.config.apiUrl))
+
+    switch (userList.apiResponse.status) {
+      case 200:
+        const fetchUserDetailList = await Promise.all(
+          userList.body.map(async u =>
+            handleFetchResult(await getUserDetail(state.config.apiUrl, u.user_id))
+          )
+        )
+        this.setState(prev => ({
+          content: {
+            ...prev.content,
+            userList: fetchUserDetailList.map(fu => fu.body)
+          }
+        }))
+        break
+      default: this.sendGlobalFlashMsg(props.t('Error while loading users list'), 'warning')
+    }
+  }
+
   loadUserContent = async () => {
     const { props, state } = this
 
@@ -185,6 +213,11 @@ class AdminWorkspaceUser extends React.Component {
     } else if (state.config.type === 'user') {
       breadcrumbsList.push({
         link: <Link to={'/ui/admin/user'}>{props.t('Users')}</Link>,
+        type: BREADCRUMBS_TYPE.APP_FULLSCREEN
+      })
+    } else if (state.config.type === 'form') {
+      breadcrumbsList.push({
+        link: <Link to={'/ui/admin/form'}>{'Formulaires'}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     }
@@ -267,7 +300,6 @@ class AdminWorkspaceUser extends React.Component {
         return
       }
     }
-
     const newUserResult = await handleFetchResult(
       await postAddUser(state.config.apiUrl, name, email, profile, state.config.system.config.email_notification_activated, password)
     )
@@ -359,6 +391,18 @@ class AdminWorkspaceUser extends React.Component {
             breadcrumbsList={state.breadcrumbsList}
           />
         )}
+        {state.config.type === 'form' && (
+          <AdminForm
+            userList={state.content.userList}
+            idLoggedUser={state.loggedUser.user_id}
+            profile={state.config.profileObject}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
+            onClickToggleUserBtn={this.handleToggleUser}
+            onChangeProfile={this.handleUpdateProfile}
+            onClickAddUser={this.handleClickAddUser}
+            breadcrumbsList={state.breadcrumbsList}
+          />
+        )}
 
         {state.popupDeleteWorkspaceDisplay &&
           <CardPopup
@@ -398,4 +442,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(Radium(AdminWorkspaceUser))
+export default DragDropContext(HTML5Backend)(translate()(Radium(AdminWorkspaceUser)))

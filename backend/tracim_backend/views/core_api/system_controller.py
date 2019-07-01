@@ -3,6 +3,7 @@
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import custom_form_content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
@@ -17,6 +18,7 @@ from tracim_backend.views.core_api.schemas import AboutSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
+from tracim_backend.views.core_api.schemas import CustomFormContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 
@@ -44,6 +46,16 @@ class SystemController(Controller):
         content_types_slugs = content_type_list.endpoint_allowed_types_slug()
         content_types = [content_type_list.get_one_by_slug(slug) for slug in content_types_slugs]
         return content_types
+
+    # G.Metzger
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(CustomFormContentTypeSchema(many=True))
+    def custom_form_content_types(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get list of alls content types availables in this tracim instance.
+        """
+        return custom_form_content_type_list.custom_form_content_types()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
@@ -112,6 +124,10 @@ class SystemController(Controller):
         # Content_types
         configurator.add_route("content_types", "/system/content_types", request_method="GET")
         configurator.add_view(self.content_types, route_name="content_types")
+
+        # Custom_form_content_types
+        configurator.add_route("custom_form_content_types", "/system/custom_form_content_types", request_method="GET")
+        configurator.add_view(self.custom_form_content_types, route_name="custom_form_content_types")
 
         # Content_types
         configurator.add_route("timezones_list", "/system/timezones", request_method="GET")

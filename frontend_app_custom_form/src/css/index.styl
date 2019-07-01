@@ -1,0 +1,153 @@
+@import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.custom-form
+  height calc(100% - 61px)
+  &__header
+    &__editionmode
+      display none
+    &__icon
+      .fa-file-text-o
+        color white
+  &__lastversionbtn
+    & > i
+      font-size 20px
+  .selectStatus
+    margin-right 15px
+  &__contentpage
+    width 100%
+    &__left
+      &__wrapper
+        height 100%
+        padding 10px 10px 0
+        overflow-y auto
+    &__content
+      height calc(100% - 130px)
+    &__textnote
+      border-radius 10px
+      padding 25px
+      height 100%
+      overflow-y auto
+      background-color offWhite
+      &__state
+        display flex
+        align-items center
+        justify-content space-between
+        margin-bottom 15px
+        padding 5px 15px
+        background-color #fee498
+        border-radius 10px
+        &__msg > i
+          margin-right 8px
+        &__btnrestore
+          cursor pointer
+          & > i
+            margin-right 8px
+          &.link
+            color #453d9b
+            &:hover
+              color #1a0dab
+              text-decoration underline
+      &__version
+        display flex
+        justify-content flex-end
+        align-items center
+        text-align right
+        opacity 0.7
+      &__lastversion
+        margin-left 15px
+        font-weight bold
+      &__text
+        font-size 14px
+      &__edition
+        display none
+    &__messagelist
+      min-height 70px
+      &__item
+        &__content
+          color darkGrey
+      &__version
+        background-color grey-hover
+        &__btn
+          padding 5px 25px
+          border-radius 5px
+          width 145px
+          color white
+          font-size 17px
+          & > i
+            margin-right 10px
+            color darkGrey
+            font-size 20px
+        &__date
+          color fontColor
+          font-size 17px
+
+.messagelistOpen
+  .timeline__messagelist
+    flex 0
+    min-height 0
+
+.received
+  .timeline__messagelist__item__content
+    background-color htmlColor
+
+i
+  &.glyphicon
+    display none
+.btn-add
+  &::after
+    content '\f067'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item-move-up
+  &::after
+    content '\f077'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item-move-down
+  &::after
+    content '\f078'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item-remove
+  &::after
+    content '\f00d'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item
+  width 100%
+  margin 1%
+.array-item-add
+  width 100%
+  margin 1%
+.btn-add
+  width 50%
+.field-description
+  font-style italic
+
+// MEDIAQUERIES
+
+@media (min-width: min-sm) and (max-width: max-lg)
+  .custom-form
+    &__contentpage
+      &__left
+        &__wrapper
+          padding 0
+      &__content
+        margin 10px
+      &__textnote
+        margin 0
+
+@media (max-width: max-xs)
+  .custom-form
+    &__contentpage
+      &__left
+        &__wrapper
+          padding 0
+      &__content
+        margin 10px
+      &__textnote
+        margin 0

@@ -139,6 +139,7 @@ class PopupCreateHtmlDocument extends React.Component {
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={this.props.t('New Document')}
+
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}

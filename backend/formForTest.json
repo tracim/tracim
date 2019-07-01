@@ -1,0 +1,56 @@
+{
+  "hexColor": "#5e0c66",
+  "faIcon": "comments-o",
+  "forms": [
+    {
+      "label": "Compte rendu réunion",
+      "creationLabel": "Completer un CR de réunion",
+      "fa_icon": "users",
+      "hexColor": "#5e0c66",
+      "slug": "custom-form",
+      "slugForm": "compte_rendu_reunion",
+      "id": "0",
+      "schema": {
+        "title": "Formulaire réunion",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "odj": {
+            "title": "Ordre du jour",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lister les points à traiter durant la réunion, éventuellement avec la durée associée"
+          },
+          "date": {
+            "title": "Date et heure de la réunion",
+            "type": "string",
+            "format": "date"
+          },
+          "duree": {
+            "title": "Durée",
+            "type": "string",
+            "default": "30 minutes"
+          },
+          "participant": {
+            "title": "Liste des participants",
+            "userfrom": "workspace"
+          },
+          "compteRendu": {
+            "type": "string",
+            "title": "Compte-rendu"
+          }
+        }
+      },
+      "uiSchema": {
+        "compteRendu": {
+          "ui:field": "textRich"
+        },
+        "participant": {
+          "ui:field": "selectUsers"
+        }
+      }
+    }
+  ]
+}

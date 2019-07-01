@@ -54,6 +54,13 @@ export const PROFILE = {
     faIcon: 'user',
     hexcolor: '#3145f7',
     label: i18n.t('User')
+  },
+  FORM: {
+    id: 5,
+    slug: 'form',
+    faIcon: 'user',
+    hexcolor: '#00FFFF',
+    label: 'Formulaire'
   }
 }
 
@@ -65,7 +72,7 @@ export const debug = {
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
-    type: 'user', // 'user' or 'workspace'
+    type: 'form', // 'user' or 'workspace'
     translation: {en: {}, fr: {}},
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
@@ -98,6 +105,13 @@ export const debug = {
         faIcon: 'user',
         hexcolor: '#3145f7',
         label: i18n.t('User')
+      },
+      FORM: {
+        id: 5,
+        slug: 'form',
+        faIcon: 'user',
+        hexcolor: '#00FFFF',
+        label: 'Formulaire'
       }
     }
   },

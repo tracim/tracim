@@ -101,7 +101,8 @@ class UserController(Controller):
         return uapi.get_user_with_context(request.candidate_user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
-    @check_right(is_administrator)
+    # @check_right(is_administrator)
+    @check_right(has_personal_access) # HACK
     @hapic.output_body(UserDigestSchema(many=True))
     def users(self, context, request: TracimRequest, hapic_data=None):
         """

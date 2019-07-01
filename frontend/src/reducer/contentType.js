@@ -15,7 +15,9 @@ export function contentType (state = [], action) {
           faIcon: as.fa_icon,
           hexcolor: as.hexcolor,
           globalStatus: as.global_status
-        }))
+        })),
+        schema: ct.schema,
+        uischema: ct.uischema
       }))
 
     default:

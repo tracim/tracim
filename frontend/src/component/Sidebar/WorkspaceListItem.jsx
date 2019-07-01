@@ -33,6 +33,8 @@ const buildLink = (route, search, idWorkspace, activeIdWorkspace) => {
 }
 
 const WorkspaceListItem = props => {
+  // HACK for the key
+  let i = 0
   return (
     <li className='sidebar__content__navigation__workspace__item' data-cy='sidebar__content__navigation__workspace__item'>
       <div
@@ -64,7 +66,7 @@ const WorkspaceListItem = props => {
       <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
         <ul className='sidebar__content__navigation__workspace__item__submenu'>
           {props.allowedAppList.map(aa =>
-            <li key={aa.slug}>
+            <li key={aa.slug === 'contents/custom-form' ? 'contents/custom-form' + i++ : aa.slug}>
               <Link to={buildLink(aa.route, props.location.search, props.idWorkspace, props.activeIdWorkspace)}>
                 <div className={classnames(
                   'sidebar__content__navigation__workspace__item__submenu__dropdown',

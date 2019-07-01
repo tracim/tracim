@@ -30,6 +30,7 @@ import {
   CONFIG,
   APP_LIST,
   CONTENT_TYPE_LIST,
+  CUSTOM_FORM_CONTENT_TYPE_LIST,
   WORKSPACE_CONTENT_ARCHIVED,
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
@@ -629,6 +630,22 @@ export const getContentTypeList = () => dispatch => {
       method: 'GET'
     },
     actionName: CONTENT_TYPE_LIST,
+    dispatch
+  })
+}
+
+// G.Metzger
+export const getCustomFormContentTypeList = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/custom_form_content_types`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: CUSTOM_FORM_CONTENT_TYPE_LIST,
     dispatch
   })
 }
