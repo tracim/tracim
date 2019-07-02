@@ -3,46 +3,39 @@ import Form from 'react-jsonschema-form/lib'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
-import {
-  TextRichField,
-  UsersSelectField,
-  ImageField,
-  MarkdownField
-}
-  from './CustomFields/Fields'
-
-const FIELDS = {
-  selectUsers: (
-    <UsersSelectField />
-  ),
-  imageField: ImageField,
-  textRich: TextRichField,
-  markdownField: MarkdownField
-}
+import field from './CustomFields/index'
 
 export class JsonForm extends React.Component {
   render () {
     return (
       <div>
-        {this.props.isDisable && <Form
-          disabled={this.props.isDisable}
-          schema={this.props.schema}
-          formData={this.props.formData}
-          uiSchema={this.props.uiSchema}
-          onChange={this.props.onChange}
-          fields={FIELDS}
-          noValidate
-        ><p type='submit' style={{ visibility: 'hidden' }} />
-        </Form>}
+        {this.props.isDisable && (
+          <Form
+            disabled={this.props.isDisable}
+            schema={this.props.schema}
+            formData={this.props.formData}
+            uiSchema={this.props.uiSchema}
+            onChange={this.props.onChange}
+            fields={field}
+            formContext={this.props.contextForm}
+            noValidate
+          >
+            <p
+              type='submit'
+              style={{ display: 'none' }}
+            />
+          </Form>
+        )}
         {this.props.isDisable === false &&
         <Form
           disabled={this.props.isDisable}
           schema={this.props.schema}
           formData={this.props.formData}
-          fields={FIELDS}
+          fields={field}
           uiSchema={this.props.uiSchema}
           onChange={this.props.onChange}
           onSubmit={this.props.onClickValidateBtn}
+          formContext={this.props.contextForm}
           noValidate
         >
           <div

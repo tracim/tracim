@@ -36,7 +36,8 @@ const CustomFormComponent = props => {
         />
       )}
 
-      <div className='wsContentHtmlDocument__contentpage__textnote custom-form__contentpage__textnote'>
+      <div
+        className='wsContentHtmlDocument__contentpage__textnote custom-form__contentpage__textnote'>
         {props.mode === MODE.VIEW && props.isDraftAvailable && (
           <DisplayState
             msg={props.t('You have a pending draft')}
@@ -48,37 +49,33 @@ const CustomFormComponent = props => {
         )}
 
         {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) && (
-          <JsonForm
-            id={props.wysiwygNewVersion}
-            customClass={'custom-form__editionmode'}
-            customColor={props.customColor}
-            onClickCancelBtn={props.onClickCloseEditMode}
-            disableValidateBtn={props.disableValidateBtn}
-            onClickValidateBtn={props.onClickValidateBtn}
-            text={''}
-            schema={props.schema}
-            uiSchema={props.uischema}
-            formData={props.formdata}
-            isDisable
-            onChange={props.onChangeForm}
-          />
+          <div>
+            <div className='custom-form__contentpage__textnote__version'>
+              version n°
+              <div
+                dangerouslySetInnerHTML={{ __html: props.mode === MODE.VIEW ? props.lastVersion : props.version }} />
+              {props.mode === MODE.REVISION &&
+              <div
+                className='custom-form__contentpage__textnote__lastversion outlineTextBtn'>
+                ({props.t('latest version :')} {props.lastVersion})
+              </div>
+              }
+            </div>
+          </div>
         )}
-        {props.mode === MODE.EDIT && (
-          <JsonForm
-            id={props.wysiwygNewVersion}
-            customClass={'custom-form__editionmode'}
-            customColor={props.customColor}
-            onClickCancelBtn={props.onClickCloseEditMode}
-            disableValidateBtn={props.disableValidateBtn}
-            onClickValidateBtn={props.onClickValidateBtn}
-            text={''}
-            schema={props.schema}
-            uiSchema={props.uischema}
-            formData={props.formdata}
-            onChange={props.onChangeForm}
-            isDisable={false}
-          />
-        )}
+        <JsonForm
+          customClass={'custom-form__editionmode'}
+          customColor={props.customColor}
+          onClickCancelBtn={props.onClickCloseEditMode}
+          disableValidateBtn={props.disableValidateBtn}
+          onClickValidateBtn={props.onClickValidateBtn}
+          schema={props.schema}
+          uiSchema={props.uischema}
+          formData={props.formdata}
+          isDisable={((props.mode === MODE.VIEW || props.mode === MODE.REVISION) && props.mode !== MODE.EDIT)}
+          onChange={props.onChangeForm}
+          contextForm={props.contextForm}
+        />
       </div>
     </div>
   )

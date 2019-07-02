@@ -1,5 +1,5 @@
 import React from 'react'
-import FormGeneratorComponent from '../component/CustomFormComponent.jsx'
+import CustomFormComponent from '../component/CustomFormComponent.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -38,7 +38,6 @@ import {
   putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
-import Context from '../component/Context'
 
 class CustomForm extends React.Component {
   constructor (props) {
@@ -71,10 +70,6 @@ class CustomForm extends React.Component {
       hexcolor: '#ffffff',
       faIcon: 'comments-o'
     }
-    let context = new Context()
-    context.setApiKey(this.state.config.apiUrl)
-    context.setWorkSpaceId(this.state.content.workspace_id)
-
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
@@ -593,6 +588,10 @@ class CustomForm extends React.Component {
   render () {
     const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, schema, uiSchema, rawContentBeforeEdit } = this.state
     const { t } = this.props
+    const contextForm = {
+      apiUrl: config.apiUrl,
+      workspaceId: content.workspace_id
+    }
     if (!isVisible) return null
     // console.log('COMPARE0', rawContentBeforeEdit, content.raw_content, rawContentBeforeEdit === content.raw_content)
     return (
@@ -665,10 +664,9 @@ class CustomForm extends React.Component {
         <PopinFixedContent
           customClass={`${config.slug}__contentpage`}
         >
-          {schema && <FormGeneratorComponent
+          {schema && <CustomFormComponent
             mode={mode}
             customColor={this.state.hexcolor}
-            wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={JSON.stringify(rawContentBeforeEdit) === JSON.stringify(content.raw_content)}
             onClickValidateBtn={this.onSubmit}
@@ -688,6 +686,7 @@ class CustomForm extends React.Component {
             uischema={uiSchema}
             formdata={content.raw_content}
             onChangeForm={this.handleChangeForm}
+            contextForm={contextForm}
           />}
 
           <Timeline

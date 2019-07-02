@@ -137,11 +137,12 @@ export const getWorkspaceMemberList = (apiUrl, idWorkspace) =>
     method: 'GET'
   })
 
-export const getAllUsers = (apiUrl) =>
-  fetch(`${apiUrl}/users`, {
-    credentials: 'include',
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
+// export const getMyselfKnownMember = (apiUrl, idUser) =>
+//   fetch(
+//     `${apiUrl}/users/${idUser}/known_members`, {
+//       credentials: 'include',
+//       headers: {
+//         ...FETCH_CONFIG.headers
+//       },
+//       method: 'GET'
+//     })

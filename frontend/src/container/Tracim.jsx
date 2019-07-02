@@ -161,7 +161,7 @@ class Tracim extends React.Component {
           return {
             'route': '/ui/workspaces/' + ws.workspace_id + '/contents?type=html-document',
             'label': c.label,
-            'slug': 'contents/custom-form',
+            'slug': 'contents/custom-form/' + c.slugForm,
             'hexcolor': c.hexcolor,
             'fa_icon': c.faIcon
           }

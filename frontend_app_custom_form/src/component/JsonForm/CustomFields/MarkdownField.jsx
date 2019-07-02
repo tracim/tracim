@@ -2,6 +2,7 @@ import React from 'react'
 import ReactMde from 'react-mde'
 import * as Showdown from 'showdown'
 import 'react-mde/lib/styles/css/react-mde-all.css'
+import PropTypes from 'prop-types'
 
 export class MarkdownField extends React.Component {
   constructor (props) {
@@ -48,3 +49,14 @@ export class MarkdownField extends React.Component {
 }
 
 export default MarkdownField
+
+MarkdownField.defaultProps = {
+  disabled: false
+}
+
+MarkdownField.propType = {
+  onChange: PropTypes.func,
+  schema: PropTypes.object,
+  formData: PropTypes.object,
+  disabled: PropTypes.bool
+}

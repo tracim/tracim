@@ -2,15 +2,11 @@ import React from 'react'
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
 import { handleFetchResult } from 'tracim_frontend_lib'
-import { getWorkspaceMemberList, getAllUsers } from '../../../action.async'
-import Context from '../../Context'
+import { getWorkspaceMemberList } from '../../../action.async'
 import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 
 const animatedComponents = makeAnimated()
-const userFroms = [
-  'workspace',
-  'all'
-]
 
 export class UsersSelectField extends React.Component {
   constructor (props) {
@@ -18,13 +14,12 @@ export class UsersSelectField extends React.Component {
     this.state = {
       users: []
     }
-    this.fetchUsers().catch((r) => {
-      this.sendGlobalFlashMessage('Error while fetch users')
-    })
   }
 
   componentDidMount = () => {
-
+    this.fetchUsers().catch((r) => {
+      this.sendGlobalFlashMessage('Error while fetch users')
+    })
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -37,23 +32,16 @@ export class UsersSelectField extends React.Component {
   })
 
   fetchUsers = async () => {
-    const p = this.props
-    const userFrom = p.schema.userfrom
-      ? userFroms.includes(p.schema.userfrom) ? p.schema.userfrom : 'all'
-      : 'all'
-    const context = new Context()
-    if (context.getApiKey() === undefined && context.getWorkSpaceId() === undefined) return
-    const fetchUsersResponse = await handleFetchResult(
-      userFrom === 'workspace'
-        ? await getWorkspaceMemberList(context.getApiKey(), context.getWorkSpaceId())
-        : await getAllUsers(context.getApiKey())
-    )
+    const formContext = this.props.formContext
+    if (formContext.apiUrl === undefined && formContext.workspaceId === undefined) return
+    const fetchUsersResponse = await handleFetchResult(await getWorkspaceMemberList(formContext.apiUrl, formContext.workspaceId))
+    // const fetchUsersResponse = await handleFetchResult(await getMyselfKnownMember(formContext.apiUrl, formContext.userId))
     switch (fetchUsersResponse.apiResponse.status) {
       case 200 :
         let usersTmp = fetchUsersResponse.body.map((u) =>
           ({
             value: u.user_id,
-            label: userFrom === 'workspace' ? u.user.public_name : u.public_name
+            label: u.user.public_name
           }))
         this.setState({
           users: usersTmp
@@ -85,3 +73,16 @@ export class UsersSelectField extends React.Component {
 }
 
 export default translate()(UsersSelectField)
+
+UsersSelectField.defaultProps = {
+  disabled: false,
+  formContext: {}
+}
+
+UsersSelectField.propType = {
+  onChange: PropTypes.func,
+  schema: PropTypes.object,
+  formData: PropTypes.object,
+  disabled: PropTypes.bool,
+  formContext: PropTypes.object
+}
