@@ -33,8 +33,8 @@ const debug = { // outdated
     email: 'osef@algoo.fr',
     avatar: ''
   },
-  idWorkspace: 1,
-  idFolder: null
+  workspaceId: 1,
+  folderId: null
 }
 
 class PopupCreateFolder extends React.Component {
@@ -44,8 +44,8 @@ class PopupCreateFolder extends React.Component {
       appName: 'folder',
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
-      idFolder: props.data ? props.data.idFolder : debug.idFolder,
+      workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
+      folderId: props.data ? props.data.folderId : debug.folderId,
       newFolderName: ''
     }
 
@@ -96,7 +96,7 @@ class PopupCreateFolder extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchSaveNewFolder = await handleFetchResult(await postFolder(state.config.apiUrl, state.idWorkspace, state.idFolder, state.config.slug, state.newFolderName))
+    const fetchSaveNewFolder = await handleFetchResult(await postFolder(state.config.apiUrl, state.workspaceId, state.folderId, state.config.slug, state.newFolderName))
 
     switch (fetchSaveNewFolder.apiResponse.status) {
       case 200:

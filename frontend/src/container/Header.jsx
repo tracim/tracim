@@ -53,23 +53,23 @@ class Header extends React.Component {
     else props.history.push(PAGE.LOGIN)
   }
 
-  handleChangeLang = async idLang => {
+  handleChangeLang = async langId => {
     const { props } = this
 
     if (props.user.user_id === -1) {
-      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
-      i18n.changeLanguage(idLang)
-      props.dispatch(setUserLang(idLang))
+      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+      i18n.changeLanguage(langId)
+      props.dispatch(setUserLang(langId))
       return
     }
 
-    const fetchPutUserLang = await props.dispatch(putUserLang(props.user, idLang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(props.user, langId))
     switch (fetchPutUserLang.status) {
       case 200:
-        i18n.changeLanguage(idLang)
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
-        props.dispatch(setUserLang(idLang))
-        props.dispatchCustomEvent('allApp_changeLang', idLang)
+        i18n.changeLanguage(langId)
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        props.dispatch(setUserLang(langId))
+        props.dispatchCustomEvent('allApp_changeLang', langId)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }
@@ -164,7 +164,7 @@ class Header extends React.Component {
 
               <DropdownLang
                 langList={props.lang}
-                idLangActive={props.user.lang}
+                langActiveId={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 

@@ -89,7 +89,7 @@ export const NewMemberForm = props => {
             </div>
           )}
 
-          {(props.canSendInviteNewUser && props.idRoleUserWorkspace >= 8) && (
+          {(props.canSendInviteNewUser && props.userRoleIdInWorkspace >= 8) && (
             props.emailNotifActivated
               ? (
                 <div className='name__adminmsg'>

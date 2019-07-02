@@ -144,8 +144,8 @@ class Dashboard extends React.Component {
     const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
     switch (fetchCalendar.status) {
       case 200:
-        const idCurrentWorkspace = parseInt(props.match.params.idws)
-        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === idCurrentWorkspace) || {agenda_url: ''}).agenda_url
+        const currentWorkspaceId = parseInt(props.match.params.idws)
+        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || {agenda_url: ''}).agenda_url
         this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
         break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
@@ -227,9 +227,9 @@ class Dashboard extends React.Component {
   handleClickSeeMore = async () => {
     const { props, state } = this
 
-    const idLastRecentActivity = props.curWs.recentActivityList[props.curWs.recentActivityList.length - 1].id
+    const lastRecentActivityId = props.curWs.recentActivityList[props.curWs.recentActivityList.length - 1].id
 
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl, idLastRecentActivity))
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getMyselfWorkspaceRecentActivityList(state.workspaceIdInUrl, lastRecentActivityId))
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
@@ -358,13 +358,13 @@ class Dashboard extends React.Component {
     }
   }
 
-  handleClickRemoveMember = async idMember => {
+  handleClickRemoveMember = async memberId => {
     const { props } = this
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.user, props.curWs.id, idMember))
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.user, props.curWs.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
-        props.dispatch(removeWorkspaceMember(idMember))
+        props.dispatch(removeWorkspaceMember(memberId))
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
@@ -415,11 +415,11 @@ class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const idRoleUserWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
 
     const contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
-        .filter(app => idRoleUserWorkspace === 2 ? app.slug !== 'contents/folder' : true)
+        .filter(app => userRoleIdInWorkspace === 2 ? app.slug !== 'contents/folder' : true)
         .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
@@ -456,7 +456,7 @@ class Dashboard extends React.Component {
               breadcrumbsList={props.breadcrumbs}
             >
               <div className='dashboard__header__advancedmode'>
-                {idRoleUserWorkspace >= 8 &&
+                {userRoleIdInWorkspace >= 8 &&
                   <button
                     type='button'
                     className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -484,7 +484,7 @@ class Dashboard extends React.Component {
                     dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
                   />
 
-                  {idRoleUserWorkspace >= 2 && (
+                  {userRoleIdInWorkspace >= 2 && (
                     <div className='dashboard__calltoaction'>
                       {contentTypeButtonList.map(app =>
                         <ContentTypeBtn
@@ -520,7 +520,7 @@ class Dashboard extends React.Component {
                 <RecentActivity
                   customClass='dashboard__activity'
                   workspaceId={props.curWs.id}
-                  roleIdForLoggedUser={idRoleUserWorkspace}
+                  roleIdForLoggedUser={userRoleIdInWorkspace}
                   recentActivityList={props.curWs.recentActivityList}
                   readByUserList={props.curWs.contentReadStatusList}
                   contentTypeList={props.contentType}
@@ -549,7 +549,7 @@ class Dashboard extends React.Component {
                   onClickAddMemberBtn={this.handleClickAddMemberBtn}
                   onClickCloseAddMemberBtn={this.handleClickCloseAddMemberBtn}
                   onClickRemoveMember={this.handleClickRemoveMember}
-                  idRoleUserWorkspace={idRoleUserWorkspace}
+                  userRoleIdInWorkspace={userRoleIdInWorkspace}
                   canSendInviteNewUser={[PROFILE.ADMINISTRATOR.slug, PROFILE.MANAGER.slug].includes(props.user.profile)}
                   emailNotifActivated={props.system.config.email_notification_activated}
                   autoCompleteClicked={state.autoCompleteClicked}

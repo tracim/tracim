@@ -242,7 +242,7 @@ class FolderAdvanced extends React.Component {
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
           componentTitle={<div>{state.content.label}</div>}
-          idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
         />
@@ -250,7 +250,7 @@ class FolderAdvanced extends React.Component {
         <PopinFixedOption>
           <div className='justify-content-end'>
             <div className='d-flex'>
-              {/* state.loggedUser.idRoleUserWorkspace >= 2 &&
+              {/* state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
@@ -259,7 +259,7 @@ class FolderAdvanced extends React.Component {
                 />
               */}
 
-              {state.loggedUser.idRoleUserWorkspace >= 4 &&
+              {state.loggedUser.userRoleIdInWorkspace >= 4 &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}

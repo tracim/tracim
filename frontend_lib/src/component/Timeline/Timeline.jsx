@@ -132,7 +132,7 @@ class Timeline extends React.Component {
             <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
           </ul>
 
-          {props.loggedUser.idRoleUserWorkspace >= 2 &&
+          {props.loggedUser.userRoleIdInWorkspace >= 2 &&
             <form className={classnames(`${props.customClass}__texteditor`, 'timeline__body__texteditor')}>
               <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
                 <textarea
@@ -230,7 +230,7 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    idRoleUserWorkspace: 1
+    userRoleIdInWorkspace: 1
   },
   timelineData: [],
   wysiwyg: false,

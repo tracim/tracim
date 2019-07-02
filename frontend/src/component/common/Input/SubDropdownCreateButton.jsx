@@ -13,7 +13,7 @@ const SubDropdownCreateButton = props => {
           onClick={e => {
             e.preventDefault()
             e.stopPropagation()
-            props.onClickCreateContent(e, props.idFolder, app.slug)
+            props.onClickCreateContent(e, props.folderId, app.slug)
           }}
           key={app.slug}
         >
@@ -38,7 +38,7 @@ const SubDropdownCreateButton = props => {
 SubDropdownCreateButton.propTypes = {
   availableApp: PropTypes.array.isRequired,
   onClickCreateContent: PropTypes.func.isRequired,
-  idFolder: PropTypes.number
+  folderId: PropTypes.number
 }
 
 export default translate()(SubDropdownCreateButton)

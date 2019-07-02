@@ -618,7 +618,7 @@ class File extends React.Component {
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
           componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
-          idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
@@ -631,7 +631,7 @@ class File extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {state.loggedUser.idRoleUserWorkspace >= 2 &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -653,7 +653,7 @@ class File extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {state.loggedUser.idRoleUserWorkspace >= 2 &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
@@ -662,7 +662,7 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.idRoleUserWorkspace >= 4 &&
+              {state.loggedUser.userRoleIdInWorkspace >= 4 &&
                 <ArchiveDeleteContent
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
