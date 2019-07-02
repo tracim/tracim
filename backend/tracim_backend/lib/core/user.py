@@ -747,7 +747,7 @@ class UserApi(object):
 
     def create_minimal_user(self, email, groups=[], save_now=False) -> User:
         """Previous create_user method"""
-        lowercase_email = email.lower()
+        lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
         validator.validate_all()
