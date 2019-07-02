@@ -50,15 +50,15 @@ class FolderAdvanced extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP('file'):
+      case CUSTOM_EVENT.SHOW_APP('folder'):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data.content}, isVisible: true}))
         break
-      case CUSTOM_EVENT.HIDE_APP('file'):
+      case CUSTOM_EVENT.HIDE_APP('folder'):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case CUSTOM_EVENT.RELOAD_CONTENT('file'):
+      case CUSTOM_EVENT.RELOAD_CONTENT('folder'):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break

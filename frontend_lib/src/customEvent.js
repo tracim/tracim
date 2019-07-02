@@ -19,6 +19,5 @@ export const CUSTOM_EVENT = {
   SET_BREADCRUMBS: 'setBreadcrumbs',
   SHOW_APP: function(type) { return `${type}_showApp`; },
   SHOW_CREATE_WORKSPACE_POPUP: 'showCreateWorkspacePopup',
-  TINYMCE_LOADED: 'tinymceLoaded',
   UNMOUNT_APP: 'unmount_app',
 }
