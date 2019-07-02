@@ -9,7 +9,35 @@ from tracim_backend.lib.search.search_factory import SearchFactory
 from tracim_backend.models.context_models import ContentInContext
 
 
-class SearchIndexInitCommand(AppContextCommand):
+class IndexingCommand(AppContextCommand):
+    def _index_one_content(self, content_id: int) -> None:
+        print('Indexing content "{}"'.format(content_id))
+        content_api = ContentApi(current_user=None, session=self._session, config=self._app_config)
+        content = content_api.get_one(
+            content_id=content_id, content_type=content_type_list.Any_SLUG
+        )
+        content_in_context = ContentInContext(
+            content, dbsession=self._session, config=self._app_config
+        )
+        self.search_api.index_content(content_in_context)
+        print('content "{}" correctly indexed.'.format(content_id))
+
+    def _index_all_contents(self) -> None:
+        print("Indexing all content")
+        index_contents_result = self.search_api.index_all_content()
+        nb_index_errors = index_contents_result.get_nb_index_errors()
+        nb_contents_to_index = index_contents_result.get_nb_contents_to_index()
+        if nb_index_errors == 0:
+            print("All {} content where indexed".format(nb_contents_to_index))
+        else:
+            print(
+                "Warning ! {}/{} contents cannot be indexed properly.".format(
+                    nb_index_errors, nb_contents_to_index
+                )
+            )
+
+
+class SearchIndexInitCommand(IndexingCommand):
     def get_description(self) -> str:
         return "create index of search engine"
 
@@ -36,11 +64,7 @@ class SearchIndexInitCommand(AppContextCommand):
         self.search_api.create_index()
         print("Index template was created")
         if parsed_args.index_all:
-            nb_errors = self.search_api.index_all_content()
-            if nb_errors == 0:
-                print("All content where indexed")
-            else:
-                print("Warning ! {} contents cannot be indexed properly.".format(nb_errors))
+            self._index_all_contents()
 
 
 class SearchIndexUpgradeCommand(AppContextCommand):
@@ -58,7 +82,7 @@ class SearchIndexUpgradeCommand(AppContextCommand):
         self.search_api.migrate_index()
 
 
-class SearchIndexIndexCommand(AppContextCommand):
+class SearchIndexIndexCommand(IndexingCommand):
     def get_description(self) -> str:
         return "index content(s) into search engine"
 
@@ -95,12 +119,7 @@ class SearchIndexIndexCommand(AppContextCommand):
             )
             self.search_api.index_content(content_in_context)
         else:
-            print("Indexing all content")
-            nb_errors = self.search_api.index_all_content()
-            if nb_errors == 0:
-                print("All content where indexed")
-            else:
-                print("Warning ! {} contents cannot be indexed properly.".format(nb_errors))
+            self._index_all_contents()
 
 
 class SearchIndexDeleteCommand(AppContextCommand):

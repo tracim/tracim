@@ -25,6 +25,32 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
 
+class IndexedContentsResults(object):
+    def __init__(
+        self, content_ids_to_index: typing.List[int], errored_indexed_content_ids: typing.List[int]
+    ) -> None:
+        self.content_ids_to_index = content_ids_to_index
+        self.errored_indexed_contents_ids = errored_indexed_content_ids
+
+    def get_nb_index_errors(self) -> int:
+        """
+        nb of content where indexation failed
+        """
+        return len(self.errored_indexed_contents_ids)
+
+    def get_nb_content_correctly_indexed(self) -> int:
+        """
+        nb of contents where indexation success
+        """
+        return self.get_nb_contents_to_index() - self.get_nb_index_errors()
+
+    def get_nb_contents_to_index(self) -> int:
+        """
+        Total of content to index
+        """
+        return len(self.content_ids_to_index)
+
+
 class SearchApi(ABC):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         self._user = current_user
@@ -47,11 +73,10 @@ class SearchApi(ABC):
     def index_content(self, content: ContentInContext):
         pass
 
-    def index_all_content(self) -> int:
+    def index_all_content(self) -> IndexedContentsResults:
         """
         Index/update all content in current index of ElasticSearch
         """
-        nb_indexation_errors = 0
         content_api = ContentApi(
             session=self._session,
             config=self._config,
@@ -61,10 +86,13 @@ class SearchApi(ABC):
             show_deleted=True,
         )
         contents = content_api.get_all()
+        content_ids_to_index = []  # type: typing.List[int]
+        errored_indexed_contents_ids = []  # type: typing.List[int]
         for content in contents:
             content_in_context = ContentInContext(
                 content, config=self._config, dbsession=self._session
             )
+            content_ids_to_index.append(content_in_context.content_id)
             try:
                 self.index_content(content_in_context)
             except ConnectionError as exc:
@@ -75,7 +103,7 @@ class SearchApi(ABC):
                     ),
                 )
                 logger.exception(self, exc)
-                nb_indexation_errors += 1
+                errored_indexed_contents_ids.append(content_in_context.content_id)
             except Exception as exc:
                 logger.error(
                     self,
@@ -84,8 +112,8 @@ class SearchApi(ABC):
                     ),
                 )
                 logger.exception(self, exc)
-                nb_indexation_errors += 1
-        return nb_indexation_errors
+                errored_indexed_contents_ids.append(content_in_context.content_id)
+        return IndexedContentsResults(content_ids_to_index, errored_indexed_contents_ids)
 
     def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
         """
