@@ -418,14 +418,12 @@ search.engine = simple
 # if you use ingest mode in elasticsearch, you can activate file content ingest
 # for search (default as false)
 ; search.elasticsearch.use_ingest = false
-# if you set ingest mimetype whitelist to list of separated mimetype by "," , you will index file
-# content for only file with those mimetype, if set to empty, allow any mimetype, default value
-# allow most text-based content type.
+# define mimetypes to be plain-text indexed. List of mimetypes, separated by a coma ",".
+# if set to empty, index documents of any mimetype.
 ; search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
-# if you set ingest mimetype blacklist to list of separated mimetype by "," , you will not index file
-# content with those mimetype (even in included in whitelist), if set to empty, do nothing, default
-# value to "" meaning no blacklist.
-; search.elasticsearch.ingest.mimetype_blacklist = text/markdown,application/gzip,application/zip
+# exclude mimetypes from plain-text indexation. If a mimetype is both in whitelist and blacklist, it will be blacklisted.
+# if set to empty, do nothing. default value is empty, meaning no blacklist.
+; search.elasticsearch.ingest.mimetype_blacklist = application/gzip,application/zip
 # add size limit (in bytes) for elasticsearch ingest activation
 # if file content like a pdf of a content type file is bigger than the limit, it's content will
 # not be indexed using ingest mode.
