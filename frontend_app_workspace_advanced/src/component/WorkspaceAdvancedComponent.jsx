@@ -150,7 +150,7 @@ const WorkspaceAdvancedComponent = props => {
             autoCompleteActive={props.autoCompleteFormNewMemberActive}
             emailNotifActivated={props.emailNotifActivated}
             canSendInviteNewUser={props.canSendInviteNewUser}
-            idRoleUserWorkspace={props.idRoleUserWorkspace}
+            userRoleIdInWorkspace={props.userRoleIdInWorkspace}
             autoCompleteClicked={props.autoCompleteClicked}
             onClickAutoComplete={props.onClickAutoComplete}
           />

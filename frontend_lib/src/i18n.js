@@ -29,6 +29,6 @@ i18n
     }
   })
 
-i18n.idTracim = 'frontend_lib'
+i18n.tracimId = 'frontend_lib'
 
 export default i18n

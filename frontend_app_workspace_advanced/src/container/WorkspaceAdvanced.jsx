@@ -185,16 +185,16 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleClickNewRole = async (idMember, slugNewRole) => {
+  handleClickNewRole = async (memberId, slugNewRole) => {
     const { props, state } = this
-    const fetchPutUserRole = await handleFetchResult(await putMemberRole(state.config.apiUrl, state.content.workspace_id, idMember, slugNewRole))
+    const fetchPutUserRole = await handleFetchResult(await putMemberRole(state.config.apiUrl, state.content.workspace_id, memberId, slugNewRole))
 
     switch (fetchPutUserRole.apiResponse.status) {
       case 200:
         this.setState(prev => ({
           content: {
             ...prev.content,
-            memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
+            memberList: prev.content.memberList.map(m => m.user_id === memberId ? {...m, role: slugNewRole} : m)
           }
         }))
         GLOBAL_dispatchEvent({ type: 'refreshDashboardMemberList', data: {} })
@@ -278,15 +278,15 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleClickDeleteMember = async idUser => {
+  handleClickDeleteMember = async userId => {
     const { props, state } = this
-    const fetchDeleteMember = await deleteMember(state.config.apiUrl, state.content.workspace_id, idUser)
+    const fetchDeleteMember = await deleteMember(state.config.apiUrl, state.content.workspace_id, userId)
     switch (fetchDeleteMember.status) {
       case 204:
         this.setState(prev => ({
           content: {
             ...prev.content,
-            memberList: prev.content.memberList.filter(m => m.user_id !== idUser)
+            memberList: prev.content.memberList.filter(m => m.user_id !== userId)
           }
         }))
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
@@ -402,7 +402,7 @@ class WorkspaceAdvanced extends React.Component {
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
           componentTitle={<div>{state.content.label}</div>}
-          idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
         />
@@ -432,7 +432,7 @@ class WorkspaceAdvanced extends React.Component {
             searchedKnownMemberList={state.searchedKnownMemberList}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
             loggedUser={state.loggedUser}
-            idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
+            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
             canSendInviteNewUser={
               [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
             }

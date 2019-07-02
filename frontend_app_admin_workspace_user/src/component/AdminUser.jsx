@@ -26,13 +26,13 @@ export class AdminUser extends React.Component {
     displayAddUser: !prevState.displayAddUser
   }))
 
-  handleToggleUser = (e, idUser, toggle) => {
+  handleToggleUser = (e, userId, toggle) => {
     e.preventDefault()
     e.stopPropagation()
 
     const { props } = this
 
-    if (props.idLoggedUser === idUser) {
+    if (props.loggedUserId === userId) {
       GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -44,16 +44,16 @@ export class AdminUser extends React.Component {
       return
     }
 
-    this.props.onClickToggleUserBtn(idUser, toggle)
+    this.props.onClickToggleUserBtn(userId, toggle)
   }
 
-  handleToggleProfileManager = (e, idUser, toggle) => {
+  handleToggleProfileManager = (e, userId, toggle) => {
     e.preventDefault()
     e.stopPropagation()
 
     const { props } = this
 
-    if (props.userList.find(u => u.user_id === idUser).profile === 'administrators') {
+    if (props.userList.find(u => u.user_id === userId).profile === 'administrators') {
       GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -65,17 +65,17 @@ export class AdminUser extends React.Component {
       return
     }
 
-    if (toggle) props.onChangeProfile(idUser, 'trusted-users')
-    else props.onChangeProfile(idUser, 'users')
+    if (toggle) props.onChangeProfile(userId, 'trusted-users')
+    else props.onChangeProfile(userId, 'users')
   }
 
-  handleToggleProfileAdministrator = (e, idUser, toggle) => {
+  handleToggleProfileAdministrator = (e, userId, toggle) => {
     e.preventDefault()
     e.stopPropagation()
 
     const { props } = this
 
-    if (!toggle && props.idLoggedUser === idUser) {
+    if (!toggle && props.loggedUserId === userId) {
       GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -87,8 +87,8 @@ export class AdminUser extends React.Component {
       return
     }
 
-    if (toggle) this.props.onChangeProfile(idUser, 'administrators')
-    else this.props.onChangeProfile(idUser, 'trusted-users')
+    if (toggle) this.props.onChangeProfile(userId, 'administrators')
+    else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
   handleClickAddUser = async (name, email, profile, password) => {

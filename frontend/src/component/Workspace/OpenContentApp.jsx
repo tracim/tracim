@@ -9,7 +9,7 @@ import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
     const {
-      idWorkspace,
+      workspaceId,
       appOpenedType,
       user,
       currentWorkspace,
@@ -19,14 +19,14 @@ export class OpenContentApp extends React.Component {
       match
     } = this.props
 
-    if (isNaN(idWorkspace) || idWorkspace === -1) return
+    if (isNaN(workspaceId) || workspaceId === -1) return
 
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
-        workspace_id: parseInt(idWorkspace),
+        workspace_id: parseInt(workspaceId),
         type: match.params.type
       }
 
