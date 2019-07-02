@@ -5,9 +5,8 @@ import Radium from 'radium'
 import color from 'color'
 import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
-import FileDropzone from './FileDropzone.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
-import { DisplayState } from 'tracim_frontend_lib'
+import { DisplayState, FileDropzone } from 'tracim_frontend_lib'
 
 export const FileComponent = props =>
   <div className={classnames('file__contentpage__statewrapper', {'displayState': props.isArchived || props.isDeleted})}>

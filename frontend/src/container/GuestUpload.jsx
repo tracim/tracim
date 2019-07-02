@@ -5,8 +5,9 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
+import InputTextArea from '../component/common/Input/InputTextArea.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-// import { FileDropzone } from 'tracim_frontend_lib'
+import { FileDropzone } from 'tracim_frontend_lib'
 
 class GuestUpload extends React.Component {
   constructor (props) {
@@ -34,6 +35,8 @@ class GuestUpload extends React.Component {
 
   handleClickSend = () => {}
 
+  nada = () => {}
+
   render () {
     const { props, state } = this
 
@@ -52,16 +55,15 @@ class GuestUpload extends React.Component {
                 type='text'
                 placeHolder={props.t('Full name')}
                 value={state.guestName}
-                maxLength={512}
                 onChange={this.handleChangeFullName}
               />
 
-              <textarea className='guestupload__card__form__comment form-control mb-3'
-                placeholder={props.t('Comment')}
-                rows='5'
+              <InputTextArea
+                customClass='mb-3'
+                placeHolder={props.t('Comment')}
+                numberRows='5'
                 value={state.guestComment}
                 onChange={this.handleChangeComment}
-                maxLength={512}
               />
 
               <div className='d-flex'>
@@ -76,7 +78,6 @@ class GuestUpload extends React.Component {
                   value={state.guestPassword.value}
                   onChange={this.handleChangePassword}
                   onKeyDown={() => {}}
-                  maxLength={512}
                 />
 
                 <button
@@ -87,15 +88,15 @@ class GuestUpload extends React.Component {
                   <i className='fa fa-fw fa-question-circle' />
                 </button>
               </div>
-              {/*
+
               <FileDropzone
-                onDrop={() => {}}
-                onClick={() => {}}
+                onDrop={this.nada()}
+                onClick={this.nada()}
                 hexcolor='#ffa500'
                 preview={state.uploadFilePreview}
                 filename={state.uploadFile ? state.uploadFile.name : ''}
               />
-              */}
+
               <div className='d-flex' >
                 <button type='button'
                   className='guestupload__card__form__btn btn btn-primary ml-auto'

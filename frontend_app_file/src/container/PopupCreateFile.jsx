@@ -7,7 +7,6 @@ import {
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
-// import FileDropzone from '../component/FileDropzone.jsx'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 
 class PopupCreateFile extends React.Component {

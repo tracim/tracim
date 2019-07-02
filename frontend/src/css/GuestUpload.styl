@@ -1,29 +1,8 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 .guestupload
-  display flex
-  flex-direction column
-  align-items center
-  justify-content center
-  height "calc(100vh - %s)" % headerHeight
-  background-image url('../img/tracimLogoAsBg.png')
-  background-repeat no-repeat
-  background-size contain
-  background-position center
-  width 100%
   &__card
-    width 40%
-    max-width 500px
-    z-index 1
-    &__header
-      text-align center
     &__form
-      &__fullname
-        &__input
-          padding-left 12px
-      &__comment
-        padding-left 12px
-        resize none
       &__groupepw
         margin-right 5px
         flex-grow 2
@@ -36,38 +15,3 @@
       &__btn
         background-color #ffa500 // Change
         border-color #ffa500
-  &__footer
-    position absolute
-    bottom 10px
-    &__text
-      display flex
-      align-items center
-      font-size 17px
-      color offWhite
-      & > a
-        margin-left 15px
-        color offWhite
-        font-size 18px
-        &:hover
-          text-decoration underline
-
-// MEDIAQUERIES
-@media (min-width: min-lg) and (max-width: max-lg)
-  .guestupload
-    &__card
-      width 50%
-
-@media (min-width: min-md) and (max-width: max-md)
-  .guestupload
-    &__card
-      width 60%
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .guestupload
-    &__card
-      width 80%
-
-@media (max-width: max-xs)
-  .guestupload
-    &__card
-      width 95%
