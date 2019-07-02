@@ -425,7 +425,7 @@ search.engine = simple
 # if you set ingest mimetype blacklist to list of separated mimetype by "," , you will not index file
 # content with those mimetype (even in included in whitelist), if set to empty, do nothing, default
 # value to "" meaning no blacklist.
-; search.elasticsearch.ingest.mimetype_blacklist = text/markdown
+; search.elasticsearch.ingest.mimetype_blacklist = text/markdown,application/gzip,application/zip
 # add size limit (in bytes) for elasticsearch ingest activation
 # if file content like a pdf of a content type file is bigger than the limit, it's content will
 # not be indexed using ingest mode.
