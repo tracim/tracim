@@ -419,7 +419,7 @@ class ESSearchApi(SearchApi):
                 return
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed: no content'.format(
+                'Skip binary content file of content "{}": no binary content'.format(
                     content.content_id
                 ),
             )
@@ -433,7 +433,7 @@ class ESSearchApi(SearchApi):
         if not self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed: ingest mode disabled'.format(
+                'Skip binary indexation of content "{}" will be not indexed: ingest mode disabled'.format(
                     content.content_id
                 ),
             )
@@ -442,7 +442,7 @@ class ESSearchApi(SearchApi):
         if not content.content.depot_file or content.size is None:
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed:  not a correct file format'.format(
+                'Skip binary indexation of content "{}":  invalid file format'.format(
                     content.content_id
                 ),
             )
@@ -456,7 +456,7 @@ class ESSearchApi(SearchApi):
         ):
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed (whitelist rule)'.format(
+                'Skip binary indexation of content "{}": mimetype "{}" not whitelisted'.format(
                     content.content_id, content.mimetype
                 ),
             )
@@ -469,7 +469,7 @@ class ESSearchApi(SearchApi):
         ):
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed: mimetype "{}" not allowed to be indexed (blacklist rule)'.format(
+                'Skip binary indexation of content "{}": mimetype "{}" blacklisted'.format(
                     content.content_id, content.mimetype
                 ),
             )
@@ -478,9 +478,7 @@ class ESSearchApi(SearchApi):
         if content.size == 0:
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed:  empty'.format(
-                    content.content_id
-                ),
+                'Skip binary indexation of content "{}":  empty file'.format(content.content_id),
             )
             return False
 
@@ -488,7 +486,7 @@ class ESSearchApi(SearchApi):
         if content.size > self._config.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT:
             logger.debug(
                 self,
-                'Content file of content "{}" will be not indexed: size "{}" is  bigger than size limit ({})'.format(
+                'Skip binary indexation of content "{}": binary is "{}" bytes, max allowed size for indexation is ({})'.format(
                     content.content_id,
                     content.size,
                     self._config.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT,
