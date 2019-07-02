@@ -45,7 +45,7 @@ class Agenda extends React.Component {
     const { state } = this
 
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
           this.setState({config: data.config})
