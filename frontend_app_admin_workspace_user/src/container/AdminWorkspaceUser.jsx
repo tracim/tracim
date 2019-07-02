@@ -49,12 +49,12 @@ class AdminWorkspaceUser extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP('admin_workspace_user'):
+      case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.setState({config: data.config})
         break
@@ -62,7 +62,7 @@ class AdminWorkspaceUser extends React.Component {
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceContent()
         break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -102,7 +102,7 @@ class AdminWorkspaceUser extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<AdminWorkspaceUser> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
@@ -322,7 +322,7 @@ class AdminWorkspaceUser extends React.Component {
           workspace_id: idWorkspace
         }
       })
-    } else GLOBAL_dispatchEvent({type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: {workspace_id: idWorkspace}})
+    } else GLOBAL_dispatchEvent({type: CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data: {workspace_id: idWorkspace}})
 
     this.setState({workspaceIdOpened: idWorkspace})
   }

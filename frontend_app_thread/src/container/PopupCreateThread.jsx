@@ -59,16 +59,16 @@ class PopupCreateThread extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<PopupCreateThread> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -84,7 +84,7 @@ class PopupCreateThread extends React.Component {
   handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, // handled by tracim_front:dist/index.html
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
     data: {
       name: this.state.appName
     }
@@ -104,7 +104,7 @@ class PopupCreateThread extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
 
         GLOBAL_dispatchEvent({
-          type: CUSTOM_EVENT.OPEN_CONTENT_URL, // handled by tracim_front:src/container/WorkspaceContent.jsx
+          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
           data: {
             idWorkspace: resSave.body.workspace_id,
             contentType: appName,

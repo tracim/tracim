@@ -54,7 +54,7 @@ class Tracim extends React.Component {
   constructor (props) {
     super(props)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
@@ -118,7 +118,7 @@ class Tracim extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadAppConfig = async () => {

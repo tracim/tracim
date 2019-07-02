@@ -69,7 +69,7 @@ class Dashboard extends React.Component {
       displayWebdavBtn: false
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
@@ -79,7 +79,7 @@ class Dashboard extends React.Component {
         await this.loadWorkspaceDetail()
         this.buildBreadcrumbs()
         break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
     }
   }
 
@@ -116,7 +116,7 @@ class Dashboard extends React.Component {
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadWorkspaceDetail = async () => {

@@ -60,7 +60,7 @@ class WorkspaceContent extends React.Component {
       contentLoaded: false
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
@@ -94,7 +94,7 @@ class WorkspaceContent extends React.Component {
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
     }
   }
 
@@ -138,7 +138,7 @@ class WorkspaceContent extends React.Component {
 
   componentWillUnmount () {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   buildBreadcrumbs = () => {

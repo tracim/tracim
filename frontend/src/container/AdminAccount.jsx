@@ -61,12 +61,12 @@ class Account extends React.Component {
       subComponentMenu: builtSubComponentMenu
     }
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG: this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
     }
   }
 

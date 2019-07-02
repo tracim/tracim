@@ -15,12 +15,12 @@ import { CUSTOM_EVENT } from '../../customEvent.js'
 class Timeline extends React.Component {
   constructor (props) {
     super(props)
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', type, data)
         i18n.changeLanguage(data)
         break
@@ -37,7 +37,7 @@ class Timeline extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})

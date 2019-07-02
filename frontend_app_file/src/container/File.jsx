@@ -75,13 +75,13 @@ class File extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP('file'):
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
@@ -90,7 +90,7 @@ class File extends React.Component {
         }
         break
 
-      case CUSTOM_EVENT.HIDE_APP('file'):
+      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         this.setState({
@@ -99,7 +99,7 @@ class File extends React.Component {
         })
         break
 
-      case CUSTOM_EVENT.RELOAD_CONTENT('file'):
+      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
 
@@ -115,7 +115,7 @@ class File extends React.Component {
         }))
         break
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
 
         if (state.timelineWysiwyg) {
@@ -169,7 +169,7 @@ class File extends React.Component {
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({

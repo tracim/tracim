@@ -69,7 +69,7 @@ class Header extends React.Component {
         i18n.changeLanguage(idLang)
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
         props.dispatch(setUserLang(idLang))
-        props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANG, idLang)
+        props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, idLang)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }

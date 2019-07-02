@@ -54,25 +54,25 @@ class WorkspaceAdvanced extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP('workspace_advanced'):
+      case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         this.loadContent()
         break
-      case CUSTOM_EVENT.HIDE_APP('workspace_advanced'):
+      case CUSTOM_EVENT.HIDE_APP(this.state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'):
+      case CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug):
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -103,7 +103,7 @@ class WorkspaceAdvanced extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<WorkspaceAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
@@ -148,7 +148,7 @@ class WorkspaceAdvanced extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
   }
 
   handleSaveEditLabel = async newLabel => {

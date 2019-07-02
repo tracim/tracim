@@ -68,13 +68,13 @@ class HtmlDocument extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
-      case CUSTOM_EVENT.SHOW_APP('html-document'):
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
@@ -83,7 +83,7 @@ class HtmlDocument extends React.Component {
         }
         break
 
-      case CUSTOM_EVENT.HIDE_APP('html-document'):
+      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
@@ -93,7 +93,7 @@ class HtmlDocument extends React.Component {
         })
         break
 
-      case CUSTOM_EVENT.RELOAD_CONTENT('html-document'):
+      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
@@ -105,7 +105,7 @@ class HtmlDocument extends React.Component {
         }))
         break
 
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANG:
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
 
         initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
@@ -161,7 +161,7 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     tinymce.remove('#wysiwygNewVersion')
     tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT, this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
