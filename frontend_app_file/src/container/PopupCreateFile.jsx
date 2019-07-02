@@ -17,8 +17,8 @@ class PopupCreateFile extends React.Component {
       appName: 'file', // must remain 'file' because it is the name of the react built app (which contains File and PopupCreateFile)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
-      idFolder: props.data ? props.data.idFolder : debug.idFolder,
+      workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
+      folderId: props.data ? props.data.folderId : debug.folderId,
       uploadFile: null,
       uploadFilePreview: null,
       progressUpload: {
@@ -110,7 +110,7 @@ class PopupCreateFile extends React.Component {
 
     const formData = new FormData()
     formData.append('files', state.uploadFile)
-    formData.append('parent_id', state.idFolder || 0)
+    formData.append('parent_id', state.folderId || 0)
 
     // fetch still doesn't handle event progress. So we need to use old school xhr object
     const xhr = new XMLHttpRequest()
@@ -119,7 +119,7 @@ class PopupCreateFile extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-    xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.idWorkspace}/files`, true)
+    xhr.open('POST', `${state.config.apiUrl}/workspaces/${state.workspaceId}/files`, true)
 
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
@@ -136,9 +136,9 @@ class PopupCreateFile extends React.Component {
             GLOBAL_dispatchEvent({
               type: CUSTOM_EVENT.OPEN_CONTENT_URL,
               data: {
-                idWorkspace: jsonResult200.workspace_id,
+                workspaceId: jsonResult200.workspace_id,
                 contentType: state.appName,
-                idContent: jsonResult200.content_id
+                contentId: jsonResult200.content_id
               }
             })
             break

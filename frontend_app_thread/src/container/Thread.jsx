@@ -414,7 +414,7 @@ class Thread extends React.Component {
           faIcon={config.faIcon}
           rawTitle={content.label}
           componentTitle={<div>{content.label}</div>}
-          idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
+          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!content.is_editable}
@@ -426,7 +426,7 @@ class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            {loggedUser.idRoleUserWorkspace >= 2 &&
+            {loggedUser.userRoleIdInWorkspace >= 2 &&
               <SelectStatus
                 selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                 availableStatus={config.availableStatuses}
@@ -435,7 +435,7 @@ class Thread extends React.Component {
               />
             }
 
-            {loggedUser.idRoleUserWorkspace >= 4 &&
+            {loggedUser.userRoleIdInWorkspace >= 4 &&
               <ArchiveDeleteContent
                 customColor={config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}

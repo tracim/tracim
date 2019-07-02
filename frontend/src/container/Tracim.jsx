@@ -69,7 +69,7 @@ class Tracim extends React.Component {
         break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
+        this.loadWorkspaceList(data.openInSidebarId ? data.openInSidebarId : undefined)
         break
       case CUSTOM_EVENT.DISCONNECTED_FROM_API:
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
@@ -134,10 +134,10 @@ class Tracim extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceList = async (idOpenInSidebar = undefined) => {
+  loadWorkspaceList = async (openInSidebarId = undefined) => {
     const { props } = this
 
-    const idWsToOpen = idOpenInSidebar || props.currentWorkspace.id || undefined
+    const idWsToOpen = openInSidebarId || props.currentWorkspace.id || undefined
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
@@ -158,13 +158,13 @@ class Tracim extends React.Component {
 
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
-        idWorkspace: ws.workspace_id,
+        workspaceId: ws.workspace_id,
         fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      idWorkspace: memberList.idWorkspace,
+      workspaceId: memberList.workspaceId,
       memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
     }))
 

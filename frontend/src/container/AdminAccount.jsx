@@ -52,7 +52,7 @@ class Account extends React.Component {
     }].filter(menu => props.system.config.email_notification_activated ? true : menu.name !== 'notification')
 
     this.state = {
-      idUserToEdit: props.match.params.iduser,
+      userToEditId: props.match.params.userid,
       userToEdit: {
         public_name: '',
         auth_type: 'internal'
@@ -79,7 +79,7 @@ class Account extends React.Component {
   getUserDetail = async () => {
     const { props, state } = this
 
-    const fetchGetUser = await props.dispatch(getUser(state.idUserToEdit))
+    const fetchGetUser = await props.dispatch(getUser(state.userToEditId))
 
     switch (fetchGetUser.status) {
       case 200:
@@ -96,7 +96,7 @@ class Account extends React.Component {
   getUserWorkspaceList = async () => {
     const { props, state } = this
 
-    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.idUserToEdit))
+    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.userToEditId))
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break
@@ -129,13 +129,13 @@ class Account extends React.Component {
 
     const fetchWorkspaceListMemberList = await Promise.all(
       wsList.map(async ws => ({
-        idWorkspace: ws.workspace_id,
+        workspaceId: ws.workspace_id,
         fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(wsMemberList => ({
-      idWorkspace: wsMemberList.idWorkspace,
+      workspaceId: wsMemberList.workspaceId,
       memberList: wsMemberList.fetchMemberList.status === 200
         ? wsMemberList.fetchMemberList.json
         : [] // handle error ?
@@ -145,7 +145,7 @@ class Account extends React.Component {
       userToEditWorkspaceList: wsList.map(ws => ({
         ...ws,
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.idWorkspace).memberList
+        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId).memberList
       }))
     })
   }
@@ -192,13 +192,13 @@ class Account extends React.Component {
     return false
   }
 
-  handleChangeSubscriptionNotif = async (idWorkspace, doNotify) => {
+  handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props, state } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, idWorkspace, doNotify))
+    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, workspaceId, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
       case 204: this.setState(prev => ({
-        userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === idWorkspace
+        userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === workspaceId
           ? {...ws, memberList: ws.memberList.map(u => u.user_id === state.userToEdit.user_id ? {...u, do_notify: doNotify} : u)}
           : ws
         )}))
@@ -268,7 +268,7 @@ class Account extends React.Component {
 
                       case 'notification':
                         return <Notification
-                          idUserLogged={parseInt(state.idUserToEdit)}
+                          userLoggedId={parseInt(state.userToEditId)}
                           workspaceList={state.userToEditWorkspaceList}
                           onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                         />

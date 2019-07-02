@@ -39,8 +39,8 @@ const debug = { // outdated
     email: 'osef@algoo.fr',
     avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
   },
-  idWorkspace: 1,
-  idFolder: null
+  workspaceId: 1,
+  folderId: null
 }
 
 class PopupCreateThread extends React.Component {
@@ -50,8 +50,8 @@ class PopupCreateThread extends React.Component {
       appName: 'thread', // must remain 'thread' because it is the name of the react built app (which contains Threac and PopupCreateThread)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
-      idFolder: props.data ? props.data.idFolder : debug.idFolder,
+      workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
+      folderId: props.data ? props.data.folderId : debug.folderId,
       newContentName: ''
     }
 
@@ -91,9 +91,9 @@ class PopupCreateThread extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, appName, idWorkspace, idFolder, newContentName } = this.state
+    const { config, appName, workspaceId, folderId, newContentName } = this.state
 
-    const fetchSaveThreadDoc = postThreadContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
+    const fetchSaveThreadDoc = postThreadContent(config.apiUrl, workspaceId, folderId, config.slug, newContentName)
 
     const resSave = await handleFetchResult(await fetchSaveThreadDoc)
 
@@ -106,9 +106,9 @@ class PopupCreateThread extends React.Component {
         GLOBAL_dispatchEvent({
           type: CUSTOM_EVENT.OPEN_CONTENT_URL,
           data: {
-            idWorkspace: resSave.body.workspace_id,
+            workspaceId: resSave.body.workspace_id,
             contentType: appName,
-            idContent: resSave.body.content_id
+            contentId: resSave.body.content_id
           }
         })
         break

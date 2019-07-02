@@ -54,7 +54,7 @@ export const FileComponent = props =>
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
-        displayChangeDescriptionBtn={props.loggedUser.idRoleUserWorkspace >= 2}
+        displayChangeDescriptionBtn={props.loggedUser.userRoleIdInWorkspace >= 2}
         disableChangeDescription={!props.isEditable}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
