@@ -4,11 +4,12 @@
 ### Fixed issues
 
 - Search: #2025
+- Docker: #2054
 - Timeline: #2032
 - Admin user: #1470, #2034
 - Email: #2036
 - Preview-generator: #2022
-- Security: #2049
+- Security: #2049, #2052
 
 
 ## 2.3.0 / 2019-06-21
