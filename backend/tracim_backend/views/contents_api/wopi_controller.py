@@ -90,7 +90,6 @@ class WOPIController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        actual_file = api.get_content_in_context(content)
         file = DepotManager.get().get(content.depot_file)
         return Response(body=file.read())
 
@@ -109,13 +108,13 @@ class WOPIController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        actual_file = api.get_content_in_context(content)
-        author = actual_file.author
+        file = DepotManager.get().get(content.depot_file)
+        author = content.owner
 
         # FIXME - H.D. - 2019/07/02 - create model
         return {
-            "BaseFileName": actual_file.filename,
-            "Size": len(actual_file.raw_content),
+            "BaseFileName": content.file_name,
+            "Size": len(file.read()),
             "OwnerId": author.user_id,
             "UserId": request.current_user.user_id,
             "UserFriendlyName": request.current_user.display_name,
@@ -142,7 +141,12 @@ class WOPIController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
 
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            api.update_content(item=content, new_label=content.label, new_content=request.body)
+            api.update_file_data(
+                item=content,
+                new_mimetype=content.type,
+                new_filename=content.file_name,
+                new_content=request.body,
+            )
             api.save(content)
             api.execute_update_content_actions(content)
 
