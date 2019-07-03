@@ -6,6 +6,7 @@ import transaction
 from defusedxml import ElementTree
 from pyramid.config import Configurator
 from pyramid.response import Response
+from depot.manager import DepotManager
 
 from tracim_backend import TracimRequest, hapic, BASE_API_V2
 from tracim_backend.app_models.contents import content_type_list
@@ -90,7 +91,8 @@ class WOPIController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         actual_file = api.get_content_in_context(content)
-        return Response(body=actual_file.raw_content)
+        file = DepotManager.get().get(content.depot_file)
+        return Response(body=file.read())
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
@@ -176,7 +178,3 @@ class WOPIController(Controller):
             request_method="POST",
         )
         configurator.add_view(self.put_content, route_name="wopi_put_content")
-
-
-http://localhost:9980/lool/http://192.168.1.228:6543/api/v2/workspaces/2/wopi/files/11?access_token=b143eab900c02d511e6c25ecb40a4f67b5b5eab663d3ec61228f4bdb850dbd7ac8e423fe&access_token_ttl=0&permission=edit/ws?WOPISrc=http://192.168.1.228:6543/api/v2/workspaces/2/wopi/files/11&compat=/ws
-http://localhost:9980/lool/http://192.168.1.228:6543/api/v2/workspaces/2/wopi/files/11?access_token=b143eab900c02d511e6c25ecb40a4f67b5b5eab663d3ec61228f4bdb850dbd7ac8e423fe&access_token_ttl=0&permission=edit/ws?WOPISrc=http://192.168.1.228:6543/api/v2/workspaces/2/wopi/files/11&compat=/ws
