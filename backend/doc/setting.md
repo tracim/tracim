@@ -105,6 +105,7 @@ Priority order is (from less to most priority):
 |TRACIM_SEARCH__ELASTICSEARCH__PORT|search.elasticsearch.port|SEARCH__ELASTICSEARCH__PORT|
 |TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS|search.elasticsearch.index_alias|SEARCH__ELASTICSEARCH__INDEX_ALIAS|
 |TRACIM_SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|search.elasticsearch.index_pattern_template|SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE|
+|TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|search.elasticsearch.request_timeout|SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT|
 
 ### Currently config-file only params:
 
