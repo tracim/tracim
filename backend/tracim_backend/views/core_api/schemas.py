@@ -1033,7 +1033,11 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
         description="Whether it's possible to save the document as a new name ("
         "Save As functionality)",
     )
+    LastModifiedTime = marshmallow.fields.DateTime(description="Last time the file was modified")
 
+
+class WOPILastModifiedTime(marshmallow.Schema):
+    LastModifiedTime = marshmallow.fields.DateTime(description="Last time the file was modified")
 
 #####
 # Revision
