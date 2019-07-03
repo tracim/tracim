@@ -3,11 +3,8 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   addAllResourceI18n,
-<<<<<<< HEAD
-  FileDropzone
-=======
+  FileDropzone,
   CUSTOM_EVENT
->>>>>>> fa24bcbeb85e67ba8e52d6058543f106112926b7
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'

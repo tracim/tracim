@@ -35,7 +35,33 @@ class GuestUpload extends React.Component {
 
   handleClickSend = () => {}
 
-  nada = () => {}
+  handleChangeFile = newFile => {
+    if (!newFile || !newFile[0]) return
+
+    const fileToSave = newFile[0]
+
+    if (
+      !fileToSave.type.includes('image') ||
+      fileToSave.size > 2000000
+    ) {
+      this.setState({
+        uploadFile: fileToSave,
+        uploadFilePreview: false
+      })
+      return
+    }
+
+    this.setState({uploadFile: fileToSave})
+
+    var reader = new FileReader()
+    reader.onload = e => {
+      this.setState({uploadFilePreview: e.total > 0 ? e.target.result : false})
+      const img = new Image()
+      img.src = e.target.result
+      img.onerror = () => this.setState({uploadFilePreview: false})
+    }
+    reader.readAsDataURL(fileToSave)
+  }
 
   render () {
     const { props, state } = this
@@ -90,9 +116,9 @@ class GuestUpload extends React.Component {
               </div>
 
               <FileDropzone
-                onDrop={this.nada()}
-                onClick={this.nada()}
-                hexcolor='#ffa500'
+                onDrop={this.handleChangeFile}
+                onClick={this.handleChangeFile}
+                hexcolor='#ffa500' //contentType[1].hexcolor
                 preview={state.uploadFilePreview}
                 filename={state.uploadFile ? state.uploadFile.name : ''}
               />

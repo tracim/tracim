@@ -33,7 +33,6 @@
     "radium": "^0.24.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "react-dropzone": "^5.0.1",
     "react-i18next": "^7.5.0",
     "react-images": "^0.5.19",
     "standard": "^11.0.0",

@@ -95,6 +95,9 @@ class Tracim extends React.Component {
     // console.log('<Tracim> did Mount')
     const { props } = this
 
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
+    if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
+
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
@@ -197,8 +200,8 @@ class Tracim extends React.Component {
     if (
       !unLoggedAllowedPageList.includes(props.location.pathname) && (
         !props.system.workspaceListLoaded ||
-        !props.system.appListLoaded ||
-        !props.system.contentTypeListLoaded
+        !props.system.appListLoaded // ||
+        // !props.system.contentTypeListLoaded
       )
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
