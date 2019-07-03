@@ -31,9 +31,17 @@ If you want to activate notification by email:
 
 * EMAIL_NOTIFICATION=1 (In this case you need to give some smtp parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
 
+If you want to deactivate notification by email:
+
+* EMAIL_NOTIFICATION=0
+
 If you want to use reply_by_email feature:
 
 * REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
+
+If you want to deactivate reply_by_email feature:
+
+* REPLY_BY_EMAIL=0
 
 If you don't want to use webdav:
 
