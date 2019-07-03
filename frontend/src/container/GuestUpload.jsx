@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
+import { Popover, PopoverHeader, PopoverBody } from 'reactstrap' // react-awesome-popover
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -12,7 +13,9 @@ import { FileDropzone } from 'tracim_frontend_lib'
 class GuestUpload extends React.Component {
   constructor (props) {
     super(props)
+    this.toggle = this.toggle.bind(this)
     this.state = {
+      popoverOpen: false,
       guestName: '',
       guestComment: '',
       guestPassword: {
@@ -27,6 +30,12 @@ class GuestUpload extends React.Component {
         percent: 0
       }
     }
+  }
+
+  toggle () {
+    this.setState({
+      popoverOpen: !this.state.popoverOpen
+    })
   }
 
   handleChangeFullName = e => this.setState({guestName: e.target.value})
@@ -107,18 +116,22 @@ class GuestUpload extends React.Component {
                 />
 
                 <button
+                  type='button'
                   className='guestupload__card__form__groupepw__question mb-3'
-                  data-toggle='popover'
-                  data-content='test'
+                  id='popoverQuestion'
                 >
                   <i className='fa fa-fw fa-question-circle' />
                 </button>
+                <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.toggle}>
+                  <PopoverHeader>Popover Title</PopoverHeader>
+                  <PopoverBody>Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</PopoverBody>
+                </Popover>
               </div>
 
               <FileDropzone
                 onDrop={this.handleChangeFile}
                 onClick={this.handleChangeFile}
-                hexcolor='#ffa500' //contentType[1].hexcolor
+                hexcolor='#ffa500'
                 preview={state.uploadFilePreview}
                 filename={state.uploadFile ? state.uploadFile.name : ''}
               />

@@ -50,6 +50,7 @@ import {
 } from '../action-creator.sync.js'
 import SearchResult from './SearchResult.jsx'
 import GuestUpload from './GuestUpload.jsx'
+import GuestDownload from './GuestDownload.jsx'
 
 class Tracim extends React.Component {
   constructor (props) {
@@ -94,9 +95,6 @@ class Tracim extends React.Component {
   async componentDidMount () {
     // console.log('<Tracim> did Mount')
     const { props } = this
-
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
-    if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
 
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
@@ -200,8 +198,8 @@ class Tracim extends React.Component {
     if (
       !unLoggedAllowedPageList.includes(props.location.pathname) && (
         !props.system.workspaceListLoaded ||
-        !props.system.appListLoaded // ||
-        // !props.system.contentTypeListLoaded
+        !props.system.appListLoaded ||
+        !props.system.contentTypeListLoaded
       )
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
@@ -276,6 +274,7 @@ class Tracim extends React.Component {
           <Route path={PAGE.SEARCH_RESULT} component={SearchResult} />
 
           <Route path={PAGE.GUEST_UPLOAD} component={GuestUpload} />
+          <Route path={PAGE.GUEST_DOWNLOAD} component={GuestDownload} />
 
           {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />

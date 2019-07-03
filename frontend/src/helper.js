@@ -49,10 +49,11 @@ export const PAGE = {
     USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
   },
   SEARCH_RESULT: '/ui/search-result',
-  GUEST_UPLOAD: '/ui/guest-upload'
+  GUEST_UPLOAD: '/ui/guest-upload',
+  GUEST_DOWNLOAD: '/ui/guest-download'
 }
 
-export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD, PAGE.GUEST_UPLOAD]
+export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD, PAGE.GUEST_UPLOAD, PAGE.GUEST_DOWNLOAD]
 
 export const ROLE = [{
   id: 8,
