@@ -3,13 +3,18 @@
 .comment
   &.sent
     padding-left 5%
-    & ^[0]__body a
+    & ^[0]__body a // renders .comment.sent .comment__body a
       text-decoration underline
       color #fff
       &:hover
         font-weight bold
   &.received
     padding-right 5%
+    & ^[0]__body a // renders .comment.received .comment__body a
+      text-decoration underline
+      color inherit
+      &:hover
+        font-weight bold
   p
     margin 0
   &__header
