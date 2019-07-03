@@ -25,29 +25,21 @@ Used port in container:
 
 * 80 (Tracim HTTP API and web user interface)
 
-⚠ You can also use this list of [supported var](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md) (this var are from development.ini.sample conf file)
+⚠ You can also use this list of [supported var](https://github.com/tracim/tracim/blob/master/backend/doc/setting.md) (this var are from development.ini.sample conf file)
 
-If you want to activate notification by email:
+If you want to use notification by email:
 
-* EMAIL_NOTIFICATION=1 (In this case you need to give some smtp parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
-
-If you want to deactivate notification by email:
-
-* EMAIL_NOTIFICATION=0
+* You need to give some smtp parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
 
 If you want to use reply_by_email feature:
 
-* REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/develop/backend/development.ini.sample))
+* REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
 
-If you want to deactivate reply_by_email feature:
-
-* REPLY_BY_EMAIL=0
-
-If you don't want to use webdav:
+If you don't want to use webdav (webdav is started by default):
 
 * START_WEBDAV=0 (to deactivate webdav in tracim)
 
-If you don't want to use caldav:
+If you don't want to use caldav (webdav is started by default):
 
 * START_CALDAV=0 (to deactivate agenda in tracim)
 
@@ -102,7 +94,7 @@ Example with SQLite
 Exemple with SQlite, email_notification and some small instance personnalisation:
 
     docker run -e DATABASE_TYPE=sqlite \
-               -e EMAIL_NOTIFICATION=1 \
+               -e TRACIM_EMAIL__NOTIFICATION__ACTIVATED=True \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__SERVER=xxxx.servermail.xx \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__PORT=25 \
                -e TRACIM_EMAIL__NOTIFICATION__SMTP__USER=xxxxxxxxxx \
@@ -114,7 +106,7 @@ Exemple with SQlite, email_notification and some small instance personnalisation
 
 With this exemple, tracim is now accessible on my network and I can send notification by email when content change.
 
-Exemple to use tracim with ElasticSearch: (you need to start elasticsearch container first)
+Exemple to use tracim with ElasticSearch: (you need to start elasticsearch first)
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_SEARCH__ENGINE=elasticsearch \

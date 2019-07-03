@@ -147,21 +147,3 @@ if [ "$START_CALDAV" = "1" ]; then
         ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
     fi
 fi
-
-# Activate email
-if [ "$EMAIL_NOTIFICATION" = "1" ]; then
-    sed -i "s|email.notification.activated = .*|email.notification.activated = True|g" /etc/tracim/development.ini
-else
-    if [ "$EMAIL_NOTIFICATION" = "0" ]; then
-    sed -i "s|email.notification.activated = .*|email.notification.activated = False|g" /etc/tracim/development.ini
-    fi
-fi
-
-# Activate reply by email
-if [ "$REPLY_BY_EMAIL" = "1" ]; then
-    sed -i "s|email.reply.activated = .*|email.reply.activated = True|g" /etc/tracim/development.ini
-else
-    if [ "$REPLY_BY_EMAIL" = "0" ]; then
-    sed -i "s|email.reply.activated = .*|email.reply.activated = False|g" /etc/tracim/development.ini
-    fi
-fi
