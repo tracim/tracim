@@ -66,7 +66,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           label: ra.label,
           type: ra.content_type,
           fileExtension: ra.file_extension,
-          idParent: ra.parent_id,
+          parentId: ra.parent_id,
           showInUi: ra.show_in_ui,
           isArchived: ra.is_archived,
           isDeleted: ra.is_deleted,
@@ -85,7 +85,8 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
             slug: ra.slug,
             label: ra.label,
             type: ra.content_type,
-            idParent: ra.parent_id,
+            fileExtension: ra.file_extension,
+            parentId: ra.parent_id,
             showInUi: ra.show_in_ui,
             isArchived: ra.is_archived,
             isDeleted: ra.is_deleted,
@@ -106,14 +107,14 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${REMOVE}/${WORKSPACE_MEMBER}`:
       return {
         ...state,
-        memberList: state.memberList.filter(m => m.id !== action.idMember)
+        memberList: state.memberList.filter(m => m.id !== action.memberId)
       }
 
     case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
-      return action.idWorkspace === state.id
+      return action.workspaceId === state.id
         ? {
           ...state,
-          memberList: state.memberList.map(u => u.id === action.idUser
+          memberList: state.memberList.map(u => u.id === action.userId
             ? {...u, doNotify: action.doNotify}
             : u
           )
@@ -121,11 +122,11 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         : state
 
     case `${SET}/${FOLDER_READ}`:
-      return state.contentReadStatusList.includes(action.idFolder)
+      return state.contentReadStatusList.includes(action.folderId)
         ? state
         : {
           ...state,
-          contentReadStatusList: [...state.contentReadStatusList, action.idFolder]
+          contentReadStatusList: [...state.contentReadStatusList, action.folderId]
         }
 
     case `${SET}/${WORKSPACE_AGENDA_URL}`:

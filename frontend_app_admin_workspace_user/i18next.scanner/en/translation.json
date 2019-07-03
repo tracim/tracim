@@ -3,7 +3,7 @@
   "Active": "Active",
   "Administrator": "Administrator",
   "Description": "Description",
-  "Member count": "Member count",
+  "Members": "Members",
   "Error while loading users list": "Error while loading users list",
   "Error while enabling or disabling user": "Error while enabling or disabling user",
   "Error while saving new profile": "Error while saving new profile",

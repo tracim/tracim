@@ -68,7 +68,7 @@ export const debug = {
     email: 'osef@algoo.fr',
     lang: 'en',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
-    idRoleUserWorkspace: 8
+    userRoleIdInWorkspace: 8
   },
   content: {
     author: {

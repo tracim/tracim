@@ -9,7 +9,8 @@ import {
   ListItemWrapper,
   displayDistanceDate,
   IconButton,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   PAGE
@@ -36,7 +37,8 @@ class SearchResult extends React.Component {
     this.state = {
       totalHits: 0
     }
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   parseUrl () {
@@ -56,7 +58,7 @@ class SearchResult extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Search> Custom event', 'color: #28a745', type, data)
         this.buildBreadcrumbs(); break
     }
@@ -68,7 +70,7 @@ class SearchResult extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   componentDidUpdate (prevProps) {

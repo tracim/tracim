@@ -8,18 +8,19 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
+import { CUSTOM_EVENT } from '../../customEvent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
 class Timeline extends React.Component {
   constructor (props) {
     super(props)
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', type, data)
         i18n.changeLanguage(data)
         break
@@ -36,7 +37,7 @@ class Timeline extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
@@ -132,7 +133,7 @@ class Timeline extends React.Component {
             <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
           </ul>
 
-          {props.loggedUser.idRoleUserWorkspace >= 2 &&
+          {props.loggedUser.userRoleIdInWorkspace >= 2 &&
             <form className={classnames(`${props.customClass}__texteditor`, 'timeline__body__texteditor')}>
               <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
                 <textarea
@@ -230,7 +231,7 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    idRoleUserWorkspace: 1
+    userRoleIdInWorkspace: 1
   },
   timelineData: [],
   wysiwyg: false,
