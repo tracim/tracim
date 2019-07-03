@@ -4,7 +4,7 @@
 ### Fixed issues
 
 - Search: #2025
-- Docker: #2054
+- Docker: #2005, #2054
 - Timeline: #2032
 - Admin user: #1470, #2034
 - Email: #2036
