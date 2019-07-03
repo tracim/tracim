@@ -1,4 +1,16 @@
 
+## 2.3.1 / 2019-xx-xx
+
+### Fixed issues
+
+- Search: #2025
+- Timeline: #2032
+- Admin user: #1470, #2034
+- Email: #2036
+- Preview-generator: #2022
+- Security: #2049
+
+
 ## 2.3.0 / 2019-06-21
 
 ### New Features
@@ -72,7 +84,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 - Contents: #818, #827, #943, #1067, #1097, #1105, #1507, #1509, #1563, #1624, #1648, #1693, #1712, #1745, #1788, #1804
 - Sidebar: #1177, #1571
 - Backend config file: #987, #1475, #1495, #1550, #1626, #1665, #1689, #1690, #1696, #1752
-- Email: #1489, #1491, #1649 
+- Email: #1489, #1491, #1649
 - Security related: #1617
 - Preview-generator: #1126, #1472
 - Webdav: #1335, #1499, #1652
