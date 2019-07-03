@@ -1,7 +1,27 @@
-<html><body>
-<form action="http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http://172.16.20.7:6543/api/v2/workspaces/1/wopi/files/1" enctype="multipart/form-data"
-method="post">
-<input name="access_token" value="access token goes here"/>
-<input type="submit" value="Load Collabora Online"/>
+<html>
+<body>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta http-equiv="Content-Security-Policy" content="frame-ancestors http://localhost:9980">
+    </head>
+  <div id="collabora"></div>
 </form>
-</body></html>
+    <script type="text/javascript">
+      var iframeAnchor = 'collabora'
+      var wopiUrl = "http://localhost:9980/loleaflet/305832f/loleaflet.html"
+      var tracimWopiUrl = "http://192.168.1.228:6543/api/v2/workspaces/2/wopi/files/"
+      var fileId = 11
+      var iframeUrl = `${wopiUrl}?WOPISrc=${tracimWopiUrl}${fileId}&closebutton=1`
+      var accessToken = 'b143eab900c02d511e6c25ecb40a4f67b5b5eab663d3ec61228f4bdb850dbd7ac8e423fe'
+
+      var form = `<form id="loleafletform" name="loleafletform" target="loleafletframe" action="${iframeUrl}" method="post">
+          <input name="access_token" value="${accessToken}"type="hidden"/>
+        </form>`
+      var frame = '<iframe id="loleafletframe" name= "loleafletframe" allowfullscreen style="width:100%;height:100%;position:absolute;"/>'
+      document.getElementById(iframeAnchor).insertAdjacentHTML('beforeend', form)
+      document.getElementById(iframeAnchor).insertAdjacentHTML('beforeend', frame)
+      document.getElementById('loleafletform').submit()
+
+    </script>
+  </body>
+</html>

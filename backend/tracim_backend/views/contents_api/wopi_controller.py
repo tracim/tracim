@@ -45,7 +45,7 @@ class WOPIController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WOPIDiscoverySchema())
     def discovery(self, context, request: TracimRequest, hapic_data=None):
-        response = requests.get("https://localhost:9980/hosting/discovery", verify=False)
+        response = requests.get("http://localhost:9980/hosting/discovery", verify=False)
         root = ElementTree.fromstring(response.text)
         actions = {}
         for xml_actions in root.findall("net-zone/app/action"):

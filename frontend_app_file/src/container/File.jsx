@@ -193,8 +193,10 @@ class File extends React.Component {
           content: {
             ...fetchResultFile.body,
             filenameNoExtension: filenameNoExtension,
+            // FIXME - b.l - refactor urls
             previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${fetchResultFile.body.current_revision_id}`,
             lightboxUrlList: (new Array(fetchResultFile.body.page_nb)).fill('').map((n, i) =>
+              // FIXME - b.l - refactor urls
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${fetchResultFile.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           }
@@ -263,6 +265,7 @@ class File extends React.Component {
       type: 'appendBreadcrumbs',
       data: {
         breadcrumbs: [{
+          // FIXME - b.l - refactor urls
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
           label: `${state.content.filename}`,
           link: null,
@@ -309,6 +312,33 @@ class File extends React.Component {
   }
 
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
+
+  handleClickEdit = () => {
+    const { state } = this
+    const pageContainer = document.getElementsByClassName('sidebarpagecontainer')[0]
+
+    const editWopiUrl = `http://192.168.1.228:6543/api/v2/workspaces/${state.content.workspace_id}/wopi/files/${state.content.content_id}`
+
+    const wopiUrl = 'http://localhost:9980/loleaflet/305832f/loleaflet.html'
+    const accessToken = document.cookie.split(';')[0].replace('session_key=', '')
+
+    const iframeUrl = `${wopiUrl}?WOPISrc=${editWopiUrl}&closebutton=1`
+    const form = `<form id="loleafletform" name="loleafletform" target="loleafletframe" action="${iframeUrl}" method="post">
+        <input name="access_token" value="${accessToken}"type="hidden"/>
+      </form>`
+    const frame = '<iframe id="loleafletframe" name= "loleafletframe" allowfullscreen style="width:100%;height:100%;position:absolute;z-index:999"/>'
+    pageContainer.insertAdjacentHTML('afterbegin', form)
+    pageContainer.insertAdjacentHTML('afterbegin', frame)
+    document.getElementById('loleafletform').submit()
+
+    const iframe = document.getElementById('loleafletframe')
+    window.addEventListener('message', (e) => {
+      console.log(e)
+      if (JSON.parse(e.data).MessageId === 'close') {
+        pageContainer.removeChild(iframe)
+      }
+    }, false)
+  }
 
   handleClickValidateNewDescription = async newDescription => {
     const { props, state } = this
@@ -478,6 +508,7 @@ class File extends React.Component {
         // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=1&revision_id=${revision.revision_id}`,
         lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
+          // FIXME - b.l - refactor urls
           `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${pageNb}`
         )
       },
@@ -535,6 +566,7 @@ class File extends React.Component {
     xhr.upload.addEventListener('progress', uploadInProgress, false)
     xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
+    // FIXME - b.l - refactor urls
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
     xhr.withCredentials = true
@@ -581,6 +613,7 @@ class File extends React.Component {
       fileCurrentPage: nextPageNumber,
       content: {
         ...prev.content,
+        // FIXME - b.l - refactor urls
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
       }
     }))
@@ -588,19 +621,27 @@ class File extends React.Component {
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {
     const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    // FIXME - b.l - refactor urls
     return `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${urlRevisionPart}`
   }
 
   // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
   // see https://github.com/tracim/tracim/issues/1804
   getDownloadRawUrl = ({config: {apiUrl}, content, mode}) =>
+    // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
 
   getDownloadPdfPageUrl = ({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+    // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
 
   getDownloadPdfFullUrl = ({config: {apiUrl}, content, mode}) =>
+    // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
+
+  isEditable = () => {
+    return true
+  }
 
   render () {
     const { props, state } = this
@@ -637,6 +678,27 @@ class File extends React.Component {
                   onClickNewVersionBtn={this.handleClickNewVersion}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
                   label={props.t('Update')}
+                />
+              }
+
+              {state.loggedUser.idRoleUserWorkspace >= 2 &&
+                <NewVersionBtn
+                  customColor={state.config.hexcolor}
+                  onClickNewVersionBtn={this.handleClickEdit}
+                  disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
+                  label={props.t('Edit')}
+                  style={{
+                    backgroundColor: '#fdfdfd',
+                    color: '#333',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: props.customColor,
+                    ':hover': {
+                      backgroundColor: props.customColor,
+                      color: '#fdfdfd'
+                    },
+                    'marginLeft': '5px'
+                  }}
                 />
               }
 
