@@ -25,7 +25,7 @@ Used port in container:
 
 * 80 (Tracim HTTP API and web user interface)
 
-You can also use this list of [supported var](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md) (this var are from development.ini.sample conf file)
+⚠ You can also use this list of [supported var](https://github.com/tracim/tracim/blob/develop/backend/doc/setting.md) (this var are from development.ini.sample conf file)
 
 If you want to activate notification by email:
 
@@ -43,9 +43,23 @@ If you don't want to use caldav:
 
 * START_CALDAV=0 (to deactivate agenda in tracim)
 
-If you want to update ElasticSearch index:
+#### Updating index of ElasticSearch
 
-* UPDATE_INDEX_ELASTICSEARCH=1 (execute: drop, create and populate index)
+⚠ Prerequiste: elasticsearch is running and you have starting tracim with parameter to communicate with elasticsearch
+
+To make an update of elasticsearch index you need to go inside you tracim container running:
+
+        docker ps
+        docker exec -it {CONTAINER ID} /bin/bash
+
+Now you are in your tracim container.
+
+        cd /tracim/backend
+        tracimcli search index-drop -c /etc/tracim/development.ini -d
+        tracimcli search index-create -c /etc/tracim/development.ini -d
+        tracimcli search index-populate -c /etc/tracim/development.ini -d
+
+When is finished, you can quit your container. Index is now updated with all of your tracim content.
 
 #### Example commands
 
@@ -76,7 +90,7 @@ Example with SQLite
     docker run -e DATABASE_TYPE=sqlite \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
-               
+
 Exemple with SQlite, email_notification and some small instance personnalisation:
 
     docker run -e DATABASE_TYPE=sqlite \
@@ -89,7 +103,7 @@ Exemple with SQlite, email_notification and some small instance personnalisation
                -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain} \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
-               
+
 With this exemple, tracim is now accessible on my network and I can send notification by email when content change.
 
 Exemple to use tracim with ElasticSearch: (you need to start elasticsearch container first)
@@ -99,6 +113,17 @@ Exemple to use tracim with ElasticSearch: (you need to start elasticsearch conta
                -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
                -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
                -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=test_tracim \
+               -p 8080:80 \
+               -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+
+Exemple to use tracim with ElasticSearch-ingest: (you need to create your elasticsearch-ingest image first and start this image before tracim)
+
+    docker run -e DATABASE_TYPE=sqlite \
+               -e TRACIM_SEARCH__ENGINE=elasticsearch \
+               -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
+               -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
+               -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS=test_tracim \
+               -e TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST=True \
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
@@ -117,12 +142,12 @@ You can build with specific branch
     docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
 
 Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
-    
+
 You can also build image with specific tag (This build is make just with necessary files: no other branch available)
 
     cd tools_docker/Debian_Uwsgi
     docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
-    
+
 Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
 
 ⚠ **Its not possible to build image with ARG TAG and ARG BRANCH in same time.**
