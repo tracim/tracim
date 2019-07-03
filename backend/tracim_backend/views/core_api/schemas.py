@@ -3,7 +3,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
-from marshmallow.fields import String, Dict
+from marshmallow.fields import String
 from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.contents import content_type_list
@@ -992,11 +992,21 @@ class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
 
 
 class WOPIDiscoverySchema(marshmallow.Schema):
-    urls = Dict(
-        keys=String(),
-        values=String(),
+    extensions = marshmallow.fields.List(
+        marshmallow.fields.String(example="odt"),
         required=True,
-        description="Get Collabora Online URLs from file extensions",
+        description="Collabora Online supported file extensions",
+    )
+    urlsrc = marshmallow.fields.URL(
+        required=True,
+        description="URL of the collabora online editor",
+        example="http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc="
+        "http://172.16.20.7:6543/api/v2/workspaces/1/wopi/files/1",
+    )
+    access_token = marshmallow.fields.String(
+        required=True,
+        description="The access token which should be sent to collabora online and "
+        "which uniquely identifies the user",
     )
 
 
