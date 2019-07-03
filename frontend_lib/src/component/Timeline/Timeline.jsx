@@ -8,18 +8,19 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
+import { CUSTOM_EVENT } from '../../customEvent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
 class Timeline extends React.Component {
   constructor (props) {
     super(props)
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', type, data)
         i18n.changeLanguage(data)
         break
@@ -36,7 +37,7 @@ class Timeline extends React.Component {
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})

@@ -2,6 +2,7 @@ import React from 'react'
 import i18n from './i18n.js'
 import { distanceInWords } from 'date-fns'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
+import { CUSTOM_EVENT } from './customEvent.js'
 
 var dateFnsLocale = {
   fr: require('date-fns/locale/fr'),
@@ -17,7 +18,7 @@ const generateFetchResponse = async fetchResult => {
 }
 
 const errorFlashMessageTemplateObject = errorMsg => ({
-  type: 'addFlashMsg',
+  type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
     msg: <ErrorFlashMessageTemplateHtml errorMsg={errorMsg} />,
     type: 'danger',
@@ -32,7 +33,7 @@ export const handleFetchResult = async fetchResult => {
   if (status >= 200 && status <= 299) return generateFetchResponse(fetchResult)
   if (status >= 300 && status <= 399) return generateFetchResponse(fetchResult)
   if (status === 401) { // unauthorized
-    GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}})
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.DISCONNECTED_FROM_API, date: {}})
     return generateFetchResponse(fetchResult)
   }
   if (status >= 400 && status <= 499) return generateFetchResponse(fetchResult) // let specific handler handle it with fetchResult.body.code
@@ -114,7 +115,7 @@ export const generateLocalStorageContentId = (workspaceId, contentId, contentTyp
 
 export const appFeatureCustomEventHandlerShowApp = (newContent, currentContentId, appName) => {
   if (newContent.content_id !== currentContentId) {
-    const event = new CustomEvent('appCustomEvent', {detail: {type: `${appName}_reloadContent`, data: newContent}})
+    const event = new CustomEvent(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, {detail: {type: CUSTOM_EVENT.RELOAD_CONTENT(appName), data: newContent}})
     document.dispatchEvent(event)
     return false
   }

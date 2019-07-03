@@ -8,7 +8,8 @@ import {
   PageTitle,
   PageContent,
   BtnSwitch,
-  IconWithWarning
+  IconWithWarning,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -34,7 +35,7 @@ export class AdminUser extends React.Component {
 
     if (props.loggedUserId === userId) {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t("You can't deactivate your own account"),
           type: 'warning',
@@ -55,7 +56,7 @@ export class AdminUser extends React.Component {
 
     if (props.userList.find(u => u.user_id === userId).profile === 'administrators') {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t('An administrator can always create shared spaces'),
           type: 'warning',
@@ -77,7 +78,7 @@ export class AdminUser extends React.Component {
 
     if (!toggle && props.loggedUserId === userId) {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t("You can't remove yourself from Administrator"),
           type: 'warning',

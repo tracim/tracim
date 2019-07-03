@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
   constructor (props) {
@@ -26,7 +27,7 @@ export class AddUserForm extends React.Component {
 
     if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t('Please type a name, an email, a password and select a profile'),
           type: 'warning',
