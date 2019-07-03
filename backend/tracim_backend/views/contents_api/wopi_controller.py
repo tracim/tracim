@@ -21,8 +21,8 @@ from tracim_backend.views.core_api.schemas import (
     WOPITokenQuerySchema,
     WOPICheckFileInfoSchema,
     WorkspaceAndContentIdPathSchema,
-    NoContentSchema,
-    WOPILastModifiedTime)
+    WOPILastModifiedTime,
+)
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
 try:  # Python 3.5+
@@ -121,7 +121,7 @@ class WOPIController(Controller):
             "UserCanWrite": request.current_workspace.get_user_role(request.current_user)
             >= WorkspaceRoles.CONTRIBUTOR.level,
             "Version": str(content.revision_id),
-            "LastModifiedTime": content.updated
+            "LastModifiedTime": content.updated,
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
@@ -151,9 +151,7 @@ class WOPIController(Controller):
             api.save(content)
             api.execute_update_content_actions(content)
 
-        return {
-            "LastModifiedTime": content.updated
-        }
+        return {"LastModifiedTime": content.updated}
 
     def bind(self, configurator: Configurator):
         # Discovery
