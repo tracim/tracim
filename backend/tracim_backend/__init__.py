@@ -201,6 +201,7 @@ def web(global_config, **local_settings):
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+    configurator.scan("tracim_backend.lib.utils.authentification")
     if app_config.CALDAV__ENABLED:
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to

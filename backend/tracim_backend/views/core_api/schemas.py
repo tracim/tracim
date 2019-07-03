@@ -1011,6 +1011,18 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
         required=True, description="Filename as shown in collabora Online"
     )
     Size = marshmallow.fields.Int(required=True, description="File length, in bytes")
+    OwnerId = marshmallow.fields.Int(description="Owner's database identifier")
+    UserId = marshmallow.fields.Int(description="User's database identifier")
+    UserFriendlyName = marshmallow.fields.String(description="User's display name")
+    Version = marshmallow.fields.String(description="Version of the file (the revision_id)")
+    UserCanWrite = marshmallow.fields.Boolean(
+        description="Whether the user can (or can't) edit the file in libreoffice online"
+    )
+    UserCanNotWriteRelative = marshmallow.fields.Boolean(
+        default=True,
+        description="Whether it's possible to save the document as a new name ("
+        "Save As functionality)",
+    )
 
 
 #####

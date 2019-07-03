@@ -1,10 +1,13 @@
 import datetime
 import typing
 
+import pyramid_beaker
+from pyramid import config
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
+from pyramid.events import subscriber, NewRequest
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
@@ -20,6 +23,7 @@ from tracim_backend.models.auth import User
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_EMAIL_LOGIN_HEADER = "Tracim-Api-Login"
+COLLABORA_TOKEN = "access_token"
 
 
 class TracimAuthenticationPolicy(object):
@@ -216,3 +220,27 @@ class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthent
 
     def forget(self, request):
         return []
+
+
+###
+# Collabora access_token authentication
+###
+
+
+@subscriber(NewRequest)
+def add_access_token_for_collabora(event):
+    access_token = event.request.GET.get(COLLABORA_TOKEN)
+    if not access_token:
+        return
+
+    from tracim_backend import sliced_dict
+
+    # FIXME - H.D. - 2019/07/02 - quick fix to retrieve user from cookie, to clean
+    event.request.cookies["session_key"] = access_token
+    settings = config.global_registries.last.settings
+    app_config = CFG(settings)
+    tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
+    tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
+    tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
+    session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
+    event.request.session = session_factory(event.request)
