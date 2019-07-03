@@ -1,7 +1,7 @@
 import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
-export const getFileContent = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
+export const getFileContent = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -9,8 +9,8 @@ export const getFileContent = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getFileContentRaw = (apiUrl, idWorkspace, idContent) => // caper à 1900x1080
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/raw`, {
+export const getFileContentRaw = (apiUrl, workspaceId, contentId) => // caper à 1900x1080
+  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -18,8 +18,8 @@ export const getFileContentRaw = (apiUrl, idWorkspace, idContent) => // caper à
     method: 'GET'
   })
 
-export const getFileComment = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+export const getFileComment = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -27,8 +27,8 @@ export const getFileComment = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getFileRevision = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions`, {
+export const getFileRevision = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -36,8 +36,8 @@ export const getFileRevision = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const postFileNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+export const postFileNewComment = (apiUrl, workspaceId, contentId, newComment) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -48,8 +48,8 @@ export const postFileNewComment = (apiUrl, idWorkspace, idContent, newComment) =
     })
   })
 
-export const putFileContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
+export const putFileContent = (apiUrl, workspaceId, contentId, label, newContent) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -61,8 +61,8 @@ export const putFileContent = (apiUrl, idWorkspace, idContent, label, newContent
     })
   })
 
-export const putFileStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/status`, {
+export const putFileStatus = (apiUrl, workspaceId, contentId, newStatus) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}/status`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -73,8 +73,8 @@ export const putFileStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
     })
   })
 
-export const postFileContent = (apiUrl, idWorkspace, idFolder, contentType, uploadFileName) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
+export const postFileContent = (apiUrl, workspaceId, folderId, contentType, uploadFileName) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -87,8 +87,8 @@ export const postFileContent = (apiUrl, idWorkspace, idFolder, contentType, uplo
     })
   })
 
-export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
+export const putFileIsArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -97,8 +97,8 @@ export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
+export const putFileIsDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -107,8 +107,8 @@ export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
+export const putFileRestoreArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -117,8 +117,8 @@ export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
+export const putFileRestoreDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -127,8 +127,8 @@ export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putMyselfFileRead = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/users/me/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+export const putMyselfFileRead = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/users/me/workspaces/${workspaceId}/contents/${contentId}/read`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

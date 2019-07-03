@@ -1,7 +1,7 @@
 import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
-export const getThreadContent = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}`, {
+export const getThreadContent = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -9,8 +9,8 @@ export const getThreadContent = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getThreadComment = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+export const getThreadComment = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -18,8 +18,8 @@ export const getThreadComment = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getThreadRevision = (apiUrl, idWorkspace, idContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}/revisions`, {
+export const getThreadRevision = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/revisions`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -27,8 +27,8 @@ export const getThreadRevision = (apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const postThreadNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+export const postThreadNewComment = (apiUrl, workspaceId, contentId, newComment) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -39,8 +39,8 @@ export const postThreadNewComment = (apiUrl, idWorkspace, idContent, newComment)
     })
   })
 
-export const putThreadStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}/status`, {
+export const putThreadStatus = (apiUrl, workspaceId, contentId, newStatus) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/status`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -51,22 +51,22 @@ export const putThreadStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
     })
   })
 
-export const postThreadContent = (apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
+export const postThreadContent = (apiUrl, workspaceId, folderId, contentType, newContentName) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
     method: 'POST',
     body: JSON.stringify({
-      parent_id: idFolder,
+      parent_id: folderId,
       content_type: contentType,
       label: newContentName
     })
   })
 
-export const putThreadContent = (apiUrl, idWorkspace, idContent, label) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}`, {
+export const putThreadContent = (apiUrl, workspaceId, contentId, label) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/threads/${contentId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -78,8 +78,8 @@ export const putThreadContent = (apiUrl, idWorkspace, idContent, label) =>
     })
   })
 
-export const putThreadIsArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
+export const putThreadIsArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -88,8 +88,8 @@ export const putThreadIsArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putThreadIsDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
+export const putThreadIsDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -98,8 +98,8 @@ export const putThreadIsDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putThreadRestoreArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
+export const putThreadRestoreArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -108,8 +108,8 @@ export const putThreadRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putThreadRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
+export const putThreadRestoreDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -118,8 +118,8 @@ export const putThreadRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putThreadRead = (user, apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+export const putThreadRead = (user, apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${workspaceId}/contents/${contentId}/read`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

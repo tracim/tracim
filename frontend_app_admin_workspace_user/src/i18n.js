@@ -20,6 +20,6 @@ i18n
     resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
-i18n.idTracim = 'frontend_app_admin_workspace_user'
+i18n.tracimId = 'frontend_app_admin_workspace_user'
 
 export default i18n

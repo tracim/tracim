@@ -12,7 +12,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -71,12 +72,12 @@ class Account extends React.Component {
       subComponentMenu: builtSubComponentMenu.filter(menu => menu.display)
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
     }
   }
 
@@ -105,13 +106,13 @@ class Account extends React.Component {
 
     const fetchWorkspaceListMemberList = await Promise.all(
       props.workspaceList.map(async ws => ({
-        idWorkspace: ws.id,
+        workspaceId: ws.id,
         fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(wsMemberList => ({
-      idWorkspace: wsMemberList.idWorkspace,
+      workspaceId: wsMemberList.workspaceId,
       memberList: wsMemberList.fetchMemberList.status === 200
         ? wsMemberList.fetchMemberList.json
         : [] // handle error ?
@@ -179,12 +180,12 @@ class Account extends React.Component {
     }
   }
 
-  handleChangeSubscriptionNotif = async (idWorkspace, doNotify) => {
+  handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
     const { props } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(idWorkspace, doNotify))
+    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, workspaceId, doNotify)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -241,7 +242,7 @@ class Account extends React.Component {
                       case 'notification':
                         return (
                           <Notification
-                            idUserLogged={props.user.user_id}
+                            userLoggedId={props.user.user_id}
                             workspaceList={props.workspaceList}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                           />
