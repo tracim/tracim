@@ -37,12 +37,8 @@ class SearchResult extends React.Component {
     this.state = {
       totalHits: 0
     }
-<<<<<<< HEAD
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-=======
-    document.addEventListener('appCustomEvent', this.customEventReducer)
->>>>>>> 3dfed8c6c8479093e169f616a25c48e2cd9161c1
   }
 
   parseUrl () {
