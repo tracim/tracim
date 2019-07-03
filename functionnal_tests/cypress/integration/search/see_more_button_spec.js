@@ -60,5 +60,20 @@ describe('Searching keywords', () => {
         cy.get('[data-cy=content__item]').its('length').should('gt', 10)
       })
     })
+    describe('with a search with 5 results per page by changing it in the url', () => {
+      it('Should display maximum 5 results in the page and the See more button', () => {
+        const pageNumber = '1'
+        const numberByPage = '5'
+        const actived = '1'
+        const deleted = '0'
+        const archived = '0'
+        const contentTypes = 'html-document%2Cfile%2Cthread%2Cfolder%2Ccomment'
+        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+
+        cy.get('[data-cy=content__item]').its('length').should('eq', 5)
+
+        cy.get(seeMoreButton).should('be.visible')
+      })
+    })
   })
 })
