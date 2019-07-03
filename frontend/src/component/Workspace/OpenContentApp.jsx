@@ -33,10 +33,10 @@ export class OpenContentApp extends React.Component {
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open
-        dispatchCustomEvent(`${contentToOpen.type}_reloadContent`, contentToOpen)
+        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
       } else { // open another app
         // if another app is already visible, hide it
-        if (appOpenedType !== false) dispatchCustomEvent(`${appOpenedType}_hideApp`, {})
+        if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
         // open app
         renderAppFeature(
           contentType.find(ct => ct.slug === contentToOpen.type),

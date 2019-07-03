@@ -8,7 +8,8 @@ import {
   PageContent,
   PageTitle,
   PageWrapper,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -37,20 +38,20 @@ class Agenda extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
 
     switch (type) {
-      case 'agenda_showApp':
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
           this.setState({config: data.config})
         }
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -92,7 +93,7 @@ class Agenda extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   loadAgendaList = async workspaceId => {

@@ -45,24 +45,25 @@ class FolderAdvanced extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    const { state } = this
     switch (type) {
-      case 'folder_showApp':
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data.content}, isVisible: true}))
         break
-      case 'folder_hideApp':
+      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case 'folder_reloadContent':
+      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -90,11 +91,11 @@ class FolderAdvanced extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<FolderAdvanced> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: type,
@@ -121,7 +122,7 @@ class FolderAdvanced extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -132,7 +133,7 @@ class FolderAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new folder label'), 'warning')
     }
@@ -155,7 +156,7 @@ class FolderAdvanced extends React.Component {
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFERSH_CONTENT_LIST, data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
         this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')

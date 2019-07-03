@@ -16,7 +16,8 @@ import {
   convertBackslashNToBr,
   generateLocalStorageContentId,
   appFeatureCustomEventHandlerShowApp,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -57,13 +58,13 @@ class Thread extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
-      case 'thread_showApp':
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
@@ -72,7 +73,7 @@ class Thread extends React.Component {
         }
         break
 
-      case 'thread_hideApp':
+      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         this.setState({
@@ -81,7 +82,7 @@ class Thread extends React.Component {
         })
         break
 
-      case 'thread_reloadContent':
+      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
 
@@ -97,7 +98,7 @@ class Thread extends React.Component {
         }))
         break
 
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
 
         if (state.timelineWysiwyg) {
@@ -149,11 +150,11 @@ class Thread extends React.Component {
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
     tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: 'warning',
@@ -211,14 +212,14 @@ class Thread extends React.Component {
     })
 
     await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}})
   }
 
   buildBreadcrumbs = () => {
     const { state } = this
 
     GLOBAL_dispatchEvent({
-      type: 'appendBreadcrumbs',
+      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
@@ -232,7 +233,7 @@ class Thread extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
+    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -245,7 +246,7 @@ class Thread extends React.Component {
     switch (fetchResultSaveThread.apiResponse.status) {
       case 200:
         this.loadContent()
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       case 400:
         switch (fetchResultSaveThread.body.code) {
@@ -330,7 +331,7 @@ class Thread extends React.Component {
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while archiving thread'),
           type: 'warning',
@@ -350,7 +351,7 @@ class Thread extends React.Component {
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while deleting thread'),
           type: 'warning',
@@ -370,7 +371,7 @@ class Thread extends React.Component {
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while restoring thread'),
           type: 'warning',
@@ -390,7 +391,7 @@ class Thread extends React.Component {
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while restoring thread'),
           type: 'warning',

@@ -53,12 +53,12 @@ import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
-    case 'allApp_changeLang': i18n.changeLanguage(data); break
+    case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: i18n.changeLanguage(data); break
     default: break
   }
 }
 
-document.addEventListener('appCustomEvent', customEventReducer)
+document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEventReducer)
 
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')

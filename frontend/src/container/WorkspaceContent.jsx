@@ -20,7 +20,8 @@ import {
   PageWrapper,
   PageTitle,
   PageContent,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -59,24 +60,24 @@ class WorkspaceContent extends React.Component {
       contentLoaded: false
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
     const { props, state } = this
     switch (type) {
-      case 'refreshContentList':
+      case CUSTOM_EVENT.REFRESH_CONTENT_LIST:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
         this.loadContentList(state.workspaceIdInUrl)
         break
 
-      case 'openContentUrl':
+      case CUSTOM_EVENT.OPEN_CONTENT_URL:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
         props.history.push(PAGE.WORKSPACE.CONTENT(data.workspaceId, data.contentType, data.contentId) + props.location.search)
         break
 
-      case 'appClosed':
-      case 'hide_popupCreateContent':
+      case CUSTOM_EVENT.APP_CLOSED:
+      case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT:
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
 
         const contentFolderPath = props.workspaceContentList.filter(c => c.isOpen).map(c => c.id)
@@ -93,7 +94,7 @@ class WorkspaceContent extends React.Component {
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
-      case 'allApp_changeLang': this.buildBreadcrumbs(); break
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: this.buildBreadcrumbs(); break
     }
   }
 
@@ -136,8 +137,8 @@ class WorkspaceContent extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.dispatchCustomEvent('unmount_app')
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   buildBreadcrumbs = () => {

@@ -3,7 +3,8 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
-  addAllResourceI18n
+  addAllResourceI18n,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -54,16 +55,16 @@ class PopupCreateHtmlDocument extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -79,7 +80,7 @@ class PopupCreateHtmlDocument extends React.Component {
   handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
     data: {
       name: this.state.appName
     }
@@ -96,10 +97,10 @@ class PopupCreateHtmlDocument extends React.Component {
       case 200:
         this.handleClose()
 
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
 
         GLOBAL_dispatchEvent({
-          type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
+          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
           data: {
             workspaceId: resSave.body.workspace_id,
             contentType: appName,
@@ -112,7 +113,7 @@ class PopupCreateHtmlDocument extends React.Component {
         switch (resSave.body.code) {
           case 3002:
             GLOBAL_dispatchEvent({
-              type: 'addFlashMsg',
+              type: CUSTOM_EVENT.ADD_FLASH_MSG,
               data: {
                 msg: this.props.t('A content with the same name already exists'),
                 type: 'warning',
@@ -123,7 +124,7 @@ class PopupCreateHtmlDocument extends React.Component {
         }
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while creating document'),
           type: 'warning',
