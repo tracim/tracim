@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import io
 from urllib.parse import quote
 
@@ -6,6 +7,9 @@ from PIL import Image
 from depot.io.utils import FileIntent
 import pytest
 import transaction
+from depot.manager import DepotManager
+
+from mock import patch
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
@@ -4073,3 +4077,179 @@ class TestThreads(FunctionalTest):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE
+
+
+class TestWOPI(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/wopi/files/{content_id}
+    endpoints
+    """
+
+    fixtures = [BaseFixture, ContentFixtures]
+
+    @patch("requests.get")
+    def test_api__discovery__ok_200__nominal_case(self, patched_get) -> None:
+        """
+        Discover libre office capabilities
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        transaction.commit()
+
+        self.testapp.set_cookie("session_key", "some_valid_cookie")
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        patched_get.return_value.text = """
+        <wopi-discovery>
+            <net-zone name="external-http">
+                <app name="application/vnd.lotus-wordpro">
+                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="image/svg+xml">
+                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.text">
+                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <!-- a lot more `app` in the real response -->
+            </net-zone>
+        </wopi-discovery>
+        """
+        url = "/api/v2/workspaces/{}/wopi/files/{}/discovery".format(
+            business_workspace.workspace_id, test_file.content_id
+        )
+        res = self.testapp.get(url, status=200)
+        content = res.json_body
+        assert len(content["extensions"]) == 3
+        assert (
+            content["urlsrc"] == "http://localhost:9980/loleaflet/305832f/loleaflet.html"
+            "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F1%2Fwopi%2Ffiles%2F21"
+        )
+        assert content["access_token"] == "some_valid_cookie"
+
+    def test_api__get_content__ok_200__nominal_case(self) -> None:
+        """Get file content"""
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        transaction.commit()
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token=fake_access_token".format(
+            business_workspace.workspace_id, test_file.content_id
+        )
+        res = self.testapp.get(url, status=200)
+        assert res.body == b"Test file"
+
+    def test_api__check_file_info__ok_200__nominal_case(self) -> None:
+        """Get file content"""
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        file_content = b"Test file"
+        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=file_content
+            )
+        transaction.commit()
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        url = "/api/v2/workspaces/{}/wopi/files/{}?access_token=fake_access_token".format(
+            business_workspace.workspace_id, test_file.content_id
+        )
+        res = self.testapp.get(url, status=200)
+        response = res.json_body
+        assert response["BaseFileName"] == "Test_file.txt"
+        assert response["Size"] == len(file_content)
+        assert response["OwnerId"] == admin.user_id
+        assert response["UserId"] == admin.user_id
+        assert response["UserFriendlyName"] == "Global manager"
+        assert response["UserCanWrite"] is True
+        assert response["Version"] == str(test_file.revision_id)
+        assert (
+            response["LastModifiedTime"]
+            == test_file.updated.replace(tzinfo=datetime.timezone.utc).isoformat()
+        )
+        assert response["UserCanNotWriteRelative"] is True
+
+    def test_api__put_content__ok_200__nominal_case(self) -> None:
+        """Save file content"""
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        transaction.commit()
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token=fake_access_token".format(
+            business_workspace.workspace_id, test_file.content_id
+        )
+        updated_at = test_file.updated
+        new_content = b"content has been modified"
+        res = self.testapp.post(url, params=new_content, status=200)
+        transaction.commit()
+
+        # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
+        #  without reinstancing the database session
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content = content_api.get_one(test_file.content_id, content_type=content_type_list.Any_SLUG)
+        response = res.json_body
+        file_ = DepotManager.get().get(content.depot_file)
+        assert (
+            response["LastModifiedTime"]
+            != updated_at.replace(tzinfo=datetime.timezone.utc).isoformat()
+        )
+        assert file_.read() == new_content

@@ -8,7 +8,7 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 from depot.manager import DepotManager
 
-from tracim_backend import TracimRequest, hapic, BASE_API_V2
+from tracim_backend import TracimRequest, hapic, BASE_API_V2, CFG
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right, is_reader, is_contributor
@@ -21,14 +21,9 @@ from tracim_backend.views.core_api.schemas import (
     WOPITokenQuerySchema,
     WOPICheckFileInfoSchema,
     WorkspaceAndContentIdPathSchema,
-    NoContentSchema,
+    WOPILastModifiedTime,
 )
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
 
 
 SWAGGER_TAG__CONTENT_WOPI_SECTION = "WOPI"
@@ -90,8 +85,8 @@ class WOPIController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        file = DepotManager.get().get(content.depot_file)
-        return Response(body=file.read())
+        file_ = DepotManager.get().get(content.depot_file)
+        return Response(body=file_.read())
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
@@ -108,19 +103,20 @@ class WOPIController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        file = DepotManager.get().get(content.depot_file)
+        file_ = DepotManager.get().get(content.depot_file)
         author = content.owner
 
         # FIXME - H.D. - 2019/07/02 - create model
         return {
             "BaseFileName": content.file_name,
-            "Size": len(file.read()),
+            "Size": len(file_.read()),
             "OwnerId": author.user_id,
             "UserId": request.current_user.user_id,
             "UserFriendlyName": request.current_user.display_name,
             "UserCanWrite": request.current_workspace.get_user_role(request.current_user)
             >= WorkspaceRoles.CONTRIBUTOR.level,
             "Version": str(content.revision_id),
+            "LastModifiedTime": content.updated,
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
@@ -128,7 +124,7 @@ class WOPIController(Controller):
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(WOPILastModifiedTime())
     def put_content(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
@@ -150,7 +146,7 @@ class WOPIController(Controller):
             api.save(content)
             api.execute_update_content_actions(content)
 
-        return
+        return {"LastModifiedTime": content.updated}
 
     def bind(self, configurator: Configurator):
         # Discovery
