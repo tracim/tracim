@@ -100,14 +100,16 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
-    def get_one_by_email(self, email: str) -> User:
+    def get_one_by_email(self, email: typing.Optional[str]) -> User:
         """
         Get one user by email
         :param email: Email of the user
         :return: one user
         """
+        if not email:
+            raise UserDoesNotExist("User not found : no email provided")
         try:
-            user = self._base_query().filter(User.email == email).one()
+            user = self._base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
