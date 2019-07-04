@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
 
-# from tracim.lib.content import ContentApi
 from depot.fields.upload import UploadedFile
 import pytest
 from sqlalchemy.sql.elements import and_
@@ -10,7 +9,6 @@ import transaction
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
-from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
@@ -76,10 +74,6 @@ class TestContent(StandardTest):
         eq_("TEST_CONTENT_DESCRIPTION_1_UPDATED", content1_from_query.description)
 
         self.session.query(User).filter(User.email == "admin@admin.admin").one()
-
-        api = ContentApi(current_user=None, session=self.session, config=self.app_config)
-
-        api.get_one(content1.id, content_type_list.Page.slug, workspace1)
 
     def test_update(self):
         created_content = self.test_create()
@@ -148,7 +142,7 @@ class TestContent(StandardTest):
         )
         eq_(0, self.session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").count())
 
-        user_admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        user_admin = self.get_admin_user()
         workspace = Workspace(label="TEST_WORKSPACE_1")
         self.session.add(workspace)
         self.session.flush()
@@ -211,7 +205,7 @@ class TestContent(StandardTest):
             .count(),
         )
 
-        user_admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        user_admin = self.get_admin_user()
         workspace = Workspace(label="TEST_WORKSPACE_%s" % key)
         self.session.add(workspace)
         self.session.flush()

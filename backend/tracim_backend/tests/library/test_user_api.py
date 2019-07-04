@@ -11,10 +11,7 @@ from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
@@ -308,7 +305,7 @@ class TestUserApi(DefaultTest):
         assert users[0] == u1
 
     def test_unit__get_known__user__user__no_workspace_empty_known_user(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = self.get_admin_user()
         api = UserApi(current_user=admin, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         api2 = UserApi(current_user=u1, session=self.session, config=self.app_config)
@@ -316,16 +313,15 @@ class TestUserApi(DefaultTest):
         assert len(users) == 0
 
     def test_unit__get_known__user__same_workspaces_users_by_name(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        role_api = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+        role_api = self.get_role_api()
         role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
@@ -336,18 +332,17 @@ class TestUserApi(DefaultTest):
         assert users[1] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+        role_api = self.get_role_api()
         role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
         role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
@@ -360,7 +355,6 @@ class TestUserApi(DefaultTest):
     def test_unit__get_known__user__distinct_workspaces_users_by_name__exclude_workspace_and_name(
         self
     ):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
@@ -368,11 +362,11 @@ class TestUserApi(DefaultTest):
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
         u4 = api.create_user(email="email3@email3", name="name3", do_notify=False, do_save=True)
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+        role_api = self.get_role_api()
         role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
         role_api.create_one(u4, workspace_2, UserRoleInWorkspace.READER, False)
@@ -386,18 +380,17 @@ class TestUserApi(DefaultTest):
         assert users[0] == u2
 
     def test_unit__get_known__user__distinct_workspaces_users_by_name(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+        role_api = self.get_role_api()
         role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
         role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
@@ -409,16 +402,15 @@ class TestUserApi(DefaultTest):
         assert users[1] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_name__exclude_user(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        role_api = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+        role_api = self.get_role_api()
         role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
@@ -428,16 +420,15 @@ class TestUserApi(DefaultTest):
         assert users[0] == u2
 
     def test_unit__get_known__user__same_workspaces_users_by_email(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
-        wapi = WorkspaceApi(current_user=admin, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        role_api = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+        role_api = self.get_role_api()
         role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
@@ -500,7 +491,7 @@ class TestUserApi(DefaultTest):
     @pytest.mark.internal_auth
     def test_unit__authenticate_user___err__user_not_active(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        gapi = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = api.create_user(
             email="test@test.test",
@@ -529,7 +520,7 @@ class TestUserApi(DefaultTest):
 
     def test_unit__disable_user___ok__nominal_case(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        gapi = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = api.create_user(
             email="test@test.test",
@@ -560,7 +551,7 @@ class TestUserApi(DefaultTest):
 
     def test_unit__disable_user___err__user_cant_disable_itself(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
-        gapi = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = api.create_user(
             email="test@test.test",

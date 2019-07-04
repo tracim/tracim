@@ -9,19 +9,10 @@ import transaction
 from tracim_backend import AuthType
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
-from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import MailHogFunctionalTest
 
@@ -36,16 +27,11 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
     def test_api__get_recently_active_content__ok__200__admin(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -57,9 +43,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -91,7 +77,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -123,7 +111,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -166,16 +154,11 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
     def test_api__get_recently_active_content__err__400__no_access_to_workspace(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -187,7 +170,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -220,7 +203,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         )
 
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -252,7 +237,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -269,17 +254,12 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
     def test_api__get_recently_active_content__ok__200__user_itself(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
 
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -291,9 +271,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -325,7 +305,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -357,7 +339,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -400,17 +382,12 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
     def test_api__get_recently_active_content__err__403__other_user(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
 
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -422,9 +399,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -456,7 +433,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -488,13 +467,13 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=403,
         )
@@ -507,16 +486,11 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # anymore to fix datetime lack of precision.
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
 
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -548,7 +522,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -580,7 +556,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -629,16 +605,11 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # anymore to fix datetime lack of precision.
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
 
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -670,7 +641,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -702,7 +675,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -725,16 +698,11 @@ class TestUserReadStatusEndpoint(FunctionalTest):
     def test_api__get_read_status__ok__200__admin(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -746,9 +714,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -780,7 +748,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -812,13 +782,13 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -843,16 +813,11 @@ class TestUserReadStatusEndpoint(FunctionalTest):
     def test_api__get_read_status__ok__200__user_itself(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -864,9 +829,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -898,7 +863,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -930,7 +897,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -970,16 +937,11 @@ class TestUserReadStatusEndpoint(FunctionalTest):
     def test_api__get_read_status__err__403__other_user(self):
 
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -991,9 +953,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -1025,7 +987,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=dbsession, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -1057,7 +1021,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -1076,7 +1040,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             )
         }
         url = "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-            workspace_id=workspace.workspace_id, user_id=admin.user_id
+            workspace_id=workspace.workspace_id, user_id=self.get_admin_user().user_id
         )
         res = self.testapp.get(url=url, status=403, params=params)
         assert isinstance(res.json, dict)
@@ -1091,13 +1055,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__admin(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1108,10 +1069,10 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1121,7 +1082,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1137,7 +1098,7 @@ class TestUserSetContentAsRead(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1163,7 +1124,7 @@ class TestUserSetContentAsRead(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1172,13 +1133,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__admin_workspace_do_not_exist(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1190,10 +1148,10 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1203,7 +1161,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1220,13 +1178,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__admin_content_do_not_exist(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1238,10 +1193,10 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1251,7 +1206,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1268,13 +1223,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__user_itself(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1286,10 +1238,10 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1299,7 +1251,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -1333,13 +1285,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__403__other_user(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1351,10 +1300,10 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1364,7 +1313,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -1373,7 +1322,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=self.get_admin_user().user_id,
             ),
             status=403,
         )
@@ -1383,13 +1332,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__admin_with_comments_read_content(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1401,9 +1347,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1414,7 +1360,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_unread(firstly_created)
         api.mark_unread(comments)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1430,7 +1376,7 @@ class TestUserSetContentAsRead(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1455,7 +1401,7 @@ class TestUserSetContentAsRead(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1464,13 +1410,10 @@ class TestUserSetContentAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__admin_with_comments_read_comment(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1482,9 +1425,9 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1495,7 +1438,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_unread(comments)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1511,7 +1454,7 @@ class TestUserSetContentAsRead(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1536,7 +1479,7 @@ class TestUserSetContentAsRead(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1551,13 +1494,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__ok__200__admin(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1569,10 +1509,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1582,7 +1522,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1598,7 +1538,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1625,7 +1565,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
         res = self.testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin.user_id, workspace_id=workspace.workspace_id
+                user_id=self.get_admin_user().user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
@@ -1634,13 +1574,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__err__400__admin_workspace_do_not_exist(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1652,10 +1589,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1665,7 +1602,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1682,13 +1619,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__err__400__admin_content_do_not_exist(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1700,10 +1634,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1713,7 +1647,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1731,13 +1665,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__ok__200__user_itself(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1749,10 +1680,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1762,7 +1693,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -1796,13 +1727,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__err__403__other_user(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1814,10 +1742,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1827,7 +1755,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -1837,7 +1765,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=self.get_admin_user().user_id,
             ),
             status=403,
         )
@@ -1847,12 +1775,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__ok__200__with_comments_read_content(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        api = self.get_content_api()
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1863,7 +1788,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1877,7 +1802,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=self.get_admin_user().user_id,
             )
         )
         res = self.testapp.get(
@@ -1889,12 +1814,9 @@ class TestUserSetContentAsUnread(FunctionalTest):
 
     def test_api_set_content_as_unread__ok__200__with_comments_read_comment_only(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        api = self.get_content_api()
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1905,7 +1827,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1919,7 +1841,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=comments.content_id,
-                user_id=admin.user_id,
+                user_id=self.get_admin_user().user_id,
             )
         )
         res = self.testapp.get(
@@ -1937,13 +1859,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__admin(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1955,10 +1874,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -1970,7 +1889,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2004,13 +1923,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__ok__200__user_itself(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2022,10 +1938,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -2037,7 +1953,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -2071,13 +1987,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
 
     def test_api_set_content_as_read__err__403__other_user(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2089,10 +2002,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        api2 = ContentApi(current_user=test_user, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
+        api2 = self.get_content_api(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -2104,7 +2017,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
         api2.mark_unread(firstly_created)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
@@ -2112,7 +2025,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=self.get_admin_user().user_id,
             ),
             status=403,
         )
@@ -2128,13 +2041,10 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
 
     def test_api_enable_user_workspace_notification__ok__200__admin(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2146,7 +2056,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
@@ -2158,21 +2068,18 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        transaction.commit()
+        rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
 
     def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2184,7 +2091,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
@@ -2197,21 +2104,17 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             status=204,
         )
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        transaction.commit()
+        rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
 
     def test_api_enable_user_workspace_notification__err__403__other_user(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2233,7 +2136,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
         rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)
         transaction.commit()
@@ -2258,14 +2161,10 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
 
     def test_api_disable_user_workspace_notification__ok__200__admin(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2277,7 +2176,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
@@ -2290,21 +2189,17 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             status=204,
         )
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        transaction.commit()
+        rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
 
     def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2316,7 +2211,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
@@ -2328,21 +2223,18 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        transaction.commit()
+        rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
 
     def test_api_disable_user_workspace_notification__err__403__other_user(self):
         # init DB
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2364,7 +2256,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
         rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)
         transaction.commit()
@@ -2393,12 +2285,10 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         """
         Check obtain all workspaces reachables for user with user auth.
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(1)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
 
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
@@ -2469,10 +2359,9 @@ class TestUserEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__get_user__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2502,10 +2391,9 @@ class TestUserEndpoint(FunctionalTest):
         assert res["lang"] == "fr"
 
     def test_api__get_user__ok_200__user_itself(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2534,10 +2422,9 @@ class TestUserEndpoint(FunctionalTest):
         assert res["is_deleted"] is False
 
     def test_api__get_user__err_403__other_normal_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2591,9 +2478,8 @@ class TestUserEndpoint(FunctionalTest):
         assert res["public_name"] == "test user"
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.validate_password("mysuperpassword")
@@ -2614,18 +2500,15 @@ class TestUserEndpoint(FunctionalTest):
         assert res["lang"] is None
         assert res["auth_type"] == "unknown"
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.password is None
 
     def test_api__create_user__err_400__email_already_in_db(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2655,10 +2538,9 @@ class TestUserEndpoint(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
 
     def test_api__create_user__err_403__other_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2718,9 +2600,7 @@ class TestUserWithNotificationEndpoint(MailHogFunctionalTest):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.validate_password("mysuperpassword")
@@ -2748,9 +2628,7 @@ class TestUserWithNotificationEndpoint(MailHogFunctionalTest):
         assert res["timezone"] == ""
         assert res["lang"] is None
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert user.email == "test@test.test"
         assert user.password
@@ -2765,10 +2643,9 @@ class TestUserWithNotificationEndpoint(MailHogFunctionalTest):
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
     def test_api_delete_user__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2790,13 +2667,15 @@ class TestUserWithNotificationEndpoint(MailHogFunctionalTest):
         assert res["is_deleted"] is True
 
     def test_api_delete_user__err_400__admin_itself(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.put("/api/v2/users/{}/trashed".format(admin.user_id), status=400)
+        res = self.testapp.put(
+            "/api/v2/users/{}/trashed".format(self.get_admin_user().user_id), status=400
+        )
         assert res.json_body["code"] == ErrorCode.USER_CANT_DELETE_HIMSELF
-        res = self.testapp.get("/api/v2/users/{}".format(admin.user_id), status=200).json_body
+        res = self.testapp.get(
+            "/api/v2/users/{}".format(self.get_admin_user().user_id), status=200
+        ).json_body
         assert res["is_deleted"] is False
 
 
@@ -2808,10 +2687,9 @@ class TestUsersEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__get_user__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2834,15 +2712,14 @@ class TestUsersEndpoint(FunctionalTest):
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
-        assert res[1]["user_id"] == admin.user_id
-        assert res[1]["public_name"] == admin.display_name
+        assert res[1]["user_id"] == self.get_admin_user().user_id
+        assert res[1]["public_name"] == self.get_admin_user().display_name
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__normal_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2872,10 +2749,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__get_user__ok_200__admin__by_name(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2900,7 +2776,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
@@ -2920,10 +2796,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2949,7 +2824,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
@@ -2965,10 +2840,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -2991,19 +2865,15 @@ class TestKnownMembersEndpoint(FunctionalTest):
             do_notify=False,
         )
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        role_api = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        role_api = self.get_role_api()
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_workspace_ids": str(workspace2.workspace_id)}
@@ -3019,10 +2889,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3055,20 +2924,16 @@ class TestKnownMembersEndpoint(FunctionalTest):
             do_notify=False,
         )
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        role_api = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        role_api = self.get_role_api()
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
@@ -3088,10 +2953,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3117,7 +2981,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
@@ -3133,10 +2997,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[0]["avatar_url"] is None
 
     def test_api__get_user__ok_200__admin__by_email(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3161,7 +3024,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "test"}
@@ -3181,10 +3044,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[1]["avatar_url"] is None
 
     def test_api__get_user__err_403__admin__too_small_acp(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3208,7 +3070,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        user_id = int(admin.user_id)
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "t"}
@@ -3222,10 +3084,9 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__get_user__ok_200__normal_user_by_email(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3261,10 +3122,8 @@ class TestKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user2)
         uapi.save(test_user3)
 
-        workspace = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        role_api = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
+        role_api = self.get_role_api()
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
@@ -3300,10 +3159,9 @@ class TestSetEmailPasswordLdapEndpoint(FunctionalTest):
     config_section = "functional_ldap_and_internal_test"
 
     def test_api__set_user_email__ok_200__ldap_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3339,10 +3197,9 @@ class TestSetEmailPasswordLdapEndpoint(FunctionalTest):
         assert res["auth_type"] == "ldap"
 
     def test_api__set_user_password__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3374,8 +3231,8 @@ class TestSetEmailPasswordLdapEndpoint(FunctionalTest):
         )
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
         # Check After
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert not user.validate_password("mynewpassword")
 
@@ -3388,10 +3245,9 @@ class TestSetEmailEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__set_user_email__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3422,10 +3278,9 @@ class TestSetEmailEndpoint(FunctionalTest):
         assert res["email"] == "mysuperemail@email.fr"
 
     def test_api__set_user_email__err_400__admin_same_email(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3461,10 +3316,9 @@ class TestSetEmailEndpoint(FunctionalTest):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__err_403__admin_wrong_password(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3500,10 +3354,9 @@ class TestSetEmailEndpoint(FunctionalTest):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__err_400__admin_string_is_not_email(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3540,10 +3393,9 @@ class TestSetEmailEndpoint(FunctionalTest):
         assert res["email"] == "test@test.test"
 
     def test_api__set_user_email__ok_200__user_itself(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3575,10 +3427,9 @@ class TestSetEmailEndpoint(FunctionalTest):
         assert res["email"] == "mysuperemail@email.fr"
 
     def test_api__set_user_email__err_403__other_normal_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3624,10 +3475,9 @@ class TestSetPasswordEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__set_user_password__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3658,17 +3508,17 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "/api/v2/users/{}/password".format(user_id), params=params, status=204
         )
         # Check After
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        transaction.commit()
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
         assert user.validate_password("mynewpassword")
 
     def test_api__set_user_password__err_403__admin_wrong_password(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3701,18 +3551,17 @@ class TestSetPasswordEndpoint(FunctionalTest):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         # Check After
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
 
     def test_api__set_user_password__err_400__admin_passwords_do_not_match(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3747,18 +3596,17 @@ class TestSetPasswordEndpoint(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.PASSWORD_DO_NOT_MATCH
         # Check After
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
         assert not user.validate_password("mynewpassword2")
 
     def test_api__set_user_password__ok_200__user_itself(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3789,17 +3637,16 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "/api/v2/users/{}/password".format(user_id), params=params, status=204
         )
         # Check After
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+        transaction.commit()
+        uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
         assert user.validate_password("mynewpassword")
 
     def test_api__set_user_email__err_403__other_normal_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3845,10 +3692,9 @@ class TestSetUserInfoEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__set_user_info__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3884,10 +3730,9 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res["lang"] == "en"
 
     def test_api__set_user_info__ok_200__user_itself(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3923,10 +3768,9 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res["lang"] == "en"
 
     def test_api__set_user_info__err_403__other_normal_user(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -3970,10 +3814,9 @@ class TestSetUserProfileEndpoint(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api__set_user_profile__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4009,26 +3852,27 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         Trying to set is own profile as user with admin right.
         Return 400 because of "not allow to set own profile check"
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
-        res = self.testapp.get("/api/v2/users/{}".format(admin.user_id), status=200)
+        res = self.testapp.get("/api/v2/users/{}".format(self.get_admin_user().user_id), status=200)
         res = res.json_body
-        assert res["user_id"] == admin.user_id
+        assert res["user_id"] == self.get_admin_user().user_id
         assert res["profile"] == "administrators"
         # Set params
         params = {"profile": "users"}
         res = self.testapp.put_json(
-            "/api/v2/users/{}/profile".format(admin.user_id), params=params, status=400
+            "/api/v2/users/{}/profile".format(self.get_admin_user().user_id),
+            params=params,
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.USER_CANT_CHANGE_IS_OWN_PROFILE
         # Check After
-        res = self.testapp.get("/api/v2/users/{}".format(admin.user_id), status=200)
+        res = self.testapp.get("/api/v2/users/{}".format(self.get_admin_user().user_id), status=200)
         res = res.json_body
-        assert res["user_id"] == admin.user_id
+        assert res["user_id"] == self.get_admin_user().user_id
         assert res["profile"] == "administrators"
 
     def test_api__set_user_profile__err_403__other_normal_user(self):
@@ -4036,10 +3880,9 @@ class TestSetUserProfileEndpoint(FunctionalTest):
         Set user profile of user normal user as normal user
         Return 403 error because of no right to do this as simple user
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4086,10 +3929,9 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
     fixtures = [BaseFixture]
 
     def test_api_enable_user__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4120,10 +3962,9 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res["is_active"] is True
 
     def test_api_disable_user__ok_200__admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4154,9 +3995,8 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res["is_active"] is False
 
     def test_api_disable_user__err_400__cant_disable_myself_admin(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        user_id = int(admin.user_id)
+
+        user_id = int(self.get_admin_user().user_id)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
@@ -4174,10 +4014,9 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res["is_active"] is True
 
     def test_api_enable_user__err_403__other_account(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4212,10 +4051,9 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__err_403__other_account(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4255,10 +4093,9 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         right to disable anyone as simple user. (check of right is before
         self-disable not allowed_check).
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -4334,9 +4171,9 @@ class TestUserEnpointsLDAPAuth(FunctionalTest):
     def test_api__create_user__ok_200__full_admin(self):
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
         self.testapp.get("/api/v2/auth/whoami", status=200)
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api(current_user=None)
         user = api.get_one_by_email("hubert@planetexpress.com")
-        gapi = GroupApi(session=self.session, config=self.app_config, current_user=user)
+        gapi = self.get_group_api(current_user=user)
         api.update(
             user, auth_type=user.auth_type, groups=[gapi.get_one_with_name("administrators")]
         )
