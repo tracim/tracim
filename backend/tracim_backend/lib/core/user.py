@@ -107,7 +107,7 @@ class UserApi(object):
         :return: one user
         """
         try:
-            user = self._base_query().filter(User.email == email).one()
+            user = self._base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
