@@ -11,11 +11,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import create_1000px_png_test_image
 from tracim_backend.tests import set_html_document_slug_to_legacy
@@ -31,14 +27,8 @@ class TestFolder(FunctionalTest):
 
     def _setup_basics(self) -> None:
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.dbsession = get_tm_session(self.session_factory, transaction.manager)
-        self.admin = self.dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        self.workspace_api = WorkspaceApi(
-            current_user=self.admin, session=self.dbsession, config=self.app_config
-        )
-        self.content_api = ContentApi(
-            current_user=self.admin, session=self.dbsession, config=self.app_config
-        )
+        self.workspace_api = self.get_workpace_api()
+        self.content_api = self.get_content_api()
         self.workspace = self.workspace_api.create_workspace(label="test", save_now=True)
         self.folder = self.content_api.create(
             label="test_folder",
@@ -53,10 +43,9 @@ class TestFolder(FunctionalTest):
         """
         Get one folder content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test-folder",
@@ -105,10 +94,9 @@ class TestFolder(FunctionalTest):
         Get one folder of a content content 7 is not folder
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         thread = content_api.create(
             label="thread",
@@ -133,9 +121,8 @@ class TestFolder(FunctionalTest):
         Get one folder content (content 170 does not exist in db)
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         transaction.commit()
         res = self.testapp.get(
@@ -153,10 +140,9 @@ class TestFolder(FunctionalTest):
         Get one folders of a content (content is in another workspace)
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -182,10 +168,9 @@ class TestFolder(FunctionalTest):
         """
         Get one folder content (Workspace 40 does not exist)
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -208,10 +193,9 @@ class TestFolder(FunctionalTest):
         """
         Get one folder content, workspace id is not int
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -234,10 +218,9 @@ class TestFolder(FunctionalTest):
         """
         Get one folder content, content_id is not int
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         content_api.create(
             label="test_folder",
@@ -263,10 +246,9 @@ class TestFolder(FunctionalTest):
         """
         Update(put) one folder content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -298,10 +280,9 @@ class TestFolder(FunctionalTest):
         """
         Update(put) one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -353,10 +334,9 @@ class TestFolder(FunctionalTest):
         """
         Update(put) one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -419,10 +399,9 @@ class TestFolder(FunctionalTest):
         """
         Update(put) one folder but change only allowed content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -514,10 +493,9 @@ class TestFolder(FunctionalTest):
         """
         Update(put) one folder but change only allowed content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -607,10 +585,9 @@ class TestFolder(FunctionalTest):
         """
         Update(put) one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         content_api.create(
             label="already_used",
@@ -648,10 +625,9 @@ class TestFolder(FunctionalTest):
         """
         Get one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test-folder",
@@ -660,15 +636,15 @@ class TestFolder(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=self.session, tm=transaction.manager, content=folder):
             content_api.update_content(
                 folder, new_label="test-folder-updated", new_content="Just a test"
             )
         content_api.save(folder)
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=self.session, tm=transaction.manager, content=folder):
             content_api.archive(folder)
         content_api.save(folder)
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=self.session, tm=transaction.manager, content=folder):
             content_api.unarchive(folder)
         content_api.save(folder)
         transaction.commit()
@@ -783,10 +759,9 @@ class TestFolder(FunctionalTest):
         """
         Get one folder content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -838,10 +813,9 @@ class TestFolder(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "unexistant-status"}
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -1328,10 +1302,9 @@ class TestFiles(FunctionalTest):
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1342,13 +1315,13 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1390,10 +1363,9 @@ class TestFiles(FunctionalTest):
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1404,7 +1376,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1446,10 +1418,9 @@ class TestFiles(FunctionalTest):
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1460,7 +1431,7 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
@@ -1468,7 +1439,7 @@ class TestFiles(FunctionalTest):
                 new_content=bytes(100),
             )
         content_api.save(test_file)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1570,10 +1541,9 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1584,13 +1554,13 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1607,13 +1577,12 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1625,9 +1594,9 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1700,13 +1669,12 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1718,11 +1686,11 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         test_file.status = "closed-validated"
         content_api.save(test_file)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1738,15 +1706,12 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api(show_deleted=True)
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1758,11 +1723,11 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             test_file.is_deleted = True
         content_api.save(test_file)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1778,15 +1743,12 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api(show_deleted=True)
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1798,11 +1760,11 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             test_file.is_archived = True
         content_api.save(test_file)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1818,10 +1780,9 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1832,13 +1793,13 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1918,10 +1879,9 @@ class TestFiles(FunctionalTest):
         """
         Update(put) one file, failed because label already used
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         content_api.create(
@@ -1932,7 +1892,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1953,9 +1913,9 @@ class TestFiles(FunctionalTest):
         )
         test_file2.file_extension = ".txt"
         test_file2.depot_file = FileIntent(b"Test file", "already_used.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1975,10 +1935,9 @@ class TestFiles(FunctionalTest):
         """
         Get file revisions
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1989,13 +1948,13 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2035,10 +1994,9 @@ class TestFiles(FunctionalTest):
         """
         set file status
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2051,9 +2009,9 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2088,10 +2046,9 @@ class TestFiles(FunctionalTest):
         """
         set file status
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2104,9 +2061,9 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "unexistant-status"}
@@ -2134,10 +2091,9 @@ class TestFiles(FunctionalTest):
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2150,9 +2106,9 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2174,10 +2130,9 @@ class TestFiles(FunctionalTest):
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2188,7 +2143,7 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 new_content=b"Test file",
@@ -2196,7 +2151,7 @@ class TestFiles(FunctionalTest):
                 new_mimetype="text/plain",
             )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2225,9 +2180,7 @@ class TestFiles(FunctionalTest):
         create one file of a content at workspace root
         """
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         business_workspace = workspace_api.get_one(1)
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2268,7 +2221,7 @@ class TestFiles(FunctionalTest):
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
-        assert res["author"]["user_id"] == admin.user_id
+        assert res["author"]["user_id"] == self.get_admin_user().user_id
         assert res["page_nb"] == 1
         assert res["mimetype"] == "image/png"
 
@@ -2277,9 +2230,7 @@ class TestFiles(FunctionalTest):
         create one file of a content but filename is already used here
         """
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
 
         business_workspace = workspace_api.get_one(1)
 
@@ -2316,10 +2267,8 @@ class TestFiles(FunctionalTest):
         create one file of a content in a folder
         """
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         folder = content_api.create(
             label="test-folder",
@@ -2369,7 +2318,7 @@ class TestFiles(FunctionalTest):
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
-        assert res["author"]["user_id"] == admin.user_id
+        assert res["author"]["user_id"] == self.get_admin_user().user_id
         assert res["page_nb"] == 1
         assert res["mimetype"] == "image/png"
 
@@ -2377,10 +2326,9 @@ class TestFiles(FunctionalTest):
         """
         create one file of a content but subcontent of type file unallowed here
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         folder = content_api.create(
             label="test-folder",
@@ -2389,7 +2337,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=self.session, tm=transaction.manager, content=folder):
             content_api.set_allowed_content(folder, [])
         content_api.save(folder)
         transaction.commit()
@@ -2410,9 +2358,8 @@ class TestFiles(FunctionalTest):
         """
         create one file of a content but parent_id is not valid
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
 
         business_workspace = workspace_api.get_one(1)
 
@@ -2433,10 +2380,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2447,7 +2393,7 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2468,10 +2414,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2490,7 +2435,7 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         content2_id = int(test_file_2.content_id)
@@ -2514,10 +2459,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2530,7 +2474,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.status = "closed-validated"
         content_api.save(test_file)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2549,10 +2493,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2563,7 +2506,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2591,10 +2534,9 @@ class TestFiles(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2607,7 +2549,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         content_id = int(test_file.content_id)
@@ -2625,10 +2567,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2641,7 +2582,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2661,10 +2602,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2677,7 +2617,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2704,10 +2644,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2718,14 +2657,14 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2743,10 +2682,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2757,7 +2695,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2780,10 +2718,9 @@ class TestFiles(FunctionalTest):
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2794,14 +2731,14 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2821,10 +2758,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2835,7 +2771,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2864,10 +2800,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2878,7 +2813,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2909,10 +2844,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2923,7 +2857,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2952,10 +2886,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2966,7 +2899,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -2989,10 +2922,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 revision preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3005,7 +2937,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
@@ -3040,10 +2972,9 @@ class TestFiles(FunctionalTest):
         """
         get 256x256 revision preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3056,7 +2987,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
@@ -3098,10 +3029,9 @@ class TestFiles(FunctionalTest):
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3112,11 +3042,11 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3136,10 +3066,9 @@ class TestFiles(FunctionalTest):
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3150,11 +3079,11 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3190,10 +3119,9 @@ class TestFiles(FunctionalTest):
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3204,7 +3132,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
@@ -3226,10 +3154,9 @@ class TestFiles(FunctionalTest):
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3240,14 +3167,14 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        self.session.flush()
         content_id = test_file.content_id
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3264,10 +3191,9 @@ class TestFiles(FunctionalTest):
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3278,11 +3204,11 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3304,10 +3230,9 @@ class TestFiles(FunctionalTest):
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3318,14 +3243,14 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3343,10 +3268,9 @@ class TestFiles(FunctionalTest):
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3357,11 +3281,11 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3387,10 +3311,9 @@ class TestFiles(FunctionalTest):
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3401,11 +3324,11 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3428,10 +3351,9 @@ class TestFiles(FunctionalTest):
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3444,7 +3366,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
@@ -3477,10 +3399,9 @@ class TestFiles(FunctionalTest):
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3493,7 +3414,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
@@ -3523,10 +3444,9 @@ class TestFiles(FunctionalTest):
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3539,7 +3459,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
@@ -3576,10 +3496,9 @@ class TestFiles(FunctionalTest):
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3592,7 +3511,7 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
@@ -3626,10 +3545,8 @@ class TestFiles(FunctionalTest):
 
     def test_api__set_file_status__err_400__same_status(self) -> None:
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3642,9 +3559,9 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
 
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -3958,11 +3875,10 @@ class TestThreads(FunctionalTest):
         """
         get threads revisions
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
         business_workspace = workspace_api.get_one(1)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -3972,27 +3888,27 @@ class TestThreads(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
                 test_thread, new_label="test_thread_updated", new_content="Just a test"
             )
         content_api.save(test_thread)
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.archive(test_thread)
         content_api.save(test_thread)
 
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.unarchive(test_thread)
         content_api.save(test_thread)
 
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.delete(test_thread)
         content_api.save(test_thread)
 
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.undelete(test_thread)
         content_api.save(test_thread)
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(

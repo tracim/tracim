@@ -5,15 +5,8 @@ import pytest
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import WebdavFunctionalTest
 
 
@@ -21,10 +14,9 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
     config_section = "functional_webdav_test_remote_user"
 
     def test_functional__webdav_access_to_root_remote_auth__as_http_header(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "remoteuser@emoteuser.remoteuser",
@@ -40,10 +32,9 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
         assert res
 
     def test_functional__webdav_access_to_root__remote_auth(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "remoteuser@remoteuser.remoteuser",
@@ -66,10 +57,9 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
     """
 
     def test_functional__webdav_access_to_root__nominal_case(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -100,10 +90,9 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
     def test_functional__webdav_access_to_workspace__nominal_case(
         self, workspace_label, webdav_workspace_label
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -112,11 +101,11 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
 
@@ -127,10 +116,9 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -139,9 +127,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
@@ -150,10 +136,9 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         self.testapp.get("/test", status=404)
 
     def test_functional__webdav_access_to_workspace__workspace_not_exist(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -180,14 +165,13 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
     def test_functional__webdav_access_to_content__ok__nominal_case(
         self, workspace_label, webdav_workspace_label, content_filename, webdav_content_filename
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        with dbsession.no_autoflush:
+        api = self.get_content_api()
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -212,11 +196,8 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         )
 
     def test_functional__webdav_access_to_content__err__file_not_exist(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace_api.create_workspace("workspace1", save_now=True)
         transaction.commit()
 
@@ -251,17 +232,16 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         content_filename,
         webdav_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         folder = api.create(
             content_type_list.Folder.slug, workspace, None, dir_label, do_save=True, do_notify=False
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -295,13 +275,10 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         )
 
     def test_functional__webdav_access_to_subdir_content__err__file_not_exist(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("workspace1", save_now=True)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -393,10 +370,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -405,13 +381,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         dir1_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -428,7 +404,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -581,10 +557,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -593,15 +568,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         example_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -618,7 +591,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -750,10 +723,8 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_new_content_filename,
     ) -> None:
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -762,13 +733,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -777,7 +748,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -914,10 +885,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -926,15 +896,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         api.create(
             content_type_list.Folder.slug,
             workspace2,
@@ -943,7 +911,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1058,10 +1026,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1070,13 +1037,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         example_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -1085,7 +1052,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1218,10 +1185,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1230,15 +1196,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        api = self.get_content_api()
         example_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -1247,7 +1211,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1360,10 +1324,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1372,14 +1335,14 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        with dbsession.no_autoflush:
+        api = self.get_content_api()
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1485,10 +1448,9 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         new_content_filename,
         webdav_new_content_filename,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1497,16 +1459,14 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
-        with dbsession.no_autoflush:
+        api = self.get_content_api()
+        with self.session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1639,18 +1599,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             content_filename,
 #             webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory, transaction.manager)
-#         admin = dbsession.query(User) \
+#
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -1659,21 +1619,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         example_folder = api.create(
@@ -1692,7 +1652,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             do_save=True,
 #             do_notify=False,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -1831,19 +1791,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         content_filename,
 #         webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory,
+#         self.session = get_tm_session(self.session_factory,
 #                                    transaction.manager)
-#         admin = dbsession.query(User) \
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -1852,7 +1812,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
@@ -1862,7 +1822,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                                     save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace,
@@ -1873,7 +1833,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         example_folder = api.create(
@@ -1892,7 +1852,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             do_save=True,
 #             do_notify=False,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -2071,18 +2031,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         content_filename,
 #         webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory, transaction.manager)
-#         admin = dbsession.query(User) \
+#
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -2091,21 +2051,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         product_folder = api.create(
@@ -2116,7 +2076,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             do_save=True,
 #             do_notify=False,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -2243,19 +2203,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         content_filename,
 #         webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory,
+#         self.session = get_tm_session(self.session_factory,
 #                                    transaction.manager)
-#         admin = dbsession.query(User) \
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -2264,7 +2224,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
@@ -2274,7 +2234,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                                     save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace,
@@ -2285,7 +2245,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         product_folder = api.create(
@@ -2296,7 +2256,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             do_save=True,
 #             do_notify=False,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -2456,18 +2416,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             content_filename,
 #             webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory, transaction.manager)
-#         admin = dbsession.query(User) \
+#
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -2476,21 +2436,21 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         example_folder = api.create(
@@ -2501,7 +2461,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             do_save=True,
 #             do_notify=False,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -2628,19 +2588,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             content_filename,
 #             webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory,
+#         self.session = get_tm_session(self.session_factory,
 #                                    transaction.manager)
-#         admin = dbsession.query(User) \
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -2649,7 +2609,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
@@ -2659,7 +2619,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                                     save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace,
@@ -2670,7 +2630,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         example_folder = api.create(
@@ -2681,7 +2641,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             do_save=True,
 #             do_notify=False,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -2837,18 +2797,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         content_filename,
 #         webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory, transaction.manager)
-#         admin = dbsession.query(User) \
+#
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -2857,24 +2817,24 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
 #         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
 #                         False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
@@ -3003,18 +2963,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #             content_filename,
 #             webdav_content_filename,
 #     ) -> None:
-#         dbsession = get_tm_session(self.session_factory, transaction.manager)
-#         admin = dbsession.query(User) \
+#
+#         admin = self.session.query(User) \
 #             .filter(User.email == 'admin@admin.admin') \
 #             .one()
 #         uapi = UserApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         gapi = GroupApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         groups = [gapi.get_one_with_name('users')]
@@ -3023,7 +2983,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #                                 groups=groups)
 #         workspace_api = WorkspaceApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #             show_deleted=True,
 #         )
@@ -3031,17 +2991,17 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
 #         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
 #         rapi = RoleApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
 #         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
 #         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
 #         api = ContentApi(
 #             current_user=admin,
-#             session=dbsession,
+#             session=self.session,
 #             config=self.app_config,
 #         )
-#         with dbsession.no_autoflush:
+#         with self.session.no_autoflush:
 #             example_product_folder = api.create(
 #                 content_type_list.Folder.slug,
 #                 workspace,
