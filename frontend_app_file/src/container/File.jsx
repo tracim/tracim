@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
+import CollaboraFrame from '../component/CollaboraFrame.jsx'
 import {
   addAllResourceI18n,
   handleFetchResult,
@@ -37,7 +38,8 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putMyselfFileRead
+  putMyselfFileRead,
+  getWOPIDiscovery
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -67,7 +69,11 @@ class File extends React.Component {
       progressUpload: {
         display: false,
         percent: 0
-      }
+      },
+      isEditable: false,
+      isCollaboraShown: false,
+      accessToken: '',
+      collaboraSrc: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -144,6 +150,7 @@ class File extends React.Component {
     if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
 
     await this.loadContent()
+    await this.setIsEditable()
     this.loadTimeline()
     this.buildBreadcrumbs()
   }
@@ -157,6 +164,7 @@ class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
+      await this.setIsEditable()
       this.loadTimeline()
       this.buildBreadcrumbs()
     }
@@ -314,30 +322,7 @@ class File extends React.Component {
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
 
   handleClickEdit = () => {
-    const { state } = this
-    const pageContainer = document.getElementsByClassName('sidebarpagecontainer')[0]
-
-    const editWopiUrl = `http://192.168.1.228:6543/api/v2/workspaces/${state.content.workspace_id}/wopi/files/${state.content.content_id}`
-
-    const wopiUrl = 'http://localhost:9980/loleaflet/305832f/loleaflet.html'
-    const accessToken = document.cookie.split(';')[0].replace('session_key=', '')
-
-    const iframeUrl = `${wopiUrl}?WOPISrc=${editWopiUrl}&closebutton=1`
-    const form = `<form id="loleafletform" name="loleafletform" target="loleafletframe" action="${iframeUrl}" method="post">
-        <input name="access_token" value="${accessToken}"type="hidden"/>
-      </form>`
-    const frame = '<iframe id="loleafletframe" name= "loleafletframe" allowfullscreen style="width:100%;height:100%;position:absolute;z-index:999"/>'
-    pageContainer.insertAdjacentHTML('afterbegin', form)
-    pageContainer.insertAdjacentHTML('afterbegin', frame)
-    document.getElementById('loleafletform').submit()
-
-    const iframe = document.getElementById('loleafletframe')
-    window.addEventListener('message', (e) => {
-      console.log(e)
-      if (JSON.parse(e.data).MessageId === 'close') {
-        pageContainer.removeChild(iframe)
-      }
-    }, false)
+    this.showCollabora(true)
   }
 
   handleClickValidateNewDescription = async newDescription => {
@@ -639,14 +624,48 @@ class File extends React.Component {
     // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
-  isEditable = () => {
-    return true
+  setIsEditable = async () => {
+    const { state } = this
+
+    const response = await handleFetchResult(
+      await getWOPIDiscovery(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    )
+    switch (response.apiResponse.status) {
+      case 200:
+        if (response.body.extensions.includes(state.content.file_extension.substr(1))) {
+          this.setState({
+            isEditable: true,
+            accessToken: response.body.access_token,
+            collaboraSrc: response.body.urlsrc
+          })
+        } else {
+          this.setState({ isEditable: false })
+        }
+        break
+      default:
+        this.setState({ isEditable: false })
+        break
+    }
+  }
+
+  showCollabora = (isCollaboraShown) => {
+    this.setState({isCollaboraShown: isCollaboraShown})
   }
 
   render () {
     const { props, state } = this
 
     if (!state.isVisible) return null
+
+    if (state.isEditable && state.isCollaboraShown) {
+      return (
+        <CollaboraFrame
+          accessToken={state.accessToken}
+          iframeUrl={state.collaboraSrc}
+          showCollabora={this.showCollabora}
+        />
+      )
+    }
 
     return (
       <PopinFixed
@@ -681,23 +700,14 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.idRoleUserWorkspace >= 2 &&
+              {state.loggedUser.idRoleUserWorkspace >= 2 && state.isEditable &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickEdit}
                   disabled={state.mode !== MODE.VIEW || !state.content.is_editable}
                   label={props.t('Edit')}
                   style={{
-                    backgroundColor: '#fdfdfd',
-                    color: '#333',
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderColor: props.customColor,
-                    ':hover': {
-                      backgroundColor: props.customColor,
-                      color: '#fdfdfd'
-                    },
-                    'marginLeft': '5px'
+                    marginLeft: '5px'
                   }}
                 />
               }

@@ -7,11 +7,11 @@
   <div id="collabora"></div>
     <script type="text/javascript">
       var iframeAnchor = 'collabora'
-      var wopiUrl = "http://localhost:9980/loleaflet/305832f/loleaflet.html"
-      var tracimWopiUrl = "http://192.168.1.228:6543/api/v2/workspaces/2/wopi/files/"
-      var fileId = 11
+      var wopiUrl = "http://192.168.1.228:9980/loleaflet/305832f/loleaflet.html"
+      var tracimWopiUrl = "http://192.168.1.228:6543/api/v2/workspaces/1/wopi/files/"
+      var fileId = 10
       var iframeUrl = `${wopiUrl}?WOPISrc=${tracimWopiUrl}${fileId}&closebutton=1`
-      var accessToken = 'b143eab900c02d511e6c25ecb40a4f67b5b5eab663d3ec61228f4bdb850dbd7ac8e423fe'
+      var accessToken = '5c0b6c6592b274a252b2cb3f29ea55e5a66d7d7584eb73ef69894551b434f3bd6ead5aa2'
 
       var form = `<form id="loleafletform" name="loleafletform" target="loleafletframe" action="${iframeUrl}" method="post">
           <input name="access_token" value="${accessToken}"type="hidden"/>

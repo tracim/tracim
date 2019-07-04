@@ -137,6 +137,15 @@ export const putMyselfFileRead = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
+export const getWOPIDiscovery = (apiUrl, workspaceId, contentId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/wopi/files/${contentId}/discovery`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
 // export const getFilePdf = pdfUrl => {
 //   return fetch(`${pdfUrl}`, {
 //     credentials: 'include',
