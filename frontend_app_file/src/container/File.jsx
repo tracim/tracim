@@ -9,7 +9,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
-  Timeline,
+  // Timeline,
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
@@ -40,6 +40,7 @@ import {
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
+import ShareFileManagement from './ShareFile/ShareFileManagement.jsx'
 
 class File extends React.Component {
   constructor (props) {
@@ -717,11 +718,14 @@ class File extends React.Component {
             progressUpload={state.progressUpload}
           />
 
-          <Timeline
+          <ShareFileManagement />
+
+          {/* <Timeline
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
+            showHeader
             newComment={state.newComment}
             disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
@@ -731,7 +735,7 @@ class File extends React.Component {
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
             shouldScrollToBottom={state.mode !== MODE.REVISION}
-          />
+          /> */}
         </PopinFixedContent>
       </PopinFixed>
     )

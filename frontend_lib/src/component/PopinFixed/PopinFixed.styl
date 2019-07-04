@@ -98,12 +98,24 @@
       transition width 0.4s ease
       width calc(25% - 10px)
       height 100%
+      &__header
+        display flex
+        flex-direction column
+        border-radius 10px 0 0 10px
+        margin-top 10px
+        width 50px
+        background-color grey-hover
+        font-size 20px
+        color darkGrey
+        cursor pointer
+        &__icon
+          text-align center
+        &__title
+          transform rotate(-90deg)
 
 .rightPartClose
   .wsContentGeneric__content__left
-    width calc(50% - 50px)
-  //.wsContentGeneric__content__right
-  //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
+    width calc(50% - 50px) // 50px is the width of the rightPart header (eg. timeline__header)
 
 @media (max-width: max-lg)
   .rightPartClose

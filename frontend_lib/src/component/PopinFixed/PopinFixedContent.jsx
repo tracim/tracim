@@ -28,7 +28,21 @@ class PopinFixedContent extends React.Component {
             {this.props.children[0]}
           </div>
 
-          <div className={classnames('wsContentGeneric__content__right', `${this.props.customClass}__content__right`)}>
+          <div className={classnames('wsContentGeneric__content__right', `${this.props.customClass}__content__right`, 'd-flex')}>
+            <div
+              className={classnames(`${this.props.customClass}__header`, 'wsContentGeneric__content__right__header')}
+              onClick={this.handleToggleRightPart}
+            >
+              <div className='wsContentGeneric__content__right__header__icon mt-3 mb-auto'>
+                <i className={classnames('fa fa-fw', {'fa-angle-double-right': this.state.rightPartOpen, 'fa-angle-double-left': !this.state.rightPartOpen})} />
+              </div>
+              <div className='wsContentGeneric__content__right__header__title'>
+                Timeline
+              </div>
+              <div className='wsContentGeneric__content__right__header__icon mb-3 mt-auto'>
+                <i className={classnames('fa fa-fw', {'fa-angle-double-right': this.state.rightPartOpen, 'fa-angle-double-left': !this.state.rightPartOpen})} />
+              </div>
+            </div>
             {React.cloneElement(this.props.children[1], {
               toggleRightPart: this.handleToggleRightPart,
               rightPartOpen: this.state.rightPartOpen

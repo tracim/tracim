@@ -52,7 +52,7 @@ class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
-        {props.showHeader &&
+        {/* {props.showHeader &&
           <div
             className={classnames(`${props.customClass}__header`, 'timeline__header')}
             onClick={props.toggleRightPart}
@@ -67,7 +67,7 @@ class Timeline extends React.Component {
               <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
             </div>
           </div>
-        }
+        } */}
 
         <div className='timeline__body'>
           <div className='timeline__body__warning'>

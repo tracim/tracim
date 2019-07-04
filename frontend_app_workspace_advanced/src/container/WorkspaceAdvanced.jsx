@@ -231,6 +231,79 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  handleToggleUploadEnabled = () => {}
+  // handleToggleUploadEnabled = async () => {
+  //   const { props, state } = this
+  //   const oldUploadEnabledValue = state.content.upload_enabled
+  //   const newUploadEnabledValue = !state.content.upload_enabled
+  //   const folderId = 0 // Chose a special number
+  //   const folderName = 'Files received'
+  //   // At folders asyc file
+  //   const fetchSaveUploadFolder = await handleFetchResult(await postFolder(state.config.apiUrl, state.content.workspace_id, folderId, 'folder', folderName))
+
+  //   switch (fetchSaveUploadFolder.apiResponse.status) {
+  //     case 200:
+  //       this.handleClose()
+  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
+  //       break
+  //     case 400:
+  //       switch (fetchSaveUploadFolder.body.code) {
+  //         default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
+  //       }
+  //       break
+  //     default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
+  //   }
+
+  //   this.setState(prev => ({content: {...prev.content, upload_enabled: newUploadEnabledValue}}))
+  //   const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
+
+  //   switch (fetchToggleUploadEnabled.apiResponse.status) {
+  //     case 200:
+  //       this.sendGlobalFlashMessage(
+  //         newUploadEnabledValue ? props.t('Upload activated') : props.t('Upload deactivated'),
+  //         'info'
+  //       )
+  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+  //       break
+  //     default:
+  //       this.setState(prev => ({content: {...prev.content, upload_enabled: oldUploadEnabledValue}}))
+  //       this.sendGlobalFlashMessage(
+  //         newUploadEnabledValue
+  //           ? props.t('Error while activating upload')
+  //           : props.t('Error while deactivating upload'),
+  //         'warning'
+  //       )
+  //   }
+  // }
+
+  handleToggleDownloadEnabled = () => {}
+  // handleToggleDownloadEnabled = async () => {
+  //   const { props, state } = this
+  //   const oldDownloadEnabledValue = state.content.download_enabled
+  //   const newDownloadEnabledValue = !state.content.download_enabled
+
+  //   this.setState(prev => ({content: {...prev.content, download_enabled: newDownloadEnabledValue}}))
+  //   const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
+
+  //   switch (fetchToggleDownloadEnabled.apiResponse.status) {
+  //     case 200:
+  //       this.sendGlobalFlashMessage(
+  //         newDownloadEnabledValue ? props.t('Download activated') : props.t('Download deactivated'),
+  //         'info'
+  //       )
+  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+  //       break
+  //     default:
+  //       this.setState(prev => ({content: {...prev.content, download_enabled: oldDownloadEnabledValue}}))
+  //       this.sendGlobalFlashMessage(
+  //         newDownloadEnabledValue
+  //           ? props.t('Error while activating download')
+  //           : props.t('Error while deactivating download'),
+  //         'warning'
+  //       )
+  //   }
+  // }
+
   handleClickNewMemberRole = slugRole => this.setState(prev => ({newMember: {...prev.newMember, role: slugRole}}))
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
@@ -424,6 +497,8 @@ class WorkspaceAdvanced extends React.Component {
             roleList={state.config.roleList}
             memberList={state.content.memberList}
             agendaEnabled={state.content.agenda_enabled}
+            uploadEnabled // ={state.content.upload_enabled}
+            downloadEnabled // ={state.content.download_enabled}
             appAgendaAvailable={state.content.appAgendaAvailable}
             displayFormNewMember={state.displayFormNewMember}
             autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
@@ -453,6 +528,8 @@ class WorkspaceAdvanced extends React.Component {
             onChangeDescription={this.handleChangeDescription}
             onChangeNewMemberName={this.handleChangeNewMemberName}
             onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+            onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+            onToggleUploadEnabled={this.handleToggleUploadEnabled}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>
