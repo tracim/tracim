@@ -8,7 +8,37 @@ import {
 } from 'tracim_frontend_lib'
 import { postWorkspace } from '../action.async.js'
 import i18n from '../i18n.js'
-import { debug } from '../debug.js'
+
+// FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
+// https://github.com/tracim/tracim/issues/2066
+const debug = {
+  config: {
+    slug: 'workspace',
+    faIcon: 'bank',
+    hexcolor: '#7d4e24',
+    creationLabel: 'Create a shared space',
+    domContainer: 'appFeatureContainer',
+    apiUrl: 'http://localhost:6543',
+    apiHeader: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    translation: {
+      en: {},
+      fr: {}
+    }
+  },
+  loggedUser: {
+    id: 5,
+    username: 'Smoi',
+    firstname: 'Côme',
+    lastname: 'Stoilenom',
+    email: 'osef@algoo.fr',
+    avatar: ''
+  },
+  workspaceId: 1,
+  folderId: null
+}
 
 class PopupCreateWorkspace extends React.Component {
   constructor (props) {
