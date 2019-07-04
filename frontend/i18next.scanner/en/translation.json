@@ -204,5 +204,10 @@
   "The destination folder doesn't allow this content type": "The destination folder doesn't allow this content type",
   ", create the first content of that type by clicking on the button 'Create'": ", create the first content of that type by clicking on the button 'Create'",
   "This shared space has no content of that type yet": "This shared space has no content of that type yet",
-  "Insufficient rights": "Insufficient rights"
+  "Insufficient rights": "Insufficient rights",
+  "Download file": "Download file",
+  "Upload files": "Upload files",
+  "shared with you the file": "shared with you the file",
+  "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "The person who sent you this file protected it with a password. If you do not know the password, please contact her.",
+  "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again."
 }

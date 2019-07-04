@@ -1,7 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { connect } from 'react-redux'
-import { Popover, PopoverHeader, PopoverBody } from 'reactstrap' // react-awesome-popover
+import { Popover, PopoverBody } from 'reactstrap'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -58,6 +57,13 @@ class GuestUpload extends React.Component {
         uploadFilePreview: false
       })
       return
+      // acceptedFiles.forEach(newFile => {
+      //   if (!newFile || !newFile[0]) return
+
+      //   const fileToSave = newFile[0]
+
+      //   this.setState({uploadFile: [...this.state.uploadFile, fileToSave], uploadFilePreview: false})
+      // })
     }
 
     this.setState({uploadFile: fileToSave})
@@ -95,7 +101,7 @@ class GuestUpload extends React.Component {
 
               <InputTextArea
                 customClass='mb-3'
-                placeHolder={props.t('Comment')}
+                placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
                 numberRows='5'
                 value={state.guestComment}
                 onChange={this.handleChangeComment}
@@ -123,22 +129,21 @@ class GuestUpload extends React.Component {
                   <i className='fa fa-fw fa-question-circle' />
                 </button>
                 <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.toggle}>
-                  <PopoverHeader>Popover Title</PopoverHeader>
-                  <PopoverBody>Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</PopoverBody>
+                  <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
                 </Popover>
               </div>
 
               <FileDropzone
                 onDrop={this.handleChangeFile}
                 onClick={this.handleChangeFile}
-                hexcolor='#ffa500'
                 preview={state.uploadFilePreview}
                 filename={state.uploadFile ? state.uploadFile.name : ''}
+                multipleFiles
               />
 
               <div className='d-flex' >
                 <button type='button'
-                  className='guestupload__card__form__btn btn btn-primary ml-auto'
+                  className='btnSubmit guestupload__card__form__btn btn ml-auto'
                   onClick={this.handleClickSend}
                 >
                   {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
@@ -154,5 +159,4 @@ class GuestUpload extends React.Component {
   }
 }
 
-const mapStateToProps = ({ contentType }) => ({ contentType })
-export default connect(mapStateToProps)(translate()(GuestUpload))
+export default translate()(GuestUpload)

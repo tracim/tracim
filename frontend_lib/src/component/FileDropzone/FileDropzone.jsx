@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone'
 import { translate } from 'react-i18next'
 
@@ -7,7 +8,7 @@ export const FileDropzone = props => {
     <Dropzone
       onDrop={props.onDrop}
       onClick={props.onClick}
-      multiple={false}
+      multiple={props.multipleFiles}
       style={{}} // to reset default style
       inputProps={{'data-cy': 'filecontent__form_input_file'}}
     >
@@ -35,19 +36,34 @@ export const FileDropzone = props => {
                 </div>
               </div>
             )
-            case false: return (
-              <div className='filecontent__preview' drop='true'>
-                <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{color: props.hexcolor}} />
-                <div className='filecontent__preview__nopreview-msg'>
-                  {props.filename}
-                </div>
-              </div>
-            )
-            default: return (
-              <div className='filecontent__preview' drop='true'>
-                <img src={props.preview} />
-              </div>
-            )
+            case false:
+              if (!props.multipleFiles) {
+                return (
+                  <div className='filecontent__preview' drop='true'>
+                    <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{color: props.hexcolor}} />
+                    <div className='filecontent__preview__nopreview-msg'>
+                      {props.filename}
+                    </div>
+                  </div>
+                )
+              }
+            default:
+              if (props.multipleFiles) { // TODO
+                return (
+                  <div className='filecontent__preview' drop='true'>
+                    <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{color: props.hexcolor}} />
+                    <div className='filecontent__preview__nopreview-msg'>
+                      {props.filename}
+                    </div>
+                  </div>
+                )
+              } else {
+                return (
+                  <div className='filecontent__preview' drop='true'>
+                    <img src={props.preview} />
+                  </div>
+                )
+              }
           }
         })()}
       </div>
@@ -56,3 +72,19 @@ export const FileDropzone = props => {
 }
 
 export default translate()(FileDropzone)
+
+FileDropzone.propTypes = {
+  onDrop: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
+  multipleFiles: PropTypes.bool,
+  preview: PropTypes.string,
+  hexcolor: PropTypes.string,
+  filename: PropTypes.string
+}
+
+FileDropzone.defaultState = {
+  multipleFiles: false,
+  preview: '',
+  hexcolor: '',
+  filename: ''
+}

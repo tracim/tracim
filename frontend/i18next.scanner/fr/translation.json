@@ -204,5 +204,10 @@
   "The destination folder doesn't allow this content type": "Le dossier de destination n'autorise pas ce type de contenu",
   ", create the first content of that type by clicking on the button 'Create'": ", créez le premier contenu de ce type en cliquant sur le bouton 'Créer'",
   "This shared space has no content of that type yet": "Cet espace partagé n'a pas encore de contenu de ce type",
-  "Insufficient rights": "Droits insuffisants"
+  "Insufficient rights": "Droits insuffisants",
+  "Download file": "Télécharger un fichier",
+  "Upload files": "Importer des fichiers",
+  "shared with you the file": "a partagé avec vous le fichier",
+  "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "La personne qui vous a envoyé ce fichier l'a protégé par mot de passe. Si vous ne connaissez pas le mot de passe, veuillez la contacter.",
+  "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Laisez un message avec votre ou vos fichiers si vous le souhaitez. N'hésitez pas à laisser vos coordonnées si vous souhaitez être recontacté."
 }
