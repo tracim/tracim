@@ -4,7 +4,8 @@ import i18n from './i18n.js'
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': `Basic ${btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)}`
   }
 }
 
@@ -87,7 +88,7 @@ export const debug = {
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 3,
+    content_id: 57,
     content_type: 'file',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,

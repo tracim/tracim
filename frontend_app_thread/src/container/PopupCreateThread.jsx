@@ -1,5 +1,6 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
+import { withTranslation } from 'react-i18next'
 import {
   addAllResourceI18n,
   CardPopupCreateContent,
@@ -7,7 +8,6 @@ import {
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
-import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
@@ -81,7 +81,7 @@ class PopupCreateThread extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
@@ -154,4 +154,4 @@ class PopupCreateThread extends React.Component {
   }
 }
 
-export default translate()(PopupCreateThread)
+export default withTranslation()(PopupCreateThread)

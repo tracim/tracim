@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
@@ -57,7 +57,7 @@ class Header extends React.Component {
     const { props } = this
 
     if (props.user.user_id === -1) {
-      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
       props.dispatch(setUserLang(langId))
       return
@@ -67,7 +67,7 @@ class Header extends React.Component {
     switch (fetchPutUserLang.status) {
       case 200:
         i18n.changeLanguage(langId)
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         props.dispatch(setUserLang(langId))
         props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
         break
@@ -187,4 +187,4 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = ({ searchResult, lang, user, system, appList }) => ({ searchResult, lang, user, system, appList })
-export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))
+export default withRouter(connect(mapStateToProps)(withTranslation()(appFactory(Header))))

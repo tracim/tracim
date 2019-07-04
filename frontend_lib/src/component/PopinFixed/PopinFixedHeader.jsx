@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -13,19 +13,19 @@ class PopinFixedHeader extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.rawTitle !== this.props.rawTitle) this.setState({editTitleValue: this.props.rawTitle})
+    if (prevProps.rawTitle !== this.props.rawTitle) this.setState({ editTitleValue: this.props.rawTitle })
   }
 
   onChangeTitle = e => {
     const newTitle = e.target.value
-    this.setState({editTitleValue: newTitle})
+    this.setState({ editTitleValue: newTitle })
   }
 
   handleClickChangeTitleBtn = () => {
     const { props, state } = this
     if (state.editTitle) {
       props.onValidateChangeTitle(state.editTitleValue)
-      this.setState(prevState => ({editTitle: !prevState.editTitle}))
+      this.setState(prevState => ({ editTitle: !prevState.editTitle }))
       return
     }
 
@@ -54,7 +54,7 @@ class PopinFixedHeader extends React.Component {
     const { state } = this
 
     return (
-      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{backgroundColor: customColor}}>
+      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
           <i className={`fa fa-${faIcon}`} />
         </div>
@@ -106,7 +106,7 @@ class PopinFixedHeader extends React.Component {
   }
 }
 
-export default translate()(PopinFixedHeader)
+export default withTranslation()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   faIcon: PropTypes.string.isRequired,

@@ -1,13 +1,14 @@
 import React from 'react'
 import Radium from 'radium'
-import color from 'color'
 import {
   BtnSwitch,
   NewMemberForm,
   CardPopup,
   Avatar
 } from 'tracim_frontend_lib'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
+
+const color = require('color')
 
 const WorkspaceAdvancedComponent = props => {
   return (
@@ -32,7 +33,7 @@ const WorkspaceAdvancedComponent = props => {
             type='button'
             className='workspace_advanced__description__bottom__btn btn highlightBtn'
             onClick={props.onClickValidateNewDescription}
-            style={{backgroundColor: props.customColor}}
+            style={{ backgroundColor: props.customColor }}
           >
             {props.t('Validate')}
           </button>
@@ -60,7 +61,7 @@ const WorkspaceAdvancedComponent = props => {
 
                     <div className='workspace_advanced__userlist__list__item__namerole__role dropdown'>
                       {(() => {
-                        const role = props.roleList.find(r => r.slug === m.role) || {label: 'unknown', hexcolor: '#333', faIcon: ''}
+                        const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                         return (
                           <button
                             className='btndropdown dropdown-toggle'
@@ -70,7 +71,7 @@ const WorkspaceAdvancedComponent = props => {
                             aria-haspopup='true'
                             aria-expanded='false'
                           >
-                            <div className='btndropdown__icon mr-3' style={{color: role.hexcolor}}>
+                            <div className='btndropdown__icon mr-3' style={{ color: role.hexcolor }}>
                               <i className={`fa fa-${role.faIcon}`} />
                             </div>
 
@@ -88,7 +89,7 @@ const WorkspaceAdvancedComponent = props => {
                             onClick={() => props.onClickNewRole(m.user_id, r.slug)}
                             key={`role_${r.id}`}
                           >
-                            <div className='subdropdown__item__icon' style={{color: r.hexcolor}}>
+                            <div className='subdropdown__item__icon' style={{ color: r.hexcolor }}>
                               <i className={`fa fa-fw fa-${r.faIcon}`} />
                             </div>
 
@@ -211,7 +212,7 @@ const WorkspaceAdvancedComponent = props => {
                   type='button'
                   className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
                   onClick={props.onClickValidatePopupDeleteWorkspace}
-                  style={{':hover': {backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hexString()}}}
+                  style={{ ':hover': { backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hex() } }}
                 >
                   {props.t('Delete')}
                 </button>
@@ -223,7 +224,7 @@ const WorkspaceAdvancedComponent = props => {
 
       <div
         className='workspace_advanced__functionality'
-        style={{display: 'none'}}
+        style={{ display: 'none' }}
         // Côme - 2018/09/10 - hide this div until webdav and/or visioconf is activated
       >
         <div className='workspace_advanced__functionality__title'>
@@ -258,4 +259,4 @@ const WorkspaceAdvancedComponent = props => {
   )
 }
 
-export default translate()(Radium(WorkspaceAdvancedComponent))
+export default withTranslation()(Radium(WorkspaceAdvancedComponent))

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   PageWrapper,
@@ -218,4 +218,4 @@ class SearchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, user }) => ({ breadcrumbs, searchResult, contentType, user })
-export default connect(mapStateToProps)(translate()(SearchResult))
+export default connect(mapStateToProps)(withTranslation()(SearchResult))

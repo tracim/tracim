@@ -1,5 +1,5 @@
 import i18n from 'i18next'
-import { reactI18nextModule } from 'react-i18next'
+import { initReactI18next } from 'react-i18next'
 import { frTranslation, enTranslation } from 'tracim_frontend_lib'
 import en from '../i18next.scanner/en/translation.json'
 import fr from '../i18next.scanner/fr/translation.json'
@@ -33,7 +33,7 @@ export const getBrowserLang = () => {
 }
 
 i18n
-  .use(reactI18nextModule)
+  .use(initReactI18next)
   .init({
     fallbackLng: getBrowserLang(),
     // have a common namespace used around the full app
@@ -42,9 +42,6 @@ i18n
     nsSeparator: false,
     keySeparator: false,
     debug: false,
-    react: {
-      wait: true
-    },
     resources: {
       en: {
         translation: {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
@@ -83,7 +83,7 @@ class PopupCreateWorkspace extends React.Component {
     }
   })
 
-  handleChangeNewWorkspaceName = e => this.setState({newWorkspaceName: e.target.value})
+  handleChangeNewWorkspaceName = e => this.setState({ newWorkspaceName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE, // handled by tracim_front:dist/index.html
@@ -100,8 +100,8 @@ class PopupCreateWorkspace extends React.Component {
     switch (fetchSaveNewWorkspace.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {openIdInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
-        GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REDIRECT, data: {url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: { openIdInSidebar: fetchSaveNewWorkspace.body.workspace_id } })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard` } })
         break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {
@@ -131,4 +131,4 @@ class PopupCreateWorkspace extends React.Component {
   }
 }
 
-export default translate()(PopupCreateWorkspace)
+export default withTranslation()(PopupCreateWorkspace)

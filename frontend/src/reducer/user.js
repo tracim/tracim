@@ -38,19 +38,19 @@ export default function user (state = defaultUser, action) {
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
-      return {...defaultUser, lang: state.lang, logged: false}
+      return { ...defaultUser, lang: state.lang, logged: false }
 
     case `${SET}/${USER_LANG}`:
-      return {...state, lang: action.lang}
+      return { ...state, lang: action.lang }
 
     case `${UPDATE}/${USER_NAME}`:
-      return {...state, public_name: action.newName}
+      return { ...state, public_name: action.newName }
 
     case `${UPDATE}/${USER_EMAIL}`:
-      return {...state, email: action.newEmail}
+      return { ...state, email: action.newEmail }
 
     case `${SET}/${USER_AGENDA_URL}`:
-      return {...state, agendaUrl: action.newAgendaUrl}
+      return { ...state, agendaUrl: action.newAgendaUrl }
 
     default:
       return state

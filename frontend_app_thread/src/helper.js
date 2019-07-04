@@ -43,7 +43,7 @@ export const debug = { // copied from html-document => outdated
       hexcolor: '#ababab',
       globalStatus: 'closed'
     }],
-    translation: {en: {}, fr: {}}
+    translation: { en: {}, fr: {} }
   },
   loggedUser: { // @FIXME this object is outdated
     user_id: 1,

@@ -33,7 +33,7 @@ const PageTitle = props => {
 }
 
 PageTitle.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   subtitle: PropTypes.string,
   parentClass: PropTypes.string,
   customClass: PropTypes.string,

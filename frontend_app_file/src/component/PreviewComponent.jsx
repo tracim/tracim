@@ -1,8 +1,9 @@
 import React from 'react'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import Lightbox from 'react-images'
+import Lightbox from 'react-image-lightbox'
+import 'react-image-lightbox/style.css'
 
 require('./PreviewComponent.styl')
 
@@ -26,18 +27,18 @@ export class PreviewComponent extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { props } = this
+    const { props, state } = this
 
-    if (prevProps.previewUrl !== props.previewUrl) {
-      this.setState({isJpegPreviewDisplayable: true})
+    if (prevProps.previewUrl !== props.previewUrl && state.displayLightbox === false) {
+      this.setState({ isJpegPreviewDisplayable: true })
       this.isJpegPreviewDisplayable()
     }
     // if (prevProps.downloadPdfPageUrl !== props.downloadPdfPageUrl) {
-    //   this.setState({isPdfPageDisplayable: true})
+    //   this.setState({ isPdfPageDisplayable: true })
     //   this.isPdfPageDisplayable()
     // }
     // if (prevProps.downloadPdfFullUrl !== props.downloadPdfFullUrl) {
-    //   this.setState({isPdfFullDisplayable: true})
+    //   this.setState({ isPdfFullDisplayable: true })
     //   this.isPdfFullDisplayable()
     // }
   }
@@ -47,15 +48,19 @@ export class PreviewComponent extends React.Component {
     newDescription: this.props.description
   }))
 
-  handleChangeDescription = e => this.setState({newDescription: e.target.value})
+  handleChangeDescription = e => this.setState({ newDescription: e.target.value })
 
   handleClickValidateNewDescription = () => {
     this.props.onClickValidateNewDescription(this.state.newDescription)
-    this.setState({displayFormNewDescription: false})
+    this.setState({ displayFormNewDescription: false })
   }
 
-  handleClickShowImageRaw = async () => {
-    this.setState({displayLightbox: true})
+  handleClickShowImageRaw = () => {
+    this.setState({ displayLightbox: true })
+  }
+
+  handleClickHideImageRaw = () => {
+    this.setState({ displayLightbox: false })
   }
 
   isJpegPreviewDisplayable = () => {
@@ -64,7 +69,7 @@ export class PreviewComponent extends React.Component {
     if (props.isJpegAvailable) {
       const img = document.createElement('img')
       img.src = props.previewUrl
-      img.onerror = () => this.setState({isJpegPreviewDisplayable: false})
+      img.onerror = () => this.setState({ isJpegPreviewDisplayable: false })
     }
   }
 
@@ -75,7 +80,7 @@ export class PreviewComponent extends React.Component {
   //
   //   if (props.isPdfAvailable) {
   //     const fetchPdfPage = await handleFetchResult(await getFilePdf(props.downloadPdfPageUrl))
-  //     if (fetchPdfPage.status !== 200) this.setState({isPdfPageDisplayable: false})
+  //     if (fetchPdfPage.status !== 200) this.setState({ isPdfPageDisplayable: false })
   //   }
   // }
   //
@@ -84,7 +89,7 @@ export class PreviewComponent extends React.Component {
   //
   //   if (props.isPdfAvailable) {
   //     const fetchPdfFull = await handleFetchResult(await getFilePdf(props.downloadPdfFullUrl))
-  //     if (fetchPdfFull.status !== 200) this.setState({isPdfFullDisplayable: false})
+  //     if (fetchPdfFull.status !== 200) this.setState({ isPdfFullDisplayable: false })
   //   }
   // }
 
@@ -92,7 +97,7 @@ export class PreviewComponent extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
+      <div className={classnames('previewcomponent', { 'closedproperty': !props.displayProperty })}>
         <div className='previewcomponent__dloption'>
           {state.isJpegPreviewDisplayable && props.isPdfAvailable && (
             <a
@@ -100,7 +105,7 @@ export class PreviewComponent extends React.Component {
               href={props.downloadPdfPageUrl}
               target='_blank'
               download
-              style={{':hover': {color: props.color}}}
+              style={{ ':hover': { color: props.color } }}
               title={props.t('Download current page as PDF')}
               key={'file_btn_dl_pdfall'}
             >
@@ -114,7 +119,7 @@ export class PreviewComponent extends React.Component {
               href={props.downloadPdfFullUrl}
               target='_blank'
               download
-              style={{':hover': {color: props.color}}}
+              style={{ ':hover': { color: props.color } }}
               title={props.t('Download as PDF')}
               key={'file_btn_dl_pdfpage'}
             >
@@ -127,7 +132,7 @@ export class PreviewComponent extends React.Component {
             href={props.downloadRawUrl}
             target='_blank'
             download
-            style={{':hover': {color: props.color}}}
+            style={{ ':hover': { color: props.color } }}
             title={props.t('Download file')}
             key={'file_btn_dl_raw'}
           >
@@ -141,7 +146,7 @@ export class PreviewComponent extends React.Component {
               type='button'
               className='previewcomponent__slider__icon btn iconBtn'
               onClick={props.onClickPreviousPage}
-              style={{':hover': {color: props.color}}}
+              style={{ ':hover': { color: props.color } }}
               title={props.t('Previous page')}
               disabled={props.fileCurrentPage === 1}
               key={'file_btn_previouspage'}
@@ -152,7 +157,7 @@ export class PreviewComponent extends React.Component {
 
           <div
             className={
-              classnames('previewcomponent__slider__fileimg', {'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable})
+              classnames('previewcomponent__slider__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
             }
             onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
           >
@@ -162,34 +167,37 @@ export class PreviewComponent extends React.Component {
               )
               : (
                 <div className='filecontent__preview' drop='true'>
-                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{color: props.color}} />
+                  <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{ color: props.color }} />
                   <div className='filecontent__preview__nopreview-msg'>
                     {props.t('No preview available')}
                   </div>
                 </div>
               )
             }
-
-            {state.isJpegPreviewDisplayable && props.isJpegAvailable && (
-              <Lightbox
-                isOpen={state.displayLightbox}
-                images={(props.lightboxUrlList || []).map(url => ({src: url}))}
-                currentImage={props.fileCurrentPage - 1}
-                onClose={() => this.setState({displayLightbox: false})}
-                onClickPrev={props.onClickPreviousPage}
-                onClickNext={props.onClickNextPage}
-                showImageCount
-                imageCountSeparator={props.t(' of ')}
-              />
-            )}
           </div>
+
+          {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
+            ? (
+              <Lightbox
+                prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
+                mainSrc={props.lightboxUrlList[props.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                nextSrc={props.lightboxUrlList[props.fileCurrentPage]}
+                onCloseRequest={this.handleClickHideImageRaw}
+                onMovePrevRequest={props.onClickPreviousPage}
+                onMoveNextRequest={props.onClickNextPage}
+                imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
+                imagePadding={55}
+              />
+            )
+            : null
+          }
 
           {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
             <button
               type='button'
               className='previewcomponent__slider__icon btn iconBtn'
               onClick={props.onClickNextPage}
-              style={{':hover': {color: props.color}}}
+              style={{ ':hover': { color: props.color } }}
               title={props.t('Next page')}
               disabled={props.fileCurrentPage === props.filePageNb}
               key={'file_btn_nextpage'}
@@ -208,7 +216,7 @@ export class PreviewComponent extends React.Component {
         <div className='previewcomponent__property'>
           <div className='previewcomponent__property__button' onClick={props.onClickProperty}>
             <div className='previewcomponent__property__button__arrow mt-3'>
-              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty})} />
+              <i className={classnames('fa fa-fw', { 'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty })} />
             </div>
 
             <div className='previewcomponent__property__button__title'>
@@ -216,7 +224,7 @@ export class PreviewComponent extends React.Component {
             </div>
 
             <div className='previewcomponent__property__button__arrow mb-3'>
-              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty})} />
+              <i className={classnames('fa fa-fw', { 'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty })} />
             </div>
           </div>
 
@@ -292,4 +300,4 @@ export class PreviewComponent extends React.Component {
   }
 }
 
-export default translate()(Radium(PreviewComponent))
+export default withTranslation()(Radium(PreviewComponent))

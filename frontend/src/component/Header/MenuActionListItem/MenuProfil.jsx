@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { PAGE } from '../../../helper.js'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Avatar } from 'tracim_frontend_lib'
 
 require('./MenuProfil.styl')
@@ -52,7 +52,7 @@ const MenuProfil = props => {
     </li>
   )
 }
-export default translate()(MenuProfil)
+export default withTranslation()(MenuProfil)
 
 MenuProfil.propTypes = {
   user: PropTypes.object.isRequired,

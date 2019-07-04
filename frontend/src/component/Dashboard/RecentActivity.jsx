@@ -26,10 +26,10 @@ export const RecentActivity = props =>
     <div className='recentactivity__list'>
       {props.recentActivityList.length > 0
         ? props.recentActivityList.map(content => {
-          const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || {hexcolor: '', faIcon: ''}
+          const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || { hexcolor: '', faIcon: '' }
 
           const recentActivityItemIcon = (
-            <div className='recentactivity__list__item__icon' style={{color: contentType.hexcolor}}>
+            <div className='recentactivity__list__item__icon' style={{ color: contentType.hexcolor }}>
               <i className={`fa fa-${contentType.faIcon}`} />
             </div>
           )
@@ -57,7 +57,7 @@ export const RecentActivity = props =>
           } else {
             return (
               <Link
-                className={classnames('recentactivity__list__item primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
+                className={classnames('recentactivity__list__item primaryColorBgLightenHover', { 'read': props.readByUserList.includes(content.id) })}
                 to={PAGE.WORKSPACE.CONTENT(props.workspaceId, content.type, content.id)}
                 title={content.label}
                 key={content.id}
@@ -73,7 +73,7 @@ export const RecentActivity = props =>
 
       <div
         className='recentactivity__more'
-        style={{display: props.recentActivityList.length === 0 ? 'none' : 'flex'}}
+        style={{ display: props.recentActivityList.length === 0 ? 'none' : 'flex' }}
       >
         <button
           className='recentactivity__more__btn btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
