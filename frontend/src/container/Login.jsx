@@ -18,13 +18,15 @@ import {
   setAppList,
   setConfig,
   resetBreadcrumbs,
-  setUserLang
+  setUserLang,
+  setWorkspaceListMemberList
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
+  getWorkspaceMemberList,
   postUserLogin,
   putUserLang
 } from '../action-creator.async.js'
@@ -154,7 +156,28 @@ class Login extends React.Component {
   loadWorkspaceList = async () => {
     const { props } = this
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
-    if (fetchGetWorkspaceList.status === 200) props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
+    if (fetchGetWorkspaceList.status === 200) {
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
+      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
+    }
+  }
+
+  loadWorkspaceListMemberList = async workspaceList => {
+    const { props } = this
+
+    const fetchWorkspaceListMemberList = await Promise.all(
+      workspaceList.map(async ws => ({
+        idWorkspace: ws.workspace_id,
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+      }))
+    )
+
+    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
+      idWorkspace: memberList.idWorkspace,
+      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+    }))
+
+    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   setDefaultUserLang = async loggedUser => {

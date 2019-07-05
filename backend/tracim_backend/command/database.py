@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import traceback
 
 from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
@@ -119,7 +120,13 @@ class DeleteDBCommand(AppContextCommand):
                 depot = DepotManager.get()
                 depot_files = depot.list()
                 for file_ in depot_files:
-                    depot.delete(file_)
+                    try:
+                        depot.delete(file_)
+                    # TODO - G.M - 2019-05-09 - better handling of specific exception here
+                    except Exception as exc:
+                        traceback.print_exc()
+                        print("Something goes wrong during deletion of {}".format(file_))
+                        raise exc
                 print("Cleaning depot done.")
             except FileNotFoundError:
                 print("Warning! Can delete depots file, is depot path correctly" " configured?")

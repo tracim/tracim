@@ -11,6 +11,7 @@ import contentType from './contentType.js'
 import timezone from './timezone.js'
 import system from './system.js'
 import customFormContentType from './customFormContentType'
+import searchResult from './searchResult.js'
 
 const rootReducer = combineReducers({
   lang,
@@ -24,7 +25,8 @@ const rootReducer = combineReducers({
   customFormContentType,
   contentType,
   timezone,
-  system
+  system,
+  searchResult
 })
 
 export default rootReducer

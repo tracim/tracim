@@ -2,6 +2,9 @@ import i18n, { getBrowserLang } from './i18n.js'
 
 const configEnv = require('../configEnv.json')
 
+const versionFile = require('./version.json')
+export const TRACIM_APP_VERSION = versionFile.tracim_app_version
+
 // this function is declared in i18n to avoid cyclic imports and reexported here for consistency
 export { getBrowserLang }
 
@@ -46,10 +49,9 @@ export const PAGE = {
     USER: '/ui/admin/user',
     FORM: '/ui/admin/form',
     USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
-  }
+  },
+  SEARCH_RESULT: '/ui/search-result'
 }
-
-export const APP_FULLSCREEN_LIST = [PAGE.ADMIN.WORKSPACE, PAGE.ADMIN.USER, PAGE.ADMIN.FORM, PAGE.AGENDA]
 
 export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]
 
@@ -83,13 +85,12 @@ export const ROLE = [{
   label: 'Reader' // label must be used in components
 }]
 
-export const findIdRoleUserWorkspace = (idUser, memberList, roleList) => {
-  const myself = memberList.find(u => u.id === idUser) || {role: 'reader'}
-  return (roleList.find(r => myself.role === r.slug) || {id: 1}).id
+export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
+  const user = memberList.find(u => u.id === userId) || {role: 'reader'}
+  return (roleList.find(r => user.role === r.slug) || {id: 1}).id
 }
 
-// Côme - 2018/08/21 - useful ?
-export const ROLE2 = {
+export const ROLE_OBJECT = {
   reader: {
     id: 1,
     sluf: 'reader',
@@ -151,6 +152,16 @@ export const PROFILE = {
   }
 }
 
+// INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/v2/system/content_types
+export const CONTENT_TYPE = {
+  HTML_DOCUMENT: 'html-document',
+  FILE: 'file',
+  THREAD: 'thread',
+  FOLDER: 'folder',
+  COMMENT: 'comment',
+  CUSTOM_FORM: 'custom-form'
+}
+
 export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
@@ -162,6 +173,10 @@ export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).
 const USER_AUTH_INTERNAL = 'internal'
 const USER_AUTH_UNKNOWN = 'unknown'
 export const editableUserAuthTypeList = [USER_AUTH_INTERNAL, USER_AUTH_UNKNOWN]
+
+export const DRAG_AND_DROP = {
+  CONTENT_ITEM: 'contentItem'
+}
 
 // Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.
@@ -175,3 +190,5 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Cancelled'),
   i18n.t('Deprecated')
 ]
+
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,custom-form'

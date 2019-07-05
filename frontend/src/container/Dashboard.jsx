@@ -38,7 +38,7 @@ import appFactory from '../appFactory.js'
 import {
   ROLE,
   PAGE,
-  findIdRoleUserWorkspace,
+  findUserRoleIdInWorkspace,
   PROFILE
 } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
@@ -384,7 +384,7 @@ class Dashboard extends React.Component {
           creationLabel: ''
         },
         props.user,
-        findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
+        findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
         {...props.curWs, workspace_id: props.curWs.id}
       )
     } else {
@@ -415,8 +415,7 @@ class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
-    // let indexCustomFormContentType = 0
+    const idRoleUserWorkspace = findUserRoleIdInWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
 
     let contentTypeButtonList = props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
@@ -433,7 +432,6 @@ class Dashboard extends React.Component {
           // }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
           // these endpoints are /system/applications, /system/content_types and key sidebar_entry from /user/me/workspaces
-
           return {
             ...app,
             creationLabel: app.slug === 'agenda' ? props.t('Open the agenda') : contentType.creationLabel,

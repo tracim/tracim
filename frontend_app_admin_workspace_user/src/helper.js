@@ -127,3 +127,8 @@ export const debug = {
     userList: []
   }
 }
+
+export const DRAG_AND_DROP = {
+  FIELD: 'field',
+  FIELD_TYPE: 'field_type'
+}

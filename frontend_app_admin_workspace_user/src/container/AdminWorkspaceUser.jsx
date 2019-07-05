@@ -25,7 +25,7 @@ import {
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
-import {AdminForm} from "../component/AdminForm";
+import AdminForm from '../component/AdminForm';
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
 
@@ -59,7 +59,7 @@ class AdminWorkspaceUser extends React.Component {
     switch (type) {
       case 'admin_workspace_user_showApp':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({...prev.config, config: data.config}))
+        this.setState({config: data.config})
         break
       case 'refreshWorkspaceList':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)

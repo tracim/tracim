@@ -52,6 +52,10 @@ log "cd $DEFAULTDIR/frontend_app_html-document"
 cd $DEFAULTDIR/frontend_app_html-document || exit 1
 ./build_html-document.sh $dev
 
+# app Html Document
+log "cd $DEFAULTDIR/frontend_app_custom-form"
+cd $DEFAULTDIR/frontend_app_custom-form || exit 1
+./build_custom-form.sh $dev
 
 # app Thread
 log "cd $DEFAULTDIR/frontend_app_thread"

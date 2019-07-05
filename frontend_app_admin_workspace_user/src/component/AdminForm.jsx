@@ -1,58 +1,65 @@
 import React from 'react'
 import JSONInput from 'react-json-editor-ajrm'
-import locale from 'react-json-editor-ajrm/locale/en'
-import JsonForm from '../../../frontend_app_custom_form/src/component/JsonForm/JsonForm'
-import FormComponentDropZone from './FormComponent/FormComponentDropZone.jsx'
-import TextFieldDrag from './FormComponent/TextFieldDrag.jsx'
+import locale from 'react-json-editor-ajrm/locale/fr'
+import JsonForm
+  from '../../../frontend_app_custom-form/src/component/JsonForm/JsonForm'
+import FormBuilder from './FormBuilder/FormBuilder'
+import JsonFormEditor from './FormBuilder/JsonFormEditor'
 
 import { translate } from 'react-i18next'
 import {
   PageWrapper,
   PageTitle,
-  PageContent,
+  PageContent
 } from 'tracim_frontend_lib'
-
-const uiSchema = {
-  resume: {
-    'ui:widget': 'textarea'
-  },
-}
-
-const formData = {
-  title: '',
-
-}
+import FormInfo from './FormBuilder/FormInfo'
 
 export class AdminForm extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      r: false,
-      schema: {}
+      editor: true,
+      extraInfo: {}
     }
   }
 
+  onSchemaChange = (data) => {
+    if (data !== undefined) {
+      // TODO WTF is dis
+      this.setState({
+        schema: {}
+      }, () => this.setState({
+        schema: data
+      }))
+    }
+  }
+
+  onUiSchemaChange = (data) => {
+    if (data.jsObject !== undefined) {
+      this.setState({
+        uischema: data.jsObject
+      })
+    }
+  }
+
+  onInfoChange (name, value) {
+    this.setState(state => {
+      let extraInfo = state.extraInfo
+      extraInfo[name] = value
+      return {extraInfo}
+    })
+  }
+
+  handleClickSaveButton () {
+    let form = this.state.extraInfo
+    form.schema = this.state.schema
+    form.uiSchema = this.state.uischema
+    console.log(form)
+  }
+
   render () {
-    const { props, state } = this
-
-    const onChange = (data) => {
-
-      //console.log(this.state.schema)
-      if (data.jsObject !== undefined) {
-        this.setState(prevState => ({
-          r: true,
-          schema: data.jsObject
-        }))
-      }
-    }
-
-    const handleClickSaveButton = e => {
-      console.log(this.state.schema)
-    }
-
     return (
-
       <PageWrapper customClass='adminUser'>
         <PageTitle
           parentClass={'adminUser'}
@@ -67,7 +74,6 @@ export class AdminForm extends React.Component {
           </div>
 
           <div className='adminUser__table'>
-
             <table className='table'>
               <thead>
                 <tr>
@@ -75,39 +81,66 @@ export class AdminForm extends React.Component {
                 </tr>
               </thead>
             </table>
-            <table>
-              <tbody>
-                <tr>
-                  <th>
-                    <div>
-                      <JSONInput
-                        id='a_unique_id'
-                        locale={locale}
-                        height='550px'
-                        onChange={onChange}
-                      />
-                    </div>
-                  </th>
-                  <th>
-                    <div>
-                      {this.state.r === true && (<JsonForm
-                        isDisable={false}
-                        id={1}
-                        customClass={'html-document__editionmode'}
-                        disableValidateBtn
-                        text={''}
-                        schema={this.state.schema.schema}
-                        uischema={this.state.schema.uischema}
-                      />)}
-                    </div>
-                  </th>
-                </tr>
-              </tbody>
-            </table>
-            <button onClick={handleClickSaveButton}>Sauvegarder</button>
+            <div>
+              <FormInfo onChange={this.onInfoChange.bind(this)} onSave={this.handleClickSaveButton.bind(this)} />
+            </div>
 
-            <TextFieldDrag id={0} />
-            <FormComponentDropZone />
+            <br />
+
+            <button onClick={() => this.setState({editor: !this.state.editor})}>{this.state.editor ? 'Drag and drop' : 'Json editor'}</button>
+            <div>
+              <div className='divLeft'>
+                {!this.state.editor && (
+                  <FormBuilder onChange={this.onSchemaChange} schema={this.state.schema} />
+                )}
+                {this.state.editor && (
+                  <JsonFormEditor
+                    schema={this.state.schema}
+                    onSchemaChange={this.onSchemaChange}
+                    onUiSchemaChange={this.onUiSchemaChange}
+                  />
+                  // <div style={{marginTop: '2%'}}>
+                  //   <div>
+                  //     <p>schema :</p>
+                  //     <JSONInput
+                  //       id='schema'
+                  //       locale={locale}
+                  //       height='550px'
+                  //       width={'100%'}
+                  //       placeholder={this.state.schema}
+                  //       onChange={(data) => this.onSchemaChange(data.jsObject)}
+                  //     />
+                  //   </div>
+                  //
+                  //   <div>
+                  //     <p>uischema :</p>
+                  //
+                  //     <JSONInput
+                  //       id='uischema'
+                  //       locale={locale}
+                  //       height='250px'
+                  //       width={'100%'}
+                  //       onChange={this.onUiSchemaChange}
+                  //     />
+                  //   </div>
+                  // </div>
+                )}
+              </div>
+
+              <div className='divRight'>
+                <div>
+                  <JsonForm
+                    isDisable={false}
+                    id={1}
+                    customClass={'html-document__editionmode'}
+                    disableValidateBtn
+                    text={''}
+                    schema={this.state.schema || {}}
+                    uiSchema={this.state.uischema || {}}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </PageContent>
 

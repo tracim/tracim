@@ -15,13 +15,24 @@
       display flex
       align-items center
       flex-wrap wrap
-  &__workspaceTable__tr
-    &:hover, &:nth-child(even):hover
-      background-color grey-hover
-    &__td-link
-      cursor pointer
-      &:not(:hover)
-        color inherit
+  &__workspaceTable
+    table-layout fixed
+    &__tr
+      &:hover, &:nth-child(even):hover
+        background-color grey-hover
+      &__td-link
+        max-width 0
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+        cursor pointer
+        &:not(:hover)
+          color inherit
+      &__td-description
+        max-width 0
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
 
 .adminUser
   &__description
@@ -86,3 +97,109 @@
       .btn:first-child
         margin-right 15px
 
+.adminWorkspace
+  &__workspaceTable
+    & .table
+      &__id
+        width 5%
+        text-align right
+      &__sharedSpace
+        width 15%
+      &__description
+        width 60%
+      &__memberCount
+        width 10%
+        text-align right
+      &__delete
+        width 10%
+
+@media (min-width: min-sm) and (max-width: max-md)
+  .adminWorkspace
+    &__workspaceTable
+      & .table
+        &__description
+          width 50%
+        &__memberCount
+          width 15%
+        &__delete
+          width 15%
+
+@media (max-width: max-xs)
+  .adminWorkspace
+    &__workspaceTable
+      & .table
+        &__id
+          width 10%
+        &__sharedSpace
+          width 30%
+        &__description
+          width 0%
+          display none
+        &__memberCount
+          width 30%
+        &__delete
+          width 30%
+
+i
+  &.glyphicon
+    display none
+.btn-add
+  &::after
+    content '\f067'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item-move-up
+  &::after
+    content '\f077'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item-move-down
+  &::after
+    content '\f078'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item-remove
+  &::after
+    content '\f00d'
+    font: normal normal normal 21px/1 FontAwesome
+  &:disabled
+    display none
+.array-item
+  width 100%
+  margin 1%
+.array-item-add
+  width 100%
+  margin 1%
+.btn-add
+  width 50%
+.field-description
+  font-style italic
+
+.divRight
+  width 35%
+  display inline
+  float right
+
+.divLeft
+  width 60%
+  display inline
+  float left
+
+.formInfo > span
+  margin-right 0.5%
+  margin-left 0.5%
+
+.formInfo > button
+  margin-left 2%
+
+.panel-heading h3 {
+  white-space nowrap
+  overflow hidden
+  text-overflow ellipsis
+  line-height normal
+  width 75%
+  padding-top 8px
+}

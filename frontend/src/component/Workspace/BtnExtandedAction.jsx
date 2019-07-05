@@ -4,7 +4,10 @@ import { translate } from 'react-i18next'
 
 const ExtandedAction = props => {
   return (
-    <div className='extandedaction dropdown'>
+    <div
+      className='extandedaction dropdown'
+      data-cy='extended_action'
+    >
       <button
         className='extandedaction__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
         type='button'
@@ -18,8 +21,12 @@ const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        {props.onClickExtendedAction.edit && props.idRoleUserWorkspace >= 2 &&
-          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
+        {props.onClickExtendedAction.edit && props.userRoleIdInWorkspace >= 2 && (
+          <div
+            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            onClick={props.onClickExtendedAction.edit}
+            data-cy='extended_action_edit'
+          >
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-pencil' />
             </div>
@@ -28,19 +35,7 @@ const ExtandedAction = props => {
               {props.t('Edit')}
             </div>
           </div>
-        }
-
-        {props.onClickExtendedAction.move && props.idRoleUserWorkspace >= 4 &&
-          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.move}>
-            <div className='subdropdown__item__icon mr-3'>
-              <i className='fa fa-fw fa-arrows-alt' />
-            </div>
-
-            <div className='subdropdown__item__text'>
-              {props.t('Move')}
-            </div>
-          </div>
-        }
+        )}
 
         {/*
         <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.download}>
@@ -53,8 +48,12 @@ const ExtandedAction = props => {
         </div>
         */}
 
-        {props.idRoleUserWorkspace >= 4 &&
-          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.archive}>
+        {props.userRoleIdInWorkspace >= 4 && (
+          <div
+            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            onClick={props.onClickExtendedAction.archive}
+            data-cy='extended_action_archive'
+          >
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-archive' />
             </div>
@@ -63,10 +62,14 @@ const ExtandedAction = props => {
               {props.t('Archive')}
             </div>
           </div>
-        }
+        )}
 
-        {props.idRoleUserWorkspace >= 4 &&
-          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.delete}>
+        {props.userRoleIdInWorkspace >= 4 && (
+          <div
+            className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center'
+            onClick={props.onClickExtendedAction.delete}
+            data-cy='extended_action_delete'
+          >
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-trash-o' />
             </div>
@@ -75,7 +78,7 @@ const ExtandedAction = props => {
               {props.t('Delete')}
             </div>
           </div>
-        }
+        )}
 
       </div>
     </div>
@@ -85,7 +88,10 @@ const ExtandedAction = props => {
 export default translate()(ExtandedAction)
 
 ExtandedAction.propTypes = {
-  onClickExtendedAction: PropTypes.object.isRequired
+  onClickExtendedAction: PropTypes.object.isRequired,
+  userRoleIdInWorkspace: PropTypes.number
 }
 
-ExtandedAction.defaultProps = {}
+ExtandedAction.defaultProps = {
+  userRoleIdInWorkspace: 0
+}

@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import AppFormGeneration from './AppFormGeneration.jsx'
 
 export class WIPcomponent extends React.Component {
   render () {
@@ -13,9 +12,7 @@ export class WIPcomponent extends React.Component {
     // const ComponentToDisplay = MyComponent[this.props.match.params.cp]
 
     return (
-      <div>
-        <AppFormGeneration />
-      </div>
+      <div />
     )
   }
 }

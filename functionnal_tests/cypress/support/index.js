@@ -16,6 +16,8 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import './db_commands'
+import './generic_selector_commands'
+import './urls_commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

@@ -7,7 +7,6 @@ if [ ! -f /etc/tracim/development.ini ]; then
     SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1)
     cp /tracim/backend/development.ini.sample /etc/tracim/development.ini
     sed -i "s|basic_setup.website_base_url = .*|basic_setup.website_base_url = http://localhost:8080|g" /etc/tracim/development.ini
-    sed -i "s|basic_setup.listen = .*|basic_setup.listen = 127.0.0.1:8080|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.depot_storage_dir = .*|basic_setup.depot_storage_dir = /var/tracim/data/depot|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.caldav_storage_dir = .*|basic_setup.caldav_storage_dir = /var/tracim/data/radicale_storage|g" /etc/tracim/development.ini
     sed -i "s|basic_setup.preview_cache_dir = .*|basic_setup.preview_cache_dir = /var/tracim/data/preview|g" /etc/tracim/development.ini
@@ -16,9 +15,12 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|basic_setup.session_secret = change_this_value_please\!|basic_setup.session_secret = $SECRET|g" /etc/tracim/development.ini
     sed -i "s|email.template_dir = .*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
     sed -i "s|email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
-    sed -i "s|webdav.listen = .*|webdav.listen = 127.0.0.1:3030|g" /etc/tracim/development.ini
     sed -i "s|;webdav.root_path = /|webdav.root_path = /webdav|g" /etc/tracim/development.ini
     sed -i "s|webdav.base_url = .*|webdav.base_url = http://localhost:8080|g" /etc/tracim/development.ini
+    sed -i "s|email.processing_mode = sync|email.processing_mode = async|g" /etc/tracim/development.ini
+    sed -i "s|; email.async.redis.host = .*|email.async.redis.host = localhost|g" /etc/tracim/development.ini
+    sed -i "s|; email.async.redis.port = .*|email.async.redis.port = 6379|g" /etc/tracim/development.ini
+    sed -i "s|; email.async.redis.db = .*|email.async.redis.db = 0|g" /etc/tracim/development.ini
     case "$DATABASE_TYPE" in
       mysql)
         sed -i "s|basic_setup.sqlalchemy_url = .*|basic_setup.sqlalchemy_url = $DATABASE_TYPE+pymysql://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/$DATABASE_NAME$DATABASE_SUFFIX|g" /etc/tracim/development.ini ;;
@@ -101,7 +103,19 @@ fi
 if [ ! -f /var/tracim/assets ]; then
     mkdir /var/tracim/assets -p
 fi
-# Create folder radicale_storage for caldav
+# Create required folder
+if [ ! -d /var/tracim/data/sessions_data ]; then
+    mkdir /var/tracim/data/sessions_data
+fi
+if [ ! -d /var/tracim/data/sessions_lock ]; then
+    mkdir /var/tracim/data/sessions_lock
+fi
+if [ ! -d /var/tracim/data/depot ]; then
+    mkdir /var/tracim/data/depot
+fi
+if [ ! -d /var/tracim/data/preview ]; then
+    mkdir /var/tracim/data/preview
+fi
 if [ ! -d /var/tracim/data/radicale_storage ]; then
     mkdir /var/tracim/data/radicale_storage
 fi
@@ -132,4 +146,18 @@ if [ "$START_CALDAV" = "1" ]; then
     if [ ! -L /etc/uwsgi/apps-available/tracim_caldav.ini ]; then
         ln -s /etc/tracim/tracim_caldav.ini /etc/uwsgi/apps-available/tracim_caldav.ini
     fi
+fi
+
+# Activate email
+if [ "$EMAIL_NOTIFICATION" = "1" ]; then
+    sed -i "s|email.notification.activated = .*|email.notification.activated = True|g" /etc/tracim/development.ini
+else
+    sed -i "s|email.notification.activated = .*|email.notification.activated = False|g" /etc/tracim/development.ini
+fi
+
+# Activate reply by email
+if [ "$REPLY_BY_EMAIL" = "1" ]; then
+    sed -i "s|email.reply.activated = .*|email.reply.activated = True|g" /etc/tracim/development.ini
+else
+    sed -i "s|email.reply.activated = .*|email.reply.activated = False|g" /etc/tracim/development.ini
 fi

@@ -360,6 +360,16 @@ class File extends React.Component {
         this.loadContent()
         this.loadTimeline()
         break
+      case 400:
+        switch (fetchResultSaveNewComment.body.code) {
+          case 2003:
+            this.sendGlobalFlashMessage(props.t("You can't send an empty comment"))
+            break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while saving new comment'))
+            break
+        }
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
     }
   }
@@ -667,6 +677,8 @@ class File extends React.Component {
         <PopinFixedContent
           customClass={`${state.config.slug}__contentpage`}
         >
+          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
+            https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
