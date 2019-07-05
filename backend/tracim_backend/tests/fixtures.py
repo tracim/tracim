@@ -13,7 +13,6 @@ from tracim_backend import init_models
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
@@ -38,7 +37,7 @@ def config_section() -> str:
 
 @pytest.fixture
 def tracim_fixtures() -> typing.List:
-    return [BaseFixture]
+    return []
 
 
 @pytest.fixture
