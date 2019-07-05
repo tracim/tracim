@@ -229,22 +229,20 @@ class WOPIController(Controller):
     def bind(self, configurator: Configurator):
         # Discovery
         configurator.add_route(
-            "wopi_discovery",
-            "/{wopi_base}/discovery".format(wopi_base=WOPI_BASE),
-            request_method="GET",
+            "wopi_discovery", "/{}/discovery".format(WOPI_BASE), request_method="GET"
         )
         configurator.add_view(self.discovery, route_name="wopi_discovery")
 
         # Edit file
         configurator.add_route(
-            "wopi_edit_file", "/{wopi_base}/edit".format(wopi_base=WOPI_FILES), request_method="GET"
+            "wopi_edit_file", "/{}/edit".format(WOPI_FILES), request_method="GET"
         )
         configurator.add_view(self.edit_file, route_name="wopi_edit_file")
 
         # Create file from template
         configurator.add_route(
             "wopi_create_file_from_template",
-            "/{wopi_base}/create".format(wopi_base=WOPI_FILES),
+            "/{}/files/create".format(WOPI_BASE),
             request_method="POST",
         )
         configurator.add_view(
@@ -253,24 +251,18 @@ class WOPIController(Controller):
 
         # Get content
         configurator.add_route(
-            "wopi_get_content",
-            "/{wopi_base}/contents".format(wopi_base=WOPI_FILES),
-            request_method="GET",
+            "wopi_get_content", "/{}/contents".format(WOPI_FILES), request_method="GET"
         )
         configurator.add_view(self.get_content, route_name="wopi_get_content")
 
         # Check file info
         configurator.add_route(
-            "wopi_check_file_info",
-            "/{wopi_base}".format(wopi_base=WOPI_FILES),
-            request_method="GET",
+            "wopi_check_file_info", "/{}".format(WOPI_FILES), request_method="GET"
         )
         configurator.add_view(self.check_file_info, route_name="wopi_check_file_info")
 
         # Put file content
         configurator.add_route(
-            "wopi_put_content",
-            "/{wopi_base}/contents".format(wopi_base=WOPI_FILES),
-            request_method="POST",
+            "wopi_put_content", "/{}/contents".format(WOPI_FILES), request_method="POST"
         )
         configurator.add_view(self.put_content, route_name="wopi_put_content")

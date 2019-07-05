@@ -4133,10 +4133,10 @@ class TestWOPI(FunctionalTest):
         res = self.testapp.get(url, status=200)
         content = res.json_body
         assert len(content["extensions"]) == 3
-        assert (
-            content["urlsrc"] == "http://localhost:9980/loleaflet/305832f/loleaflet.html"
-            "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F1%2Fwopi%2Ffiles%2F%7B"
-            "content_id%7D"
+        assert content[
+            "urlsrc"
+        ] == "http://localhost:9980/loleaflet/305832f/loleaflet.html" "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F%7Bcontent_id%7D".format(
+            business_workspace.workspace_id
         )
 
     def test_api__get_content__ok_200__nominal_case(self) -> None:
@@ -4250,3 +4250,59 @@ class TestWOPI(FunctionalTest):
             != updated_at.replace(tzinfo=datetime.timezone.utc).isoformat()
         )
         assert file_.read() == new_content
+
+    @patch("requests.get")
+    def test_api__edit_file__ok_200__nominal_case(self, patched_get) -> None:
+        """
+        Ask to edit a file, returns the url of collabora online
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+        transaction.commit()
+
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        self.testapp.set_cookie("session_key", "some valid session")
+        patched_get.return_value.text = """
+        <wopi-discovery>
+            <net-zone name="external-http">
+                <app name="application/vnd.lotus-wordpro">
+                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="image/svg+xml">
+                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.text">
+                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <!-- a lot more `app` in the real response -->
+            </net-zone>
+        </wopi-discovery>
+        """
+        url = "/api/v2/workspaces/{}/wopi/files/{}/edit".format(
+            business_workspace.workspace_id, test_file.content_id
+        )
+        res = self.testapp.get(url, status=200)
+        content = res.json_body
+        assert len(content["extensions"]) == 3
+        assert content[
+            "urlsrc"
+        ] == "http://localhost:9980/loleaflet/305832f/loleaflet.html" "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F{}".format(
+            business_workspace.workspace_id, test_file.content_id
+        )
+        assert content["access_token"] == "some valid session"

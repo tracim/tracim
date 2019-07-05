@@ -1007,7 +1007,7 @@ class WOPICreateFromTemplateSchema(marshmallow.Schema):
     )
     title = StrippedString(
         required=True,
-        example=list(TEMPLATES.values())[0],
+        example=list(TEMPLATES.keys())[0],
         description="The file name, as saved in the workspace",
     )
     parent_id = marshmallow.fields.Int(
