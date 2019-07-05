@@ -4112,7 +4112,6 @@ class TestWOPI(FunctionalTest):
             )
         transaction.commit()
 
-        self.testapp.set_cookie("session_key", "some_valid_cookie")
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         patched_get.return_value.text = """
         <wopi-discovery>
@@ -4130,17 +4129,15 @@ class TestWOPI(FunctionalTest):
             </net-zone>
         </wopi-discovery>
         """
-        url = "/api/v2/workspaces/{}/wopi/files/{}/discovery".format(
-            business_workspace.workspace_id, test_file.content_id
-        )
+        url = "/api/v2/workspaces/{}/wopi/discovery".format(business_workspace.workspace_id)
         res = self.testapp.get(url, status=200)
         content = res.json_body
         assert len(content["extensions"]) == 3
         assert (
             content["urlsrc"] == "http://localhost:9980/loleaflet/305832f/loleaflet.html"
-            "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F1%2Fwopi%2Ffiles%2F21"
+            "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F1%2Fwopi%2Ffiles%2F%7B"
+            "content_id%7D"
         )
-        assert content["access_token"] == "some_valid_cookie"
 
     def test_api__get_content__ok_200__nominal_case(self) -> None:
         """Get file content"""

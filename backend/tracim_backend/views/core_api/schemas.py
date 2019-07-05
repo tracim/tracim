@@ -991,7 +991,35 @@ class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
     pass
 
 
-class WOPIDiscoverySchema(marshmallow.Schema):
+TEMPLATES = {
+    "default.ods": "application/vnd.oasis.opendocument.spreadsheet",
+    "default.odt": "application/vnd.oasis.opendocument.text",
+    "default.odp": "application/vnd.oasis.opendocument.presentation",
+}
+
+
+class WOPICreateFromTemplateSchema(marshmallow.Schema):
+    template = StrippedString(
+        validate=OneOf(set(TEMPLATES.keys())),
+        example=list(TEMPLATES.keys())[0],
+        description="The template of the file you want to create",
+        required=True,
+    )
+    title = StrippedString(
+        required=True,
+        example=list(TEMPLATES.values())[0],
+        description="The file name, as saved in the workspace",
+    )
+    parent_id = marshmallow.fields.Int(
+        example=42,
+        description="id of the new parent content id.",
+        default=None,
+        validate=positive_int_validator,
+    )
+
+
+class WOPIEditFileSchema(marshmallow.Schema):
+    # FIXME - H.D. - 2019/07/05 - extensions not useful for file edition, see with frontend
     extensions = marshmallow.fields.List(
         marshmallow.fields.String(example="odt"),
         required=True,
@@ -1007,6 +1035,20 @@ class WOPIDiscoverySchema(marshmallow.Schema):
         required=True,
         description="The access token which should be sent to collabora online and "
         "which uniquely identifies the user",
+    )
+
+
+class WOPIDiscoverySchema(marshmallow.Schema):
+    extensions = marshmallow.fields.List(
+        marshmallow.fields.String(example="odt"),
+        required=True,
+        description="Collabora Online supported file extensions",
+    )
+    urlsrc = marshmallow.fields.URL(
+        required=True,
+        description="URL of the collabora online editor",
+        example="http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc="
+        "http://172.16.20.7:6543/api/v2/workspaces/1/wopi/files/1",
     )
 
 
