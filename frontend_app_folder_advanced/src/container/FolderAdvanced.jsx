@@ -281,6 +281,7 @@ class FolderAdvanced extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            // customColor={state.config.hexcolor}
           />
         </PopinFixedContent>
       </PopinFixed>
