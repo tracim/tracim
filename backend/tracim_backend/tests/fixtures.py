@@ -10,12 +10,20 @@ import transaction
 
 from tracim_backend import CFG
 from tracim_backend import init_models
+from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import TEST_CONFIG_FILE_PATH
+from tracim_backend.tests.utils import ApplicationApiFactory
+from tracim_backend.tests.utils import ContentApiFactory
+from tracim_backend.tests.utils import GroupApiFactory
+from tracim_backend.tests.utils import RoleApiFactory
+from tracim_backend.tests.utils import WorkspaceApiFactory
 
 
 @pytest.fixture
@@ -30,7 +38,7 @@ def config_section() -> str:
 
 @pytest.fixture
 def tracim_fixtures() -> typing.List:
-    return []
+    return [BaseFixture]
 
 
 @pytest.fixture
@@ -86,7 +94,7 @@ def session(empty_session, engine, app_config, tracim_fixtures, test_logger):
         try:
             DeclarativeBase.metadata.drop_all(engine)
             DeclarativeBase.metadata.create_all(engine)
-            fixtures_loader = FixturesLoader(session, app_config)
+            fixtures_loader = FixturesLoader(dbsession, app_config)
             fixtures_loader.loads(tracim_fixtures)
             transaction.commit()
             logger.info(session, "Database initialized.")
@@ -110,9 +118,48 @@ def session(empty_session, engine, app_config, tracim_fixtures, test_logger):
     DeclarativeBase.metadata.drop_all(engine)
 
 
+@pytest.fixture
+def workspace_api_factory(session, app_config, admin_user) -> WorkspaceApiFactory:
+    return WorkspaceApiFactory(session, app_config, admin_user)
+
+
+@pytest.fixture
+def content_api_factory(session, app_config, admin_user) -> ContentApiFactory:
+    return ContentApiFactory(session, app_config, admin_user)
+
+
+@pytest.fixture
+def group_api_factory(session, app_config, admin_user) -> GroupApiFactory:
+    return GroupApiFactory(session, app_config, admin_user)
+
+
+@pytest.fixture
+def role_api_factory(session, app_config, admin_user) -> RoleApiFactory:
+    return RoleApiFactory(session, app_config, admin_user)
+
+
+@pytest.fixture
+def application_api_factory(app_list) -> ApplicationApiFactory:
+    return ApplicationApiFactory(app_list)
+
+
 @pytest.fixture()
-def admin_user(session):
+def admin_user(session) -> User:
     return session.query(User).filter(User.email == "admin@admin.admin").one()
+
+
+@pytest.fixture()
+def app_list() -> typing.List[Application]:
+    from tracim_backend.extensions import app_list as application_list_static
+
+    return application_list_static
+
+
+@pytest.fixture()
+def content_type_list() -> ContentTypeList:
+    from tracim_backend.app_models.contents import content_type_list as content_type_list_static
+
+    return content_type_list_static
 
 
 @pytest.fixture
