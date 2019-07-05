@@ -30,6 +30,12 @@ class TestUserApi(DefaultTest):
         assert u.email == "bob@bob"
         assert u.display_name == "bob"
 
+    def test_unit__create_minimal_user__ok__email_treated_as_lowercase(self):
+        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        u = api.create_minimal_user("BOB@BOB")
+        assert u.email == "bob@bob"
+        assert u.display_name == "BOB"
+
     @pytest.mark.internal_auth
     def test_unit__create_minimal_user_and_update__ok__nominal_case(self):
         api = UserApi(current_user=None, session=self.session, config=self.app_config)
@@ -58,6 +64,13 @@ class TestUserApi(DefaultTest):
         u = api.create_minimal_user("bob@bob")
         assert u.email == "bob@bob"
         u = api.update(user=u, email="bib@bib")
+        assert u.email == "bib@bib"
+
+    def test_unit__update_user_email__ok__email_treated_as_lowercase(self):
+        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        u = api.create_minimal_user("bob@bob")
+        assert u.email == "bob@bob"
+        u = api.update(user=u, email="BIB@BIB")
         assert u.email == "bib@bib"
 
     def test_unit__update_user_email__err__wrong_format(self):
