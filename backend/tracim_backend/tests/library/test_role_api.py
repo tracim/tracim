@@ -7,29 +7,26 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.tests import DefaultTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-class TestRoleApi(DefaultTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixture]])
+class TestRoleApi(object):
+    def test_unit__get_one__ok__nominal_case(self, admin_user, session, app_config):
+        rapi = RoleApi(current_user=admin_user, session=session, config=app_config)
+        rapi.get_one(admin_user.user_id, 1)
 
-    fixtures = [BaseFixture, ContentFixture]
-
-    def test_unit__get_one__ok__nominal_case(self):
-        admin = self.get_admin_user()
-        rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
-        rapi.get_one(admin.user_id, 1)
-
-    def test_unit__get_one__err__role_does_not_exist(self):
-        admin = self.get_admin_user()
-        rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+    def test_unit__get_one__err__role_does_not_exist(self, session, app_config, admin_user):
+        rapi = RoleApi(current_user=admin_user, session=session, config=app_config)
         with pytest.raises(UserRoleNotFound):
-            rapi.get_one(admin.user_id, 100)  # workspace 100 does not exist
+            rapi.get_one(admin_user.user_id, 100)  # workspace 100 does not exist
 
-    def test_unit__create_one__nominal_case(self):
-        admin = self.get_admin_user()
-        workspace = self._create_workspace_and_test("workspace_1", admin)
-        bob = self.session.query(User).filter(User.email == "bob@fsf.local").one()
-        rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
+    def test_unit__create_one__nominal_case(
+        self, admin_user, session, app_config, workspace_api_factory
+    ):
+        workspace = workspace_api_factory.get().create_workspace("workspace_1", save_now=True)
+        bob = session.query(User).filter(User.email == "bob@fsf.local").one()
+        rapi = RoleApi(current_user=admin_user, session=session, config=app_config)
         created_role = rapi.create_one(
             user=bob,
             workspace=workspace,
@@ -39,11 +36,10 @@ class TestRoleApi(DefaultTest):
         obtain_role = rapi.get_one(bob.user_id, workspace.workspace_id)
         assert created_role == obtain_role
 
-    def test_unit__get_all_for_usages(self):
-        admin = self.get_admin_user()
-        rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
-        workspace = self._create_workspace_and_test("workspace_1", admin)
+    def test_unit__get_all_for_usages(self, admin_user, session, app_config, workspace_api_factory):
+        rapi = RoleApi(current_user=admin_user, session=session, config=app_config)
+        workspace = workspace_api_factory.get().create_workspace("workspace_1", save_now=True)
         roles = rapi.get_all_for_workspace(workspace)
-        len(roles) == 1
-        roles[0].user_id == admin.user_id
-        roles[0].role == WorkspaceRoles.WORKSPACE_MANAGER.level
+        assert len(roles) == 1
+        assert roles[0].user_id == admin_user.user_id
+        assert roles[0].role == WorkspaceRoles.WORKSPACE_MANAGER.level
