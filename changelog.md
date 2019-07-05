@@ -6,7 +6,7 @@
 - Search: #2001, #2016, #2025
 - Docker: #2005, #2054
 - Timeline: #2032
-- Shared space: #2058
+- Shared spaces: #2058
 - User management: #1470, #2034
 - Email: #2036
 - Content preview: #2022
