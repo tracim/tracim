@@ -8,9 +8,11 @@ import pytest
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 import transaction
+from webtest import TestApp
 
 from tracim_backend import CFG
 from tracim_backend import init_models
+from tracim_backend import web
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
@@ -23,6 +25,7 @@ from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import GroupApiFactory
 from tracim_backend.tests.utils import RoleApiFactory
+from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 
 
@@ -63,6 +66,29 @@ def depot():
 @pytest.fixture
 def app_config(depot, settings) -> CFG:
     return CFG(settings)
+
+
+@pytest.fixture
+def web_testapp(settings, hapic):
+    app = web({}, **settings)
+    return TestApp(app)
+
+
+@pytest.fixture
+def hapic():
+    from tracim_backend.extensions import hapic as hapic_static
+
+    # INFO - G.M - 2019-03-19 - Reset all hapic context: PyramidContext
+    # and controllers
+    hapic_static.reset_context()
+    # TODO - G.M - 2019-03-19 - Replace this code by something better, see
+    # https://github.com/algoo/hapic/issues/144
+    hapic_static._controllers = []
+    yield hapic_static
+    hapic_static.reset_context()
+    # TODO - G.M - 2019-03-19 - Replace this code by something better, see
+    # https://github.com/algoo/hapic/issues/144
+    hapic_static._controllers = []
 
 
 @pytest.fixture
@@ -123,6 +149,11 @@ def session(empty_session, engine, app_config, tracim_fixtures, test_logger):
     dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
+
+
+@pytest.fixture
+def user_api_factory(session, app_config, admin_user) -> UserApiFactory:
+    return UserApiFactory(session, app_config, admin_user)
 
 
 @pytest.fixture

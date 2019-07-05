@@ -2,6 +2,7 @@
 import os
 import subprocess
 
+from depot.manager import DepotManager
 import pytest
 import transaction
 
@@ -15,17 +16,16 @@ from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.auth import AuthType
 from tracim_backend.tests import TEST_CONFIG_FILE_PATH
-from tracim_backend.tests import CommandFunctionalTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 
 
-class TestCommands(CommandFunctionalTest):
+class TestCommandsList(object):
     """
-    Test tracimcli command line ui.
+    Test tracimcli command line ui: from command line
     """
-
-    config_section = "app:command_test"
 
     def test_func__check_commands_list__ok__nominal_case(self) -> None:
         """
@@ -50,14 +50,23 @@ class TestCommands(CommandFunctionalTest):
         assert output.find("search index-drop") > 0
         assert output.find("dev parameters list") > 0
 
-    def test_func__user_create_command__ok__nominal_case(self) -> None:
+
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["app:command_test"])
+class TestCommands(object):
+    """
+    Test tracimcli command line ui
+    """
+
+    def test_func__user_create_command__ok__nominal_case(self, session, user_api_factory) -> None:
         """
         Test User creation
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("command_test@user")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         result = app.run(
             [
@@ -73,21 +82,23 @@ class TestCommands(CommandFunctionalTest):
             ]
         )
         assert result == 0
-        self.connect_database()
-        api = self.get_user_api()
+        api = user_api_factory.get()
         new_user = api.get_one_by_email("command_test@user")
         assert new_user.email == "command_test@user"
         assert new_user.validate_password("new_password")
         assert new_user.profile.name == "users"
 
-    def test_func__user_create_command__ok__in_admin_group(self) -> None:
+    def test_func__user_create_command__ok__in_admin_group(
+        self, session, user_api_factory, hapic
+    ) -> None:
         """
         Test User creation with admin as group
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("command_test@user")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         result = app.run(
             [
@@ -105,18 +116,18 @@ class TestCommands(CommandFunctionalTest):
             ]
         )
         assert result == 0
-        self.connect_database()
-        api = self.get_user_api()
+        api = user_api_factory.get()
         new_user = api.get_one_by_email("command_test@user")
         assert new_user.email == "command_test@user"
         assert new_user.validate_password("new_password")
         assert new_user.profile.name == "administrators"
 
-    def test_func__user_create_command__err__in_unknown_group(self) -> None:
+    def test_func__user_create_command__err__in_unknown_group(self, hapic, session) -> None:
         """
         Test User creation with an unknown group
         """
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(GroupDoesNotExist):
             app.run(
@@ -135,11 +146,12 @@ class TestCommands(CommandFunctionalTest):
                 ]
             )
 
-    def test_func__user_create_command__err_user_already_exist(self) -> None:
+    def test_func__user_create_command__err_user_already_exist(self, hapic, session) -> None:
         """
         Test User creation with existing user login
         """
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(UserAlreadyExistError):
             app.run(
@@ -157,11 +169,14 @@ class TestCommands(CommandFunctionalTest):
                 ]
             )
 
-    def test_func__user_create_command__err__with_email_notification_disabled(self) -> None:
+    def test_func__user_create_command__err__with_email_notification_disabled(
+        self, hapic, session
+    ) -> None:
         """
         Test User creation with email with notification disable
         """
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(NotificationDisabledCantCreateUserWithInvitation):
             app.run(
@@ -180,11 +195,12 @@ class TestCommands(CommandFunctionalTest):
                 ]
             )
 
-    def test_func__user_create_command__err__password_required(self) -> None:
+    def test_func__user_create_command__err__password_required(self, hapic, session) -> None:
         """
         Test User creation without filling password
         """
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(BadCommandError):
             app.run(
@@ -200,16 +216,19 @@ class TestCommands(CommandFunctionalTest):
                 ]
             )
 
-    def test_func__user_update_command__ok__nominal_case(self) -> None:
+    def test_func__user_update_command__ok__nominal_case(
+        self, hapic, session, user_api_factory
+    ) -> None:
         """
         Test user password update
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         result = app.run(
             [
@@ -225,30 +244,30 @@ class TestCommands(CommandFunctionalTest):
             ]
         )
         assert result == 0
-        self.connect_database()
-        api = self.get_user_api()
+        api = user_api_factory.get()
         new_user = api.get_one_by_email("admin@admin.admin")
         assert new_user.email == "admin@admin.admin"
         assert new_user.validate_password("new_password")
         assert not new_user.validate_password("admin@admin.admin")
 
     def test_func__user_update_command__err_password_modification_failed__external_auth(
-        self
+        self, hapic, session, user_api_factory
     ) -> None:
         """
         Test user password update
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         user.auth_type = AuthType.LDAP
         assert user.auth_type == AuthType.LDAP
-        self.session.add(user)
-        self.session.flush()
+        session.add(user)
+        session.flush()
         transaction.commit()
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
             app.run(
@@ -265,17 +284,20 @@ class TestCommands(CommandFunctionalTest):
                 ]
             )
 
-    def test_func__user_update_command__ok__remove_group(self) -> None:
+    def test_func__user_update_command__ok__remove_group(
+        self, hapic, session, user_api_factory
+    ) -> None:
         """
         Test user password update
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         assert user.profile.name == "administrators"
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         result = app.run(
             [
@@ -293,40 +315,41 @@ class TestCommands(CommandFunctionalTest):
             ]
         )
         assert result == 0
-        self.connect_database()
-        api = self.get_user_api()
+        api = user_api_factory.get()
         new_user = api.get_one_by_email("admin@admin.admin")
         assert new_user.email == "admin@admin.admin"
         assert new_user.validate_password("new_password")
         assert not new_user.validate_password("admin@admin.admin")
         assert new_user.profile.name == "trusted-users"
 
-    def test__init__db__ok_db_already_exist(self):
+    def test__init__db__ok_db_already_exist(self, hapic, session, user_api_factory):
         """
         Test database initialisation
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(DatabaseInitializationFailed):
             app.run(
                 ["db", "init", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
             )
 
-    def test__init__db__ok_nominal_case(self):
+    def test__init__db__ok_nominal_case(self, hapic, session, user_api_factory):
         """
         Test database initialisation
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         # delete config to be sure command will work
         app.run(
@@ -344,16 +367,17 @@ class TestCommands(CommandFunctionalTest):
         )
         assert result == 0
 
-    def test__init__db__no_config_file(self):
+    def test__init__db__no_config_file(self, hapic, session, user_api_factory):
         """
         Test database initialisation
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
 
         app = TracimCLI()
         with pytest.raises(FileNotFoundError):
@@ -361,16 +385,17 @@ class TestCommands(CommandFunctionalTest):
         result = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test"])
         assert result == 1
 
-    def test__delete__db__ok_nominal_case(self):
+    def test__delete__db__ok_nominal_case(self, hapic, session, user_api_factory):
         """
         Test database deletion
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         result = app.run(
             [
@@ -384,16 +409,17 @@ class TestCommands(CommandFunctionalTest):
         )
         assert result == 0
 
-    def test__delete__db__err_no_force_param(self):
+    def test__delete__db__err_no_force_param(self, hapic, session, user_api_factory):
         """
         Test database deletion
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(ForceArgumentNeeded):
             app.run(
@@ -402,16 +428,17 @@ class TestCommands(CommandFunctionalTest):
         result = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
         assert result == 1
 
-    def test__delete__db__err_no_config_file(self):
+    def test__delete__db__err_no_config_file(self, hapic, session, user_api_factory):
         """
         Test database deletion
         """
-        api = self.get_user_api()
+        api = user_api_factory.get()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
-        self.disconnect_database()
+        session.close()
+        DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(FileNotFoundError):
             app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])

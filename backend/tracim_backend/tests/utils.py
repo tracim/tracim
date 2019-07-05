@@ -6,6 +6,7 @@ from tracim_backend import CFG
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import User
@@ -59,6 +60,20 @@ class GroupApiFactory(object):
 
     def get(self, current_user: typing.Optional[User] = None) -> GroupApi:
         return GroupApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
+        )
+
+
+class UserApiFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> UserApi:
+        return UserApi(
             session=self.session,
             config=self.app_config,
             current_user=current_user or self.admin_user,
