@@ -6,10 +6,9 @@ from tracim_backend.app_models.workspace_menu_entries import all_content_menu_en
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.tests import DefaultTest
 
 
-class TestApplicationApi(DefaultTest):
+class TestApplicationApi(object):
     def test_get_default_workspace_menu_entry__ok__nominal_case(self):
         """
         Show only enabled app

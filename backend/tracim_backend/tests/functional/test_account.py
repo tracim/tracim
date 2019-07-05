@@ -6,31 +6,40 @@ Tests for /api/v2/users subpath endpoints.
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.tests import FunctionalTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestAccountRecentlyActiveContentEndpoint(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active
     """
 
-    fixtures = [BaseFixture]
-
-    def test_api__get_recently_active_content__ok__200__nominal(self):
+    def test_api__get_recently_active_content__ok__200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -42,9 +51,9 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -76,9 +85,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -110,11 +117,11 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        res = web_testapp.get(
             "/api/v2/users/me/workspaces/{workspace_id}/contents/recently_active".format(
                 workspace_id=workspace.workspace_id
             ),
@@ -150,16 +157,26 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]["content_id"] == main_folder.content_id
 
-    def test_api__get_recently_active_content__ok__200__limit_2_multiple(self):
+    def test_api__get_recently_active_content__ok__200__limit_2_multiple(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
         # anymore to fix datetime lack of precision.
 
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
 
-        api = self.get_content_api()
+        api = content_api_factory.get()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -191,9 +208,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -225,12 +240,12 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"limit": 2}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/me/workspaces/{}/contents/recently_active".format(
                 workspace.workspace_id
             ),
@@ -259,7 +274,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
 
         params = {"limit": 2, "before_content_id": secondly_created_but_not_commented.content_id}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/me/workspaces/{}/contents/recently_active".format(
                 workspace.workspace_id
             ),
@@ -273,16 +288,26 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         assert res[0]["content_id"] == firstly_created_but_recently_updated.content_id
         assert res[1]["content_id"] == secondly_created_but_not_updated.content_id
 
-    def test_api__get_recently_active_content__err__400__bad_before_content_id(self):
+    def test_api__get_recently_active_content__err__400__bad_before_content_id(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
         # anymore to fix datetime lack of precision.
 
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
 
-        api = self.get_content_api()
+        api = content_api_factory.get()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -314,9 +339,7 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -348,12 +371,12 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
             "",
             True,
         )
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"before_content_id": 4000}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/me/workspaces/{}/contents/recently_active".format(
                 workspace.workspace_id
             ),
@@ -365,19 +388,31 @@ class TestAccountRecentlyActiveContentEndpoint(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
 
-class TestUserReadStatusEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestUserReadStatusEndpoint(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status
     """
 
-    def test_api__get_read_status__ok__200__nominal(self):
+    def test_api__get_read_status__ok__200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -389,9 +424,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -423,9 +458,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -457,10 +490,10 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             "",
             True,
         )
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         selected_contents_id = [
             firstly_created_but_recently_commented.content_id,
             firstly_created_but_recently_updated.content_id,
@@ -478,7 +511,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         url = "/api/v2/users/me/workspaces/{workspace_id}/contents/read_status".format(
             workspace_id=workspace.workspace_id
         )
-        res = self.testapp.get(url=url, status=200, params=params)
+        res = web_testapp.get(url=url, status=200, params=params)
         res = res.json_body
         assert len(res) == 4
         for elem in res:
@@ -495,17 +528,29 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         assert res[3]["content_id"] == main_folder.content_id
 
 
-class TestUserSetContentAsRead(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestUserSetContentAsRead(object):
     """
     Tests for /api/v2/users/me/workspaces/{workspace_id}/contents/{content_id}/read
     """
 
-    def test_api_set_content_as_read__ok__200__nominal(self):
+    def test_api_set_content_as_read__ok__200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -517,10 +562,10 @@ class TestUserSetContentAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = self.get_content_api()
-        api2 = self.get_content_api(current_user=test_user)
+        api = content_api_factory.get()
+        api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -530,12 +575,12 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
@@ -545,7 +590,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         assert res.json_body[0]["read_by_user"] is False
 
         # read
-        self.testapp.put(
+        web_testapp.put(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
@@ -553,7 +598,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             )
         )
         # after
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
@@ -563,17 +608,29 @@ class TestUserSetContentAsRead(FunctionalTest):
         assert res.json_body[0]["read_by_user"] is True
 
 
-class TestUserSetContentAsUnread(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestUserSetContentAsUnread(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread
     """
 
-    def test_api_set_content_as_unread__ok__200__nominal(self):
+    def test_api_set_content_as_unread__ok__200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -585,10 +642,10 @@ class TestUserSetContentAsUnread(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = self.get_content_api()
-        api2 = self.get_content_api(current_user=test_user)
+        api = content_api_factory.get()
+        api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -598,12 +655,12 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
@@ -613,7 +670,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         assert res.json_body[0]["read_by_user"] is True
 
         # unread
-        self.testapp.put(
+        web_testapp.put(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
@@ -621,7 +678,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             )
         )
         # after
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
@@ -631,17 +688,29 @@ class TestUserSetContentAsUnread(FunctionalTest):
         assert res.json_body[0]["read_by_user"] is False
 
 
-class TestUserSetWorkspaceAsRead(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestUserSetWorkspaceAsRead(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/read
     """
 
-    def test_api_set_content_as_read__ok__200__nominal(self):
+    def test_api_set_content_as_read__ok__200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -653,10 +722,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        api = self.get_content_api()
-        api2 = self.get_content_api(current_user=test_user)
+        api = content_api_factory.get()
+        api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -668,11 +737,11 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         api.mark_unread(firstly_created)
         api2.mark_unread(main_folder)
         api2.mark_unread(firstly_created)
-        self.session.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        res = web_testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
@@ -682,14 +751,14 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         assert res.json_body[0]["read_by_user"] is False
         assert res.json_body[1]["content_id"] == main_folder.content_id
         assert res.json_body[1]["read_by_user"] is False
-        self.testapp.put(
+        web_testapp.put(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
@@ -701,17 +770,29 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         assert res.json_body[1]["read_by_user"] is True
 
 
-class TestAccountEnableWorkspaceNotification(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestAccountEnableWorkspaceNotification(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate
     """
 
-    def test_api_enable_account_workspace_notification__ok__200__user_nominal(self):
+    def test_api_enable_account_workspace_notification__ok__200__user_nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -723,35 +804,47 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
-        self.session.close()
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
-        self.testapp.put_json(
+        session.close()
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.put_json(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=204,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
 
 
-class TestAccountDisableWorkspaceNotification(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestAccountDisableWorkspaceNotification(object):
     """
     Tests for /api/v2/users/me/workspaces/{workspace_id}/notifications/deactivate
     """
 
-    def test_api_enable_account_workspace_notification__ok__200__nominal(self):
+    def test_api_enable_account_workspace_notification__ok__200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         # init DB
 
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -763,45 +856,56 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
-        self.session.close()
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
-        self.testapp.put_json(
+        session.close()
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.put_json(
             "/api/v2/users/me/workspaces/{workspace_id}/notifications/deactivate".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=204,
         )
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
 
 
-class TestAccountWorkspaceEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestAccountWorkspaceEndpoint(object):
     """
     Tests for /api/v2/users/me/workspaces
     """
 
-    fixtures = [BaseFixture, ContentFixtures]
-
-    def test_api__get_account_workspaces__ok_200__nominal_case(self):
+    def test_api__get_account_workspaces__ok_200__nominal_case(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        application_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
         """
         Check obtain all workspaces reachables for user with user auth.
         """
 
-        workspace_api = self.get_workspace_api()
+        workspace_api = workspace_api_factory.get()
         workspace = workspace_api.get_one(1)
-        app_api = self.get_application_api()
+        app_api = application_api_factory.get()
 
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/users/1/workspaces", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/users/1/workspaces", status=200)
         res = res.json_body
         workspace = res[0]
         assert workspace["workspace_id"] == 1
@@ -818,17 +922,28 @@ class TestAccountWorkspaceEndpoint(FunctionalTest):
             workspace["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
 
-class TestAccountEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestAccountEndpoint(object):
     # -*- coding: utf-8 -*-
     """
     Tests for GET /api/v2/users/me
     """
-    fixtures = [BaseFixture]
 
-    def test_api__get_user__ok_200__nominal(self):
+    def test_api__get_user__ok_200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -844,8 +959,8 @@ class TestAccountEndpoint(FunctionalTest):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["created"]
@@ -857,17 +972,29 @@ class TestAccountEndpoint(FunctionalTest):
         assert res["is_deleted"] is False
 
 
-class TestAccountKnownMembersEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestAccountKnownMembersEndpoint(object):
     # -*- coding: utf-8 -*-
     """
     Tests for GET /api/v2/users/me
     """
-    fixtures = [BaseFixture]
 
-    def test_api__get_user__ok_200__admin__by_name(self):
+    def test_api__get_user__ok_200__admin__by_name(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -892,11 +1019,11 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
@@ -907,10 +1034,21 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         assert res[1]["public_name"] == test_user2.display_name
         assert res[1]["avatar_url"] is None
 
-    def test_api__get_user__ok_200__admin__by_name_exclude_user(self):
+    def test_api__get_user__ok_200__admin__by_name_exclude_user(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -936,21 +1074,32 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
-    def test_api__get_user__ok_200__admin__by_name_exclude_workspace(self):
+    def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -972,29 +1121,40 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
-        role_api = self.get_role_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        role_api = role_api_factory.get()
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob", "exclude_workspace_ids": str(workspace2.workspace_id)}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
-    def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(self):
+    def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1026,34 +1186,45 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        workspace2 = self.get_workspace_api().create_workspace("test workspace2", save_now=True)
-        role_api = self.get_role_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        role_api = role_api_factory.get()
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "acp": "bob",
             "exclude_workspace_ids": str(workspace2.workspace_id),
             "exclude_user_ids": str(test_user3.user_id),
         }
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
-    def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
+    def test_api__get_user__ok_200__admin__by_name__deactivated_members(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1079,21 +1250,32 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "bob"}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["avatar_url"] is None
 
-    def test_api__get_user__ok_200__admin__by_email(self):
+    def test_api__get_user__ok_200__admin__by_email(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1118,11 +1300,11 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "test"}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
@@ -1133,10 +1315,21 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         assert res[1]["public_name"] == test_user2.display_name
         assert res[1]["avatar_url"] is None
 
-    def test_api__get_user__err_403__admin__too_small_acp(self):
+    def test_api__get_user__err_403__admin__too_small_acp(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1160,19 +1353,29 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         )
         uapi.save(test_user)
         transaction.commit()
-        int(self.get_admin_user().user_id)
+        int(admin_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"acp": "t"}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=400, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__get_user__ok_200__normal_user_by_email(self):
+    def test_api__get_user__ok_200__normal_user_by_email(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1207,16 +1410,16 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         uapi.save(test_user)
         uapi.save(test_user2)
         uapi.save(test_user3)
-        workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
-        role_api = self.get_role_api()
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        role_api = role_api_factory.get()
         role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
-        res = self.testapp.get("/api/v2/users/me/known_members", status=200, params=params)
+        res = web_testapp.get("/api/v2/users/me/known_members", status=200, params=params)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
@@ -1228,20 +1431,30 @@ class TestAccountKnownMembersEndpoint(FunctionalTest):
         assert res[1]["avatar_url"] is None
 
 
-class TestAccountSetPasswordEmailLDAPAuthEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
+@pytest.mark.parametrize("config_section", ["functional_ldap_and_internal_test"])
+class TestAccountSetPasswordEmailLDAPAuthEndpoint(object):
     # -*- coding: utf-8 -*-
     """
     Tests for PUT /api/v2/users/me/email
     Tests for PUT /api/v2/users/me/password
     for ldap user
     """
-    fixtures = [BaseFixture]
-    config_section = "functional_ldap_and_internal_test"
 
     @pytest.mark.ldap
-    def test_api_set_account_password__err__400__setting_password_unallowed_for_ldap_user(self):
-        self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+    def test_api_set_account_password__err__400__setting_password_unallowed_for_ldap_user(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
+        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        res = web_testapp.get("/api/v2/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
         params = {
@@ -1249,50 +1462,71 @@ class TestAccountSetPasswordEmailLDAPAuthEndpoint(FunctionalTest):
             "new_password2": "mynewpassword",
             "loggedin_user_password": "professor",
         }
-        res = self.testapp.put_json("/api/v2/users/me/password", params=params, status=400)
+        res = web_testapp.put_json("/api/v2/users/me/password", params=params, status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
 
         # Check After
-        res = self.testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "hubert@planetexpress.com"
         assert res["auth_type"] == "ldap"
 
     @pytest.mark.ldap
-    def test_api_set_account_email__err__400__setting_email_unallowed_for_ldap_user(self):
-        self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
-        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+    def test_api_set_account_email__err__400__setting_email_unallowed_for_ldap_user(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
+        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        res = web_testapp.get("/api/v2/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
         params = {
             "email": "hubertnewemail@planetexpress.com",
             "loggedin_user_password": "professor",
         }
-        res = self.testapp.put_json("/api/v2/users/me/email", params=params, status=400)
+        res = web_testapp.put_json("/api/v2/users/me/email", params=params, status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
 
         # Check After
-        res = self.testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = web_testapp.get("/api/v2/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "hubert@planetexpress.com"
         assert res["auth_type"] == "ldap"
 
 
-class TestSetEmailEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestSetEmailEndpoint(object):
     # -*- coding: utf-8 -*-
     """
     Tests for PUT /api/v2/users/me/email
     """
-    fixtures = [BaseFixture]
 
-    def test_api__set_account_email__err_400__admin_same_email(self):
+    def test_api__set_account_email__err_400__admin_same_email(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1308,27 +1542,37 @@ class TestSetEmailEndpoint(FunctionalTest):
         transaction.commit()
         int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "admin@admin.admin", "loggedin_user_password": "password"}
-        res = self.testapp.put_json("/api/v2/users/me/email", params=params, status=400)
+        res = web_testapp.put_json("/api/v2/users/me/email", params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
         # Check After
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
-    def test_api__set_account_email__err_403__admin_wrong_password(self):
+    def test_api__set_account_email__err_403__admin_wrong_password(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1344,27 +1588,37 @@ class TestSetEmailEndpoint(FunctionalTest):
         transaction.commit()
         int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "badpassword"}
-        res = self.testapp.put_json("/api/v2/users/me/email", params=params, status=403)
+        res = web_testapp.put_json("/api/v2/users/me/email", params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
         # Check After
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
-    def test_api__set_account_email__ok_200__user_nominal(self):
+    def test_api__set_account_email__ok_200__user_nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1380,33 +1634,44 @@ class TestSetEmailEndpoint(FunctionalTest):
         transaction.commit()
         int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
         params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
-        self.testapp.put_json("/api/v2/users/me/email", params=params, status=200)
-        self.testapp.authorization = ("Basic", ("mysuperemail@email.fr", "password"))
+        web_testapp.put_json("/api/v2/users/me/email", params=params, status=200)
+        web_testapp.authorization = ("Basic", ("mysuperemail@email.fr", "password"))
         # Check After
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
 
-class TestSetPasswordEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestSetPasswordEndpoint(object):
     # -*- coding: utf-8 -*-
     """
     Tests for PUT /api/v2/users/me/password
     """
-    fixtures = [BaseFixture]
 
-    def test_api__set_account_password__err_403__admin_wrong_password(self):
+    def test_api__set_account_password__err_403__admin_wrong_password(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1422,7 +1687,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
@@ -1433,21 +1698,31 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "new_password2": "mynewpassword",
             "loggedin_user_password": "wrongpassword",
         }
-        res = self.testapp.put_json("/api/v2/users/me/password", params=params, status=403)
+        res = web_testapp.put_json("/api/v2/users/me/password", params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
 
-        uapi = self.get_user_api()
+        uapi = user_api_factory.get()
         # Check After
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
 
-    def test_api__set_account_password__err_400__admin_passwords_do_not_match(self):
+    def test_api__set_account_password__err_400__admin_passwords_do_not_match(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1463,7 +1738,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check before
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
@@ -1475,22 +1750,32 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "new_password2": "mynewpassword2",
             "loggedin_user_password": "admin@admin.admin",
         }
-        res = self.testapp.put_json("/api/v2/users/me/password", params=params, status=400)
+        res = web_testapp.put_json("/api/v2/users/me/password", params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.PASSWORD_DO_NOT_MATCH
         # Check After
 
-        uapi = self.get_user_api()
+        uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
         assert not user.validate_password("mynewpassword2")
 
-    def test_api__set_account_password__ok_200__nominal(self):
+    def test_api__set_account_password__ok_200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1506,36 +1791,47 @@ class TestSetPasswordEndpoint(FunctionalTest):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
-        self.session.close()
+        session.close()
         # Set password
         params = {
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",
             "loggedin_user_password": "password",
         }
-        self.testapp.put_json("/api/v2/users/me/password", params=params, status=204)
-        uapi = self.get_user_api()
+        web_testapp.put_json("/api/v2/users/me/password", params=params, status=204)
+        uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
         assert user.validate_password("mynewpassword")
 
 
-class TestSetUserInfoEndpoint(FunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test"])
+class TestSetUserInfoEndpoint(object):
     # -*- coding: utf-8 -*-
     """
     Tests for PUT /api/v2/users/me
     """
-    fixtures = [BaseFixture]
 
-    def test_api__set_account_info__ok_200__nominal(self):
+    def test_api__set_account_info__ok_200__nominal(
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        content_api_factory,
+        role_api_factory,
+        group_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -1551,9 +1847,9 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "password"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # check before
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "bob"
@@ -1561,9 +1857,9 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res["lang"] == "fr"
         # Set params
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        self.testapp.put_json("/api/v2/users/me", params=params, status=200)
+        web_testapp.put_json("/api/v2/users/me", params=params, status=200)
         # Check After
-        res = self.testapp.get("/api/v2/users/me", status=200)
+        res = web_testapp.get("/api/v2/users/me", status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["public_name"] == "updated"

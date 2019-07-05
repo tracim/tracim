@@ -29,7 +29,7 @@ if typing.TYPE_CHECKING:
 configure_mappers()
 
 
-def get_engine(app_config: "CFG", prefix="sqlalchemy.") -> Engine:
+def get_engine(app_config: "CFG", prefix="sqlalchemy.", **kwargs) -> Engine:
     sqlalchemy_params = sliced_dict(
         app_config.__dict__, beginning_key_string=prefix.upper().replace(".", "__")
     )
@@ -40,7 +40,7 @@ def get_engine(app_config: "CFG", prefix="sqlalchemy.") -> Engine:
         new_key = key.lower().replace("__", ".")
         new_config[new_key] = value
 
-    return engine_from_config(new_config, prefix=prefix)
+    return engine_from_config(new_config, prefix=prefix, **kwargs)
 
 
 def get_session_factory(engine) -> sessionmaker:
