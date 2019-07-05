@@ -5,6 +5,7 @@ from depot.manager import DepotManager
 import plaster
 from pyramid import testing
 import pytest
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 import transaction
 
@@ -82,6 +83,13 @@ def session_factory(engine):
 @pytest.fixture
 def empty_session(session_factory):
     return get_tm_session(session_factory, transaction.manager)
+
+
+@pytest.fixture
+def migration_engine(engine):
+    yield engine
+    sql = text("DROP TABLE IF EXISTS migrate_version;")
+    engine.execute(sql)
 
 
 @pytest.fixture
