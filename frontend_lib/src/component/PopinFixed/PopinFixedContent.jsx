@@ -37,7 +37,7 @@ class PopinFixedContent extends React.Component {
                 <i className={classnames('fa fa-fw', {'fa-angle-double-right': this.state.rightPartOpen, 'fa-angle-double-left': !this.state.rightPartOpen})} />
               </div>
               <div className='wsContentGeneric__content__right__header__title'>
-                Timeline
+                Menu
               </div>
               <div className='wsContentGeneric__content__right__header__icon mb-3 mt-auto'>
                 <i className={classnames('fa fa-fw', {'fa-angle-double-right': this.state.rightPartOpen, 'fa-angle-double-left': !this.state.rightPartOpen})} />

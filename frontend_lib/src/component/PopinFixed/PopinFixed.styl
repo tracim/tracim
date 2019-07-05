@@ -136,7 +136,7 @@
         height auto
 
 
-columnTimeline()
+columnContents()
   .wsContentGeneric
     &__content
       &__right
@@ -158,6 +158,9 @@ columnTimeline()
             transform none
             width 100%
 
+@media (min-width: min-lg) and (max-width: max-lg)
+  columnContents()
+
 @media (min-width: min-md) and (max-width: max-md)
   .wsContentGeneric
     &__content
@@ -173,7 +176,7 @@ columnTimeline()
       &__right
         width calc(100% - 20px) // 20px => margin
         height auto
-  columnTimeline()
+  columnContents()
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .wsContentGeneric
@@ -193,7 +196,7 @@ columnTimeline()
       &__right
         width calc(100% - 20px) // 20px => margin
         height auto
-  columnTimeline()
+  columnContents()
 
 @media (max-width: max-xs)
   .wsContentGeneric
@@ -215,4 +218,4 @@ columnTimeline()
       &__right
         width calc(100% - 20px) // 20px => margin
         height auto
-  columnTimeline()
+  columnContents()

@@ -8,7 +8,7 @@ import {
   PageTitle,
   PageContent,
   BtnSwitch,
-  IconWithWarning,
+  ComposedIcon,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
@@ -126,9 +126,11 @@ export class AdminUser extends React.Component {
             <div className='adminUser__adduser__emailstate'>
               {!props.emailNotifActivated && (
                 <div>
-                  <IconWithWarning
+                  <ComposedIcon
                     icon='envelope'
+                    smallIcon='warning'
                     customClass='primaryColorFont'
+                    smallIconCustomClass='text-danger'
                   />
                   {props.t('Email notification are disabled, please manually notify users of any change')}
                 </div>

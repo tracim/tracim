@@ -35,7 +35,7 @@ import {
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
-import { IconWithWarning, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { ComposedIcon, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 class Header extends React.Component {
   componentDidMount () {
@@ -127,9 +127,11 @@ class Header extends React.Component {
               {!unLoggedAllowedPageList.includes(props.location.pathname) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
-                    <IconWithWarning
+                    <ComposedIcon
                       icon='envelope'
+                      smallIcon='warning'
                       customClass='slowblink'
+                      smallIconCustomClass='text-danger'
                     />
                   </div>
                 </li>

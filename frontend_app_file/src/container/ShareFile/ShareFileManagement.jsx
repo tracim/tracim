@@ -1,7 +1,7 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
+import Radium from 'radium'
 import color from 'color'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
@@ -10,13 +10,14 @@ require('./ShareFile.styl')
 class ShareFileManagement extends React.Component {
   constructor (props) {
     super(props)
+
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<FrontendLib:ShareFileManagement> Custom event', 'color: #28a745', type, data)
+        console.log('%c<ShareFileManagement> Custom event', 'color: #28a745', type, data)
         i18n.changeLanguage(data)
         break
     }
@@ -30,34 +31,36 @@ class ShareFileManagement extends React.Component {
     const { props } = this
 
     return (
-      <div className='share'>
-        <div className='share__title'>
+      <div className='shareFile'>
+        <div className='shareFile__title'>
           {props.t('File share')}
         </div>
-        <div className='d-flex'>
+        <div className='d-flex ml-auto'>
           <button
-            className='btn outlineTextBtn ml-auto'
+            className='btn outlineTextBtn d-flex mr-3'
+            key='delete_all_shares'
             style={{
-              borderColor: props.contentType[1].hexcolor,
+              borderColor: props.hexcolor,
               ':hover': {
-                backgroundColor: props.contentType[1].hexcolor
-              }
-            }}
-          >
-            {props.t('New')}
-            <i className='fa fa-fw fa-plus-circle' />
-          </button>
-          <button
-            className='btn highlightBtn d-flex ml-auto'
-            style={{
-              backgroundColor: props.contentType[1].hexcolor,
-              ':hover': {
-                backgroundColor: color(props.contentType[1].hexcolor).darken(0.15).hexString()
+                backgroundColor: props.hexcolor
               }
             }}
           >
             {props.t('Delete all')}
             <i className='fa fa-fw fa-trash-o' />
+          </button>
+          <button
+            className='btn highlightBtn'
+            key='new_share_file'
+            style={{
+              backgroundColor: props.hexcolor,
+              ':hover': {
+                backgroundColor: color(props.hexcolor).darken(0.15).hexString()
+              }
+            }}
+          >
+            {props.t('New')}
+            <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
       </div>
@@ -65,5 +68,4 @@ class ShareFileManagement extends React.Component {
   }
 }
 
-const mapStateToProps = ({ contentType }) => ({ contentType })
-export default connect(mapStateToProps)(translate()(ShareFileManagement))
+export default translate()(Radium(ShareFileManagement))

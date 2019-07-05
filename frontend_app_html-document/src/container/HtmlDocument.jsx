@@ -658,7 +658,6 @@ class HtmlDocument extends React.Component {
             customColor={config.hexcolor}
             loggedUser={loggedUser}
             timelineData={timeline}
-            showHeader
             newComment={newComment}
             disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
             availableStatusList={config.availableStatuses}
