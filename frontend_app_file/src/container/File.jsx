@@ -42,6 +42,7 @@ import {
   getWOPIDiscovery
 } from '../action.async.js'
 
+const qs = require('query-string')
 class File extends React.Component {
   constructor (props) {
     super(props)
@@ -322,7 +323,7 @@ class File extends React.Component {
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
 
   handleClickEdit = () => {
-    this.showCollabora(true)
+    this.showCollaboraFrame(true)
   }
 
   handleClickValidateNewDescription = async newDescription => {
@@ -638,6 +639,9 @@ class File extends React.Component {
             accessToken: response.body.access_token,
             collaboraSrc: response.body.urlsrc
           })
+          if (qs.parse(window.location.search).onlineedition === '1') {
+            this.showCollaboraFrame(true)
+          }
         } else {
           this.setState({ isEditable: false })
         }
@@ -648,7 +652,7 @@ class File extends React.Component {
     }
   }
 
-  showCollabora = (isCollaboraShown) => {
+  showCollaboraFrame = (isCollaboraShown) => {
     this.setState({isCollaboraShown: isCollaboraShown})
   }
 
@@ -662,7 +666,7 @@ class File extends React.Component {
         <CollaboraFrame
           accessToken={state.accessToken}
           iframeUrl={state.collaboraSrc}
-          showCollabora={this.showCollabora}
+          showCollaboraFrame={this.showCollaboraFrame}
         />
       )
     }

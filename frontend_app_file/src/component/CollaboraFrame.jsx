@@ -7,6 +7,8 @@ import {
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
 
+const qs = require('query-string')
+
 class CollaboraFrame extends React.Component {
   constructor (props) {
     super(props)
@@ -33,7 +35,12 @@ class CollaboraFrame extends React.Component {
 
   handleIframeIsClosing = (event) => {
     if (JSON.parse(event.data).MessageId === 'close') {
-      this.props.showCollabora(false)
+      this.props.showCollaboraFrame(false)
+      let parsedSearch = qs.parse(window.location.search)
+      if (parsedSearch.onlineedition) {
+        delete parsedSearch.onlineedition
+        window.location.search = qs.stringify(parsedSearch)
+      }
     }
   }
 
