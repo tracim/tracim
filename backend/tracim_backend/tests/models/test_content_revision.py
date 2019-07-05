@@ -6,7 +6,6 @@ from sqlalchemy import inspect
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests import DefaultTest
-from tracim_backend.tests import eq_
 
 
 class TestContentRevision(DefaultTest):
@@ -63,4 +62,4 @@ class TestContentRevision(DefaultTest):
         new_revision_by_test_dict = self._get_dict_representation(new_revision_by_test)
 
         # They must be identical
-        eq_(new_revision_by_model_dict, new_revision_by_test_dict)
+        assert new_revision_by_model_dict == new_revision_by_test_dict

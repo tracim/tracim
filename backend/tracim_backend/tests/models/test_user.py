@@ -5,16 +5,16 @@ from freezegun import freeze_time
 import transaction
 
 from tracim_backend.models.auth import User
-from tracim_backend.tests import BaseTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 
 
-class TestUserModel(BaseTest):
+class TestUserModel(object):
     """
     Test for User model
     """
 
-    def test_unit__create__ok__nominal_case(self):
-        self.session.flush()
+    def test_unit__create__ok__nominal_case(self, session):
+        session.flush()
         transaction.commit()
         name = "Damien"
         email = "damien@accorsi.info"
@@ -23,17 +23,17 @@ class TestUserModel(BaseTest):
         user.display_name = name
         user.email = email
 
-        self.session.add(user)
-        self.session.flush()
+        session.add(user)
+        session.flush()
         transaction.commit()
 
-        new_user = self.session.query(User).filter(User.display_name == name).one()
+        new_user = session.query(User).filter(User.display_name == name).one()
 
         assert new_user.display_name == name
         assert new_user.email == email
         assert new_user.email_address == email
 
-    def test_unit__password__ok__nominal_case(self):
+    def test_unit__password__ok__nominal_case(self, session):
         """
         Check if password can be set and hashed password
         can be retrieve. Verify if hashed password is not
