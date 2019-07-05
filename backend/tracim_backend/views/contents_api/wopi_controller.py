@@ -91,7 +91,7 @@ class WOPIController(Controller):
     @hapic.output_body(WOPIEditFileSchema())
     def create_from_template(self, context, request: TracimRequest, hapic_data=None):
         template = hapic_data.body.get("template")
-        title = hapic_data.body.get("title")
+        file_name = "{}.{}".format(hapic_data.body.get("title"), template.split(".")[-1])
         parent_id = hapic_data.body.get("parent_id")
 
         current_file_path = os.path.dirname(os.path.abspath(__file__))
@@ -117,7 +117,7 @@ class WOPIController(Controller):
                     "Parent with content_id {} not found".format(parent_id)
                 ) from exc
         content = api.create(
-            filename=title,
+            filename=file_name,
             content_type_slug=FILE_TYPE,
             workspace=request.current_workspace,
             parent=parent,
@@ -125,7 +125,10 @@ class WOPIController(Controller):
         api.save(content, ActionDescription.CREATION)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(
-                content, new_filename=title, new_mimetype=mimetype, new_content=raw_template_content
+                content,
+                new_filename=file_name,
+                new_mimetype=mimetype,
+                new_content=raw_template_content,
             )
         api.execute_created_content_actions(content)
 
