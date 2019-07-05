@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import io
+import os
 from urllib.parse import quote
 
 from PIL import Image
@@ -4305,4 +4306,72 @@ class TestWOPI(FunctionalTest):
         ] == "http://localhost:9980/loleaflet/305832f/loleaflet.html" "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F{}".format(
             business_workspace.workspace_id, test_file.content_id
         )
+        assert content["access_token"] == "some valid session"
+
+    @patch("requests.get")
+    def test_api__create_from_template__ok_200__nominal_case(self, patched_get) -> None:
+        """
+        Ask to create a file from a template, returns the url of collabora online
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        transaction.commit()
+
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        self.testapp.set_cookie("session_key", "some valid session")
+        patched_get.return_value.text = """
+        <wopi-discovery>
+            <net-zone name="external-http">
+                <app name="application/vnd.lotus-wordpro">
+                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="image/svg+xml">
+                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.text">
+                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <!-- a lot more `app` in the real response -->
+            </net-zone>
+        </wopi-discovery>
+        """
+        url = "/api/v2/workspaces/{}/wopi/files/create".format(business_workspace.workspace_id)
+        template = "default.ods"
+        res = self.testapp.post_json(
+            url,
+            params={
+                "title": "test_file.ods",
+                "template": template,
+                "parent_id": tool_folder.content_id,
+            },
+            status=200,
+        )
+        transaction.commit()
+        content = res.json_body
+        content_id = int(content["urlsrc"].split("%2F")[-1])
+
+        # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
+        #  without reinstancing the database session
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        created_content = content_api.get_one(content_id, content_type=content_type_list.Any_SLUG)
+        file_ = DepotManager.get().get(created_content.depot_file)
+        current_file_path = os.path.dirname(os.path.abspath(__file__))
+
+        assert len(content["extensions"]) == 3
+        assert content["urlsrc"].startswith(
+            "http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F".format(
+                business_workspace.workspace_id
+            )
+        )
+        with open(
+            os.path.join(current_file_path, "..", "..", "templates", "open_documents", template),
+            "rb",
+        ) as f:
+            assert file_.read() == f.read()
         assert content["access_token"] == "some valid session"
