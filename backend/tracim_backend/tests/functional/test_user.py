@@ -2061,6 +2061,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
+        self.session.close()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         self.testapp.put_json(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
@@ -2068,8 +2069,6 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-
-        transaction.commit()
         rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
@@ -2096,6 +2095,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
+        self.session.close()
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         self.testapp.put_json(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
@@ -2103,8 +2103,6 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-
-        transaction.commit()
         rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
@@ -2181,6 +2179,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
+        self.session.close()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         self.testapp.put_json(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
@@ -2188,13 +2187,11 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-
-        transaction.commit()
         rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
 
-    def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
+    def test_api_disable_user_workspace_notification__ok__200__user_itself(self):
         # init DB
 
         workspace = self.get_workspace_api().create_workspace("test workspace", save_now=True)
@@ -2216,6 +2213,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
+        self.session.close()
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         self.testapp.put_json(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
@@ -2223,8 +2221,6 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-
-        transaction.commit()
         rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
@@ -3196,7 +3192,7 @@ class TestSetEmailPasswordLdapEndpoint(FunctionalTest):
         assert res["email"] == "test@test.test"
         assert res["auth_type"] == "ldap"
 
-    def test_api__set_user_password__ok_200__admin(self):
+    def test_api__set_user_password_ldap__ok_200__admin(self):
 
         uapi = self.get_user_api()
         gapi = self.get_group_api()
@@ -3220,6 +3216,7 @@ class TestSetEmailPasswordLdapEndpoint(FunctionalTest):
         # check before
         user = uapi.get_one(user_id)
         assert not user.validate_password("mynewpassword")
+        self.session.close()
         # Set password
         params = {
             "new_password": "mynewpassword",
@@ -3498,6 +3495,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
+        self.session.close()
         # Set password
         params = {
             "new_password": "mynewpassword",
@@ -3508,8 +3506,6 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "/api/v2/users/{}/password".format(user_id), params=params, status=204
         )
         # Check After
-
-        transaction.commit()
         uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
@@ -3627,6 +3623,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
+        self.session.close()
         # Set password
         params = {
             "new_password": "mynewpassword",
@@ -3637,7 +3634,6 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "/api/v2/users/{}/password".format(user_id), params=params, status=204
         )
         # Check After
-        transaction.commit()
         uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
