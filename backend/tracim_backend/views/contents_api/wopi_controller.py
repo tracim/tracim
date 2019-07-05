@@ -94,8 +94,10 @@ class WOPIController(Controller):
         title = hapic_data.body.get("title")
         parent_id = hapic_data.body.get("parent_id")
 
+        current_file_path = os.path.dirname(os.path.abspath(__file__))
         with open(
-            os.path.join("tracim_backend", "templates", "open_documents", template), "rb"
+            os.path.join(current_file_path, "..", "..", "templates", "open_documents", template),
+            "rb",
         ) as f:
             raw_template_content = f.read()
 
