@@ -728,6 +728,7 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
+        self.session.close()
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         self.testapp.put_json(
             "/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
@@ -735,7 +736,6 @@ class TestAccountEnableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-        transaction.commit()
         rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
@@ -768,6 +768,7 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
         transaction.commit()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is True
+        self.session.close()
         self.testapp.authorization = ("Basic", ("test@test.test", "password"))
         self.testapp.put_json(
             "/api/v2/users/me/workspaces/{workspace_id}/notifications/deactivate".format(
@@ -775,7 +776,6 @@ class TestAccountDisableWorkspaceNotification(FunctionalTest):
             ),
             status=204,
         )
-        transaction.commit()
         rapi = self.get_role_api()
         role = rapi.get_one(test_user.user_id, workspace.workspace_id)
         assert role.do_notify is False
@@ -1511,6 +1511,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
         assert not user.validate_password("mynewpassword")
+        self.session.close()
         # Set password
         params = {
             "new_password": "mynewpassword",
@@ -1518,8 +1519,6 @@ class TestSetPasswordEndpoint(FunctionalTest):
             "loggedin_user_password": "password",
         }
         self.testapp.put_json("/api/v2/users/me/password", params=params, status=204)
-        # Check After
-        transaction.commit()
         uapi = self.get_user_api()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
