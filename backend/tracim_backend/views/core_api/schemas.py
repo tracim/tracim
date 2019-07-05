@@ -1014,6 +1014,7 @@ class WOPICreateFromTemplateSchema(marshmallow.Schema):
         example=42,
         description="id of the new parent content id.",
         default=None,
+        allow_none=True,
         validate=positive_int_validator,
     )
 
