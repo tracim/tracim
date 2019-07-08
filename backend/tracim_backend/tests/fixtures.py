@@ -28,6 +28,7 @@ from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import GroupApiFactory
 from tracim_backend.tests.utils import MailHogHelper
+from tracim_backend.tests.utils import RadicaleServerHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
@@ -254,3 +255,10 @@ def elasticsearch(app_config, session) -> ElasticSearchHelper:
     elasticsearch_helper = ElasticSearchHelper(app_config, session)
     yield elasticsearch_helper
     elasticsearch_helper.delete_index()
+
+
+@pytest.fixture
+def radicale_server(config_uri, config_section) -> RadicaleServerHelper:
+    radicale_server_helper = RadicaleServerHelper(config_uri, config_section)
+    yield radicale_server_helper
+    radicale_server_helper.stop_radicale_server()

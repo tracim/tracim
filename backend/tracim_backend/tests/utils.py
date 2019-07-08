@@ -1,12 +1,16 @@
+import multiprocessing
 import typing
 
+import plaster
 import requests
 from requests import Response
 from sqlalchemy.orm import Session
+from waitress import serve
 from wsgidav import util as wsgidav_util
 from wsgidav.dav_provider import _DAVResource
 
 from tracim_backend import CFG
+from tracim_backend import CaldavAppFactory
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -177,3 +181,19 @@ class ElasticSearchHelper(object):
 
     def delete_index(self) -> None:
         self.elastic_search_api.delete_index()
+
+
+class RadicaleServerHelper(object):
+    def __init__(self, config_uri, config_section):
+        settings = plaster.get_settings(config_uri, config_section)
+        app_factory = CaldavAppFactory(**settings)
+        app = app_factory.get_wsgi_app()
+        self.radicale_server = multiprocessing.Process(
+            target=serve, kwargs={"app": app, "listen": "localhost:5232"}
+        )
+        self.radicale_server.daemon = True
+        self.radicale_server.start()
+
+    def stop_radicale_server(self):
+        if self.radicale_server:
+            self.radicale_server.terminate()
