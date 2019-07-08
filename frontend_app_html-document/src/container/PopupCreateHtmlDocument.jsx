@@ -5,7 +5,7 @@ import {
   handleFetchResult,
   addAllResourceI18n
 } from 'tracim_frontend_lib'
-import { postHtmlDocContent } from '../action.async.js'
+import { postODP } from '../action.async.js'
 import i18n from '../i18n.js'
 
 const debug = { // outdated
@@ -86,24 +86,24 @@ class PopupCreateHtmlDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, appName, idWorkspace, idFolder, newContentName } = this.state
+    const { config, idWorkspace, idFolder, newContentName } = this.state
 
-    const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
+    const fetchSaveNewHtmlDoc = postODP(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
 
     const resSave = await handleFetchResult(await fetchSaveNewHtmlDoc)
 
     switch (resSave.apiResponse.status) {
       case 200:
         this.handleClose()
-
         GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
 
         GLOBAL_dispatchEvent({
           type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
           data: {
             idWorkspace: resSave.body.workspace_id,
-            contentType: appName,
-            idContent: resSave.body.content_id
+            contentType: 'file',
+            idContent: resSave.body.content_id,
+            search: '&onlineedition=1'
             // will be open in edit mode because revision.length === 1
           }
         })

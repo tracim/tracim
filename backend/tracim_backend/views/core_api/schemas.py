@@ -1037,6 +1037,8 @@ class WOPIEditFileSchema(marshmallow.Schema):
         description="The access token which should be sent to collabora online and "
         "which uniquely identifies the user",
     )
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
 
 
 class WOPIDiscoverySchema(marshmallow.Schema):

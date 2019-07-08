@@ -81,6 +81,8 @@ class WOPIController(Controller):
             "extensions": list(actions.keys()),
             "urlsrc": url_src,
             "access_token": request.cookies.get("session_key"),
+            "content_id": 1,
+            "workspace_id": 1,
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
@@ -140,6 +142,8 @@ class WOPIController(Controller):
             "extensions": list(actions.keys()),
             "urlsrc": url_src,
             "access_token": request.cookies.get("session_key"),
+            "content_id": content.content_id,
+            "workspace_id": content.workspace_id,
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])

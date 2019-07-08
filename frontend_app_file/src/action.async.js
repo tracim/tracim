@@ -138,7 +138,7 @@ export const putMyselfFileRead = (apiUrl, idWorkspace, idContent) => {
 }
 
 export const getWOPIDiscovery = (apiUrl, workspaceId, contentId) =>
-  fetch(`${apiUrl}/workspaces/${workspaceId}/wopi/files/${contentId}/discovery`, {
+  fetch(`${apiUrl}/workspaces/${workspaceId}/wopi/files/${contentId}/edit`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
