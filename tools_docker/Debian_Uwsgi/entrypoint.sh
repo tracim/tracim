@@ -2,7 +2,7 @@
 
 # Default values
 CONFIG_FILE_IS_NEW=0
-export PYTHON_EGG_CACHE=/tmp 
+export PYTHON_EGG_CACHE=/tmp
 set -e
 
 # Check environment variables
@@ -117,13 +117,6 @@ fi
 # Make sure index is created in case of Elastic Search based search. (the command does nothing in case of simple search)
 cd /tracim/backend/
 tracimcli search index-create -c /etc/tracim/development.ini
-
-if [ "$UPDATE_INDEX_ELASTICSEARCH" = "1" ]; then
-    cd /tracim/backend/
-    tracimcli search index-drop -c /etc/tracim/development.ini
-    tracimcli search index-create -c /etc/tracim/development.ini
-    tracimcli search index-populate -c /etc/tracim/development.ini
-fi
 
 # Reload apache config
 service apache2 restart

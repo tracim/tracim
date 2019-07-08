@@ -16,6 +16,7 @@ import imapclient
 import markdown
 import requests
 
+from tracim_backend.exceptions import AutoReplyEmailNotAllowed
 from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.exceptions import EmptyEmailBody
 from tracim_backend.exceptions import NoSpecialKeyFound
@@ -171,6 +172,50 @@ class DecodedMail(object):
             )
             return None
 
+    def check_validity_for_comment_content(self) -> None:
+        """
+        Check if DecodedMail is valid for comment content
+        :return: None or raise Error
+        """
+        if self._check_if_auto_reply_mail():
+            raise AutoReplyEmailNotAllowed("Mail seems to be an auto-reply mail, skip it")
+
+    def _check_if_auto_reply_mail(self) -> bool:
+        """
+        Check if email seems to be an autoreply
+        see https://arp242.net/autoreply.html for more info
+        """
+        # INFO - G.M - 2019-06-28 - RFC 3834, https://tools.ietf.org/html/rfc3834
+        # standard mecanism
+        auto_submitted_header = self._decode_header("Auto-submitted")
+        if auto_submitted_header and auto_submitted_header.lower().strip().startswith(
+            "auto-replied"
+        ):
+            return True
+
+        # INFO - G.M - 2019-06-28 - somes not standard check for autoreply
+        x_auto_response_suppress_raw_value = self._decode_header("X-Auto-Response-Suppress")
+        if x_auto_response_suppress_raw_value:
+            x_auto_response_suppress_values = []
+            for value in x_auto_response_suppress_raw_value.split(","):
+                value = value.strip().lower()
+                x_auto_response_suppress_values.append(value)
+            if (
+                "dr" in x_auto_response_suppress_values
+                or "autoreply" in x_auto_response_suppress_values
+                or "all" in x_auto_response_suppress_values
+            ):
+                return True
+
+        precedence_header = self._decode_header("Precedence")
+        if precedence_header and precedence_header.lower() == "auto_reply":
+            return True
+
+        x_auto_reply_header = self._decode_header("X-Autoreply")
+        if x_auto_reply_header and x_auto_reply_header.lower() == "yes":
+            return True
+        return False
+
 
 class BadIMAPFetchResponse(Exception):
     pass
@@ -276,7 +321,7 @@ class MailFetcher(object):
 
                     if self.use_idle and imapc.has_capability("IDLE"):
                         # IDLE_mode wait until event from server
-                        logger.debug(self, "wail for event(IDLE)")
+                        logger.debug(self, "wait for event(IDLE)")
                         imapc.idle()
                         imapc.idle_check(timeout=MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT)
                         imapc.idle_done()
@@ -434,6 +479,10 @@ class MailFetcher(object):
                 log = "Empty body, skip mail"
                 logger.error(self, log)
                 continue
+            except AutoReplyEmailNotAllowed:
+                log = "Autoreply mail, skip mail"
+                logger.warning(self, log)
+                continue
             except Exception as exc:
                 log = "Failed to create comment request in mail fetcher error : {}"
                 logger.error(self, log.format(exc.__str__()))
@@ -470,6 +519,7 @@ class MailFetcher(object):
         return result.json()
 
     def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:
+        mail.check_validity_for_comment_content()
         content_id = mail.get_key()
         content_info = self._get_content_info(content_id, mail.get_from_address())
         mail_body = mail.get_body(

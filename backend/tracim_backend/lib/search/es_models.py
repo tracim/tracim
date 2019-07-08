@@ -101,6 +101,6 @@ class IndexedContent(Document):
     current_revision_id = Integer()
     raw_content = Text(analyzer=html_folding, search_analyzer=folding)
     # INFO - G.M - 2019-05-31 - file is needed to store file content b64 value,
-    # information about content are stored in an "attachment" fields, which is
-    # not defined in this mapping.
-    file = Text()
+    # information about content are stored in the "file_data" fields not defined
+    # in this mapping
+    b64_file = Text()
