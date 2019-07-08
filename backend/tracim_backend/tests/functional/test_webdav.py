@@ -1,22 +1,23 @@
 from urllib.parse import quote
 
-from parameterized import parameterized
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.tests import WebdavFunctionalTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
-    config_section = "functional_webdav_test_remote_user"
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_webdav_test_remote_user"])
+class TestFunctionWebdavRemoteUser(object):
+    def test_functional__webdav_access_to_root_remote_auth__as_http_header(
+        self, session, webdav_testapp, user_api_factory, group_api_factory
+    ) -> None:
 
-    def test_functional__webdav_access_to_root_remote_auth__as_http_header(self) -> None:
-
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "remoteuser@emoteuser.remoteuser",
@@ -28,13 +29,15 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
         )
         transaction.commit()
         headers_auth = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
-        res = self.testapp.get("/", status=401, headers=headers_auth)
+        res = webdav_testapp.get("/", status=401, headers=headers_auth)
         assert res
 
-    def test_functional__webdav_access_to_root__remote_auth(self) -> None:
+    def test_functional__webdav_access_to_root__remote_auth(
+        self, session, webdav_testapp, user_api_factory, group_api_factory
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "remoteuser@remoteuser.remoteuser",
@@ -47,19 +50,23 @@ class TestFunctionWebdavRemoteUser(WebdavFunctionalTest):
         uapi.save(user)
         transaction.commit()
         extra_environ = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
-        res = self.testapp.get("/", status=200, extra_environ=extra_environ)
+        res = webdav_testapp.get("/", status=200, extra_environ=extra_environ)
         assert res
 
 
-class TestFunctionalWebdavGet(WebdavFunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_webdav_test"])
+class TestFunctionalWebdavGet(object):
     """
     Test for all Webdav "GET" action in different case
     """
 
-    def test_functional__webdav_access_to_root__nominal_case(self) -> None:
+    def test_functional__webdav_access_to_root__nominal_case(
+        self, session, user_api_factory, group_api_factory, webdav_testapp
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -69,30 +76,42 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             groups=groups,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of root using webdav
-        res = self.testapp.get("/", status=200)
+        res = webdav_testapp.get("/", status=200)
         assert res
 
-    def test_functional__webdav_access_to_root__user_not_exist(self) -> None:
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+    def test_functional__webdav_access_to_root__user_not_exist(
+        self, session, webdav_testapp
+    ) -> None:
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of root using webdav
-        self.testapp.get("/", status=401)
+        webdav_testapp.get("/", status=401)
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label",
         [
             # workspace_label, webdav_workspace_label
             ("myworkspace", "myworkspace"),
             ("/?\\#*", "⧸ʔ⧹#∗"),
             ("Project Z", "Project Z"),
-        ]
+        ],
     )
     def test_functional__webdav_access_to_workspace__nominal_case(
-        self, workspace_label, webdav_workspace_label
+        self,
+        session,
+        workspace_label,
+        webdav_workspace_label,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        webdav_testapp,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -101,24 +120,24 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         # check availability of new created content using webdav
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
 
-    def test_functional__webdav_access_to_workspace__no_role_in_workspace(self) -> None:
+    def test_functional__webdav_access_to_workspace__no_role_in_workspace(
+        self, user_api_factory, group_api_factory, workspace_api_factory, webdav_testapp
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -127,18 +146,20 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of new created content using webdav
-        self.testapp.get("/test", status=404)
+        webdav_testapp.get("/test", status=404)
 
-    def test_functional__webdav_access_to_workspace__workspace_not_exist(self) -> None:
+    def test_functional__webdav_access_to_workspace__workspace_not_exist(
+        self, session, user_api_factory, group_api_factory, webdav_testapp
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -149,29 +170,38 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # check availability of new created content using webdav
-        self.testapp.get("/test", status=404)
+        webdav_testapp.get("/test", status=404)
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, content_filename, webdav_content_filename",
         [
             # workspace_label, webdav_workspace_label,
             # content_filename, webdav_content_filename
             ("myworkspace", "myworkspace", "myfile.txt", "myfile.txt"),
             ("/?\\#*", "⧸ʔ⧹#∗", "/?\\#*.txt", "⧸ʔ⧹#∗.txt"),
             ("Project Z", "Project Z", "report product 47.txt", "report product 47.txt"),
-        ]
+        ],
     )
     def test_functional__webdav_access_to_content__ok__nominal_case(
-        self, workspace_label, webdav_workspace_label, content_filename, webdav_content_filename
+        self,
+        session,
+        workspace_label,
+        webdav_workspace_label,
+        content_filename,
+        webdav_content_filename,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        admin_user,
+        webdav_testapp,
     ) -> None:
 
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        api = self.get_content_api()
-        with self.session.no_autoflush:
+        api = content_api_factory.get()
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -184,29 +214,32 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         # check availability of new created content using webdav
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=200,
         )
 
-    def test_functional__webdav_access_to_content__err__file_not_exist(self) -> None:
+    def test_functional__webdav_access_to_content__err__file_not_exist(
+        self, session, workspace_api_factory, webdav_testapp
+    ) -> None:
 
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace_api.create_workspace("workspace1", save_now=True)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check availability of new created content using webdav
-        self.testapp.get("/workspace1", status=200)
-        self.testapp.get("/workspace1/report.txt", status=404)
+        webdav_testapp.get("/workspace1", status=200)
+        webdav_testapp.get("/workspace1/report.txt", status=404)
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, dir_label, webdav_dir_label, content_filename, webdav_content_filename",
         [
             # workspace_label, webdav_workspace_label,
             # dir_label, webdav_dir_label
@@ -221,7 +254,7 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
                 "report product 47.txt",
                 "report product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_access_to_subdir_content__ok__nominal_case(
         self,
@@ -231,17 +264,21 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         webdav_dir_label,
         content_filename,
         webdav_content_filename,
+        workspace_api_factory,
+        admin_user,
+        content_api_factory,
+        content_type_list,
+        session,
+        webdav_testapp,
     ) -> None:
 
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         folder = api.create(
             content_type_list.Folder.slug, workspace, None, dir_label, do_save=True, do_notify=False
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -254,18 +291,18 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_dir_label = quote(webdav_dir_label)
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         # check availability of new created content using webdav
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir_label),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir_label,
@@ -274,11 +311,13 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
             status=200,
         )
 
-    def test_functional__webdav_access_to_subdir_content__err__file_not_exist(self) -> None:
+    def test_functional__webdav_access_to_subdir_content__err__file_not_exist(
+        self, session, workspace_api_factory, content_api_factory, content_type_list, webdav_testapp
+    ) -> None:
 
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("workspace1", save_now=True)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -289,20 +328,23 @@ class TestFunctionalWebdavGet(WebdavFunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # check availability of new created content using webdav
-        self.testapp.get("/workspace1", status=200)
-        self.testapp.get("/workspace1/examples", status=200)
-        self.testapp.get("/workspace1/examples/report.txt", status=404)
+        webdav_testapp.get("/workspace1", status=200)
+        webdav_testapp.get("/workspace1/examples", status=200)
+        webdav_testapp.get("/workspace1/examples/report.txt", status=404)
 
 
-class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_webdav_test"])
+class TestFunctionalWebdavMoveSimpleFile(object):
     """
     Test for all Webdav "MOVE" action for simple file in different case
     """
 
     # move same workspaces : file
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, dir1_label, webdav_dir1_label, dir2_label, webdav_dir2_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -355,7 +397,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__same_workspace_folder_to_folder(
         self,
@@ -369,10 +411,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        admin_user,
+        workspace_api_factory,
+        role_api_factory,
+        content_api_factory,
+        content_type_list,
+        webdav_testapp,
+        session,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -381,13 +432,11 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         dir1_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -404,7 +453,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -417,7 +466,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
@@ -425,12 +474,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label).format(), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label).format(), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -438,12 +487,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             ),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label),
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -461,7 +510,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         )
 
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -469,7 +518,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             ),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir2_label,
@@ -478,7 +527,8 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, workspace2_label, webdav_workspace2_label, dir1_label, webdav_dir1_label, dir2_label, webdav_dir2_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -540,7 +590,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__different_workspace_folder_to_folder(
         self,
@@ -556,10 +606,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        webdav_testapp,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -568,13 +626,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         example_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -591,7 +649,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -604,7 +662,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
@@ -613,12 +671,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -626,12 +684,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             ),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label),
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -648,7 +706,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -656,7 +714,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             ),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace2_label,
                 urlencoded_webdav_dir2_label,
@@ -665,7 +723,8 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, dir1_label, webdav_dir1_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -709,7 +768,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__same_workspace_root_to_folder(
         self,
@@ -721,10 +780,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        content_type_list,
+        content_api_factory,
+        webdav_testapp,
+        session,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -733,13 +801,11 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -748,7 +814,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -761,7 +827,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
@@ -770,17 +836,17 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             method="MOVE",
             headers={
@@ -793,11 +859,11 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -806,7 +872,8 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, workspace2_label, webdav_workspace2_label, dir1_label, webdav_dir1_label, dir2_label, webdav_dir2_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -868,7 +935,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__different_workspace_root_to_folder(
         self,
@@ -884,10 +951,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        webdav_testapp,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -896,13 +971,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         api.create(
             content_type_list.Folder.slug,
             workspace2,
@@ -911,7 +986,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -924,7 +999,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
@@ -933,17 +1008,17 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label),
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             method="MOVE",
             headers={
@@ -956,11 +1031,11 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace2_label,
                 urlencoded_webdav_dir2_label,
@@ -969,7 +1044,8 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, dir1_label, webdav_dir1_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -1013,7 +1089,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__same_workspace_folder_to_root(
         self,
@@ -1025,10 +1101,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        content_type_list,
+        content_api_factory,
+        session,
+        webdav_testapp,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1037,13 +1122,11 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         example_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -1052,7 +1135,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1065,7 +1148,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
@@ -1073,12 +1156,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -1087,7 +1170,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -1102,7 +1185,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -1110,14 +1193,15 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             ),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(
                 urlencoded_webdav_workspace_label, urlencoded_webdav_new_content_filename
             ),
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, workspace2_label, webdav_workspace2_label, dir1_label, webdav_dir1_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -1170,7 +1254,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__different_workspace_folder_to_root(
         self,
@@ -1184,10 +1268,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        webdav_testapp,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1196,13 +1288,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
+        api = content_api_factory.get()
         example_folder = api.create(
             content_type_list.Folder.slug,
             workspace,
@@ -1211,7 +1303,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1224,7 +1316,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
@@ -1233,12 +1325,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -1247,7 +1339,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -1262,7 +1354,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}/{}".format(
                 urlencoded_webdav_workspace_label,
                 urlencoded_webdav_dir1_label,
@@ -1270,14 +1362,15 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             ),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(
                 urlencoded_webdav_workspace2_label, urlencoded_webdav_new_content_filename
             ),
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -1312,7 +1405,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     @pytest.mark.xfail(reason="To be determined")
     def test_functional__webdav_move_file__ok__rename_file_at_root(
@@ -1323,10 +1416,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        content_api_factory,
+        content_type_list,
+        webdav_testapp,
+        session,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1335,14 +1437,12 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(
-            current_user=self.get_admin_user(), show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
-        with self.session.no_autoflush:
+        api = content_api_factory.get()
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1355,7 +1455,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
@@ -1363,13 +1463,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             method="MOVE",
             headers={
@@ -1380,18 +1480,19 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(
                 urlencoded_webdav_workspace_label, urlencoded_webdav_new_content_filename
             ),
             status=200,
         )
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "workspace_label, webdav_workspace_label, workspace2_label, webdav_workspace2_label, content_filename, webdav_content_filename, new_content_filename, webdav_new_content_filename",
         [
             (
                 # workspace_label, webdav_workspace_label,
@@ -1435,7 +1536,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
                 "Report Product 47.txt",
                 "Report Product 47.txt",
             ),
-        ]
+        ],
     )
     def test_functional__webdav_move_file__ok__different_workspace_root_to_root(
         self,
@@ -1447,10 +1548,18 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         webdav_content_filename,
         new_content_filename,
         webdav_new_content_filename,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        content_api_factory,
+        session,
+        content_type_list,
+        webdav_testapp,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1459,14 +1568,14 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api = self.get_content_api()
-        with self.session.no_autoflush:
+        api = content_api_factory.get()
+        with session.no_autoflush:
             file = api.create(
                 content_type_list.File.slug,
                 workspace,
@@ -1479,7 +1588,7 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             api.save(file)
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        webdav_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
@@ -1489,13 +1598,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        self.testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
-        self.testapp.get(
+        webdav_testapp.get("/{}".format(urlencoded_webdav_workspace_label), status=200)
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=200,
         )
         # do move
-        self.testapp.request(
+        webdav_testapp.request(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             method="MOVE",
             headers={
@@ -1506,1556 +1615,13 @@ class TestFunctionalWebdavMoveSimpleFile(WebdavFunctionalTest):
             status=201,
         )
         # verify move
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename),
             status=404,
         )
-        self.testapp.get(
+        webdav_testapp.get(
             "/{}/{}".format(
                 urlencoded_webdav_workspace2_label, urlencoded_webdav_new_content_filename
             ),
             status=200,
         )
-
-
-# class TestFunctionalWebdavMoveFolder(WebdavFunctionalTest):
-#     """
-#     Test for all Webdav "MOVE" action for folder in different case
-#     """
-#     # move same workspaces: folder
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # workspace2_label, webdav_workspace2_label,
-#             'workspace2',
-#             'workspace2',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # workspace2_label, webdav_workspace2_label,
-#             '/?\\#*wp2',
-#             '⧸ʔ⧹#∗wp2',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # workspace2_label, webdav_workspace2_label,
-#             'Project Y',
-#             'Project Y',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__same_workspace_folder_to_folder(
-#             self,
-#             workspace_label,
-#             webdav_workspace_label,
-#             dir1_label,
-#             webdav_dir1_label,
-#             dir2_label,
-#             webdav_dir2_label,
-#             dir3_label,
-#             webdav_dir3_label,
-#             content_filename,
-#             webdav_content_filename,
-#     ) -> None:
-#
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         example_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace,
-#             None,
-#             label=dir1_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         product_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace,
-#             None,
-#             label=dir2_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 example_folder,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=200)
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_dir3_label,urlencoded_webdav_content_filename), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label), status=200)
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_dir3_label,urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_dir3_label), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label), status=200)
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label,urlencoded_webdav_dir3_label), status=200)
-#
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # workspace_label, webdav_workspace_label,
-#             'workspace2',
-#             'workspace2',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # workspace2_label, webdav_workspace2_label,
-#             '/?\\#*wp2',
-#             '⧸ʔ⧹#∗wp2',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # workspace2_label, webdav_workspace2_label,
-#             'Project Y',
-#             'Project Y',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__different_workspace_folder_to_folder(
-#         self,
-#         workspace_label,
-#         webdav_workspace_label,
-#         workspace2_label,
-#         webdav_workspace2_label,
-#         dir1_label,
-#         webdav_dir1_label,
-#         dir2_label,
-#         webdav_dir2_label,
-#         dir3_label,
-#         webdav_dir3_label,
-#         content_filename,
-#         webdav_content_filename,
-#     ) -> None:
-#         self.session = get_tm_session(self.session_factory,
-#                                    transaction.manager)
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label,
-#                                                    save_now=True)
-#         workspace2 = workspace_api.create_workspace(workspace2_label,
-#                                                     save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace,
-#                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         rapi.create_one(user, workspace2,
-#                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         example_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace,
-#             None,
-#             label=dir1_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         product_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace2,
-#             None,
-#             label=dir2_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 example_folder,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                         urlencoded_webdav_dir1_label),
-#                                         status=200)
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_dir3_filename),
-#             status=200)
-#         self.testapp.get(
-#             '/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                   urlencoded_webdav_dir1_label,
-#                                   urlencoded_webdav_dir3_label,
-#                                   urlencoded_webdav_content_filename),
-#             status=200)
-#         self.testapp.get(
-#             '/{}/{}'.format(
-#                 urlencoded_webdav_workspace2_label,
-#                 urlencoded_webdav_dir2_label
-#             ),
-#             status=200
-#         )
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}'.format(
-#                 urlencoded_webdav_workspace2_label,
-#                 urlencoded_webdav_dir2_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename),
-#             status=404)
-#         self.testapp.get(
-#             '/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                   urlencoded_webdav_dir1_label,
-#                                   urlencoded_webdav_dir3_label,
-#                                   urlencoded_webdav_content_filename),
-#             status=404)
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_dir3_label), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(
-#                 urlencoded_webdav_workspace2_label,
-#                 urlencoded_webdav_dir2_label,
-#                 urlencoded_webdav_dir3_label
-#             ),
-#             status=200
-#         )
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace2_label,
-#                                          urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label, urlencoded_webdav_content_filename)
-#         , status=200)
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # workspace2_label, webdav_workspace2_label,
-#             'workspace2',
-#             'workspace2',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # workspace2_label, webdav_workspace2_label,
-#             '/?\\#*wp2',
-#             '⧸ʔ⧹#∗wp2',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # workspace2_label, webdav_workspace2_label,
-#             'Project Y',
-#             'Project Y',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__same_workspace_root_to_folder(
-#         self,
-#         workspace_label,
-#         webdav_workspace_label,
-#         workspace2_label,
-#         webdav_workspace2_label,
-#         dir1_label,
-#         webdav_dir1_label,
-#         dir2_label,
-#         webdav_dir2_label,
-#         dir3_label,
-#         webdav_dir3_label,
-#         content_filename,
-#         webdav_content_filename,
-#     ) -> None:
-#
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         product_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace,
-#             None,
-#             label=dir2_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 None,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label), status=200)
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label), status=200)
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label,urlencoded_webdav_dir3_label), status=200)
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__different_workspace_root_to_folder(
-#         self,
-#         workspace_label,
-#         webdav_workspace_label,
-#         workspace2_label,
-#         webdav_workspace2_label,
-#         dir1_label,
-#         webdav_dir1_label,
-#         dir2_label,
-#         webdav_dir2_label,
-#         dir3_label,
-#         webdav_dir3_label,
-#         content_filename,
-#         webdav_content_filename,
-#     ) -> None:
-#         self.session = get_tm_session(self.session_factory,
-#                                    transaction.manager)
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label,
-#                                                    save_now=True)
-#         workspace2 = workspace_api.create_workspace(workspace2_label,
-#                                                     save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace,
-#                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         rapi.create_one(user, workspace2,
-#                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         product_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace2,
-#             None,
-#             label=dir2_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 None,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                          urlencoded_webdav_dir1_label),
-#                          status=200)
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename)
-#         , status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace2_label,
-#                                          urlencoded_webdav_dir2_label)
-#         , status=200)
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                             urlencoded_webdav_dir1_label),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}/{}'.format(
-#                 urlencoded_webdav_workspace2_label,
-#                 urlencoded_webdav_dir2_label,
-#                 urlencoded_webdav_dir3_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                          urlencoded_webdav_dir1_label),
-#                          status=404)
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename)
-#         , status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace2_label,
-#                                          urlencoded_webdav_dir2_label, urlencoded_webdav_dir3_label)
-#         , status=200)
-#         self.testapp.get('/{}/{}/{}/{}'.format(
-#             urlencoded_webdav_workspace2_label,
-#             urlencoded_webdav_dir2_label,
-#             urlencoded_webdav_dir3_label,
-#             urlencoded_webdav_content_filename)
-#         , status=200)
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # workspace2_label, webdav_workspace2_label,
-#             'workspace2',
-#             'workspace2',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # workspace2_label, webdav_workspace2_label,
-#             '/?\\#*wp2',
-#             '⧸ʔ⧹#∗wp2',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # workspace2_label, webdav_workspace2_label,
-#             'Project Y',
-#             'Project Y',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__same_workspace_folder_to_root(
-#             self,
-#             workspace_label,
-#             webdav_workspace_label,
-#             workspace2_label,
-#             webdav_workspace2_label,
-#             dir1_label,
-#             webdav_dir1_label,
-#             dir2_label,
-#             webdav_dir2_label,
-#             dir3_label,
-#             webdav_dir3_label,
-#             content_filename,
-#             webdav_content_filename,
-#     ) -> None:
-#
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         example_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace,
-#             None,
-#             label=dir1_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 example_folder,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=200)
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_dir3_label,urlencoded_webdav_content_filename), status=200)
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_dir3_label,urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_content_filename), status=200)
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__different_workspace_folder_to_root(
-#             self,
-#             workspace_label,
-#             webdav_workspace_label,
-#             workspace2_label,
-#             webdav_workspace2_label,
-#             dir1_label,
-#             webdav_dir1_label,
-#             dir2_label,
-#             webdav_dir2_label,
-#             dir3_label,
-#             webdav_dir3_label,
-#             content_filename,
-#             webdav_content_filename,
-#     ) -> None:
-#         self.session = get_tm_session(self.session_factory,
-#                                    transaction.manager)
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label,
-#                                                    save_now=True)
-#         workspace2 = workspace_api.create_workspace(workspace2_label,
-#                                                     save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace,
-#                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         rapi.create_one(user, workspace2,
-#                         UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         example_folder = api.create(
-#             content_type_list.Folder.slug,
-#             workspace,
-#             None,
-#             label=dir1_label,
-#             do_save=True,
-#             do_notify=False,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 example_folder,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                         urlencoded_webdav_dir1_label),
-#                                         status=200)
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename),
-#             status=200)
-#         self.testapp.get(
-#             '/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                   urlencoded_webdav_dir1_label,
-#                                   urlencoded_webdav_dir3_label,
-#                                   urlencoded_webdav_content_filename),
-#             status=200)
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}'.format(
-#                 urlencoded_webdav_workspace2_label,
-#                 urlencoded_webdav_dir2_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                urlencoded_webdav_dir1_label,
-#                                urlencoded_webdav_content_filename),
-#             status=404)
-#         self.testapp.get(
-#             '/{}/{}/{}/{}'.format(urlencoded_webdav_workspace_label,
-#                                   urlencoded_webdav_dir1_label,
-#                                   urlencoded_webdav_dir3_label,
-#                                   urlencoded_webdav_content_filename),
-#             status=404)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace2_label,
-#                                          urlencoded_webdav_dir2_label),
-#                          status=200)
-#         self.testapp.get(
-#             '/{}/{}/{}'.format(urlencoded_webdav_workspace2_label,
-#                                urlencoded_webdav_dir2_label,
-#                                urlencoded_webdav_content_filename),
-#             status=200)
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__rename_file_at_root(
-#         self,
-#         workspace_label,
-#         webdav_workspace_label,
-#         workspace2_label,
-#         webdav_workspace2_label,
-#         dir1_label,
-#         webdav_dir1_label,
-#         dir2_label,
-#         webdav_dir2_label,
-#         dir3_label,
-#         webdav_dir3_label,
-#         content_filename,
-#         webdav_content_filename,
-#     ) -> None:
-#
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER,
-#                         False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 None,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=200)
-#
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label, urlencoded_webdav_content_filename), status=200)
-#
-#     # move different workspace: folder
-#
-#     @parameterized.expand([
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'workspace1',
-#             'workspace1',
-#             # dir1_label, webdav_dir1_label
-#             'folder1',
-#             'folder1',
-#             # dir2_label, webdav_dir2_label
-#             'folder2',
-#             'folder2',
-#             # dir3_label, webdav_dir3_label
-#             'folder3',
-#             'folder3',
-#             # content_filename, webdav_content_filename
-#             'myfile.txt',
-#             'myfile.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             '/?\\#*wp',
-#             '⧸ʔ⧹#∗wp',
-#             # dir1_label, webdav_dir1_label
-#             '/?\\#*dir1',
-#             '⧸ʔ⧹#∗dir1',
-#             # dir2_label, webdav_dir2_label
-#             '/?\\#*dir2',
-#             '⧸ʔ⧹#∗dir2',
-#             # dir2_label, webdav_dir3_label
-#             '/?\\#*dir3',
-#             '⧸ʔ⧹#∗dir3',
-#             # content_filename, webdav_content_filename
-#             '/?\\#*file.txt',
-#             '⧸ʔ⧹#∗file.txt',
-#         ),
-#         (
-#             # workspace_label, webdav_workspace_label,
-#             'Project Z',
-#             'Project Z',
-#             # dir1_label, webdav_dir1_label
-#             'Product 21',
-#             'Product 21',
-#             # dir2_label, webdav_dir2_label
-#             'Product 47',
-#             'Product 47',
-#             # dir3_label, webdav_dir3_label
-#             'technical_doc',
-#             'technical_doc',
-#             # content_filename, webdav_content_filename
-#             'report product 47.txt',
-#             'report product 47.txt',
-#         ),
-#     ])
-#     def test_functional__webdav_move_folder__ok__different_workspace_root_to_root(
-#             self,
-#             workspace_label,
-#             webdav_workspace_label,
-#             workspace2_label,
-#             webdav_workspace2_label,
-#             dir1_label,
-#             webdav_dir1_label,
-#             dir2_label,
-#             webdav_dir2_label,
-#             dir3_label,
-#             webdav_dir3_label,
-#             content_filename,
-#             webdav_content_filename,
-#     ) -> None:
-#
-#         admin = self.session.query(User) \
-#             .filter(User.email == 'admin@admin.admin') \
-#             .one()
-#         uapi = UserApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         gapi = GroupApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         groups = [gapi.get_one_with_name('users')]
-#         user = uapi.create_user('test@test.test', password='test@test.test',
-#                                 do_save=True, do_notify=False,
-#                                 groups=groups)
-#         workspace_api = WorkspaceApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#             show_deleted=True,
-#         )
-#         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-#         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-#         rapi = RoleApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-#         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
-#         api = ContentApi(
-#             current_user=admin,
-#             session=self.session,
-#             config=self.app_config,
-#         )
-#         with self.session.no_autoflush:
-#             example_product_folder = api.create(
-#                 content_type_list.Folder.slug,
-#                 workspace,
-#                 None,
-#                 label=dir3_label,
-#                 do_save=True,
-#                 do_notify=False,
-#             )
-#             file = api.create(
-#                 content_type_list.File.slug,
-#                 workspace,
-#                 example_product_folder,
-#                 filename=content_filename,
-#                 do_save=False,
-#                 do_notify=False,
-#             )
-#             api.update_file_data(
-#                 file,
-#                 content_filename,
-#                 'text/plain',
-#                 b'test_content'
-#             )
-#             api.save(file)
-#         transaction.commit()
-#
-#
-#         self.testapp.authorization = (
-#             'Basic',
-#             (
-#                 'test@test.test',
-#                 'test@test.test'
-#             )
-#         )
-#         # convert to %encoded for valid_url
-#         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
-#         urlencoded_webdav_workspace2_label = quote(webdav_workspace2_label)
-#         urlencoded_webdav_dir1_label = quote(webdav_dir1_label)
-#         urlencoded_webdav_dir2_label = quote(webdav_dir2_label)
-#         urlencoded_webdav_dir3_label = quote(webdav_dir3_label)
-#         urlencoded_webdav_content_filename = quote(webdav_content_filename)
-#         # check availability of content
-#         self.testapp.get('/{}'.format(urlencoded_webdav_workspace_label), status=200)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=200)
-#
-#         # do move
-#         self.testapp.request(
-#             '/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
-#             method='MOVE',
-#             headers={'destination': '/{}/{}'.format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label)},
-#             status=201
-#         )
-#         # verify move
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label), status=404)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label, urlencoded_webdav_content_filename), status=404)
-#         self.testapp.get('/{}/{}'.format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label), status=200)
-#         self.testapp.get('/{}/{}/{}'.format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label, urlencoded_webdav_content_filename), status=200)

@@ -19,6 +19,7 @@ from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
+from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
@@ -262,3 +263,12 @@ def radicale_server(config_uri, config_section) -> RadicaleServerHelper:
     radicale_server_helper = RadicaleServerHelper(config_uri, config_section)
     yield radicale_server_helper
     radicale_server_helper.stop_radicale_server()
+
+
+@pytest.fixture
+def webdav_testapp(config_uri, config_section) -> TestApp:
+    DepotManager._clear()
+    settings = plaster.get_settings(config_uri, config_section)
+    app_factory = WebdavAppFactory(**settings)
+    app = app_factory.get_wsgi_app()
+    return TestApp(app)
