@@ -17,6 +17,7 @@ import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
+import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 
 import Avatar from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
@@ -75,6 +76,7 @@ export {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   Avatar,
   Badge,
   Timeline,

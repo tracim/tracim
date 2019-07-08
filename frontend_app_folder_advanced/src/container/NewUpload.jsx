@@ -129,8 +129,8 @@ class NewUpload extends React.Component {
                 }
               }}
             >
-              {props.t('Delete all')}
-              <i className='fa fa-fw fa-trash-o' />
+              {props.t('Cancel')}
+              <i className='fa fa-fw fa-times' />
             </button>
             <button
               className='btn highlightBtn mt-3'

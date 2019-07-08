@@ -464,7 +464,6 @@ class Thread extends React.Component {
             allowClickOnRevision={false}
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
-            showHeader={false}
             isArchived={content.is_archived}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             isDeleted={content.is_deleted}

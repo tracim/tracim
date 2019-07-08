@@ -107,11 +107,12 @@
         background-color grey-hover
         font-size 20px
         color darkGrey
-        cursor pointer
         &__icon
           text-align center
-        &__title
-          transform rotate(-90deg)
+          cursor pointer
+          &__close
+            text-align center
+            cursor pointer
 
 .rightPartClose
   .wsContentGeneric__content__left
@@ -149,14 +150,14 @@ columnContents()
           height 50px
           border-radius 10px 10px 0 0
           cursor auto
+          justify-content flex-end
+          padding-left 10px
           &__icon
-            display none
-          &__title
             display flex
-            justify-content center
-            align-items center
             transform none
-            width 100%
+            margin 10px
+            &__close
+              display none
 
 @media (min-width: min-lg) and (max-width: max-lg)
   columnContents()

@@ -9,6 +9,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   Timeline,
   NewVersionBtn,
   ArchiveDeleteContent,
@@ -69,9 +70,7 @@ class File extends React.Component {
       progressUpload: {
         display: false,
         percent: 0
-      },
-      showTimeline: true,
-      showShareFile: false
+      }
     }
 
     // i18n has been init, add resources from frontend
@@ -720,31 +719,39 @@ class File extends React.Component {
             progressUpload={state.progressUpload}
           />
 
-          <div className='file__contentpage__rightContent'>
-            {state.showTimeline &&
-              <Timeline
-                customClass={`${state.config.slug}__contentpage`}
-                customColor={state.config.hexcolor}
-                loggedUser={state.loggedUser}
-                timelineData={state.timeline}
-                newComment={state.newComment}
-                disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
-                availableStatusList={state.config.availableStatuses}
-                wysiwyg={state.timelineWysiwyg}
-                onChangeNewComment={this.handleChangeNewComment}
-                onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                onClickWysiwygBtn={this.handleToggleWysiwyg}
-                onClickRevisionBtn={this.handleClickShowRevision}
-                shouldScrollToBottom={state.mode !== MODE.REVISION}
-              />
-            }
-
-            {state.showShareFile &&
-              <ShareFileManagement
-                hexcolor={state.config.hexcolor}
-              />
-            }
-          </div>
+          <PopinFixedRightPart
+            customClass={`${state.config.slug}__contentpage`}
+            menuItemList={[
+              {
+                id: 'timeline',
+                label: 'Timeline',
+                icon: 'fa-history',
+                children: <Timeline
+                  customClass={`${state.config.slug}__contentpage`}
+                  customColor={state.config.hexcolor}
+                  loggedUser={state.loggedUser}
+                  timelineData={state.timeline}
+                  newComment={state.newComment}
+                  disableComment={state.mode === MODE.REVISION || state.mode === MODE.EDIT || !state.content.is_editable}
+                  availableStatusList={state.config.availableStatuses}
+                  wysiwyg={state.timelineWysiwyg}
+                  onChangeNewComment={this.handleChangeNewComment}
+                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                  onClickWysiwygBtn={this.handleToggleWysiwyg}
+                  onClickRevisionBtn={this.handleClickShowRevision}
+                  shouldScrollToBottom={state.mode !== MODE.REVISION}
+                />
+              },
+              {
+                id: 'share',
+                label: 'Share',
+                icon: 'fa-share-alt',
+                children: <ShareFileManagement
+                  hexcolor={state.config.hexcolor}
+                />
+              }
+            ]}
+          />
         </PopinFixedContent>
       </PopinFixed>
     )

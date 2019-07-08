@@ -5,6 +5,7 @@ import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
+import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 
 // import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 // import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
@@ -74,40 +75,49 @@ ReactDOM.render(
       <PopinFixedContent customClass={`${'randomClass'}__contentpage`} style={{width: '100%'}}>
         <div className='wsContentGeneric__content__left' />
 
-        <Timeline
-          showHeader
-          customClass={`${'randomClass'}__contentpage`}
-          customColor={'#3f52e3'}
-          loggedUser={{
-            user_id: 1,
-            username: 'Smoi',
-            firstname: 'Côme',
-            lastname: 'Stoilenom',
-            email: 'osef@algoo.fr',
-            avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
-            userRoleIdInWorkspace: 8
-          }}
-          timelineData={TimelineDebugData.map(item => item.timelineType === 'comment'
-            ? {
-              ...item,
-              author: {
-                ...item.author,
-                avatar_url: item.author.avatar_url
-                  ? item.author.avatar_url
-                  : ''
+        <PopinFixedRightPart
+            customClass={`${'randomClass'}__contentpage`}
+            menuItemList={[
+              {
+                id: 'timeline',
+                label: 'Timeline',
+                icon: 'fa-history',
+                children: <Timeline
+                  customClass={`${'randomClass'}__contentpage`}
+                  customColor={'#3f52e3'}
+                  loggedUser={{
+                    user_id: 1,
+                    username: 'Smoi',
+                    firstname: 'Côme',
+                    lastname: 'Stoilenom',
+                    email: 'osef@algoo.fr',
+                    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
+                    userRoleIdInWorkspace: 8
+                  }}
+                  timelineData={TimelineDebugData.map(item => item.timelineType === 'comment'
+                    ? {
+                      ...item,
+                      author: {
+                        ...item.author,
+                        avatar_url: item.author.avatar_url
+                          ? item.author.avatar_url
+                          : ''
+                      }
+                    }
+                    : item
+                  )}
+                  newComment={''}
+                  disableComment={false}
+                  wysiwyg={false}
+                  onChangeNewComment={() => {}}
+                  onClickValidateNewCommentBtn={() => {}}
+                  onClickWysiwygBtn={() => {}}
+                  onClickRevisionBtn={() => {}}
+                  shouldScrollToBottom={true}
+                />
               }
-            }
-            : item
-          )}
-          newComment={''}
-          disableComment={false}
-          wysiwyg={false}
-          onChangeNewComment={() => {}}
-          onClickValidateNewCommentBtn={() => {}}
-          onClickWysiwygBtn={() => {}}
-          onClickRevisionBtn={() => {}}
-          shouldScrollToBottom={true}
-        />
+            ]}
+          />
       </PopinFixedContent>
     </PopinFixed>
   </div>

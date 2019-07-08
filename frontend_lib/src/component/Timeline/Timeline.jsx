@@ -52,23 +52,6 @@ class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
-        {/* {props.showHeader &&
-          <div
-            className={classnames(`${props.customClass}__header`, 'timeline__header')}
-            onClick={props.toggleRightPart}
-          >
-            <div className='timeline__header__icon mt-3 mb-auto'>
-              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
-            </div>
-            <div className='timeline__header__title'>
-              {props.t('Timeline')}
-            </div>
-            <div className='timeline__header__icon mb-3 mt-auto'>
-              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
-            </div>
-          </div>
-        } */}
-
         <div className='timeline__body'>
           <div className='timeline__body__warning'>
             {props.isDeprecated && !props.isArchived && !props.isDeleted && (
@@ -215,8 +198,7 @@ Timeline.propTypes = {
   onClickRevisionBtn: PropTypes.func,
   allowClickOnRevision: PropTypes.bool,
   shouldScrollToBottom: PropTypes.bool,
-  showHeader: PropTypes.bool,
-  rightPartOpen: PropTypes.bool, // irrelevant if showHeader is false
+  rightPartOpen: PropTypes.bool,
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
@@ -239,7 +221,6 @@ Timeline.defaultProps = {
   onClickRevisionBtn: () => {},
   allowClickOnRevision: true,
   shouldScrollToBottom: true,
-  showHeader: true,
   rightPartOpen: false,
   isArchived: false,
   isDeleted: false
