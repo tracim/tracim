@@ -39,7 +39,8 @@ class CollaboraFrame extends React.Component {
       let parsedSearch = qs.parse(window.location.search)
       if (parsedSearch.onlineedition) {
         delete parsedSearch.onlineedition
-        window.location.search = qs.stringify(parsedSearch)
+        const url = window.location.pathname + '?' + qs.stringify(parsedSearch)
+        GLOBAL_dispatchEvent({type: 'changeUrl', data: {url: url}})
       }
     }
   }

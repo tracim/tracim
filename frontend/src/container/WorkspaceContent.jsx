@@ -93,6 +93,10 @@ class WorkspaceContent extends React.Component {
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
 
+      case 'changeUrl':
+        props.history.push(data.url)
+        break
+
       case 'allApp_changeLang': this.buildBreadcrumbs(); break
     }
   }
