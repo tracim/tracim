@@ -25,6 +25,7 @@ from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
+from tracim_backend.tests.utils import ElasticSearchHelper
 from tracim_backend.tests.utils import GroupApiFactory
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RoleApiFactory
@@ -246,3 +247,10 @@ def mailhog() -> MailHogHelper:
     mailhog_helper.cleanup_mailhog()
     yield mailhog_helper
     mailhog_helper.cleanup_mailhog()
+
+
+@pytest.fixture
+def elasticsearch(app_config, session) -> ElasticSearchHelper:
+    elasticsearch_helper = ElasticSearchHelper(app_config, session)
+    yield elasticsearch_helper
+    elasticsearch_helper.delete_index()

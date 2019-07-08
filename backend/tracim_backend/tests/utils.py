@@ -13,6 +13,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.search.search import ESSearchApi
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
@@ -162,3 +163,17 @@ class MailHogHelper(object):
         return requests.get(
             "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
         ).json()
+
+    elastic_search_api = None
+
+
+class ElasticSearchHelper(object):
+    def __init__(self, app_config, session):
+        self.elastic_search_api = ESSearchApi(config=app_config, current_user=None, session=session)
+        self.elastic_search_api.create_index()
+
+    def refresh_elasticsearch(self) -> None:
+        self.elastic_search_api.refresh_index()
+
+    def delete_index(self) -> None:
+        self.elastic_search_api.delete_index()

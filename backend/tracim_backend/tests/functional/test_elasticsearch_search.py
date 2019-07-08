@@ -1,17 +1,17 @@
-from parameterized import parameterized
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.tests import FunctionalElasticSearchTest
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-class TestElasticSearchSearch(FunctionalElasticSearchTest):
-    config_section = "functional_test_elasticsearch_search"
-
-    @parameterized.expand(
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test_elasticsearch_search"])
+class TestElasticSearchSearch(object):
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, nb_content_result, first_search_result_content_name",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
@@ -20,18 +20,25 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             ("testdocument", "testdoc", 1, "testdocument"),
             # # autocomplete with multi result (can't check result order now)
             ("testdocument", "test", 2, None),
-        ]
+        ],
     )
     def test_api___elasticsearch_search_ok__by_label(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
         created_content_name,
         search_string,
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -40,11 +47,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         content1 = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -65,11 +72,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         )
         api.execute_created_content_actions(content3)
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -77,7 +84,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         if first_search_result_content_name:
             assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, nb_content_result, first_search_result_content_name",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name
             # exact syntax
@@ -86,18 +94,25 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             ("good practices", ".thread", 1, "discussion"),
             # # autocomplete with multi result (can't check result order now)
             ("good practices", ".document", 2, None),
-        ]
+        ],
     )
     def test_api___elasticsearch_search_ok__by_filename(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
         created_content_name,
         search_string,
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -106,11 +121,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         content1 = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -127,11 +142,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         )
         api.execute_created_content_actions(content3)
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
@@ -139,7 +154,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         if first_search_result_content_name:
             assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "created_content_name, created_content_body, search_string, nb_content_result, first_search_result_content_name",
         [
             # created_content_name, created_content_body,  search_string, nb_content_result, first_search_result_content_name
             # exact syntax
@@ -157,10 +173,18 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
                 1,
                 "good practices",
             ),
-        ]
+        ],
     )
     def test_api___elasticsearch_search_ok__by_description(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+        session,
         created_content_name,
         created_content_body,
         search_string,
@@ -168,8 +192,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         first_search_result_content_name,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -178,18 +202,18 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label=created_content_name,
             do_save=True,
         )
-        with new_revision(session=self.session, tm=transaction.manager, content=content):
+        with new_revision(session=session, tm=transaction.manager, content=content):
             api.update_content(
                 content, new_label=created_content_name, new_content=created_content_body
             )
@@ -204,18 +228,19 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         )
         api.execute_created_content_actions(thread)
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
@@ -236,10 +261,17 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
                 "this is a comment content containing the string: eureka.",
                 "this is another comment content containing eureka string",
             ),
-        ]
+        ],
     )
     def test_api___elasticsearch_search_ok__by_comment_content(
         self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
         created_content_name,
         search_string,
         nb_content_result,
@@ -248,8 +280,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         second_created_comment_content,
     ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -258,11 +290,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -290,21 +322,30 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         )
         api.execute_created_content_actions(thread)
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
 
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string}
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
-    def test_api___elasticsearch_search_ok__no_search_string(self) -> None:
+    def test_api___elasticsearch_search_ok__no_search_string(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -313,29 +354,38 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document", workspace=workspace, label="test", do_save=True
         )
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
 
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 0
         assert search_result["is_total_hits_accurate"] is True
         assert len(search_result["contents"]) == 0
 
-    def test_api___elasticsearch_search_ok__filter_by_content_type(self) -> None:
+    def test_api___elasticsearch_search_ok__filter_by_content_type(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -344,11 +394,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         doc = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -378,11 +428,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         )
         api.execute_created_content_actions(folder)
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
         # get all
         params = {"search_string": "stringtosearch"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -390,8 +440,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert len(search_result["contents"]) == 4
 
         params = {"search_string": "stringtosearch", "content_types": "html-document"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 2
@@ -402,8 +452,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert "stringtosearch doc" in labels
 
         params = {"search_string": "stringtosearch", "content_types": "html-document,thread"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -416,8 +466,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert "stringtosearch thread" in labels
 
         params = {"search_string": "stringtosearch", "content_types": "folder"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -425,10 +475,20 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"] == "stringtosearch folder"
 
-    def test_api___elasticsearch_search_ok__filter_by_deleted_archived_active(self) -> None:
+    def test_api___elasticsearch_search_ok__filter_by_deleted_archived_active(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+        session,
+    ) -> None:
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -437,11 +497,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
+        api = content_api_factory.get(current_user=user)
         active_content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -463,7 +523,7 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_save=True,
         )
         api.execute_created_content_actions(deleted_content)
-        with new_revision(session=self.session, tm=transaction.manager, content=deleted_content):
+        with new_revision(session=session, tm=transaction.manager, content=deleted_content):
             api.delete(deleted_content)
         api.save(deleted_content)
         api.execute_update_content_actions(deleted_content)
@@ -474,12 +534,12 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_save=True,
         )
         api.execute_created_content_actions(archived_content)
-        with new_revision(session=self.session, tm=transaction.manager, content=archived_content):
+        with new_revision(session=session, tm=transaction.manager, content=archived_content):
             api.archive(archived_content)
         api.save(archived_content)
         api.execute_update_content_actions(archived_content)
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
         # get all
         params = {
             "search_string": "stringtosearch",
@@ -487,8 +547,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             "show_archived": 1,
             "show_active": 1,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -497,8 +557,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
 
         # get only active
         params = {"search_string": "stringtosearch"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         default_search_result = res.json_body
         assert default_search_result
         assert default_search_result["total_hits"] == 2
@@ -514,8 +574,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             "show_deleted": 0,
             "show_archived": 0,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         only_active_search_result = res.json_body
         assert only_active_search_result == default_search_result
 
@@ -525,8 +585,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             "show_deleted": 1,
             "show_archived": 0,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -542,8 +602,8 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             "show_deleted": 0,
             "show_archived": 1,
         }
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -552,14 +612,25 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
 
-class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
-    config_section = "functional_test_elasticsearch_ingest_search"
-
+@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.parametrize("config_section", ["functional_test_elasticsearch_ingest_search"])
+class TestElasticSearchSearchWithIngest(object):
     @pytest.mark.xfail(reason="Need elasticsearch ingest plugin enabled")
-    def test_api__elasticsearch_search__ok__in_file_ingest_search(self):
+    def test_api__elasticsearch_search__ok__in_file_ingest_search(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+        session,
+        content_type_list,
+    ):
 
-        uapi = self.get_user_api()
-        gapi = self.get_group_api()
+        uapi = user_api_factory.get()
+        gapi = group_api_factory.get()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -568,12 +639,12 @@ class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = self.get_workspace_api(show_deleted=True)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = self.get_role_api()
+        rapi = role_api_factory.get()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = self.get_content_api(current_user=user)
-        with self.session.no_autoflush:
+        api = content_api_factory.get(current_user=user)
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -587,11 +658,11 @@ class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
             api.execute_created_content_actions(text_file)
         content_id = text_file.content_id
         transaction.commit()
-        self.refresh_elasticsearch()
+        elasticsearch.refresh_elasticsearch()
 
         params = {"search_string": "stringtosearch"}
-        self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = self.testapp.get("/api/v2/search/content".format(), status=200, params=params)
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        res = web_testapp.get("/api/v2/search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
