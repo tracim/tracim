@@ -26,6 +26,7 @@ from tracim_backend.tests import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import GroupApiFactory
+from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
@@ -237,3 +238,11 @@ def test_logger() -> None:
     logging.getLogger("cliff").setLevel("ERROR")
     logging.getLogger("_jb_pytest_runner").setLevel("ERROR")
     return logger
+
+
+@pytest.fixture
+def mailhog() -> MailHogHelper:
+    mailhog_helper = MailHogHelper()
+    mailhog_helper.cleanup_mailhog()
+    yield mailhog_helper
+    mailhog_helper.cleanup_mailhog()

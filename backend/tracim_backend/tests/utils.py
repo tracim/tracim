@@ -1,5 +1,7 @@
 import typing
 
+import requests
+from requests import Response
 from sqlalchemy.orm import Session
 from wsgidav import util as wsgidav_util
 from wsgidav.dav_provider import _DAVResource
@@ -146,3 +148,17 @@ def webdav_put_new_test_file_helper(
 
     # Now file should exist
     return provider.getResourceInst(file_path, environ)
+
+
+class MailHogHelper(object):
+
+    MAILHOG_BASE_URL = "http://127.0.0.1:8025"
+    MAILHOG_MESSAGES_ENDPOINT = "/api/v1/messages"
+
+    def cleanup_mailhog(self) -> Response:
+        return requests.delete("{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT))
+
+    def get_mailhog_mails(self) -> typing.List[typing.Any]:
+        return requests.get(
+            "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
+        ).json()
