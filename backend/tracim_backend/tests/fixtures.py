@@ -7,6 +7,7 @@ from pyramid import testing
 import pytest
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 import transaction
 from webtest import TestApp
 
@@ -17,6 +18,7 @@ from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.webdav import Provider
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
@@ -26,6 +28,7 @@ from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import GroupApiFactory
 from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 
 
@@ -182,7 +185,7 @@ def application_api_factory(app_list) -> ApplicationApiFactory:
 
 
 @pytest.fixture()
-def admin_user(session) -> User:
+def admin_user(session: Session) -> User:
     return session.query(User).filter(User.email == "admin@admin.admin").one()
 
 
@@ -198,6 +201,27 @@ def content_type_list() -> ContentTypeList:
     from tracim_backend.app_models.contents import content_type_list as content_type_list_static
 
     return content_type_list_static
+
+
+@pytest.fixture()
+def current_webdav_user(session: Session) -> User:
+    return admin_user
+
+
+@pytest.fixture()
+def webdav_provider(app_config: CFG):
+    return Provider(
+        show_archived=False, show_deleted=False, show_history=False, app_config=app_config
+    )
+
+
+@pytest.fixture()
+def webdav_environ_factory(
+    webdav_provider: Provider, session: Session, admin_user: admin_user, app_config: CFG
+) -> WedavEnvironFactory:
+    return WedavEnvironFactory(
+        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user
+    )
 
 
 @pytest.fixture

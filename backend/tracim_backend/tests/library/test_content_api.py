@@ -3467,9 +3467,8 @@ class TestContentApi(object):
         eq_(original_id, item.content_id)
 
 
+@pytest.mark.parametrize("tracim_fixtures", [[FixtureTest]])
 class TestContentApiSecurity(object):
-    fixtures = [FixtureTest]
-
     def test_unit__cant_get_non_access_content__ok__nominal_case(
         self, session, workspace_api_factory, admin_user, app_config, content_type_list
     ):
