@@ -72,7 +72,8 @@ def app_config(depot, settings) -> CFG:
 
 
 @pytest.fixture
-def web_testapp(settings, hapic):
+def web_testapp(settings, hapic, session):
+    DepotManager._clear()
     app = web({}, **settings)
     return TestApp(app)
 
