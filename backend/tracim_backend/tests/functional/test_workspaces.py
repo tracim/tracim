@@ -11,8 +11,8 @@ from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
 @pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])

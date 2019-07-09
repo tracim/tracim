@@ -1,10 +1,14 @@
+from io import BytesIO
 import multiprocessing
+import os
 import typing
 
+from PIL import Image
 import plaster
 import requests
 from requests import Response
 from sqlalchemy.orm import Session
+import transaction
 from waitress import serve
 from wsgidav import util as wsgidav_util
 from wsgidav.dav_provider import _DAVResource
@@ -21,6 +25,8 @@ from tracim_backend.lib.search.search import ESSearchApi
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.setup_models import get_tm_session
 
 
 class ContentApiFactory(object):
@@ -197,3 +203,42 @@ class RadicaleServerHelper(object):
     def stop_radicale_server(self):
         if self.radicale_server:
             self.radicale_server.terminate()
+
+
+def eq_(a, b, msg=None) -> None:
+    # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
+    assert a == b, msg or "%r != %r" % (a, b)
+
+
+def set_html_document_slug_to_legacy(session_factory) -> None:
+    """
+    Simple function to help some functional test. This modify "html-documents"
+    type content in database to legacy "page" slug.
+    :param session_factory: session factory of the test
+    :return: Nothing.
+    """
+    dbsession = get_tm_session(session_factory, transaction.manager)
+    content_query = (
+        dbsession.query(ContentRevisionRO)
+        .filter(ContentRevisionRO.type == "page")
+        .filter(ContentRevisionRO.content_id == 6)
+    )
+    assert content_query.count() == 0
+    html_documents_query = dbsession.query(ContentRevisionRO).filter(
+        ContentRevisionRO.type == "html-document"
+    )
+    html_documents_query.update({ContentRevisionRO.type: "page"})
+    transaction.commit()
+    assert content_query.count() > 0
+
+
+def create_1000px_png_test_image() -> None:
+    file = BytesIO()
+    image = Image.new("RGBA", size=(1000, 1000), color=(0, 0, 0))
+    image.save(file, "png")
+    file.name = "test_image.png"
+    file.seek(0)
+    return file
+
+
+TEST_CONFIG_FILE_PATH = os.environ.get("TEST_CONFIG_FILE_PATH")

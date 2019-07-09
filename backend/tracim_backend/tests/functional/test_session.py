@@ -7,7 +7,6 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.tests import FunctionalTestNoDB
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -17,16 +16,6 @@ class TestLogoutEndpoint(object):
 
     def test_api__access_logout_post_enpoint__ok__nominal_case(self, web_testapp):
         web_testapp.get("/api/v2/auth/logout", status=204)
-
-
-class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
-    def test_api__try_login_enpoint__err_500__no_inited_db(self):
-        params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
-        res = self.testapp.post_json("/api/v2/auth/login", params=params, status=500)
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert "message" in res.json.keys()
-        assert "details" in res.json.keys()
 
 
 @pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])

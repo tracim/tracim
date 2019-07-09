@@ -18,8 +18,8 @@ from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.auth import AuthType
-from tracim_backend.tests import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
+from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 
 
 class TestCommandsList(object):

@@ -23,7 +23,7 @@ from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import User
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
-from tracim_backend.tests import TEST_CONFIG_FILE_PATH
+from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import ElasticSearchHelper

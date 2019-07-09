@@ -12,8 +12,8 @@ from tracim_backend.lib.webdav import TracimDomainController
 from tracim_backend.lib.webdav.resources import RootResource
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.tests import eq_
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import eq_
 from tracim_backend.tests.utils import webdav_put_new_test_file_helper
 
 

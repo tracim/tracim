@@ -20,8 +20,8 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.tests import eq_
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
+from tracim_backend.tests.utils import eq_
 
 
 class TestSortContentApi(object):
