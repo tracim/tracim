@@ -2,12 +2,15 @@ from io import BytesIO
 import multiprocessing
 import os
 import typing
+from typing import Any
+from typing import Optional
 
 from PIL import Image
 import plaster
 import requests
 from requests import Response
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.session import sessionmaker
 import transaction
 from waitress import serve
 from wsgidav import util as wsgidav_util
@@ -137,7 +140,7 @@ class ApplicationApiFactory(object):
     def __init__(self, app_list):
         self.app_list = app_list
 
-    def get(self):
+    def get(self) -> ApplicationApi:
         return ApplicationApi(self.app_list)
 
 
@@ -205,12 +208,12 @@ class RadicaleServerHelper(object):
             self.radicale_server.terminate()
 
 
-def eq_(a, b, msg=None) -> None:
+def eq_(a: Any, b: Any, msg: Optional[str] = None) -> None:
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
     assert a == b, msg or "%r != %r" % (a, b)
 
 
-def set_html_document_slug_to_legacy(session_factory) -> None:
+def set_html_document_slug_to_legacy(session_factory: sessionmaker) -> None:
     """
     Simple function to help some functional test. This modify "html-documents"
     type content in database to legacy "page" slug.
