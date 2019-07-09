@@ -94,4 +94,37 @@ describe('Searching keywords', () => {
       cy.get('.searchResult__content__empty').should('be.visible')
     })
   })
+
+
+  describe('by changing it in the url', () => {
+    const pageNumber = '1'
+    const numberByPage = '10'
+    const actived = '1'
+    const deleted = '0'
+    const archived = '0'
+    const contentTypes = 'html-document%2Cfile%2Cthread%2Cfolder%2Ccomment'
+
+    before(function () {
+      cy.resetDB()
+      cy.setupBaseDB()
+      cy.loginAs('administrators')
+      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+        workspaceId = workspace.workspace_id
+        cy.createThread(threadTitle, workspaceId)
+        cy.createThread(threadTitleLong, workspaceId)
+      })
+    })
+
+    describe('that match two documents', () => {
+      beforeEach(function () {
+        cy.loginAs('users')
+        cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: threadTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+      })
+
+      it('Should display two results', () => {
+        cy.get(contentThreadGetter).should('be.visible')
+        cy.get(contentThreadTitleLongGetter).should('be.visible')
+      })
+    })
+  })
 })
