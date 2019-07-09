@@ -7,7 +7,6 @@ import sys
 from typing import Any
 from typing import List
 from typing import Optional
-from typing import Union
 
 from cliff.app import App
 from cliff.command import Command
@@ -15,10 +14,6 @@ from cliff.commandmanager import CommandManager
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
 
-from tracim_backend.command.database import DeleteDBCommand
-from tracim_backend.command.database import InitializeDBCommand
-from tracim_backend.command.user import CreateUserCommand
-from tracim_backend.command.user import UpdateUserCommand
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 
@@ -35,17 +30,10 @@ class TracimCLI(App):
     def initialize_app(self, argv: List[str]) -> None:
         self.LOG.debug("initialize_app")
 
-    def prepare_to_run_command(
-        self, cmd: Union[UpdateUserCommand, InitializeDBCommand, DeleteDBCommand, CreateUserCommand]
-    ) -> None:
+    def prepare_to_run_command(self, cmd: Command) -> None:
         self.LOG.debug("prepare_to_run_command %s", cmd.__class__.__name__)
 
-    def clean_up(
-        self,
-        cmd: Union[UpdateUserCommand, InitializeDBCommand, DeleteDBCommand, CreateUserCommand],
-        result: int,
-        err: Any,
-    ) -> None:
+    def clean_up(self, cmd: Command, result: int, err: Any) -> None:
         self.LOG.debug("clean_up %s", cmd.__class__.__name__)
         if err:
             self.LOG.debug("got an error: %s", err)

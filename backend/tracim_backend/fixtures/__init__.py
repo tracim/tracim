@@ -6,7 +6,6 @@ from sqlalchemy.orm.session import Session
 import transaction
 
 from tracim_backend.config import CFG
-from tracim_backend.fixtures.users_and_groups import Base
 
 
 class Fixture(object):
@@ -38,7 +37,7 @@ class FixturesLoader(object):
         self._config = copy.copy(config)
         self._config.EMAIL_NOTIFICATION_ACTIVATED = False
 
-    def loads(self, fixtures_classes: List[Type[Base]]) -> None:
+    def loads(self, fixtures_classes: List[Type[Fixture]]) -> None:
         for fixture_class in fixtures_classes:
             for required_fixture_class in fixture_class.require:
                 self._load(required_fixture_class)

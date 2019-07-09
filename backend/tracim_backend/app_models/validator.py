@@ -26,8 +26,8 @@ class TracimValidator(object):
     """
 
     def __init__(self) -> None:
-        self.validators: typing.Dict[str, typing.Callable[[typing.Any], None]] = {}
-        self.values: typing.Dict[str, str] = {}
+        self.validators = {}  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]
+        self.values = {}  # type: typing.Dict[str, str]
 
     def add_validator(
         self,
