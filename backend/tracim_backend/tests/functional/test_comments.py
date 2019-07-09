@@ -5,7 +5,6 @@ import transaction
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -76,8 +75,6 @@ class TestCommentsEndpoint(object):
         """
         Get alls comments of a content
         """
-
-        # type: User
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
@@ -123,7 +120,6 @@ class TestCommentsEndpoint(object):
         Get alls comments of a content
         """
 
-        # type: User
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
