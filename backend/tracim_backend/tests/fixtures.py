@@ -108,7 +108,11 @@ def engine(config, app_config):
     init_models(config, app_config)
     from tracim_backend.models.setup_models import get_engine
 
-    engine = get_engine(app_config)
+    if app_config.SQLALCHEMY__URL.startswith("sqlite"):
+        isolation_level = "SERIALIZABLE"
+    else:
+        isolation_level = "READ_COMMITTED"
+    engine = get_engine(app_config, isolation_level=isolation_level)
     yield engine
     engine.dispose()
 
