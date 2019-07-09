@@ -13,8 +13,6 @@
   width 100%
   &__card
     background-color lightGrey
-    width 40%
-    max-width 500px
     z-index 1
     &__header
       text-align center
@@ -32,6 +30,11 @@
         font-size 18px
         &:hover
           text-decoration underline
+
+.loginpage, .resetpassword, .forgotpassword, .guestdownload
+  &__card
+    max-width 500px
+    width 40%
 
 // MEDIAQUERIES
 @media (min-width: min-lg) and (max-width: max-lg)

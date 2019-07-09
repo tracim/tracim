@@ -90,64 +90,67 @@ class GuestUpload extends React.Component {
 
           <CardBody formClass='guestupload__card__form'>
             <form>
-              <InputGroupText
-                parentClassName='guestupload__card__form__fullname'
-                customClass='mb-3'
-                type='text'
-                placeHolder={props.t('Full name')}
-                value={state.guestName}
-                onChange={this.handleChangeFullName}
-              />
-
-              <InputTextArea
-                customClass='mb-3'
-                placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
-                numberRows='5'
-                value={state.guestComment}
-                onChange={this.handleChangeComment}
-              />
-
-              <div className='d-flex'>
+              <div className='guestupload__card__form__left'>
                 <InputGroupText
-                  parentClassName='guestupload__card__form__groupepw'
-                  customClass=''
-                  icon='fa-lock'
-                  type='password'
-                  placeHolder={props.t('Password')}
-                  invalidMsg={props.t('Invalid password')}
-                  isInvalid={state.guestPassword.isInvalid}
-                  value={state.guestPassword.value}
-                  onChange={this.handleChangePassword}
-                  onKeyDown={() => {}}
+                  parentClassName='guestupload__card__form__fullname'
+                  customClass='mb-3'
+                  type='text'
+                  placeHolder={props.t('Full name')}
+                  value={state.guestName}
+                  onChange={this.handleChangeFullName}
                 />
 
-                <button
-                  type='button'
-                  className='guestupload__card__form__groupepw__question mb-3'
-                  id='popoverQuestion'
-                >
-                  <i className='fa fa-fw fa-question-circle' />
-                </button>
-                <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.toggle}>
-                  <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
-                </Popover>
+                <div className='d-flex'>
+                  <InputGroupText
+                    parentClassName='guestupload__card__form__groupepw'
+                    customClass=''
+                    icon='fa-lock'
+                    type='password'
+                    placeHolder={props.t('Password')}
+                    invalidMsg={props.t('Invalid password')}
+                    isInvalid={state.guestPassword.isInvalid}
+                    value={state.guestPassword.value}
+                    onChange={this.handleChangePassword}
+                    onKeyDown={() => {}}
+                  />
+
+                  <button
+                    type='button'
+                    className='guestupload__card__form__groupepw__question mb-3'
+                    id='popoverQuestion'
+                  >
+                    <i className='fa fa-fw fa-question-circle' />
+                  </button>
+                  <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.toggle}>
+                    <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
+                  </Popover>
+                </div>
+
+                <InputTextArea
+                  customClass='mb-3'
+                  placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
+                  numberRows='15'
+                  value={state.guestComment}
+                  onChange={this.handleChangeComment}
+                />
               </div>
+              <div className='guestupload__card__form__right'>
+                <FileDropzone
+                  onDrop={this.handleChangeFile}
+                  onClick={this.handleChangeFile}
+                  preview={state.uploadFilePreview}
+                  filename={state.uploadFile ? state.uploadFile.name : ''}
+                  multipleFiles
+                />
 
-              <FileDropzone
-                onDrop={this.handleChangeFile}
-                onClick={this.handleChangeFile}
-                preview={state.uploadFilePreview}
-                filename={state.uploadFile ? state.uploadFile.name : ''}
-                multipleFiles
-              />
-
-              <div className='d-flex' >
-                <button type='button'
-                  className='btnSubmit guestupload__card__form__btn btn ml-auto'
-                  onClick={this.handleClickSend}
-                >
-                  {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
-                </button>
+                <div className='d-flex' >
+                  <button type='button'
+                    className='btnSubmit guestupload__card__form__btn btn ml-auto'
+                    onClick={this.handleClickSend}
+                  >
+                    {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
+                  </button>
+                </div>
               </div>
             </form>
           </CardBody>
