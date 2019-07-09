@@ -41,7 +41,7 @@ import {
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
-import ShareFileManagement from './ShareFile/ShareFileManagement.jsx'
+import ShareFile from './ShareFile/ShareFile.jsx'
 
 class File extends React.Component {
   constructor (props) {
@@ -746,7 +746,7 @@ class File extends React.Component {
                 id: 'share',
                 label: 'Share',
                 icon: 'fa-share-alt',
-                children: <ShareFileManagement
+                children: <ShareFile
                   hexcolor={state.config.hexcolor}
                 />
               }

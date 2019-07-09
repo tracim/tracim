@@ -52,6 +52,7 @@ class ShareFileManagement extends React.Component {
           <button
             className='btn highlightBtn'
             key='new_share_file'
+            onClick={props.onClickNewShareFile}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {

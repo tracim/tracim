@@ -69,6 +69,11 @@ class NewShareFile extends React.Component {
     }
     let randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
     this.setState({password: randomPassword})
+
+    const passwordInput = document.getElementsByClassName('shareFile__password__input')[0]
+    if (passwordInput.type === 'password') {
+      this.handleSeePassword()
+    }
   }
 
   render () {
@@ -139,6 +144,7 @@ class NewShareFile extends React.Component {
           <button
             className='btn outlineTextBtn d-flex mr-3'
             key='cancel__new__share'
+            onClick={props.onClickReturnToManagement}
             style={{
               borderColor: props.hexcolor,
               ':hover': {
@@ -153,6 +159,7 @@ class NewShareFile extends React.Component {
           <button
             className='btn highlightBtn'
             key='new__share__file'
+            onClick={props.onClickReturnToManagement}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
