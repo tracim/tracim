@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from copy import deepcopy
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
+from pyramid.router import Router
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
@@ -68,7 +70,7 @@ except ImportError:
     from http import client as HTTPStatus
 
 
-def web(global_config, **local_settings):
+def web(global_config: OrderedDict, **local_settings) -> Router:
     """ This function returns a Pyramid WSGI application.
     """
     settings = deepcopy(global_config)

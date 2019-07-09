@@ -1,6 +1,9 @@
 from copy import copy
 import typing
+from typing import List
 
+from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.app_models.workspace_menu_entries import all_content_menu_entry
 from tracim_backend.app_models.workspace_menu_entries import dashboard_menu_entry
@@ -11,7 +14,7 @@ if typing.TYPE_CHECKING:
 
 
 class ApplicationApi(object):
-    def __init__(self, app_list, show_all: bool = False) -> None:
+    def __init__(self, app_list: List[Application], show_all: bool = False) -> None:
         self.apps = app_list
         self.show_all = show_all
 
@@ -21,7 +24,7 @@ class ApplicationApi(object):
                 return app
         raise AppDoesNotExist("Application {app} does not exist".format(app=slug))
 
-    def get_all(self):
+    def get_all(self) -> List[Application]:
         active_apps = []
         for app in self.apps:
             if self.show_all or app.is_active:
@@ -29,7 +32,7 @@ class ApplicationApi(object):
 
         return active_apps
 
-    def get_content_types(self):
+    def get_content_types(self) -> List[ContentType]:
         active_content_types = []
         for app in self.get_all():
             if app.content_types:

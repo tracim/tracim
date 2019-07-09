@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 import argparse
+from argparse import ArgumentParser
+from argparse import Namespace
 import logging
 import sys
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Union
 
 from cliff.app import App
 from cliff.command import Command
@@ -9,6 +15,10 @@ from cliff.commandmanager import CommandManager
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
 
+from tracim_backend.command.database import DeleteDBCommand
+from tracim_backend.command.database import InitializeDBCommand
+from tracim_backend.command.user import CreateUserCommand
+from tracim_backend.command.user import UpdateUserCommand
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 
@@ -22,13 +32,20 @@ class TracimCLI(App):
             deferred_help=True,
         )
 
-    def initialize_app(self, argv) -> None:
+    def initialize_app(self, argv: List[str]) -> None:
         self.LOG.debug("initialize_app")
 
-    def prepare_to_run_command(self, cmd) -> None:
+    def prepare_to_run_command(
+        self, cmd: Union[UpdateUserCommand, InitializeDBCommand, DeleteDBCommand, CreateUserCommand]
+    ) -> None:
         self.LOG.debug("prepare_to_run_command %s", cmd.__class__.__name__)
 
-    def clean_up(self, cmd, result, err) -> None:
+    def clean_up(
+        self,
+        cmd: Union[UpdateUserCommand, InitializeDBCommand, DeleteDBCommand, CreateUserCommand],
+        result: int,
+        err: Any,
+    ) -> None:
         self.LOG.debug("clean_up %s", cmd.__class__.__name__)
         if err:
             self.LOG.debug("got an error: %s", err)
@@ -63,7 +80,7 @@ class AppContextCommand(Command):
             print("Something goes wrong during command")
             raise exc
 
-    def _setup_logging(self, parsed_args):
+    def _setup_logging(self, parsed_args: Namespace) -> None:
         if parsed_args.debug:
             # INFO - G.M - 2019-03-13 - setup logging for config file
             setup_logging(parsed_args.config_file)
@@ -98,7 +115,13 @@ class Extender(argparse.Action):
     Copied class from http://stackoverflow.com/a/12461237/801924
     """
 
-    def __call__(self, parser, namespace, values, option_strings=None):
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        values: List[str],
+        option_strings: Optional[str] = None,
+    ) -> None:
         # Need None here incase `argparse.SUPPRESS` was supplied for `dest`
         dest = getattr(namespace, self.dest, None)
         # print dest,self.default,values,option_strings

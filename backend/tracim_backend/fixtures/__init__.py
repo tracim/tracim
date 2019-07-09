@@ -1,6 +1,12 @@
 import copy
+from typing import List
+from typing import Type
 
+from sqlalchemy.orm.session import Session
 import transaction
+
+from tracim_backend.config import CFG
+from tracim_backend.fixtures.users_and_groups import Base
 
 
 class Fixture(object):
@@ -9,7 +15,7 @@ class Fixture(object):
 
     require = NotImplemented
 
-    def __init__(self, session, config):
+    def __init__(self, session: Session, config: CFG) -> None:
         self._session = session
         self._config = config
 
@@ -22,7 +28,7 @@ class FixturesLoader(object):
     Fixtures loader. Load each fixture once.
     """
 
-    def __init__(self, session, config, loaded=None):
+    def __init__(self, session: Session, config: CFG, loaded: None = None) -> None:
         loaded = [] if loaded is None else loaded
         self._loaded = loaded
         self._session = session
@@ -32,13 +38,13 @@ class FixturesLoader(object):
         self._config = copy.copy(config)
         self._config.EMAIL_NOTIFICATION_ACTIVATED = False
 
-    def loads(self, fixtures_classes):
+    def loads(self, fixtures_classes: List[Type[Base]]) -> None:
         for fixture_class in fixtures_classes:
             for required_fixture_class in fixture_class.require:
                 self._load(required_fixture_class)
             self._load(fixture_class)
 
-    def _load(self, fixture_class: Fixture):
+    def _load(self, fixture_class: Fixture) -> None:
         if fixture_class not in self._loaded:
             fixture = fixture_class(session=self._session, config=self._config)
             fixture.insert()

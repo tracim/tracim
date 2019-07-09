@@ -25,9 +25,9 @@ class TracimValidator(object):
     Validate many fields with value and validator Callable.
     """
 
-    def __init__(self):
-        self.validators = {}  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]
-        self.values = {}  # type: typing.Dict[str, str]
+    def __init__(self) -> None:
+        self.validators: typing.Dict[str, typing.Callable[[typing.Any], None]] = {}
+        self.values: typing.Dict[str, str] = {}
 
     def add_validator(
         self,
@@ -105,5 +105,5 @@ user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
 all_content_types_validator = OneOf(choices=[])
 
 
-def update_validators():
+def update_validators() -> None:
     all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()
