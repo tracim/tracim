@@ -50,8 +50,6 @@ class GuestUpload extends React.Component {
   handleChangeComment = e => this.setState({guestComment: e.target.value})
   handleChangePassword = e => this.setState({guestPassword: {...this.state.guestPassword, value: e.target.value}})
 
-  handleClickSend = () => {}
-
   handleChangeFile = uploadFileList => {
     if (!uploadFileList || !uploadFileList[0]) return
 
@@ -62,7 +60,13 @@ class GuestUpload extends React.Component {
     })
   }
 
-  handleClickDropzoneValidate = async () => {
+  handleDeleteFile = deletedFile => {
+    this.setState(previousState => ({
+      uploadFileList: previousState.uploadFileList.filter(file => file.name !== deletedFile.name)
+    }))
+  }
+
+  handleClickSend = async () => {
     const { props, state } = this
 
     state.uploadFileList.forEach((uploadFile, index) => {
@@ -84,7 +88,9 @@ class GuestUpload extends React.Component {
         if (xhr.readyState === 4) {
           switch (xhr.status) {
             case 204:
-              this.setState(uploadFileList => uploadFileList.filter((file, j) => index !== j))
+              this.setState(previousState => ({
+                uploadFileList: previousState.uploadFileList.filter((file, j) => index !== j)
+              }))
               break
             case 400:
               const jsonResult400 = JSON.parse(xhr.responseText)
@@ -99,6 +105,10 @@ class GuestUpload extends React.Component {
       }
       xhr.send(formData)
     })
+  }
+
+  showFiles = () => {
+
   }
 
   render () {
@@ -170,8 +180,11 @@ class GuestUpload extends React.Component {
                 {(state.uploadFileList.map(file =>
                   <div className='d-flex' key={file.name}>
                     <i className='fa fa-fw fa-file-o m-1' />
-                    {file.name}
-                    <button className='iconBtn ml-auto'>
+                    {file.name} ({file.size} bytes)
+                    <button
+                      className='iconBtn ml-auto primaryColorFontHover'
+                      onClick={() => this.handleDeleteFile(file)}
+                    >
                       <i className='fa fa-fw fa-trash-o' />
                     </button>
                   </div>

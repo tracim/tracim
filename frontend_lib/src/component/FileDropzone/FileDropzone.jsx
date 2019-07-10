@@ -50,10 +50,23 @@ export const FileDropzone = props => {
             default:
               if (props.multipleFiles) { // TODO
                 return (
-                  <div className='filecontent__preview' drop='true'>
-                    <i className='filecontent__preview__nopreview-icon fa fa-paperclip' style={{color: props.hexcolor}} />
-                    <div className='filecontent__preview__nopreview-msg'>
-                      {props.filename}
+                  <div>
+                    <div
+                      className='filecontent__form__icon d-flex justify-content-center'
+                      style={{color: props.hexcolor}}
+                    >
+                      <i className='fa fa-download' />
+                    </div>
+
+                    <div
+                      className='filecontent__form__instruction text-center'
+                      style={{color: props.hexcolor}}
+                    >
+                      {props.t('Drag and drop your file here')}
+                    </div>
+
+                    <div className='filecontent__form__text text-center'>
+                      {props.t('You can also import your file by clicking here')}
                     </div>
                   </div>
                 )
@@ -77,7 +90,6 @@ FileDropzone.propTypes = {
   onDrop: PropTypes.func.isRequired,
   onClick: PropTypes.func.isRequired,
   multipleFiles: PropTypes.bool,
-  preview: PropTypes.string,
   hexcolor: PropTypes.string,
   filename: PropTypes.string
 }
