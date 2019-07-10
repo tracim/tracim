@@ -403,7 +403,7 @@ class TestWorkspaceEndpoint(object):
         workspace_id = res.json_body["workspace_id"]
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
-        assert workspace == workspace_2
+        assert workspace["workspace_id"] == workspace_2["workspace_id"]
 
     def test_api__create_workspace_err_400__label_already_used(self, web_testapp) -> None:
         """
