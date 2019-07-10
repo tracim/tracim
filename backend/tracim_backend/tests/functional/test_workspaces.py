@@ -396,6 +396,10 @@ class TestWorkspaceEndpoint(object):
         assert workspace["label"] == "superworkspace"
         assert workspace["agenda_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
+        assert workspace["creator"]["user_id"] == 1
+        assert workspace["creator"]["avatar_url"] is None
+        assert workspace["creator"]["public_name"] == "Global manager"
+        assert workspace["created"]
         workspace_id = res.json_body["workspace_id"]
         res = web_testapp.get("/api/v2/workspaces/{}".format(workspace_id), status=200)
         workspace_2 = res.json_body
