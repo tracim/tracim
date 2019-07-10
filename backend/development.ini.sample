@@ -449,6 +449,12 @@ collaborative_document_edition.software = collabora
 collaborative_document_edition.collabora.base_url = http://localhost:9980
 collaborative_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
 
+###
+# Limits
+###
+# max upload content length accepted by tracim for file in bytes
+# by default, no limitation. 104857600 (100MB) is a good value
+; upload.content_length.max_size = 104857600
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #

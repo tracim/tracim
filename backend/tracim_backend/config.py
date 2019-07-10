@@ -158,6 +158,12 @@ class CFG(object):
         import tracim_backend.applications.upload_permissions.config as upload_permissions_config
 
         upload_permissions_config.load_config(self)
+        self._load_limit_config()
+
+    def _load_limit_config(self) -> None:
+        self.UPLOAD__CONTENT_LENGTH__MAX_SIZE = self.get_raw_config(
+            "upload.content_length.max_size", None
+        )
 
     def _load_global_config(self) -> None:
         """

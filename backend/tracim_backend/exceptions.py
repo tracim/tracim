@@ -275,6 +275,10 @@ class EmptyValueNotAllowed(TracimException):
     pass
 
 
+class FileSizeOverMaxLimitation(TracimException):
+    error_code = ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
+
+
 class TracimUnavailablePreviewType(TracimException):
     error_code = ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
