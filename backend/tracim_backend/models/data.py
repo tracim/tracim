@@ -89,6 +89,13 @@ class Workspace(DeclarativeBase):
 
         return contents
 
+    def get_size(self) -> int:
+        size = 0
+        for revision in self.revisions:
+            if revision.depot_file:
+                size += revision.depot_file.file.content_length
+        return size
+
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
             if role.workspace.workspace_id == self.workspace_id:

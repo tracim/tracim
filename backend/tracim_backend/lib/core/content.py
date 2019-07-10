@@ -38,6 +38,7 @@ from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
+from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -1907,14 +1908,24 @@ class ContentApi(object):
         item.revision_type = ActionDescription.REVISION
         return item
 
-    def check_upload_size(self, content_length: int):
+    def check_upload_size(self, content_length: int, workspace: Workspace):
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE == 0:
-            return
+            pass
         elif content_length > self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE:
             raise FileSizeOverMaxLimitation(
                 'File cannot be added because his size "{}" is higher than max allowed size : "{}"'.format(
                     content_length, self._config.LIMITATION__CONTENT_LENGTH_FILE_SIZE
+                )
+            )
+        workspace_size = workspace.get_size()
+        if (
+            self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE
+            and workspace_size + content_length > self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE
+        ):
+            raise FileSizeOverWorkspaceEmptySpace(
+                'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
+                    content_length, workspace_size, self._config.WORKSPACE__CONTENT_LENGTH__MAX_SIZE
                 )
             )
 
