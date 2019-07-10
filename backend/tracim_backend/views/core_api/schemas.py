@@ -767,6 +767,10 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 class WorkspaceSchema(WorkspaceDigestSchema):
     description = StrippedString(example="All intranet data.")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Workspace creation date"
+    )
+    creator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
 
     class Meta:
         description = "Full workspace informations"

@@ -699,6 +699,18 @@ class WorkspaceInContext(object):
         )
         return root_frontend_url + workspace_frontend_url
 
+    @property
+    def creator(self) -> typing.Optional[UserInContext]:
+        if self.workspace.creator:
+            return UserInContext(
+                dbsession=self.dbsession, config=self.config, user=self.workspace.creator
+            )
+        return None
+
+    @property
+    def created(self) -> datetime:
+        return self.workspace.created
+
 
 class UserRoleWorkspaceInContext(object):
     """
