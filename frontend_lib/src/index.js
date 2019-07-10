@@ -52,6 +52,8 @@ import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
 
+import ShareLink from './component/ShareLink/ShareLink.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: i18n.changeLanguage(data); break
@@ -101,5 +103,6 @@ export {
   IconButton,
   ComposedIcon,
   DisplayState,
-  FileDropzone
+  FileDropzone,
+  ShareLink
 }

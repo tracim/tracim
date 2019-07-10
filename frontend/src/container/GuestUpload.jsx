@@ -7,7 +7,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import InputTextArea from '../component/common/Input/InputTextArea.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { FileDropzone } from 'tracim_frontend_lib'
+import { FileDropzone, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 class GuestUpload extends React.Component {
   constructor (props) {
@@ -22,7 +22,7 @@ class GuestUpload extends React.Component {
         isInvalid: false
       },
       appName: 'file',
-      uploadFile: null,
+      uploadFileList: [],
       uploadFilePreview: null,
       progressUpload: {
         display: false,
@@ -37,45 +37,68 @@ class GuestUpload extends React.Component {
     })
   }
 
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
   handleChangeFullName = e => this.setState({guestName: e.target.value})
   handleChangeComment = e => this.setState({guestComment: e.target.value})
   handleChangePassword = e => this.setState({guestPassword: {...this.state.guestPassword, value: e.target.value}})
 
   handleClickSend = () => {}
 
-  handleChangeFile = newFile => {
-    if (!newFile || !newFile[0]) return
+  handleChangeFile = uploadFileList => {
+    if (!uploadFileList || !uploadFileList[0]) return
 
-    const fileToSave = newFile[0]
+    uploadFileList.forEach(uploadFile => {
+      this.setState(previousState => ({
+        uploadFileList: [...previousState.uploadFileList, uploadFile]
+      }))
+    })
+  }
 
-    if (
-      !fileToSave.type.includes('image') ||
-      fileToSave.size > 2000000
-    ) {
-      this.setState({
-        uploadFile: fileToSave,
-        uploadFilePreview: false
-      })
-      return
-      // acceptedFiles.forEach(newFile => {
-      //   if (!newFile || !newFile[0]) return
+  handleClickDropzoneValidate = async () => {
+    const { props, state } = this
 
-      //   const fileToSave = newFile[0]
+    state.uploadFileList.forEach((uploadFile, index) => {
+      const formData = new FormData()
+      formData.append('files', uploadFile)
 
-      //   this.setState({uploadFile: [...this.state.uploadFile, fileToSave], uploadFilePreview: false})
-      // })
-    }
+      // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
+      const xhr = new XMLHttpRequest()
+      xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+      const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
+      xhr.upload.addEventListener('progress', uploadInProgress, false)
+      xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-    this.setState({uploadFile: fileToSave})
+      // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
+      xhr.setRequestHeader('Accept', 'application/json')
+      xhr.withCredentials = true
 
-    var reader = new FileReader()
-    reader.onload = e => {
-      this.setState({uploadFilePreview: e.total > 0 ? e.target.result : false})
-      const img = new Image()
-      img.src = e.target.result
-      img.onerror = () => this.setState({uploadFilePreview: false})
-    }
-    reader.readAsDataURL(fileToSave)
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          switch (xhr.status) {
+            case 204:
+              this.setState(uploadFileList => uploadFileList.filter((file, j) => index !== j))
+              break
+            case 400:
+              const jsonResult400 = JSON.parse(xhr.responseText)
+              switch (jsonResult400.code) {
+                case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+                default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+              }
+              break
+            default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+          }
+        }
+      }
+      xhr.send(formData)
+    })
   }
 
   render () {
@@ -127,7 +150,6 @@ class GuestUpload extends React.Component {
                 </div>
 
                 <InputTextArea
-                  customClass='mb-3'
                   placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
                   numberRows='15'
                   value={state.guestComment}
@@ -139,18 +161,28 @@ class GuestUpload extends React.Component {
                   onDrop={this.handleChangeFile}
                   onClick={this.handleChangeFile}
                   preview={state.uploadFilePreview}
-                  filename={state.uploadFile ? state.uploadFile.name : ''}
                   multipleFiles
                 />
 
-                <div className='d-flex' >
-                  <button type='button'
-                    className='btnSubmit guestupload__card__form__btn btn ml-auto'
-                    onClick={this.handleClickSend}
-                  >
-                    {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
-                  </button>
+                <div className='font-weight-bold m-1'>
+                  {state.uploadFileList.length > 0 && props.t('Attached files')}
                 </div>
+                {(state.uploadFileList.map(file =>
+                  <div className='d-flex' key={file.name}>
+                    <i className='fa fa-fw fa-file-o m-1' />
+                    {file.name}
+                    <button className='iconBtn ml-auto'>
+                      <i className='fa fa-fw fa-trash-o' />
+                    </button>
+                  </div>
+                ))}
+
+                <button type='button'
+                  className='btnSubmit guestupload__card__form__right__btn btn ml-auto'
+                  onClick={this.handleClickSend}
+                >
+                  {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
+                </button>
               </div>
             </form>
           </CardBody>
