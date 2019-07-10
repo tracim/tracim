@@ -161,7 +161,7 @@ class GuestUpload extends React.Component {
 
                 <InputTextArea
                   placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
-                  numberRows='15'
+                  numberRows='20'
                   value={state.guestComment}
                   onChange={this.handleChangeComment}
                 />
@@ -175,23 +175,29 @@ class GuestUpload extends React.Component {
                 />
 
                 <div className='font-weight-bold m-1'>
-                  {state.uploadFileList.length > 0 && props.t('Attached files')}
+                  {state.uploadFileList.length > 0
+                    ? props.t('Attached files')
+                    : props.t('You have not yet chosen any files to upload.')
+                  }
                 </div>
-                {(state.uploadFileList.map(file =>
-                  <div className='d-flex' key={file.name}>
-                    <i className='fa fa-fw fa-file-o m-1' />
-                    {file.name} ({file.size} bytes)
-                    <button
-                      className='iconBtn ml-auto primaryColorFontHover'
-                      onClick={() => this.handleDeleteFile(file)}
-                    >
-                      <i className='fa fa-fw fa-trash-o' />
-                    </button>
-                  </div>
-                ))}
+                <div className='guestupload__card__form__right__files'>
+                  {(state.uploadFileList.map(file =>
+                    <div className='d-flex' key={file.name}>
+                      <i className='fa fa-fw fa-file-o m-1' />
+                      {file.name} ({file.size} bytes)
+                      <button
+                        className='iconBtn ml-auto primaryColorFontHover'
+                        onClick={() => this.handleDeleteFile(file)}
+                        title={props.t('Delete')}
+                      >
+                        <i className='fa fa-fw fa-trash-o' />
+                      </button>
+                    </div>
+                  ))}
+                </div>
 
                 <button type='button'
-                  className='btnSubmit guestupload__card__form__right__btn btn ml-auto'
+                  className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover ml-auto'
                   onClick={this.handleClickSend}
                 >
                   {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />

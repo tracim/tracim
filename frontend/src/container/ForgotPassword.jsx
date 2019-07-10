@@ -98,7 +98,7 @@ export class ForgotPassword extends React.Component {
                 <Button
                   htmlType='button'
                   bootstrapType=''
-                  customClass='btnSubmit forgotpassword__card__body__btnsubmit'
+                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover forgotpassword__card__body__btnsubmit'
                   label={props.t('Validate')}
                   onClick={this.handleClickSubmit}
                 />

@@ -114,7 +114,7 @@ export class ResetPassword extends React.Component {
                 <Button
                   htmlType='button'
                   bootstrapType=''
-                  customClass='btnSubmit resetpassword__card__body__btnsubmit ml-auto'
+                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover resetpassword__card__body__btnsubmit ml-auto'
                   label={props.t('Validate')}
                   onClick={this.handleClickSubmit}
                 />

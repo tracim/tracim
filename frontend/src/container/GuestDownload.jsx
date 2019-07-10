@@ -78,8 +78,8 @@ class GuestDownload extends React.Component {
               <div className='d-flex'>
                 <Button
                   htmlType='button'
-                  bootstrapType='primary'
-                  customClass='guestupload__card__form__btndownload btn btnSubmit ml-auto'
+                  bootstrapType=''
+                  customClass='guestupload__card__form__btndownload btn highlightBtn primaryColorBg primaryColorBgDarkenHover ml-auto'
                   label={props.t('Download')}
                   onClick={this.handleClickDowload}
                 />

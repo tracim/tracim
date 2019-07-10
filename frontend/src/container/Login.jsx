@@ -252,8 +252,8 @@ class Login extends React.Component {
                 <div className='col-12 col-sm-6 d-flex align-items-end'>
                   <Button
                     htmlType='button'
-                    bootstrapType='primary'
-                    customClass='btnSubmit loginpage__card__form__btnsubmit ml-auto'
+                    bootstrapType=''
+                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
                     label={props.t('Connection')}
                     onClick={this.handleClickSubmit}
                   />
