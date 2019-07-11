@@ -2480,6 +2480,65 @@ class TestUserEndpoint(FunctionalTest):
         assert user.email == "test@test.test"
         assert user.validate_password("mysuperpassword")
 
+    def test_api__create_user__ok_200__email_treated_as_lowercase(self):
+        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "ThisIsAnEmailWithUppercaseCharacters@Test.Test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = self.testapp.post_json("/api/v2/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        user_id = res["user_id"]
+        assert res["email"] == "thisisanemailwithuppercasecharacters@test.test"
+        res = self.testapp.get("/api/v2/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["email"] == "thisisanemailwithuppercasecharacters@test.test"
+        transaction.commit()
+        # INFO - G.M - 2019-07-02 - check if we cannot
+        # create multiples accounts with same email but different case.
+        params = {
+            "email": "thisisanemailwithuppercasecharacters@test.test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = self.testapp.post_json("/api/v2/users", status=400, params=params)
+        res = res.json_body
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        params = {
+            "email": "THISISANEMAILWITHUPPERCASECHARACTERS@TEST.TEST",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = self.testapp.post_json("/api/v2/users", status=400, params=params)
+        res = res.json_body
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+        params = {
+            "email": "ThisIsAnEmailWithUppercaseCharacters@Test.Test",
+            "password": "mysuperpassword",
+            "profile": "users",
+            "timezone": "Europe/Paris",
+            "lang": "fr",
+            "public_name": "test user",
+            "email_notification": False,
+        }
+        res = self.testapp.post_json("/api/v2/users", status=400, params=params)
+        res = res.json_body
+        assert res["code"] == ErrorCode.EMAIL_ALREADY_EXIST_IN_DB
+
     def test_api__create_user__ok_200__limited_admin(self):
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"email": "test@test.test", "email_notification": False, "password": None}

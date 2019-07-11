@@ -407,6 +407,8 @@ search.engine = simple
 # elasticsearch configuration
 ;search.elasticsearch.host = localhost
 ;search.elasticsearch.port = 9200
+# global elasticsearch timeout in seconds
+;search.elasticsearch.request_timeout = 60
 # main index alias use to search/index content in elasticsearch
 ;search.elasticsearch.index_alias = tracim_contents
 # template_name for all index created currently only {index_alias} and {date} variable are usable.
@@ -416,10 +418,17 @@ search.engine = simple
 # if you use ingest mode in elasticsearch, you can activate file content ingest
 # for search (default as false)
 ; search.elasticsearch.use_ingest = false
-# if you set ingest mimetype whitelist to list of separated mimetype by "," , you will index file
-# content for only file with those mimetype, if set to empty, allow any mimetype, default value
-# allow most text-based content type.
+# define mimetypes to be plain-text indexed. List of mimetypes, separated by a coma ",".
+# if set to empty, index documents of any mimetype.
 ; search.elasticsearch.ingest.mimetype_whitelist = text/markdown,text/plain
+# exclude mimetypes from plain-text indexation. If a mimetype is both in whitelist and blacklist, it will be blacklisted.
+# if set to empty, do nothing. default value is empty, meaning no blacklist.
+; search.elasticsearch.ingest.mimetype_blacklist = application/gzip,application/zip
+# add size limit (in bytes) for elasticsearch ingest activation
+# if file content like a pdf of a content type file is bigger than the limit, it's content will
+# not be indexed using ingest mode.
+# default value to 52428800 = 50Mo
+;search.elasticsearch.ingest.size_limit = 52428800
 
 
 ##############################

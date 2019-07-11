@@ -41,6 +41,15 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body["avatar_url"] is None
         assert res.json_body["auth_type"] == "internal"
 
+    def test_api__try_login_enpoint__ok_200__insensitive_to_case(self):
+        params = {"email": "ADMIN@ADMIN.ADMIN", "password": "admin@admin.admin"}
+        res = self.testapp.post_json("/api/v2/auth/login", params=params, status=200)
+        assert res.json_body["email"] == "admin@admin.admin"
+
+        params = {"email": "aDmIn@AdmIn.AdMIn", "password": "admin@admin.admin"}
+        res = self.testapp.post_json("/api/v2/auth/login", params=params, status=200)
+        assert res.json_body["email"] == "admin@admin.admin"
+
     def test_api__try_login_enpoint__err_401__user_not_activated(self):
 
         uapi = self.get_user_api()
@@ -347,6 +356,15 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body["lang"] is None
         assert res.json_body["auth_type"] == "internal"
 
+    def test_api__try_whoami_enpoint__ok_200__insensitive_to_case(self):
+        self.testapp.authorization = ("Basic", ("ADMIN@ADMIN.ADMIN", "admin@admin.admin"))
+        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        assert res.json_body["email"] == "admin@admin.admin"
+
+        self.testapp.authorization = ("Basic", ("aDmIn@AdmIn.AdMIn", "admin@admin.admin"))
+        res = self.testapp.get("/api/v2/auth/whoami", status=200)
+        assert res.json_body["email"] == "admin@admin.admin"
+
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
 
         uapi = self.get_user_api()
@@ -398,6 +416,15 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert res.json_body["avatar_url"] is None
         assert res.json_body["auth_type"] == "internal"
 
+    def test_api__try_whoami_enpoint_with_api_key__ok_200__case_insensitive_email(self):
+        headers_auth = {"Tracim-Api-Key": "mysuperapikey", "Tracim-Api-Login": "ADMIN@ADMIN.ADMIN"}
+        res = self.testapp.get("/api/v2/auth/whoami", status=200, headers=headers_auth)
+        assert res.json_body["email"] == "admin@admin.admin"
+
+        headers_auth = {"Tracim-Api-Key": "mysuperapikey", "Tracim-Api-Login": "aDmIn@AdmIn.AdMIn"}
+        res = self.testapp.get("/api/v2/auth/whoami", status=200, headers=headers_auth)
+        assert res.json_body["email"] == "admin@admin.admin"
+
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
 
         uapi = self.get_user_api()
@@ -441,9 +468,15 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
     config_section = "functional_test_remote_auth"
 
     def test_api__try_whoami_enpoint_remote_user__err_401__as_http_header(self):
-
         headers_auth = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
         self.testapp.get("/api/v2/auth/whoami", status=401, headers=headers_auth)
+
+    def test_api__try_whoami_enpoint_remote_user__ok_200__case_insensitive_email(self):
+        extra_environ = {"REMOTE_USER": "REMOTEUSER@REMOTEUSER.REMOTEUSER"}
+        res = self.testapp.get("/api/v2/auth/whoami", status=200, extra_environ=extra_environ)
+        extra_environ = {"REMOTE_USER": "ReMoTeUser@rEmoTEUSer.rEMoTeusEr"}
+        res = self.testapp.get("/api/v2/auth/whoami", status=200, extra_environ=extra_environ)
+        assert res.json_body["email"] == "remoteuser@remoteuser.remoteuser"
 
     def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self):
 
