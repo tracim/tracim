@@ -5,11 +5,8 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 
 
@@ -71,11 +68,11 @@ class TestCommentsEndpoint(FunctionalTest):
         """
         Get alls comments of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()  # type: User
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        # type: User
+        workspace_api = self.get_workspace_api()
         business_workspace = workspace_api.get_one(1)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -85,7 +82,7 @@ class TestCommentsEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
                 test_thread, new_label="test_thread_updated", new_content="Just a test"
             )
@@ -104,10 +101,10 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment["parent_id"] == test_thread.content_id
         assert comment["raw_content"] == "I strongly disagree, Tiramisu win!"
         assert comment["author"]
-        assert comment["author"]["user_id"] == admin.user_id
+        assert comment["author"]["user_id"] == self.get_admin_user().user_id
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment["author"]["avatar_url"] is None
-        assert comment["author"]["public_name"] == admin.display_name
+        assert comment["author"]["public_name"] == self.get_admin_user().display_name
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
@@ -115,11 +112,11 @@ class TestCommentsEndpoint(FunctionalTest):
         """
         Get alls comments of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()  # type: User
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        # type: User
+        workspace_api = self.get_workspace_api()
         business_workspace = workspace_api.get_one(1)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -129,7 +126,7 @@ class TestCommentsEndpoint(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
                 test_thread, new_label="test_thread_updated", new_content="Just a test"
             )

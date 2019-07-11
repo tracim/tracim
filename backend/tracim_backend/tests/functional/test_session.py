@@ -5,10 +5,6 @@ from freezegun import freeze_time
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models.auth import User
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import FunctionalTestNoDB
 
@@ -55,10 +51,9 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body["email"] == "admin@admin.admin"
 
     def test_api__try_login_enpoint__err_401__user_not_activated(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -371,10 +366,9 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body["email"] == "admin@admin.admin"
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -432,10 +426,9 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert res.json_body["email"] == "admin@admin.admin"
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -511,10 +504,9 @@ class TestWhoamiEndpointWithRemoteHeader(FunctionalTest):
         assert res.json_body["user_id"] == user_id
 
     def test_api__try_whoami_enpoint__err_401__remote_user_is_not_active(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         test_user = uapi.create_user(
             email="test@test.test",
@@ -589,8 +581,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         Test if email change doesn't break cookie auth
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
+
         with freeze_time("1999-12-31 23:59:58"):
             params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
             res = self.testapp.post_json("/api/v2/auth/login", params=params, status=200)
@@ -605,7 +596,9 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
                 "loggedin_user_password": "admin@admin.admin",
             }
             self.testapp.put_json(
-                "/api/v2/users/{}/email".format(admin.user_id), params=params, status=200
+                "/api/v2/users/{}/email".format(self.get_admin_user().user_id),
+                params=params,
+                status=200,
             )
             assert "Set-Cookie" in res.headers
             assert "session_key" in self.testapp.cookies

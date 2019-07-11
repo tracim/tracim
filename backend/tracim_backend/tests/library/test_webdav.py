@@ -7,7 +7,6 @@ from tracim_backend import WebdavAppFactory
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.notifications import DummyNotifier
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.webdav import TracimDomainController
 from tracim_backend.lib.webdav.dav_provider import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
@@ -68,7 +67,7 @@ class TestWebDav(StandardTest):
         return environ
 
     def _get_user(self, email):
-        return UserApi(None, self.session, self.app_config).get_one_by_email(email)
+        return self.get_user_api().get_one_by_email(email)
 
     def _put_new_text_file(self, provider, environ, file_path, file_content):
         # This part id a reproduction of

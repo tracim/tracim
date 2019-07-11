@@ -3,9 +3,6 @@ import pytest
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_fetcher.daemon import MailFetcherDaemon
 from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 from tracim_backend.tests import MailHogTest
@@ -17,7 +14,7 @@ class TestMailNotifyDaemon(MailHogTest):
 
     @pytest.mark.mail
     def test_func__create_user_with_mail_notification__ok__nominal_case(self):
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api(current_user=None)
         u = api.create_user(
             email="bob@bob",
             password="password",
@@ -44,15 +41,15 @@ class TestMailNotifyDaemon(MailHogTest):
 
     @pytest.mark.mail
     def test_func__create_new_content_with_notification__ok__nominal_case(self):
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = self.get_user_api(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
-        wapi = WorkspaceApi(current_user=current_user, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api(current_user=current_user)
         workspace = wapi.get_one_by_label("Recipes")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )

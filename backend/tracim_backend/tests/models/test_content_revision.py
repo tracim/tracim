@@ -4,7 +4,6 @@ from collections import OrderedDict
 from sqlalchemy import inspect
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
@@ -38,7 +37,7 @@ class TestContentRevision(DefaultTest):
         return dict_repr
 
     def test_new_revision(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = self.get_admin_user()
         workspace = self._create_workspace_and_test(name="workspace_1", user=admin)
         folder = self._create_content_and_test(
             name="folder_1", workspace=workspace, type=content_type_list.Folder.slug

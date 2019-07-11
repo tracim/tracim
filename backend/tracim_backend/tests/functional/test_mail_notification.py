@@ -10,9 +10,6 @@ import transaction
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.utils import get_redis_connection
@@ -82,7 +79,7 @@ class TestNotificationsSync(MailHogTest):
     fixtures = [BaseFixture, ContentFixture]
 
     def test_func__create_user_with_mail_notification__ok__nominal_case(self):
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api(current_user=None)
         u = api.create_user(
             email="bob@bob",
             password="password",
@@ -106,17 +103,17 @@ class TestNotificationsSync(MailHogTest):
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
     def test_func__create_new_content_with_notification__ok__nominal_case(self):
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = self.get_user_api(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # set admin as french, useful to verify if i18n work properly
         current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
-        wapi = WorkspaceApi(current_user=current_user, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api(current_user=current_user)
         workspace = wapi.get_one_by_label("Recipes")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )
@@ -137,17 +134,17 @@ class TestNotificationsSync(MailHogTest):
         )
 
     def test_func__create_comment_with_notification__ok__nominal_case(self):
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = self.get_user_api(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # set admin as french, useful to verify if i18n work properly
         current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
-        wapi = WorkspaceApi(current_user=current_user, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api(current_user=current_user)
         workspace = wapi.get_one_by_label("Recipes")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )
@@ -170,7 +167,7 @@ class TestNotificationsSync(MailHogTest):
         )
 
     def test_func__reset_password__ok__nominal_case(self):
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = self.get_user_api(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         uapi.reset_password_notification(current_user, do_save=True)
         transaction.commit()
@@ -187,7 +184,7 @@ class TestNotificationsAsync(MailHogTest):
     config_section = "mail_test_async"
 
     def test_func__create_user_with_mail_notification__ok__nominal_case(self):
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api(current_user=None)
         u = api.create_user(
             email="bob@bob",
             password="password",
@@ -215,15 +212,15 @@ class TestNotificationsAsync(MailHogTest):
         assert headers["Subject"][0] == "[TRACIM] Created account"
 
     def test_func__create_new_content_with_notification__ok__nominal_case(self):
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = self.get_user_api(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
-        wapi = WorkspaceApi(current_user=current_user, session=self.session, config=self.app_config)
+        wapi = self.get_workspace_api(current_user=current_user)
         workspace = wapi.get_one_by_label("Recipes")
         user = uapi.get_one_by_email("bob@fsf.local")
         wapi.enable_notifications(user, workspace)
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         item = api.create(
             content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
         )
@@ -248,7 +245,7 @@ class TestNotificationsAsync(MailHogTest):
         )
 
     def test_func__reset_password__ok__nominal_case(self):
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = self.get_user_api(current_user=None)
         current_user = uapi.get_one_by_email("admin@admin.admin")
         uapi.reset_password_notification(current_user, do_save=True)
         transaction.commit()

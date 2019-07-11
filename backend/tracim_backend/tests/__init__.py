@@ -22,13 +22,19 @@ from tracim_backend import WebdavAppFactory
 from tracim_backend import web
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
+from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.search import ESSearchApi
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
@@ -97,7 +103,66 @@ class AbstractMailHogTest(object):
         ).json()
 
 
-class FunctionalTest(unittest.TestCase):
+class TestWithHelpers(object):
+
+    session = None
+    app_config = None  # noqa:F841
+
+    def get_admin_user(self):
+        return self.session.query(User).filter(User.email == "admin@admin.admin").one()
+
+    def get_workspace_api(
+        self, current_user: typing.Optional[User] = None, show_deleted: bool = False
+    ) -> WorkspaceApi:
+        return WorkspaceApi(
+            session=self.session,
+            config=self.app_config,
+            show_deleted=show_deleted,
+            current_user=current_user or self.get_admin_user(),
+        )
+
+    def get_application_api(self):
+        return ApplicationApi(app_list)
+
+    def get_role_api(self, current_user: typing.Optional[User] = None) -> RoleApi:
+        return RoleApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.get_admin_user(),
+        )
+
+    def get_user_api(self, current_user: typing.Optional[User] = None) -> UserApi:
+        return UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.get_admin_user(),
+        )
+
+    def get_content_api(
+        self,
+        current_user: typing.Optional[User] = None,
+        show_active: bool = True,
+        show_deleted: bool = False,
+        show_archived: bool = False,
+    ) -> ContentApi:
+        return ContentApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.get_admin_user(),
+            show_active=show_active,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
+        )
+
+    def get_group_api(self, current_user: typing.Optional[User] = None) -> GroupApi:
+        return GroupApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.get_admin_user(),
+        )
+
+
+class FunctionalTest(unittest.TestCase, TestWithHelpers):
 
     fixtures = [BaseFixture]
     config_uri = TEST_CONFIG_FILE_PATH
@@ -305,7 +370,7 @@ class CommandFunctionalTest(FunctionalTest):
         pass
 
 
-class BaseTest(unittest.TestCase):
+class BaseTest(unittest.TestCase, TestWithHelpers):
     """
     Pyramid default test.
     """

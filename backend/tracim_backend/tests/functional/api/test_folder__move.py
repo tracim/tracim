@@ -2,10 +2,6 @@ import transaction
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 
 
@@ -13,14 +9,8 @@ class TestFolderMove(FunctionalTest):
     def setUp(self):
         super().setUp()
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.dbsession = get_tm_session(self.session_factory, transaction.manager)
-        self.admin = self.dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        self.workspace_api = WorkspaceApi(
-            current_user=self.admin, session=self.dbsession, config=self.app_config
-        )
-        self.content_api = ContentApi(
-            current_user=self.admin, session=self.dbsession, config=self.app_config
-        )
+        self.workspace_api = self.get_workspace_api()
+        self.content_api = self.get_content_api()
         self.workspace = self.workspace_api.create_workspace(label="test", save_now=True)
         transaction.commit()
 
