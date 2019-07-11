@@ -3,15 +3,8 @@ import pytest
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalElasticSearchTest
 
 
@@ -36,10 +29,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -48,13 +40,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         content1 = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -105,10 +95,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -117,13 +106,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         content1 = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -180,10 +167,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -192,20 +178,18 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
             label=created_content_name,
             do_save=True,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=content):
+        with new_revision(session=self.session, tm=transaction.manager, content=content):
             api.update_content(
                 content, new_label=created_content_name, new_content=created_content_body
             )
@@ -263,10 +247,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         first_created_comment_content,
         second_created_comment_content,
     ) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -275,13 +258,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -321,10 +302,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     def test_api___elasticsearch_search_ok__no_search_string(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -333,13 +313,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         api.create(
             content_type_slug="html-document", workspace=workspace, label="test", do_save=True
         )
@@ -355,10 +333,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert len(search_result["contents"]) == 0
 
     def test_api___elasticsearch_search_ok__filter_by_content_type(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -367,13 +344,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         doc = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -451,10 +426,9 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
         assert search_result["contents"][0]["label"] == "stringtosearch folder"
 
     def test_api___elasticsearch_search_ok__filter_by_deleted_archived_active(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -463,13 +437,11 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         active_content = api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -491,7 +463,7 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_save=True,
         )
         api.execute_created_content_actions(deleted_content)
-        with new_revision(session=dbsession, tm=transaction.manager, content=deleted_content):
+        with new_revision(session=self.session, tm=transaction.manager, content=deleted_content):
             api.delete(deleted_content)
         api.save(deleted_content)
         api.execute_update_content_actions(deleted_content)
@@ -502,7 +474,7 @@ class TestElasticSearchSearch(FunctionalElasticSearchTest):
             do_save=True,
         )
         api.execute_created_content_actions(archived_content)
-        with new_revision(session=dbsession, tm=transaction.manager, content=archived_content):
+        with new_revision(session=self.session, tm=transaction.manager, content=archived_content):
             api.archive(archived_content)
         api.save(archived_content)
         api.execute_update_content_actions(archived_content)
@@ -585,10 +557,9 @@ class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
 
     @pytest.mark.xfail(reason="Need elasticsearch ingest plugin enabled")
     def test_api__elasticsearch_search__ok__in_file_ingest_search(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -597,13 +568,11 @@ class TestElasticSearchSearchWithIngest(FunctionalElasticSearchTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        api = ContentApi(session=dbsession, current_user=user, config=self.app_config)
+        api = self.get_content_api(current_user=user)
         with self.session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,

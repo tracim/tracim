@@ -9,7 +9,7 @@ import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
     const {
-      idWorkspace,
+      workspaceId,
       appOpenedType,
       user,
       currentWorkspace,
@@ -20,7 +20,7 @@ export class OpenContentApp extends React.Component {
       match
     } = this.props
 
-    if (isNaN(idWorkspace) || idWorkspace === -1) return
+    if (isNaN(workspaceId) || workspaceId === -1) return
 
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents') {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
@@ -30,13 +30,13 @@ export class OpenContentApp extends React.Component {
       if (match.params.type === 'html-document') {
         contentToOpen = {
           content_id: parseInt(match.params.idcts),
-          workspace_id: parseInt(idWorkspace),
+          workspace_id: parseInt(workspaceId),
           type: 'custom-form'
         }
       } else {
         contentToOpen = {
           content_id: parseInt(match.params.idcts),
-          workspace_id: parseInt(idWorkspace),
+          workspace_id: parseInt(workspaceId),
           type: match.params.type
         }
       }
@@ -51,14 +51,11 @@ export class OpenContentApp extends React.Component {
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open
-        console.log('ABCalreadyOpen')
-        dispatchCustomEvent(`${contentToOpen.type}_reloadContent`, contentToOpen)
+        dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
       } else { // open another app
         // if another app is already visible, hide it
-        console.log('ABCappOpenedType00', appOpenedType)
-        if (appOpenedType !== false) dispatchCustomEvent(`${appOpenedType}_hideApp`, {})
-
-        // open
+        if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
+        // open app
         // Hard coding the custom-form case, he need another contentType stored in the customFormContentType props
         let contentToOpenType = contentType.find(ct => ct.slug === contentToOpen.type)
         if (contentToOpen.type === 'custom-form') contentToOpenType = customFormContentType.find(ct => ct.slug === contentToOpen.type)

@@ -15,7 +15,6 @@ from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.tests import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests import CommandFunctionalTest
@@ -55,7 +54,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("command_test@user")
         self.disconnect_database()
@@ -75,7 +74,7 @@ class TestCommands(CommandFunctionalTest):
         )
         assert result == 0
         self.connect_database()
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         new_user = api.get_one_by_email("command_test@user")
         assert new_user.email == "command_test@user"
         assert new_user.validate_password("new_password")
@@ -85,7 +84,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation with admin as group
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("command_test@user")
         self.disconnect_database()
@@ -107,7 +106,7 @@ class TestCommands(CommandFunctionalTest):
         )
         assert result == 0
         self.connect_database()
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         new_user = api.get_one_by_email("command_test@user")
         assert new_user.email == "command_test@user"
         assert new_user.validate_password("new_password")
@@ -205,7 +204,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test user password update
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -227,7 +226,7 @@ class TestCommands(CommandFunctionalTest):
         )
         assert result == 0
         self.connect_database()
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         new_user = api.get_one_by_email("admin@admin.admin")
         assert new_user.email == "admin@admin.admin"
         assert new_user.validate_password("new_password")
@@ -239,7 +238,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test user password update
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -270,7 +269,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test user password update
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -295,7 +294,7 @@ class TestCommands(CommandFunctionalTest):
         )
         assert result == 0
         self.connect_database()
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         new_user = api.get_one_by_email("admin@admin.admin")
         assert new_user.email == "admin@admin.admin"
         assert new_user.validate_password("new_password")
@@ -306,7 +305,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test database initialisation
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -322,7 +321,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test database initialisation
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -349,7 +348,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test database initialisation
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -366,7 +365,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test database deletion
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -389,7 +388,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test database deletion
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")
@@ -407,7 +406,7 @@ class TestCommands(CommandFunctionalTest):
         """
         Test database deletion
         """
-        api = UserApi(current_user=None, session=self.session, config=self.app_config)
+        api = self.get_user_api()
         user = api.get_one_by_email("admin@admin.admin")
         assert user.email == "admin@admin.admin"
         assert user.validate_password("admin@admin.admin")

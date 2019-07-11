@@ -7,19 +7,10 @@ import transaction
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
-from tracim_backend.extensions import app_list
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import MailHogFunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
@@ -36,10 +27,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Check obtain workspace reachable for user.
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -48,15 +38,13 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(workspace.workspace_id)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
@@ -82,17 +70,18 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Check obtain workspace reachable for user.
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(workspace.workspace_id)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
@@ -118,12 +107,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Test update workspace
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(1)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
@@ -174,12 +161,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Test update workspace
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(1)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
@@ -226,12 +211,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Test update workspace
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(1)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
@@ -278,12 +261,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Test update workspace
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.get_one(1)
-        app_api = ApplicationApi(app_list)
+        app_api = self.get_application_api()
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace
         )  # nope8
@@ -423,10 +404,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test delete workspace as admin
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         uapi.create_user(
             "test@test.test",
@@ -435,9 +415,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -459,10 +437,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test delete workspace as global manager and workspace manager
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -471,11 +448,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -491,10 +466,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test delete workspace as simple user and workspace manager
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -503,11 +477,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -526,17 +498,14 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test delete workspace as manager and reader of the workspace
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -556,15 +525,12 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        self.get_role_api()
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -579,10 +545,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test undelete workspace as admin
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         uapi.create_user(
             "test@test.test",
@@ -591,9 +556,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         transaction.commit()
@@ -617,10 +580,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test undelete workspace as global manager and workspace manager
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -629,12 +591,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -650,10 +610,9 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test undelete workspace as simple user and workspace manager
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -662,12 +621,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -688,18 +645,15 @@ class TestWorkspaceEndpoint(FunctionalTest):
         Test undelete workspace as manager and reader of the workspace
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.create_user(
             "test@test.test", password="test@test.test", do_save=True, do_notify=False
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
@@ -721,13 +675,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         workspace
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
         transaction.commit()
@@ -789,10 +740,8 @@ class TestWorkspacesEndpoints(FunctionalTest):
         """
         Check obtain all workspaces reachables for user with user auth.
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
 
-        workspace_api = WorkspaceApi(session=dbsession, current_user=admin, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace_api.create_workspace("test", save_now=True)
         workspace_api.create_workspace("test2", save_now=True)
         workspace_api.create_workspace("test3", save_now=True)
@@ -816,10 +765,9 @@ class TestWorkspacesEndpoints(FunctionalTest):
         Check obtain all workspaces reachables for one user
         with another non-admin user auth.
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -885,10 +833,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list of a workspace where admin doesn't
         have any right
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -897,11 +844,15 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -967,10 +918,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Check obtain workspace members list with a reachable workspace for user
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -979,11 +929,15 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1002,10 +956,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Check obtain workspace members list with a reachable workspace for user
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1014,14 +967,14 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api(current_user=None)
         rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        admin_id = admin.user_id
+        admin_id = self.get_admin_user().user_id
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = self.testapp.get(
             "/api/v2/workspaces/{}/members/{}".format(workspace_id, user_id), status=200
@@ -1120,12 +1073,15 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list of a workspace where admin doesn't
         have any right
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         workspace_id = workspace.workspace_id
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1161,10 +1117,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Check obtain workspace members list of a workspace where admin doesn't
         have any right
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1173,11 +1128,15 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = self.get_workspace_api()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1251,9 +1210,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Create workspace member role
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         lawrence = uapi.get_one_by_email("lawrence-not-real-email@fsf.local")
         lawrence.is_active = False
         uapi.save(lawrence)
@@ -1277,9 +1235,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Create workspace member role
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         lawrence = uapi.get_one_by_email("lawrence-not-real-email@fsf.local")
         lawrence.is_deleted = True
         uapi.save(lawrence)
@@ -1410,10 +1367,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Update worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1429,14 +1385,16 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         # before
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1476,10 +1434,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Update worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         uapi.create_user(
             "test@test.test",
@@ -1495,12 +1452,14 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         # update workspace role
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1520,10 +1479,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Update worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1539,14 +1497,16 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=None, session=dbsession, config=self.app_config)
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
+        groups = [gapi.get_one_with_name("administrators")]
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", groups=groups, do_notify=False)
+        rapi = self.get_role_api(current_user=admin2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
-        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        rapi.delete_one(self.get_admin_user().user_id, workspace.workspace_id)
         transaction.commit()
         # before
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1586,10 +1546,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Delete worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1598,11 +1557,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
@@ -1624,10 +1581,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Delete worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1643,11 +1599,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
@@ -1670,10 +1624,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Delete worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         uapi.create_user(
             "test@test.test",
@@ -1689,9 +1642,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
@@ -1711,10 +1662,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         Delete worskpace member role.
         Unallow to delete himself as workspace_manager
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1730,11 +1680,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
@@ -1757,10 +1705,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         """
         Delete worskpace member role
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user2 = uapi.create_user(
             "test2@test2.test2",
@@ -1777,11 +1724,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
         transaction.commit()
@@ -1814,10 +1759,9 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         Create workspace member role
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1826,11 +1770,9 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1873,10 +1815,9 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
         Create workspace member role
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1885,11 +1826,9 @@ class TestUserInvitationWithMailActivatedSync(MailHogFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
@@ -1921,10 +1860,9 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         Create workspace member role
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("trusted-users")]
         user = uapi.create_user(
             "test@test.test",
@@ -1933,11 +1871,9 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         transaction.commit()
 
@@ -1979,7 +1915,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         # check for notification to new user, user should not be notified
         # until it connected to tracim.
         self.cleanup_mailhog()
-        api = ContentApi(session=dbsession, current_user=admin, config=self.app_config)
+        api = self.get_content_api()
         api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -1997,7 +1933,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(MailHogFunctionalT
         self.testapp.authorization = ("Basic", ("bob@bob.bob", "bob@bob.bob"))
         self.testapp.get("/api/v2/auth/whoami", status=200)
         self.cleanup_mailhog()
-        api = ContentApi(session=dbsession, current_user=admin, config=self.app_config)
+        api = self.get_content_api()
         api.create(
             content_type_slug="html-document",
             workspace=workspace,
@@ -2025,18 +1961,16 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(FunctionalTest):
         """
         self.testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
         res = self.testapp.get("/api/v2/auth/whoami", status=200)
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        uapi = UserApi(current_user=None, session=self.session, config=self.app_config)
+
+        uapi = self.get_user_api(current_user=None)
         user = uapi.get_one_by_email("hubert@planetexpress.com")
-        gapi = GroupApi(session=self.session, config=self.app_config, current_user=user)
+        gapi = self.get_group_api(current_user=user)
         uapi.update(
             user, auth_type=user.auth_type, groups=[gapi.get_one_with_name("administrators")]
         )
         uapi.save(user)
         transaction.commit()
-        workspace_api = WorkspaceApi(
-            current_user=user, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(current_user=user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
@@ -2075,11 +2009,8 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         :return:
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
@@ -2115,10 +2046,9 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         :return:
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
@@ -2156,11 +2086,8 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         :return:
         """
         self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
@@ -2940,11 +2867,10 @@ class TestWorkspaceContents(FunctionalTest):
     # Folder related
     def test_api__get_workspace_content__ok_200__get_all_filter_content_thread(self):
         # prepare data
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
         business_workspace = workspace_api.get_one(1)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -2955,7 +2881,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_thread.description = "Thread description"
-        dbsession.add(test_thread)
+        self.session.add(test_thread)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2974,7 +2900,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_page_legacy.type = "page"
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_page_legacy):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_page_legacy):
             content_api.update_content(test_page_legacy, "test_page", "<p>PAGE</p>")
         test_html_document = content_api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -2983,9 +2909,9 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_html_document):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_html_document):
             content_api.update_content(test_html_document, "test_page", "<p>HTML_DOCUMENT</p>")
-        dbsession.flush()
+        self.session.flush()
         transaction.commit()
         # test-itself
         params = {
@@ -3015,11 +2941,10 @@ class TestWorkspaceContents(FunctionalTest):
 
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):
         # prepare data
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
         business_workspace = workspace_api.get_one(1)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -3030,7 +2955,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_thread.description = "Thread description"
-        dbsession.add(test_thread)
+        self.session.add(test_thread)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3050,7 +2975,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_page_legacy.type = "page"
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_page_legacy):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_page_legacy):
             content_api.update_content(test_page_legacy, "test_page", "<p>PAGE</p>")
         test_html_document = content_api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -3060,9 +2985,9 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_html_document):
+        with new_revision(session=self.session, tm=transaction.manager, content=test_html_document):
             content_api.update_content(test_html_document, "test_html_page", "<p>HTML_DOCUMENT</p>")
-            dbsession.flush()
+            self.session.flush()
         transaction.commit()
         # test-itself
         params = {
@@ -3481,10 +3406,9 @@ class TestWorkspaceContents(FunctionalTest):
         """
         Create generic content but content_type is not allowed in this folder
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = self.get_workspace_api()
+        content_api = self.get_content_api()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test-folder",
@@ -3533,10 +3457,9 @@ class TestWorkspaceContents(FunctionalTest):
         """
         Create generic content but content_type is not allowed in this folder
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -3545,13 +3468,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -3585,10 +3508,9 @@ class TestWorkspaceContents(FunctionalTest):
         """
         Create generic content but content_type is not allowed in this folder
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -3597,13 +3519,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -3632,10 +3554,9 @@ class TestWorkspaceContents(FunctionalTest):
         """
         move content to a dir where content_type is not allowed
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -3644,13 +3565,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         thread = content_api.create(
             label="test-thread",
             content_type_slug=content_type_list.Thread.slug,
@@ -3687,10 +3608,9 @@ class TestWorkspaceContents(FunctionalTest):
         """
         move content to a dir where content_type is not allowed
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -3699,13 +3619,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -3895,10 +3815,9 @@ class TestWorkspaceContents(FunctionalTest):
         - Workspace projectB
         :return:
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -3907,15 +3826,15 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
+        workspace_api = self.get_workspace_api(
+            current_user=self.get_admin_user(), show_deleted=True
         )
         projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)
         projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         rapi.create_one(user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = self.get_content_api()
 
         documentation_folder = content_api.create(
             label="documentation",
@@ -3948,7 +3867,7 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=readme_file):
+        with new_revision(session=self.session, tm=transaction.manager, content=readme_file):
             content_api.update_file_data(
                 readme_file, "readme.txt", new_mimetype="plain/text", new_content=b"To be completed"
             )

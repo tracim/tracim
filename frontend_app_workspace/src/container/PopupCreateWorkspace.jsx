@@ -3,7 +3,8 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
-  addAllResourceI18n
+  addAllResourceI18n,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { postWorkspace } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -33,8 +34,8 @@ const debug = { // outdated
     email: 'osef@algoo.fr',
     avatar: ''
   },
-  idWorkspace: 1,
-  idFolder: null
+  workspaceId: 1,
+  folderId: null
 }
 
 class PopupCreateWorkspace extends React.Component {
@@ -51,16 +52,16 @@ class PopupCreateWorkspace extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<PopupCreateWorkspace> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -74,7 +75,7 @@ class PopupCreateWorkspace extends React.Component {
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: 'warning',
@@ -85,7 +86,7 @@ class PopupCreateWorkspace extends React.Component {
   handleChangeNewWorkspaceName = e => this.setState({newWorkspaceName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateWorkspace', // handled by tracim_front:dist/index.html
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE, // handled by tracim_front:dist/index.html
     data: {
       name: this.state.appName
     }
@@ -99,8 +100,8 @@ class PopupCreateWorkspace extends React.Component {
     switch (fetchSaveNewWorkspace.apiResponse.status) {
       case 200:
         this.handleClose()
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
-        GLOBAL_dispatchEvent({type: 'redirect', data: {url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {openIdInSidebar: fetchSaveNewWorkspace.body.workspace_id} })
+        GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REDIRECT, data: {url: `/ui/workspaces/${fetchSaveNewWorkspace.body.workspace_id}/dashboard`}})
         break
       case 400:
         switch (fetchSaveNewWorkspace.body.code) {

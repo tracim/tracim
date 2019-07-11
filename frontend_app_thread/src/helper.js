@@ -53,7 +53,7 @@ export const debug = { // copied from html-document => outdated
     email: 'osef@algoo.fr',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
     lang: 'en',
-    idRoleUserWorkspace: 8
+    userRoleIdInWorkspace: 8
   },
   content: {
     author: {

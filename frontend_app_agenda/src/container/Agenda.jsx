@@ -8,7 +8,8 @@ import {
   PageContent,
   PageTitle,
   PageWrapper,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
@@ -37,20 +38,20 @@ class Agenda extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
 
     switch (type) {
-      case 'agenda_showApp':
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
-        if (data.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
+        if (data.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
           this.setState({config: data.config})
         }
         break
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<Agenda> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({
           loggedUser: {
@@ -72,8 +73,8 @@ class Agenda extends React.Component {
 
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
-    this.loadAgendaList(state.config.appConfig.idWorkspace)
-    if (state.config.appConfig.idWorkspace !== null) await this.loadWorkspaceData()
+    this.loadAgendaList(state.config.appConfig.workspaceId)
+    if (state.config.appConfig.workspaceId !== null) await this.loadWorkspaceData()
     this.buildBreadcrumbs()
   }
 
@@ -82,8 +83,8 @@ class Agenda extends React.Component {
 
     console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
-    if (prevState.config.appConfig.idWorkspace !== state.config.appConfig.idWorkspace) {
-      if (state.config.appConfig.idWorkspace) await this.loadAgendaList(state.config.appConfig.idWorkspace)
+    if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
+      if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
       this.agendaIframe.contentWindow.location.reload()
@@ -92,14 +93,14 @@ class Agenda extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<Agenda> will Unmount', `color: ${this.state.config.hexcolor}`)
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  loadAgendaList = async idWorkspace => {
+  loadAgendaList = async workspaceId => {
     const { state } = this
 
     const fetchResultUserWorkspace = await handleFetchResult(
-      await getAgendaList(state.config.apiUrl, idWorkspace)
+      await getAgendaList(state.config.apiUrl, workspaceId)
     )
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
@@ -130,7 +131,7 @@ class Agenda extends React.Component {
     if (fetchResultSuccess.length < fetchResultList.length) this.sendGlobalFlashMessage(props.t('Some agenda could not be loaded'))
 
     const workspaceListMemberList = fetchResultSuccess.map(result => ({
-      idWorkspace: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member
+      workspaceId: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member
       memberList: result.body || []
     }))
 
@@ -138,18 +139,18 @@ class Agenda extends React.Component {
       // INFO - CH - 2019-04-09 - remove user's agenda
       .filter(a => a.agenda_type === 'workspace')
       // INFO - CH - 2019-04-09 - remove unloaded members list agenda
-      .filter(a => workspaceListMemberList.map(ws => ws.idWorkspace).includes(a.workspace_id))
+      .filter(a => workspaceListMemberList.map(ws => ws.workspaceId).includes(a.workspace_id))
 
     const agendaListWithRole = agendaThatCouldGetRoleFrom.map(agenda => ({
       ...agenda,
       loggedUserRole: workspaceListMemberList
-        .find(ws => ws.idWorkspace === agenda.workspace_id)
+        .find(ws => ws.workspaceId === agenda.workspace_id)
         .memberList
         .find(user => user.user_id === state.loggedUser.user_id)
         .role
     }))
 
-    if (state.config.appConfig.idWorkspace === null) {
+    if (state.config.appConfig.workspaceId === null) {
       agendaListWithRole.push(agendaList.find(a => a.agenda_type === 'private'))
     }
 
@@ -167,12 +168,12 @@ class Agenda extends React.Component {
       type: BREADCRUMBS_TYPE.CORE
     }]
 
-    if (state.config.appConfig.idWorkspace) {
+    if (state.config.appConfig.workspaceId) {
       breadcrumbsList.push({
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/dashboard`}>{state.content.workspaceLabel}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/dashboard`}>{state.content.workspaceLabel}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       }, {
-        link: <Link to={`/ui/workspaces/${state.config.appConfig.idWorkspace}/agenda`}>{props.t('Agenda')}</Link>,
+        link: <Link to={`/ui/workspaces/${state.config.appConfig.workspaceId}/agenda`}>{props.t('Agenda')}</Link>,
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN
       })
     } else {
@@ -193,7 +194,7 @@ class Agenda extends React.Component {
     const { state } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
-      await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.idWorkspace)
+      await getWorkspaceDetail(state.config.apiUrl, state.config.appConfig.workspaceId)
     )
 
     switch (fetchResultWorkspaceDetail.apiResponse.status) {
@@ -221,7 +222,7 @@ class Agenda extends React.Component {
           settingsAccount: a.agenda_type === 'private',
           withCredentials: a.with_credentials,
           loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
-          idWorkspace: a.agenda_type === 'private' ? '' : a.workspace_id
+          workspaceId: a.agenda_type === 'private' ? '' : a.workspace_id
         }))
       },
       userLang: state.loggedUser.lang,
@@ -230,7 +231,7 @@ class Agenda extends React.Component {
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
-    const pageTitle = state.config.appConfig.idWorkspace === null
+    const pageTitle = state.config.appConfig.workspaceId === null
       ? props.t('All my agendas')
       : <div dangerouslySetInnerHTML={
         {__html: props.t('Agenda of shared space {{workspaceLabel}}', {workspaceLabel: state.content.workspaceLabel, interpolation: {escapeValue: false}})}

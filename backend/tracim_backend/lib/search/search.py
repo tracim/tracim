@@ -25,6 +25,32 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
 
+class IndexedContentsResults(object):
+    def __init__(
+        self, content_ids_to_index: typing.List[int], errored_indexed_content_ids: typing.List[int]
+    ) -> None:
+        self.content_ids_to_index = content_ids_to_index
+        self.errored_indexed_contents_ids = errored_indexed_content_ids
+
+    def get_nb_index_errors(self) -> int:
+        """
+        nb of content where indexation failed
+        """
+        return len(self.errored_indexed_contents_ids)
+
+    def get_nb_content_correctly_indexed(self) -> int:
+        """
+        nb of contents where indexation success
+        """
+        return self.get_nb_contents_to_index() - self.get_nb_index_errors()
+
+    def get_nb_contents_to_index(self) -> int:
+        """
+        Total of content to index
+        """
+        return len(self.content_ids_to_index)
+
+
 class SearchApi(ABC):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         self._user = current_user
@@ -47,7 +73,7 @@ class SearchApi(ABC):
     def index_content(self, content: ContentInContext):
         pass
 
-    def index_all_content(self) -> None:
+    def index_all_content(self) -> IndexedContentsResults:
         """
         Index/update all content in current index of ElasticSearch
         """
@@ -60,11 +86,34 @@ class SearchApi(ABC):
             show_deleted=True,
         )
         contents = content_api.get_all()
+        content_ids_to_index = []  # type: typing.List[int]
+        errored_indexed_contents_ids = []  # type: typing.List[int]
         for content in contents:
             content_in_context = ContentInContext(
                 content, config=self._config, dbsession=self._session
             )
-            self.index_content(content_in_context)
+            content_ids_to_index.append(content_in_context.content_id)
+            try:
+                self.index_content(content_in_context)
+            except ConnectionError as exc:
+                logger.error(
+                    self,
+                    "connexion error issue with elasticsearch during indexing of content {}".format(
+                        content_in_context.content_id
+                    ),
+                )
+                logger.exception(self, exc)
+                errored_indexed_contents_ids.append(content_in_context.content_id)
+            except Exception as exc:
+                logger.error(
+                    self,
+                    "something goes wrong during indexing of content {}".format(
+                        content_in_context.content_id
+                    ),
+                )
+                logger.exception(self, exc)
+                errored_indexed_contents_ids.append(content_in_context.content_id)
+        return IndexedContentsResults(content_ids_to_index, errored_indexed_contents_ids)
 
     def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
         """
@@ -357,20 +406,95 @@ class ESSearchApi(SearchApi):
             current_revision_id=content.current_revision_id,
         )
         indexed_content.meta.id = content.content_id
-        if self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
-            if (
-                not self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
-                or content.mimetype
-                in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
-            ):
-                file_ = content.get_b64_file()
-                if file_:
-                    indexed_content.file = file_
-                    indexed_content.save(
-                        using=self.es, pipeline="attachment", index=self.index_document_alias
-                    )
-                    return
-        indexed_content.save(using=self.es, index=self.index_document_alias)
+        if self._can_index_content(content):
+            file_ = content.get_b64_file()
+            if file_:
+                indexed_content.b64_file = file_
+                indexed_content.save(
+                    using=self.es,
+                    pipeline="attachment",
+                    index=self.index_document_alias,
+                    request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+                )
+                return
+            logger.debug(
+                self,
+                'Skip binary content file of content "{}": no binary content'.format(
+                    content.content_id
+                ),
+            )
+        indexed_content.save(
+            using=self.es,
+            index=self.index_document_alias,
+            request_timeout=self._config.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT,
+        )
+
+    def _can_index_content(self, content: ContentInContext) -> bool:
+        if not self._config.SEARCH__ELASTICSEARCH__USE_INGEST:
+            logger.debug(
+                self,
+                'Skip binary indexation of content "{}" will be not indexed: ingest mode disabled'.format(
+                    content.content_id
+                ),
+            )
+            return False
+
+        if not content.content.depot_file or content.size is None:
+            logger.debug(
+                self,
+                'Skip binary indexation of content "{}":  invalid file format'.format(
+                    content.content_id
+                ),
+            )
+            return False
+
+        # INFO - G.M - 2019-06-24 - check mimetype validity
+        if (
+            self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
+            and content.mimetype
+            not in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST
+        ):
+            logger.debug(
+                self,
+                'Skip binary indexation of content "{}": mimetype "{}" not whitelisted'.format(
+                    content.content_id, content.mimetype
+                ),
+            )
+            return False
+
+        # INFO - G.M - 2019-06-24 - check mimetype validity
+        if (
+            self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
+            and content.mimetype in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
+        ):
+            logger.debug(
+                self,
+                'Skip binary indexation of content "{}": mimetype "{}" blacklisted'.format(
+                    content.content_id, content.mimetype
+                ),
+            )
+            return False
+
+        if content.size == 0:
+            logger.debug(
+                self,
+                'Skip binary indexation of content "{}":  empty file'.format(content.content_id),
+            )
+            return False
+
+        # INFO - G.M - 2019-06-24 - check content size
+        if content.size > self._config.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT:
+            logger.debug(
+                self,
+                'Skip binary indexation of content "{}": binary is "{}" bytes, max allowed size for indexation is ({})'.format(
+                    content.content_id,
+                    content.size,
+                    self._config.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT,
+                ),
+            )
+            return False
+
+        return True
 
     def search_content(
         self,
@@ -411,7 +535,10 @@ class ESSearchApi(SearchApi):
                 "file_extension",
                 "raw_content^3",
                 "comments.raw_content",
-                "attachment.content^3",
+                "file_data.content^3",
+                "file_data.title^4",
+                "file_data.author",
+                "file_data.keywords",
             ],
         )
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -426,7 +553,7 @@ class ESSearchApi(SearchApi):
         search = search.response_class(ESContentSearchResponse)
         # INFO - G.M - 2019-05-21 - remove raw content of content of result in elasticsearch
         # result, because we do not need them and for performance reasons.
-        search = search.source(exclude=["raw_content", "*.raw_content", "attachment.*", "file"])
+        search = search.source(exclude=["raw_content", "*.raw_content", "file_data.*", "file"])
         # INFO - G.M - 2019-05-16 - None is different than empty list here, None mean we can
         # return all workspaces content, empty list mean return nothing.
         if size:
@@ -452,6 +579,9 @@ class ESSearchApi(SearchApi):
             id="attachment",
             body={
                 "description": "Extract attachment information",
-                "processors": [{"attachment": {"field": "file"}}],
+                "processors": [
+                    {"attachment": {"field": "b64_file", "target_field": "file_data"}},
+                    {"remove": {"field": "b64_file"}},
+                ],
             },
         )

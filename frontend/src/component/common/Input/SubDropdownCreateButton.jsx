@@ -14,7 +14,7 @@ const SubDropdownCreateButton = props => {
             e.preventDefault()
             e.stopPropagation()
             // HACK
-            props.onClickCreateContent(e, props.idFolder, app.slug === 'custom-form' ? app.slug + '/' + app.slugForm : app.slug)
+            props.onClickCreateContent(e, props.folderId, app.slug === 'custom-form' ? app.slug + '/' + app.slugForm : app.slug)
           }}
           // HACK
           key={app.slug === 'custom-form' ? app.slugForm : app.slug}
@@ -40,7 +40,7 @@ const SubDropdownCreateButton = props => {
 SubDropdownCreateButton.propTypes = {
   availableApp: PropTypes.array.isRequired,
   onClickCreateContent: PropTypes.func.isRequired,
-  idFolder: PropTypes.number
+  folderId: PropTypes.number
 }
 
 export default translate()(SubDropdownCreateButton)

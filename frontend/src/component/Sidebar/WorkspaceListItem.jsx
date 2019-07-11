@@ -11,8 +11,8 @@ import {DRAG_AND_DROP, ROLE_OBJECT} from '../../helper.js'
 const qs = require('query-string')
 
 class WorkspaceListItem extends React.Component {
-  shouldDisplayAsActive = (location, workspaceId, activeIdWorkspace, app) => {
-    if (workspaceId !== activeIdWorkspace) return false
+  shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {
+    if (workspaceId !== activeWorkspaceId) return false
 
     const filterType = qs.parse(location.search).type
 
@@ -21,8 +21,8 @@ class WorkspaceListItem extends React.Component {
       : location.pathname.includes(app.route)
   }
 
-  buildLink = (route, search, workspaceId, activeIdWorkspace) => {
-    if (workspaceId !== activeIdWorkspace) return route
+  buildLink = (route, search, workspaceId, activeWorkspaceId) => {
+    if (workspaceId !== activeWorkspaceId) return route
 
     if (search === '') return route
 
@@ -41,7 +41,7 @@ class WorkspaceListItem extends React.Component {
     const isDropActive = props.canDrop && props.isOver
 
     if (isDropActive) {
-      const isDropAllowed = props.userWorkspaceRoleId >= ROLE_OBJECT.contributor.id
+      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id
       const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
       if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return <i className='fa fa-arrow-circle-down' />
@@ -94,10 +94,10 @@ class WorkspaceListItem extends React.Component {
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug === 'contents/custom-form' ? 'contents/custom-form' + i++ : allowedApp.slug}
               >
-                <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeIdWorkspace)}>
+                <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}>
                   <div className={classnames(
                     'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                    {'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeIdWorkspace, allowedApp)}
+                    {'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp)}
                   )}>
                     <div className='dropdown__icon' style={{backgroundColor: allowedApp.hexcolor}}>
                       <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
@@ -145,7 +145,7 @@ WorkspaceListItem.propTypes = {
   onClickAllContent: PropTypes.func,
   isOpenInSidebar: PropTypes.bool,
   activeFilterList: PropTypes.array,
-  activeIdWorkspace: PropTypes.number
+  activeWorkspaceId: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
@@ -153,5 +153,5 @@ WorkspaceListItem.defaultProps = {
   onClickAllContent: () => {},
   isOpenInSidebar: false,
   activeFilterList: [],
-  activeIdWorkspace: -1
+  activeWorkspaceId: -1
 }

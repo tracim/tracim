@@ -48,7 +48,7 @@ export const PAGE = {
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
     FORM: '/ui/admin/form',
-    USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
   },
   SEARCH_RESULT: '/ui/search-result'
 }

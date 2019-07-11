@@ -73,4 +73,25 @@ describe('Searching keywords', () => {
       })
     })
   })
+  describe('by changing it in the url', () => {
+    const pageNumber = '1'
+    const numberByPage = '10'
+    const actived = '1'
+    const deleted = '0'
+    const archived = '0'
+    const contentTypes = 'html-document%2Cfile%2Cthread%2Cfolder%2Ccomment'
+
+    before(function () {
+      cy.loginAs('users')
+      cy.visitPage({pageName: PAGES.SEARCH, params: {searchedKeywords: htmlDocTitle, pageNumber, numberByPage, actived, deleted, archived, contentTypes}})
+    })
+
+    describe('the subtitle', () => {
+      const pageSubTitle = '[data-cy=layoutPageSubTitle]'
+
+      it('Should display the same searched keywords', () => {
+        cy.get(pageSubTitle).contains(`best results for "${htmlDocTitle}"`).should('be.visible')
+      })
+    })
+  })
 })

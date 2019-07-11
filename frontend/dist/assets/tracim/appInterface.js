@@ -134,7 +134,7 @@ function GLOBAL_dispatchEvent (event) {
   var data = event.data
   console.log('%cGLOBAL_dispatchEvent', 'color: #fff', type, data)
 
-  var customEvent = new CustomEvent('appCustomEvent', {detail: {type, data}})
+  var customEvent = new CustomEvent('appCustomEventListener', {detail: {type, data}})
   document.dispatchEvent(customEvent)
 }
 
@@ -171,4 +171,4 @@ function GLOBAL_eventReducer (event) {
   }
 }
 
-document.addEventListener('appCustomEvent', GLOBAL_eventReducer)
+document.addEventListener('appCustomEventListener', GLOBAL_eventReducer)
