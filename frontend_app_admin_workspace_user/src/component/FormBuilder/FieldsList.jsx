@@ -4,104 +4,73 @@ import { DropTarget } from 'react-dnd'
 import {
   DRAG_AND_DROP
 } from '../../helper.js'
+import PropTypes from 'prop-types'
 const style = {
   width: '100%',
-  height: '400px',
-  border: '1px dashed gray'
+  height: '100%'
 }
 
 class FieldsList extends React.Component {
   constructor (props) {
     super(props)
-    this.i = 0
-    this.state = {
-      fields: props.schema ? Object.keys(props.schema.properties).map(key => {
-        let properties = props.schema.properties[key]
-        properties.label = props.schema.properties.label || key
-        return {
-          id: this.i++,
-          properties: properties
-        }
-      }) : [],
-      schema: props.schema || {}
-    }
-  }
-
-  handleSchemaChange () {
-    const fields = this.state.fields || []
-    this.setState(state => {
-      let properties = {}
-      state.fields.forEach((field, index) => {
-        let add = ''
-        let count = 0
-        fields.forEach((f) => {
-          if (f.properties.label === field.properties.label) {
-            count++
-          }
-        })
-        if (count > 1) add = '2'
-        field.properties.label += add
-        properties[field.properties.label + add] = field.properties
-      })
-      return {
-        schema: {type: 'object', properties: properties}
-      }
-    }, () => this.props.onChange(this.state.schema))
-  }
-
-  onDelete (index) {
-    this.setState(state => {
-      let fields = state.fields
-      fields.splice(index, 1)
-      return {
-        fields
-      }
-    }, () => this.handleSchemaChange())
-  }
-
-  onPropertiesChange (name, value, index) {
-    this.setState(state => {
-      let fields = state.fields
-      fields[index].properties[name] = value
-      return {
-        fields
-      }
-    }, () => this.handleSchemaChange())
+    this.ref = React.createRef()
   }
 
   renderField (field, index) {
     return (
       <Field
-        key={field.id}
+        key={field.label}
         index={index}
-        id={field.id}
-        moveCard={this.moveCard}
-        name={field.properties.label + ' : ' + field.properties.type}
-        onDelete={this.onDelete.bind(this)}
-        properties={field.properties}
-        onPropertiesChange={this.onPropertiesChange.bind(this)}
+        id={field.label}
+        moveField={this.props.moveField}
+        name={field.label + ' : ' + field.type}
+        removeField={this.props.removeField}
+        properties={field}
+        onPropertiesChange={this.props.onPropertiesChange}
+        position={this.props.position}
+        addField={this.props.addField}
+        addOrderTab={this.props.addOrderTab}
       />
     )
   }
 
-  moveCard = (dragIndex, hoverIndex) => {
-    if (dragIndex !== undefined && hoverIndex !== undefined) {
-      this.setState(state => {
-        const dragField = state.fields[dragIndex]
-        let fields = state.fields
-        fields[dragIndex] = fields[hoverIndex]
-        fields[hoverIndex] = dragField
-        return {
-          fields
-        }
-      }, () => this.handleSchemaChange())
-      return true
+  addField (fieldType) {
+    const targetType = this.props.schema.type
+    this.props.addField(targetType, this.props.position, fieldType.fieldType)
+  }
+
+  getFieldsFromArray () {
+    let schema = Object.assign({}, this.props.schema)
+    if (schema.items === undefined) return []
+    if (schema.items.type && schema.items.type === 'object') {
+      if (schema.items.order) {
+        return schema.items.order.map(p => ({...schema.items.properties[p], label: p}))
+      }
+      this.props.addOrderTab(this.props.position)
+    }
+    return [{...schema.items, label: 'unique'}]
+  }
+
+  getFieldsFromObject () {
+    let schema = Object.assign({}, this.props.schema)
+    if (schema.properties === undefined) return []
+    if (schema.order) {
+      return schema.order.map(p => ({...schema.properties[p], label: p}))
+    }
+    this.props.addOrderTab(this.props.position)
+    return []
+  }
+
+  getFields () {
+    if (this.props.schema.type === 'object') {
+      return this.getFieldsFromObject()
     } else {
-      return false
+      return this.getFieldsFromArray()
     }
   }
+
   render () {
-    const fields = this.state.fields
+    const fields = this.getFields()
     return (
       <div style={{ ...style }} ref={this.props.connectDropTarget}>
         <div>{fields.map((field, i) => this.renderField(field, i))}</div>
@@ -112,19 +81,8 @@ class FieldsList extends React.Component {
 
 const fieldsListDragAndDropTarget = {
   drop: (props, monitor, component) => {
-    const fieldType = monitor.getItem()
-    component.setState(state => {
-      const fields = state.fields.concat({
-        id: component.i,
-        properties: {
-          type: fieldType.fieldType,
-          label: 'f_' + component.i++
-        }
-      })
-      return {
-        fields
-      }
-    }, () => component.handleSchemaChange())
+    if (monitor.didDrop()) return
+    component.addField(monitor.getItem())
   }
 }
 
@@ -133,3 +91,12 @@ const fieldsListDragAndDropSourceCollect = (connect, monitor) => ({
 })
 
 export default DropTarget(DRAG_AND_DROP.FIELD_TYPE, fieldsListDragAndDropTarget, fieldsListDragAndDropSourceCollect)(FieldsList)
+
+FieldsList.propTypes = {
+  onChange: PropTypes.func,
+  schema: PropTypes.object
+}
+
+FieldsList.defaultProps = {
+  schema: {}
+}

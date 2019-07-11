@@ -36,6 +36,7 @@
     "react-dnd-html5-backend": "^8.0.3",
     "react-dom": "^16.0.0",
     "react-i18next": "^7.5.0",
+    "react-json-editor-ajrm": "^2.5.9",
     "react-router-dom": "^4.2.2",
     "standard": "^11.0.0",
     "standard-loader": "^6.0.1",

@@ -1,11 +1,10 @@
 import React from 'react'
-import JSONInput from 'react-json-editor-ajrm'
-import locale from 'react-json-editor-ajrm/locale/fr'
-import JsonForm
-  from '../../../frontend_app_custom-form/src/component/JsonForm/JsonForm'
+// FIXME - CH - 2019-07-08 - JsonForm should not be imported like so.
+// Whether to put it into frontend_lib (might be a bit heavy) or to handle it differently
+// is yet to be decided
+import JsonForm from '../../../frontend_app_custom-form/src/component/JsonForm/JsonForm'
 import FormBuilder from './FormBuilder/FormBuilder'
 import JsonFormEditor from './FormBuilder/JsonFormEditor'
-
 import { translate } from 'react-i18next'
 import {
   PageWrapper,
@@ -13,6 +12,13 @@ import {
   PageContent
 } from 'tracim_frontend_lib'
 import FormInfo from './FormBuilder/FormInfo'
+import {
+  addField,
+  moveField,
+  removeField,
+  onPropertiesChange,
+  addOrderTab
+} from './FormBuilder/FormHelper'
 
 export class AdminForm extends React.Component {
   constructor (props) {
@@ -20,18 +26,30 @@ export class AdminForm extends React.Component {
 
     this.state = {
       editor: true,
-      extraInfo: {}
+      label: '',
+      creationLabel: '',
+      icon: '',
+      color: '',
+      schema: {
+        type: 'object'
+      }
     }
+    this.i = 0
+  }
+
+  handleClickSaveButton () {
+    let form = this.state
+    delete form.editor
+    console.log(form)
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    // console.log('Update', this.state.schema.properties)
   }
 
   onSchemaChange = (data) => {
     if (data !== undefined) {
-      // TODO WTF is dis
-      this.setState({
-        schema: {}
-      }, () => this.setState({
-        schema: data
-      }))
+      this.setState({ schema: {type: 'object', properties: data.properties} })
     }
   }
 
@@ -44,18 +62,30 @@ export class AdminForm extends React.Component {
   }
 
   onInfoChange (name, value) {
-    this.setState(state => {
-      let extraInfo = state.extraInfo
-      extraInfo[name] = value
-      return {extraInfo}
-    })
+    this.setState({[name]: value})
   }
 
-  handleClickSaveButton () {
-    let form = this.state.extraInfo
-    form.schema = this.state.schema
-    form.uiSchema = this.state.uischema
-    console.log(form)
+  moveField (position, dragIndex, hoverIndex) {
+    this.setState({schema: moveField(this.state.schema, position, dragIndex, hoverIndex)})
+  }
+
+  removeField (position, label) {
+    this.setState({schema: removeField(this.state.schema, position, label)})
+  }
+
+  addField (targetType, position, fieldType) {
+    this.setState({schema: addField(this.state.schema, targetType, position, fieldType)})
+  }
+
+  onPropertiesChange (position, name, value, label) {
+    const schema = onPropertiesChange(this.state.schema, position, name, value, label)
+    // Check if the onChange got errors, to notify the field
+    if (schema === undefined) return false
+    this.setState({schema})
+  }
+
+  addOrderTab (position) {
+    this.setState({schema: addOrderTab(this.state.schema, position)})
   }
 
   render () {
@@ -90,54 +120,40 @@ export class AdminForm extends React.Component {
             <button onClick={() => this.setState({editor: !this.state.editor})}>{this.state.editor ? 'Drag and drop' : 'Json editor'}</button>
             <div>
               <div className='divLeft'>
-                {!this.state.editor && (
-                  <FormBuilder onChange={this.onSchemaChange} schema={this.state.schema} />
-                )}
-                {this.state.editor && (
-                  <JsonFormEditor
-                    schema={this.state.schema}
-                    onSchemaChange={this.onSchemaChange}
-                    onUiSchemaChange={this.onUiSchemaChange}
-                  />
-                  // <div style={{marginTop: '2%'}}>
-                  //   <div>
-                  //     <p>schema :</p>
-                  //     <JSONInput
-                  //       id='schema'
-                  //       locale={locale}
-                  //       height='550px'
-                  //       width={'100%'}
-                  //       placeholder={this.state.schema}
-                  //       onChange={(data) => this.onSchemaChange(data.jsObject)}
-                  //     />
-                  //   </div>
-                  //
-                  //   <div>
-                  //     <p>uischema :</p>
-                  //
-                  //     <JSONInput
-                  //       id='uischema'
-                  //       locale={locale}
-                  //       height='250px'
-                  //       width={'100%'}
-                  //       onChange={this.onUiSchemaChange}
-                  //     />
-                  //   </div>
-                  // </div>
-                )}
+                {this.state.editor
+                  ? (
+                    <JsonFormEditor
+                      schema={this.state.schema}
+                      onSchemaChange={this.onSchemaChange}
+                      onUiSchemaChange={this.onUiSchemaChange}
+                    />
+                  )
+                  : (
+                    <FormBuilder
+                      schema={this.state.schema}
+                      addField={this.addField.bind(this)}
+                      removeField={this.removeField.bind(this)}
+                      moveField={this.moveField.bind(this)}
+                      onPropertiesChange={this.onPropertiesChange.bind(this)}
+                      addOrderTab={this.addOrderTab.bind(this)}
+                    />
+                  )
+                }
               </div>
 
               <div className='divRight'>
                 <div>
-                  <JsonForm
-                    isDisable={false}
-                    id={1}
-                    customClass={'html-document__editionmode'}
-                    disableValidateBtn
-                    text={''}
-                    schema={this.state.schema || {}}
-                    uiSchema={this.state.uischema || {}}
-                  />
+                  {this.state.schema && (
+                    <JsonForm
+                      isDisable={false}
+                      id={1}
+                      customClass={'html-document__editionmode'}
+                      disableValidateBtn
+                      text={''}
+                      schema={this.state.schema}
+                      uiSchema={this.state.uischema || {}}
+                    />
+                  )}
                 </div>
               </div>
             </div>

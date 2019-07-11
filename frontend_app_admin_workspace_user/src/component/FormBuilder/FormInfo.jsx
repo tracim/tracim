@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class FormInfo extends React.Component {
   handleChange (event) {
@@ -29,3 +30,8 @@ class FormInfo extends React.Component {
 }
 
 export default FormInfo
+
+FormInfo.propTypes = {
+  onChange: PropTypes.func,
+  onSave: PropTypes.func
+}

@@ -1,10 +1,14 @@
 import React from 'react'
 import FieldList from './FieldsList'
 import FieldType from './FieldType'
+import PropTypes from 'prop-types'
+import {
+  FIELD_TYPE,
+  POSITION } from '../../helper'
 
 class FormBuilder extends React.Component {
   render () {
-    const { onChange, schema } = this.props
+    const { schema, addField, removeField, moveField, onPropertiesChange, addOrderTab } = this.props
     return (
       <div style={{marginTop: '2%'}}>
         <div style={{
@@ -13,24 +17,28 @@ class FormBuilder extends React.Component {
           textAlign: 'center'
         }}>
           <FieldType
-            fieldType={'string'}
-            name={'String'}
+            fieldType={FIELD_TYPE.STRING.fieldType}
+            name={FIELD_TYPE.STRING.name}
           />
           <FieldType
-            fieldType={'integer'}
-            name={'Integer'}
+            fieldType={FIELD_TYPE.INTEGER.fieldType}
+            name={FIELD_TYPE.INTEGER.name}
           />
           <FieldType
-            fieldType={'number'}
-            name={'Number'}
+            fieldType={FIELD_TYPE.NUMBER.fieldType}
+            name={FIELD_TYPE.NUMBER.name}
           />
           <FieldType
-            fieldType={'array'}
-            name={'Array'}
+            fieldType={FIELD_TYPE.BOOLEAN.fieldType}
+            name={FIELD_TYPE.BOOLEAN.name}
           />
           <FieldType
-            fieldType={'boolean'}
-            name={'Boolean'}
+            fieldType={FIELD_TYPE.ARRAY.fieldType}
+            name={FIELD_TYPE.ARRAY.name}
+          />
+          <FieldType
+            fieldType={FIELD_TYPE.OBJECT.fieldType}
+            name={FIELD_TYPE.OBJECT.name}
           />
         </div>
 
@@ -38,9 +46,19 @@ class FormBuilder extends React.Component {
           overflow: 'auto',
           width: '83%',
           display: 'inline',
-          float: 'right'
+          float: 'right',
+          height: '800px',
+          border: '1px dashed gray'
         }}>
-          <FieldList onChange={onChange} schema={schema} />
+          <FieldList
+            schema={schema}
+            addField={addField}
+            removeField={removeField}
+            moveField={moveField}
+            onPropertiesChange={onPropertiesChange}
+            addOrderTab={addOrderTab}
+            position={POSITION.ROOT}
+          />
         </div>
       </div>
     )
@@ -48,3 +66,7 @@ class FormBuilder extends React.Component {
 }
 
 export default FormBuilder
+
+FormBuilder.propTypes = {
+  schema: PropTypes.object
+}

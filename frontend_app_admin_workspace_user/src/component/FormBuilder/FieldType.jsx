@@ -1,6 +1,7 @@
 import React from 'react'
 import { DragSource } from 'react-dnd'
 import { DRAG_AND_DROP } from '../../helper'
+import PropTypes from 'prop-types'
 const style = {
   border: '1px dashed gray',
   backgroundColor: 'white',
@@ -35,3 +36,8 @@ const fieldTypeDragAndDropSourceCollect = (connect, monitor) => ({
 })
 
 export default DragSource(DRAG_AND_DROP.FIELD_TYPE, fieldTypeDragAndDropSource, fieldTypeDragAndDropSourceCollect)(FieldType)
+
+FieldType.propTypes = {
+  fieldType: PropTypes.string,
+  name: PropTypes.string
+}

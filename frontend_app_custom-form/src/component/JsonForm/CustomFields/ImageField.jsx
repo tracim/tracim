@@ -43,7 +43,7 @@ ImageField.defaultProps = {
   disabled: false
 }
 
-ImageField.propType = {
+ImageField.propTypes = {
   onChange: PropTypes.func,
   schema: PropTypes.object,
   formData: PropTypes.object,

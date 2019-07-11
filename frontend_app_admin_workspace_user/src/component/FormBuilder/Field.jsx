@@ -1,5 +1,7 @@
 import React from 'react'
 import { DragSource, DropTarget } from 'react-dnd'
+import PropTypes from 'prop-types'
+import FieldsList from './FieldsList'
 import {
   DRAG_AND_DROP
 } from '../../helper.js'
@@ -24,34 +26,51 @@ class Field extends React.Component {
   }
 
   handleChange (event) {
-    this.props.onPropertiesChange(event.target.name, event.target.value, this.props.index)
+    this.props.onPropertiesChange(this.props.position, event.target.name, event.target.value, this.props.properties.label)
+  }
+
+  onLabelChange () {
+    let newLabel = prompt('Please enter a new label', this.props.properties.label)
+    if (newLabel !== null && newLabel !== '') {
+      if (this.props.onPropertiesChange(this.props.position, 'label', newLabel, this.props.properties.label) === false) {
+        alert('Invalid Label')
+      }
+    }
   }
 
   render () {
-    const { isDragging, onDelete, index, name, properties } = this.props
+    const { isDragging, removeField, index, name, properties, onPropertiesChange, position, addField, moveField, addOrderTab } = this.props
     const opacity = isDragging ? 0 : 1
     return (
-      <div style={{ ...style, opacity }} ref={this.ref}>
-        <button onClick={() => onDelete(index)}>Delete</button>
-        <button onClick={() => this.setState({
-          editMode: !this.state.editMode
-        })}>Edit</button>
-        {name}
+      <div style={{ ...style, opacity }}>
+        <div ref={this.ref}>
+          <button onClick={() => removeField(position, properties.label)}>Delete</button>
+          <button onClick={() => this.setState({
+            editMode: !this.state.editMode
+          })}>Edit</button>
+          {name}
+        </div>
         {this.state.editMode && (
-          <form>
+          <div className={'fieldInfo'}>
             <div>
               Titre<br />
               <input type='text' name='title' onChange={this.handleChange.bind(this)} value={properties.title || ''} />
             </div>
 
             <div>
-              Label<br />
-              <input type='text' name='label' onChange={this.handleChange.bind(this)} value={properties.label || ''} />
+              Description<br />
+              <textarea type='text' name='description' onChange={this.handleChange.bind(this)} value={properties.description || ''} />
             </div>
 
             <div>
-              Description<br />
-              <input type='text' name='description' onChange={this.handleChange.bind(this)} value={properties.description || ''} />
+              Label<br />
+              {/* <input type='text' name='label' onChange={this.handleChange.bind(this)} value={properties.label || ''} /> */}
+              <button onClick={this.onLabelChange.bind(this)}>Change it</button>
+            </div>
+
+            <div>
+              Required
+              <input type='checkbox' name='required' onChange={event => onPropertiesChange(event.target.name, event.target.checked, index)} checked={properties.required || false} />
             </div>
 
             <div>
@@ -62,6 +81,7 @@ class Field extends React.Component {
                 <option value='number'>Number</option>
                 <option value='boolean'>Boolean</option>
                 <option value='array'>Array</option>
+                <option value='object'>Object</option>
               </select>
             </div>
 
@@ -78,7 +98,57 @@ class Field extends React.Component {
                 </select>
               </div>
             )}
-          </form>
+
+            {properties.type === 'array' && (
+              <div>
+                Items type :<br />
+                <div style={{
+                  overflow: 'auto',
+                  width: '100%',
+                  height: '200px',
+                  border: '2px dashed gray'
+                }}>
+                  <FieldsList
+                    schema={properties}
+                    onChange={(schema) => {
+                      onPropertiesChange('items', schema, index)
+                    }}
+                    addField={addField}
+                    position={properties.label}
+                    removeField={removeField}
+                    moveField={moveField}
+                    onPropertiesChange={onPropertiesChange}
+                    addOrderTab={addOrderTab}
+                  />
+                </div>
+              </div>
+            )}
+
+            {properties.type === 'object' && (
+              <div>
+                Object<br />
+                <div style={{
+                  overflow: 'auto',
+                  width: '100%',
+                  height: '200px',
+                  border: '2px dashed gray'
+                }}>
+                  <FieldsList
+                    schema={properties}
+                    onChange={(schema) => {
+                      onPropertiesChange('properties', schema.properties, index)
+                    }}
+                    addField={addField}
+                    position={properties.label}
+                    removeField={removeField}
+                    moveField={moveField}
+                    onPropertiesChange={onPropertiesChange}
+                    addOrderTab={addOrderTab}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     )
@@ -86,7 +156,7 @@ class Field extends React.Component {
 }
 
 const fieldDragAndDropSource = {
-  beginDrag: props => {
+  beginDrag: (props, monitor, component) => {
     return {
       index: props.index
     }
@@ -109,6 +179,7 @@ const fieldDragAndDropTarget = {
     }
     const dragIndex = monitor.getItem().index
     const hoverIndex = props.index
+    // console.log(dragIndex, hoverIndex)
     if (dragIndex === hoverIndex) {
       return
     }
@@ -123,7 +194,7 @@ const fieldDragAndDropTarget = {
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
       return
     }
-    props.moveCard(dragIndex, hoverIndex)
+    props.moveField(props.position, dragIndex, hoverIndex)
     monitor.getItem().index = hoverIndex
   }
 }
@@ -137,3 +208,10 @@ const fieldDragAndDropTargetCollect = (connect, monitor) => {
 export default DragSource(DRAG_AND_DROP.FIELD, fieldDragAndDropSource, fieldDragAndDropSourceCollect)(
   DropTarget(DRAG_AND_DROP.FIELD, fieldDragAndDropTarget, fieldDragAndDropTargetCollect)(Field)
 )
+
+Field.propTypes = {
+  index: PropTypes.number,
+  moveField: PropTypes.func,
+  name: PropTypes.string,
+  properties: PropTypes.object
+}

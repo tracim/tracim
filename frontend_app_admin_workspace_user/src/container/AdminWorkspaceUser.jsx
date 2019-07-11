@@ -25,7 +25,7 @@ import {
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
-import AdminForm from '../component/AdminForm';
+import AdminForm from '../component/AdminForm'
 import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
 
@@ -88,7 +88,7 @@ class AdminWorkspaceUser extends React.Component {
 
     if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
     else if (this.state.config.type === 'user') await this.loadUserContent()
-    //else if (state.config.type === 'form') this.loadUserContent()
+    // else if (state.config.type === 'form') this.loadUserContent()
     this.buildBreadcrumbs()
   }
 
@@ -99,7 +99,7 @@ class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
-      //else if (state.config.type === 'form') this.loadUserContent()
+      // else if (state.config.type === 'form') this.loadUserContent()
       this.buildBreadcrumbs()
     }
   }

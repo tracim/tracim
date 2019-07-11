@@ -132,3 +132,34 @@ export const DRAG_AND_DROP = {
   FIELD: 'field',
   FIELD_TYPE: 'field_type'
 }
+
+export const FIELD_TYPE = {
+  STRING: {
+    fieldType: 'string',
+    name: 'String'
+  },
+  INTEGER: {
+    fieldType: 'integer',
+    name: 'Integer'
+  },
+  NUMBER: {
+    fieldType: 'number',
+    name: 'Number'
+  },
+  ARRAY: {
+    fieldType: 'array',
+    name: 'Array'
+  },
+  BOOLEAN: {
+    fieldType: 'boolean',
+    name: 'Boolean'
+  },
+  OBJECT: {
+    fieldType: 'object',
+    name: 'Object'
+  }
+}
+
+export const POSITION = {
+  ROOT: '_root'
+}
