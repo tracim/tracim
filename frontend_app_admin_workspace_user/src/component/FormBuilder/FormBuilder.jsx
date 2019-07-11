@@ -8,12 +8,12 @@ import {
 
 class FormBuilder extends React.Component {
   render () {
-    const { schema, addField, removeField, moveField, onPropertiesChange, addOrderTab } = this.props
+    const { schema, addField, removeField, moveField, onPropertiesChange, addOrderTab, uiSchema, changeUiSchema } = this.props
     return (
       <div style={{marginTop: '2%'}}>
         <div style={{
           float: 'left',
-          width: '17%',
+          width: '20%',
           textAlign: 'center'
         }}>
           <FieldType
@@ -40,11 +40,27 @@ class FormBuilder extends React.Component {
             fieldType={FIELD_TYPE.OBJECT.fieldType}
             name={FIELD_TYPE.OBJECT.name}
           />
+          <FieldType
+            fieldType={'textRich'}
+            name={'textRich'}
+          />
+          <FieldType
+            fieldType={'selectUsers'}
+            name={'selectUsers'}
+          />
+          <FieldType
+            fieldType={'markdownField'}
+            name={'markdownField'}
+          />
+          <FieldType
+            name={'imageField'}
+            fieldType={'imageField'}
+          />
         </div>
 
         <div style={{
           overflow: 'auto',
-          width: '83%',
+          width: '80%',
           display: 'inline',
           float: 'right',
           height: '800px',
@@ -52,12 +68,14 @@ class FormBuilder extends React.Component {
         }}>
           <FieldList
             schema={schema}
+            uiSchema={uiSchema}
             addField={addField}
             removeField={removeField}
             moveField={moveField}
             onPropertiesChange={onPropertiesChange}
             addOrderTab={addOrderTab}
             position={POSITION.ROOT}
+            changeUiSchema={changeUiSchema}
           />
         </div>
       </div>

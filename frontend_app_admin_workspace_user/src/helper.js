@@ -157,9 +157,113 @@ export const FIELD_TYPE = {
   OBJECT: {
     fieldType: 'object',
     name: 'Object'
+  },
+  TEXT_RICH: {
+    fieldType: 'textRich',
+    name: 'Text rich'
+  },
+  SELECT_USER: {
+    fieldType: 'selectUsers',
+    name: 'Select users'
+  },
+  MARKDOWN_FIELD: {
+    fieldType: 'markdownField',
+    name: 'Markdown editor'
+  },
+  IMAGE_FIELD: {
+    fieldType: 'imageField',
+    name: 'Image'
   }
+}
+
+export const SPECIAL_FIELD = [
+  FIELD_TYPE.TEXT_RICH.fieldType,
+  FIELD_TYPE.SELECT_USER.fieldType,
+  FIELD_TYPE.MARKDOWN_FIELD.fieldType,
+  FIELD_TYPE.IMAGE_FIELD.fieldType
+]
+
+export const isSpecialField = (fieldType) => {
+  return SPECIAL_FIELD.includes(fieldType)
 }
 
 export const POSITION = {
   ROOT: '_root'
+}
+
+export const getWidgets = (type) => {
+  switch (type) {
+    case 'string':
+      return FIELD_PROPERTIES.STRING.WIDGET
+    case 'number':
+      return FIELD_PROPERTIES.NUMBER.WIDGET
+    case 'integer':
+      return FIELD_PROPERTIES.INTEGER.WIDGET
+    case 'boolean':
+      return FIELD_PROPERTIES.BOOLEAN.WIDGET
+    default:
+      return undefined
+  }
+}
+
+export const getFormats = (type) => {
+  switch (type) {
+    case 'string':
+      return FIELD_PROPERTIES.STRING.FORMAT
+    default:
+      return undefined
+  }
+}
+
+const FIELD_PROPERTIES = {
+  STRING: {
+    WIDGET: [
+      'hidden',
+      'text',
+      'password',
+      'uri',
+      'data-url',
+      'textarea',
+      'date',
+      'datetime',
+      'alt-date',
+      'alt-datetime',
+      'color',
+      'file'
+    ],
+    FORMAT: [
+      'date-time',
+      'email',
+      'hostname',
+      'date',
+      'ipv4',
+      'ipv6',
+      'uri'
+    ]
+  },
+  NUMBER: {
+    WIDGET: [
+      'hidden',
+      'range',
+      'text',
+      'updown'
+    ],
+    FORMAT: []
+  },
+  INTEGER: {
+    WIDGET: [
+      'hidden',
+      'range',
+      'text',
+      'updown'
+    ],
+    FORMAT: []
+  },
+  BOOLEAN: {
+    WIDGET: [
+      'hidden',
+      'checkbox'
+    ],
+    FORMAT: []
+  }
 }

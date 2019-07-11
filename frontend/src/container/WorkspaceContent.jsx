@@ -426,7 +426,7 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
+    const { breadcrumbs, user, currentWorkspace, workspaceContentList, contentType, location, t, customFormContentType } = this.props
     const { state } = this
 
     const urlFilter = qs.parse(location.search).type

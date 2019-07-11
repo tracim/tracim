@@ -9,6 +9,9 @@ const style = {
   width: '100%',
   height: '100%'
 }
+import {
+  findFieldInUiSchema
+} from './FormHelper'
 
 class FieldsList extends React.Component {
   constructor (props) {
@@ -30,6 +33,8 @@ class FieldsList extends React.Component {
         position={this.props.position}
         addField={this.props.addField}
         addOrderTab={this.props.addOrderTab}
+        changeUiSchema={this.props.changeUiSchema}
+        uiSchema={this.props.uiSchema}
       />
     )
   }
@@ -41,10 +46,16 @@ class FieldsList extends React.Component {
 
   getFieldsFromArray () {
     let schema = Object.assign({}, this.props.schema)
+    let uiSchema = Object.assign({}, this.props.uiSchema)
     if (schema.items === undefined) return []
     if (schema.items.type && schema.items.type === 'object') {
       if (schema.items.order) {
-        return schema.items.order.map(p => ({...schema.items.properties[p], label: p}))
+        return schema.items.order.map(p => ({
+          ...schema.items.properties[p],
+          label: p,
+          require: schema.items.required ? schema.items.required.includes(p) : false,
+          uiSchema: uiSchema ? findFieldInUiSchema(uiSchema, p) : undefined
+        }))
       }
       this.props.addOrderTab(this.props.position)
     }
@@ -53,9 +64,15 @@ class FieldsList extends React.Component {
 
   getFieldsFromObject () {
     let schema = Object.assign({}, this.props.schema)
+    let uiSchema = Object.assign({}, this.props.uiSchema)
     if (schema.properties === undefined) return []
     if (schema.order) {
-      return schema.order.map(p => ({...schema.properties[p], label: p}))
+      return schema.order.map(p => ({
+        ...schema.properties[p],
+        label: p,
+        require: schema.required ? schema.required.includes(p) : false,
+        uiSchema: uiSchema ? findFieldInUiSchema(uiSchema, p) : undefined
+      }))
     }
     this.props.addOrderTab(this.props.position)
     return []

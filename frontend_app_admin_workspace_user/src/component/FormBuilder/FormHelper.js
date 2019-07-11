@@ -1,4 +1,4 @@
-import { POSITION } from '../../helper'
+import { isSpecialField, POSITION } from '../../helper'
 
 const moveObjectField = (schemaRoot, schemaField, position, dragIndex, hoverIndex) => {
   let fields = Object.keys(schemaField.properties)
@@ -45,13 +45,10 @@ export const moveField = (schema, position, dragIndex, hoverIndex) => {
 export const removeField = (schema, position, label) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
-  if (schemaField.type === 'object') {
-    delete schemaField.properties[label]
-    schemaField.order.splice(schemaField.order.indexOf(label), 1)
-  } else if (schemaField.type === 'array') {
-    delete schemaField.items.properties[label]
-    schemaField.items.order.splice(schemaField.items.order.indexOf(label), 1)
-  }
+  if (schemaField.type === 'array') schemaField = schemaField.items
+  delete schemaField.properties[label]
+  schemaField.order.splice(schemaField.order.indexOf(label), 1)
+  if (schemaField.required) schemaField.required.splice(schemaField.required.indexOf(label), 1)
   return schemaRoot
 }
 
@@ -123,6 +120,7 @@ const addFieldInArray = (schemaRoot, schemaField, fieldType) => {
     // label
   }
   schemaField.items.order.push(label)
+  return label
 }
 
 const addFieldInObject = (schemaRoot, schemaField, fieldType) => {
@@ -135,19 +133,20 @@ const addFieldInObject = (schemaRoot, schemaField, fieldType) => {
     // label
   }
   schemaField.order.push(label)
+  return label
 }
 
 export const addField = (schema, targetType, position, fieldType) => {
   // const target = targetType === 'array' ? 'items' : 'properties'
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
-
+  let label = ''
   if (targetType === 'array') {
-    addFieldInArray(schemaRoot, schemaField, fieldType)
+    label = addFieldInArray(schemaRoot, schemaField, fieldType)
   } else {
-    addFieldInObject(schemaRoot, schemaField, fieldType)
+    label = addFieldInObject(schemaRoot, schemaField, fieldType)
   }
-  return schemaRoot
+  return { schemaRoot, label }
 }
 
 const onLabelChange = (schema, position, value, label) => {
@@ -173,9 +172,26 @@ const onLabelChange = (schema, position, value, label) => {
   return schemaRoot
 }
 
+const changeRequiredFields = (schema, position, value, label) => {
+  let schemaRoot = JSON.parse(JSON.stringify(schema))
+  let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField.type === 'array') schemaField = schemaField.items
+  if (schemaField.required === undefined) schemaField.required = []
+  if (value) {
+    if (schemaField.required[label]) return schemaRoot
+    schemaField.required.push(label)
+  } else {
+    if (!schemaField.required.includes(label)) return schemaRoot
+    schemaField.required.splice(schemaField.required.indexOf(label), 1)
+  }
+  return schemaRoot
+}
+
 export const onPropertiesChange = (schema, position, name, value, label) => {
   if (name === 'label') {
     return onLabelChange(schema, position, value, label)
+  } else if (name === 'required') {
+    return changeRequiredFields(schema, position, value, label)
   } else {
     return changeSchemaProperty(schema, position, label, name, value)
   }
@@ -184,11 +200,8 @@ export const onPropertiesChange = (schema, position, name, value, label) => {
 const changeSchemaProperty = (schema, position, label, name, value) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
-  if (schemaField.type === 'object') {
-    schemaField.properties[label][name] = value
-  } else if (schemaField.type === 'array') {
-    schemaField.items.properties[label][name] = value
-  }
+  if (schemaField.type === 'array') schemaField = schemaField.items
+  schemaField.properties[label][name] = value
   return schemaRoot
 }
 
@@ -209,4 +222,67 @@ export const addOrderTab = (schema, position) => {
     schemaField.items.order = Object.keys(schemaField.items.properties).map(p => p)
   }
   return schemaRoot
+}
+
+export const changeUiSchema = (schema, uischema, position, name, value, label) => {
+  let schemaRoot = JSON.parse(JSON.stringify(schema))
+  let schemaField = getSchemaAtPosition(schemaRoot, position)
+  let uiSchemaRoot = JSON.parse(JSON.stringify(uischema))
+  let uiSchemaField = getUiSchemaAtPosition(uiSchemaRoot, position)
+  if (schemaField.type === 'array') {
+    uiSchemaField = uiSchemaField.items
+  }
+  if (uiSchemaField[label] === undefined) uiSchemaField[label] = {}
+  if (value !== undefined && value !== '') {
+    uiSchemaField[label][name] = value
+  } else {
+    if (uiSchemaField[label][name]) delete uiSchemaField[label][name]
+  }
+  return uiSchemaRoot
+}
+
+export const findFieldInUiSchema = (uiSchema, label) => {
+  let keys = Object.keys(uiSchema)
+  let item
+  for (let i = 0; i < keys.length; i++) {
+    let p = keys[i]
+    if (label === p) {
+      item = uiSchema[p]
+    } else {
+      if (typeof uiSchema[p] === 'object') item = findFieldInUiSchema(uiSchema[p], label)
+    }
+    if (item) return item
+  }
+}
+
+export const getUiSchemaAtPosition = (uiSchema, position) => {
+  if (position === POSITION.ROOT) {
+    return uiSchema
+  } else {
+    return findFieldInUiSchema(uiSchema, position)
+  }
+}
+
+export const addFieldUiSchema = (uischema, targetType, position, label, fieldType) => {
+  let uiSchemaRoot = JSON.parse(JSON.stringify(uischema))
+  let newObject = {}
+  if (isSpecialField(fieldType)) newObject = { 'ui:field': fieldType }
+  let uiSchemaField = getUiSchemaAtPosition(uiSchemaRoot, position)
+  if (targetType === 'array') {
+    if (uiSchemaField['items'] === undefined) uiSchemaField.items = {}
+    uiSchemaField.items[label] = newObject
+  } else {
+    uiSchemaField[label] = newObject
+  }
+  return uiSchemaRoot
+}
+
+export const removeFieldUiSchema = (schema, uischema, position, label) => {
+  let schemaRoot = JSON.parse(JSON.stringify(schema))
+  let schemaField = getSchemaAtPosition(schemaRoot, position)
+  let uiSchemaRoot = JSON.parse(JSON.stringify(uischema))
+  let uiSchemaField = getUiSchemaAtPosition(uiSchemaRoot, position)
+  if (schemaField.type === 'array') uiSchemaField = uiSchemaField.items
+  delete uiSchemaField[label]
+  return uiSchemaRoot
 }

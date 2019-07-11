@@ -3,7 +3,9 @@ import { DragSource, DropTarget } from 'react-dnd'
 import PropTypes from 'prop-types'
 import FieldsList from './FieldsList'
 import {
-  DRAG_AND_DROP
+  DRAG_AND_DROP,
+  getFormats,
+  getWidgets
 } from '../../helper.js'
 
 const style = {
@@ -38,8 +40,12 @@ class Field extends React.Component {
     }
   }
 
+  renderFormat (type, i) {
+    return (<option value={type} key={i}>{type}</option>)
+  }
+
   render () {
-    const { isDragging, removeField, index, name, properties, onPropertiesChange, position, addField, moveField, addOrderTab } = this.props
+    const { isDragging, removeField, index, name, properties, onPropertiesChange, position, addField, moveField, addOrderTab, changeUiSchema, uiSchema } = this.props
     const opacity = isDragging ? 0 : 1
     return (
       <div style={{ ...style, opacity }}>
@@ -70,31 +76,37 @@ class Field extends React.Component {
 
             <div>
               Required
-              <input type='checkbox' name='required' onChange={event => onPropertiesChange(event.target.name, event.target.checked, index)} checked={properties.required || false} />
+              <input type='checkbox' name='required' onChange={event => onPropertiesChange(this.props.position, event.target.name, event.target.checked, this.props.properties.label)} checked={properties.require || false} />
             </div>
 
-            <div>
-              Type<br />
-              <select name='type' onChange={this.handleChange.bind(this)} value={properties.type || ''}>
-                <option value='string'>String</option>
-                <option value='integer'>Integer</option>
-                <option value='number'>Number</option>
-                <option value='boolean'>Boolean</option>
-                <option value='array'>Array</option>
-                <option value='object'>Object</option>
-              </select>
-            </div>
+            {/*<div>*/}
+            {/*  Type<br />*/}
+            {/*  <select name='type' onChange={this.handleChange.bind(this)} value={properties.type || ''}>*/}
+            {/*    <option value='string'>String</option>*/}
+            {/*    <option value='integer'>Integer</option>*/}
+            {/*    <option value='number'>Number</option>*/}
+            {/*    <option value='boolean'>Boolean</option>*/}
+            {/*    <option value='array'>Array</option>*/}
+            {/*    <option value='object'>Object</option>*/}
+            {/*  </select>*/}
+            {/*</div>*/}
 
-            {properties.type === 'string' && (
+            {getFormats(properties.type) && (
               <div>
                 Format<br />
                 <select name='format' onChange={this.handleChange.bind(this)} value={properties.format || ''}>
-                  <option value='' disabled hidden>None</option>
-                  <option value='email'>Email</option>
-                  <option value='uri'>Uri</option>
-                  <option value='data-url'>Data-url</option>
-                  <option value='date'>Date</option>
-                  <option value='date-time'>Date-time</option>
+                  <option value=''>none</option>
+                  {getFormats(properties.type).map((format, i) => this.renderFormat(format, i))}
+                </select>
+              </div>
+            )}
+
+            {getWidgets(properties.type) && (
+              <div>
+                Widget<br />
+                <select name='widget' onChange={(event) => changeUiSchema(this.props.position, 'ui:widget', event.target.value, properties.label)} value={properties.uiSchema ? properties.uiSchema['ui:widget'] ? properties.uiSchema['ui:widget'] : '' : ''}>
+                  <option value=''>None</option>
+                  {getWidgets(properties.type).map((format, i) => this.renderFormat(format, i))}
                 </select>
               </div>
             )}
@@ -119,6 +131,8 @@ class Field extends React.Component {
                     moveField={moveField}
                     onPropertiesChange={onPropertiesChange}
                     addOrderTab={addOrderTab}
+                    changeUiSchema={changeUiSchema}
+                    uiSchema={uiSchema}
                   />
                 </div>
               </div>
@@ -144,6 +158,8 @@ class Field extends React.Component {
                     moveField={moveField}
                     onPropertiesChange={onPropertiesChange}
                     addOrderTab={addOrderTab}
+                    changeUiSchema={changeUiSchema}
+                    uiSchema={uiSchema}
                   />
                 </div>
               </div>

@@ -16,7 +16,7 @@ class JsonFormEditor extends React.Component {
             locale={locale}
             height='550px'
             width={'100%'}
-            placeholder={schema}
+            placeholder={this.props.schema}
             onChange={(data) => this.props.onSchemaChange(data.jsObject)}
           />
         </div>
@@ -29,6 +29,7 @@ class JsonFormEditor extends React.Component {
             locale={locale}
             height='250px'
             width={'100%'}
+            placeholder={this.props.uiSchema}
             onChange={this.props.onUiSchemaChange}
           />
         </div>

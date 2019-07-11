@@ -47,7 +47,7 @@ export class OpenContentApp extends React.Component {
       //    type: match.params.type
       //  }
       // ORIGINAL
-      console.log('PropsContentToOpen', this.props)
+      console.log('PropsContentToOpen', appOpenedType, contentToOpen.type)
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open

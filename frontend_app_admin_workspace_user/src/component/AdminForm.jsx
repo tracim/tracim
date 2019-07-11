@@ -17,8 +17,12 @@ import {
   moveField,
   removeField,
   onPropertiesChange,
-  addOrderTab
+  addOrderTab,
+  changeUiSchema,
+  addFieldUiSchema,
+  removeFieldUiSchema
 } from './FormBuilder/FormHelper'
+import ErrorBoundary from './FormBuilder/ErrorBoundary'
 
 export class AdminForm extends React.Component {
   constructor (props) {
@@ -32,7 +36,8 @@ export class AdminForm extends React.Component {
       color: '',
       schema: {
         type: 'object'
-      }
+      },
+      uischema: {}
     }
     this.i = 0
   }
@@ -49,7 +54,9 @@ export class AdminForm extends React.Component {
 
   onSchemaChange = (data) => {
     if (data !== undefined) {
-      this.setState({ schema: {type: 'object', properties: data.properties} })
+      this.setState({
+        schema: {type: 'object', properties: data.properties}
+      })
     }
   }
 
@@ -70,11 +77,18 @@ export class AdminForm extends React.Component {
   }
 
   removeField (position, label) {
-    this.setState({schema: removeField(this.state.schema, position, label)})
+    this.setState({
+      schema: removeField(this.state.schema, position, label),
+      uischema: removeFieldUiSchema(this.state.schema, this.state.uischema, position, label)
+    })
   }
 
   addField (targetType, position, fieldType) {
-    this.setState({schema: addField(this.state.schema, targetType, position, fieldType)})
+    const result = addField(this.state.schema, targetType, position, fieldType)
+    this.setState({
+      schema: result.schemaRoot,
+      uischema: addFieldUiSchema(this.state.uischema, targetType, position, result.label, fieldType)
+    })
   }
 
   onPropertiesChange (position, name, value, label) {
@@ -85,7 +99,15 @@ export class AdminForm extends React.Component {
   }
 
   addOrderTab (position) {
-    this.setState({schema: addOrderTab(this.state.schema, position)})
+    this.setState({
+      schema: addOrderTab(this.state.schema, position)
+    })
+  }
+
+  changeUiSchema (position, name, value, label) {
+    this.setState({
+      uischema: changeUiSchema(this.state.schema, this.state.uischema, position, name, value, label)
+    })
   }
 
   render () {
@@ -126,16 +148,19 @@ export class AdminForm extends React.Component {
                       schema={this.state.schema}
                       onSchemaChange={this.onSchemaChange}
                       onUiSchemaChange={this.onUiSchemaChange}
+                      uiSchema={this.state.uischema}
                     />
                   )
                   : (
                     <FormBuilder
                       schema={this.state.schema}
+                      uiSchema={this.state.uischema}
                       addField={this.addField.bind(this)}
                       removeField={this.removeField.bind(this)}
                       moveField={this.moveField.bind(this)}
                       onPropertiesChange={this.onPropertiesChange.bind(this)}
                       addOrderTab={this.addOrderTab.bind(this)}
+                      changeUiSchema={this.changeUiSchema.bind(this)}
                     />
                   )
                 }
@@ -144,15 +169,17 @@ export class AdminForm extends React.Component {
               <div className='divRight'>
                 <div>
                   {this.state.schema && (
-                    <JsonForm
-                      isDisable={false}
-                      id={1}
-                      customClass={'html-document__editionmode'}
-                      disableValidateBtn
-                      text={''}
-                      schema={this.state.schema}
-                      uiSchema={this.state.uischema || {}}
-                    />
+                    <ErrorBoundary>
+                      <JsonForm
+                        isDisable={false}
+                        id={1}
+                        customClass={'html-document__editionmode'}
+                        disableValidateBtn
+                        text={''}
+                        schema={this.state.schema}
+                        uiSchema={this.state.uischema || {}}
+                      />
+                    </ErrorBoundary>
                   )}
                 </div>
               </div>
