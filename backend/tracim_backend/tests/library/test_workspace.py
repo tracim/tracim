@@ -5,22 +5,35 @@ from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 @pytest.mark.usefixtures("base_fixture")
 class TestThread(object):
-    # # FIXME - G.M - 2019-07-05 - TODO !!!
-    # def test_children(self, admin_user, session, app_config, content_api_factory):
-    #
-    #     _create_thread_and_test(
-    #         workspace_name="workspace_1", folder_name="folder_1", thread_name="thread_1", user=admin_user
-    #     )
-    #     workspace = session.query(Workspace).filter(Workspace.label == "workspace_1").one()
-    #     content_api = content_api_factory.get()
-    #     folder = content_api.get_canonical_query().filter(Content.label == "folder_1").one()
-    #     assert [folder] == list(workspace.get_valid_children())
+    def test_children(
+        self, admin_user, session, app_config, content_api_factory, content_type_list
+    ):
+        workspace = WorkspaceApi(
+            current_user=admin_user, session=session, config=app_config
+        ).create_workspace("workspace_1", save_now=True)
+        folder = Content(type=content_type_list.Folder.slug, owner=admin_user)
+        folder.label = "folder_1"
+        folder.workspace = workspace
+        session.add(folder)
+        session.flush()
+
+        thread = Content(type=content_type_list.Thread.slug, owner=admin_user, parent=folder)
+        thread.label = "thread_1"
+        thread.workspace = workspace
+        session.add(folder)
+        session.flush()
+        workspace = session.query(Workspace).filter(Workspace.label == "workspace_1").one()
+        content_api = content_api_factory.get()
+        folder = content_api.get_canonical_query().filter(Content.label == "folder_1").one()
+        assert [folder] == list(workspace.get_valid_children())
 
     def test__unit__get_notifiable_roles__ok__nominal_case(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
