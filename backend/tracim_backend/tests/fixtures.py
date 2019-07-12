@@ -63,6 +63,7 @@ def settings(config_uri, config_section):
 
 @pytest.fixture
 def config(settings):
+    """This fixture initialize and return pyramid configurator"""
     yield testing.setUp(settings=settings)
     testing.tearDown()
 
