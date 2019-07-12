@@ -7,15 +7,13 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountRecentlyActiveContentEndpoint(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active
@@ -388,8 +386,8 @@ class TestAccountRecentlyActiveContentEndpoint(object):
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserReadStatusEndpoint(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status
@@ -528,8 +526,8 @@ class TestUserReadStatusEndpoint(object):
         assert res[3]["content_id"] == main_folder.content_id
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserSetContentAsRead(object):
     """
     Tests for /api/v2/users/me/workspaces/{workspace_id}/contents/{content_id}/read
@@ -608,8 +606,8 @@ class TestUserSetContentAsRead(object):
         assert res.json_body[0]["read_by_user"] is True
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserSetContentAsUnread(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread
@@ -688,8 +686,8 @@ class TestUserSetContentAsUnread(object):
         assert res.json_body[0]["read_by_user"] is False
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserSetWorkspaceAsRead(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/read
@@ -770,8 +768,8 @@ class TestUserSetWorkspaceAsRead(object):
         assert res.json_body[1]["read_by_user"] is True
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountEnableWorkspaceNotification(object):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate
@@ -822,8 +820,8 @@ class TestAccountEnableWorkspaceNotification(object):
         assert role.do_notify is True
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountDisableWorkspaceNotification(object):
     """
     Tests for /api/v2/users/me/workspaces/{workspace_id}/notifications/deactivate
@@ -874,8 +872,9 @@ class TestAccountDisableWorkspaceNotification(object):
         assert role.do_notify is False
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountWorkspaceEndpoint(object):
     """
     Tests for /api/v2/users/me/workspaces
@@ -922,8 +921,8 @@ class TestAccountWorkspaceEndpoint(object):
             workspace["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -972,8 +971,8 @@ class TestAccountEndpoint(object):
         assert res["is_deleted"] is False
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestAccountKnownMembersEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -1431,8 +1430,11 @@ class TestAccountKnownMembersEndpoint(object):
         assert res[1]["avatar_url"] is None
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_ldap_and_internal_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_ldap_and_internal_test"}], indirect=True
+)
 class TestAccountSetPasswordEmailLDAPAuthEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -1505,8 +1507,8 @@ class TestAccountSetPasswordEmailLDAPAuthEndpoint(object):
         assert res["auth_type"] == "ldap"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestSetEmailEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -1650,8 +1652,8 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "mysuperemail@email.fr"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestSetPasswordEndpoint(object):
     # -*- coding: utf-8 -*-
     """
@@ -1810,8 +1812,8 @@ class TestSetPasswordEndpoint(object):
         assert user.validate_password("mynewpassword")
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestSetUserInfoEndpoint(object):
     # -*- coding: utf-8 -*-
     """

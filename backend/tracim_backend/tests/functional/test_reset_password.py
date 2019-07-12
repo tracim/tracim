@@ -3,12 +3,13 @@ import pytest as pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_sync"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
 class TestResetPasswordRequestEndpointMailSync(object):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -65,8 +66,8 @@ class TestResetPasswordRequestEndpointMailSync(object):
         assert len(response) == 0
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestResetPasswordRequestEndpointMailDisabled(object):
     @pytest.mark.internal_auth
     def test_api__reset_password_request__ok__nominal_case(self, web_testapp):
@@ -106,8 +107,10 @@ class TestResetPasswordRequestEndpointMailDisabled(object):
         assert res.json_body["code"] == ErrorCode.NOTIFICATION_DISABLED_CANT_RESET_PASSWORD
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_sync"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
 class TestResetPasswordCheckTokenEndpoint(object):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -165,8 +168,10 @@ class TestResetPasswordCheckTokenEndpoint(object):
         assert res.json_body["code"] == ErrorCode.INVALID_RESET_PASSWORD_TOKEN
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_sync"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
 class TestResetPasswordModifyEndpoint(object):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -284,8 +289,10 @@ class TestResetPasswordModifyEndpoint(object):
         assert res.json_body["code"] == ErrorCode.PASSWORD_DO_NOT_MATCH
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_ldap_email_notif_sync_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_ldap_email_notif_sync_test"}], indirect=True
+)
 class TestResetPasswordInternalAuthDisabled(object):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
@@ -327,8 +334,10 @@ class TestResetPasswordInternalAuthDisabled(object):
         assert res.json_body["code"] == ErrorCode.USER_AUTH_TYPE_DISABLED
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_ldap_email_notif_sync_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_ldap_email_notif_sync_test"}], indirect=True
+)
 class TestResetPasswordExternalAuthUser(object):
     @pytest.mark.email_notification
     @pytest.mark.ldap

@@ -17,6 +17,8 @@ from tracim_backend import web
 from tracim_backend.app_models.applications import Application
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
+from tracim_backend.fixtures.content import Content as ContentFixture
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
@@ -42,8 +44,8 @@ def config_uri() -> str:
 
 
 @pytest.fixture
-def config_section() -> str:
-    return "base_test"
+def config_section(request) -> str:
+    return getattr(request, "param", {}).get("name", "base_test")
 
 
 @pytest.fixture
@@ -143,21 +145,9 @@ def session(empty_session, engine, app_config, tracim_fixtures, test_logger):
         try:
             DeclarativeBase.metadata.drop_all(engine)
             DeclarativeBase.metadata.create_all(engine)
-            fixtures_loader = FixturesLoader(dbsession, app_config)
-            fixtures_loader.loads(tracim_fixtures)
-            transaction.commit()
-            logger.info(session, "Database initialized.")
-        except IntegrityError:
-            logger.error(
-                session,
-                "Warning, there was a problem when adding default data"
-                ", it may have already been added:",
-            )
-            import traceback
-
-            logger.error(session, traceback.format_exc())
+        except Exception as e:
             transaction.abort()
-            logger.error(session, "Database initialization failed")
+            raise e
     yield dbsession
     from tracim_backend.models.meta import DeclarativeBase
 
@@ -165,6 +155,35 @@ def session(empty_session, engine, app_config, tracim_fixtures, test_logger):
     dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
+
+
+@pytest.fixture
+def base_fixture(session, app_config) -> Session:
+    with transaction.manager:
+        try:
+            fixtures_loader = FixturesLoader(session, app_config)
+            fixtures_loader.loads([BaseFixture])
+        except IntegrityError as e:
+            transaction.abort()
+            raise e
+    transaction.commit()
+    return session
+
+
+@pytest.fixture
+def default_content_fixture(base_fixture, app_config) -> Session:
+    """
+    Warning ! This fixture is now deprecated. Don't use it for new created tests.
+    """
+    with transaction.manager:
+        try:
+            fixtures_loader = FixturesLoader(base_fixture, app_config)
+            fixtures_loader.loads([ContentFixture])
+        except IntegrityError as e:
+            transaction.abort()
+            raise e
+    transaction.commit()
+    return session
 
 
 @pytest.fixture
@@ -198,8 +217,8 @@ def application_api_factory(app_list) -> ApplicationApiFactory:
 
 
 @pytest.fixture()
-def admin_user(session: Session) -> User:
-    return session.query(User).filter(User.email == "admin@admin.admin").one()
+def admin_user(base_fixture: Session) -> User:
+    return base_fixture.query(User).filter(User.email == "admin@admin.admin").one()
 
 
 @pytest.fixture()

@@ -3,14 +3,13 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestCommentsEndpoint(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/contents/{content_id}/comments

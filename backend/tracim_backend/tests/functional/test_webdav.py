@@ -3,14 +3,15 @@ from urllib.parse import quote
 import pytest
 import transaction
 
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_webdav_test_remote_user"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_webdav_test_remote_user"}], indirect=True
+)
 class TestFunctionWebdavRemoteUser(object):
     def test_functional__webdav_access_to_root_remote_auth__as_http_header(
         self, session, webdav_testapp, user_api_factory, group_api_factory
@@ -78,8 +79,8 @@ class TestFunctionWebdavRemoteUser(object):
         assert res
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_webdav_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_webdav_test"}], indirect=True)
 class TestFunctionalWebdavGet(object):
     """
     Test for all Webdav "GET" action in different case
@@ -382,8 +383,8 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/workspace1/examples/report.txt", status=404)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_webdav_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_webdav_test"}], indirect=True)
 class TestFunctionalWebdavMoveSimpleFile(object):
     """
     Test for all Webdav "MOVE" action for simple file in different case

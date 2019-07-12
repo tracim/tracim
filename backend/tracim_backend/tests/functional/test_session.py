@@ -6,7 +6,6 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -18,8 +17,8 @@ class TestLogoutEndpoint(object):
         web_testapp.get("/api/v2/auth/logout", status=204)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestLoginEndpoint(object):
     def test_api__try_login_enpoint__ok_200__nominal_case(self, web_testapp):
         params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
@@ -97,8 +96,8 @@ class TestLoginEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_ldap_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_ldap_test"}], indirect=True)
 class TestLDAPAuthOnlyEndpoint(object):
     def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(self, web_testapp):
         params = {"email": "hubert@planetexpress.com", "password": "professor"}
@@ -216,8 +215,10 @@ class TestLDAPAuthOnlyEndpoint(object):
         web_testapp.get("/api/v2/auth/whoami", status=401)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_ldap_and_internal_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_ldap_and_internal_test"}], indirect=True
+)
 class TestLDAPandInternalAuthOnlyEndpoint(object):
     def test_api__try_login_enpoint_ldap_internal_auth__ok_200__valid_ldap_user(self, web_testapp):
         params = {"email": "hubert@planetexpress.com", "password": "professor"}
@@ -349,8 +350,8 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
         web_testapp.get("/api/v2/auth/whoami", status=401)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWhoamiEndpoint(object):
     def test_api__try_whoami_enpoint__ok_200__nominal_case(self, web_testapp):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -413,8 +414,8 @@ class TestWhoamiEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWhoamiEndpointWithApiKey(object):
     def test_api__try_whoami_enpoint_with_api_key__ok_200__nominal_case(self, web_testapp):
         headers_auth = {"Tracim-Api-Key": "mysuperapikey", "Tracim-Api-Login": "admin@admin.admin"}
@@ -474,16 +475,16 @@ class TestWhoamiEndpointWithApiKey(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWhoamiEndpointWithApiKeyNoKey(object):
     def test_api__try_whoami_enpoint_with_api_key__err_401__no_api_key(self, web_testapp):
         headers_auth = {"Tracim-Api-Key": "", "Tracim-Api-Login": "admin@admin.admin"}
         web_testapp.get("/api/v2/auth/whoami", status=401, headers=headers_auth)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_remote_auth"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test_remote_auth"}], indirect=True)
 class TestWhoamiEndpointWithRemoteHeader(object):
     def test_api__try_whoami_enpoint_remote_user__err_401__as_http_header(self, web_testapp):
         headers_auth = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
@@ -564,8 +565,10 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_cookie_auth"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_cookie_auth"}], indirect=True
+)
 class TestSessionEndpointWithCookieAuthToken(object):
     def test_api__test_cookie_auth_token__ok__nominal(self, web_testapp):
         with freeze_time("1999-12-31 23:59:59"):

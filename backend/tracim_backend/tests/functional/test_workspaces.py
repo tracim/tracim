@@ -7,16 +7,15 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspaceEndpoint(object):
     """
     Tests for /api/v2/workspaces/{workspace_id} endpoint
@@ -795,8 +794,8 @@ class TestWorkspaceEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspacesEndpoints(object):
     """
     Tests for /api/v2/workspaces
@@ -867,8 +866,9 @@ class TestWorkspacesEndpoints(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspaceMembersEndpoint(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/members endpoint
@@ -1921,8 +1921,11 @@ class TestWorkspaceMembersEndpoint(object):
         assert len([role for role in roles if role["user_id"] == user.user_id]) == 1
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_sync"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+)
 class TestUserInvitationWithMailActivatedSync(object):
     def test_api__create_workspace_member_role__ok_200__new_user(
         self,
@@ -2036,8 +2039,13 @@ class TestUserInvitationWithMailActivatedSync(object):
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_sync_with_auto_notif"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
+    "config_section",
+    [{"name": "functional_test_with_mail_test_sync_with_auto_notif"}],
+    indirect=True,
+)
 class TestUserInvitationWithMailActivatedSyncWithNotification(object):
     def test_api__create_workspace_member_role__ok_200__new_user_notif(
         self,
@@ -2142,8 +2150,13 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         assert headers["Subject"][0] == "[TRACIM] [test] test_document2 (Open)"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_sync_ldap_auth_only"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
+    "config_section",
+    [{"name": "functional_test_with_mail_test_sync_ldap_auth_only"}],
+    indirect=True,
+)
 class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
     def test_api__create_workspace_member_role__ok_200__new_user_but_internal_auth_disabled(
         self, web_testapp, user_api_factory, group_api_factory, workspace_api_factory
@@ -2187,9 +2200,12 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         assert res.json_body["email"] == "bob@bob.bob"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
-    "config_section", ["functional_test_with_no_email_notif_but_invitation_email_notif"]
+    "config_section",
+    ["functional_test_with_no_email_notif_but_invitation_email_notif"],
+    indirect=True,
 )
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmailEnabled(object):
     def test_api__create_workspace_member_role__err_400__email_notif_disabe_but_invitation_notif_enabled(
@@ -2222,9 +2238,12 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
-    "config_section", ["functional_test_with_no_email_notif_and_no_invitation_email_notif"]
+    "config_section",
+    ["functional_test_with_no_email_notif_and_no_invitation_email_notif"],
+    indirect=True,
 )
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmailDisabled(object):
     def test_api__create_workspace_member_role__ok_200__email_notif_disabe_but_invitation_notif_enabled(
@@ -2260,9 +2279,12 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         assert res.json_body["email"] == "bob@bob.bob"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
-    "config_section", ["functional_test_with_email_notif_and_no_invitation_email_notif"]
+    "config_section",
+    ["functional_test_with_email_notif_and_no_invitation_email_notif"],
+    indirect=True,
 )
 class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisabled(object):
     def test_api__create_workspace_member_role__ok_200__email_notif_disabe_but_invitation_notif_enabled(
@@ -2298,8 +2320,11 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         assert res.json_body["email"] == "bob@bob.bob"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test_with_mail_test_async"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_mail_test_async"}], indirect=True
+)
 class TestUserInvitationWithMailActivatedASync(object):
     def test_api__create_workspace_member_role__ok_200__new_user(self, web_testapp):
         """
@@ -2320,8 +2345,9 @@ class TestUserInvitationWithMailActivatedASync(object):
         assert user_role_found["email_sent"] is False
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWorkspaceContents(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/contents endpoint

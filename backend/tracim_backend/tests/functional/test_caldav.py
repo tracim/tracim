@@ -5,7 +5,6 @@ import requests
 from requests.exceptions import ConnectionError
 import transaction
 
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -30,8 +29,10 @@ END:VCALENDAR
 CALDAV_URL_FOR_TEST = "http://localhost:5232"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_caldav_radicale_proxy_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_caldav_radicale_proxy_test"}], indirect=True
+)
 class TestCaldavRadicaleProxyEndpoints(object):
     @pytest.mark.skip("This Need sleep method actually")
     def test_radicale_available(self, radicale_server, session) -> None:
@@ -200,8 +201,10 @@ class TestCaldavRadicaleProxyEndpoints(object):
         assert result.json_body["code"] == 5001
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_caldav_radicale_proxy_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_caldav_radicale_proxy_test"}], indirect=True
+)
 class TestAgendaApi(object):
     def test_proxy_user_agenda__ok__nominal_case(
         self,

@@ -8,8 +8,6 @@ import pytest
 from rq import SimpleWorker
 import transaction
 
-from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.utils import get_redis_connection
@@ -17,7 +15,7 @@ from tracim_backend.lib.utils.utils import get_rq_queue
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("config_section", ["mail_test"])
+@pytest.mark.parametrize("config_section", [{"name": "mail_test"}], indirect=True)
 class TestEmailSender(object):
     def test__func__connect_disconnect__ok__nominal_case(self, app_config, mailhog):
         smtp_config = SmtpConfiguration(
@@ -75,8 +73,9 @@ class TestEmailSender(object):
         assert response[0]["MIME"]["Parts"][1]["Body"] == html
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixture]])
-@pytest.mark.parametrize("config_section", ["mail_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "mail_test"}], indirect=True)
 class TestNotificationsSync(object):
     def test_func__create_user_with_mail_notification__ok__nominal_case(
         self, user_api_factory, mailhog
@@ -195,8 +194,9 @@ class TestNotificationsSync(object):
         assert headers["Subject"][0] == "[TRACIM] A password reset has been requested"
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixture]])
-@pytest.mark.parametrize("config_section", ["mail_test_async"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "mail_test_async"}], indirect=True)
 class TestNotificationsAsync(object):
     def test_func__create_user_with_mail_notification__ok__nominal_case(
         self, mailhog, user_api_factory, app_config

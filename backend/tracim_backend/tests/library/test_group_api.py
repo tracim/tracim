@@ -2,12 +2,11 @@
 import pytest
 
 from tracim_backend.exceptions import GroupDoesNotExist
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestGroupApi(object):
     def test_unit__get_one__ok_nominal_case(self, session, app_config) -> None:
         """

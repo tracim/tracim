@@ -10,7 +10,6 @@ from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
@@ -92,7 +91,7 @@ class TestSortContentApi(object):
         assert sorteds[1] == c1
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestContentApi(object):
     def test_unit__create_content__OK_nominal_case(
         self,

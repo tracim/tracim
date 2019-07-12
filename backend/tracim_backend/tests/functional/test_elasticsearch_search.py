@@ -1,14 +1,24 @@
 import pytest
 import transaction
 
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_elasticsearch_search"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_elasticsearch_search"}], indirect=True
+)
+class TestIndrectParametrize(object):
+    def test_indirect_parametrize(self, config_section):
+        assert config_section == "functional_test_elasticsearch_search"
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_elasticsearch_search"}], indirect=True
+)
 class TestElasticSearchSearch(object):
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",
@@ -35,6 +45,7 @@ class TestElasticSearchSearch(object):
         search_string,
         nb_content_result,
         first_search_result_content_name,
+        config_section,
     ) -> None:
 
         uapi = user_api_factory.get()
@@ -612,8 +623,10 @@ class TestElasticSearchSearch(object):
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_elasticsearch_ingest_search"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_elasticsearch_ingest_search"}], indirect=True
+)
 class TestElasticSearchSearchWithIngest(object):
     @pytest.mark.xfail(reason="Need elasticsearch ingest plugin enabled")
     def test_api__elasticsearch_search__ok__in_file_ingest_search(

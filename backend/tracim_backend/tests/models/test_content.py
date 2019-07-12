@@ -8,7 +8,6 @@ from sqlalchemy.sql.elements import and_
 import transaction
 
 from tracim_backend.exceptions import ContentRevisionUpdateError
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
@@ -17,7 +16,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestContent(object):
     def test_unit__create_content__ok__nominal_case(self, admin_user, session, content_type_list):
         assert session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").count() == 0

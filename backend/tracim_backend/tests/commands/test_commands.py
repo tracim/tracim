@@ -16,7 +16,6 @@ from tracim_backend.exceptions import GroupDoesNotExist
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.auth import AuthType
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
@@ -51,8 +50,8 @@ class TestCommandsList(object):
         assert output.find("dev parameters list") > 0
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["app:command_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "app:command_test"}], indirect=True)
 class TestCommands(object):
     """
     Test tracimcli command line ui

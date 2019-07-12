@@ -1,14 +1,13 @@
 import pytest
 
-from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.mail_fetcher.daemon import MailFetcherDaemon
 from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixture]])
-@pytest.mark.parametrize("config_section", ["mail_test_async"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "mail_test_async"}], indirect=True)
 class TestMailNotifyDaemon(object):
     @pytest.mark.mail
     def test_func__create_user_with_mail_notification__ok__nominal_case(

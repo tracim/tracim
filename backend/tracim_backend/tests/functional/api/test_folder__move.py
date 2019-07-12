@@ -2,12 +2,11 @@ import pytest
 import transaction
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestFolderMove(object):
     def test_api__move_folder_into_itself__err_400(
         self, content_api_factory, workspace_api_factory, web_testapp, content_type_list

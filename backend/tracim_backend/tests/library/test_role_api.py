@@ -2,15 +2,14 @@
 import pytest
 
 from tracim_backend.exceptions import UserRoleNotFound
-from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixture]])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
 class TestRoleApi(object):
     def test_unit__get_one__ok__nominal_case(self, admin_user, session, app_config):
         rapi = RoleApi(current_user=admin_user, session=session, config=app_config)

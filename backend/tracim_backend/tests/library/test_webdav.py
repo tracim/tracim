@@ -4,8 +4,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from tracim_backend import WebdavAppFactory
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.notifications import DummyNotifier
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import TracimDomainController
@@ -17,7 +15,7 @@ from tracim_backend.tests.utils import eq_
 from tracim_backend.tests.utils import webdav_put_new_test_file_helper
 
 
-@pytest.mark.parametrize("config_section", ["webdav_test"])
+@pytest.mark.parametrize("config_section", [{"name": "webdav_test"}], indirect=True)
 class TestWebdavFactory(object):
     def test_unit__initConfig__ok__nominal_case(self, settings):
         """
@@ -43,7 +41,8 @@ class TestWebdavFactory(object):
         assert isinstance(config["domaincontroller"], TracimDomainController)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixtures]])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
 class TestWebDav(object):
     def test_unit__get_root__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory

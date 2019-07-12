@@ -7,8 +7,6 @@ from alembic.script import ScriptDirectory
 import pytest
 from sqlalchemy.engine import Engine
 
-from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.setup_models import *  # noqa: F403,F401
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 
@@ -32,8 +30,9 @@ def get_revision(
     return revision
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture, ContentFixture]])
-@pytest.mark.parametrize("config_section", ["migration_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "migration_test"}], indirect=True)
 class TestMigration(object):
     def test_downgrade_and_upgrade(self, migration_engine, session, app_config):
         """Test all migrations up and down.

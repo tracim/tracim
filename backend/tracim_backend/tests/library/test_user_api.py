@@ -11,7 +11,6 @@ from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
@@ -20,7 +19,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestUserApi(object):
     def test_unit__create_minimal_user__ok__nominal_case(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
@@ -604,8 +603,8 @@ class TestUserApi(object):
             api2.disable(user)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["base_test_ldap"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "base_test_ldap"}], indirect=True)
 class TestFakeLDAPUserApi(object):
     @pytest.mark.ldap
     def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):

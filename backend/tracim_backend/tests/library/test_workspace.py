@@ -2,7 +2,6 @@
 import pytest
 
 from tracim_backend.exceptions import WorkspaceLabelAlreadyUsed
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Group
@@ -10,7 +9,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestThread(object):
     # # FIXME - G.M - 2019-07-05 - TODO !!!
     # def test_children(self, admin_user, session, app_config, content_api_factory):

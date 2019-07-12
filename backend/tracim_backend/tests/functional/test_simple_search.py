@@ -1,14 +1,15 @@
 import pytest
 import transaction
 
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test_simple_search"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_simple_search"}], indirect=True
+)
 class TestSimpleSearch(object):
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",

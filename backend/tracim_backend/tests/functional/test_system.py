@@ -2,7 +2,6 @@
 import pytest
 
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -12,7 +11,7 @@ Tests for /api/v2/system subpath endpoints.
 """
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestApplicationEndpoint(object):
     """
     Tests for /api/v2/system/applications
@@ -50,7 +49,7 @@ class TestApplicationEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestContentsTypesEndpoint(object):
     """
     Tests for /api/v2/system/content_types
@@ -100,7 +99,7 @@ class TestContentsTypesEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestTimezonesEndpoint(object):
     """
     Tests for /api/v2/system/timezones
@@ -132,7 +131,7 @@ class TestTimezonesEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestAboutEndpoint(object):
     """
     Tests for /api/v2/system/about
@@ -161,8 +160,8 @@ class TestAboutEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
-@pytest.mark.parametrize("config_section", ["functional_test"])
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestConfigEndpoint(object):
     """
     Tests for /api/v2/system/config
@@ -192,7 +191,7 @@ class TestConfigEndpoint(object):
         assert "details" in res.json.keys()
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[BaseFixture]])
+@pytest.mark.usefixtures("base_fixture")
 class TestErrorCodeEndpoint(object):
     def test_api__get_error_code_endpoint__ok__200__nominal_case(self, web_testapp):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
