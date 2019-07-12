@@ -65,6 +65,8 @@ class TestCommands(object):
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("command_test@user")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         result = app.run(
@@ -97,6 +99,8 @@ class TestCommands(object):
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("command_test@user")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         result = app.run(
@@ -126,6 +130,8 @@ class TestCommands(object):
         Test User creation with an unknown group
         """
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(GroupDoesNotExist):
@@ -150,6 +156,8 @@ class TestCommands(object):
         Test User creation with existing user login
         """
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(UserAlreadyExistError):
@@ -175,6 +183,8 @@ class TestCommands(object):
         Test User creation with email with notification disable
         """
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(NotificationDisabledCantCreateUserWithInvitation):
@@ -199,6 +209,8 @@ class TestCommands(object):
         Test User creation without filling password
         """
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(BadCommandError):
@@ -227,6 +239,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         result = app.run(
@@ -266,6 +280,8 @@ class TestCommands(object):
         session.flush()
         transaction.commit()
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
@@ -296,6 +312,8 @@ class TestCommands(object):
         assert not user.validate_password("new_password")
         assert user.profile.name == "administrators"
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         result = app.run(
@@ -331,6 +349,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(DatabaseInitializationFailed):
@@ -348,6 +368,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         # delete config to be sure command will work
@@ -376,6 +398,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
 
         app = TracimCLI()
@@ -394,6 +418,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         result = app.run(
@@ -418,6 +444,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(ForceArgumentNeeded):
@@ -437,6 +465,8 @@ class TestCommands(object):
         assert user.validate_password("admin@admin.admin")
         assert not user.validate_password("new_password")
         session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(FileNotFoundError):
