@@ -41,20 +41,20 @@ class FormBuilder extends React.Component {
             name={FIELD_TYPE.OBJECT.name}
           />
           <FieldType
-            fieldType={'textRich'}
-            name={'textRich'}
+            fieldType={FIELD_TYPE.TEXT_RICH.fieldType}
+            name={FIELD_TYPE.TEXT_RICH.name}
           />
           <FieldType
-            fieldType={'selectUsers'}
-            name={'selectUsers'}
+            fieldType={FIELD_TYPE.SELECT_USER.fieldType}
+            name={FIELD_TYPE.SELECT_USER.name}
           />
           <FieldType
-            fieldType={'markdownField'}
-            name={'markdownField'}
+            fieldType={FIELD_TYPE.MARKDOWN_FIELD.fieldType}
+            name={FIELD_TYPE.MARKDOWN_FIELD.name}
           />
           <FieldType
-            name={'imageField'}
-            fieldType={'imageField'}
+            fieldType={FIELD_TYPE.IMAGE_FIELD.fieldType}
+            name={FIELD_TYPE.IMAGE_FIELD.name}
           />
         </div>
 
@@ -86,5 +86,12 @@ class FormBuilder extends React.Component {
 export default FormBuilder
 
 FormBuilder.propTypes = {
-  schema: PropTypes.object
+  schema: PropTypes.object,
+  addField: PropTypes.func,
+  removeField: PropTypes.func,
+  moveField: PropTypes.func,
+  onPropertiesChange: PropTypes.func,
+  addOrderTab: PropTypes.func,
+  position: PropTypes.string,
+  changeUiSchema: PropTypes.func
 }

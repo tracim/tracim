@@ -5,13 +5,14 @@ import {
   DRAG_AND_DROP
 } from '../../helper.js'
 import PropTypes from 'prop-types'
+import {
+  findFieldInUiSchema
+} from './FormHelper'
+
 const style = {
   width: '100%',
   height: '100%'
 }
-import {
-  findFieldInUiSchema
-} from './FormHelper'
 
 class FieldsList extends React.Component {
   constructor (props) {
@@ -110,8 +111,14 @@ const fieldsListDragAndDropSourceCollect = (connect, monitor) => ({
 export default DropTarget(DRAG_AND_DROP.FIELD_TYPE, fieldsListDragAndDropTarget, fieldsListDragAndDropSourceCollect)(FieldsList)
 
 FieldsList.propTypes = {
-  onChange: PropTypes.func,
-  schema: PropTypes.object
+  schema: PropTypes.object,
+  addField: PropTypes.func,
+  removeField: PropTypes.func,
+  moveField: PropTypes.func,
+  onPropertiesChange: PropTypes.func,
+  addOrderTab: PropTypes.func,
+  position: PropTypes.string,
+  changeUiSchema: PropTypes.func
 }
 
 FieldsList.defaultProps = {

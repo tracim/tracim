@@ -39,7 +39,6 @@ export class AdminForm extends React.Component {
       },
       uischema: {}
     }
-    this.i = 0
   }
 
   handleClickSaveButton () {
@@ -48,14 +47,10 @@ export class AdminForm extends React.Component {
     console.log(form)
   }
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
-    // console.log('Update', this.state.schema.properties)
-  }
-
   onSchemaChange = (data) => {
     if (data !== undefined) {
       this.setState({
-        schema: {type: 'object', properties: data.properties}
+        schema: data
       })
     }
   }

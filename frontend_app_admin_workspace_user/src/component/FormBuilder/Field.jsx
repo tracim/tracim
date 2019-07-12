@@ -79,17 +79,17 @@ class Field extends React.Component {
               <input type='checkbox' name='required' onChange={event => onPropertiesChange(this.props.position, event.target.name, event.target.checked, this.props.properties.label)} checked={properties.require || false} />
             </div>
 
-            {/*<div>*/}
-            {/*  Type<br />*/}
-            {/*  <select name='type' onChange={this.handleChange.bind(this)} value={properties.type || ''}>*/}
-            {/*    <option value='string'>String</option>*/}
-            {/*    <option value='integer'>Integer</option>*/}
-            {/*    <option value='number'>Number</option>*/}
-            {/*    <option value='boolean'>Boolean</option>*/}
-            {/*    <option value='array'>Array</option>*/}
-            {/*    <option value='object'>Object</option>*/}
-            {/*  </select>*/}
-            {/*</div>*/}
+            {/* <div> */}
+            {/*   Type<br /> */}
+            {/*   <select name='type' onChange={this.handleChange.bind(this)} value={properties.type || ''}> */}
+            {/*     <option value='string'>String</option> */}
+            {/*     <option value='integer'>Integer</option> */}
+            {/*     <option value='number'>Number</option> */}
+            {/*     <option value='boolean'>Boolean</option> */}
+            {/*     <option value='array'>Array</option> */}
+            {/*     <option value='object'>Object</option> */}
+            {/*   </select> */}
+            {/* </div> */}
 
             {getFormats(properties.type) && (
               <div>
@@ -227,7 +227,15 @@ export default DragSource(DRAG_AND_DROP.FIELD, fieldDragAndDropSource, fieldDrag
 
 Field.propTypes = {
   index: PropTypes.number,
-  moveField: PropTypes.func,
+  id: PropTypes.string,
   name: PropTypes.string,
-  properties: PropTypes.object
+  properties: PropTypes.object,
+  moveField: PropTypes.func,
+  removeField: PropTypes.func,
+  onPropertiesChange: PropTypes.func,
+  position: PropTypes.string,
+  addField: PropTypes.func,
+  addOrderTab: PropTypes.func,
+  changeUiSchema: PropTypes.func,
+  uiSchema: PropTypes.object
 }

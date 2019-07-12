@@ -152,6 +152,7 @@ export const addField = (schema, targetType, position, fieldType) => {
 const onLabelChange = (schema, position, value, label) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField.type === 'array') schemaField = schemaField.items
   let newOrder = schemaField.order
   if (findField(schema, value) !== undefined) return undefined
   newOrder[newOrder.indexOf(label)] = value
