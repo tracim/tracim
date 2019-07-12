@@ -60,14 +60,6 @@ def config(settings):
     testing.tearDown()
 
 
-# @pytest.fixture
-# def depot():
-#     DepotManager._clear()
-#     DepotManager.configure("test", {"depot.backend": "depot.io.memory.MemoryFileStorage"})
-#     yield DepotManager.get("test")
-#     DepotManager._clear()
-
-
 @pytest.fixture
 def app_config(settings) -> CFG:
     DepotManager._clear()
