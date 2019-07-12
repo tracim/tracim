@@ -19,6 +19,7 @@ from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav import WebdavAppFactory
@@ -46,11 +47,6 @@ def config_uri() -> str:
 @pytest.fixture
 def config_section(request) -> str:
     return getattr(request, "param", {}).get("name", "base_test")
-
-
-@pytest.fixture
-def tracim_fixtures() -> typing.List:
-    return []
 
 
 @pytest.fixture
@@ -137,7 +133,7 @@ def migration_engine(engine):
 
 
 @pytest.fixture
-def session(empty_session, engine, app_config, tracim_fixtures, test_logger):
+def session(empty_session, engine, app_config, test_logger):
     dbsession = empty_session
     from tracim_backend.models.meta import DeclarativeBase
 
@@ -163,6 +159,22 @@ def base_fixture(session, app_config) -> Session:
         try:
             fixtures_loader = FixturesLoader(session, app_config)
             fixtures_loader.loads([BaseFixture])
+        except IntegrityError as e:
+            transaction.abort()
+            raise e
+    transaction.commit()
+    return session
+
+
+@pytest.fixture
+def test_fixture(session, app_config) -> Session:
+    """
+    Warning ! This fixture is now deprecated. Don't use it for new created tests.
+    """
+    with transaction.manager:
+        try:
+            fixtures_loader = FixturesLoader(session, app_config)
+            fixtures_loader.loads([FixtureTest])
         except IntegrityError as e:
             transaction.abort()
             raise e
@@ -217,8 +229,8 @@ def application_api_factory(app_list) -> ApplicationApiFactory:
 
 
 @pytest.fixture()
-def admin_user(base_fixture: Session) -> User:
-    return base_fixture.query(User).filter(User.email == "admin@admin.admin").one()
+def admin_user(session: Session) -> User:
+    return session.query(User).filter(User.email == "admin@admin.admin").one()
 
 
 @pytest.fixture()

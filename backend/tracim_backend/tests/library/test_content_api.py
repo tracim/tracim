@@ -10,7 +10,6 @@ from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
 from tracim_backend.models.auth import Group
@@ -3466,7 +3465,7 @@ class TestContentApi(object):
         eq_(original_id, item.content_id)
 
 
-@pytest.mark.parametrize("tracim_fixtures", [[FixtureTest]])
+@pytest.mark.usefixtures("test_fixture")
 class TestContentApiSecurity(object):
     def test_unit__cant_get_non_access_content__ok__nominal_case(
         self, session, workspace_api_factory, admin_user, app_config, content_type_list
