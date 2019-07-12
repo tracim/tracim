@@ -2204,7 +2204,7 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section",
-    ["functional_test_with_no_email_notif_but_invitation_email_notif"],
+    [{"name": "functional_test_with_no_email_notif_but_invitation_email_notif"}],
     indirect=True,
 )
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmailEnabled(object):
@@ -2242,7 +2242,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section",
-    ["functional_test_with_no_email_notif_and_no_invitation_email_notif"],
+    [{"name": "functional_test_with_no_email_notif_and_no_invitation_email_notif"}],
     indirect=True,
 )
 class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmailDisabled(object):
@@ -2283,7 +2283,7 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section",
-    ["functional_test_with_email_notif_and_no_invitation_email_notif"],
+    [{"name": "functional_test_with_email_notif_and_no_invitation_email_notif"}],
     indirect=True,
 )
 class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisabled(object):
