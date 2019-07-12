@@ -10,15 +10,6 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 @pytest.mark.parametrize(
     "config_section", [{"name": "functional_test_elasticsearch_search"}], indirect=True
 )
-class TestIndrectParametrize(object):
-    def test_indirect_parametrize(self, config_section):
-        assert config_section == "functional_test_elasticsearch_search"
-
-
-@pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_elasticsearch_search"}], indirect=True
-)
 class TestElasticSearchSearch(object):
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",
