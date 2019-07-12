@@ -74,7 +74,19 @@ class File extends React.Component {
       },
       shareEmails: '',
       sharePassword: '',
-      shareLinkList: []
+      shareLinkList: [
+        {
+          email: 'test@test.test',
+          link: 'https://test.test.tst'
+        },
+        {
+          email: 'test@test.test',
+          link: 'https://test.test.tst'
+        },
+        {
+          email: 'test@test.test',
+          link: 'https://test.test.tst'
+        }]
     }
 
     // i18n has been init, add resources from frontend
@@ -626,8 +638,10 @@ class File extends React.Component {
   // handleClickNewShare = async () => {
   //   const { content, config } = this.state
   //   this.handleEmailList()
+  //   const emailList = this.state.shareEmails.split('\n')
 
-  //   const fetchResultShareLinkList = await handleFetchResult(await getShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
+  //   emailList.forEach(email => {
+  //   const fetchResultShareLinkList = await handleFetchResult(await postShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
 
   //   switch (fetchResultShareLinkList.apiResponse.status) {
   //     case 200:
@@ -639,7 +653,7 @@ class File extends React.Component {
   //     default:
   //       this.sendGlobalFlashMessage(this.props.t('Error while creating new share link'))
   //       return
-  //   }
+  //   }})
   // }
 
   handleChangeEmails = e => this.setState({shareEmails: e.target.value})

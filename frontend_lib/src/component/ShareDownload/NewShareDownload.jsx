@@ -61,7 +61,7 @@ class NewShareDownload extends React.Component {
     const { props } = this
 
     return (
-      <div className='shareDownload'>
+      <div className='shareDownload__new'>
         <div className='shareDownload__title'>
           {props.t('New share')}
         </div>

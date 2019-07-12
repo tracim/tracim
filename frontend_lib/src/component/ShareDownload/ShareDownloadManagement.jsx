@@ -4,6 +4,7 @@ import i18n from '../../i18n.js'
 import Radium from 'radium'
 import color from 'color'
 import { CUSTOM_EVENT } from '../../customEvent.js'
+import ShareLink from '../ShareLink/ShareLink.jsx'
 
 class ShareDownloadManagement extends React.Component {
   constructor (props) {
@@ -30,7 +31,7 @@ class ShareDownloadManagement extends React.Component {
 
     return (
       <div className='shareDownload'>
-        <div className='d-flex justify-content-between'>
+        <div className='shareDownload__management__header'>
           <div className='shareDownload__title'>
             {props.t(`${props.label} share`)}
           </div>
@@ -50,13 +51,13 @@ class ShareDownloadManagement extends React.Component {
           </button>
         </div>
         {props.shareLinkList.length > 0
-          ? props.shareLinkList.forEach(shareLink => {
+          ? props.shareLinkList.map(shareLink =>
               <ShareLink
                 email={shareLink.email}
                 link={shareLink.link}
                 hexcolor={props.hexcolor}
               />
-            })
+            )
           : <div className='m-auto'>No share link has been created yet.</div>
         }
       </div>
