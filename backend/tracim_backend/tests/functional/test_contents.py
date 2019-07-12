@@ -22,20 +22,6 @@ class TestFolder(object):
     endpoint
     """
 
-    # def _setup_basics(self) -> None:
-    #     web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-    #     self.workspace_api = workspace_api_factory.get()
-    #     self.content_api = content_api_factory.get()
-    #     self.workspace = self.workspace_api.create_workspace(label="test", save_now=True)
-    #     self.folder = self.content_api.create(
-    #         label="test_folder",
-    #         content_type_slug=content_type_list.Folder.slug,
-    #         workspace=self.workspace,
-    #         do_save=True,
-    #         do_notify=False,
-    #     )
-    #     transaction.commit()
-
     def test_api__get_folder__ok_200__nominal_case(
         self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
     ) -> None:
