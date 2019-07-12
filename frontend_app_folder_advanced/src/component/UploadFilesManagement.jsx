@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
+import { ShareLink } from 'tracim_frontend_lib'
 
 const UploadFilesManagement = props => {
   const customColor = props.tracimContentTypeList[1] ? props.tracimContentTypeList[1].hexcolor : props.customColor
@@ -40,6 +41,16 @@ const UploadFilesManagement = props => {
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
+        <ShareLink
+          email='test@test.test'
+          link='https://test.test.tst'
+          hexcolor={customColor}
+        />
+        <ShareLink
+          email='test@test.test'
+          link='https://test.test.tst'
+          hexcolor={customColor}
+        />
       </div>
     </div>
   )

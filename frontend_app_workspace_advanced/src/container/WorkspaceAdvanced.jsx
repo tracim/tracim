@@ -238,21 +238,6 @@ class WorkspaceAdvanced extends React.Component {
   //   const newUploadEnabledValue = !state.content.upload_enabled
   //   const folderId = 0 // Chose a special number
   //   const folderName = 'Files received'
-  //   // At folders asyc file
-  //   const fetchSaveUploadFolder = await handleFetchResult(await postFolder(state.config.apiUrl, state.content.workspace_id, folderId, 'folder', folderName))
-
-  //   switch (fetchSaveUploadFolder.apiResponse.status) {
-  //     case 200:
-  //       this.handleClose()
-  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-  //       break
-  //     case 400:
-  //       switch (fetchSaveUploadFolder.body.code) {
-  //         default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
-  //       }
-  //       break
-  //     default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
-  //   }
 
   //   this.setState(prev => ({content: {...prev.content, upload_enabled: newUploadEnabledValue}}))
   //   const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))

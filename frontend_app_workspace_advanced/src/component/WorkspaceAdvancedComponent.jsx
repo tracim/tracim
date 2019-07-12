@@ -159,7 +159,7 @@ const WorkspaceAdvancedComponent = props => {
 
       <div className='formBlock workspace_advanced__agendaconfig'>
         <div className='formBlock__title workspace_advanced__agendaconfig__title'>
-          {props.t('Management')}
+          {props.t('Optional functionalities')}
         </div>
         {props.appAgendaAvailable && (
           <div className='formBlock__field workspace_advanced__agendaconfig__content'>

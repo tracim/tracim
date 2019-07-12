@@ -50,6 +50,11 @@ class NewUpload extends React.Component {
     }
     let randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
     this.setState({password: randomPassword})
+
+    const passwordInput = document.getElementsByClassName('newUpload__password__input')[0]
+    if (passwordInput.type === 'password') {
+      this.handleSeePassword
+    }
   }
 
   render () {

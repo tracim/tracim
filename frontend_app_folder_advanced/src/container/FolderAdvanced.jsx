@@ -1,5 +1,5 @@
 import React from 'react'
-import FolderAdvancedComponent from '../component/FolderAdvanced.jsx'
+import FolderAdvancedComponent from '../component/UploadFilesManagement.jsx'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
@@ -102,6 +102,13 @@ class FolderAdvanced extends React.Component {
       delay: undefined
     }
   })
+
+  // copyText() {
+  //   var copyText = document.getElementById("myInput");
+  //   copyText.select();
+  //   document.execCommand("copy");
+  //   alert("Copied the text: " + copyText.value);
+  // }
 
   loadContent = async () => {
     const { props, state } = this
@@ -281,7 +288,7 @@ class FolderAdvanced extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            // customColor={state.config.hexcolor}
+            customColor={state.config.hexcolor}
           />
         </PopinFixedContent>
       </PopinFixed>
