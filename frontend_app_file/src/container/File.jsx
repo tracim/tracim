@@ -20,7 +20,8 @@ import {
   Badge,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  ShareDownload
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -32,6 +33,7 @@ import {
   getFileContent,
   getFileComment,
   getFileRevision,
+  // getShareLinkList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -41,7 +43,7 @@ import {
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
-import ShareFile from './ShareFile/ShareFile.jsx'
+import PropertiesComponent from '../component/PropertiesComponent.jsx'
 
 class File extends React.Component {
   constructor (props) {
@@ -66,11 +68,13 @@ class File extends React.Component {
       fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: MODE.VIEW,
-      displayProperty: false,
       progressUpload: {
         display: false,
         percent: 0
-      }
+      },
+      shareEmails: '',
+      sharePassword: '',
+      shareLinkList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -258,6 +262,25 @@ class File extends React.Component {
       timeline: revisionWithComment
     })
   }
+
+  // loadShareLinkList = async () => {
+  //   const { content, config } = this.state
+
+  //   const fetchResultShareLinkList = await handleFetchResult(await getShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
+
+  //   switch (fetchResultShareLinkList.apiResponse.status) {
+  //     case 200:
+  //       this.setState({
+  //         shareLinkList: fetchResultShareLinkList.links
+  //       })
+  //       break
+  //     default:
+  //       this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+  //       return
+  //   }
+
+  //   GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}}) // Needed?
+  // }
 
   buildBreadcrumbs = () => {
     const { state } = this
@@ -497,8 +520,6 @@ class File extends React.Component {
     this.loadContent(1)
   }
 
-  handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
-
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
 
@@ -587,6 +608,52 @@ class File extends React.Component {
         previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500/${state.content.filenameNoExtension + '.jpg'}?page=${nextPageNumber}&revision_id=${state.content.current_revision_id}`
       }
     }))
+  }
+
+  checkEmailValid = email => {
+    let parts = email.split('@')
+    if (parts.length !== 2) {
+      return false
+    } else {
+      let domainParts = parts[1].split('.')
+      if (domainParts.length !== 2) {
+        return false
+      }
+    }
+    return true
+  }
+
+  // handleClickNewShare = async () => {
+  //   const { content, config } = this.state
+  //   this.handleEmailList()
+
+  //   const fetchResultShareLinkList = await handleFetchResult(await getShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
+
+  //   switch (fetchResultShareLinkList.apiResponse.status) {
+  //     case 200:
+  //       this.setState({
+  //         shareEmails: '',
+  //         sharePassword: ''
+  //       })
+  //       break
+  //     default:
+  //       this.sendGlobalFlashMessage(this.props.t('Error while creating new share link'))
+  //       return
+  //   }
+  // }
+
+  handleChangeEmails = e => this.setState({shareEmails: e.target.value})
+  handleChangePassword = e => this.setState({sharePassword: e.target.value})
+
+  // INFO - GB - 2019-05-24 - Change all spaces and commas to new lines
+  handleEmailList = e => {
+    if (e.key === 'Enter') {
+      let emailList = this.state.shareEmails.split(' ').join(',').split(',')
+      emailList.forEach(email => !this.checkEmailValid(email) &&
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
+
+      this.setState({shareEmails: emailList.join('\n')})
+    }
   }
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {
@@ -688,18 +755,12 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             isJpegAvailable={state.content.has_jpeg_preview}
-            fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
-            displayProperty={state.displayProperty}
-            onClickProperty={this.handleClickProperty}
             version={state.content.number}
             lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
-            description={state.content.raw_content}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
-            isEditable={state.content.is_editable}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchived}
@@ -746,8 +807,29 @@ class File extends React.Component {
                 id: 'share',
                 label: 'Share',
                 icon: 'fa-share-alt',
-                children: <ShareFile
+                children: <ShareDownload
+                  label={state.config.label}
                   hexcolor={state.config.hexcolor}
+                  shareEmails={state.shareEmails}
+                  onChangeEmails={this.handleChangeEmails}
+                  handleEmailList={this.handleEmailList}
+                  sharePassword={state.sharePassword}
+                  onChangePassword={this.handleChangePassword}
+                  shareLinkList={state.shareLinkList}
+                />
+              },
+              {
+                id: 'properties',
+                label: 'Properties',
+                icon: 'fa-info-circle',
+                children: <PropertiesComponent
+                  color={state.config.hexcolor}
+                  fileSize={displayFileSize(state.content.size)}
+                  filePageNb={state.content.page_nb}
+                  description={state.content.raw_content}
+                  displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= 2}
+                  disableChangeDescription={!state.content.is_editable}
+                  onClickValidateNewDescription={this.handleClickValidateNewDescription}
                 />
               }
             ]}

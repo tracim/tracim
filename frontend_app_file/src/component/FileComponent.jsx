@@ -46,18 +46,11 @@ export const FileComponent = props =>
         downloadPdfPageUrl={props.downloadPdfPageUrl}
         downloadPdfFullUrl={props.downloadPdfFullUrl}
         previewUrl={props.previewUrl}
-        fileSize={props.fileSize}
         filePageNb={props.filePageNb}
         fileCurrentPage={props.fileCurrentPage}
         lightboxUrlList={props.lightboxUrlList}
-        displayProperty={props.displayProperty}
-        onClickProperty={props.onClickProperty}
-        description={props.description}
-        displayChangeDescriptionBtn={props.loggedUser.userRoleIdInWorkspace >= 2}
-        disableChangeDescription={!props.isEditable}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
-        onClickValidateNewDescription={props.onClickValidateNewDescription}
       />
     }
 

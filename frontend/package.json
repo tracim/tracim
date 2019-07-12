@@ -76,7 +76,8 @@
       "GLOBAL_dispatchEvent",
       "GLOBAL_hideApp",
       "GLOBAL_primaryColor",
-      "FileReader",
+      "FormData",
+      "XMLHttpRequest",
       "Image"
     ],
     "parser": "babel-eslint",

@@ -96,32 +96,38 @@
       height 100%
     &__right
       transition width 0.4s ease
-      width calc(25% - 10px)
+      width 25%
       height 100%
       &__header
         display flex
         flex-direction column
-        border-radius 10px 0 0 10px
-        margin-top 10px
         width 50px
         background-color grey-hover
         font-size 20px
         color darkGrey
+        border-right 3px solid grey
         &__icon
           text-align center
           cursor pointer
+          padding-top 2px
+          padding-bottom 2px
+          &:focus
+            border-color transparent
+            outline 0
+          &.active
+            background-color grey
           &__close
             text-align center
             cursor pointer
 
 .rightPartClose
   .wsContentGeneric__content__left
-    width calc(50% - 50px) // 50px is the width of the rightPart header (eg. timeline__header)
+    width calc(50% - 43px) // 43px is the width of the rightPart header without the right border
 
 @media (max-width: max-lg)
   .rightPartClose
     .wsContentGeneric__content__left
-      width calc(100% - 20px) // 20px => margin
+      width 100%
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .wsContentGeneric
@@ -130,10 +136,10 @@
       width 100%
       &__left
         margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
 
 
@@ -147,11 +153,12 @@ columnContents()
         &__header
           flex-direction row
           width 100%
-          height 50px
-          border-radius 10px 10px 0 0
+          min-height 50px
           cursor auto
           justify-content flex-end
           padding-left 10px
+          border-right none
+          border-bottom 3px solid grey
           &__icon
             display flex
             transform none
@@ -168,14 +175,13 @@ columnContents()
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
         &__textnote
           height auto
           overflow-y hidden
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
   columnContents()
 
@@ -188,14 +194,13 @@ columnContents()
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
         &__textnote
           height auto
           overflow-y hidden
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
   columnContents()
 
@@ -210,13 +215,12 @@ columnContents()
       overflow-Y auto
       width 100%
       &__left
-        margin-bottom 20px
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
         &__textnote
           height auto
           overflow-y hidden
       &__right
-        width calc(100% - 20px) // 20px => margin
+        width 100%
         height auto
   columnContents()

@@ -161,7 +161,7 @@ class GuestUpload extends React.Component {
 
                 <InputTextArea
                   placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
-                  numberRows='20'
+                  numberRows={state.uploadFileList.length > 4 ? '20' : '15'}
                   value={state.guestComment}
                   onChange={this.handleChangeComment}
                 />

@@ -52,6 +52,7 @@ import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
 
+import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
 import ShareLink from './component/ShareLink/ShareLink.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -104,5 +105,6 @@ export {
   ComposedIcon,
   DisplayState,
   FileDropzone,
-  ShareLink
+  ShareLink,
+  ShareDownload
 }

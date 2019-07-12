@@ -3,11 +3,9 @@ import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import Radium from 'radium'
 import color from 'color'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT } from '../../customEvent.js'
 
-require('./ShareFile.styl')
-
-class ShareFileManagement extends React.Component {
+class ShareDownloadManagement extends React.Component {
   constructor (props) {
     super(props)
 
@@ -17,7 +15,7 @@ class ShareFileManagement extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<ShareFileManagement> Custom event', 'color: #28a745', type, data)
+        console.log('%c<ShareDownloadManagement> Custom event', 'color: #28a745', type, data)
         i18n.changeLanguage(data)
         break
     }
@@ -31,28 +29,15 @@ class ShareFileManagement extends React.Component {
     const { props } = this
 
     return (
-      <div className='shareFile'>
-        <div className='shareFile__title'>
-          {props.t('File share')}
-        </div>
-        <div className='d-flex ml-auto'>
+      <div className='shareDownload'>
+        <div className='d-flex justify-content-between'>
+          <div className='shareDownload__title'>
+            {props.t(`${props.label} share`)}
+          </div>
           <button
-            className='btn outlineTextBtn d-flex mr-3'
-            key='delete_all_shares'
-            style={{
-              borderColor: props.hexcolor,
-              ':hover': {
-                backgroundColor: props.hexcolor
-              }
-            }}
-          >
-            {props.t('Delete all')}
-            <i className='fa fa-fw fa-trash-o' />
-          </button>
-          <button
-            className='btn highlightBtn'
-            key='new_share_file'
-            onClick={props.onClickNewShareFile}
+            className='btn highlightBtn my-auto'
+            key='new_share_download'
+            onClick={props.onClickNewShareDownload}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
@@ -64,9 +49,19 @@ class ShareFileManagement extends React.Component {
             <i className='fa fa-fw fa-plus-circle' />
           </button>
         </div>
+        {props.shareLinkList.length > 0
+          ? props.shareLinkList.forEach(shareLink => {
+              <ShareLink
+                email={shareLink.email}
+                link={shareLink.link}
+                hexcolor={props.hexcolor}
+              />
+            })
+          : <div className='m-auto'>No share link has been created yet.</div>
+        }
       </div>
     )
   }
 }
 
-export default translate()(Radium(ShareFileManagement))
+export default translate()(Radium(ShareDownloadManagement))

@@ -3,19 +3,16 @@ import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import Radium from 'radium'
 import color from 'color'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { Popover, PopoverBody } from 'reactstrap'
+import { CUSTOM_EVENT } from '../../customEvent.js'
+import { generateRandomPassword } from '../../helper.js'
 
-require('./ShareFile.styl')
-
-class NewShareFile extends React.Component {
+class NewShareDownload extends React.Component {
   constructor (props) {
     super(props)
     this.toggle = this.toggle.bind(this)
     this.state = {
-      popoverOpen: false,
-      emails: '',
-      password: ''
+      popoverOpen: false
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
@@ -30,7 +27,7 @@ class NewShareFile extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => {
     switch (type) {
       case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<NewShareFile> Custom event', 'color: #28a745', type, data)
+        console.log('%c<NewShareDownload> Custom event', 'color: #28a745', type, data)
         i18n.changeLanguage(data)
         break
     }
@@ -40,11 +37,8 @@ class NewShareFile extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  handleChangeEmails = e => this.setState({emails: e.target.value})
-  handleChangePassword = e => this.setState({password: e.target.value})
-
   handleSeePassword = () => {
-    const passwordInput = document.getElementsByClassName('shareFile__password__input')[0]
+    const passwordInput = document.getElementsByClassName('shareDownload__password__input')[0]
     const passwordIcon = document.getElementById('seePasswordIcon')
     if (passwordInput.type === 'password') {
       passwordInput.type = 'text'
@@ -55,22 +49,9 @@ class NewShareFile extends React.Component {
     }
   }
 
-  // INFO - GB - 2019-07-05 - This password generetor function was based on
-  // https://stackoverflow.com/questions/5840577/jquery-or-javascript-password-generator-with-at-least-a-capital-and-a-number
   handleRandomPassword = () => {
-    let password = []
-    let charCode = String.fromCharCode
-    let randomNumber = Math.random
-    let random, i
-
-    for (i = 0; i < 10; i++) { // password with a size 10
-      random = 0 | randomNumber() * 62 // generate upper OR lower OR number
-      password.push(charCode(48 + random + (random > 9 ? 7 : 0) + (random > 35 ? 6 : 0)))
-    }
-    let randomPassword = password.sort(() => { return randomNumber() - 0.5 }).join('')
-    this.setState({password: randomPassword})
-
-    const passwordInput = document.getElementsByClassName('shareFile__password__input')[0]
+    this.props.sharePassword = generateRandomPassword()
+    const passwordInput = document.getElementsByClassName('shareDownload__password__input')[0]
     if (passwordInput.type === 'password') {
       this.handleSeePassword()
     }
@@ -80,23 +61,24 @@ class NewShareFile extends React.Component {
     const { props } = this
 
     return (
-      <div className='shareFile'>
-        <div className='shareFile__title'>
-          {props.t('New file share')}
+      <div className='shareDownload'>
+        <div className='shareDownload__title'>
+          {props.t('New share')}
         </div>
 
-        <div className='shareFile__email'>
-          <input
+        <div className='shareDownload__email'>
+          <textarea
             type='text'
-            className='shareFile__email__input form-control'
+            className='shareDownload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
-            value={this.state.emails}
-            onChange={this.handleChangeEmails}
-            onKeyDown={() => {}}
+            rows='10'
+            value={props.shareEmails}
+            onChange={props.onChangeEmails}
+            onKeyDown={props.handleEmailList}
           />
           <button
             type='button'
-            className='shareFile__email__icon'
+            className='shareDownload__email__icon'
             id='popoverMultipleEmails'
             key='share_emails'
             style={{':hover': {color: props.hexcolor}}}
@@ -108,12 +90,12 @@ class NewShareFile extends React.Component {
           </Popover>
         </div>
 
-        <div className='shareFile__password'>
-          <div className='shareFile__password__wrapper'>
+        <div className='shareDownload__password'>
+          <div className='shareDownload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
             <button
               type='button'
-              className='shareFile__password__icon'
+              className='shareDownload__password__icon'
               key='see_share_password'
               style={{':hover': {color: props.hexcolor}}}
               onClick={this.handleSeePassword}
@@ -122,16 +104,16 @@ class NewShareFile extends React.Component {
             </button>
             <input
               type='password'
-              className='shareFile__password__input form-control'
+              className='shareDownload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
-              value={this.state.password}
-              onChange={this.handleChangePassword}
-              onKeyDown={() => {}}
+              value={props.sharePassword}
+              onChange={props.onChangePassword}
+              onFocus={props.handleEmailList}
             />
           </div>
           <button
             type='button'
-            className='shareFile__password__icon'
+            className='shareDownload__password__icon'
             key='random_share_password'
             style={{':hover': {color: props.hexcolor}}}
             onClick={this.handleRandomPassword}
@@ -153,12 +135,12 @@ class NewShareFile extends React.Component {
             }}
           >
             {props.t('Cancel')}
-            <i className='fa fa-fw fa-trash-o' />
+            <i className='fa fa-fw fa-times' />
           </button>
 
           <button
             className='btn highlightBtn'
-            key='new__share__file'
+            key='new__share__download'
             onClick={props.onClickReturnToManagement}
             style={{
               backgroundColor: props.hexcolor,
@@ -176,4 +158,4 @@ class NewShareFile extends React.Component {
   }
 }
 
-export default translate()(Radium(NewShareFile))
+export default translate()(Radium(NewShareDownload))

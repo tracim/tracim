@@ -21,10 +21,9 @@
   &__contentpage
     width 100%
     &__content
-      height calc(100% - 130px)
+      height calc(100% - 120px)
     &__statewrapper
       height 100%
-      padding 10px 10px 0px 10px
       overflow-y auto
       &.displayState ^[1]__preview // render .file__contentpage__statewrapper.displayState .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
@@ -53,7 +52,7 @@
       display none
 
 .activeEditionDesc
-  .file__contentpage__preview__property__content__detail
+  .file__contentpage__preview__content__detail
     &__description
       &__editiondesc
         display block
@@ -85,8 +84,6 @@
                 margin-left 35px
                 &__icon
                   margin-left 15px
-      &__content
-        margin 10px
       &__statewrapper
         padding 0
 
@@ -120,7 +117,6 @@
           width 100%
           min-height 250px
         &__right
-          margin 0 10px
           width 100%
       &__statewrapper
         width 100%

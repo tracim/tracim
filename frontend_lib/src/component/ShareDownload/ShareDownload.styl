@@ -1,14 +1,12 @@
-@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+@import "../../css/Variable.styl"
 
-.shareFile
+.shareDownload
   display flex
   flex-direction column
-  margin 10px 0
-  border-radius 0 10px 10px 0
   width 100%
-  height calc(100% - 10px)
-  background-color white
-  padding 10px
+  height 100%
+  padding 5px
+  min-height 260px
   &__title
     border-bottom 2px solid lightGrey
     margin 10px 15px
@@ -20,10 +18,13 @@
       background-color transparent
       border none
       cursor pointer
+      margin auto
       &:focus
         box-shadow 0 0 0 0
         border 0 none
         outline 0
+    &__input
+      resize none
   &__password
     padding 5px 0px
     display flex
@@ -46,12 +47,9 @@
       border none
       cursor pointer
       &:focus
-        box-shadow 0 0 0 0
         border 0 none
         outline 0
 
 @media (min-width: min-xs) and (max-width: max-lg)
-  .shareFile
+  .shareDownload
     margin-top 0px
-    border-top-right-radius 0px
-    border-bottom-left-radius 10px

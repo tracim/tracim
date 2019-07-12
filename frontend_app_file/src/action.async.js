@@ -144,3 +144,12 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) => {
 //     method: 'GET'
 //   })
 // }
+
+// export const getShareLinksList = (apiUrl, workspaceId, contentId) =>
+//   fetch(`${apiUrl}/workspaces/${workspaceId}/files/${contentId}/share`, {
+//     credentials: 'include',
+//     headers: {
+//       ...FETCH_CONFIG.headers
+//     },
+//     method: 'GET'
+//   })
