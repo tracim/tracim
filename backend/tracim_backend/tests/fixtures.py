@@ -46,6 +46,13 @@ def config_uri() -> str:
 
 @pytest.fixture
 def config_section(request) -> str:
+    """This fixture is used by other fixtures to know which test config section to use.
+    
+    To change which config section name must be used for a test, use following decorator
+    on your test:
+    
+        @pytest.mark.parametrize("config_section", [{"name": "<name_of_config_section>"}], indirect=True)
+    """
     return getattr(request, "param", {}).get("name", "base_test")
 
 
