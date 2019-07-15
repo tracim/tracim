@@ -2,7 +2,6 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
-import CollaboraFrame from '../component/CollaboraFrame.jsx'
 import {
   addAllResourceI18n,
   handleFetchResult,
@@ -25,7 +24,8 @@ import {
   MODE,
   removeExtensionOfFilename,
   displayFileSize,
-  debug
+  debug,
+  PAGE
 } from '../helper.js'
 import {
   getFileContent,
@@ -42,7 +42,8 @@ import {
   getWOPIDiscovery
 } from '../action.async.js'
 
-const qs = require('query-string')
+const CONTENT_TYPE_FILE = 'file'
+
 class File extends React.Component {
   constructor (props) {
     super(props)
@@ -323,7 +324,9 @@ class File extends React.Component {
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
 
   handleClickEdit = () => {
-    this.showCollaboraFrame(true)
+    this.props.data.config.history.push(
+      PAGE.WORKSPACE.CONTENT_EDITION(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id)
+    )
   }
 
   handleClickValidateNewDescription = async newDescription => {
@@ -635,13 +638,8 @@ class File extends React.Component {
       case 200:
         if (response.body.extensions.includes(state.content.file_extension.substr(1))) {
           this.setState({
-            isEditable: true,
-            accessToken: response.body.access_token,
-            collaboraSrc: response.body.urlsrc
+            isEditable: true
           })
-          if (qs.parse(window.location.search).onlineedition === '1') {
-            this.showCollaboraFrame(true)
-          }
         } else {
           this.setState({ isEditable: false })
         }
@@ -660,16 +658,6 @@ class File extends React.Component {
     const { props, state } = this
 
     if (!state.isVisible) return null
-
-    if (state.isEditable && state.isCollaboraShown) {
-      return (
-        <CollaboraFrame
-          accessToken={state.accessToken}
-          iframeUrl={state.collaboraSrc}
-          showCollaboraFrame={this.showCollaboraFrame}
-        />
-      )
-    }
 
     return (
       <PopinFixed

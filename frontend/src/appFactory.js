@@ -20,7 +20,8 @@ export function appFactory (WrappedComponent) {
         translation: i18n.store.data,
         system: this.props.system,
         roleList: ROLE,
-        profileObject: PROFILE
+        profileObject: PROFILE,
+        history: this.props.history
       },
       content
     })
@@ -51,7 +52,8 @@ export function appFactory (WrappedComponent) {
         translation: i18n.store.data,
         system: this.props.system,
         roleList: ROLE,
-        profileObject: PROFILE
+        profileObject: PROFILE,
+        history: this.props.history
       },
       idWorkspace,
       idFolder: idFolder === 'null' ? null : idFolder

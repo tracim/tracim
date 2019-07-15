@@ -1,7 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import File from './container/File.jsx'
+import CollaboraFrame from './component/CollaboraFrame.jsx'
 import PopupCreateFile from './container/PopupCreateFile.jsx'
+import { Router, Switch, Route } from 'react-router'
+
 // @TODO make a file that contains all events implemented by this App.
 // @todo add this file to appInterface
 // @todo app shall make it's customReducer from the events of this app
@@ -14,7 +17,20 @@ const appInterface = {
   isRendered: false,
   renderAppFeature: data => {
     return ReactDOM.render(
-      <File data={data} />
+      <Router history={data.config.history}>
+        <Switch>
+          <Route path='*/online_edition' render={() =>
+            <CollaboraFrame
+              content={data.content}
+              config={data.config}
+              history={data.config.history}
+            />
+          } />
+          <Route path='*' render={() =>
+            <File data={data} />
+          } />
+        </Switch>
+      </Router>
       , document.getElementById(data.config.domContainer)
     )
   },

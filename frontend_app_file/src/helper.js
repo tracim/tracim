@@ -113,3 +113,10 @@ export const debug = {
   timeline: timelineDebugData,
   idWorkspace: 1
 }
+
+export const PAGE = {
+  WORKSPACE: {
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}`,
+    CONTENT_EDITION: (idws = ':idws', type = ':type', idcts = ':idcts') => `/ui/workspaces/${idws}/contents/${type}/${idcts}/online_edition`
+  }
+}
