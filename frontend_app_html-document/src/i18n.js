@@ -20,6 +20,6 @@ i18n
     resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
-i18n.idTracim = 'frontend_app_htmldocument'
+i18n.tracimId = 'frontend_app_htmldocument'
 
 export default i18n

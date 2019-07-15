@@ -16,15 +16,11 @@ import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
   setUserLang,
-  setUserDisconnected,
-  setSearchResultsList,
-  setSearchedKeywords,
-  setCurrentNumberPage
+  setUserDisconnected
 } from '../action-creator.sync.js'
 import {
   postUserLogout,
-  putUserLang,
-  getSearchedKeywords
+  putUserLang
 } from '../action-creator.async.js'
 import {
   COOKIE_FRONTEND,
@@ -35,7 +31,9 @@ import {
 } from '../helper.js'
 import Search from '../component/Header/Search.jsx'
 import { Link } from 'react-router-dom'
-import { IconWithWarning } from 'tracim_frontend_lib'
+import { IconWithWarning, CUSTOM_EVENT } from 'tracim_frontend_lib'
+
+const qs = require('query-string')
 
 class Header extends React.Component {
   componentDidMount () {
@@ -53,23 +51,23 @@ class Header extends React.Component {
     else props.history.push(PAGE.LOGIN)
   }
 
-  handleChangeLang = async idLang => {
+  handleChangeLang = async langId => {
     const { props } = this
 
     if (props.user.user_id === -1) {
-      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
-      i18n.changeLanguage(idLang)
-      props.dispatch(setUserLang(idLang))
+      Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+      i18n.changeLanguage(langId)
+      props.dispatch(setUserLang(langId))
       return
     }
 
-    const fetchPutUserLang = await props.dispatch(putUserLang(props.user, idLang))
+    const fetchPutUserLang = await props.dispatch(putUserLang(props.user, langId))
     switch (fetchPutUserLang.status) {
       case 200:
-        i18n.changeLanguage(idLang)
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, idLang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
-        props.dispatch(setUserLang(idLang))
-        props.dispatchCustomEvent('allApp_changeLang', idLang)
+        i18n.changeLanguage(langId)
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        props.dispatch(setUserLang(langId))
+        props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, langId)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }
@@ -94,22 +92,18 @@ class Header extends React.Component {
     const FIRST_PAGE = 1
 
     // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
-    // Respectively, show_archived=0 (false), show_deleted=0 (false), show_active=1 (true)
-    const fetchGetSearchedKeywords = await props.dispatch(getSearchedKeywords(
-      ALL_CONTENT_TYPES, searchedKeywords, FIRST_PAGE, props.searchResult.numberResultsByPage, false, false, true
-    ))
-
-    switch (fetchGetSearchedKeywords.status) {
-      case 200:
-        props.dispatch(setSearchedKeywords(searchedKeywords))
-        props.dispatch(setCurrentNumberPage(FIRST_PAGE))
-        props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        props.history.push(PAGE.SEARCH_RESULT)
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
-        break
+    // Respectively, we have arc for show_archived=0 (false), del for show_deleted=0 (false) and act for show_active=1 (true)
+    const newUrlSearchObject = {
+      t: ALL_CONTENT_TYPES,
+      q: searchedKeywords,
+      p: FIRST_PAGE,
+      nr: props.searchResult.numberResultsByPage,
+      arc: 0,
+      del: 0,
+      act: 1
     }
+
+    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, {encode: true}))
   }
 
   render () {
@@ -164,7 +158,7 @@ class Header extends React.Component {
 
               <DropdownLang
                 langList={props.lang}
-                idLangActive={props.user.lang}
+                langActiveId={props.user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 

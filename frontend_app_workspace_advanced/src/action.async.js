@@ -1,14 +1,14 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const getWorkspaceDetail = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}`, {
+export const getWorkspaceDetail = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'GET'
   })
 
-export const getWorkspaceMember = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/members`, {
+export const getWorkspaceMember = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/members`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'GET'
@@ -58,8 +58,8 @@ export const putAgendaEnabled = (apiUrl, workspace, agendaEnabled) =>
     })
   })
 
-export const putMemberRole = (apiUrl, idWorkspace, idMember, slugNewRole) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/members/${idMember}`, {
+export const putMemberRole = (apiUrl, workspaceId, memberId, slugNewRole) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/members/${memberId}`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'PUT',
@@ -68,22 +68,22 @@ export const putMemberRole = (apiUrl, idWorkspace, idMember, slugNewRole) =>
     })
   })
 
-export const deleteMember = (apiUrl, idWorkspace, idMember) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/members/${idMember}`, {
+export const deleteMember = (apiUrl, workspaceId, memberId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/members/${memberId}`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'DELETE'
   })
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch, idWorkspaceToExclude) =>
-  fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${idWorkspaceToExclude}`, {
+export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceToExcludeId) =>
+  fetch(`${apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceToExcludeId}`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'GET'
   })
 
-export const postWorkspaceMember = (apiUrl, idWorkspace, newMember) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/members`, {
+export const postWorkspaceMember = (apiUrl, workspaceId, newMember) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/members`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'POST',
@@ -95,8 +95,8 @@ export const postWorkspaceMember = (apiUrl, idWorkspace, newMember) =>
     })
   })
 
-export const deleteWorkspace = (apiUrl, idWorkspace) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/trashed`, {
+export const deleteWorkspace = (apiUrl, workspaceId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/trashed`, {
     credentials: 'include',
     headers: {...FETCH_CONFIG.headers},
     method: 'PUT'

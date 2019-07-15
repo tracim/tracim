@@ -4,9 +4,6 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models.auth import User
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import MailHogFunctionalTest
 
@@ -119,10 +116,9 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_check_token__ok_204__nominal_case(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        reset_password_token = uapi.reset_password_notification(admin, do_save=True)
+
+        uapi = self.get_user_api()
+        reset_password_token = uapi.reset_password_notification(self.get_admin_user(), do_save=True)
         transaction.commit()
         params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
         self.testapp.post_json("/api/v2/auth/password/reset/token/check", status=204, params=params)
@@ -147,9 +143,8 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
 
         # make a check of token
         self.testapp.authorization = None
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.get_one_by_email("test@test.test")
         reset_password_token = uapi.reset_password_notification(user, do_save=True)
         transaction.commit()
@@ -176,10 +171,9 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_reset__ok_204__nominal_case(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        reset_password_token = uapi.reset_password_notification(admin, do_save=True)
+
+        uapi = self.get_user_api()
+        reset_password_token = uapi.reset_password_notification(self.get_admin_user(), do_save=True)
         transaction.commit()
         params = {
             "email": "admin@admin.admin",
@@ -212,9 +206,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
 
         # make a check of token
         self.testapp.authorization = None
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         user = uapi.get_one_by_email("test@test.test")
         reset_password_token = uapi.reset_password_notification(user, do_save=True)
         transaction.commit()
@@ -249,11 +242,12 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_reset__err_400__expired_token(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
         with freeze_time("1999-12-31 23:59:59"):
-            reset_password_token = uapi.reset_password_notification(admin, do_save=True)
+            reset_password_token = uapi.reset_password_notification(
+                self.get_admin_user(), do_save=True
+            )
             params = {
                 "email": "admin@admin.admin",
                 "reset_password_token": reset_password_token,
@@ -272,10 +266,9 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
     @pytest.mark.email_notification
     @pytest.mark.internal_auth
     def test_api__reset_password_reset__err_400__password_does_not_match(self):
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        reset_password_token = uapi.reset_password_notification(admin, do_save=True)
+
+        uapi = self.get_user_api()
+        reset_password_token = uapi.reset_password_notification(self.get_admin_user(), do_save=True)
         transaction.commit()
         params = {
             "email": "admin@admin.admin",

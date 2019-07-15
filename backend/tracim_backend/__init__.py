@@ -142,7 +142,6 @@ def web(global_config, **local_settings):
     # Override default request
     configurator.set_request_factory(TracimRequest)
     # Pyramids "plugin" include.
-    configurator.include("pyramid_jinja2")
     # Add SqlAlchemy DB
     init_models(configurator, app_config)
     # set Hapic

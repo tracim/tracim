@@ -15,18 +15,18 @@ class TestRoleApi(DefaultTest):
     fixtures = [BaseFixture, ContentFixture]
 
     def test_unit__get_one__ok__nominal_case(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = self.get_admin_user()
         rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
         rapi.get_one(admin.user_id, 1)
 
     def test_unit__get_one__err__role_does_not_exist(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = self.get_admin_user()
         rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
         with pytest.raises(UserRoleNotFound):
             rapi.get_one(admin.user_id, 100)  # workspace 100 does not exist
 
     def test_unit__create_one__nominal_case(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = self.get_admin_user()
         workspace = self._create_workspace_and_test("workspace_1", admin)
         bob = self.session.query(User).filter(User.email == "bob@fsf.local").one()
         rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
@@ -40,7 +40,7 @@ class TestRoleApi(DefaultTest):
         assert created_role == obtain_role
 
     def test_unit__get_all_for_usages(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = self.get_admin_user()
         rapi = RoleApi(current_user=admin, session=self.session, config=self.app_config)
         workspace = self._create_workspace_and_test("workspace_1", admin)
         roles = rapi.get_all_for_workspace(workspace)

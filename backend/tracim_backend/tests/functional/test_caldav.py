@@ -6,13 +6,7 @@ import requests
 from requests.exceptions import ConnectionError
 import transaction
 
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.models.setup_models import get_tm_session
 from tracim_backend.tests import CaldavRadicaleProxyFunctionalTest
 from tracim_backend.tests import FunctionalTest
 
@@ -50,10 +44,9 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         assert result.status_code == 200
 
     def test_proxy_user_agenda__ok__nominal_case(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -80,10 +73,9 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         ]
     )
     def test_proxy_user_agenda__ok__on_sub_items(self, sub_item_label) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -112,10 +104,9 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         self.testapp.delete("/agenda/user/{}/".format(user.user_id, sub_item_label), status=200)
 
     def test_proxy_user_agenda__err__other_user_agenda(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -137,10 +128,9 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         assert result.json_body["code"] == 5001
 
     def test_proxy_workspace_agenda__ok__nominal_case(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -149,12 +139,10 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -170,10 +158,9 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
         self.testapp.delete("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         uapi.create_user(
             "test@test.test",
@@ -182,9 +169,7 @@ class TestCaldavRadicaleProxyEndpoints(CaldavRadicaleProxyFunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         self.testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -198,10 +183,9 @@ class TestAgendaApi(FunctionalTest):
     config_section = "functional_caldav_radicale_proxy_test"
 
     def test_proxy_user_agenda__ok__nominal_case(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -210,9 +194,7 @@ class TestAgendaApi(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
         workspace2 = workspace_api.create_workspace("wp2", save_now=True)
@@ -221,7 +203,7 @@ class TestAgendaApi(FunctionalTest):
         workspace3.agenda_enabled = False
         secret_workspace = workspace_api.create_workspace("secret", save_now=True)
         secret_workspace.agenda_enabled = True
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)
         rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
@@ -245,10 +227,9 @@ class TestAgendaApi(FunctionalTest):
         assert agenda["with_credentials"] is True
 
     def test_proxy_user_agenda__ok__workspace_filter(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        uapi = UserApi(current_user=admin, session=dbsession, config=self.app_config)
-        gapi = GroupApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        uapi = self.get_user_api()
+        gapi = self.get_group_api()
         groups = [gapi.get_one_with_name("users")]
         user = uapi.create_user(
             "test@test.test",
@@ -257,16 +238,14 @@ class TestAgendaApi(FunctionalTest):
             do_notify=False,
             groups=groups,
         )
-        workspace_api = WorkspaceApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+        workspace_api = self.get_workspace_api(show_deleted=True)
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
         workspace2 = workspace_api.create_workspace("wp2", save_now=True)
         workspace2.agenda_enabled = True
         workspace3 = workspace_api.create_workspace("wp3", save_now=True)
         workspace3.agenda_enabled = True
-        rapi = RoleApi(current_user=admin, session=dbsession, config=self.app_config)
+        rapi = self.get_role_api()
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
         rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)
         rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
