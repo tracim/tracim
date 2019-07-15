@@ -23,9 +23,9 @@ import {
 } from 'tracim_frontend_lib'
 import {
   MODE,
-  debug,
   initWysiwyg
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocComment,

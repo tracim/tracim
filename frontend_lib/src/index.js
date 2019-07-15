@@ -7,9 +7,12 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   appFeatureCustomEventHandlerShowApp,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  FETCH_CONFIG
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+
+import { defaultDebug } from './debug.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
@@ -99,6 +102,8 @@ export {
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
+  FETCH_CONFIG,
+  defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,

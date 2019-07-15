@@ -8,7 +8,11 @@ import {
 } from 'tracim_frontend_lib'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
+import FileDropzone from '../component/FileDropzone.jsx'
 import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
+// FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
+// https://github.com/tracim/tracim/issues/2066
+import { debug } from '../debug.js'
 
 class PopupCreateFile extends React.Component {
   constructor (props) {

@@ -2,7 +2,6 @@ from email.message import Message
 
 from mock import MagicMock
 from mock import Mock
-from parameterized import parameterized
 import pytest
 import responses
 
@@ -22,7 +21,8 @@ class TestDecodedMail(object):
         except AutoReplyEmailNotAllowed:
             pytest.fail("mail is seen as autoreply mail but it is not")
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        "header_name, header_value",
         [
             # header_name, header_value
             ("Auto-submitted", "auto-replied"),
@@ -37,7 +37,7 @@ class TestDecodedMail(object):
             ("X-Auto-Response-Suppress", "a,autoreply,z"),
             ("X-Auto-Response-Suppress", "a,all,z"),
             ("X-Auto-Response-Suppress", "DR,All,Autoreply"),
-        ]
+        ],
     )
     def test_unit__decoded_mail__check_validity_for_comment_content__err__is_autoreply_email(
         self, header_name, header_value

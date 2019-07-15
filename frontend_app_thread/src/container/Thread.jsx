@@ -1,7 +1,7 @@
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
-import { debug } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
