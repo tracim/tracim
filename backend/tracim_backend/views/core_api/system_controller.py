@@ -126,8 +126,12 @@ class SystemController(Controller):
         configurator.add_view(self.content_types, route_name="content_types")
 
         # Custom_form_content_types
-        configurator.add_route("custom_form_content_types", "/system/custom_form_content_types", request_method="GET")
-        configurator.add_view(self.custom_form_content_types, route_name="custom_form_content_types")
+        configurator.add_route(
+            "custom_form_content_types", "/system/custom_form_content_types", request_method="GET"
+        )
+        configurator.add_view(
+            self.custom_form_content_types, route_name="custom_form_content_types"
+        )
 
         # Content_types
         configurator.add_route("timezones_list", "/system/timezones", request_method="GET")

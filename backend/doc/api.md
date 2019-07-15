@@ -41,16 +41,16 @@ Server: waitress
 Set-Cookie:  session_key=22fd293b6d850faabc8e3f167bcfc804d8713deed03bc15e5029434687050fb809ef2076; expires=Mon, 22-Jan-2019 11:26:53 GMT; Path=/; SameSite=Lax
 
 {
-    "auth_type": "internal", 
-    "avatar_url": null, 
-    "created": "2019-01-18T13:07:02Z", 
-    "email": "admin@admin.admin", 
-    "is_active": true, 
-    "is_deleted": false, 
-    "lang": null, 
-    "profile": "administrators", 
-    "public_name": "Global manager", 
-    "timezone": "", 
+    "auth_type": "internal",
+    "avatar_url": null,
+    "created": "2019-01-18T13:07:02Z",
+    "email": "admin@admin.admin",
+    "is_active": true,
+    "is_deleted": false,
+    "lang": null,
+    "profile": "administrators",
+    "public_name": "Global manager",
+    "timezone": "",
     "user_id": 1
 }
 ```
@@ -71,16 +71,16 @@ Server: waitress
 Set-Cookie:  session_key=50307c9007fff16791f660eed14d47a33cf11eef365b3e0403ce42f5a8b8f1f12c254b58; expires=Mon, 22-Jan-2018 13:00:49 GMT; Path=/; SameSite=Lax
 
 {
-    "auth_type": "internal", 
-    "avatar_url": null, 
-    "created": "2019-01-18T13:07:02Z", 
-    "email": "admin@admin.admin", 
-    "is_active": true, 
-    "is_deleted": false, 
-    "lang": null, 
-    "profile": "administrators", 
-    "public_name": "Global manager", 
-    "timezone": "", 
+    "auth_type": "internal",
+    "avatar_url": null,
+    "created": "2019-01-18T13:07:02Z",
+    "email": "admin@admin.admin",
+    "is_active": true,
+    "is_deleted": false,
+    "lang": null,
+    "profile": "administrators",
+    "public_name": "Global manager",
+    "timezone": "",
     "user_id": 1
 }
 ```
@@ -89,7 +89,7 @@ Set-Cookie:  session_key=50307c9007fff16791f660eed14d47a33cf11eef365b3e0403ce42f
 
 You need to send a json with `email` and `password` fields:
 
-```                                                                                                                                                                                                     
+```  
 $ http POST http://127.0.0.1:6543/api/v2/auth/login email=admin@admin.admin password=admin@admin.admin
 HTTP/1.1 200 OK
 Content-Length: 276
@@ -101,14 +101,14 @@ Set-Cookie:  session_key=92504e7310aa6433b523405591a9785e056927dab15e49f7c3204ae
 {
     "auth_type": "internal",
     "avatar_url": null,
-    "created": "2019-01-18T13:07:02Z", 
-    "email": "admin@admin.admin", 
-    "is_active": true, 
-    "is_deleted": false, 
-    "lang": null, 
-    "profile": "administrators", 
-    "public_name": "Global manager", 
-    "timezone": "", 
+    "created": "2019-01-18T13:07:02Z",
+    "email": "admin@admin.admin",
+    "is_active": true,
+    "is_deleted": false,
+    "lang": null,
+    "profile": "administrators",
+    "public_name": "Global manager",
+    "timezone": "",
     "user_id": 1
 }
 ```
@@ -125,16 +125,16 @@ Server: waitress
 Set-Cookie:  session_key=978301c4058de0646a4c6acf55a2b28b102b297f590edf75ffec4295b34435d8bedd3cb7; expires=Tue, 29-Jan-2019 16:05:38 GMT; Path=/; SameSite=Lax
 
 {
-    "auth_type": "internal", 
+    "auth_type": "internal",
     "avatar_url": null,
-    "created": "2019-01-18T13:07:02Z", 
-    "email": "admin@admin.admin", 
-    "is_active": true, 
-    "is_deleted": false, 
-    "lang": null, 
-    "profile": "administrators", 
-    "public_name": "Global manager", 
-    "timezone": "", 
+    "created": "2019-01-18T13:07:02Z",
+    "email": "admin@admin.admin",
+    "is_active": true,
+    "is_deleted": false,
+    "lang": null,
+    "profile": "administrators",
+    "public_name": "Global manager",
+    "timezone": "",
     "user_id": 1
 }
 ```
@@ -152,15 +152,15 @@ Date: Tue, 22 Jan 2019 12:47:52 GMT
 Server: waitress
 
 {
-    "code": 2001, 
+    "code": 2001,
     "details": {
         "email": [
             "Missing data for required field."
-        ], 
+        ],
         "password": [
             "Missing data for required field."
         ]
-    }, 
+    },
     "message": "Validation error of input data"
 }
 ```
@@ -170,4 +170,3 @@ You can also see an error code in json response as `code`, this is useful in cas
 Look at [error.py](../tracim_backend/error.py) to get detail.
 
 Note: a specific endpoint about error cases code, [will be added later](https://github.com/tracim/tracim/issues/1006).
- 

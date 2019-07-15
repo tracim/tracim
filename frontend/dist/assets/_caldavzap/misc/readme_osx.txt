@@ -1,6 +1,6 @@
 OS X Server instructions:
 
-1. Calendarserver in OS X not sends headers required by web browsers to allow cross domain queries. To add these headers follow the steps below: 
+1. Calendarserver in OS X not sends headers required by web browsers to allow cross domain queries. To add these headers follow the steps below:
 	- copy the misc/calendarserver.diff into any directory on your server (for example: ~/Desktop)
 	Mac OS X Lion Server (for OS X Mountain Lion Server see below):
 		- if your server is already patched (previous version of patch) you must restore the original files from backup:

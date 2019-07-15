@@ -4,4 +4,3 @@
 4.) set $config['auth_send_authenticate_header']=false in auth/config.inc
 
 By default the generic plugin is used for basic HTTP authentication ($config['auth_method']='generic'; in config.inc).
-

@@ -188,4 +188,3 @@ translate_email
 # Return to "$DEFAULTDIR/"
 log "cd $DEFAULTDIR"
 cd $DEFAULTDIR || exit 1
-

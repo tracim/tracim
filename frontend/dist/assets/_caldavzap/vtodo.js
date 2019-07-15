@@ -1356,7 +1356,7 @@ function todoToVcalendar(operation, accountUID, inputUID, inputEtag, delUID, del
 					}
 					process_elem=process_elem.replace('##:::##value##:::##', vcalendarEscapeValue('DISPLAY'));
 					alarmText+=process_elem;
-					
+
 					if(vCalendar.tplM['VTcontentline_DESCRIPTION']!=null && (process_elem=vCalendar.tplM['VTcontentline_DESCRIPTION'][0])!=undefined)
 					{
 						parsed=('\r\n'+process_elem).match(RegExp('\r\n((?:'+vCalendar.re['group']+'\\.)?)', 'm'));
@@ -1371,7 +1371,7 @@ function todoToVcalendar(operation, accountUID, inputUID, inputEtag, delUID, del
 					}
 					process_elem=process_elem.replace('##:::##value##:::##', vcalendarEscapeValue('Reminder'));
 					alarmText+=process_elem;
-					
+
 				}
 
 				if(typeof vCalendar.tplM['VTunprocessedVALARM'][repeatHash]!='undefined' && vCalendar.tplM['VTunprocessedVALARM'][repeatHash]!='' && vCalendar.tplM['VTunprocessedVALARM'][repeatHash]!=null)

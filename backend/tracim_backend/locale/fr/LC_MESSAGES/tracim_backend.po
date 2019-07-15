@@ -198,4 +198,3 @@ msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
 "Si le lien ne fonctionne pas, Je vous suggère de copier/coller l'url "
 "entière :"
-

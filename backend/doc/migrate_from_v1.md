@@ -59,16 +59,16 @@ After migration, file is accessible in:
 Copy folder `collection-root/agenda/` in `radicale_storage/`.
 
     cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
-    
+
 Make sure `.Radicale.props` file does not exist in the following folders (otherwise delete them):
-  
+
 - `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/user/`
 - `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/workspace/`
 
 After starting caldav server you need to synchronize tracim with radicale. For that you need to use this command:
 
     tracimcli caldav sync
-    
+
 Now all of your agendas are visible in tracim.
 
 ## Parameter changed from v2.1 to v2.2
@@ -137,7 +137,7 @@ One easy way to migrate from tracim v1 to tracim v2 with shell script is :
  - running shell automatic install with default sqlite database
  - active virtual environment (in `/backend` folder) `source env/bin/activate`
  - verify if tracim v2 is running correctly by launching `pserve development.ini`
- - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your 
+ - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your
 SGDB.
  - modify default config file (`development.ini` name here but you can change it) with `basic_setup.sqlalchemy_url` linking to your own database with tracim_v1 data and `basic_setup.depot_storage_dir` with path giving access to your old tracim v1 depot dir content.
  - force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)
@@ -150,12 +150,12 @@ and verify which tracim_v1 parameter already exist and add them to your config f
 
 ## 5. More infos about new config in Tracim_v2
 
-Big change in config ini in tracim_v2 was to move most of the config (mostly from `[app:main]`) in `[DEFAULT]` section and 
+Big change in config ini in tracim_v2 was to move most of the config (mostly from `[app:main]`) in `[DEFAULT]` section and
 separated more properly global config from app specific param like `pyramid.*` param in tracim_web app section , `[app:tracim_web]`  .
 In order to have something working easily, best solution is using  [developement.ini.sample](../development.ini.sample) and
 modify parameters, which are mostly in `[DEFAULT]` section.
 
-| parameters        | status in tracim v2 |complementary informations  | 
+| parameters        | status in tracim v2 |complementary informations  |
 |-------------------|--------------------|----------------------------|
 | auth_type         |  renamed           | only `auth_type=internal` is supported in tracim v2.0, tracim v2.1 use now `auth_types` a list of ',' separated auth type, valid value are `internal` and  `ldap`.
 |-------------------|-------------------|-----------------------------|

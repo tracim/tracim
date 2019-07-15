@@ -62,9 +62,9 @@ You also need to make the mock api able to tell tracim_frontend that it handle y
 
 
 #### Urls list
-- __/__ => detail of the first workspace 
+- __/__ => detail of the first workspace
 - __/login__ => login page
 - __/workspace/:idws__ => detail of the workspace :idws
 - __/workspace/:idws/content/:idc__ => detail of the workspace :idws with the app of the content :idc openned
 - __/account__ => profile page of the connected user
-- __/dashboard__ => dashboard of a workspace (code not plugged in therefore no :idws in url) 
+- __/dashboard__ => dashboard of a workspace (code not plugged in therefore no :idws in url)

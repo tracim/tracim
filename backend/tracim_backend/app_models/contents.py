@@ -138,21 +138,21 @@ class CustomFormContentType(object):
     """
 
     def __init__(
-            self,
-            slug: str,
-            slug_form: str,
-            fa_icon: str,
-            hexcolor: str,
-            label: str,
-            creation_label: str,
-            schema: str,
-            uischema: str,
-            index: int,
-            available_statuses: typing.List[ContentStatus],
-            slug_alias: typing.List[str] = None,
-            allow_sub_content: bool = False,
-            file_extension: typing.Optional[str] = None,
-            minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
+        self,
+        slug: str,
+        slug_form: str,
+        fa_icon: str,
+        hexcolor: str,
+        label: str,
+        creation_label: str,
+        schema: str,
+        uischema: str,
+        index: int,
+        available_statuses: typing.List[ContentStatus],
+        slug_alias: typing.List[str] = None,
+        allow_sub_content: bool = False,
+        file_extension: typing.Optional[str] = None,
+        minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
     ):
         self.slug = slug
         self.slug_form = slug_form

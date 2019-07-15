@@ -70,5 +70,5 @@ The other is workspace related and is called "workspace role".
 |------------------------------|--------|-------------|-----------------|-------------------|
 | modify comments              |  no    | owner       | owner             | yes             |
 | delete comments              |  no    | owner       | owner             | yes             |
- 
+
   *: folder content not included.

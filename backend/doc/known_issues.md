@@ -20,4 +20,3 @@ be careful for uwsgi ini file :
 
     # correct
     env = TRACIM_CONF_PATH=/home/me/tracim/backend/development.ini
-

@@ -13,7 +13,7 @@ and active the Tracim virtualenv:
     (env) user@host:~/tracim_backend$
 
 ## Migration howto - Overview ##
-   
+
 ### Upgrading schema to last revision ###
 
     alembic -c development.ini upgrade head
@@ -34,7 +34,7 @@ and active the Tracim virtualenv:
 
 ### Creating new schema migration ###
 
-This creates a new auto-generated python migration file 
+This creates a new auto-generated python migration file
 in `tracim_backend/migration/versions/` ending by `migration_label.py`:
 
     alembic -c development.ini revision --autogenerate -m "migration label"

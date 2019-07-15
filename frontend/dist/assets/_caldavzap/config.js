@@ -96,7 +96,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //     globalAccountSettings
 //     globalNetworkCheckSettings
 //     globalNetworkAccountSettings
-// - lockTimeOut 
+// - lockTimeOut
 //   NOTE: used only if server supports LOCK requests
 //   This option sets the LOCK timeout value if resource locking
 //   is used (in miliseconds).
@@ -174,7 +174,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //     %U = logged user name
 //     %u = logged user name without the @domain.com part (if present)
 //   If undefined, empty or or null then '%d/%p [%u]' is used.
-//   Examples: 
+//   Examples:
 //     hrefLabel: '%d/%p [%u]'
 //     hrefLabel: '%D/%u'
 //   This property is supported in:
@@ -187,7 +187,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //   - true
 //     all collections will be "read-only"
 //   - array of URL encoded
-//     - collections, such as: 
+//     - collections, such as:
 //       '/caldav.php/user/calendar/'
 //       '/caldav.php/user%40domain.com/calendar/'
 //     - regexes, such as:
@@ -197,7 +197,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //   Examples:
 //     forceReadOnly: null
 //     forceReadOnly: true
-//     forceReadOnly: ['/caldav.php/user/calendar/', 
+//     forceReadOnly: ['/caldav.php/user/calendar/',
 //                     '/caldav.php/user/calendar2/']
 //     forceReadOnly: [new RegExp('^/.*/user/calendar[0-9]/$', 'i')]
 //   This property is supported in:
@@ -212,7 +212,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //   - true
 //     alarm functionality is disabled for all collections
 //   - array of URL encoded
-//     - collections, such as: 
+//     - collections, such as:
 //       '/caldav.php/user/calendar/'
 //       '/caldav.php/user%40domain.com/calendar/'
 //     - regexes, such as:
@@ -222,7 +222,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //   for all collections.
 //   Examples:
 //     ignoreAlarms: true
-//     ignoreAlarms: ['/caldav.php/user/calendar/', 
+//     ignoreAlarms: ['/caldav.php/user/calendar/',
 //                    '/caldav.php/user/calendar2/']
 //     ignoreAlarms: [new RegExp('^/.*/user/calendar[0-9]/$', 'i')]
 //   This property is supported in:
@@ -236,14 +236,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //   the background color for that day will be pink/light-red.
 //   Supported values:
 //   - array of URL encoded
-//     - collections, such as: 
+//     - collections, such as:
 //       '/caldav.php/user/calendar/'
 //       '/caldav.php/user%40domain.com/calendar/'
 //     - regexes, such as:
 //       new RegExp('^/caldav.php/user/calendar[0-9]/$', 'i')
 //     specifies the list of background calendar collections.
 //   Examples:
-//     backgroundCalendars: ['/caldav.php/user/calendar/', 
+//     backgroundCalendars: ['/caldav.php/user/calendar/',
 //                           '/caldav.php/user/calendar2/']
 //     backgroundCalendars: [new RegExp('^/.*/user/calendar[0-9]/$', 'i')]
 //   This property is supported in:
@@ -528,7 +528,7 @@ var globalNewVersionNotifyUsers=[];
 
 
 // globalDatepickerFormat
-// Set the datepicker format (see 
+// Set the datepicker format (see
 // http://docs.jquery.com/UI/Datepicker/formatDate for valid values).
 // NOTE: date format is predefined for each localization - use this option
 // ONLY if you want to use custom date format (instead of the localization
@@ -595,7 +595,7 @@ var globalLoadedTodoCollections=[];
 // checkbox => data visible in the interface) by default after login.
 // If empty then all loaded calendar collections for the currently logged
 // user are checked.
-// NOTE: only already (down)loaded collections can be checked (see 
+// NOTE: only already (down)loaded collections can be checked (see
 // the globalLoadedCalendarCollections option).
 // NOTE: settings stored on the server (see settingsAccount) overwrite this
 // option.
@@ -608,7 +608,7 @@ var globalActiveCalendarCollections=[];
 // checkbox => data visible in the interface) by default after login.
 // If empty then all loaded todo collections for the currently logged
 // user are checked.
-// NOTE: only already (down)loaded collections can be checked (see 
+// NOTE: only already (down)loaded collections can be checked (see
 // the globalLoadedTodoCollections option).
 // NOTE: settings stored on the server (see settingsAccount) overwrite this
 // option.
@@ -638,7 +638,7 @@ var globalActiveTodoCollections=[];
 // for example: 'USER/todo_calendar/'
 // If empty or undefined then the first available todo collection
 // is selected automatically.
-// NOTE: only already (down)loaded collections can be pre-selected (see 
+// NOTE: only already (down)loaded collections can be pre-selected (see
 // the globalLoadedTodoCollections option).
 // NOTE: settings stored on the server (see settingsAccount) overwrite this
 // option.
@@ -752,13 +752,13 @@ var globalTimeZone='Europe/Berlin';
 
 
 // globalTimeZonesEnabled
-// This option sets the list of available timezones in the interface (for the 
+// This option sets the list of available timezones in the interface (for the
 // list of supported timezones see the comment for the previous configuration
 // option).
 // NOTE: if there is at least one event/todo with a certain timezone defined,
 // that timezone is enabled (even if it is not present in this list).
 // Example:
-//   var globalTimeZonesEnabled=['America/New_York', 'Europe/Berlin'];	
+//   var globalTimeZonesEnabled=['America/New_York', 'Europe/Berlin'];
 var globalTimeZonesEnabled=[];
 
 
@@ -875,8 +875,8 @@ var globalAppleRemindersMode=true;
 //   - typeList
 //     Set the list of objects you want to process from remote calendars;
 //     two options are available:
-//     - 'vevent' (show remote events in the interface) 
-//     - 'vtodo' (show remote todos in the interface) 
+//     - 'vevent' (show remote events in the interface)
+//     - 'vtodo' (show remote todos in the interface)
 //   - ignoreAlarm
 //     Set this option to true if you want to disable alarm notifications
 //     from the remote calendar.
@@ -907,4 +907,3 @@ var globalAppleRemindersMode=true;
 //		}
 //	]
 //};
-

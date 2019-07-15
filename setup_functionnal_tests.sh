@@ -95,4 +95,3 @@ else
         loggood "Path exist. Modify manualy if necessary."
     fi
 fi
-

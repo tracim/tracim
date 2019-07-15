@@ -38,4 +38,3 @@ database field inf_it_settings (see above 1.)
 
 b) it modifies vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php to give write
 access to principal properties ('write' includes 'write-properties').
-

@@ -824,24 +824,24 @@ class CFG(object):
                     creation_label=f["creationLabel"],
                     schema=f["schema"],
                     uischema=f["uiSchema"],
-                    hexcolor=f['hexColor'],
-                    fa_icon=f['fa_icon'],
+                    hexcolor=f["hexColor"],
+                    fa_icon=f["fa_icon"],
                     index=f["id"],
                     available_statuses=content_status_list.get_all(),
                     file_extension=".custom.form",
-            )
+                )
 
         # process activated app list
         available_apps = OrderedDict(
-             [
-                 (custom_form.slug, custom_form),
-                 (html_documents.slug, html_documents),
-                 (_file.slug, _file),
-                 (thread.slug, thread),
-                 (folder.slug, folder),
-                 (markdownpluspage.slug, markdownpluspage),
-                 (agenda.slug, agenda),
-             ]
+            [
+                (custom_form.slug, custom_form),
+                (html_documents.slug, html_documents),
+                (_file.slug, _file),
+                (thread.slug, thread),
+                (folder.slug, folder),
+                (markdownpluspage.slug, markdownpluspage),
+                (agenda.slug, agenda),
+            ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var

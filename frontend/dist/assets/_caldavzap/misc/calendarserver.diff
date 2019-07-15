@@ -16,7 +16,7 @@ diff -ru web2/http_headers.py web2-CardDavMATE/http_headers.py
 +    'Access-Control-Expose-Headers':(last,)
 +    # end CardDavMATE section
  }
- 
+
  generator_response_headers = {
 @@ -1545,7 +1552,14 @@
      'Set-Cookie':(generateSetCookie,),
@@ -33,7 +33,7 @@ diff -ru web2/http_headers.py web2-CardDavMATE/http_headers.py
 +    'Access-Control-Expose-Headers':(str, singleHeader)
 +    # end CardDavMATE section
  }
- 
+
  parser_entity_headers = {
 diff -ru web2/server.py web2-CardDavMATE/server.py
 --- web2/server.py	2011-10-31 00:34:21.000000000 +0100
@@ -58,11 +58,11 @@ diff -ru web2/server.py web2-CardDavMATE/server.py
 +
      return response
  defaultHeadersFilter.handleErrors = True
- 
+
 @@ -354,7 +366,7 @@
          example. This would also be the place to do any CONNECT
          processing."""
- 
+
 -        if self.method == "OPTIONS" and self.uri == "*":
 +        if self.method == "OPTIONS":
              response = http.Response(responsecode.OK)

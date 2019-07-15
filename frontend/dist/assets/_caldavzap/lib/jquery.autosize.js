@@ -101,7 +101,7 @@
 			// The mirror width must exactly match the textarea width, so using getBoundingClientRect because it doesn't round the sub-pixel value.
 			function setWidth() {
 				var style, width;
-				
+
 				if ('getComputedStyle' in window) {
 					style = window.getComputedStyle(ta, null);
 					width = ta.getBoundingClientRect().width;

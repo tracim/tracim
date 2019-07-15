@@ -240,7 +240,7 @@ function EventList()
 			delete globalEventList.todos[rid][inputUid];
 			isEvent=false;
 		}
-		
+
 		if(uidRemoved!=null)
 		{
 			if(fromInterface)

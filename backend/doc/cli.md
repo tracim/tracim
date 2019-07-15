@@ -29,7 +29,7 @@ This will drop all your database, be carefull !
     tracimcli db delete --force
 
 ## User ##
-   
+
 ### add a user
 
     tracimcli user create -l "john@john@john.john" -p "superpassword"
@@ -42,7 +42,7 @@ This will drop all your database, be carefull !
 
     tracimcli user create -h
     tracimcli user update -h
- 
+
 ## Caldav ##
 
 ### Run service ###

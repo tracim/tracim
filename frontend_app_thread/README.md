@@ -11,4 +11,3 @@ This repo is an app loaded by Tracim.
 To see your changes without importing the app into Tracim:
 - run `$ npm run servdev`
 Which will create a web server (webpack) where you will see the app loaded with some default values
-

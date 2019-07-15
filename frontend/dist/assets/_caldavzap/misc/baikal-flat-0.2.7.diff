@@ -7,13 +7,13 @@ diff -rc baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/PrincipalBackend/PDO.php 
           '{http://sabredav.org/ns}email-address' => array(
               'dbField' => 'email',
           ),
-+ 
++
 +         /* necessary to access with PROPFIND caldavzap settings (Zellner, 2014-02-14) */
 +         '{http://inf-it.com/ns/dav/}settings' => array(
 +             'dbField' => 'inf_it_settings',
 +         ),
       );
-  
+
       /**
 diff -rc baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php baikal-flat-0.2.7.new/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php
 *** baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php	2013-10-02 20:38:26.000000000 +0200
@@ -31,5 +31,5 @@ diff -rc baikal-flat/vendor/sabre/dav/lib/Sabre/DAVACL/Principal.php baikal-flat
 +                 'protected' => true,
 +             ),
           );
-  
+
       }

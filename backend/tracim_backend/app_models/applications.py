@@ -108,7 +108,7 @@ class Application(object):
             minimal_role_content_creation=minimal_role_content_creation,
             schema=schema,
             uischema=uischema,
-            index=index
+            index=index,
         )
         self.custom_form_content_types.append(custom_form_content_type)
 
