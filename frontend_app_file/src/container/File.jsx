@@ -28,6 +28,7 @@ import {
   debug,
   PAGE
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   getFileContent,
   getFileComment,

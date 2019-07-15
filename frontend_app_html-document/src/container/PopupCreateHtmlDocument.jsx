@@ -8,36 +8,9 @@ import {
 } from 'tracim_frontend_lib'
 import { postODP } from '../action.async.js'
 import i18n from '../i18n.js'
-
-const debug = { // outdated
-  config: {
-    // label: 'New Document',
-    slug: 'html-document',
-    faIcon: 'file-text-o',
-    hexcolor: '#3f52e3',
-    creationLabel: 'Write a document',
-    domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:6543/api/v2',
-    apiHeader: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    translation: {
-      en: {translation: {}},
-      fr: {translation: {}}
-    }
-  },
-  loggedUser: {
-    id: 5,
-    username: 'Smoi',
-    firstname: 'Côme',
-    lastname: 'Stoilenom',
-    email: 'osef@algoo.fr',
-    avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
-  },
-  workspaceId: 1,
-  folderId: null
-}
+// FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
+// https://github.com/tracim/tracim/issues/2066
+import { debug } from '../debug.js'
 
 class PopupCreateHtmlDocument extends React.Component {
   constructor (props) {

@@ -11,6 +11,9 @@ While working on Tracim and on tracim_lib, if you change tracim_lib, for the cha
 - commit push the new version
 - run `$ npm update tracim_lib` in Tracim to get the new version
 
+The debug.js file is used for all app debug files and it's based at debug.js.sample file. To adapt the template to your system you must change the variables:
+ - loggedUser: object in which all parameters must be changed in relation to the current user logged on in Tracim
+
 #### Alternatively you can (faster for development)
 - create a link of tracim_lib using npm: in tracim_lib `$ npm link`
 - get that link in tracim: in tracim (repo) `$ npm link tracim_lib`

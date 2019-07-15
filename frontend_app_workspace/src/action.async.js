@@ -1,4 +1,4 @@
-import { FETCH_CONFIG } from './helper.js'
+import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
 export const postWorkspace = (apiUrl, newWorkspaceName) =>
   fetch(`${apiUrl}/workspaces`, {
