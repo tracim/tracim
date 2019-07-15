@@ -4,6 +4,16 @@ import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 class ShareLink extends React.Component {
+  handleCopyToClipboard = () => {
+    let tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = this.props.link
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+    /* or https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard See what's best */
+  }
+
   render () {
     const { props } = this
 
@@ -21,7 +31,7 @@ class ShareLink extends React.Component {
           <div className='shareLink__linkInfos__email'>
             {props.email}
           </div>
-          <div className='shareLink__linkInfos__link'>
+          <div className='shareLink__linkInfos__link' id='shareLink'>
             {props.link}
           </div>
         </div>
@@ -34,6 +44,7 @@ class ShareLink extends React.Component {
               color: props.hexcolor
             }
           }}
+          onClick={this.handleCopyToClipboard}
         >
           <i className='fa fa-fw fa-files-o'/>
         </button>
@@ -45,6 +56,7 @@ class ShareLink extends React.Component {
               color: props.hexcolor
             }
           }}
+          onClick={() => props.onClickDeleteShareLink(props.id)}
         >
           <i className='fa fa-fw fa-trash-o'/>
         </button>

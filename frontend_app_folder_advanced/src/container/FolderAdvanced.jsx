@@ -103,13 +103,6 @@ class FolderAdvanced extends React.Component {
     }
   })
 
-  // copyText() {
-  //   var copyText = document.getElementById("myInput");
-  //   copyText.select();
-  //   document.execCommand("copy");
-  //   alert("Copied the text: " + copyText.value);
-  // }
-
   loadContent = async () => {
     const { props, state } = this
 
@@ -237,6 +230,20 @@ class FolderAdvanced extends React.Component {
     }
   }
 
+  handleClickDeleteShareLink = () => { // = async shareLinkId => {
+    // const { config, content } = this.state
+
+    // const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
+    // switch (fetchResultArchive.status) {
+    //   case 204:
+    //     this.setState(previousState => ({
+    //       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
+    //     }))
+    //     break
+    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+    // }
+  }
+
   render () {
     const { state } = this
 
@@ -289,6 +296,7 @@ class FolderAdvanced extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             customColor={state.config.hexcolor}
+            onClickDeleteShareLink={this.handleClickDeleteShareLink}
           />
         </PopinFixedContent>
       </PopinFixed>

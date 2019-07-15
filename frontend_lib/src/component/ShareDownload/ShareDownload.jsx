@@ -29,6 +29,7 @@ class ShareDownload extends React.Component {
             shareLinkList={props.shareLinkList}
             label={props.label}
             hexcolor={props.hexcolor}
+            onClickDeleteShareLink={props.onClickDeleteShareLink}
             onClickNewShareDownload={this.handleNewShareDownload}
           />
           : <NewShareDownload

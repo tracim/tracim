@@ -76,16 +76,19 @@ class File extends React.Component {
       sharePassword: '',
       shareLinkList: [
         {
-          email: 'test@test.test',
-          link: 'https://test.test.tst'
+          email: 'test0@test.test',
+          link: 'https://test.test.tst',
+          id: 0
         },
         {
-          email: 'test@test.test',
-          link: 'https://test.test.tst'
+          email: 'test1@test.test',
+          link: 'https://test.test.tst',
+          id: 1
         },
         {
-          email: 'test@test.test',
-          link: 'https://test.test.tst'
+          email: 'test2@test.test',
+          link: 'https://test.test.tst',
+          id: 2
         }]
     }
 
@@ -670,6 +673,20 @@ class File extends React.Component {
     }
   }
 
+  handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
+    // const { config, content } = this.state
+
+    // const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
+    // switch (fetchResultArchive.status) {
+    //   case 204:
+    //     this.setState(previousState => ({
+    //       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
+    //     }))
+    //     break
+    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+    // }
+  }
+
   getDownloadBaseUrl = (apiUrl, content, mode) => {
     const urlRevisionPart = mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
     return `${apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${urlRevisionPart}`
@@ -830,6 +847,7 @@ class File extends React.Component {
                   sharePassword={state.sharePassword}
                   onChangePassword={this.handleChangePassword}
                   shareLinkList={state.shareLinkList}
+                  onClickDeleteShareLink={this.handleClickDeleteShareLink}
                 />
               },
               {

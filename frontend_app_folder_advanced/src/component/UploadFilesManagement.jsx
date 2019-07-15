@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
-import { ShareLink } from 'tracim_frontend_lib'
+// import { ShareLink } from 'tracim_frontend_lib'
 
 const UploadFilesManagement = props => {
   const customColor = props.tracimContentTypeList[1] ? props.tracimContentTypeList[1].hexcolor : props.customColor
@@ -32,6 +32,7 @@ const UploadFilesManagement = props => {
           <ShareLink
             email={shareLink.email}
             link={shareLink.link}
+            onClickDeleteShareLink={() => props.onClickDeleteShareLink(shareLink.id)}
             hexcolor={customColor}
           />
         )
