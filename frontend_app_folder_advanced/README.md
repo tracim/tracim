@@ -3,7 +3,7 @@
 This repo is the advanced mode on the folder app loaded by Tracim.
 
 ### Development
-To see your changes without importing the app into Tracim:
+To see your changes without importing the app into Tracim you need to be logged into an account and run:
 - run `$ npm run servdev`
 Which will create a web server (webpack) where you will see the app loaded with some default values.
 For this command the configuration file debug.js is used which follows the template of the file debug.sample.js. To adapt the configuration to your content, you need to change the variables:
