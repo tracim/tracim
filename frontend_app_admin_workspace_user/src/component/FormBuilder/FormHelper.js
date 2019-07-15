@@ -2,6 +2,7 @@ import { isSpecialField, POSITION } from '../../helper'
 
 const moveObjectField = (schemaRoot, schemaField, position, dragIndex, hoverIndex) => {
   let fields = Object.keys(schemaField.properties)
+  if (fields[dragIndex] === undefined || fields[hoverIndex] === undefined) return schemaRoot
   const dragField = fields[dragIndex]
   fields[dragIndex] = fields[hoverIndex]
   fields[hoverIndex] = dragField
@@ -18,6 +19,7 @@ const moveObjectField = (schemaRoot, schemaField, position, dragIndex, hoverInde
 
 const moveArrayField = (schemaRoot, schemaField, position, dragIndex, hoverIndex) => {
   let fields = Object.keys(schemaField.items.properties)
+  if (fields[dragIndex] === undefined || fields[hoverIndex] === undefined) return schemaRoot
   const dragField = fields[dragIndex]
   fields[dragIndex] = fields[hoverIndex]
   fields[hoverIndex] = dragField
@@ -35,6 +37,7 @@ const moveArrayField = (schemaRoot, schemaField, position, dragIndex, hoverIndex
 export const moveField = (schema, position, dragIndex, hoverIndex) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   if (schemaField.type === 'object') {
     return moveObjectField(schemaRoot, schemaField, position, dragIndex, hoverIndex)
   } else if (schemaField.type === 'array') {
@@ -45,7 +48,9 @@ export const moveField = (schema, position, dragIndex, hoverIndex) => {
 export const removeField = (schema, position, label) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   if (schemaField.type === 'array') schemaField = schemaField.items
+  if (schemaField.properties === undefined) return schemaRoot
   delete schemaField.properties[label]
   schemaField.order.splice(schemaField.order.indexOf(label), 1)
   if (schemaField.required) schemaField.required.splice(schemaField.required.indexOf(label), 1)
@@ -140,6 +145,7 @@ export const addField = (schema, targetType, position, fieldType) => {
   // const target = targetType === 'array' ? 'items' : 'properties'
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   let label = ''
   if (targetType === 'array') {
     label = addFieldInArray(schemaRoot, schemaField, fieldType)
@@ -152,6 +158,7 @@ export const addField = (schema, targetType, position, fieldType) => {
 const onLabelChange = (schema, position, value, label) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   if (schemaField.type === 'array') schemaField = schemaField.items
   let newOrder = schemaField.order
   if (findField(schema, value) !== undefined) return undefined
@@ -176,6 +183,7 @@ const onLabelChange = (schema, position, value, label) => {
 const changeRequiredFields = (schema, position, value, label) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   if (schemaField.type === 'array') schemaField = schemaField.items
   if (schemaField.required === undefined) schemaField.required = []
   if (value) {
@@ -201,6 +209,7 @@ export const onPropertiesChange = (schema, position, name, value, label) => {
 const changeSchemaProperty = (schema, position, label, name, value) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   if (schemaField.type === 'array') schemaField = schemaField.items
   schemaField.properties[label][name] = value
   return schemaRoot
@@ -217,6 +226,7 @@ const getTabFromField = (schema) => {
 export const addOrderTab = (schema, position) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   if (schemaField.type === 'object') {
     schemaField.order = Object.keys(schemaField.properties).map(p => p)
   } else if (schemaField.type === 'array') {
@@ -228,6 +238,7 @@ export const addOrderTab = (schema, position) => {
 export const changeUiSchema = (schema, uischema, position, name, value, label) => {
   let schemaRoot = JSON.parse(JSON.stringify(schema))
   let schemaField = getSchemaAtPosition(schemaRoot, position)
+  if (schemaField === undefined) return schemaRoot
   let uiSchemaRoot = JSON.parse(JSON.stringify(uischema))
   let uiSchemaField = getUiSchemaAtPosition(uiSchemaRoot, position)
   if (schemaField.type === 'array') {
