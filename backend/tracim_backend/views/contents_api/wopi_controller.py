@@ -1,38 +1,42 @@
 # coding=utf-8
 import os
+import typing
 import urllib.parse
 
-import requests
-import transaction
-import typing
 from defusedxml import ElementTree
+from depot.manager import DepotManager
 from pyramid.config import Configurator
 from pyramid.response import Response
-from depot.manager import DepotManager
+import requests
+import transaction
 
-from tracim_backend import TracimRequest, hapic, BASE_API_V2, CFG, ContentNotFound
-from tracim_backend.app_models.contents import content_type_list, FILE_TYPE
+from tracim_backend import BASE_API_V2
+from tracim_backend import CFG
+from tracim_backend import ContentNotFound
+from tracim_backend import TracimRequest
+from tracim_backend import hapic
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.utils.authorization import check_right, is_reader, is_contributor
+from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import (
-    WOPIDiscoverySchema,
-    WOPITokenQuerySchema,
-    WOPICheckFileInfoSchema,
-    WorkspaceAndContentIdPathSchema,
-    WOPILastModifiedTime,
-    WorkspaceIdPathSchema,
-    WOPIEditFileSchema,
-    WOPICreateFromTemplateSchema,
-    TEMPLATES,
-)
+from tracim_backend.views.core_api.schemas import TEMPLATES
+from tracim_backend.views.core_api.schemas import WOPICheckFileInfoSchema
+from tracim_backend.views.core_api.schemas import WOPICreateFromTemplateSchema
+from tracim_backend.views.core_api.schemas import WOPIDiscoverySchema
+from tracim_backend.views.core_api.schemas import WOPIEditFileSchema
+from tracim_backend.views.core_api.schemas import WOPILastModifiedTime
+from tracim_backend.views.core_api.schemas import WOPITokenQuerySchema
+from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
-
 
 SWAGGER_TAG__CONTENT_WOPI_SECTION = "WOPI"
 SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS = generate_documentation_swagger_tag(
@@ -72,6 +76,7 @@ class WOPIController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(WOPIEditFileSchema())
     def edit_file(self, context, request: TracimRequest, hapic_data=None):
+        app_config = request.registry.settings["CFG"]  # type: CFG
         actions, url_src = self._discover_collabora(
             request, hapic_data.path.workspace_id, hapic_data.path.content_id
         )
@@ -80,7 +85,9 @@ class WOPIController(Controller):
         return {
             "extensions": list(actions.keys()),
             "urlsrc": url_src,
-            "access_token": request.cookies.get("session_key"),
+            "access_token": request.current_user.ensure_auth_token(
+                app_config.USER__AUTH_TOKEN__VALIDITY
+            ),
             "content_id": 1,
             "workspace_id": 1,
         }
@@ -141,7 +148,9 @@ class WOPIController(Controller):
         return {
             "extensions": list(actions.keys()),
             "urlsrc": url_src,
-            "access_token": request.cookies.get("session_key"),
+            "access_token": request.current_user.ensure_auth_token(
+                app_config.USER__AUTH_TOKEN__VALIDITY
+            ),
             "content_id": content.content_id,
             "workspace_id": content.workspace_id,
         }

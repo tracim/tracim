@@ -531,6 +531,7 @@ class TypeUser(Enum):
     USER_ID = "found_id"
     EMAIL = "found_email"
     PUBLIC_NAME = "found_public_name"
+    TOKEN = "found_user_token"
 
 
 class Agenda(object):

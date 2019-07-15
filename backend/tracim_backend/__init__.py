@@ -36,6 +36,7 @@ from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
@@ -98,6 +99,7 @@ def web(global_config, **local_settings):
     policies.append(
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
     )
+    policies.append(QueryTokenAuthentificationPolicy())
     if app_config.API__KEY:
         policies.append(
             ApiTokenAuthentificationPolicy(

@@ -4196,7 +4196,14 @@ class TestWOPI(object):
         )
 
     def test_api__get_content__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, content_type_list, session, web_testapp
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+        app_config,
     ) -> None:
         """Get file content"""
         workspace_api = workspace_api_factory.get()
@@ -4223,9 +4230,10 @@ class TestWOPI(object):
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
         transaction.commit()
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token=fake_access_token".format(
-            business_workspace.workspace_id, test_file.content_id
+        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token={}".format(
+            business_workspace.workspace_id, test_file.content_id, quote(access_token)
         )
         res = web_testapp.get(url, status=200)
         assert res.body == b"Test file"
@@ -4238,6 +4246,7 @@ class TestWOPI(object):
         content_type_list,
         session,
         web_testapp,
+        app_config,
     ) -> None:
         """Get file content"""
         workspace_api = workspace_api_factory.get()
@@ -4266,8 +4275,9 @@ class TestWOPI(object):
             )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/wopi/files/{}?access_token=fake_access_token".format(
-            business_workspace.workspace_id, test_file.content_id
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
+        url = "/api/v2/workspaces/{}/wopi/files/{}?access_token={}".format(
+            business_workspace.workspace_id, test_file.content_id, quote(access_token)
         )
         res = web_testapp.get(url, status=200)
         response = res.json_body
@@ -4285,7 +4295,14 @@ class TestWOPI(object):
         assert response["UserCanNotWriteRelative"] is True
 
     def test_api__put_content__ok_200__nominal_case(
-        self, content_api_factory, workspace_api_factory, content_type_list, session, web_testapp
+        self,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        app_config,
+        admin_user,
     ) -> None:
         """Save file content"""
         workspace_api = workspace_api_factory.get()
@@ -4311,10 +4328,12 @@ class TestWOPI(object):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        transaction.commit()
+
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token=fake_access_token".format(
-            business_workspace.workspace_id, test_file.content_id
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
+        transaction.commit()
+        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token={}".format(
+            business_workspace.workspace_id, test_file.content_id, quote(access_token)
         )
         updated_at = test_file.updated
         new_content = b"content has been modified"
@@ -4341,7 +4360,9 @@ class TestWOPI(object):
         content_api_factory,
         content_type_list,
         session,
+        admin_user,
         web_testapp,
+        app_config,
     ) -> None:
         """
         Ask to edit a file, returns the url of collabora online
@@ -4369,10 +4390,9 @@ class TestWOPI(object):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        web_testapp.set_cookie("session_key", "some valid session")
         patched_get.return_value.text = """
         <wopi-discovery>
             <net-zone name="external-http">
@@ -4389,8 +4409,8 @@ class TestWOPI(object):
             </net-zone>
         </wopi-discovery>
         """
-        url = "/api/v2/workspaces/{}/wopi/files/{}/edit".format(
-            business_workspace.workspace_id, test_file.content_id
+        url = "/api/v2/workspaces/{}/wopi/files/{}/edit?access_token={}".format(
+            business_workspace.workspace_id, test_file.content_id, quote(access_token)
         )
         res = web_testapp.get(url, status=200)
         content = res.json_body
@@ -4400,7 +4420,9 @@ class TestWOPI(object):
         ] == "http://localhost:9980/loleaflet/305832f/loleaflet.html" "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F{}".format(
             business_workspace.workspace_id, test_file.content_id
         )
-        assert content["access_token"] == "some valid session"
+        assert content["access_token"] == admin_user.ensure_auth_token(
+            app_config.USER__AUTH_TOKEN__VALIDITY
+        )
 
     @patch("requests.get")
     def test_api__create_from_template__ok_200__nominal_case(
@@ -4411,6 +4433,8 @@ class TestWOPI(object):
         content_type_list,
         session,
         web_testapp,
+        admin_user,
+        app_config,
     ) -> None:
         """
         Ask to create a file from a template, returns the url of collabora online
@@ -4429,7 +4453,6 @@ class TestWOPI(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        web_testapp.set_cookie("session_key", "some valid session")
         patched_get.return_value.text = """
         <wopi-discovery>
             <net-zone name="external-http">
@@ -4446,8 +4469,12 @@ class TestWOPI(object):
             </net-zone>
         </wopi-discovery>
         """
-        url = "/api/v2/workspaces/{}/wopi/files/create".format(business_workspace.workspace_id)
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
+        url = "/api/v2/workspaces/{}/wopi/files/create?access_token={}".format(
+            business_workspace.workspace_id, quote(access_token)
+        )
         template = "default.ods"
+        transaction.commit()
         res = web_testapp.post_json(
             url,
             params={
@@ -4480,4 +4507,6 @@ class TestWOPI(object):
             "rb",
         ) as f:
             assert file_.read() == f.read()
-        assert content["access_token"] == "some valid session"
+        assert content["access_token"] == admin_user.ensure_auth_token(
+            app_config.USER__AUTH_TOKEN__VALIDITY
+        )
