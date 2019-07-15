@@ -1,13 +1,11 @@
 # coding=utf-8
-import unittest
-
 import pytest
 
 from tracim_backend.exceptions import RoleDoesNotExist
 from tracim_backend.models.roles import WorkspaceRoles
 
 
-class TestWorkspacesRoles(unittest.TestCase):
+class TestWorkspacesRoles(object):
     """
     Test for WorkspaceRoles Enum Object
     """
