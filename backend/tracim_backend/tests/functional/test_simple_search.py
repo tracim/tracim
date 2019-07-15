@@ -328,7 +328,7 @@ class TestSimpleSearch(object):
         assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
-        'created_content_name, search_string, first_search_result_content_name, first_created_comment_content, second_created_comment_content',
+        "created_content_name, search_string, first_search_result_content_name, first_created_comment_content, second_created_comment_content",
         [
             # created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_comment_content, second_created_comment_content
             # exact syntax
@@ -339,7 +339,7 @@ class TestSimpleSearch(object):
                 "this is a comment content containing the string: eureka.",
                 "this is another comment content, eureka",
             )
-        ]
+        ],
     )
     def test_api___simple_search_ok__avoid_duplicate_content(
         self,
