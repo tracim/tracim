@@ -18,7 +18,6 @@ SWAGGER_TAG__CONTENT_COLLABORA_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_COLLABORA_SECTION
 )
 COLLABORA_BASE = "collabora"
-COLLABORA_FILES = "workspaces/{workspace_id}/files"
 COLLABORA_FILE = "workspaces/{workspace_id}/files/{content_id}"
 
 
