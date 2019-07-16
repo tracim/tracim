@@ -4124,6 +4124,7 @@ class TestThreads(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestWOPI(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/wopi/files/{content_id}
@@ -4188,12 +4189,7 @@ class TestWOPI(object):
         url = "/api/v2/workspaces/{}/wopi/discovery".format(business_workspace.workspace_id)
         res = web_testapp.get(url, status=200)
         content = res.json_body
-        assert len(content["extensions"]) == 3
-        assert content[
-            "urlsrc"
-        ] == "http://localhost:9980/loleaflet/305832f/loleaflet.html" "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F%7Bcontent_id%7D".format(
-            business_workspace.workspace_id
-        )
+        assert len(content) == 3
 
     def test_api__get_content__ok_200__nominal_case(
         self,
@@ -4414,12 +4410,8 @@ class TestWOPI(object):
         )
         res = web_testapp.get(url, status=200)
         content = res.json_body
-        assert len(content["extensions"]) == 3
-        assert content[
-            "urlsrc"
-        ] == "http://localhost:9980/loleaflet/305832f/loleaflet.html" "?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F{}".format(
-            business_workspace.workspace_id, test_file.content_id
-        )
+        assert content["is_collabora_editable"] is False
+        assert content["url_source"] is None
         assert content["access_token"] == admin_user.ensure_auth_token(
             app_config.USER__AUTH_TOKEN__VALIDITY
         )
@@ -4465,6 +4457,9 @@ class TestWOPI(object):
                 <app name="application/vnd.oasis.opendocument.text">
                     <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
                 </app>
+                <app name="application/vnd.oasis.opendocument.spreadsheet">
+                    <action ext="ods" name="edit" urlsrc="http://localhost:9980/loleaflet/1e4154c/loleaflet.html?"/>
+                </app>
                 <!-- a lot more `app` in the real response -->
             </net-zone>
         </wopi-discovery>
@@ -4486,7 +4481,7 @@ class TestWOPI(object):
         )
         transaction.commit()
         content = res.json_body
-        content_id = int(content["urlsrc"].split("%2F")[-1])
+        content_id = int(content["url_source"].split("%2F")[-1])
 
         # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
         #  without reinstancing the database session
@@ -4496,9 +4491,9 @@ class TestWOPI(object):
         file_ = DepotManager.get().get(created_content.depot_file)
         current_file_path = os.path.dirname(os.path.abspath(__file__))
 
-        assert len(content["extensions"]) == 3
-        assert content["urlsrc"].startswith(
-            "http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc=http%3A%2F%2Flocalhost%3A80%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F".format(
+        assert content["is_collabora_editable"] is True
+        assert content["url_source"].startswith(
+            "http://localhost:9980/loleaflet/1e4154c/loleaflet.html?WOPISrc=http%3A%2F%2Ftracimbackendserver%3A8888%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F2".format(
                 business_workspace.workspace_id
             )
         )

@@ -550,6 +550,9 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
+        self.COLLABORA__BACKEND__BASE_URL = self.get_raw_config(
+            "collabora.backend.base_url", self.API__BASE_URL
+        )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

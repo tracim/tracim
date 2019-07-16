@@ -1,16 +1,12 @@
 # coding=utf-8
 import os
 import typing
-import urllib.parse
 
-from defusedxml import ElementTree
 from depot.manager import DepotManager
 from pyramid.config import Configurator
 from pyramid.response import Response
-import requests
 import transaction
 
-from tracim_backend import BASE_API_V2
 from tracim_backend import CFG
 from tracim_backend import ContentNotFound
 from tracim_backend import TracimRequest
@@ -18,6 +14,9 @@ from tracim_backend import hapic
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ParentNotFound
+from tracim_backend.lib.collabora.collabora import WOPI_BASE
+from tracim_backend.lib.collabora.collabora import WOPI_FILES
+from tracim_backend.lib.collabora.collabora import CollaboraApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
@@ -42,10 +41,6 @@ SWAGGER_TAG__CONTENT_WOPI_SECTION = "WOPI"
 SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_WOPI_SECTION
 )
-# FIXME - H.D. - 2019/07/03 - put in global tracim config
-COLLABORA_URL = "http://localhost:9980"
-WOPI_BASE = "workspaces/{workspace_id}/wopi"
-WOPI_FILES = WOPI_BASE + "/files/{content_id}"
 
 
 class WOPIController(Controller):
@@ -53,46 +48,21 @@ class WOPIController(Controller):
     Endpoints for WOPI API
     """
 
-    @staticmethod
-    def _discover_collabora(app_config: CFG, request, workspace_id, content_id):
-        response = requests.get(COLLABORA_URL + "/hosting/discovery")
-        root = ElementTree.fromstring(response.text)
-        actions = {}
-        for xml_actions in root.findall("net-zone/app/action"):
-            extension = xml_actions.get("ext")
-            ext_url_src = xml_actions.get("urlsrc")
-            if extension not in app_config.COLLABORA__EXTENSION_BLACKLIST:
-                actions[extension] = ext_url_src
-        wopisrc = actions["odt"] + urllib.parse.urlencode(
-            {
-                "WOPISrc": "http://{host}{api_base}{path}".format(
-                    host=request.host,
-                    api_base=BASE_API_V2,
-                    path=WOPI_FILES.format(workspace_id=workspace_id, content_id=content_id),
-                )
-            }
-        )
-        return actions, wopisrc
-
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(WOPIEditFileSchema())
-    def edit_file(self, context, request: TracimRequest, hapic_data=None):
+    def edit_file_info(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        actions, url_src = self._discover_collabora(
-            app_config, request, hapic_data.path.workspace_id, hapic_data.path.content_id
+        collabora_api = CollaboraApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        # FIXME - H.D. - 2019/07/02 - create model
-        return {
-            "extensions": list(actions.keys()),
-            "urlsrc": url_src,
-            "access_token": request.current_user.ensure_auth_token(
-                app_config.USER__AUTH_TOKEN__VALIDITY
-            ),
-            "content_id": 1,
-            "workspace_id": 1,
-        }
+        access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
+        return collabora_api.edit_file_info(
+            access_token=access_token,
+            content=request.current_content,
+            workspace=request.current_workspace,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
@@ -143,32 +113,24 @@ class WOPIController(Controller):
             )
         api.execute_created_content_actions(content)
 
-        actions, url_src = self._discover_collabora(
-            app_config, request, hapic_data.path.workspace_id, content.content_id
+        collabora_api = CollaboraApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config
         )
-
-        return {
-            "extensions": list(actions.keys()),
-            "urlsrc": url_src,
-            "access_token": request.current_user.ensure_auth_token(
-                app_config.USER__AUTH_TOKEN__VALIDITY
-            ),
-            "content_id": content.content_id,
-            "workspace_id": content.workspace_id,
-        }
+        access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
+        return collabora_api.edit_file_info(
+            access_token=access_token, content=content, workspace=request.current_workspace
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
     @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.output_body(WOPIDiscoverySchema())
+    @hapic.output_body(WOPIDiscoverySchema(many=True))
     def discovery(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        actions, url_src = self._discover_collabora(
-            app_config, request, hapic_data.path.workspace_id, "{content_id}"
+        collabora_api = CollaboraApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config
         )
-
-        # FIXME - H.D. - 2019/07/02 - create model
-        return {"extensions": list(actions.keys()), "urlsrc": url_src}
+        return collabora_api.discover()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
@@ -256,9 +218,9 @@ class WOPIController(Controller):
 
         # Edit file
         configurator.add_route(
-            "wopi_edit_file", "/{}/edit".format(WOPI_FILES), request_method="GET"
+            "wopi_edit_file_info", "/{}/edit".format(WOPI_FILES), request_method="GET"
         )
-        configurator.add_view(self.edit_file, route_name="wopi_edit_file")
+        configurator.add_view(self.edit_file_info, route_name="wopi_edit_file_info")
 
         # Create file from template
         configurator.add_route(
