@@ -103,7 +103,7 @@ class Header extends React.Component {
       act: 1
     }
 
-    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, {encode: true}))
+    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
   }
 
   render () {
