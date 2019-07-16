@@ -6,7 +6,6 @@ from defusedxml import ElementTree
 import requests
 from sqlalchemy.orm import Session
 
-# FIXME - H.D. - 2019/07/03 - put in global tracim config
 from tracim_backend import BASE_API_V2
 from tracim_backend import CFG
 from tracim_backend.lib.collabora.models import CollaboraEditableFileInfo
@@ -16,7 +15,6 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 from tracim_backend.views.collabora_api.wopi_controller import WOPI_FILES
 
-COLLABORA_URL = "http://localhost:9980"
 COLLABORA_ACTION_EDIT = "edit"
 
 
@@ -27,7 +25,7 @@ class CollaboraApi(object):
         self._config = config
 
     def discover(self) -> typing.List[CollaboraFileType]:
-        response = requests.get(COLLABORA_URL + "/hosting/discovery")
+        response = requests.get(self._config.COLLABORA__BASE_URL + "/hosting/discovery")
         root = ElementTree.fromstring(response.text)
         supported_collabora_file = []  # type: typing.List[CollaboraFileType]
         for xml_actions in root.findall("net-zone/app/action"):

@@ -436,6 +436,9 @@ search.engine = simple
 ####
 # list of extensions of file to no process with collabora.
 collabora.extension_blacklist = png,jpeg,pdf,gif,bmp,tiff
+# base url where collabora server exist
+collabora.base_url = http://localhost:9980
+
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
