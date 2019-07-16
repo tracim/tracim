@@ -145,6 +145,7 @@ class CFG(object):
         self._load_webdav_config()
         self._load_caldav_config()
         self._load_search_config()
+        self._load_collabora_config()
 
     def _load_global_config(self) -> None:
         """
@@ -540,6 +541,14 @@ class CFG(object):
         )
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
+        )
+
+    def _load_collabora_config(self):
+        self.COLLABORA__EXTENSION_BLACKLIST = string_to_list(
+            self.get_raw_config("collabora.extension_blacklist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
 
     # INFO - G.M - 2019-04-05 - Config validation methods

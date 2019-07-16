@@ -54,13 +54,16 @@ class WOPIController(Controller):
     """
 
     @staticmethod
-    def _discover_collabora(request, workspace_id, content_id):
+    def _discover_collabora(app_config: CFG, request, workspace_id, content_id):
         response = requests.get(COLLABORA_URL + "/hosting/discovery")
         root = ElementTree.fromstring(response.text)
         actions = {}
         for xml_actions in root.findall("net-zone/app/action"):
-            actions[xml_actions.get("ext")] = xml_actions.get("urlsrc")
-        url_src = actions["odt"] + urllib.parse.urlencode(
+            extension = xml_actions.get("ext")
+            ext_url_src = xml_actions.get("urlsrc")
+            if extension not in app_config.COLLABORA__EXTENSION_BLACKLIST:
+                actions[extension] = ext_url_src
+        wopisrc = actions["odt"] + urllib.parse.urlencode(
             {
                 "WOPISrc": "http://{host}{api_base}{path}".format(
                     host=request.host,
@@ -69,7 +72,7 @@ class WOPIController(Controller):
                 )
             }
         )
-        return actions, url_src
+        return actions, wopisrc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
     @check_right(is_reader)
@@ -78,9 +81,8 @@ class WOPIController(Controller):
     def edit_file(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
         actions, url_src = self._discover_collabora(
-            request, hapic_data.path.workspace_id, hapic_data.path.content_id
+            app_config, request, hapic_data.path.workspace_id, hapic_data.path.content_id
         )
-
         # FIXME - H.D. - 2019/07/02 - create model
         return {
             "extensions": list(actions.keys()),
@@ -142,7 +144,7 @@ class WOPIController(Controller):
         api.execute_created_content_actions(content)
 
         actions, url_src = self._discover_collabora(
-            request, hapic_data.path.workspace_id, content.content_id
+            app_config, request, hapic_data.path.workspace_id, content.content_id
         )
 
         return {
@@ -160,8 +162,9 @@ class WOPIController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WOPIDiscoverySchema())
     def discovery(self, context, request: TracimRequest, hapic_data=None):
+        app_config = request.registry.settings["CFG"]  # type: CFG
         actions, url_src = self._discover_collabora(
-            request, hapic_data.path.workspace_id, "{content_id}"
+            app_config, request, hapic_data.path.workspace_id, "{content_id}"
         )
 
         # FIXME - H.D. - 2019/07/02 - create model

@@ -430,6 +430,11 @@ search.engine = simple
 # default value to 52428800 = 50Mo
 ;search.elasticsearch.ingest.size_limit = 52428800
 
+####
+# Collaborative Edit (Collabora)
+####
+# list of extensions of file to no process with collabora.
+collabora.extension_blacklist = png,jpeg,pdf,gif,bmp,tiff
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
