@@ -608,7 +608,7 @@ class CustomForm extends React.Component {
           faIcon={this.state.faIcon}
           rawTitle={content.label}
           componentTitle={<div>{content.label}</div>}
-          idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
+          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!content.is_editable}
@@ -621,7 +621,7 @@ class CustomForm extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.idRoleUserWorkspace >= 2 &&
+              {loggedUser.userRoleIdInWorkspace >= 2 &&
                 <NewVersionBtn
                   customColor={this.state.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -643,7 +643,7 @@ class CustomForm extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {loggedUser.idRoleUserWorkspace >= 2 &&
+              {loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
@@ -652,7 +652,7 @@ class CustomForm extends React.Component {
                 />
               }
 
-              {loggedUser.idRoleUserWorkspace >= 4 &&
+              {loggedUser.userRoleIdInWorkspace >= 4 &&
                 <ArchiveDeleteContent
                   customColor={this.state.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}

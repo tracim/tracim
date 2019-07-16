@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import HtmlDocument from './container/CustomForm.jsx'
+import CustomForm from './container/CustomForm.jsx'
 // import PopupCreateHtmlDocument from './container/PopupCreateCustomForm.jsx'
 
 require('./css/index.styl')
 
 ReactDOM.render(
-  <HtmlDocument data={undefined} />
+  <CustomForm data={undefined} />
   , document.getElementById('content')
 )
 

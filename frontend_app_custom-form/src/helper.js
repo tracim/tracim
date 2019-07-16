@@ -23,7 +23,7 @@ export const debug = {
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://192.168.1.163:6543/api/v2',
     workspace_id: 1,
-    content_id: 90,
+    content_id: 198,
     availableStatuses: [{
       label: 'Open',
       slug: 'open',
@@ -70,7 +70,7 @@ export const debug = {
     email: 'osef@algoo.fr',
     lang: 'en',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
-    idRoleUserWorkspace: 8
+    userRoleIdInWorkspace: 8
   },
   content: {
     author: {
@@ -78,7 +78,7 @@ export const debug = {
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 4,
+    content_id: 198,
     content_type: 'custom-form',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,

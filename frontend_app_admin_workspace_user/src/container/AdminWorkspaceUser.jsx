@@ -27,7 +27,7 @@ import {
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
 import AdminForm from '../component/AdminForm'
-import HTML5Backend from 'react-dnd-html5-backend'
+// import HTML5Backend from 'react-dnd-html5-backend'
 import { DragDropContext } from 'react-dnd'
 
 require('../css/index.styl')
@@ -50,10 +50,14 @@ class AdminWorkspaceUser extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
+    console.log('HERE1')
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
+    console.log('HERE2')
     i18n.changeLanguage(this.state.loggedUser.lang)
+    console.log('HERE3')
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
+    console.log('HERE4')
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -86,7 +90,7 @@ class AdminWorkspaceUser extends React.Component {
 
   async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
-
+    console.log('HELLO1234', this.state.config)
     if (this.state.config.type === 'workspace') await this.loadWorkspaceContent()
     else if (this.state.config.type === 'user') await this.loadUserContent()
     // else if (state.config.type === 'form') this.loadUserContent()
@@ -95,12 +99,12 @@ class AdminWorkspaceUser extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
+    console.log('HELLO1235', this.state.config)
     console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
-      // else if (state.config.type === 'form') this.loadUserContent()
+      // else if (state.config.type === 'form') this.loadFormContent()
       this.buildBreadcrumbs()
     }
   }
@@ -443,4 +447,5 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default DragDropContext(HTML5Backend)(translate()(Radium(AdminWorkspaceUser)))
+// export default DragDropContext(HTML5Backend)(translate()(Radium(AdminWorkspaceUser)))
+export default translate()(Radium(AdminWorkspaceUser))

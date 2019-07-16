@@ -23,11 +23,10 @@ const AdminLink = props => {
           <i className='fa fa-fw fa-users mr-2' />
           {props.t('Users')}
         </Link>
-        {/*<Link className='adminlink__setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ADMIN.FORM}>*/}
-        {/*  <i className='fa fa-fw fa-users mr-2' />*/}
-        {/*  /!* props.t('Users') */ }
-        {/*  {'Formulaires'}*/}
-        {/*</Link>*/}
+        <Link className='adminlink__setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ADMIN.USER}>
+          <i className='fa fa-fw fa-users mr-2' />
+          {'Formulaires'}
+        </Link>
       </div>
     </div>
   )
