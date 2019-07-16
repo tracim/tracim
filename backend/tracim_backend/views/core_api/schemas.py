@@ -1056,26 +1056,42 @@ class WOPITokenQuerySchema(marshmallow.Schema):
 
 class WOPICheckFileInfoSchema(marshmallow.Schema):
     BaseFileName = marshmallow.fields.String(
-        required=True, description="Filename as shown in collabora Online"
+        required=True,
+        description="Filename as shown in collabora Online",
+        attribute="base_file_name",
     )
-    Size = marshmallow.fields.Int(required=True, description="File length, in bytes")
-    OwnerId = marshmallow.fields.Int(description="Owner's database identifier")
-    UserId = marshmallow.fields.Int(description="User's database identifier")
-    UserFriendlyName = marshmallow.fields.String(description="User's display name")
-    Version = marshmallow.fields.String(description="Version of the file (the revision_id)")
+    Size = marshmallow.fields.Int(
+        required=True, description="File length, in bytes", attribute="size"
+    )
+    OwnerId = marshmallow.fields.Int(
+        description="Owner's database identifier", attribute="owner_id"
+    )
+    UserId = marshmallow.fields.Int(description="User's database identifier", attribute="user_id")
+    UserFriendlyName = marshmallow.fields.String(
+        description="User's display name", attribute="user_friendly_name"
+    )
+    Version = marshmallow.fields.String(
+        description="Version of the file (the revision_id)", attribute="version"
+    )
     UserCanWrite = marshmallow.fields.Boolean(
-        description="Whether the user can (or can't) edit the file in libreoffice online"
+        description="Whether the user can (or can't) edit the file in libreoffice online",
+        attribute="user_can_write",
     )
     UserCanNotWriteRelative = marshmallow.fields.Boolean(
         default=True,
         description="Whether it's possible to save the document as a new name ("
         "Save As functionality)",
+        attribute="user_can_not_write_relative",
     )
-    LastModifiedTime = marshmallow.fields.DateTime(description="Last time the file was modified")
+    LastModifiedTime = marshmallow.fields.DateTime(
+        description="Last time the file was modified", attribute="last_modified_time"
+    )
 
 
 class WOPILastModifiedTime(marshmallow.Schema):
-    LastModifiedTime = marshmallow.fields.DateTime(description="Last time the file was modified")
+    LastModifiedTime = marshmallow.fields.DateTime(
+        description="Last time the file was modified", attribute="last_modified_time"
+    )
 
 
 #####
