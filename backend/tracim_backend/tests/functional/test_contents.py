@@ -4218,8 +4218,14 @@ class TestCollabora(object):
         content = res.json_body
         assert len(content) == 3
         assert content[0]["extension"] == "lwp"
+        assert content[0]["mimetype"] == "application/vnd.lotus-wordpro"
+        assert content[0]["associated_action"] == "view"
         assert content[1]["extension"] == "svg"
+        assert content[1]["mimetype"] == "image/svg+xml"
+        assert content[1]["associated_action"] == "view"
         assert content[2]["extension"] == "odt"
+        assert content[2]["mimetype"] == "application/vnd.oasis.opendocument.text"
+        assert content[2]["associated_action"] == "edit"
 
     @patch("requests.get")
     def test_api__edit_file__ok_200__nominal_case(

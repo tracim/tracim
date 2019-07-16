@@ -1035,6 +1035,11 @@ class CollaboraEditFileSchema(marshmallow.Schema):
 
 
 class CollaboraDiscoverySchema(marshmallow.Schema):
+    mimetype = marshmallow.fields.String(
+        example="application/vnd.oasis.opendocument.text",
+        required=True,
+        description="Collabora Online file mimetype",
+    )
     extension = marshmallow.fields.String(
         example="odt", required=True, description="Collabora Online file extensions"
     )

@@ -28,23 +28,27 @@ class CollaboraApi(object):
         response = requests.get(self._config.COLLABORA__BASE_URL + "/hosting/discovery")
         root = ElementTree.fromstring(response.text)
         supported_collabora_file = []  # type: typing.List[CollaboraFileType]
-        for xml_actions in root.findall("net-zone/app/action"):
-            extension = xml_actions.get("ext")
-            url_source = xml_actions.get("urlsrc")
-            associated_action = xml_actions.get("name")
-            supported_collabora_file.append(
-                CollaboraFileType(
-                    extension=extension, associated_action=associated_action, url_source=url_source
+        for xml_app in root.findall("net-zone/app"):
+            mimetype = xml_app.get("name")
+            for xml_action in xml_app:
+                extension = xml_action.get("ext")
+                url_source = xml_action.get("urlsrc")
+                associated_action = xml_action.get("name")
+                supported_collabora_file.append(
+                    CollaboraFileType(
+                        mimetype=mimetype,
+                        extension=extension,
+                        associated_action=associated_action,
+                        url_source=url_source,
+                    )
                 )
-            )
         return supported_collabora_file
 
     def _get_collabora_content_file_type(
         self, content: Content
     ) -> typing.Optional[CollaboraFileType]:
-        extension = content.file_extension.strip(".")
         for collabora_file_type in self.discover():
-            if collabora_file_type.extension == extension:
+            if collabora_file_type.mimetype == content.file_mimetype:
                 return collabora_file_type
         return None
 

@@ -2,7 +2,8 @@ from datetime import datetime
 
 
 class CollaboraFileType(object):
-    def __init__(self, extension, associated_action, url_source):
+    def __init__(self, mimetype, extension, associated_action, url_source):
+        self.mimetype = mimetype
         self.extension = extension
         self.associated_action = associated_action
         self.url_source = url_source
