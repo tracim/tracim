@@ -4125,12 +4125,7 @@ class TestThreads(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
-class TestWOPI(object):
-    """
-    Tests for /api/v2/workspaces/{workspace_id}/wopi/files/{content_id}
-    endpoints
-    """
-
+class TestCollabora(object):
     @patch("requests.get")
     def test_api__discovery__ok_200__nominal_case(
         self,
@@ -4143,6 +4138,47 @@ class TestWOPI(object):
     ) -> None:
         """
         Discover libre office capabilities
+        """
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        patched_get.return_value.text = """
+        <wopi-discovery>
+            <net-zone name="external-http">
+                <app name="application/vnd.lotus-wordpro">
+                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="image/svg+xml">
+                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.text">
+                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <!-- a lot more `app` in the real response -->
+            </net-zone>
+        </wopi-discovery>
+        """
+        url = "/api/v2/collabora/discovery"
+        res = web_testapp.get(url, status=200)
+        content = res.json_body
+        assert len(content) == 3
+        assert content[0]["extension"] == "lwp"
+        assert content[1]["extension"] == "svg"
+        assert content[2]["extension"] == "odt"
+
+    @patch("requests.get")
+    def test_api__edit_file__ok_200__nominal_case(
+        self,
+        patched_get,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        admin_user,
+        web_testapp,
+        app_config,
+    ) -> None:
+        """
+        Ask to edit a file, returns the url of collabora online
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -4167,8 +4203,8 @@ class TestWOPI(object):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         patched_get.return_value.text = """
         <wopi-discovery>
@@ -4186,10 +4222,115 @@ class TestWOPI(object):
             </net-zone>
         </wopi-discovery>
         """
-        url = "/api/v2/workspaces/{}/wopi/discovery".format(business_workspace.workspace_id)
+        url = "/api/v2/workspaces/{}/files/{}/collabora_edit_info?access_token={}".format(
+            business_workspace.workspace_id, test_file.content_id, quote(access_token)
+        )
         res = web_testapp.get(url, status=200)
         content = res.json_body
-        assert len(content) == 3
+        assert content["is_collabora_editable"] is False
+        assert content["url_source"] is None
+        assert content["access_token"] == admin_user.ensure_auth_token(
+            app_config.USER__AUTH_TOKEN__VALIDITY
+        )
+
+    @patch("requests.get")
+    def test_api__create_from_template__ok_200__nominal_case(
+        self,
+        patched_get,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+        app_config,
+    ) -> None:
+        """
+        Ask to create a file from a template, returns the url of collabora online
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.create_workspace(label="business")
+        tool_folder = content_api.create(
+            label="tools",
+            content_type_slug=content_type_list.Folder.slug,
+            do_save=True,
+            do_notify=None,
+            parent=None,
+            workspace=business_workspace,
+        )
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        patched_get.return_value.text = """
+        <wopi-discovery>
+            <net-zone name="external-http">
+                <app name="application/vnd.lotus-wordpro">
+                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="image/svg+xml">
+                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.text">
+                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.spreadsheet">
+                    <action ext="ods" name="edit" urlsrc="http://localhost:9980/loleaflet/1e4154c/loleaflet.html?"/>
+                </app>
+                <!-- a lot more `app` in the real response -->
+            </net-zone>
+        </wopi-discovery>
+        """
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
+        url = "/api/v2/workspaces/{}/files/create_with_template?access_token={}".format(
+            business_workspace.workspace_id, quote(access_token)
+        )
+        template = "default.ods"
+        transaction.commit()
+        res = web_testapp.post_json(
+            url,
+            params={
+                "title": "test_file.ods",
+                "template": template,
+                "parent_id": tool_folder.content_id,
+            },
+            status=200,
+        )
+        transaction.commit()
+        content = res.json_body
+        content_id = int(content["url_source"].split("%2F")[-1])
+
+        # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
+        #  without reinstancing the database session
+        content_api = content_api_factory.get()
+
+        created_content = content_api.get_one(content_id, content_type=content_type_list.Any_SLUG)
+        file_ = DepotManager.get().get(created_content.depot_file)
+        current_file_path = os.path.dirname(os.path.abspath(__file__))
+
+        assert content["is_collabora_editable"] is True
+        assert content["url_source"].startswith(
+            "http://localhost:9980/loleaflet/1e4154c/loleaflet.html?WOPISrc=http%3A%2F%2Ftracimbackendserver%3A8888%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F2".format(
+                business_workspace.workspace_id
+            )
+        )
+        with open(
+            os.path.join(current_file_path, "..", "..", "templates", "open_documents", template),
+            "rb",
+        ) as f:
+            assert file_.read() == f.read()
+        assert content["access_token"] == admin_user.ensure_auth_token(
+            app_config.USER__AUTH_TOKEN__VALIDITY
+        )
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
+class TestWOPI(object):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/wopi/files/{content_id}
+    endpoints
+    """
 
     def test_api__get_content__ok_200__nominal_case(
         self,
@@ -4347,161 +4488,3 @@ class TestWOPI(object):
             != updated_at.replace(tzinfo=datetime.timezone.utc).isoformat()
         )
         assert file_.read() == new_content
-
-    @patch("requests.get")
-    def test_api__edit_file__ok_200__nominal_case(
-        self,
-        patched_get,
-        workspace_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        admin_user,
-        web_testapp,
-        app_config,
-    ) -> None:
-        """
-        Ask to edit a file, returns the url of collabora online
-        """
-        workspace_api = workspace_api_factory.get()
-        content_api = content_api_factory.get()
-        business_workspace = workspace_api.create_workspace(label="business")
-        tool_folder = content_api.create(
-            label="tools",
-            content_type_slug=content_type_list.Folder.slug,
-            do_save=True,
-            do_notify=None,
-            parent=None,
-            workspace=business_workspace,
-        )
-        test_file = content_api.create(
-            content_type_slug=content_type_list.File.slug,
-            workspace=business_workspace,
-            parent=tool_folder,
-            label="Test file",
-            do_save=False,
-            do_notify=False,
-        )
-        with new_revision(session=session, tm=transaction.manager, content=test_file):
-            content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
-            )
-        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
-        transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        patched_get.return_value.text = """
-        <wopi-discovery>
-            <net-zone name="external-http">
-                <app name="application/vnd.lotus-wordpro">
-                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
-                </app>
-                <app name="image/svg+xml">
-                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
-                </app>
-                <app name="application/vnd.oasis.opendocument.text">
-                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
-                </app>
-                <!-- a lot more `app` in the real response -->
-            </net-zone>
-        </wopi-discovery>
-        """
-        url = "/api/v2/workspaces/{}/wopi/files/{}/edit?access_token={}".format(
-            business_workspace.workspace_id, test_file.content_id, quote(access_token)
-        )
-        res = web_testapp.get(url, status=200)
-        content = res.json_body
-        assert content["is_collabora_editable"] is False
-        assert content["url_source"] is None
-        assert content["access_token"] == admin_user.ensure_auth_token(
-            app_config.USER__AUTH_TOKEN__VALIDITY
-        )
-
-    @patch("requests.get")
-    def test_api__create_from_template__ok_200__nominal_case(
-        self,
-        patched_get,
-        workspace_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        web_testapp,
-        admin_user,
-        app_config,
-    ) -> None:
-        """
-        Ask to create a file from a template, returns the url of collabora online
-        """
-        workspace_api = workspace_api_factory.get()
-        content_api = content_api_factory.get()
-        business_workspace = workspace_api.create_workspace(label="business")
-        tool_folder = content_api.create(
-            label="tools",
-            content_type_slug=content_type_list.Folder.slug,
-            do_save=True,
-            do_notify=None,
-            parent=None,
-            workspace=business_workspace,
-        )
-        transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        patched_get.return_value.text = """
-        <wopi-discovery>
-            <net-zone name="external-http">
-                <app name="application/vnd.lotus-wordpro">
-                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
-                </app>
-                <app name="image/svg+xml">
-                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
-                </app>
-                <app name="application/vnd.oasis.opendocument.text">
-                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
-                </app>
-                <app name="application/vnd.oasis.opendocument.spreadsheet">
-                    <action ext="ods" name="edit" urlsrc="http://localhost:9980/loleaflet/1e4154c/loleaflet.html?"/>
-                </app>
-                <!-- a lot more `app` in the real response -->
-            </net-zone>
-        </wopi-discovery>
-        """
-        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
-        url = "/api/v2/workspaces/{}/wopi/files/create?access_token={}".format(
-            business_workspace.workspace_id, quote(access_token)
-        )
-        template = "default.ods"
-        transaction.commit()
-        res = web_testapp.post_json(
-            url,
-            params={
-                "title": "test_file.ods",
-                "template": template,
-                "parent_id": tool_folder.content_id,
-            },
-            status=200,
-        )
-        transaction.commit()
-        content = res.json_body
-        content_id = int(content["url_source"].split("%2F")[-1])
-
-        # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
-        #  without reinstancing the database session
-        content_api = content_api_factory.get()
-
-        created_content = content_api.get_one(content_id, content_type=content_type_list.Any_SLUG)
-        file_ = DepotManager.get().get(created_content.depot_file)
-        current_file_path = os.path.dirname(os.path.abspath(__file__))
-
-        assert content["is_collabora_editable"] is True
-        assert content["url_source"].startswith(
-            "http://localhost:9980/loleaflet/1e4154c/loleaflet.html?WOPISrc=http%3A%2F%2Ftracimbackendserver%3A8888%2Fapi%2Fv2%2Fworkspaces%2F{}%2Fwopi%2Ffiles%2F2".format(
-                business_workspace.workspace_id
-            )
-        )
-        with open(
-            os.path.join(current_file_path, "..", "..", "templates", "open_documents", template),
-            "rb",
-        ) as f:
-            assert file_.read() == f.read()
-        assert content["access_token"] == admin_user.ensure_auth_token(
-            app_config.USER__AUTH_TOKEN__VALIDITY
-        )

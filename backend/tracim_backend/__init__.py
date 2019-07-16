@@ -49,12 +49,13 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
+from tracim_backend.views.collabora_api.collabora_controller import CollaboraController
+from tracim_backend.views.collabora_api.wopi_controller import WOPIController
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController
 from tracim_backend.views.contents_api.threads_controller import ThreadController
-from tracim_backend.views.contents_api.wopi_controller import WOPIController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
@@ -190,6 +191,7 @@ def web(global_config, **local_settings):
     file_controller = FileController()
     folder_controller = FolderController()
     wopi_controller = WOPIController()
+    collabora_controller = CollaboraController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -202,6 +204,7 @@ def web(global_config, **local_settings):
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(collabora_controller.bind, route_prefix=BASE_API_V2)
     configurator.scan("tracim_backend.lib.utils.authentification")
     if app_config.CALDAV__ENABLED:
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,

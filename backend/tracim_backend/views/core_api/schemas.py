@@ -998,7 +998,7 @@ TEMPLATES = {
 }
 
 
-class WOPICreateFromTemplateSchema(marshmallow.Schema):
+class CollaboraCreateFromTemplateSchema(marshmallow.Schema):
     template = StrippedString(
         validate=OneOf(set(TEMPLATES.keys())),
         example=list(TEMPLATES.keys())[0],
@@ -1019,7 +1019,7 @@ class WOPICreateFromTemplateSchema(marshmallow.Schema):
     )
 
 
-class WOPIEditFileSchema(marshmallow.Schema):
+class CollaboraEditFileSchema(marshmallow.Schema):
     is_collabora_editable = marshmallow.fields.Boolean(
         required=True, description="Is this content editable by collabora ?"
     )
@@ -1039,16 +1039,12 @@ class WOPIEditFileSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
 
 
-class WOPIDiscoverySchema(marshmallow.Schema):
-    extension = marshmallow.fields.List(
-        marshmallow.fields.String(example="odt"),
-        required=True,
-        description="Collabora Online file extensions",
+class CollaboraDiscoverySchema(marshmallow.Schema):
+    extension = marshmallow.fields.String(
+        example="odt", required=True, description="Collabora Online file extensions"
     )
-    associated_action = marshmallow.fields.List(
-        marshmallow.fields.String(example="edit"),
-        required=True,
-        description="Collabora Online action allowed",
+    associated_action = marshmallow.fields.String(
+        example="edit", required=True, description="Collabora Online action allowed"
     )
     url_source = marshmallow.fields.URL(
         required=True,
