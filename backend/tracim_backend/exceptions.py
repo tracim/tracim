@@ -259,6 +259,10 @@ class EmptyEmailBody(EmptyValueNotAllowed):
     pass
 
 
+class AutoReplyEmailNotAllowed(TracimException):
+    pass
+
+
 class NoSpecialKeyFound(EmptyValueNotAllowed):
     pass
 

@@ -100,14 +100,16 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
-    def get_one_by_email(self, email: str) -> User:
+    def get_one_by_email(self, email: typing.Optional[str]) -> User:
         """
         Get one user by email
         :param email: Email of the user
         :return: one user
         """
+        if not email:
+            raise UserDoesNotExist("User not found : no email provided")
         try:
-            user = self._base_query().filter(User.email == email).one()
+            user = self._base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
@@ -643,10 +645,12 @@ class UserApi(object):
                 )
             user.auth_type = auth_type
 
-        if email is not None and email != user.email:
-            self._check_email_modification_allowed(user)
-            self._check_email(email)
-            user.email = email
+        if email is not None:
+            lowercase_email = email.lower()
+            if lowercase_email != user.email:
+                self._check_email_modification_allowed(user)
+                self._check_email(lowercase_email)
+                user.email = lowercase_email
 
         if password is not None:
             self._check_password_modification_allowed(user)
@@ -745,12 +749,13 @@ class UserApi(object):
 
     def create_minimal_user(self, email, groups=[], save_now=False) -> User:
         """Previous create_user method"""
+        lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
-        validator.add_validator("email", email, user_email_validator)
+        validator.add_validator("email", lowercase_email, user_email_validator)
         validator.validate_all()
-        self._check_email(email)
+        self._check_email(lowercase_email)
         user = User()
-        user.email = email
+        user.email = lowercase_email
         # TODO - G.M - 2018-11-29 - Check if this default_value can be
         # incorrect according to user_public_name_validator
         user.display_name = email.split("@")[0]
