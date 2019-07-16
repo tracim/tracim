@@ -24,9 +24,9 @@ import {
 import {
   MODE,
   removeExtensionOfFilename,
-  displayFileSize,
-  debug
+  displayFileSize
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   getFileContent,
   getFileComment,

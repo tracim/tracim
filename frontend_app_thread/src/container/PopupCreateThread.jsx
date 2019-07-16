@@ -8,40 +8,9 @@ import {
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
 import i18n from '../i18n.js'
-
-const debug = { // outdated
-  config: {
-    // label: 'PopupCreateThread',
-    slug: 'New thread',
-    faIcon: 'file-text-o',
-    hexcolor: '#ad4cf9',
-    creationLabel: 'Write a thread',
-    domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:3001',
-    apiHeader: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    translation: {
-      en: {
-        translation: {}
-      },
-      fr: {
-        translation: {}
-      }
-    }
-  },
-  loggedUser: {
-    id: 1,
-    username: 'Smoi',
-    firstname: 'Côme',
-    lastname: 'Stoilenom',
-    email: 'osef@algoo.fr',
-    avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
-  },
-  workspaceId: 1,
-  folderId: null
-}
+// FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
+// https://github.com/tracim/tracim/issues/2066
+import { debug } from '../debug.js'
 
 class PopupCreateThread extends React.Component {
   constructor (props) {
