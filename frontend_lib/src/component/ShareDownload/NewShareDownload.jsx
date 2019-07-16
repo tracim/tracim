@@ -12,6 +12,7 @@ class NewShareDownload extends React.Component {
     super(props)
     this.toggle = this.toggle.bind(this)
     this.state = {
+      passwordActive: false,
       popoverOpen: false
     }
 
@@ -58,7 +59,7 @@ class NewShareDownload extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     return (
       <div className='shareDownload__new'>
@@ -85,12 +86,13 @@ class NewShareDownload extends React.Component {
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
-          <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverMultipleEmails' toggle={this.toggle}>
+          <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.toggle}>
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space, leave this field blank if you want to create a public link.')}</PopoverBody>
           </Popover>
         </div>
 
-        <div className='shareDownload__password'>
+        {state.passwordActive
+        ? <div className='shareDownload__password'>
           <div className='shareDownload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
             <button
@@ -121,10 +123,15 @@ class NewShareDownload extends React.Component {
             <i className='fa fa-fw fa-repeat' />
           </button>
         </div>
-
-        <div className='d-flex ml-auto mt-2'>
+        : <div className='shareDownload__password'>
+          <a className='shareDownload__password__link' href='#' onClick={() => this.setState({passwordActive: true})}>
+            Protect by password
+          </a>
+        </div>
+        }
+        <div className='d-flex mt-3'>
           <button
-            className='btn outlineTextBtn d-flex mr-3'
+            className='btn outlineTextBtn d-flex mr-3 ml-auto'
             key='cancel__new__share'
             onClick={props.onClickReturnToManagement}
             style={{

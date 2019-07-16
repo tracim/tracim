@@ -27,7 +27,7 @@ class GuestUpload extends React.Component {
       uploadFileList: [],
       uploadFilePreview: null,
       progressUpload: {
-        display: 'before',
+        display: 'beforeLoad',
         percentList: []
       }
     }
@@ -77,10 +77,10 @@ class GuestUpload extends React.Component {
 
       // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
       const xhr = new XMLHttpRequest()
-      xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: 'before', percentList: []}}), false)
+      xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: 'beforeLoad', percentList: []}}), false)
       const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: 'loading', percentList: [...this.state.percentList, {id: uploadFile.name, percent: Math.round(e.loaded / e.total * 100)}]}})
       xhr.upload.addEventListener('progress', uploadInProgress, false)
-      xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: 'after', percentList: []}}), false)
+      xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: 'afterLoad', percentList: []}}), false)
 
       // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
       xhr.setRequestHeader('Accept', 'application/json')
@@ -109,10 +109,6 @@ class GuestUpload extends React.Component {
     })
   }
 
-  showFiles = () => {
-
-  }
-
   render () {
     const { props, state } = this
 
@@ -124,7 +120,7 @@ class GuestUpload extends React.Component {
           </CardHeader>
 
           <CardBody formClass='guestupload__card__form'>
-            {state.progressUpload.display === 'before'
+            {state.progressUpload.display === 'beforeLoad'
               ? <form>
                 <div className='guestupload__card__form__left'>
                   <InputGroupText

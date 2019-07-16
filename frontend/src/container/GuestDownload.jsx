@@ -14,10 +14,10 @@ class GuestDownload extends React.Component {
     this.toggle = this.toggle.bind(this)
     this.state = {
       popoverOpen: false,
-      userName: 'USER',
+      userName: '',
       file: {
-        fileName: 'FILE',
-        fileSize: 'SIZE'
+        fileName: '',
+        fileSize: 0
       },
       guestPassword: {
         value: '',
@@ -34,7 +34,7 @@ class GuestDownload extends React.Component {
 
   handleChangePassword = e => this.setState({guestPassword: {...this.state.guestPassword, value: e.target.value}})
 
-  handleClickDowload = () => {}
+  handleClickDownload = () => {}
 
   render () {
     const { props, state } = this
@@ -62,7 +62,6 @@ class GuestDownload extends React.Component {
                   isInvalid={state.guestPassword.isInvalid}
                   value={state.guestPassword.value}
                   onChange={this.handleChangePassword}
-                  onKeyDown={() => {}}
                 />
                 <button
                   type='button'
@@ -81,7 +80,7 @@ class GuestDownload extends React.Component {
                   bootstrapType=''
                   customClass='guestupload__card__form__btndownload btn highlightBtn primaryColorBg primaryColorBgDarkenHover ml-auto'
                   label={props.t('Download')}
-                  onClick={this.handleClickDowload}
+                  onClick={this.handleClickDownload}
                 />
               </div>
             </form>
