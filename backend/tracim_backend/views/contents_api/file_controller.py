@@ -38,6 +38,7 @@ from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import FileCreateFromTemplateSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
@@ -70,6 +71,42 @@ class FileController(Controller):
     """
     Endpoints for File Content
     """
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
+    @check_right(can_create_file)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(ContentDigestSchema())
+    @hapic.input_body(FileCreateFromTemplateSchema())
+    def create_file_from_template(self, context, request: TracimRequest, hapic_data=None):
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config
+        )
+        parent = None  # type: typing.Optional['Content']
+        if hapic_data.body.parent_id:
+            try:
+                parent = api.get_one(
+                    content_id=hapic_data.body.parent_id, content_type=content_type_list.Any_SLUG
+                )
+            except ContentNotFound as exc:
+                raise ParentNotFound(
+                    "Parent with content_id {} not found".format(hapic_data.body.parent_id)
+                ) from exc
+        content = api.create(
+            filename=hapic_data.body.filename,
+            content_type_slug=FILE_TYPE,
+            workspace=request.current_workspace,
+            parent=parent,
+        )
+        api.save(content, ActionDescription.CREATION)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+            api.update_from_template(content=content, template_filename=hapic_data.body.template)
+        api.execute_created_content_actions(content)
+        return api.get_content_in_context(content)
 
     # File data
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -696,6 +733,16 @@ class FileController(Controller):
             "create_file", "/workspaces/{workspace_id}/files", request_method="POST"
         )
         configurator.add_view(self.create_file, route_name="create_file")
+
+        # Create file from template
+        configurator.add_route(
+            "create_file_from_template",
+            "/workspaces/{workspace_id}/files/from_template",
+            request_method="POST",
+        )
+        configurator.add_view(
+            self.create_file_from_template, route_name="create_file_from_template"
+        )
         # upload raw file
         configurator.add_route(
             "upload_file",

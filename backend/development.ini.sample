@@ -24,6 +24,7 @@ basic_setup.depot_storage_dir = %(here)s/depot
 basic_setup.caldav_storage_dir = %(here)s/radicale_storage
 basic_setup.preview_cache_dir = %(here)s/previews
 basic_setup.sessions_data_root_dir = %(here)s
+basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents
 ## secret
 # This is needed for some feature like reply by email
 basic_setup.api_key =
@@ -85,6 +86,7 @@ depot_storage_name = tracim
 ## This is where none database file will be stored
 depot_storage_dir = %(basic_setup.depot_storage_dir)s
 
+file_template_dir =  %(basic_setup.file_template_dir)s
 ### Preview ###
 ## preview cache directory
 preview_cache_dir = %(basic_setup.preview_cache_dir)s
@@ -429,7 +431,6 @@ search.engine = simple
 # not be indexed using ingest mode.
 # default value to 52428800 = 50Mo
 ;search.elasticsearch.ingest.size_limit = 52428800
-
 ####
 # Collaborative Edit (Collabora)
 ####

@@ -486,6 +486,17 @@ class ContentCreation(object):
         self.parent_id = parent_id or None
 
 
+class FileCreateFromTemplate(object):
+    """
+    Create From Template model
+    """
+
+    def __init__(self, template: str, filename: str, parent_id: int):
+        self.template = template
+        self.filename = filename
+        self.parent_id = parent_id
+
+
 class CommentCreation(object):
     """
     Comment creation model

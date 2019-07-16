@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
+import mimetypes
 import os
 import re
 import traceback
@@ -38,6 +39,9 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FileTemplateNotAvailable
+from tracim_backend.exceptions import NotAFileError
+from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -56,6 +60,9 @@ from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
+from tracim_backend.lib.utils.utils import is_dir_exist
+from tracim_backend.lib.utils.utils import is_file_exist
+from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import preview_manager_page_format
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
@@ -173,6 +180,7 @@ class ContentApi(object):
         if self._user:
             default_lang = self._user.lang
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
+        self.file_template_dir = self._config.FILE_TEMPLATE_DIR
 
     @contextmanager
     def show(
@@ -1797,6 +1805,25 @@ class ContentApi(object):
         )  # TODO: convert urls into links
         item.revision_type = ActionDescription.EDITION
         return item
+
+    def _get_file_template_path(self, template_filename) -> str:
+        template_path = "{}/{}".format(self._config.FILE_TEMPLATE_DIR, template_filename)
+        try:
+            is_dir_exist(self._config.FILE_TEMPLATE_DIR)
+            is_file_exist(template_path)
+            is_file_readable(template_path)
+        except (NotADirectoryError, NotAFileError, NotReadableFile) as exc:
+            raise FileTemplateNotAvailable from exc
+        return template_path
+
+    def update_from_template(self, content: Content, template_filename: str):
+        template_path = self._get_file_template_path(template_filename)
+        new_mimetype = mimetypes.guess_type(template_path)[0]
+
+        with open(self._get_file_template_path(template_filename), "rb") as file:
+            self.update_file_data(
+                content, new_filename=content.file_name, new_mimetype=new_mimetype, new_content=file
+            )
 
     def update_file_data(
         self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes

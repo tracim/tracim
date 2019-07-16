@@ -34,6 +34,7 @@ from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import FileCreateFromTemplate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
@@ -991,24 +992,14 @@ class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
     pass
 
 
-TEMPLATES = {
-    "default.ods": "application/vnd.oasis.opendocument.spreadsheet",
-    "default.odt": "application/vnd.oasis.opendocument.text",
-    "default.odp": "application/vnd.oasis.opendocument.presentation",
-}
-
-
-class CollaboraCreateFromTemplateSchema(marshmallow.Schema):
+class FileCreateFromTemplateSchema(marshmallow.Schema):
     template = StrippedString(
-        validate=OneOf(set(TEMPLATES.keys())),
-        example=list(TEMPLATES.keys())[0],
+        example="default.odt",
         description="The template of the file you want to create",
         required=True,
     )
-    title = StrippedString(
-        required=True,
-        example=list(TEMPLATES.keys())[0],
-        description="The file name, as saved in the workspace",
+    filename = StrippedString(
+        required=True, example="test.odt", description="The file name, as saved in the workspace"
     )
     parent_id = marshmallow.fields.Int(
         example=42,
@@ -1017,6 +1008,10 @@ class CollaboraCreateFromTemplateSchema(marshmallow.Schema):
         allow_none=True,
         validate=positive_int_validator,
     )
+
+    @post_load
+    def file_create_from_template(self, data: typing.Dict[str, typing.Any]) -> object:
+        return FileCreateFromTemplate(**data)
 
 
 class CollaboraEditFileSchema(marshmallow.Schema):

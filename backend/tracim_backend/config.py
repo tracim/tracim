@@ -181,7 +181,7 @@ class CFG(object):
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
-
+        self.FILE_TEMPLATE_DIR = self.get_raw_config("file_template_dir", "file_template")
         self.AUTH_TYPES = string_to_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
