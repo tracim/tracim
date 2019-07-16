@@ -2,13 +2,13 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <meta name='viewport' content='width=device-width, user-scalable=no'>
-  <title>Tracim</title>
-  <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico'>
-  <link rel='manifest' href='/assets/manifest.json'>
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <title>Office document App Tracim</title>
+  <link rel='shortcut icon' href='favicon.ico'>
 
-  <link rel='stylesheet' type='text/css' href='/assets/font/font-awesome-4.7.0/css/font-awesome.css'>
-  <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
+  <link rel="stylesheet" type="text/css" href="./assets/font/font-awesome-4.7.0/css/font-awesome.css">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
 
   <style>
     .primaryColorFont { color: #7d4e24; }
@@ -53,34 +53,21 @@
     GLOBAL_primaryColor = '#7d4e24'
   </script>
 </head>
-
 <body>
+<script src="./assets/bootstrap/jquery-3.2.1.js"></script>
+<script src="./assets/bootstrap/popper-1.12.3.js"></script>
+<script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+
 <div id='content'></div>
 
-<script type='text/javascript' src='/app/tracim_frontend_lib.style.js'></script>
+<script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
 
 <script type='text/javascript' src='/assets/tracim/appInterface.js'></script>
 <script type='text/javascript' src='/assets/tracim/tinymceInit.js'></script>
 
-<script type='text/javascript' src='/assets/tracim.vendors~app.js'></script>
-<script type='text/javascript' src='/assets/tracim.app.js'></script>
-
-<script type='text/javascript' src='/app/html-document.app.js'></script>
-<script type='text/javascript' src='/app/office_document.app.js'></script>
-<script type='text/javascript' src='/app/thread.app.js'></script>
-<script type='text/javascript' src='/app/file.app.js'></script>
-<script type='text/javascript' src='/app/workspace.app.js'></script>
-<script type='text/javascript' src='/app/folder.app.js'></script>
-<script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
-<script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
-<script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
-<script type='text/javascript' src='/app/agenda.app.js'></script>
-
-<script type='text/javascript' src='/assets/bootstrap/jquery-3.2.1.js'></script>
-<script type='text/javascript' src='/assets/bootstrap/popper-1.12.3.js'></script>
-<script type='text/javascript' src='/assets/bootstrap/bootstrap-4.0.0-beta.2.js'></script>
-
 <script type='text/javascript' src='/assets/tinymce/js/tinymce/jquery.tinymce.min.js'></script>
 <script type='text/javascript' src='/assets/tinymce/js/tinymce/tinymce.min.js'></script>
+
+<script src='./office_document.app.dev.js'></script>
 </body>
 </html>

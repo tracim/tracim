@@ -6,7 +6,7 @@ import {
   addAllResourceI18n,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import { postODP } from '../action.async.js'
+import { postHtmlDocContent } from '../action.async.js'
 import i18n from '../i18n.js'
 
 const debug = { // outdated
