@@ -30,6 +30,7 @@ from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import FileTemplateInfo
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
@@ -46,6 +47,7 @@ from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FileRevisionPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionSchema
+from tracim_backend.views.core_api.schemas import FileTemplateInfoSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PageQuerySchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
@@ -600,6 +602,25 @@ class FileController(Controller):
         )
         return api.get_jpg_preview_allowed_dim()
 
+    # File template infor
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.output_body(FileTemplateInfoSchema())
+    def get_file_template_infos(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> FileTemplateInfo:
+        """
+        Get thread content
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        return api.get_template_info()
+
     # File infos
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
@@ -713,6 +734,9 @@ class FileController(Controller):
         Add route to configurator.
         """
 
+        # Get file template info
+        configurator.add_route("file_template_info", "/files/templates", request_method="GET")
+        configurator.add_view(self.get_file_template_infos, route_name="file_template_info")
         # file info #
         # Get file info
         configurator.add_route(

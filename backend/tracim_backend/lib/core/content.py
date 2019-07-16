@@ -3,6 +3,8 @@ from contextlib import contextmanager
 import datetime
 import mimetypes
 import os
+from os.path import isfile
+from os.path import join
 import re
 import traceback
 import typing
@@ -61,11 +63,15 @@ from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.lib.utils.utils import is_dir_exist
+from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_file_exist
 from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import preview_manager_page_format
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import FileTemplate
+from tracim_backend.models.context_models import FileTemplateCategory
+from tracim_backend.models.context_models import FileTemplateInfo
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
@@ -1806,17 +1812,50 @@ class ContentApi(object):
         item.revision_type = ActionDescription.EDITION
         return item
 
+    def _has_template_extension(self, template_name: str, extension_list: typing.List[str]):
+        for extension in extension_list:
+            if template_name.endswith(extension):
+                return True
+        return False
+
+    def _get_template_list(self) -> typing.List[FileTemplate]:
+        template_list = []
+        try:
+            is_dir_exist(self._config.FILE_TEMPLATE_DIR)
+            is_dir_readable(self._config.FILE_TEMPLATE_DIR)
+        except (NotADirectoryError) as exc:
+            raise FileTemplateNotAvailable from exc
+        for filename in os.listdir(self._config.FILE_TEMPLATE_DIR):
+            if not isfile(join(self._config.FILE_TEMPLATE_DIR, filename)):
+                continue
+            if self._has_template_extension(filename, [".ods"]):
+                template_list.append(FileTemplate(filename, category=FileTemplateCategory.calc))
+            elif self._has_template_extension(filename, [".odp"]):
+                template_list.append(FileTemplate(filename, category=FileTemplateCategory.pres))
+            elif self._has_template_extension(filename, [".odt"]):
+                template_list.append(FileTemplate(filename, category=FileTemplateCategory.text))
+            else:
+                template_list.append(FileTemplate(filename, category=FileTemplateCategory.text))
+        return template_list
+
+    def get_template_info(self) -> FileTemplateInfo:
+        all_template_category = [cat.value for cat in FileTemplateCategory]
+        return FileTemplateInfo(
+            categories=all_template_category, file_templates=self._get_template_list()
+        )
+
     def _get_file_template_path(self, template_filename) -> str:
         template_path = "{}/{}".format(self._config.FILE_TEMPLATE_DIR, template_filename)
         try:
             is_dir_exist(self._config.FILE_TEMPLATE_DIR)
+            is_dir_readable(self._config.FILE_TEMPLATE_DIR)
             is_file_exist(template_path)
             is_file_readable(template_path)
         except (NotADirectoryError, NotAFileError, NotReadableFile) as exc:
             raise FileTemplateNotAvailable from exc
         return template_path
 
-    def update_from_template(self, content: Content, template_filename: str):
+    def update_from_template(self, content: Content, template_filename: str) -> Content:
         template_path = self._get_file_template_path(template_filename)
         new_mimetype = mimetypes.guess_type(template_path)[0]
 
@@ -1824,6 +1863,7 @@ class ContentApi(object):
             self.update_file_data(
                 content, new_filename=content.file_name, new_mimetype=new_mimetype, new_content=file
             )
+        return content
 
     def update_file_data(
         self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes

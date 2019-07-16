@@ -988,6 +988,20 @@ class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
     pass
 
 
+class FileTemplateSchema(marshmallow.Schema):
+    template_name = StrippedString(
+        example="default.odt", description="template name you can use", required=True
+    )
+    category = StrippedString(example="calc", description="category of the template", required=True)
+
+
+class FileTemplateInfoSchema(marshmallow.Schema):
+    categories = marshmallow.fields.List(
+        StrippedString(example="calc"), description="categories of file template available."
+    )
+    file_templates = marshmallow.fields.Nested(FileTemplateSchema, many=True)
+
+
 class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
     pass
 
