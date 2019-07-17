@@ -30,6 +30,10 @@ class CollaboraApi(object):
         supported_collabora_file = []  # type: typing.List[CollaboraFileType]
         for xml_app in root.findall("net-zone/app"):
             mimetype = xml_app.get("name")
+            # INFO - G.M - 2019-07-17 - this list return also a non mimetype type,
+            # we should not add him.
+            if mimetype == "Capabilities":
+                continue
             for xml_action in xml_app:
                 extension = xml_action.get("ext")
                 url_source = xml_action.get("urlsrc")
