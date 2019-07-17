@@ -1,4 +1,20 @@
 
+## 2.4 / 2019-08-xx
+
+### New Features
+
+- Collabora online / Libreoffice online
+- Public file share (upload and download)
+
+### Fixed issues
+
+- Collabora / libreoffice:
+- Public file share:
+-
+-
+-
+-
+
 ## 2.3.1 / 2019-07-05
 
 ### Fixed issues
