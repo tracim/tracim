@@ -2243,19 +2243,19 @@ class TestFiles(object):
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
-        business_workspace = workspace_api.create_workspace(label="business")
+        data_workspace = workspace_api.create_workspace(label="data")
         tool_folder = content_api.create(
             label="tools",
             content_type_slug=content_type_list.Folder.slug,
             do_save=True,
             do_notify=None,
             parent=None,
-            workspace=business_workspace,
+            workspace=data_workspace,
         )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/files/from_template".format(business_workspace.workspace_id)
+        url = "/api/v2/workspaces/{}/files/from_template".format(data_workspace.workspace_id)
         template_filename = "default.ods"
         res = web_testapp.post_json(
             url,
@@ -2300,18 +2300,18 @@ class TestFiles(object):
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
-        business_workspace = workspace_api.create_workspace(label="business")
+        data_workspace = workspace_api.create_workspace(label="data")
         tool_folder = content_api.create(
             label="tools",
             content_type_slug=content_type_list.Folder.slug,
             do_save=True,
             do_notify=None,
             parent=None,
-            workspace=business_workspace,
+            workspace=data_workspace,
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/files/from_template".format(business_workspace.workspace_id)
+        url = "/api/v2/workspaces/{}/files/from_template".format(data_workspace.workspace_id)
         template_filename = "unexistent_template"
         res = web_testapp.post_json(
             url,
