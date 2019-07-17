@@ -544,6 +544,7 @@ class CFG(object):
         )
 
     def _load_collabora_config(self):
+        self.COLLABORA__ACTIVATED = asbool(self.get_raw_config("collabora.activated", "false"))
         self.COLLABORA__EXTENSION_BLACKLIST = string_to_list(
             self.get_raw_config("collabora.extension_blacklist", ""),
             separator=",",
@@ -565,6 +566,20 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_caldav_config_validity()
         self._check_search_config_validity()
+        self._check_collabora_config_validity()
+
+    def _check_collabora_config_validity(self) -> None:
+        if self.COLLABORA__ACTIVATED:
+            self.check_mandatory_param(
+                "COLLABORA__BACKEND__BASE_URL",
+                self.COLLABORA__BACKEND__BASE_URL,
+                when_str="if collabora feature is activated",
+            )
+            self.check_mandatory_param(
+                "COLLABORA__BASE_URL",
+                self.COLLABORA__BASE_URL,
+                when_str="if collabora feature is activated",
+            )
 
     def _check_global_config_validity(self) -> None:
         """
