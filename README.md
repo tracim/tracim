@@ -16,7 +16,7 @@ Test  tracim on your computer with docker:
 ```
 mkdir -p ~/tracim/etc
 mkdir -p ~/tracim/var
-docker run -e DATABASE_TYPE=sqlite -e START_CALDAV=1 -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 ```
 
 Then visit the url http://localhost:8080 and login in to tracim:
