@@ -11,20 +11,20 @@ from tracim_backend import CFG
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
 from tracim_backend.exceptions import TracimFileNotFound
-from tracim_backend.lib.collabora.wopi import WopiApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.lib.wopi.wopi import WopiApi
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.views.collabora_api.schema import WopiPutHeadersSchema
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import WOPICheckFileInfoSchema
-from tracim_backend.views.core_api.schemas import WopiPutResponse
-from tracim_backend.views.core_api.schemas import WOPITokenQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
+from tracim_backend.views.wopi_api.wopi_schema import WOPICheckFileInfoSchema
+from tracim_backend.views.wopi_api.wopi_schema import WopiPutHeadersSchema
+from tracim_backend.views.wopi_api.wopi_schema import WopiPutResponse
+from tracim_backend.views.wopi_api.wopi_schema import WOPITokenQuerySchema
 
 SWAGGER_TAG__CONTENT_WOPI_SECTION = "WOPI"
 SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS = generate_documentation_swagger_tag(

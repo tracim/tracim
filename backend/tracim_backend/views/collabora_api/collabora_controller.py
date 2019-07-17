@@ -7,9 +7,9 @@ from tracim_backend.lib.collabora.collabora import CollaboraApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.views.collabora_api.collabora_schema import CollaboraDiscoverySchema
+from tracim_backend.views.collabora_api.collabora_schema import CollaboraEditFileSchema
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import CollaboraDiscoverySchema
-from tracim_backend.views.core_api.schemas import CollaboraEditFileSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 

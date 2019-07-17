@@ -49,7 +49,6 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
-from tracim_backend.views.collabora_api.wopi_controller import WOPIController
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
@@ -63,6 +62,7 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
+from tracim_backend.views.wopi_api.wopi_controller import WOPIController
 
 try:  # Python 3.5+
     from http import HTTPStatus

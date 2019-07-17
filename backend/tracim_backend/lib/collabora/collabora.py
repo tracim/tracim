@@ -13,7 +13,7 @@ from tracim_backend.lib.collabora.models import CollaboraFileType
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
-from tracim_backend.views.collabora_api.wopi_controller import WOPI_FILES
+from tracim_backend.views.wopi_api.wopi_controller import WOPI_FILES
 
 COLLABORA_ACTION_EDIT = "edit"
 
