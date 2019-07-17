@@ -2,6 +2,7 @@ import datetime
 from urllib.parse import quote
 
 from depot.manager import DepotManager
+from freezegun import freeze_time
 import pytest
 import transaction
 
@@ -137,35 +138,36 @@ class TestWOPI(object):
             parent=None,
             workspace=business_workspace,
         )
-        test_file = content_api.create(
-            content_type_slug=content_type_list.File.slug,
-            workspace=business_workspace,
-            parent=tool_folder,
-            label="Test file",
-            do_save=False,
-            do_notify=False,
-        )
-        with new_revision(session=session, tm=transaction.manager, content=test_file):
-            content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+        with freeze_time("1999-12-31 23:59:59"):
+            test_file = content_api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=business_workspace,
+                parent=tool_folder,
+                label="Test file",
+                do_save=False,
+                do_notify=False,
             )
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
-        transaction.commit()
-        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token={}".format(
-            business_workspace.workspace_id, test_file.content_id, quote(access_token)
-        )
-        updated_at = test_file.updated
-        new_content = b"content has been modified"
-        res = web_testapp.post(
-            url,
-            params=new_content,
-            status=200,
-            headers={"X-LOOL-WOPI-Timestamp": str(test_file.updated)},
-        )
-        transaction.commit()
-
+            with new_revision(session=session, tm=transaction.manager, content=test_file):
+                content_api.update_file_data(
+                    test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                )
+            transaction.commit()
+        with freeze_time("2000-01-01 00:00:05"):
+            web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+            access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
+            transaction.commit()
+            url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token={}".format(
+                business_workspace.workspace_id, test_file.content_id, quote(access_token)
+            )
+            updated_at = test_file.updated
+            new_content = b"content has been modified"
+            res = web_testapp.post(
+                url,
+                params=new_content,
+                status=200,
+                headers={"X-LOOL-WOPI-Timestamp": str(test_file.updated)},
+            )
+            transaction.commit()
         # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
         #  without reinstancing the database session
         content_api = content_api_factory.get()
