@@ -1,13 +1,10 @@
 {
   "Last version": "Dernière version",
-  "Validate and create": "Valider et créer",
   "Error while archiving document": "Erreur lors de l'archivage d'un document",
   "Error while deleting document": "Erreur lors de la suppression d'un document",
   "Error while restoring document": "Erreur lors de la restauration du document",
   "Restore": "Restaurer",
   "Error while creating file": "Erreur lors de la création du fichier",
-  "Drag and drop your file here": "Glisser déposer un fichier ici",
-  "You can also import your file by clicking here": "Vous pouvez aussi sélectionner votre fichier en cliquant ici",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Download file": "Télécharger le fichier",
@@ -20,7 +17,6 @@
   "Error while saving new description": "Erreur lors de l'enregistrement d'une nouvelle description",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
   "Page number": "Nombre de pages",
-  "Upload a file": "Importer un fichier",
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
   "Bytes": "Octets",
   "KB": "Ko",
@@ -39,7 +35,6 @@
   "Error while saving new comment": "Erreur lors de la sauvegarde du commentaire",
   "No preview available": "Prévisualisation indisponible",
   " of ": " sur ",
-  "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while saving new title": "Erreur lors de la sauvegarde du nouveau titre",
   "This content is archived": "Ce contenu est archivé",
   "This content is deleted": "Ce contenu est supprimé",
@@ -50,5 +45,6 @@
   "This content is deprecated": "Ce contenu est obsolète",
   "Previous page": "Page précédente",
   "Next page": "Page suivante",
-  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide"
+  "You can't send an empty comment": "Vous ne pouvez pas envoyer un commentaire vide",
+  "Share": "Partage"
 }

@@ -48,7 +48,7 @@ export const FileDropzone = props => {
                 )
               }
             default:
-              if (props.multipleFiles) { // TODO
+              if (props.multipleFiles) {
                 return (
                   <div>
                     <div

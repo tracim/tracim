@@ -87,7 +87,7 @@ class NewShareDownload extends React.Component {
             <i className='fa fa-fw fa-question-circle' />
           </button>
           <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.toggle}>
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space, leave this field blank if you want to create a public link.')}</PopoverBody>
+            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
         </div>
 
@@ -99,6 +99,7 @@ class NewShareDownload extends React.Component {
               type='button'
               className='shareDownload__password__icon'
               key='see_share_password'
+              title={props.t('Show password')}
               style={{':hover': {color: props.hexcolor}}}
               onClick={this.handleSeePassword}
             >
@@ -117,6 +118,7 @@ class NewShareDownload extends React.Component {
             type='button'
             className='shareDownload__password__icon'
             key='random_share_password'
+            title={props.t('Generate random password')}
             style={{':hover': {color: props.hexcolor}}}
             onClick={this.handleRandomPassword}
           >
@@ -125,7 +127,7 @@ class NewShareDownload extends React.Component {
         </div>
         : <div className='shareDownload__password'>
           <a className='shareDownload__password__link' href='#' onClick={() => this.setState({passwordActive: true})}>
-            Protect by password
+            {props.t('Protect by password')}
           </a>
         </div>
         }

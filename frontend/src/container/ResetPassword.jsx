@@ -76,7 +76,7 @@ export class ResetPassword extends React.Component {
     const { props, state } = this
 
     return (
-      <section className='resetpassword primaryColorBg'>
+      <section className='resetpassword'>
         <Card customClass='resetpassword__card'>
           <CardHeader customClass='resetpassword__card__header primaryColorBgLighten text-center'>
             {props.t('Reset password')}

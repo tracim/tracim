@@ -195,9 +195,11 @@
   "Folder": "Dossier",
   "Actions": "Actions",
   "No results for the search terms": "Aucun résultat pour les termes de recherche ",
+  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while archiving content": "Erreur lors de l'archivage du contenu",
   "Error while deleting content": "Erreur lors de la suppression du contenu",
   "Error while moving content": "Erreur lors du déplacement du contenu",
+  "Error while uploading file": "Erreur lors du téléchargement du fichier",
   "Move this content": "Déplacer ce contenu",
   "Move this folder": "Déplacer ce dossier",
   "A content with same name already exists": "Un contenu avec le même nom existe déjà",
@@ -207,7 +209,12 @@
   "Insufficient rights": "Droits insuffisants",
   "Download file": "Télécharger un fichier",
   "Upload files": "Importer des fichiers",
+  "Attached files": "Fichiers joints",
   "shared with you the file": "a partagé avec vous le fichier",
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "La personne qui vous a envoyé ce fichier l'a protégé par mot de passe. Si vous ne connaissez pas le mot de passe, veuillez la contacter.",
-  "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Laisez un message avec votre ou vos fichiers si vous le souhaitez. N'hésitez pas à laisser vos coordonnées si vous souhaitez être recontacté."
+  "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Laisez un message avec votre ou vos fichiers si vous le souhaitez. N'hésitez pas à laisser vos coordonnées si vous souhaitez être recontacté.",
+  "You have not yet chosen any files to upload.": "Vous n'avez pas encore sélectionné de fichiers à télécharger.",
+  "Send": "Envoyer",
+  "Thank you, your import is finished!": "Merci, votre importation est terminée !",
+  "You can now close this page, your recipient will receive the notification of your import.": "Vous pouvez maintenant fermer cette page, votre destinataire va recevoir la notification de votre import."
 }

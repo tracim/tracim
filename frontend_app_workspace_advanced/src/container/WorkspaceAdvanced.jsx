@@ -232,8 +232,60 @@ class WorkspaceAdvanced extends React.Component {
   }
 
   handleToggleUploadEnabled = () => {}
+  // handleToggleUploadEnabled = async () => {
+  //   const { props, state } = this
+  //   const oldUploadEnabledValue = state.content.upload_enabled
+  //   const newUploadEnabledValue = !state.content.upload_enabled
+
+  //   this.setState(prev => ({content: {...prev.content, upload_enabled: newUploadEnabledValue}}))
+  //   const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
+
+  //   switch (fetchToggleUploadEnabled.apiResponse.status) {
+  //     case 200:
+  //       this.sendGlobalFlashMessage(
+  //         newUploadEnabledValue ? props.t('Upload activated') : props.t('Upload deactivated'),
+  //         'info'
+  //       )
+  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+  //       break
+  //     default:
+  //       this.setState(prev => ({content: {...prev.content, upload_enabled: oldUploadEnabledValue}}))
+  //       this.sendGlobalFlashMessage(
+  //         newUploadEnabledValue
+  //           ? props.t('Error while activating upload')
+  //           : props.t('Error while deactivating upload'),
+  //         'warning'
+  //       )
+  //   }
+  // }
 
   handleToggleDownloadEnabled = () => {}
+  // handleToggleDownloadEnabled = async () => {
+  //   const { props, state } = this
+  //   const oldDownloadEnabledValue = state.content.download_enabled
+  //   const newDownloadEnabledValue = !state.content.download_enabled
+
+  //   this.setState(prev => ({content: {...prev.content, download_enabled: newDownloadEnabledValue}}))
+  //   const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
+
+  //   switch (fetchToggleDownloadEnabled.apiResponse.status) {
+  //     case 200:
+  //       this.sendGlobalFlashMessage(
+  //         newDownloadEnabledValue ? props.t('Download activated') : props.t('Download deactivated'),
+  //         'info'
+  //       )
+  //       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_WORKSPACE_LIST, data: {} })
+  //       break
+  //     default:
+  //       this.setState(prev => ({content: {...prev.content, download_enabled: oldDownloadEnabledValue}}))
+  //       this.sendGlobalFlashMessage(
+  //         newDownloadEnabledValue
+  //           ? props.t('Error while activating download')
+  //           : props.t('Error while deactivating download'),
+  //         'warning'
+  //       )
+  //   }
+  // }
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({newMember: {...prev.newMember, role: slugRole}}))
 

@@ -341,7 +341,7 @@ class File extends React.Component {
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
           default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
         break
@@ -816,7 +816,7 @@ class File extends React.Component {
             menuItemList={[
               {
                 id: 'timeline',
-                label: 'Timeline',
+                label: props.t('Timeline'),
                 icon: 'fa-history',
                 children: <Timeline
                   customClass={`${state.config.slug}__contentpage`}
@@ -836,7 +836,7 @@ class File extends React.Component {
               },
               {
                 id: 'share',
-                label: 'Share',
+                label: props.t('Share'),
                 icon: 'fa-share-alt',
                 children: <ShareDownload
                   label={state.config.label}
@@ -852,7 +852,7 @@ class File extends React.Component {
               },
               {
                 id: 'properties',
-                label: 'Properties',
+                label: props.t('Properties'),
                 icon: 'fa-info-circle',
                 children: <PropertiesComponent
                   color={state.config.hexcolor}

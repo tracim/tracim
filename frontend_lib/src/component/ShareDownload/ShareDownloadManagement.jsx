@@ -60,7 +60,7 @@ class ShareDownloadManagement extends React.Component {
                 hexcolor={props.hexcolor}
               />
             )
-          : <div className='m-auto'>No share link has been created yet.</div>
+          : <div className='m-auto'>{props.t('No share link has been created yet.')}</div>
         }
       </div>
     )

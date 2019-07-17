@@ -195,9 +195,11 @@
   "Folder": "Folder",
   "Actions": "Actions",
   "No results for the search terms": "No results for the search terms",
+  "A content with the same name already exists": "A content with the same name already exists",
   "Error while archiving content": "Error while archiving content",
   "Error while deleting content": "Error while deleting content",
   "Error while moving content": "Error while moving content",
+  "Error while uploading file": "Error while uploading file",
   "Move this content": "Move this content",
   "Move this folder": "Move this folder",
   "A content with same name already exists": "A content with same name already exists",
@@ -207,7 +209,12 @@
   "Insufficient rights": "Insufficient rights",
   "Download file": "Download file",
   "Upload files": "Upload files",
+  "Attached files": "Attached files",
   "shared with you the file": "shared with you the file",
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "The person who sent you this file protected it with a password. If you do not know the password, please contact her.",
-  "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again."
+  "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.",
+  "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload.",
+  "Send": "Send",
+  "Thank you, your import is finished": "Thank you, your import is finished",
+  "You can now close this page, your recipient will receive the notification of your import.": "You can now close this page, your recipient will receive the notification of your import."
 }

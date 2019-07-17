@@ -23,8 +23,8 @@ class ShareLink extends React.Component {
           <ComposedIcon
             icon='link'
             smallIcon='lock'
-            style={{color: '#ababab'}}
-            smallIconStyle={{color: '#252525'}} // See how to use Variable's variables
+            style={{color: '#ababab'}}             // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+            smallIconStyle={{color: '#252525'}}    // https://github.com/tracim/tracim/issues/2098
           />
         </div>
         <div className='shareLink__linkInfos'>
@@ -44,6 +44,7 @@ class ShareLink extends React.Component {
               color: props.hexcolor
             }
           }}
+          title={props.t('Copy link')}
           onClick={this.handleCopyToClipboard}
         >
           <i className='fa fa-fw fa-files-o'/>
@@ -56,6 +57,7 @@ class ShareLink extends React.Component {
               color: props.hexcolor
             }
           }}
+          title={props.t('Delete link')}
           onClick={() => props.onClickDeleteShareLink(props.id)}
         >
           <i className='fa fa-fw fa-trash-o'/>

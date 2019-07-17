@@ -40,7 +40,7 @@ class GuestDownload extends React.Component {
     const { props, state } = this
 
     return (
-      <section className='guestdownload primaryColorBg'>
+      <section className='guestdownload'>
         <Card customClass='guestdownload__card'>
           <CardHeader customClass='guestdownload__card__header primaryColorBgLighten'>
             {props.t('Download file')}

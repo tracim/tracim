@@ -203,7 +203,7 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{pathname: '/ui'}} />
 
     return (
-      <section className='loginpage primaryColorBg'>
+      <section className='loginpage'>
         <Card customClass='loginpage__card'>
           <CardHeader customClass='loginpage__card__header primaryColorBgLighten'>
             {props.t('Connection')}

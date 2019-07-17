@@ -113,7 +113,7 @@ class GuestUpload extends React.Component {
     const { props, state } = this
 
     return (
-      <section className='guestupload primaryColorBg'>
+      <section className='guestupload'>
         <Card customClass='guestupload__card'>
           <CardHeader customClass='guestupload__card__header primaryColorBgLighten'>
             {props.t('Upload files')}
