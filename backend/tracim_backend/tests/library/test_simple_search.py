@@ -1,7 +1,7 @@
 import pytest
 import transaction
 
-from tracim_backend.lib.search.search import SimpleSearchApi
+from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
 from tracim_backend.models.auth import Group
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
