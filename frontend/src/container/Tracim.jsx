@@ -259,7 +259,7 @@ class Tracim extends React.Component {
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
-          <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() => <AdminAccount />} />
+          <Route exact path={PAGE.ADMIN.USER_EDIT(':userid')} render={() => <AdminAccount />} />
 
           <Route exact path={[
             PAGE.ADMIN.USER,
