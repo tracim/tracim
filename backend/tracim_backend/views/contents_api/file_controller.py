@@ -13,6 +13,7 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import FileTemplateNotAvailable
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
@@ -79,6 +80,7 @@ class FileController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileTemplateNotAvailable, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_file)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
@@ -88,6 +90,7 @@ class FileController(Controller):
         api = ContentApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
+        api.check_template_available(hapic_data.body.template)
         parent = None  # type: typing.Optional['Content']
         if hapic_data.body.parent_id:
             try:

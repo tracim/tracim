@@ -1855,6 +1855,9 @@ class ContentApi(object):
             raise FileTemplateNotAvailable from exc
         return template_path
 
+    def check_template_available(self, template_filename) -> None:
+        self._get_file_template_path(template_filename)
+
     def update_from_template(self, content: Content, template_filename: str) -> Content:
         template_path = self._get_file_template_path(template_filename)
         new_mimetype = mimetypes.guess_type(template_path)[0]

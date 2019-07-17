@@ -2285,6 +2285,46 @@ class TestFiles(object):
         with open(content_api._get_file_template_path(template_filename), "rb") as file:
             assert res.body == file.read()
 
+    def test_api__create_from_template__err_400__template_does_not_exist(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        admin_user,
+        app_config,
+    ) -> None:
+        """
+        Ask to create a file from a template, returns the url of collabora online
+        """
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.create_workspace(label="business")
+        tool_folder = content_api.create(
+            label="tools",
+            content_type_slug=content_type_list.Folder.slug,
+            do_save=True,
+            do_notify=None,
+            parent=None,
+            workspace=business_workspace,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        url = "/api/v2/workspaces/{}/files/from_template".format(business_workspace.workspace_id)
+        template_filename = "unexistent_template"
+        res = web_testapp.post_json(
+            url,
+            params={
+                "filename": "test_file.ods",
+                "template": template_filename,
+                "parent_id": tool_folder.content_id,
+            },
+            status=400,
+        )
+        content = res.json_body
+        assert content["code"] == ErrorCode.FILE_TEMPLATE_NOT_AVAILABLE
+
     def test_api__create_file__ok__200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
     ) -> None:
