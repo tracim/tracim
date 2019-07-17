@@ -1,8 +1,10 @@
 # coding=utf-8
+from http import HTTPStatus
 
 from depot.manager import DepotManager
 from hapic.data import HapicFile
 from pyramid.config import Configurator
+from pyramid.response import Response
 import transaction
 
 from tracim_backend import CFG
@@ -16,9 +18,10 @@ from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.views.collabora_api.schema import WopiPutHeadersSchema
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import WOPICheckFileInfoSchema
-from tracim_backend.views.core_api.schemas import WOPILastModifiedTime
+from tracim_backend.views.core_api.schemas import WopiPutResponse
 from tracim_backend.views.core_api.schemas import WOPITokenQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -75,9 +78,15 @@ class WOPIController(Controller):
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
-    @hapic.output_body(WOPILastModifiedTime())
+    @hapic.input_headers(WopiPutHeadersSchema())
+    @hapic.output_body(WopiPutResponse())
     def put_content(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
+        if (
+            hapic_data.headers.wopi_lool_timestamp
+            and hapic_data.headers.wopi_lool_timestamp < request.current_content.updated
+        ):
+            return Response(status=HTTPStatus.CONFLICT, json_body={"LOOLStatusCode": 1010})
         api = ContentApi(
             show_archived=True,
             show_deleted=True,

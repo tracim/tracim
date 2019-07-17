@@ -115,7 +115,7 @@ class TestWOPI(object):
         )
         assert response["UserCanNotWriteRelative"] is True
 
-    def test_api__put_content__ok_200__nominal_case(
+    def test_api__put_content__ok_200__nominal_case_libreoffice_online(
         self,
         content_api_factory,
         workspace_api_factory,
@@ -158,7 +158,12 @@ class TestWOPI(object):
         )
         updated_at = test_file.updated
         new_content = b"content has been modified"
-        res = web_testapp.post(url, params=new_content, status=200)
+        res = web_testapp.post(
+            url,
+            params=new_content,
+            status=200,
+            headers={"X-LOOL-WOPI-Timestamp": str(test_file.updated)},
+        )
         transaction.commit()
 
         # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
@@ -172,3 +177,53 @@ class TestWOPI(object):
             != updated_at.replace(tzinfo=datetime.timezone.utc).isoformat()
         )
         assert file_.read() == new_content
+
+    def test_api__put_content__err_409__libreoffice_online_content_as_changed(
+        self,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        session,
+        web_testapp,
+        app_config,
+        admin_user,
+    ) -> None:
+        """Save file content"""
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.create_workspace(label="business")
+        tool_folder = content_api.create(
+            label="tools",
+            content_type_slug=content_type_list.Folder.slug,
+            do_save=True,
+            do_notify=None,
+            parent=None,
+            workspace=business_workspace,
+        )
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.update_file_data(
+                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            )
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
+        transaction.commit()
+        url = "/api/v2/workspaces/{}/wopi/files/{}/contents?access_token={}".format(
+            business_workspace.workspace_id, test_file.content_id, quote(access_token)
+        )
+        new_content = b"content has been modified"
+        res = web_testapp.post(
+            url,
+            params=new_content,
+            status=409,
+            headers={"X-LOOL-WOPI-Timestamp": "1999-12-31 23:59:59"},
+        )
+        assert res.json_body["LOOLStatusCode"] == 1010

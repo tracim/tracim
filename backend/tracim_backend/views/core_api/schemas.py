@@ -1107,7 +1107,7 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
     )
 
 
-class WOPILastModifiedTime(marshmallow.Schema):
+class WopiPutResponse(marshmallow.Schema):
     LastModifiedTime = marshmallow.fields.DateTime(
         description="Last time the file was modified", attribute="last_modified_time"
     )
