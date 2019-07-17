@@ -70,7 +70,11 @@ class IndexedContent(Document):
     """
 
     content_id = Integer()
-    label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
+    # INFO - G.M - 2019-07-17 - as acp_label store ngram of limited size, we do need
+    # to store both acp_label and label to handle autocomplete up to max_gram of acp_label analyzer
+    # but also support for exact naming for any size of label.
+    label = Keyword()
+    acp_label = Text(analyzer=edge_ngram_folding, search_analyzer=folding)
     slug = Keyword()
     content_type = Keyword()
 
