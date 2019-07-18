@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import { PAGE } from '../../helper.js'
 
 const Logo = props => {
   return (
@@ -13,10 +14,10 @@ export default Logo
 
 Logo.propTypes = {
   logoSrc: PropTypes.string.isRequired,
-  to: PropTypes.string
+  to: PropTypes.string.isRequired
 }
 
 Logo.defaultProps = {
   logoSrc: '',
-  to: ''
+  to: PAGE.LOGIN
 }
