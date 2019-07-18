@@ -73,17 +73,17 @@ class NewUpload extends React.Component {
         <div className='newUpload__password'>
           <div className='newUpload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
-             <button
+            <button
               type='button'
               className='newUpload__password__icon'
               key='seeSharePassword'
               style={{':hover': {color: customColor}}}
               onClick={this.handleSeePassword}
             >
-              <i className={state.hidePassword?'fa fa-fw fa-eye':'fa fa-fw fa-eye-slash'} />
+              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
             </button>
             <input
-              type={state.hidePassword?'password':'text'}
+              type={state.hidePassword ? 'password' : 'text'}
               className='newUpload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
               value={state.password}

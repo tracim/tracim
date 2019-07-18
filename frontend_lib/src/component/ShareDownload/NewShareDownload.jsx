@@ -90,10 +90,10 @@ class NewShareDownload extends React.Component {
               style={{':hover': {color: props.hexcolor}}}
               onClick={this.handleSeePassword}
             >
-              <i className={state.hidePassword?'fa fa-fw fa-eye':'fa fa-fw fa-eye-slash'} />
+              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
             </button>
             <input
-              type={state.hidePassword?'password':'text'}
+              type={state.hidePassword ? 'password' : 'text'}
               className='shareDownload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
               value={props.sharePassword}
@@ -120,8 +120,8 @@ class NewShareDownload extends React.Component {
         }
         <div className='d-flex mt-3'>
           <button
-            className='btn outlineTextBtn d-flex mr-3 ml-auto'
-            key='cancel__new__share'
+            className='shareDownload__cancel btn outlineTextBtn'
+            key='cancelNewShare'
             onClick={props.onClickReturnToManagement}
             style={{
               borderColor: props.hexcolor,
@@ -136,7 +136,7 @@ class NewShareDownload extends React.Component {
 
           <button
             className='btn highlightBtn'
-            key='new__share__download'
+            key='newShareDownload'
             onClick={props.onClickReturnToManagement}
             style={{
               backgroundColor: props.hexcolor,

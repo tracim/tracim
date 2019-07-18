@@ -4,6 +4,7 @@ import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 class ShareLink extends React.Component {
+  // INFO - GB - 2019-07-16 - Algorithm based on https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
   handleCopyToClipboard = () => {
     let tmp = document.createElement('textarea')
     document.body.appendChild(tmp)
@@ -11,7 +12,6 @@ class ShareLink extends React.Component {
     tmp.select()
     document.execCommand('copy')
     document.body.removeChild(tmp)
-    /* or https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard See what's best */
   }
 
   render () {
