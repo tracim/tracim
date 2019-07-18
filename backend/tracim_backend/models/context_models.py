@@ -486,39 +486,6 @@ class ContentCreation(object):
         self.parent_id = parent_id or None
 
 
-class FileTemplateCategory(Enum):
-    calc = "calc"
-    text = "text"
-    pres = "pres"
-
-
-class FileTemplate(object):
-    def __init__(self, template_name: str, category: FileTemplateCategory):
-        self.template_name = template_name
-        self.category = category.value
-
-
-class FileTemplateInfo(object):
-    def __init__(
-        self,
-        categories: typing.List[FileTemplateCategory],
-        file_templates: typing.List[FileTemplate],
-    ):
-        self.categories = categories
-        self.file_templates = file_templates
-
-
-class FileCreateFromTemplate(object):
-    """
-    Create From Template model
-    """
-
-    def __init__(self, template: str, filename: str, parent_id: int):
-        self.template = template
-        self.filename = filename
-        self.parent_id = parent_id
-
-
 class CommentCreation(object):
     """
     Comment creation model

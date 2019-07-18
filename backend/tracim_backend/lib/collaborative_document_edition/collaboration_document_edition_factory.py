@@ -6,9 +6,6 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import NoValidCollaborativeDocumentEditionSoftware
 from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.models.auth import User
-from tracim_backend.views.collaborative_document_edition_api.collabora_controller import (
-    CollaboraController,
-)
 
 
 class CollaborativeDocumentEditionFactory(object):
@@ -19,6 +16,10 @@ class CollaborativeDocumentEditionFactory(object):
     @classmethod
     def get_collaborative_document_edition_controller(cls, config: "CFG"):
         assert config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED
+        from tracim_backend.views.collaborative_document_edition_api.collabora_controller import (
+            CollaboraController,
+        )
+
         if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
             return CollaboraController()

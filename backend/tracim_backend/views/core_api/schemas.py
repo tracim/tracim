@@ -34,7 +34,6 @@ from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
-from tracim_backend.models.context_models import FileCreateFromTemplate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
@@ -988,44 +987,8 @@ class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
     pass
 
 
-class FileTemplateSchema(marshmallow.Schema):
-    template_name = StrippedString(
-        example="default.odt", description="template name you can use", required=True
-    )
-    category = StrippedString(example="calc", description="category of the template", required=True)
-
-
-class FileTemplateInfoSchema(marshmallow.Schema):
-    categories = marshmallow.fields.List(
-        StrippedString(example="calc"), description="categories of file template available."
-    )
-    file_templates = marshmallow.fields.Nested(FileTemplateSchema, many=True)
-
-
 class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
     pass
-
-
-class FileCreateFromTemplateSchema(marshmallow.Schema):
-    template = StrippedString(
-        example="default.odt",
-        description="The template of the file you want to create",
-        required=True,
-    )
-    filename = StrippedString(
-        required=True, example="test.odt", description="The file name, as saved in the workspace"
-    )
-    parent_id = marshmallow.fields.Int(
-        example=42,
-        description="id of the new parent content id.",
-        default=None,
-        allow_none=True,
-        validate=positive_int_validator,
-    )
-
-    @post_load
-    def file_create_from_template(self, data: typing.Dict[str, typing.Any]) -> object:
-        return FileCreateFromTemplate(**data)
 
 
 #####

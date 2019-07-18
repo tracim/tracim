@@ -13,7 +13,6 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import FileTemplateNotAvailable
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
@@ -31,7 +30,6 @@ from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
-from tracim_backend.models.context_models import FileTemplateInfo
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
@@ -40,7 +38,6 @@ from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
-from tracim_backend.views.core_api.schemas import FileCreateFromTemplateSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
@@ -48,7 +45,6 @@ from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FileRevisionPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionSchema
-from tracim_backend.views.core_api.schemas import FileTemplateInfoSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PageQuerySchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
@@ -74,44 +70,6 @@ class FileController(Controller):
     """
     Endpoints for File Content
     """
-
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(FileTemplateNotAvailable, HTTPStatus.BAD_REQUEST)
-    @check_right(can_create_file)
-    @hapic.input_path(WorkspaceIdPathSchema())
-    @hapic.output_body(ContentDigestSchema())
-    @hapic.input_body(FileCreateFromTemplateSchema())
-    def create_file_from_template(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
-        )
-        api.check_template_available(hapic_data.body.template)
-        parent = None  # type: typing.Optional['Content']
-        if hapic_data.body.parent_id:
-            try:
-                parent = api.get_one(
-                    content_id=hapic_data.body.parent_id, content_type=content_type_list.Any_SLUG
-                )
-            except ContentNotFound as exc:
-                raise ParentNotFound(
-                    "Parent with content_id {} not found".format(hapic_data.body.parent_id)
-                ) from exc
-        content = api.create(
-            filename=hapic_data.body.filename,
-            content_type_slug=FILE_TYPE,
-            workspace=request.current_workspace,
-            parent=parent,
-        )
-        api.save(content, ActionDescription.CREATION)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            api.update_from_template(content=content, template_filename=hapic_data.body.template)
-        api.execute_created_content_actions(content)
-        return api.get_content_in_context(content)
 
     # File data
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -605,25 +563,6 @@ class FileController(Controller):
         )
         return api.get_jpg_preview_allowed_dim()
 
-    # File template infor
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.output_body(FileTemplateInfoSchema())
-    def get_file_template_infos(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> FileTemplateInfo:
-        """
-        Get thread content
-        """
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
-            show_archived=True,
-            show_deleted=True,
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        return api.get_template_info()
-
     # File infos
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
@@ -737,9 +676,6 @@ class FileController(Controller):
         Add route to configurator.
         """
 
-        # Get file template info
-        configurator.add_route("file_template_info", "/files/templates", request_method="GET")
-        configurator.add_view(self.get_file_template_infos, route_name="file_template_info")
         # file info #
         # Get file info
         configurator.add_route(
@@ -761,15 +697,6 @@ class FileController(Controller):
         )
         configurator.add_view(self.create_file, route_name="create_file")
 
-        # Create file from template
-        configurator.add_route(
-            "create_file_from_template",
-            "/workspaces/{workspace_id}/files/from_template",
-            request_method="POST",
-        )
-        configurator.add_view(
-            self.create_file_from_template, route_name="create_file_from_template"
-        )
         # upload raw file
         configurator.add_route(
             "upload_file",
