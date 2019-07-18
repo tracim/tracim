@@ -44,13 +44,6 @@ class Header extends React.Component {
     if (prevProps.user.lang !== this.props.user.lang) i18n.changeLanguage(this.props.user.lang)
   }
 
-  handleClickLogo = () => {
-    const { props } = this
-
-    if (props.user.logged) props.history.push(PAGE.HOME)
-    else props.history.push(PAGE.LOGIN)
-  }
-
   handleChangeLang = async langId => {
     const { props } = this
 
@@ -112,7 +105,7 @@ class Header extends React.Component {
     return (
       <header className='header'>
         <nav className='navbar navbar-expand-lg navbar-light bg-light'>
-          <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
+          <Logo to={props.user.logged ? PAGE.HOME : PAGE.LOGIN} logoSrc={logoHeader} />
 
           <NavbarToggler />
 
