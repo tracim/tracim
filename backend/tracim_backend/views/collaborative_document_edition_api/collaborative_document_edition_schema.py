@@ -3,7 +3,7 @@ import marshmallow
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 
 
-class CollaboraEditFileSchema(marshmallow.Schema):
+class CollaborativeDocumentEditionToken(marshmallow.Schema):
     is_collabora_editable = marshmallow.fields.Boolean(
         required=True, description="Is this content editable by collabora ?"
     )

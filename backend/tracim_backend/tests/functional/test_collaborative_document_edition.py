@@ -10,7 +10,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
-class TestCollabora(object):
+class TestCollaborativeDocumentEdition(object):
     @patch("requests.get")
     def test_api__discovery__ok_200__nominal_case(
         self,
