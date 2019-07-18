@@ -556,9 +556,6 @@ class CFG(object):
             cast_func=str,
             do_strip=True,
         )
-        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL = self.get_raw_config(
-            "collaborative_document_edition.collabora.backend.base_url", self.API__BASE_URL
-        )
         self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
             "collaborative_document_edition.collabora.base_url"
         )
@@ -581,11 +578,6 @@ class CFG(object):
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
             if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
-                self.check_mandatory_param(
-                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL",
-                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL,
-                    when_str="if collabora feature is activated",
-                )
                 self.check_mandatory_param(
                     "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL",
                     self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
