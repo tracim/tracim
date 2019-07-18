@@ -145,7 +145,7 @@ class CFG(object):
         self._load_webdav_config()
         self._load_caldav_config()
         self._load_search_config()
-        self._load_collabora_config()
+        self._load_collaborative_document_edition_config()
 
     def _load_global_config(self) -> None:
         """
@@ -543,18 +543,25 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
-    def _load_collabora_config(self):
-        self.COLLABORA__ACTIVATED = asbool(self.get_raw_config("collabora.activated", "false"))
-        self.COLLABORA__EXTENSION_BLACKLIST = string_to_list(
-            self.get_raw_config("collabora.extension_blacklist", ""),
+    def _load_collaborative_document_edition_config(self):
+        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
+            self.get_raw_config("collaborative_document_edition.activated", "false")
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
+            "collaborative_document_edition.software"
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__EXTENSION_BLACKLIST = string_to_list(
+            self.get_raw_config("collaborative_document_edition.collabora.extension_blacklist", ""),
             separator=",",
             cast_func=str,
             do_strip=True,
         )
-        self.COLLABORA__BACKEND__BASE_URL = self.get_raw_config(
-            "collabora.backend.base_url", self.API__BASE_URL
+        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL = self.get_raw_config(
+            "collaborative_document_edition.collabora.backend.base_url", self.API__BASE_URL
         )
-        self.COLLABORA__BASE_URL = self.get_raw_config("collabora.base_url")
+        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
+            "collaborative_document_edition.collabora.base_url"
+        )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 
@@ -566,20 +573,21 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_caldav_config_validity()
         self._check_search_config_validity()
-        self._check_collabora_config_validity()
+        self._check_collaborative_document_edition_config_validity()
 
-    def _check_collabora_config_validity(self) -> None:
-        if self.COLLABORA__ACTIVATED:
-            self.check_mandatory_param(
-                "COLLABORA__BACKEND__BASE_URL",
-                self.COLLABORA__BACKEND__BASE_URL,
-                when_str="if collabora feature is activated",
-            )
-            self.check_mandatory_param(
-                "COLLABORA__BASE_URL",
-                self.COLLABORA__BASE_URL,
-                when_str="if collabora feature is activated",
-            )
+    def _check_collaborative_document_edition_config_validity(self) -> None:
+        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == "collabora":
+                self.check_mandatory_param(
+                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL",
+                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL,
+                    when_str="if collabora feature is activated",
+                )
+                self.check_mandatory_param(
+                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL",
+                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
+                    when_str="if collabora feature is activated",
+                )
 
     def _check_global_config_validity(self) -> None:
         """

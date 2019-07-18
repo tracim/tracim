@@ -432,13 +432,14 @@ search.engine = simple
 # default value to 52428800 = 50Mo
 ;search.elasticsearch.ingest.size_limit = 52428800
 ####
-# Collaborative Edit (Collabora)
+# Collaborative Document Edition (Collabora, etc)
 ####
-collabora.activated = False
+collaborative_document_edition.activated = False
+collaborative_document_edition.software = collabora
 # list of extensions of file to no process with collabora.
-collabora.extension_blacklist = png,jpeg,pdf,gif,bmp,tiff
+collaborative_document_edition.collabora.extension_blacklist = png,jpeg,pdf,gif,bmp,tiff
 # base url where collabora server exist
-collabora.base_url = http://localhost:9980
+collaborative_document_edition.collabora.base_url = http://localhost:9980
 
 
 

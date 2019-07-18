@@ -27,7 +27,9 @@ class CollaboraApi(object):
         self._config = config
 
     def discover(self) -> typing.List[CollaboraFileType]:
-        response = requests.get(self._config.COLLABORA__BASE_URL + "/hosting/discovery")
+        response = requests.get(
+            self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery"
+        )
         root = ElementTree.fromstring(response.text)
         supported_collabora_file = []  # type: typing.List[CollaboraFileType]
         for xml_app in root.findall("net-zone/app"):
@@ -60,7 +62,7 @@ class CollaboraApi(object):
 
     def _get_wopi_src(self, workspace: Workspace, content: Content) -> str:
         return "{backend_base_url}{api_base}{path}".format(
-            backend_base_url=self._config.COLLABORA__BACKEND__BASE_URL,
+            backend_base_url=self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL,
             api_base=BASE_API_V2,
             path=WOPI_FILES.format(
                 workspace_id=workspace.workspace_id, content_id=content.content_id
@@ -82,7 +84,7 @@ class CollaboraApi(object):
         return (
             collabora_content_file_type is not None
             and collabora_content_file_type.extension
-            not in self._config.COLLABORA__EXTENSION_BLACKLIST
+            not in self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__EXTENSION_BLACKLIST
             and collabora_content_file_type.associated_action == COLLABORA_ACTION_EDIT
         )
 
