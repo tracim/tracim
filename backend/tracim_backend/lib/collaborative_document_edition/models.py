@@ -1,4 +1,3 @@
-from enum import Enum
 import typing
 
 
@@ -15,23 +14,6 @@ class CollaborativeDocumentEditionToken(object):
         self.access_token = access_token
 
 
-class FileTemplateCategory(Enum):
-    calc = "calc"
-    text = "text"
-    pres = "pres"
-
-
-class FileTemplate(object):
-    def __init__(self, template_name: str, category: FileTemplateCategory):
-        self.template_name = template_name
-        self.category = category.value
-
-
-class FileTemplateInfo(object):
-    def __init__(
-        self,
-        categories: typing.List[FileTemplateCategory],
-        file_templates: typing.List[FileTemplate],
-    ):
-        self.categories = categories
+class FileTemplateList(object):
+    def __init__(self, file_templates: typing.List[str]):
         self.file_templates = file_templates

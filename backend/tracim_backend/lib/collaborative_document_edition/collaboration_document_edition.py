@@ -16,9 +16,7 @@ from tracim_backend.lib.collaborative_document_edition.models import CollaboraFi
 from tracim_backend.lib.collaborative_document_edition.models import (
     CollaborativeDocumentEditionToken,
 )
-from tracim_backend.lib.collaborative_document_edition.models import FileTemplate
-from tracim_backend.lib.collaborative_document_edition.models import FileTemplateCategory
-from tracim_backend.lib.collaborative_document_edition.models import FileTemplateInfo
+from tracim_backend.lib.collaborative_document_edition.models import FileTemplateList
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.utils import is_dir_exist
 from tracim_backend.lib.utils.utils import is_dir_readable
@@ -60,11 +58,8 @@ class CollaborativeDocumentEditionApi(object):
                 )
         return supported_collabora_file
 
-    def get_template_info(self) -> FileTemplateInfo:
-        all_template_category = [cat.value for cat in FileTemplateCategory]
-        return FileTemplateInfo(
-            categories=all_template_category, file_templates=self._get_template_list()
-        )
+    def get_file_template_list(self) -> FileTemplateList:
+        return FileTemplateList(file_templates=self._get_template_list())
 
     def _has_template_extension(self, template_name: str, extension_list: typing.List[str]):
         for extension in extension_list:
@@ -72,31 +67,28 @@ class CollaborativeDocumentEditionApi(object):
                 return True
         return False
 
-    def _get_template_list(self) -> typing.List[FileTemplate]:
+    def _get_template_list(self) -> typing.List[str]:
         template_list = []
         try:
-            is_dir_exist(self._config.FILE_TEMPLATE_DIR)
-            is_dir_readable(self._config.FILE_TEMPLATE_DIR)
+            is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
+            is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
         except (NotADirectoryError) as exc:
             raise FileTemplateNotAvailable from exc
-        for filename in os.listdir(self._config.FILE_TEMPLATE_DIR):
-            if not isfile(join(self._config.FILE_TEMPLATE_DIR, filename)):
+        for filename in os.listdir(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR):
+            if not isfile(
+                join(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, filename)
+            ):
                 continue
-            if self._has_template_extension(filename, [".ods"]):
-                template_list.append(FileTemplate(filename, category=FileTemplateCategory.calc))
-            elif self._has_template_extension(filename, [".odp"]):
-                template_list.append(FileTemplate(filename, category=FileTemplateCategory.pres))
-            elif self._has_template_extension(filename, [".odt"]):
-                template_list.append(FileTemplate(filename, category=FileTemplateCategory.text))
-            else:
-                template_list.append(FileTemplate(filename, category=FileTemplateCategory.text))
+            template_list.append(filename)
         return template_list
 
     def _get_file_template_path(self, template_filename) -> str:
-        template_path = "{}/{}".format(self._config.FILE_TEMPLATE_DIR, template_filename)
+        template_path = "{}/{}".format(
+            self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
+        )
         try:
-            is_dir_exist(self._config.FILE_TEMPLATE_DIR)
-            is_dir_readable(self._config.FILE_TEMPLATE_DIR)
+            is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
+            is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
             is_file_exist(template_path)
             is_file_readable(template_path)
         except (NotADirectoryError, NotAFileError, NotReadableFile) as exc:

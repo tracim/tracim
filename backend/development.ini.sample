@@ -86,7 +86,7 @@ depot_storage_name = tracim
 ## This is where none database file will be stored
 depot_storage_dir = %(basic_setup.depot_storage_dir)s
 
-file_template_dir =  %(basic_setup.file_template_dir)s
+
 ### Preview ###
 ## preview cache directory
 preview_cache_dir = %(basic_setup.preview_cache_dir)s
@@ -440,7 +440,7 @@ collaborative_document_edition.software = collabora
 collaborative_document_edition.collabora.extension_blacklist = png,jpeg,pdf,gif,bmp,tiff
 # base url where collabora server exist
 collaborative_document_edition.collabora.base_url = http://localhost:9980
-
+collaborafile_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s
 
 
 ##############################

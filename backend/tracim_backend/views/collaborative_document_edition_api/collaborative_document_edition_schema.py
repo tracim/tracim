@@ -53,10 +53,7 @@ class FileTemplateSchema(marshmallow.Schema):
 
 
 class FileTemplateInfoSchema(marshmallow.Schema):
-    categories = marshmallow.fields.List(
-        StrippedString(example="calc"), description="categories of file template available."
-    )
-    file_templates = marshmallow.fields.Nested(FileTemplateSchema, many=True)
+    file_templates = marshmallow.fields.List(StrippedString)
 
 
 class FileCreateFromTemplateSchema(marshmallow.Schema):

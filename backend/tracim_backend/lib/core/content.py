@@ -173,7 +173,6 @@ class ContentApi(object):
         if self._user:
             default_lang = self._user.lang
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
-        self.file_template_dir = self._config.FILE_TEMPLATE_DIR
 
     @contextmanager
     def show(

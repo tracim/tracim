@@ -109,7 +109,9 @@ class TestCollaborativeDocumentEdition(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/files/from_template".format(data_workspace.workspace_id)
+        url = "/api/v2/collaborative-document-edition/workspaces/{}/create".format(
+            data_workspace.workspace_id
+        )
         template_filename = "default.ods"
         res = web_testapp.post_json(
             url,
@@ -167,7 +169,9 @@ class TestCollaborativeDocumentEdition(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/workspaces/{}/files/from_template".format(data_workspace.workspace_id)
+        url = "/api/v2/collaborative-document-edition/workspaces/{}/create".format(
+            data_workspace.workspace_id
+        )
         template_filename = "unexistent_template"
         res = web_testapp.post_json(
             url,

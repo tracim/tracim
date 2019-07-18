@@ -20,7 +20,7 @@ from tracim_backend.lib.collaborative_document_edition.collaboration_document_ed
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
     CollaborativeDocumentEditionFactory,
 )
-from tracim_backend.lib.collaborative_document_edition.models import FileTemplateInfo
+from tracim_backend.lib.collaborative_document_edition.models import FileTemplateList
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
@@ -80,7 +80,7 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.output_body(FileTemplateInfoSchema())
     def get_file_template_infos(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> FileTemplateInfo:
+    ) -> FileTemplateList:
         """
         Get thread content
         """
@@ -88,7 +88,7 @@ class CollaborativeDocumentEditionController(Controller):
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        return collaborative_document_edition_api.get_template_info()
+        return collaborative_document_edition_api.get_file_template_list()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -143,13 +143,18 @@ class CollaborativeDocumentEditionController(Controller):
         configurator.add_view(self.discovery, route_name="collaborative_document_edition_discovery")
 
         # Get file template info
-        configurator.add_route("file_template_info", "/files/templates", request_method="GET")
+        configurator.add_route(
+            "file_template_info",
+            "/{}/templates".format(COLLABORATIVE_DOCUMENT_EDITION_BASE),
+            request_method="GET",
+        )
         configurator.add_view(self.get_file_template_infos, route_name="file_template_info")
 
         # Create file from template
+
         configurator.add_route(
             "create_file_from_template",
-            "/workspaces/{workspace_id}/files/from_template",
+            "/{}/".format(COLLABORATIVE_DOCUMENT_EDITION_BASE) + "workspaces/{workspace_id}/create",
             request_method="POST",
         )
         configurator.add_view(
