@@ -11,6 +11,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
 class TestWOPI(object):
     """
     Tests for /api/v2/collaborative-document-edition/wopi
