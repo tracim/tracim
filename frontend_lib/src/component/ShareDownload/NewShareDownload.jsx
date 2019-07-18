@@ -4,7 +4,6 @@ import i18n from '../../i18n.js'
 import Radium from 'radium'
 import color from 'color'
 import { Popover, PopoverBody } from 'reactstrap'
-import { CUSTOM_EVENT } from '../../customEvent.js'
 import { generateRandomPassword } from '../../helper.js'
 
 class NewShareDownload extends React.Component {
@@ -13,10 +12,9 @@ class NewShareDownload extends React.Component {
     this.popoverToggle = this.popoverToggle.bind(this)
     this.state = {
       passwordActive: false,
-      popoverOpen: false
+      popoverOpen: false,
+      hidePassword: true
     }
-
-    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   popoverToggle () {
@@ -25,28 +23,13 @@ class NewShareDownload extends React.Component {
     })
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        console.log('%c<NewShareDownload> Custom event', 'color: #28a745', type, data)
-        i18n.changeLanguage(data)
-        break
-    }
-  }
-
-  componentWillUnmount () {
-    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
-  }
-
   handleSeePassword = () => {
     const passwordInput = document.getElementsByClassName('shareDownload__password__input')[0]
-    const passwordIcon = document.getElementById('seePasswordIcon')
+    this.setState({hidePassword: !this.state.hidePassword})
     if (passwordInput.type === 'password') {
       passwordInput.type = 'text'
-      passwordIcon.className = 'fa fa-fw fa-eye-slash'
     } else {
       passwordInput.type = 'password'
-      passwordIcon.className = 'fa fa-fw fa-eye'
     }
   }
 
@@ -58,7 +41,7 @@ class NewShareDownload extends React.Component {
     }
   }
 
-  handleShowPassword = () => {
+  handlehidePassword = () => {
     this.setState({passwordActive: true})
   }
 
@@ -107,10 +90,10 @@ class NewShareDownload extends React.Component {
               style={{':hover': {color: props.hexcolor}}}
               onClick={this.handleSeePassword}
             >
-              <i id='seePasswordIcon' className='fa fa-fw fa-eye' />
+              <i className={state.hidePassword?'fa fa-fw fa-eye':'fa fa-fw fa-eye-slash'} />
             </button>
             <input
-              type='password'
+              type={state.hidePassword?'password':'text'}
               className='shareDownload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
               value={props.sharePassword}
@@ -130,7 +113,7 @@ class NewShareDownload extends React.Component {
           </button>
         </div>
         : <div className='shareDownload__password'>
-          <span className='shareDownload__password__link' onClick={this.handleShowPassword}>
+          <span className='shareDownload__password__link' onClick={this.handlehidePassword}>
             {props.t('Protect by password')}
           </span>
         </div>

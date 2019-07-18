@@ -12,7 +12,8 @@ class NewUpload extends React.Component {
     this.state = {
       popoverOpen: false,
       emails: '',
-      password: ''
+      password: '',
+      hidePassword: true
     }
   }
 
@@ -26,15 +27,7 @@ class NewUpload extends React.Component {
   handleChangePassword = e => this.setState({password: e.target.value})
 
   handleSeePassword = () => {
-    const passwordInput = document.getElementsByClassName('newUpload__password__input')[0]
-    const passwordIcon = document.getElementById('seePasswordIcon')
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text'
-      passwordIcon.className = 'fa fa-fw fa-eye-slash'
-    } else {
-      passwordInput.type = 'password'
-      passwordIcon.className = 'fa fa-fw fa-eye'
-    }
+    this.setState({hidePassword: !this.state.hidePassword})
   }
 
   handleRandomPassword = () => {
@@ -46,7 +39,7 @@ class NewUpload extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     const customColor = props.tracimContentTypeList[1] ? props.tracimContentTypeList[1].hexcolor : props.customColor
 
     return (
@@ -60,7 +53,7 @@ class NewUpload extends React.Component {
             type='text'
             className='newUpload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
-            value={this.state.emails}
+            value={state.emails}
             onChange={this.handleChangeEmails}
           />
           <button
@@ -72,7 +65,7 @@ class NewUpload extends React.Component {
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
-          <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverMultipleEmails' toggle={this.popoverToggle}>
+          <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.popoverToggle}>
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space, leave this field blank if you want to create a public link.')}</PopoverBody>
           </Popover>
         </div>
@@ -80,20 +73,20 @@ class NewUpload extends React.Component {
         <div className='newUpload__password'>
           <div className='newUpload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
-            <button
+             <button
               type='button'
               className='newUpload__password__icon'
               key='seeSharePassword'
               style={{':hover': {color: customColor}}}
               onClick={this.handleSeePassword}
             >
-              <i id='seePasswordIcon' className='fa fa-fw fa-eye' />
+              <i className={state.hidePassword?'fa fa-fw fa-eye':'fa fa-fw fa-eye-slash'} />
             </button>
             <input
-              type='password'
+              type={state.hidePassword?'password':'text'}
               className='newUpload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
-              value={this.state.password}
+              value={state.password}
               onChange={this.handleChangePassword}
             />
           </div>

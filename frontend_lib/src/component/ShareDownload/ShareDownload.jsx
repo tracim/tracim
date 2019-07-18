@@ -6,17 +6,22 @@ class ShareDownload extends React.Component {
   constructor (props) {
     super(props)
 
+    this.SHARE_STATUS = {
+      NEW_SHARE: 'newShare',
+      SHARE_MANAGE: 'management'
+    }
+
     this.state = {
-      currentPage: 'management'
+      currentPage: this.SHARE_STATUS.SHARE_MANAGE
     }
   }
 
   handleNewShareDownload = () => {
-    this.setState({currentPage: 'newShare'})
+    this.setState({currentPage: this.SHARE_STATUS.NEW_SHARE})
   }
 
   handleReturnToManagement = () => {
-    this.setState({currentPage: 'management'})
+    this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
   }
 
   render () {
@@ -24,7 +29,7 @@ class ShareDownload extends React.Component {
 
     return (
       <div className='shareDownload'>
-        {state.currentPage === 'management'
+        {state.currentPage === this.SHARE_STATUS.SHARE_MANAGE
           ? <ShareDownloadManagement
             shareLinkList={props.shareLinkList}
             label={props.label}
