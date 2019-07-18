@@ -57,6 +57,21 @@ class TestCollaborativeDocumentEdition(object):
         assert content[2]["mimetype"] == "application/vnd.oasis.opendocument.text"
         assert content[2]["associated_action"] == "edit"
 
+    def test_api__collaborative_document_edition_templates__ok_200__nominal_case(
+        self, admin_user, session, app_config, web_testapp
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        url = "/api/v2/collaborative-document-edition/templates"
+        res = web_testapp.get(url, status=200)
+        content = res.json_body
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
+            current_user=admin_user, session=session, config=app_config
+        )
+        assert (
+            content["file_templates"]
+            == collaborative_document_edition_api.get_file_template_list().file_templates
+        )
+
     def test_api__collaborative_document_edition_token__ok_200__nominal_case(
         self,
         workspace_api_factory,
@@ -112,7 +127,9 @@ class TestCollaborativeDocumentEdition(object):
         url = "/api/v2/collaborative-document-edition/workspaces/{}/create".format(
             data_workspace.workspace_id
         )
-        template_filename = "default.ods"
+        template_filename = collaborative_document_edition_api.get_file_template_list().file_templates[
+            0
+        ]
         res = web_testapp.post_json(
             url,
             params={
