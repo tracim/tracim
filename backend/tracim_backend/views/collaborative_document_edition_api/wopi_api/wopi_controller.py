@@ -13,11 +13,17 @@ from tracim_backend import hapic
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
-from tracim_backend.lib.utils.authorization import is_contributor
-from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_current_content_contributor
+from tracim_backend.lib.utils.authorization import is_current_content_reader
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.wopi.wopi import WopiApi
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_controller import (
+    COLLABORATIVE_DOCUMENT_EDITION_BASE,
+)
+from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_controller import (
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
+)
 from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schema import (
     WOPICheckFileInfoSchema,
 )
@@ -31,14 +37,14 @@ from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_schem
     WOPITokenQuerySchema,
 )
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
+from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 
-SWAGGER_TAG__CONTENT_WOPI_SECTION = "WOPI"
-SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS = generate_documentation_swagger_tag(
-    SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_WOPI_SECTION
+SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_SECTION = "WOPI"
+SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_SECTION,
 )
-WOPI_BASE = "workspaces/{workspace_id}/wopi"
+WOPI_BASE = COLLABORATIVE_DOCUMENT_EDITION_BASE + "/wopi"
 WOPI_FILES = WOPI_BASE + "/files/{content_id}"
 
 
@@ -47,9 +53,9 @@ class WOPIController(Controller):
     Endpoints for WOPI API
     """
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
-    @check_right(is_reader)
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
+    @check_right(is_current_content_reader)
+    @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_file([])
     def get_content(self, context, request: TracimRequest, hapic_data=None):
@@ -70,9 +76,9 @@ class WOPIController(Controller):
             last_modified=request.current_content.updated,
         )
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
-    @check_right(is_reader)
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
+    @check_right(is_current_content_reader)
+    @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_body(WOPICheckFileInfoSchema())
     def check_file_info(self, context, request: TracimRequest, hapic_data=None):
@@ -81,10 +87,9 @@ class WOPIController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config
         ).check_file_info(request.current_content)
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS])
-    @check_right(is_reader)
-    @check_right(is_contributor)
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
+    @check_right(is_current_content_contributor)
+    @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.input_headers(WopiPutHeadersSchema())
     @hapic.output_body(WopiPutResponse())

@@ -160,10 +160,9 @@ class TracimContext(object):
             session=self.dbsession,
             config=self.app_config,
         )
+
         return api.get_one(
-            content_id=content_id,
-            workspace=self.current_workspace,
-            content_type=content_type_list.Any_SLUG,
+            content_id=content_id, workspace=None, content_type=content_type_list.Any_SLUG
         )
 
     def _get_content_type(self, content_type_slug_fetcher):

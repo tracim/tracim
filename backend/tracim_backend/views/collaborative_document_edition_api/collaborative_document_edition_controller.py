@@ -14,7 +14,7 @@ from tracim_backend.views.collaborative_document_edition_api.collaborative_docum
 )
 from tracim_backend.views.controllers import Controller
 
-SWAGGER_TAG__CONTENT_COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS = "Collaborative Document Edition"
+SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS = "Collaborative Document Edition"
 COLLABORATIVE_DOCUMENT_EDITION_BASE = "collaborative-document-edition"
 
 
@@ -23,7 +23,7 @@ class CollaborativeDocumentEditionController(Controller):
     Endpoints for Collabora API
     """
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @check_right(is_user)
     @hapic.output_body(CollaborativeDocumentEditionToken())
     def collaborative_document_edition_token(
@@ -36,7 +36,7 @@ class CollaborativeDocumentEditionController(Controller):
         access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
         return collabora_api.get_token(access_token=access_token)
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @hapic.output_body(CollaboraDiscoverySchema(many=True))
     def discovery(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
