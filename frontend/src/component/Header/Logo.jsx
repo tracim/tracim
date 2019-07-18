@@ -15,3 +15,8 @@ Logo.propTypes = {
   logoSrc: PropTypes.string.isRequired,
   to: PropTypes.string
 }
+
+Logo.defaultProps = {
+  logoSrc: '',
+  to: ''
+}
