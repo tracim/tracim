@@ -162,10 +162,12 @@ class TracimContext(object):
         )
         # INFO - G.M - 2019-07-18 - code to allow get current_content according to current_workspace
         # only if there is a current workspace
+        current_workspace = None
         try:
+            self._get_current_workspace_id()
             current_workspace = self.current_workspace
-        except Exception:
-            current_workspace = None
+        except InvalidWorkspaceId:
+            pass
 
         return api.get_one(
             content_id=content_id,
