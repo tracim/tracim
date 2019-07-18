@@ -15,6 +15,7 @@ from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
+from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -577,7 +578,7 @@ class CFG(object):
 
     def _check_collaborative_document_edition_config_validity(self) -> None:
         if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == "collabora":
+            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
                 self.check_mandatory_param(
                     "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL",
                     self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BACKEND__BASE_URL,

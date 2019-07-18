@@ -1,6 +1,5 @@
 from pyramid.config import Configurator
 
-from tracim_backend import TracimRequest
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
@@ -8,6 +7,7 @@ from tracim_backend.lib.collaborative_document_edition.collaboration_document_ed
 )
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
     CollaboraDiscoverySchema,
 )

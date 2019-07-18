@@ -6,6 +6,10 @@ class TracimError(Exception):
     pass
 
 
+class NoValidCollaborativeDocumentEditionSoftware(TracimError):
+    pass
+
+
 class TracimException(Exception):
     pass
 
