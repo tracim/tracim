@@ -38,7 +38,6 @@ from tracim_backend.views.collaborative_document_edition_api.collaborative_docum
 )
 from tracim_backend.views.contents_api.file_controller import can_create_file
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import CollaborativeFileTypeSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
@@ -63,15 +62,6 @@ class CollaborativeDocumentEditionController(Controller):
         )
         access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
         return collabora_api.get_token(access_token=access_token)
-
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
-    @hapic.output_body(CollaborativeFileTypeSchema(many=True))
-    def discovery(self, context, request: TracimRequest, hapic_data=None):
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        collabora_api = CollaborativeDocumentEditionApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
-        )
-        return collabora_api.discover()
 
     # File template infor
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
@@ -132,13 +122,6 @@ class CollaborativeDocumentEditionController(Controller):
         return api.get_content_in_context(content)
 
     def bind(self, configurator: Configurator):
-        # Discovery
-        configurator.add_route(
-            "collaborative_document_edition_discovery",
-            "/{}/discovery".format(COLLABORATIVE_DOCUMENT_EDITION_BASE),
-            request_method="GET",
-        )
-        configurator.add_view(self.discovery, route_name="collaborative_document_edition_discovery")
 
         # Get file template info
         configurator.add_route(
