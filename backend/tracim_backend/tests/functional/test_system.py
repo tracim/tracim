@@ -1,4 +1,5 @@
 # coding=utf-8
+from mock import patch
 import pytest
 
 from tracim_backend.error import ErrorCode
@@ -161,6 +162,54 @@ class TestAboutEndpoint(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
+class TestConfigEndpointCollabora(object):
+    """
+    Tests for /api/v2/system/config
+    """
+
+    """
+    Get some config info about tracim
+    """
+
+    @patch("requests.get")
+    def test_api__get_config__ok_200__nominal_case(self, patched_get, web_testapp):
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        patched_get.return_value.text = """
+        <wopi-discovery>
+            <net-zone name="external-http">
+                <app name="application/vnd.lotus-wordpro">
+                    <action ext="lwp" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="image/svg+xml">
+                    <action ext="svg" name="view" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <app name="application/vnd.oasis.opendocument.text">
+                    <action ext="odt" name="edit" urlsrc="http://localhost:9980/loleaflet/305832f/loleaflet.html?"/>
+                </app>
+                <!-- a lot more `app` in the real response -->
+            </net-zone>
+        </wopi-discovery>
+        """
+        res = web_testapp.get("/api/v2/system/config", status=200)
+        assert res.json_body["collaborative_document_edition"]
+        result = res.json_body
+        assert result["collaborative_document_edition"]["software"] == "collabora"
+        supported_file_types = result["collaborative_document_edition"]["supported_file_types"]
+        assert len(supported_file_types) == 3
+        assert supported_file_types[0]["extension"] == "lwp"
+        assert supported_file_types[0]["mimetype"] == "application/vnd.lotus-wordpro"
+        assert supported_file_types[0]["associated_action"] == "view"
+        assert supported_file_types[1]["extension"] == "svg"
+        assert supported_file_types[1]["mimetype"] == "image/svg+xml"
+        assert supported_file_types[1]["associated_action"] == "view"
+        assert supported_file_types[2]["extension"] == "odt"
+        assert supported_file_types[2]["mimetype"] == "application/vnd.oasis.opendocument.text"
+        assert supported_file_types[2]["associated_action"] == "edit"
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestConfigEndpoint(object):
     """
@@ -177,6 +226,7 @@ class TestConfigEndpoint(object):
         assert res.json_body["new_user_invitation_do_notify"] is True
         assert res.json_body["webdav_enabled"] is False
         assert res.json_body["webdav_url"] == "https://localhost:3030/webdav"
+        assert res.json_body["collaborative_document_edition"] is None
 
     @pytest.mark.xfail(reason="[config_unauthenticated] issue #1270 ")
     def test_api__get_config__err_401__unregistered_user(self, web_testapp):
