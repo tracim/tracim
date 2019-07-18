@@ -31,6 +31,9 @@ from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda import CaldavAppFactory
 from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
+    CollaborativeDocumentEditionFactory,
+)
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -49,9 +52,6 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.agenda_api.radicale_proxy_controller import RadicaleProxyController
-from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_controller import (
-    WOPIController,
-)
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
@@ -191,7 +191,6 @@ def web(global_config, **local_settings):
     thread_controller = ThreadController()
     file_controller = FileController()
     folder_controller = FolderController()
-    wopi_controller = WOPIController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -203,17 +202,20 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
     if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
         # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
         # import is here because import WOPI of Collabora controller without adding it to
         # pyramid make trouble in hapic which try to get view related
         # to controller but failed.
-        from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_controller import (
-            CollaborativeDocumentEditionController,
+        from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_controller import (
+            WOPIController,
         )
 
-        collaborative_document_edition_controller = CollaborativeDocumentEditionController()
+        wopi_controller = WOPIController()
+        configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_controller(
+            app_config
+        )
         configurator.include(
             collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
         )
