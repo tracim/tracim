@@ -1,15 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 
 class PopinFixedRightPart extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      currentChildren: 'timeline'
+      currentChildren: props.menuItemList[0].id
     }
   }
 
-  handleRightChildren = (newCurrentChildren) => {
+  handleChangeRightChildren = (newCurrentChildren) => {
     this.setState({currentChildren: newCurrentChildren})
   }
 
@@ -24,22 +25,32 @@ class PopinFixedRightPart extends React.Component {
                 <button
                   className={classnames('wsContentGeneric__content__right__header__icon nav-item iconBtn m-0', {'active': menuItem.id === this.state.currentChildren})}
                   title={menuItem.label}
-                  onClick={() => this.handleRightChildren(menuItem.id)}
+                  onClick={() => this.handleChangeRightChildren(menuItem.id)}
                 >
                   <i className={`fa fa-fw ${menuItem.icon}`} />
                 </button>
               )}
-              <div className='wsContentGeneric__content__right__header__icon__close mb-3 mt-auto'
+              <div className='wsContentGeneric__content__right__header__icon__close'
                 onClick={props.toggleRightPart}>
                 <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
               </div>
             </div>
-            {props.menuItemList.map(menuItem =>
-              menuItem.id === this.state.currentChildren && menuItem.children
-            )}
+            {props.menuItemList.find(menuItem => menuItem.id === this.state.currentChildren).children}
           </div>
       )
   }
 }
 
 export default PopinFixedRightPart
+
+
+PopinFixedRightPart.propTypes = {
+  menuItemList: PropTypes.array.isRequired,
+  toggleRightPart: PropTypes.func.isRequired,
+  rightPartOpen: PropTypes.bool.isRequired,
+  customClass: PropTypes.string
+}
+
+PopinFixedRightPart.defaultProps = {
+  customClass: ''
+}

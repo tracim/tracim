@@ -11,12 +11,12 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 class GuestDownload extends React.Component {
   constructor (props) {
     super(props)
-    this.toggle = this.toggle.bind(this)
+    this.popoverToggle = this.popoverToggle.bind(this)
     this.state = {
       popoverOpen: false,
-      userName: '',
+      userName: 'USER',
       file: {
-        fileName: '',
+        fileName: 'FILE',
         fileSize: 0
       },
       guestPassword: {
@@ -26,7 +26,7 @@ class GuestDownload extends React.Component {
     }
   }
 
-  toggle () {
+  popoverToggle () {
     this.setState({
       popoverOpen: !this.state.popoverOpen
     })
@@ -49,7 +49,9 @@ class GuestDownload extends React.Component {
           <CardBody formClass='guestdownload__card__form'>
             <form>
               <div className='guestdownload__card__form__text'>
-                {state.userName} {props.t('shared with you the file')} {state.file.fileName} ({state.file.fileSize})
+                {props.t('{{userName}} shared with you the file {{fileName}}',
+                  {userName: state.userName, fileName: state.file.fileName, interpolation: {escapeValue: false}}
+                )} ({state.file.fileSize})
               </div>
               <div className='d-flex'>
                 <InputGroupText
@@ -70,7 +72,7 @@ class GuestDownload extends React.Component {
                 >
                   <i className='fa fa-fw fa-question-circle' />
                 </button>
-                <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.toggle}>
+                <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.popoverToggle}>
                   <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
                 </Popover>
               </div>

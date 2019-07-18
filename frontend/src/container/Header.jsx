@@ -122,9 +122,9 @@ class Header extends React.Component {
                 <li className='header__menu__rightside__emailwarning nav-item'>
                   <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
                     <ComposedIcon
-                      icon='envelope'
+                      mainIcon='envelope'
                       smallIcon='warning'
-                      customClass='slowblink'
+                      mainIconCustomClass='slowblink'
                       smallIconCustomClass='text-danger'
                     />
                   </div>

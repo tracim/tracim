@@ -10,7 +10,7 @@ import { generateRandomPassword } from '../../helper.js'
 class NewShareDownload extends React.Component {
   constructor (props) {
     super(props)
-    this.toggle = this.toggle.bind(this)
+    this.popoverToggle = this.popoverToggle.bind(this)
     this.state = {
       passwordActive: false,
       popoverOpen: false
@@ -19,7 +19,7 @@ class NewShareDownload extends React.Component {
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  toggle () {
+  popoverToggle () {
     this.setState({
       popoverOpen: !this.state.popoverOpen
     })
@@ -58,6 +58,10 @@ class NewShareDownload extends React.Component {
     }
   }
 
+  handleShowPassword = () => {
+    this.setState({passwordActive: true})
+  }
+
   render () {
     const { props, state } = this
 
@@ -75,7 +79,7 @@ class NewShareDownload extends React.Component {
             rows='10'
             value={props.shareEmails}
             onChange={props.onChangeEmails}
-            onKeyDown={props.handleEmailList}
+            onKeyDown={props.convertSpaceAndCommaToNewLines}
           />
           <button
             type='button'
@@ -86,7 +90,7 @@ class NewShareDownload extends React.Component {
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
-          <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.toggle}>
+          <Popover placement='bottom' isOpen={state.popoverOpen} target='popoverMultipleEmails' toggle={this.popoverToggle}>
             <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma or space.')}</PopoverBody>
           </Popover>
         </div>
@@ -111,7 +115,7 @@ class NewShareDownload extends React.Component {
               placeholder={props.t('Password to share link (optional)')}
               value={props.sharePassword}
               onChange={props.onChangePassword}
-              onFocus={props.handleEmailList}
+              onFocus={props.convertSpaceAndCommaToNewLines}
             />
           </div>
           <button
@@ -126,9 +130,9 @@ class NewShareDownload extends React.Component {
           </button>
         </div>
         : <div className='shareDownload__password'>
-          <a className='shareDownload__password__link' href='#' onClick={() => this.setState({passwordActive: true})}>
+          <span className='shareDownload__password__link' onClick={this.handleShowPassword}>
             {props.t('Protect by password')}
-          </a>
+          </span>
         </div>
         }
         <div className='d-flex mt-3'>

@@ -37,7 +37,7 @@ class ShareDownload extends React.Component {
             onClickReturnToManagement={this.handleReturnToManagement}
             shareEmails={props.shareEmails}
             onChangeEmails={props.onChangeEmails}
-            handleEmailList={props.handleEmailList}
+            convertSpaceAndCommaToNewLines={props.convertSpaceAndCommaToNewLines}
             sharePassword={props.sharePassword}
             onChangePassword={props.onChangePassword}
           />

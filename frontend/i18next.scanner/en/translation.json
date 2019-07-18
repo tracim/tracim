@@ -210,7 +210,7 @@
   "Download file": "Download file",
   "Upload files": "Upload files",
   "Attached files": "Attached files",
-  "shared with you the file": "shared with you the file",
+  "{{userName}} shared with you the file {{fileName}}": "{{userName}} shared with you the file {{fileName}}",
   "The person who sent you this file protected it with a password. If you do not know the password, please contact her.": "The person who sent you this file protected it with a password. If you do not know the password, please contact her.",
   "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.": "Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.",
   "You have not yet chosen any files to upload.": "You have not yet chosen any files to upload.",

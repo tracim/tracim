@@ -33,11 +33,11 @@ class ShareDownloadManagement extends React.Component {
       <div className='shareDownload'>
         <div className='shareDownload__management__header'>
           <div className='shareDownload__title'>
-            {props.t(`${props.label} share`)}
+            {props.t('{{label}} share', {label: props.label, interpolation: {escapeValue: false}})}
           </div>
           <button
-            className='btn highlightBtn my-auto'
-            key='new_share_download'
+            className='shareDownload__btn btn highlightBtn'
+            key='newShareDownload'
             onClick={props.onClickNewShareDownload}
             style={{
               backgroundColor: props.hexcolor,

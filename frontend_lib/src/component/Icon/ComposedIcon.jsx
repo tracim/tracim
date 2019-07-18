@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 
 const ComposedIcon = props =>
   <i
-    className={`composedIcon ${props.customClass} fa fa-fw fa-${props.icon}`}
-    style={{...props.style}}
+    className={`composedIcon ${props.mainIconCustomClass} fa fa-fw fa-${props.mainIcon}`}
+    style={{...props.mainIconStyle}}
   >
     <i
       className={`composedIcon__subIcon ${props.smallIconCustomClass} fa fa-${props.smallIcon}`}
@@ -13,18 +13,18 @@ const ComposedIcon = props =>
   </i>
 
 ComposedIcon.propTypes = {
-  icon: PropTypes.string.isRequired,
+  mainIcon: PropTypes.string.isRequired,
   smallIcon: PropTypes.string.isRequired,
-  customClass: PropTypes.string,
+  mainIconCustomClass: PropTypes.string,
   smallIconCustomClass: PropTypes.string,
-  style: PropTypes.object,
+  mainIconStyle: PropTypes.object,
   smallIconStyle: PropTypes.object
 }
 
 ComposedIcon.defaultProps = {
-  customClass: '',
+  mainIconCustomClass: '',
   smallIconCustomClass: '',
-  style: {},
+  mainIconStyle: {},
   smallIconStyle: {}
 }
 

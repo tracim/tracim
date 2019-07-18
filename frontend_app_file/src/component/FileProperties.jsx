@@ -2,9 +2,9 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 
-require('./PropertiesComponent.styl')
+require('./FileProperties.styl')
 
-export class PropertiesComponent extends React.Component {
+export class FileProperties extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -29,33 +29,33 @@ export class PropertiesComponent extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='propertiescomponent'>
-        <div className='propertiescomponent__title'>
+      <div className='fileProperties'>
+        <div className='fileProperties__title'>
           {props.t('Properties')}
         </div>
-        <div className='propertiescomponent__content'>
-          <div className='propertiescomponent__content__detail'>
-            <div className='propertiescomponent__content__detail__item'>
+        <div className='fileProperties__content'>
+          <div className='fileProperties__content__detail'>
+            <div className='fileProperties__content__detail__item'>
               {props.t('Size')}: {props.fileSize}
             </div>
 
-            <div className='propertiescomponent__content__detail__item'>
+            <div className='fileProperties__content__detail__item'>
               {props.t('Page number')}: {props.filePageNb}
             </div>
 
-            <div className='propertiescomponent__content__detail__description'>
+            <div className='fileProperties__content__detail__description'>
               {state.displayFormNewDescription
                 ? (
-                  <form className='propertiescomponent__content__detail__description__editiondesc'>
+                  <form className='fileProperties__content__detail__description__editiondesc'>
                     <textarea
                       value={state.newDescription}
                       onChange={this.handleChangeDescription}
                     />
 
-                    <div className='propertiescomponent__content__detail__description__editiondesc__btn'>
+                    <div className='fileProperties__content__detail__description__editiondesc__btn'>
                       <button
                         type='button'
-                        className='propertiescomponent__content__detail__description__editiondesc__btn__cancel btn'
+                        className='fileProperties__content__detail__description__editiondesc__btn__cancel btn'
                         onClick={this.handleToggleFormNewDescription}
                       >
                         {props.t('Cancel')}
@@ -63,7 +63,7 @@ export class PropertiesComponent extends React.Component {
 
                       <button
                         type='button'
-                        className='propertiescomponent__content__detail__description__editiondesc__validate btn'
+                        className='fileProperties__content__detail__description__editiondesc__validate btn'
                         onClick={this.handleClickValidateNewDescription}
                       >
                         {props.t('Validate')}
@@ -72,9 +72,9 @@ export class PropertiesComponent extends React.Component {
                   </form>
                 )
                 : (
-                  <label>
+                  <div>
                     {props.t('Description')}: {props.description}
-                  </label>
+                  </div>
                 )
               }
             </div>
@@ -82,7 +82,7 @@ export class PropertiesComponent extends React.Component {
             {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
               <button
                 type='button'
-                className='propertiescomponent__content__detail__btndesc btn outlineTextBtn'
+                className='fileProperties__content__detail__btndesc btn outlineTextBtn'
                 onClick={this.handleToggleFormNewDescription}
                 style={{
                   borderWidth: '1px',
@@ -104,4 +104,4 @@ export class PropertiesComponent extends React.Component {
   }
 }
 
-export default translate()(Radium(PropertiesComponent))
+export default translate()(Radium(FileProperties))

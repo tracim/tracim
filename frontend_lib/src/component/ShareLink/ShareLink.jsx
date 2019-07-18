@@ -18,12 +18,12 @@ class ShareLink extends React.Component {
     const { props } = this
 
     return (
-      <div className='shareLink d-flex'>
+      <div className='shareLink'>
         <div className='shareLink__icon'>
           <ComposedIcon
-            icon='link'
+            mainIcon='link'
             smallIcon='lock'
-            style={{color: '#ababab'}}             // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+            mainIconStyle={{color: '#ababab'}}     // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
             smallIconStyle={{color: '#252525'}}    // https://github.com/tracim/tracim/issues/2098
           />
         </div>

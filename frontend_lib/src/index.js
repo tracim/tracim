@@ -6,6 +6,7 @@ import {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  generateRandomPassword,
   appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
   FETCH_CONFIG
@@ -77,6 +78,7 @@ export {
   convertBackslashNToBr,
   revisionTypeList,
   generateLocalStorageContentId,
+  generateRandomPassword,
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,

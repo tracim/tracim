@@ -127,9 +127,9 @@ export class AdminUser extends React.Component {
               {!props.emailNotifActivated && (
                 <div>
                   <ComposedIcon
-                    icon='envelope'
+                    mainIcon='envelope'
                     smallIcon='warning'
-                    customClass='primaryColorFont'
+                    mainIconCustomClass='primaryColorFont'
                     smallIconCustomClass='text-danger'
                   />
                   {props.t('Email notification are disabled, please manually notify users of any change')}

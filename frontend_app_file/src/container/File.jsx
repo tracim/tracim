@@ -43,7 +43,7 @@ import {
   putFileRestoreDeleted,
   putMyselfFileRead
 } from '../action.async.js'
-import PropertiesComponent from '../component/PropertiesComponent.jsx'
+import FileProperties from '../component/FileProperties.jsx'
 
 class File extends React.Component {
   constructor (props) {
@@ -626,11 +626,11 @@ class File extends React.Component {
   }
 
   checkEmailValid = email => {
-    let parts = email.split('@')
+    const parts = email.split('@')
     if (parts.length !== 2) {
       return false
     } else {
-      let domainParts = parts[1].split('.')
+      const domainParts = parts[1].split('.')
       if (domainParts.length !== 2) {
         return false
       }
@@ -640,7 +640,7 @@ class File extends React.Component {
 
   // handleClickNewShare = async () => {
   //   const { content, config } = this.state
-  //   this.handleEmailList()
+  //   this.convertSpaceAndCommaToNewLines()
   //   const emailList = this.state.shareEmails.split('\n')
 
   //   emailList.forEach(email => {
@@ -662,10 +662,9 @@ class File extends React.Component {
   handleChangeEmails = e => this.setState({shareEmails: e.target.value})
   handleChangePassword = e => this.setState({sharePassword: e.target.value})
 
-  // INFO - GB - 2019-05-24 - Change all spaces and commas to new lines
-  handleEmailList = e => {
+  convertSpaceAndCommaToNewLines = e => {
     if (e.key === 'Enter') {
-      let emailList = this.state.shareEmails.split(' ').join(',').split(',')
+      const emailList = this.state.shareEmails.split(' ').join(',').split(',')
       emailList.forEach(email => !this.checkEmailValid(email) &&
         this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
 
@@ -843,7 +842,7 @@ class File extends React.Component {
                   hexcolor={state.config.hexcolor}
                   shareEmails={state.shareEmails}
                   onChangeEmails={this.handleChangeEmails}
-                  handleEmailList={this.handleEmailList}
+                  convertSpaceAndCommaToNewLines={this.convertSpaceAndCommaToNewLines}
                   sharePassword={state.sharePassword}
                   onChangePassword={this.handleChangePassword}
                   shareLinkList={state.shareLinkList}
@@ -854,7 +853,7 @@ class File extends React.Component {
                 id: 'properties',
                 label: props.t('Properties'),
                 icon: 'fa-info-circle',
-                children: <PropertiesComponent
+                children: <FileProperties
                   color={state.config.hexcolor}
                   fileSize={displayFileSize(state.content.size)}
                   filePageNb={state.content.page_nb}

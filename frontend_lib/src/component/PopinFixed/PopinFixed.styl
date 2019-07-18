@@ -119,6 +119,7 @@
           &__close
             text-align center
             cursor pointer
+            margin auto 0 15px
 
 .rightPartClose
   .wsContentGeneric__content__left
@@ -143,7 +144,7 @@
         height auto
 
 
-columnContents()
+responsiveColumnStyle()
   .wsContentGeneric
     &__content
       &__right
@@ -167,7 +168,7 @@ columnContents()
               display none
 
 @media (min-width: min-lg) and (max-width: max-lg)
-  columnContents()
+  responsiveColumnStyle()
 
 @media (min-width: min-md) and (max-width: max-md)
   .wsContentGeneric
@@ -183,7 +184,7 @@ columnContents()
       &__right
         width 100%
         height auto
-  columnContents()
+  responsiveColumnStyle()
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .wsContentGeneric
@@ -202,7 +203,7 @@ columnContents()
       &__right
         width 100%
         height auto
-  columnContents()
+  responsiveColumnStyle()
 
 @media (max-width: max-xs)
   .wsContentGeneric
@@ -223,4 +224,4 @@ columnContents()
       &__right
         width 100%
         height auto
-  columnContents()
+  responsiveColumnStyle()

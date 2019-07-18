@@ -659,7 +659,7 @@ class HtmlDocument extends React.Component {
             menuItemList={[
               {
                 id: 'timeline',
-                label: props.t('Timeline'),
+                label: t('Timeline'),
                 icon: 'fa-history',
                 children: <Timeline
                   customClass={`${config.slug}__contentpage`}

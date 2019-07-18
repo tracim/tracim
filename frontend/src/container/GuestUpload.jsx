@@ -1,22 +1,25 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
-import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-import InputTextArea from '../component/common/Input/InputTextArea.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { FileDropzone, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 import ProgressBarMultipleFiles from '../component/GuestPage/ProgressBarMultipleFiles.jsx'
-import ConfirmationPage from '../component/GuestPage/ConfirmationPage.jsx'
+import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
+import UploadForm from '../component/GuestPage/UploadForm.jsx'
 
 class GuestUpload extends React.Component {
   constructor (props) {
     super(props)
-    this.toggle = this.toggle.bind(this)
+
+    this.UPLOAD_STATUS = {
+      BEFORE_LOAD: 'beforeLoad',
+      LOADING: 'loading',
+      AFTER_LOAD: 'afterLoad'
+    }
+
     this.state = {
-      popoverOpen: false,
       guestName: '',
       guestComment: '',
       guestPassword: {
@@ -27,16 +30,10 @@ class GuestUpload extends React.Component {
       uploadFileList: [],
       uploadFilePreview: null,
       progressUpload: {
-        display: 'beforeLoad',
+        display: this.UPLOAD_STATUS.BEFORE_LOAD,
         percentList: []
       }
     }
-  }
-
-  toggle () {
-    this.setState({
-      popoverOpen: !this.state.popoverOpen
-    })
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -52,7 +49,7 @@ class GuestUpload extends React.Component {
   handleChangeComment = e => this.setState({guestComment: e.target.value})
   handleChangePassword = e => this.setState({guestPassword: {...this.state.guestPassword, value: e.target.value}})
 
-  handleChangeFile = uploadFileList => {
+  handleAddFile = uploadFileList => {
     if (!uploadFileList || !uploadFileList[0]) return
 
     uploadFileList.forEach(uploadFile => {
@@ -71,16 +68,16 @@ class GuestUpload extends React.Component {
   handleClickSend = async () => {
     const { props, state } = this
 
-    state.uploadFileList.forEach((uploadFile, index) => {
+    state.uploadFileList.forEach(uploadFile => {
       const formData = new FormData()
       formData.append('files', uploadFile)
 
       // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
       const xhr = new XMLHttpRequest()
-      xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: 'beforeLoad', percentList: []}}), false)
-      const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: 'loading', percentList: [...this.state.percentList, {id: uploadFile.name, percent: Math.round(e.loaded / e.total * 100)}]}})
+      xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.BEFORE_LOAD, percentList: []}}), false)
+      const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: this.UPLOAD_STATUS.LOADING, percentList: [...this.state.percentList, {id: uploadFile.name, percent: Math.round(e.loaded / e.total * 100)}]}})
       xhr.upload.addEventListener('progress', uploadInProgress, false)
-      xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: 'afterLoad', percentList: []}}), false)
+      xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.AFTER_LOAD, percentList: []}}), false)
 
       // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
       xhr.setRequestHeader('Accept', 'application/json')
@@ -91,7 +88,7 @@ class GuestUpload extends React.Component {
           switch (xhr.status) {
             case 204:
               this.setState(previousState => ({
-                uploadFileList: previousState.uploadFileList.filter((file, j) => index !== j)
+                uploadFileList: previousState.uploadFileList.filter(file => uploadFile.name !== file.name)
               }))
               break
             case 400:
@@ -120,117 +117,26 @@ class GuestUpload extends React.Component {
           </CardHeader>
 
           <CardBody formClass='guestupload__card__form'>
-            {state.progressUpload.display === 'beforeLoad'
-              ? <form>
-                <div className='guestupload__card__form__left'>
-                  <InputGroupText
-                    parentClassName='guestupload__card__form__fullname'
-                    customClass='mb-3'
-                    type='text'
-                    placeHolder={props.t('Full name')}
-                    value={state.guestName}
-                    onChange={this.handleChangeFullName}
-                  />
-
-                  <div className='d-flex'>
-                    <InputGroupText
-                      parentClassName='guestupload__card__form__groupepw'
-                      customClass=''
-                      icon='fa-lock'
-                      type='password'
-                      placeHolder={props.t('Password')}
-                      invalidMsg={props.t('Invalid password')}
-                      isInvalid={state.guestPassword.isInvalid}
-                      value={state.guestPassword.value}
-                      onChange={this.handleChangePassword}
-                      onKeyDown={() => {}}
-                    />
-
-                    <button
-                      type='button'
-                      className='guestupload__card__form__groupepw__question mb-3'
-                      id='popoverQuestion'
-                    >
-                      <i className='fa fa-fw fa-question-circle' />
-                    </button>
-                    <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.toggle}>
-                      <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
-                    </Popover>
-                  </div>
-
-                  <InputTextArea
-                    placeHolder={props.t('Leave a message with your file(s) if you wish. Feel free to leave your contact details if you wish to be contacted again.')}
-                    numberRows={state.uploadFileList.length > 4 ? '20' : '15'}
-                    value={state.guestComment}
-                    onChange={this.handleChangeComment}
-                  />
-                </div>
-                <div className='guestupload__card__form__right'>
-                  <FileDropzone
-                    onDrop={this.handleChangeFile}
-                    onClick={this.handleChangeFile}
-                    preview={state.uploadFilePreview}
-                    multipleFiles
-                  />
-
-                  <div className='font-weight-bold m-1'>
-                    {state.uploadFileList.length > 0
-                      ? props.t('Attached files')
-                      : props.t('You have not yet chosen any files to upload.')
-                    }
-                  </div>
-                  <div className='guestupload__card__form__right__files'>
-                    {(state.uploadFileList.map(file =>
-                      <div className='d-flex' key={file.name}>
-                        <i className='fa fa-fw fa-file-o m-1' />
-                        {file.name} ({file.size} bytes)
-                        <button
-                          className='iconBtn ml-auto primaryColorFontHover'
-                          onClick={() => this.handleDeleteFile(file)}
-                          title={props.t('Delete')}
-                        >
-                          <i className='fa fa-fw fa-trash-o' />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button type='button'
-                    className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover ml-auto'
-                    onClick={this.handleClickSend}
-                  >
-                    {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />
-                  </button>
-                </div>
-              </form>
-              : state.progressUpload.display === 'loading'
-                ? <ProgressBarMultipleFiles
-                  fileList={
-                    [{
-                      lastModified: 1555500134539,
-                      lastModifiedDate: {},
-                      name: 'favicon.jpeg',
-                      size: 4802,
-                      type: 'image/jpeg',
-                      webkitRelativePath: ''},
-                    {
-                      lastModified: 1558682270102,
-                      lastModifiedDate: {},
-                      name: 'file1.jpeg',
-                      size: 4802,
-                      type: 'image/jpeg',
-                      webkitRelativePath: ''},
-                    {
-                      lastModified: 1555500015369,
-                      lastModifiedDate: {},
-                      name: 'logo-icon.png',
-                      size: 9804,
-                      type: 'image/png',
-                      webkitRelativePath: ''}
-                    ]
-                  }
-                />
-                : <ConfirmationPage />
+            {state.progressUpload.display === this.UPLOAD_STATUS.BEFORE_LOAD
+              ? <UploadForm
+                guestName={state.guestName}
+                onChangeFullName={this.handleChangeFullName}
+                guestPassword={state.guestPassword}
+                onChangePassword={this.handleChangePassword}
+                guestComment={state.guestComment}
+                onChangeComment={this.handleChangeComment}
+                onAddFile={this.handleAddFile}
+                onDeleteFile={this.handleDeleteFile}
+                onClickSend={this.handleClickSend}
+                uploadFileList={state.uploadFileList}
+                uploadFilePreview={state.uploadFilePreview}
+              />
+              : state.progressUpload.display === this.UPLOAD_STATUS.LOADING
+                ? state.uploadFileList.map(file =>
+                  <ProgressBarMultipleFiles
+                    fileName={file.name}
+                  />)
+                : <ImportConfirmation />
             }
           </CardBody>
         </Card>

@@ -100,7 +100,7 @@ export const NewMemberForm = props => {
               : (
                 <div className='name__adminmsg'>
                   <ComposedIcon
-                    icon='envelope'
+                    mainIcon='envelope'
                     smallIcon='warning'
                     smallIconCustomClass='text-danger'
                   />

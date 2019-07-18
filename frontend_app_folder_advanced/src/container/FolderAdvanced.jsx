@@ -1,5 +1,5 @@
 import React from 'react'
-import FolderAdvancedComponent from '../component/UploadFilesManagement.jsx'
+import FolderAdvancedComponent from './NewUpload.jsx'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
