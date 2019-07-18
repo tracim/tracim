@@ -14,7 +14,6 @@ requires = [
     'plaster_pastedeploy',
     'pyramid >= 1.9a',
     'pyramid_debugtoolbar',
-    'pyramid_jinja2',
     'pyramid_retry',
     'waitress',
     # Database
@@ -40,7 +39,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
-    'preview-generator>=0.10',
+    'preview-generator>=0.11',
     'colour',
     'python-dateutil',
     # mail-notifier
@@ -76,7 +75,6 @@ tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
     'pytest',
     'pytest-dotenv',
-    'parameterized',
     'responses',
     'mock',
     'Pillow',

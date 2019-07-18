@@ -1,14 +1,55 @@
+from email.message import Message
+
 from mock import MagicMock
 from mock import Mock
 import pytest
 import responses
 
+from tracim_backend.exceptions import AutoReplyEmailNotAllowed
 from tracim_backend.exceptions import BadStatusCode
 from tracim_backend.lib.mail_fetcher.email_fetcher import DecodedMail
 from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 
 
 class TestDecodedMail(object):
+    def test_unit__decoded_mail__check_validity_for_comment_content__ok__nominal_case(self):
+        message = Message()
+        uid = 1
+        decodedmail = DecodedMail(message, uid)
+        try:
+            decodedmail.check_validity_for_comment_content()
+        except AutoReplyEmailNotAllowed:
+            pytest.fail("mail is seen as autoreply mail but it is not")
+
+    @pytest.mark.parametrize(
+        "header_name, header_value",
+        [
+            # header_name, header_value
+            ("Auto-submitted", "auto-replied"),
+            ("Auto-submitted", "auto-replied (rejected)"),
+            ("Auto-submitted", "auto-replied (vacation)"),
+            ("Precedence", "auto_reply"),
+            ("X-Autoreply", "yes"),
+            ("X-Auto-Response-Suppress", "DR"),
+            ("X-Auto-Response-Suppress", "All"),
+            ("X-Auto-Response-Suppress", "autoreply"),
+            ("X-Auto-Response-Suppress", "a,DR,z"),
+            ("X-Auto-Response-Suppress", "a,autoreply,z"),
+            ("X-Auto-Response-Suppress", "a,all,z"),
+            ("X-Auto-Response-Suppress", "DR,All,Autoreply"),
+        ],
+    )
+    def test_unit__decoded_mail__check_validity_for_comment_content__err__is_autoreply_email(
+        self, header_name, header_value
+    ):
+        message = Message()
+        message.add_header(header_name, header_value)
+
+        uid = 1
+        decodedmail = DecodedMail(message, uid)
+        with pytest.raises(AutoReplyEmailNotAllowed):
+            decodedmail.check_validity_for_comment_content()
+
     def test_unit__find_key_from_mail_address__subadress_no_key(self):
         mail_address = "reply@mydomainname.tld"
         assert (

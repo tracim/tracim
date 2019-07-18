@@ -19,12 +19,14 @@ class SearchFactory(object):
     def get_search_controller(cls, config: CFG):
         if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.views.search_api.search_controller import ESSearchController
+            from tracim_backend.views.search_api.elasticsearch_controller import ESSearchController
 
             return ESSearchController()
         elif config.SEARCH__ENGINE == SIMPLE__SEARCH_ENGINE_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.views.search_api.search_controller import SimpleSearchController
+            from tracim_backend.views.search_api.simple_search_controller import (
+                SimpleSearchController,
+            )
 
             return SimpleSearchController()
         else:
@@ -38,12 +40,14 @@ class SearchFactory(object):
     def get_search_lib(cls, session: Session, current_user: typing.Optional[User], config: CFG):
         if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.lib.search.search import ESSearchApi
+            from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import (
+                ESSearchApi,
+            )
 
             return ESSearchApi(session=session, current_user=current_user, config=config)
         elif config.SEARCH__ENGINE == SIMPLE__SEARCH_ENGINE_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
-            from tracim_backend.lib.search.search import SimpleSearchApi
+            from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
 
             return SimpleSearchApi(session=session, current_user=current_user, config=config)
         else:

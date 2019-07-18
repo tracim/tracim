@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
+import pytest
 from sqlalchemy import inspect
 
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.tests import DefaultTest
-from tracim_backend.tests import eq_
+from tracim_backend.tests.fixtures import *  # noqa F403,F401
 
 
-class TestContentRevision(DefaultTest):
+@pytest.mark.usefixtures("base_fixture")
+class TestContentRevision(object):
     def _new_from(self, revision):
         excluded_columns = (
             "revision_id",
@@ -37,31 +36,27 @@ class TestContentRevision(DefaultTest):
             dict_repr.pop(key_to_remove, None)
         return dict_repr
 
-    def test_new_revision(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace = self._create_workspace_and_test(name="workspace_1", user=admin)
-        folder = self._create_content_and_test(
-            name="folder_1", workspace=workspace, type=content_type_list.Folder.slug
+    def test_new_revision(
+        self, session, admin_user, workspace_api_factory, content_api_factory, content_type_list
+    ):
+        workspace = workspace_api_factory.get().create_workspace(label="workspace_1")
+        folder = content_api_factory.get().create(
+            content_type_slug="folder", workspace=workspace, label="folder_1", do_save=True
         )
-        page = self._create_content_and_test(
-            workspace=workspace,
-            parent=folder,
-            name="file_1",
-            description="content of file_1",
-            type=content_type_list.Page.slug,
-            owner=admin,
+        html_document = content_api_factory.get().create(
+            content_type_slug="html-document", workspace=workspace, label="file_1", parent=folder
         )
 
-        self.session.flush()
+        session.flush()
 
         # Model create a new instance with list of column
-        new_revision_by_model = ContentRevisionRO.new_from(page.revision)
+        new_revision_by_model = ContentRevisionRO.new_from(html_document.revision)
         # Test create a new instance from dynamic listing of model
         # columns mapping
-        new_revision_by_test = self._new_from(page.revision)
+        new_revision_by_test = self._new_from(html_document.revision)
 
         new_revision_by_model_dict = self._get_dict_representation(new_revision_by_model)
         new_revision_by_test_dict = self._get_dict_representation(new_revision_by_test)
 
         # They must be identical
-        eq_(new_revision_by_model_dict, new_revision_by_test_dict)
+        assert new_revision_by_model_dict == new_revision_by_test_dict

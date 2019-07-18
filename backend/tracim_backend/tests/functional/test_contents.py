@@ -7,56 +7,29 @@ from depot.io.utils import FileIntent
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.error import ErrorCode
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.auth import User
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.setup_models import get_tm_session
-from tracim_backend.tests import FunctionalTest
-from tracim_backend.tests import create_1000px_png_test_image
-from tracim_backend.tests import set_html_document_slug_to_legacy
+from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+from tracim_backend.tests.utils import create_1000px_png_test_image
+from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 
 
-class TestFolder(FunctionalTest):
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestFolder(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/folders/{content_id}
     endpoint
     """
 
-    fixtures = [BaseFixture]
-
-    def _setup_basics(self) -> None:
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.dbsession = get_tm_session(self.session_factory, transaction.manager)
-        self.admin = self.dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        self.workspace_api = WorkspaceApi(
-            current_user=self.admin, session=self.dbsession, config=self.app_config
-        )
-        self.content_api = ContentApi(
-            current_user=self.admin, session=self.dbsession, config=self.app_config
-        )
-        self.workspace = self.workspace_api.create_workspace(label="test", save_now=True)
-        self.folder = self.content_api.create(
-            label="test_folder",
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=self.workspace,
-            do_save=True,
-            do_notify=False,
-        )
-        transaction.commit()
-
-    def test_api__get_folder__ok_200__nominal_case(self) -> None:
+    def test_api__get_folder__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Get one folder content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test-folder",
@@ -67,8 +40,8 @@ class TestFolder(FunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -100,15 +73,21 @@ class TestFolder(FunctionalTest):
         assert content["last_modifier"]["avatar_url"] is None
         assert content["raw_content"] == ""
 
-    def test_api__get_folder__err_400__wrong_content_type(self) -> None:
+    def test_api__get_folder__err_400__wrong_content_type(
+        self,
+        webdav_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        content_type_list,
+    ) -> None:
         """
         Get one folder of a content content 7 is not folder
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         thread = content_api.create(
             label="thread",
@@ -118,7 +97,7 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=thread.content_id
             ),
@@ -128,17 +107,18 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_folder__err_400__content_does_not_exist(self) -> None:
+    def test_api__get_folder__err_400__content_does_not_exist(
+        self, web_testapp, workspace_api_factory
+    ) -> None:
         """
         Get one folder content (content 170 does not exist in db)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        workspace_api = workspace_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         transaction.commit()
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/170".format(
                 workspace_id=test_workspace.workspace_id
             ),
@@ -148,15 +128,16 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:
+    def test_api__get_folder__err_400__content_not_in_workspace(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
         """
         Get one folders of a content (content is in another workspace)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -167,8 +148,8 @@ class TestFolder(FunctionalTest):
         )
         test_workspace2 = workspace_api.create_workspace(label="test2", save_now=True)
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace2.workspace_id, content_id=folder.content_id
             ),
@@ -178,14 +159,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:
+    def test_api__get_folder__err_400__workspace_does_not_exist(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
         """
         Get one folder content (Workspace 40 does not exist)
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -195,8 +177,8 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/40/folders/{content_id}".format(content_id=folder.content_id),
             status=400,
         )
@@ -204,14 +186,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:
+    def test_api__get_folder__err_400__workspace_id_is_not_int(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
         """
         Get one folder content, workspace id is not int
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -221,8 +204,8 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/coucou/folders/{content_id}".format(content_id=folder.content_id),
             status=400,
         )
@@ -230,14 +213,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:
+    def test_api__get_folder__err_400__content_id_is_not_int(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
         """
         Get one folder content, content_id is not int
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         content_api.create(
             label="test_folder",
@@ -248,8 +232,8 @@ class TestFolder(FunctionalTest):
         )
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/coucou".format(
                 workspace_id=test_workspace.workspace_id
             ),
@@ -259,14 +243,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_folder__err_400__empty_label(self) -> None:
+    def test_api__update_folder__err_400__empty_label(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one folder content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -276,13 +261,13 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "",
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -294,14 +279,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__update_folder__ok_200__nominal_case(self) -> None:
+    def test_api__update_folder__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -311,13 +297,13 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -349,14 +335,15 @@ class TestFolder(FunctionalTest):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
-    def test_api__update_folder__err_400__not_modified(self) -> None:
+    def test_api__update_folder__err_400__not_modified(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -366,13 +353,13 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -404,7 +391,7 @@ class TestFolder(FunctionalTest):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["sub_content_types"] == [content_type_list.Folder.slug]
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -415,14 +402,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
 
-    def test_api__update_folder__err_400__allowed_content_changed_only(self) -> None:
+    def test_api__update_folder__err_400__allowed_content_changed_only(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one folder but change only allowed content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -432,13 +420,13 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -476,7 +464,7 @@ class TestFolder(FunctionalTest):
             "sub_content_types": [content_type_list.Folder.slug, content_type_list.Thread.slug],
         }
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -510,14 +498,15 @@ class TestFolder(FunctionalTest):
             [content_type_list.Folder.slug, content_type_list.Thread.slug]
         )
 
-    def test_api__update_folder__err_400__label_changed_only(self) -> None:
+    def test_api__update_folder__err_400__label_changed_only(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one folder but change only allowed content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -527,13 +516,13 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "My New label",
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -571,7 +560,7 @@ class TestFolder(FunctionalTest):
             "sub_content_types": [content_type_list.Folder.slug],
         }
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -603,14 +592,15 @@ class TestFolder(FunctionalTest):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert set(content["sub_content_types"]) == set([content_type_list.Folder.slug])
 
-    def test_api__update_folder__err_400__label_already_used(self) -> None:
+    def test_api__update_folder__err_400__label_already_used(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         content_api.create(
             label="already_used",
@@ -627,13 +617,13 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
             "label": "already_used",
             "raw_content": "<p> Le nouveau contenu </p>",
             "sub_content_types": [content_type_list.Folder.slug],
         }
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -644,14 +634,15 @@ class TestFolder(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
-    def test_api__get_folder_revisions__ok_200__nominal_case(self) -> None:
+    def test_api__get_folder_revisions__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get one html document of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test-folder",
@@ -660,20 +651,20 @@ class TestFolder(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.update_content(
                 folder, new_label="test-folder-updated", new_content="Just a test"
             )
         content_api.save(folder)
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.archive(folder)
         content_api.save(folder)
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.unarchive(folder)
         content_api.save(folder)
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}/revisions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -779,14 +770,15 @@ class TestFolder(FunctionalTest):
         assert revision["author"]["avatar_url"] is None
         assert revision["author"]["public_name"] == "Global manager"
 
-    def test_api__set_folder_status__ok_200__nominal_case(self) -> None:
+    def test_api__set_folder_status__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
+    ) -> None:
         """
         Get one folder content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -796,11 +788,11 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "closed-deprecated"}
 
         # before
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -812,7 +804,7 @@ class TestFolder(FunctionalTest):
         assert content["status"] == "open"
 
         # set status
-        self.testapp.put_json(
+        web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}/status".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -821,7 +813,7 @@ class TestFolder(FunctionalTest):
         )
 
         # after
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -832,16 +824,17 @@ class TestFolder(FunctionalTest):
         assert content["content_id"] == folder.content_id
         assert content["status"] == "closed-deprecated"
 
-    def test_api__set_folder_status__err_400__wrong_status(self) -> None:
+    def test_api__set_folder_status__err_400__wrong_status(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
         """
         Get one folder content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "unexistant-status"}
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
         folder = content_api.create(
             label="test_folder",
@@ -851,7 +844,7 @@ class TestFolder(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/{workspace_id}/folders/{content_id}/status".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
@@ -864,21 +857,24 @@ class TestFolder(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
 
-class TestHtmlDocuments(FunctionalTest):
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestHtmlDocuments(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/html-documents/{content_id}
     endpoint
     """
 
-    fixtures = [BaseFixture, ContentFixtures]
-
-    def test_api__get_html_document__ok_200__legacy_slug(self) -> None:
+    def test_api__get_html_document__ok_200__legacy_slug(
+        self, web_testapp, session_factory
+    ) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        set_html_document_slug_to_legacy(self.session_factory)
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        set_html_document_slug_to_legacy(session_factory)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
@@ -909,12 +905,12 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert content["file_extension"] == ".document.html"
 
-    def test_api__get_html_document__ok_200__nominal_case(self) -> None:
+    def test_api__get_html_document__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
@@ -945,97 +941,97 @@ class TestHtmlDocuments(FunctionalTest):
         )
         assert content["file_extension"] == ".document.html"
 
-    def test_api__get_html_document__ok_200__archived_content(self) -> None:
+    def test_api__get_html_document__ok_200__archived_content(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put_json("/api/v2/workspaces/2/contents/6/archived", status=204)
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put_json("/api/v2/workspaces/2/contents/6/archived", status=204)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
         assert content["is_archived"] is True
 
-    def test_api__get_html_document__ok_200__deleted_content(self) -> None:
+    def test_api__get_html_document__ok_200__deleted_content(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put_json("/api/v2/workspaces/2/contents/6/trashed", status=204)
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put_json("/api/v2/workspaces/2/contents/6/trashed", status=204)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
         assert content["is_deleted"] is True
 
-    def test_api__get_html_document__err_400__wrong_content_type(self) -> None:
+    def test_api__get_html_document__err_400__wrong_content_type(self, web_testapp) -> None:
         """
         Get one html document of a content content 7 is not html_document
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/7", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:
+    def test_api__get_html_document__err_400__content_does_not_exist(self, web_testapp) -> None:
         """
         Get one html document of a content (content 170 does not exist in db
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/170", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/170", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:
+    def test_api__get_html_document__err_400__content_not_in_workspace(self, web_testapp) -> None:
         """
         Get one html document of a content (content 6 is in workspace 2)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/html-documents/6", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/1/html-documents/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:
+    def test_api__get_html_document__err_400__workspace_does_not_exist(self, web_testapp) -> None:
         """
         Get one html document of a content (Workspace 40 does not exist)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/40/html-documents/6", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/40/html-documents/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:
+    def test_api__get_html_document__err_400__workspace_id_is_not_int(self, web_testapp) -> None:
         """
         Get one html document of a content, workspace id is not int
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/coucou/html-documents/6", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/coucou/html-documents/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:
+    def test_api__get_html_document__err_400__content_id_is_not_int(self, web_testapp) -> None:
         """
         Get one html document of a content, content_id is not int
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/coucou", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/coucou", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_html_document__err_400__empty_label(self) -> None:
+    def test_api__update_html_document__err_400__empty_label(self, web_testapp) -> None:
         """
         Update(put) one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6", params=params, status=400
         )
         # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
@@ -1043,13 +1039,13 @@ class TestHtmlDocuments(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__update_html_document__ok_200__nominal_case(self) -> None:
+    def test_api__update_html_document__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Update(put) one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6", params=params, status=200
         )
         content = res.json_body
@@ -1077,7 +1073,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
 
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
@@ -1103,31 +1099,31 @@ class TestHtmlDocuments(FunctionalTest):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["file_extension"] == ".document.html"
 
-    def test_api__update_html_document__err_400__not_editable(self) -> None:
+    def test_api__update_html_document__err_400__not_editable(self, web_testapp) -> None:
         """
         Update(put) one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "closed-deprecated"}
-        self.testapp.put_json(
+        web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6/status", params=params, status=204
         )
 
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu ! </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
-    def test_api__update_html_document__err_400__not_modified(self) -> None:
+    def test_api__update_html_document__err_400__not_modified(self, web_testapp) -> None:
         """
         Update(put) one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6", params=params, status=200
         )
         content = res.json_body
@@ -1154,7 +1150,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
@@ -1179,19 +1175,19 @@ class TestHtmlDocuments(FunctionalTest):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
 
-    def test_api__get_html_document_revisions__ok_200__nominal_case(self) -> None:
+    def test_api__get_html_document_revisions__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6/revisions", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6/revisions", status=200)
         revisions = res.json_body
         assert len(revisions) == 3
         revision = revisions[0]
@@ -1265,50 +1261,50 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision["author"]["public_name"] == "Bob i."
         assert revision["file_extension"] == ".document.html"
 
-    def test_api__set_html_document_status__ok_200__nominal_case(self) -> None:
+    def test_api__set_html_document_status__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "closed-deprecated"}
 
         # before
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
         assert content["status"] == "open"
 
         # set status
-        self.testapp.put_json(
+        web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6/status", params=params, status=204
         )
 
         # after
-        res = self.testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
         assert content["status"] == "closed-deprecated"
 
-    def test_api__set_html_document_status__err_400__wrong_status(self) -> None:
+    def test_api__set_html_document_status__err_400__wrong_status(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "unexistant-status"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6/status", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__set_document_status__err_400__same_status(self) -> None:
+    def test_api__set_document_status__err_400__same_status(self, web_testapp) -> None:
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "open"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/html-documents/6/status", params=params, status=400
         )
         assert res.json_body
@@ -1316,22 +1312,24 @@ class TestHtmlDocuments(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE
 
 
-class TestFiles(FunctionalTest):
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestFiles(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/files/{content_id}
     endpoint
     """
 
-    fixtures = [BaseFixture, ContentFixtures]
-
-    def test_api__get_file__ok_200__nominal_case(self) -> None:
+    def test_api__get_file__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1342,17 +1340,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -1386,14 +1384,15 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
 
-    def test_api__get_file__ok_200__no_file_add(self) -> None:
+    def test_api__get_file__ok_200__no_file_add(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1404,11 +1403,11 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -1442,14 +1441,15 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is False
         assert content["has_jpeg_preview"] is False
 
-    def test_api__get_file__ok_200__binary_file(self) -> None:
+    def test_api__get_file__ok_200__binary_file(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1460,7 +1460,7 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
@@ -1468,11 +1468,11 @@ class TestFiles(FunctionalTest):
                 new_content=bytes(100),
             )
         content_api.save(test_file)
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -1506,74 +1506,75 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is False
         assert content["has_jpeg_preview"] is False
 
-    def test_api__get_files__err_400__wrong_content_type(self) -> None:
+    def test_api__get_files__err_400__wrong_content_type(self, web_testapp) -> None:
         """
         Get one file of a content content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/files/6", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/files/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_file__err_400__content_does_not_exist(self) -> None:
+    def test_api__get_file__err_400__content_does_not_exist(self, web_testapp) -> None:
         """
         Get one file (content 170 does not exist in db
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/files/170", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/1/files/170", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_file__err_400__content_not_in_workspace(self) -> None:
+    def test_api__get_file__err_400__content_not_in_workspace(self, web_testapp) -> None:
         """
         Get one file (content 9 is in workspace 2)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/files/9", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/1/files/9", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:
+    def test_api__get_file__err_400__workspace_does_not_exist(self, web_testapp) -> None:
         """
         Get one file (Workspace 40 does not exist)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/40/files/9", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/40/files/9", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:
+    def test_api__get_file__err_400__workspace_id_is_not_int(self, web_testapp) -> None:
         """
         Get one file, workspace id is not int
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/coucou/files/9", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/coucou/files/9", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_file__err_400__content_id_is_not_int(self) -> None:
+    def test_api__get_file__err_400__content_id_is_not_int(self, web_testapp) -> None:
         """
         Get one file, content_id is not int
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/files/coucou", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/files/coucou", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_file_info_err_400__empty_label(self) -> None:
+    def test_api__update_file_info_err_400__empty_label(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1584,18 +1585,18 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
         )
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
@@ -1603,17 +1604,18 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__update_file_info__ok_200__nominal_case(self) -> None:
+    def test_api__update_file_info__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1625,14 +1627,14 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
         )
         content = res.json_body
@@ -1664,7 +1666,7 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
 
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -1696,17 +1698,18 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
 
-    def test_api__update_file_info__err_400__content_status_closed(self) -> None:
+    def test_api__update_file_info__err_400__content_status_closed(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1718,35 +1721,34 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         test_file.status = "closed-validated"
         content_api.save(test_file)
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
-    def test_api__update_file_info__err_400__content_deleted(self) -> None:
+    def test_api__update_file_info__err_400__content_deleted(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get(show_deleted=True)
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1758,35 +1760,34 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             test_file.is_deleted = True
         content_api.save(test_file)
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
-    def test_api__update_file_info__err_400__content_archived(self) -> None:
+    def test_api__update_file_info__err_400__content_archived(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(
-            current_user=admin, session=dbsession, config=self.app_config, show_deleted=True
-        )
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get(show_deleted=True)
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
-        with dbsession.no_autoflush:
+        with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1798,30 +1799,31 @@ class TestFiles(FunctionalTest):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             test_file.is_archived = True
         content_api.save(test_file)
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
-    def test_api__update_file_info__err_400__not_modified(self) -> None:
+    def test_api__update_file_info__err_400__not_modified(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1832,18 +1834,18 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
         )
         content = res.json_body
@@ -1875,7 +1877,7 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
 
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -1907,21 +1909,22 @@ class TestFiles(FunctionalTest):
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
 
-    def test_api__update_file_info__err_400__label_already_used(self) -> None:
+    def test_api__update_file_info__err_400__label_already_used(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Update(put) one file, failed because label already used
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         content_api.create(
@@ -1932,7 +1935,7 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with dbsession.no_autoflush:
+        with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=business_workspace,
@@ -1953,32 +1956,33 @@ class TestFiles(FunctionalTest):
         )
         test_file2.file_extension = ".txt"
         test_file2.depot_file = FileIntent(b"Test file", "already_used.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "folder_used", "raw_content": "<p> Le nouveau contenu </p>"}
-        self.testapp.put_json(
+        web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
         )
         params = {"label": "already_used", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
-    def test_api__get_file_revisions__ok_200__nominal_case(self) -> None:
+    def test_api__get_file_revisions__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get file revisions
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -1989,17 +1993,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
             )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/revisions".format(test_file.content_id), status=200
         )
         revisions = res.json_body
@@ -2031,14 +2035,15 @@ class TestFiles(FunctionalTest):
         assert revision["page_nb"] == 1
         assert revision["has_pdf_preview"] is True
 
-    def test_api__set_file_status__ok_200__nominal_case(self) -> None:
+    def test_api__set_file_status__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         set file status
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2051,16 +2056,16 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "closed-deprecated"}
 
         # before
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -2069,14 +2074,14 @@ class TestFiles(FunctionalTest):
         assert content["status"] == "open"
 
         # set status
-        self.testapp.put_json(
+        web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}/status".format(test_file.content_id),
             params=params,
             status=204,
         )
 
         # after
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -2084,14 +2089,15 @@ class TestFiles(FunctionalTest):
         assert content["content_id"] == test_file.content_id
         assert content["status"] == "closed-deprecated"
 
-    def test_api__set_file_status__err_400__wrong_status(self) -> None:
+    def test_api__set_file_status__err_400__wrong_status(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         set file status
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2104,15 +2110,15 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "unexistant-status"}
 
         # before
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}".format(test_file.content_id), status=200
         )
         content = res.json_body
@@ -2121,7 +2127,7 @@ class TestFiles(FunctionalTest):
         assert content["status"] == "open"
 
         # set status
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}/status".format(test_file.content_id),
             params=params,
             status=400,
@@ -2130,14 +2136,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__get_file_raw__ok_200__nominal_case(self) -> None:
+    def test_api__get_file_raw__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2150,14 +2157,14 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-            dbsession.flush()
+            session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         filename = "Test_file.txt"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, filename), status=200
         )
         assert res.body == b"Test file"
@@ -2170,14 +2177,15 @@ class TestFiles(FunctionalTest):
         assert res.last_modified.month == test_file.updated.month
         assert res.last_modified.year == test_file.updated.year
 
-    def test_api__get_file_raw__ok_200__force_download_case(self) -> None:
+    def test_api__get_file_raw__ok_200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Get one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2188,7 +2196,7 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 new_content=b"Test file",
@@ -2196,13 +2204,13 @@ class TestFiles(FunctionalTest):
                 new_mimetype="text/plain",
             )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"force_download": 1}
         filename = "Test_file.txt"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, filename),
             status=200,
             params=params,
@@ -2220,19 +2228,19 @@ class TestFiles(FunctionalTest):
         assert res.last_modified.month == test_file.updated.month
         assert res.last_modified.year == test_file.updated.year
 
-    def test_api__create_file__ok__200__nominal_case(self) -> None:
+    def test_api__create_file__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+    ) -> None:
         """
         create one file of a content at workspace root
         """
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         image = create_1000px_png_test_image()
-        res = self.testapp.post(
+        res = web_testapp.post(
             "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             status=200,
@@ -2250,7 +2258,7 @@ class TestFiles(FunctionalTest):
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
 
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/files/{content_id}".format(
                 workspace_id=business_workspace.workspace_id, content_id=content_id
             ),
@@ -2268,24 +2276,24 @@ class TestFiles(FunctionalTest):
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
-        assert res["author"]["user_id"] == admin.user_id
+        assert res["author"]["user_id"] == admin_user.user_id
         assert res["page_nb"] == 1
         assert res["mimetype"] == "image/png"
 
-    def test_api__create_file__err_400__filename_already_used(self) -> None:
+    def test_api__create_file__err_400__filename_already_used(
+        self, workspace_api_factory, content_api_factory, session, web_testapp
+    ) -> None:
         """
         create one file of a content but filename is already used here
         """
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = workspace_api_factory.get()
 
         business_workspace = workspace_api.get_one(1)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         image = create_1000px_png_test_image()
-        res = self.testapp.post(
+        res = web_testapp.post(
             "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             status=200,
@@ -2302,7 +2310,7 @@ class TestFiles(FunctionalTest):
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
 
-        res = self.testapp.post(
+        res = web_testapp.post(
             "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             status=400,
@@ -2311,15 +2319,21 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
-    def test_api__create_file__ok__200__in_folder(self) -> None:
+    def test_api__create_file__ok__200__in_folder(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
+        content_type_list,
+    ) -> None:
         """
         create one file of a content in a folder
         """
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         folder = content_api.create(
             label="test-folder",
@@ -2329,10 +2343,10 @@ class TestFiles(FunctionalTest):
             do_notify=False,
         )
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"parent_id": folder.content_id}
         image = create_1000px_png_test_image()
-        res = self.testapp.post(
+        res = web_testapp.post(
             "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             params=params,
@@ -2351,7 +2365,7 @@ class TestFiles(FunctionalTest):
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
 
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/{workspace_id}/files/{content_id}".format(
                 workspace_id=business_workspace.workspace_id, content_id=content_id
             ),
@@ -2369,18 +2383,19 @@ class TestFiles(FunctionalTest):
         assert res["status"] == "open"
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
-        assert res["author"]["user_id"] == admin.user_id
+        assert res["author"]["user_id"] == admin_user.user_id
         assert res["page_nb"] == 1
         assert res["mimetype"] == "image/png"
 
-    def test_api__create_file__err__400__unallow_subcontent(self) -> None:
+    def test_api__create_file__err__400__unallow_subcontent(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         create one file of a content but subcontent of type file unallowed here
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         folder = content_api.create(
             label="test-folder",
@@ -2389,14 +2404,14 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=folder):
+        with new_revision(session=session, tm=transaction.manager, content=folder):
             content_api.set_allowed_content(folder, [])
         content_api.save(folder)
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"parent_id": folder.content_id}
         image = create_1000px_png_test_image()
-        res = self.testapp.post(
+        res = web_testapp.post(
             "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             params=params,
@@ -2406,20 +2421,21 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.UNALLOWED_SUBCONTENT
 
-    def test_api__create_file__err__400__parent_not_found(self) -> None:
+    def test_api__create_file__err__400__parent_not_found(
+        self, workspace_api_factory, content_api_factory, session, web_testapp
+    ) -> None:
         """
         create one file of a content but parent_id is not valid
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
 
         business_workspace = workspace_api.get_one(1)
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"parent_id": 3000}
         image = create_1000px_png_test_image()
-        res = self.testapp.post(
+        res = web_testapp.post(
             "/api/v2/workspaces/{}/files".format(business_workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
             params=params,
@@ -2429,14 +2445,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.PARENT_NOT_FOUND
 
-    def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
+    def test_api__set_file_raw__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2447,31 +2464,32 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
         assert res.content_length == len(image.getvalue())
 
-    def test_api__set_file_raw__ok_200__filename_already_used(self) -> None:
+    def test_api__set_file_raw__ok_200__filename_already_used(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2490,18 +2508,18 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         content2_id = int(test_file_2.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.put(
+        res = web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content2_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=400,
@@ -2510,14 +2528,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
-    def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
+    def test_api__set_file_raw__err_400__closed_status_file(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2530,12 +2549,12 @@ class TestFiles(FunctionalTest):
         )
         test_file.status = "closed-validated"
         content_api.save(test_file)
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=400,
@@ -2545,14 +2564,15 @@ class TestFiles(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     @pytest.mark.xfail(raises=AssertionError, reason="Broken feature dues to pyramid behaviour")
-    def test_api__set_file_raw__err_400_not_modified(self) -> None:
+    def test_api__set_file_raw__err_400_not_modified(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2563,24 +2583,24 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
         assert res.content_length == len(image.getvalue())
 
-        res = self.testapp.put(
+        res = web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status="*",
@@ -2590,11 +2610,12 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
-    def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+    def test_api__get_allowed_size_dim__ok__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2607,11 +2628,11 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         content_id = int(test_file.content_id)
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id), status=200
         )
         res = res.json_body
@@ -2621,14 +2642,15 @@ class TestFiles(FunctionalTest):
         assert dim["width"] == 256
         assert dim["height"] == 256
 
-    def test_api__get_jpeg_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_jpeg_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2641,30 +2663,31 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/".format(content_id), status=200
         )
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
 
-    def test_api__get_jpeg_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_jpeg_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2677,18 +2700,18 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         params = {"force_download": 1}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/raw".format(content_id),
             status=200,
             params=params,
@@ -2700,14 +2723,15 @@ class TestFiles(FunctionalTest):
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
 
-    def test_api__get_jpeg_preview__err_400__UnavailablePreview(self) -> None:
+    def test_api__get_jpeg_preview__err_400__UnavailablePreview(
+        self, workspace_api_factory, content_api_factory, web_testapp, session, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2718,19 +2742,19 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"force_download": 0}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/".format(content_id),
             status=400,
             params=params,
@@ -2739,14 +2763,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
 
-    def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_sized_jpeg_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2757,17 +2782,17 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, image.name),
             status=200,
         )
@@ -2776,14 +2801,15 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_preview__err_400__UnavailablePreview(self) -> None:
+    def test_api__get_sized_jpeg_preview__err_400__UnavailablePreview(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         Set one file of a content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2794,19 +2820,19 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"force_download": 0}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
                 content_id, "Test_file.bin"
             ),
@@ -2817,14 +2843,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
 
-    def test_api__get_sized_jpeg_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_sized_jpeg_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2835,19 +2862,19 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, dl_filename),
             status=200,
             params=params,
@@ -2860,14 +2887,15 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_preview__ok__200__force_download_case_no_filename(self) -> None:
+    def test_api__get_sized_jpeg_preview__ok__200__force_download_case_no_filename(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2878,19 +2906,19 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/".format(content_id),
             status=200,
             params=params,
@@ -2904,15 +2932,14 @@ class TestFiles(FunctionalTest):
         assert 256, 256 == new_image.size
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case_filename_is_raw(
-        self
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2923,19 +2950,19 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/256x256/raw".format(content_id),
             status=200,
             params=params,
@@ -2948,14 +2975,15 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(self) -> None:
+    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get 256x256 preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -2966,18 +2994,18 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         filename = "test_image_512x512.jpg"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/jpg/512x512/{}".format(content_id, filename),
             status=400,
         )
@@ -2985,14 +3013,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.PREVIEW_DIM_NOT_ALLOWED
 
-    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get 256x256 revision preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3005,19 +3034,19 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         filename = "test_file.txt"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
@@ -3025,7 +3054,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == "text/plain"
         filename = "test_image_256x256.jpg"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
@@ -3036,14 +3065,15 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get 256x256 revision preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3056,18 +3086,18 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=image.name
             ),
@@ -3075,7 +3105,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == "text/plain"
         params = {"force_download": 1}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256/".format(
                 content_id=content_id, revision_id=revision_id
             ),
@@ -3094,14 +3124,15 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_full_pdf_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_full_pdf_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3112,34 +3143,35 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, test_file.file_name),
             upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
             status=204,
         )
         filename = "test_image.pdf"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
             status=200,
         )
         assert res.content_type == "application/pdf"
 
-    def test_api__get_full_pdf_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_full_pdf_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3150,22 +3182,22 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         filename = "Test_file.txt"
-        self.testapp.put(
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, filename),
             upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
             status=204,
         )
         params = {"force_download": 1}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
             status=200,
             params=params,
@@ -3175,7 +3207,7 @@ class TestFiles(FunctionalTest):
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, "Test_file.pdf"),
             status=200,
             params=params,
@@ -3186,14 +3218,15 @@ class TestFiles(FunctionalTest):
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
-    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3204,17 +3237,17 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, image.name),
             status=400,
         )
@@ -3222,14 +3255,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
-    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3240,19 +3274,19 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        session.flush()
         content_id = test_file.content_id
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         filename = "Test_file.bin"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
             status=400,
         )
@@ -3260,14 +3294,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
 
-    def test_api__get_pdf_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_pdf_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3278,36 +3313,37 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, test_file.file_name),
             upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
             status=204,
         )
         params = {"page": 1}
         filename = "test_file.pdf"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/{}".format(content_id, filename),
             status=200,
             params=params,
         )
         assert res.content_type == "application/pdf"
 
-    def test_api__get_pdf_preview_err__400__UnavailablePreview(self) -> None:
+    def test_api__get_pdf_preview_err__400__UnavailablePreview(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3318,19 +3354,19 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
                 test_file,
                 "Test_file.bin",
                 new_mimetype="application/octet-stream",
                 new_content=bytes(100),
             )
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"page": 1}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/".format(content_id),
             status=400,
             params=params,
@@ -3339,14 +3375,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.UNAIVALABLE_PREVIEW
 
-    def test_api__get_pdf_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_pdf_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3357,23 +3394,23 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         filename = "test_file.txt"
-        self.testapp.put(
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, filename),
             upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
             status=204,
         )
         filename = "Test_file_page_1.pdf"
         params = {"page": 1, "force_download": 1}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/{}".format(content_id, filename),
             status=200,
             params=params,
@@ -3383,14 +3420,15 @@ class TestFiles(FunctionalTest):
             "Content-Disposition"
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
 
-    def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:
+    def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get full pdf preview of a txt file
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3401,21 +3439,21 @@ class TestFiles(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
             test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/".format(content_id),
             upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
             status=204,
         )
         params = {"page": 2}
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{}/preview/pdf/".format(content_id),
             status=400,
             params=params,
@@ -3424,14 +3462,15 @@ class TestFiles(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.PAGE_OF_PREVIEW_NOT_FOUND
 
-    def test_api__get_pdf_revision_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_pdf_revision_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3444,19 +3483,19 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         filename = image.name
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
@@ -3465,7 +3504,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == "text/plain"
         params = {"page": 1}
         filename = "test_image__page_1.pdf"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(
                 content_id=content_id, revision_id=revision_id, params=params, filename=filename
             ),
@@ -3473,14 +3512,15 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == "application/pdf"
 
-    def test_api__get_full_pdf_revision_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_full_pdf_revision_preview__ok__200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3493,25 +3533,25 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/".format(
                 content_id=content_id, revision_id=revision_id
             ),
             status=200,
         )
         assert res.content_type == "text/plain"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/".format(
                 content_id=content_id, revision_id=revision_id
             ),
@@ -3519,14 +3559,15 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == "application/pdf"
 
-    def test_api__get_full_pdf_revision_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_full_pdf_revision_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3539,18 +3580,18 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=image.name
             ),
@@ -3559,7 +3600,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == "text/plain"
         params = {"force_download": 1}
         filename = "Test_file.pdf"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename="Test_file.pdf"
             ),
@@ -3572,14 +3613,15 @@ class TestFiles(FunctionalTest):
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
-    def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
+    def test_api__get_pdf_revision_preview__ok__200__force_download_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get pdf revision preview of content
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3592,18 +3634,18 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        self.testapp.put(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.put(
             "/api/v2/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=image.name
             ),
@@ -3612,7 +3654,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == "text/plain"
         params = {"page": 1, "force_download": 1}
         filename = "test_image_page_1.pdf"
-        res = self.testapp.get(
+        res = web_testapp.get(
             "/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(
                 content_id=content_id, revision_id=revision_id, filename=filename
             ),
@@ -3624,12 +3666,12 @@ class TestFiles(FunctionalTest):
         ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
         assert res.content_type == "application/pdf"
 
-    def test_api__set_file_status__err_400__same_status(self) -> None:
+    def test_api__set_file_status__err_400__same_status(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
 
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_file = content_api.create(
@@ -3642,15 +3684,15 @@ class TestFiles(FunctionalTest):
         )
         test_file.file_extension = ".txt"
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_file):
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
-        dbsession.flush()
+        session.flush()
         transaction.commit()
 
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "open"}
         # set status
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/1/files/{}/status".format(test_file.content_id),
             params=params,
             status=400,
@@ -3661,30 +3703,31 @@ class TestFiles(FunctionalTest):
         assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE
 
 
-class TestThreads(FunctionalTest):
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestThreads(object):
     """
     Tests for /api/v2/workspaces/{workspace_id}/threads/{content_id}
     endpoint
     """
 
-    fixtures = [BaseFixture, ContentFixtures]
-
-    def test_api__get_thread__err_400__wrong_content_type(self) -> None:
+    def test_api__get_thread__err_400__wrong_content_type(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/threads/6", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/threads/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_thread__ok_200__nominal_case(self) -> None:
+    def test_api__get_thread__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Get one html document of a content
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3714,63 +3757,63 @@ class TestThreads(FunctionalTest):
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "Best Cakes?.thread.html"
 
-    def test_api__get_thread__err_400__content_does_not_exist(self) -> None:
+    def test_api__get_thread__err_400__content_does_not_exist(self, web_testapp) -> None:
         """
         Get one thread (content 170 does not exist)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/threads/170", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/threads/170", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_thread__err_400__content_not_in_workspace(self) -> None:
+    def test_api__get_thread__err_400__content_not_in_workspace(self, web_testapp) -> None:
         """
         Get one thread(content 7 is in workspace 2)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/1/threads/7", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/1/threads/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:
+    def test_api__get_thread__err_400__workspace_does_not_exist(self, web_testapp) -> None:
         """
         Get one thread (Workspace 40 does not exist)
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/40/threads/7", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/40/threads/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:
+    def test_api__get_thread__err_400__workspace_id_is_not_int(self, web_testapp) -> None:
         """
         Get one thread, workspace id is not int
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/coucou/threads/7", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/coucou/threads/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:
+    def test_api__get_thread__err_400_content_id_is_not_int(self, web_testapp) -> None:
         """
         Get one thread, content id is not int
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/threads/coucou", status=400)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/threads/coucou", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_thread__ok_200__nominal_case(self) -> None:
+    def test_api__update_thread__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Update(put) thread
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=200)
+        res = web_testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3797,7 +3840,7 @@ class TestThreads(FunctionalTest):
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
 
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3824,13 +3867,13 @@ class TestThreads(FunctionalTest):
         assert content["file_extension"] == ".thread.html"
         assert content["filename"] == "My New label.thread.html"
 
-    def test_api__update_thread__err_400__not_modified(self) -> None:
+    def test_api__update_thread__err_400__not_modified(self, web_testapp) -> None:
         """
         Update(put) thread
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=200)
+        res = web_testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3855,7 +3898,7 @@ class TestThreads(FunctionalTest):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -3880,29 +3923,29 @@ class TestThreads(FunctionalTest):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = self.testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=400)
+        res = web_testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
 
-    def test_api__update_thread__err_400__empty_label(self) -> None:
+    def test_api__update_thread__err_400__empty_label(self, web_testapp) -> None:
         """
         Update(put) thread
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = self.testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=400)
+        res = web_testapp.put_json("/api/v2/workspaces/2/threads/7", params=params, status=400)
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__get_thread_revisions__ok_200__nominal_case(self) -> None:
+    def test_api__get_thread_revisions__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Get threads revisions
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7/revisions", status=200)
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/v2/workspaces/2/threads/7/revisions", status=200)
         revisions = res.json_body
         assert len(revisions) == 2
         revision = revisions[0]
@@ -3954,15 +3997,16 @@ class TestThreads(FunctionalTest):
         assert revision["file_extension"] == ".thread.html"
         assert revision["filename"] == "Best Cakes?.thread.html"
 
-    def test_api__get_thread_revisions__ok_200__most_revision_type(self) -> None:
+    def test_api__get_thread_revisions__ok_200__most_revision_type(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
         """
         get threads revisions
         """
-        dbsession = get_tm_session(self.session_factory, transaction.manager)
-        admin = dbsession.query(User).filter(User.email == "admin@admin.admin").one()
-        workspace_api = WorkspaceApi(current_user=admin, session=dbsession, config=self.app_config)
+
+        workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        content_api = ContentApi(current_user=admin, session=dbsession, config=self.app_config)
+        content_api = content_api_factory.get()
         tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
@@ -3972,30 +4016,30 @@ class TestThreads(FunctionalTest):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
                 test_thread, new_label="test_thread_updated", new_content="Just a test"
             )
         content_api.save(test_thread)
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.archive(test_thread)
         content_api.save(test_thread)
 
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.unarchive(test_thread)
         content_api.save(test_thread)
 
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.delete(test_thread)
         content_api.save(test_thread)
 
-        with new_revision(session=dbsession, tm=transaction.manager, content=test_thread):
+        with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.undelete(test_thread)
         content_api.save(test_thread)
-        dbsession.flush()
+        session.flush()
         transaction.commit()
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = self.testapp.get(
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
             "/api/v2/workspaces/1/threads/{}/revisions".format(test_thread.content_id), status=200
         )
         revisions = res.json_body
@@ -4023,39 +4067,39 @@ class TestThreads(FunctionalTest):
         assert revision["revision_type"] == "undeletion"
         assert revision["is_editable"] is True
 
-    def test_api__set_thread_status__ok_200__nominal_case(self) -> None:
+    def test_api__set_thread_status__ok_200__nominal_case(self, web_testapp) -> None:
         """
         Set thread status
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "closed-deprecated"}
 
         # before
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
         assert content["status"] == "open"
         assert content["is_editable"] is True
         # set status
-        self.testapp.put_json("/api/v2/workspaces/2/threads/7/status", params=params, status=204)
+        web_testapp.put_json("/api/v2/workspaces/2/threads/7/status", params=params, status=204)
 
         # after
-        res = self.testapp.get("/api/v2/workspaces/2/threads/7", status=200)
+        res = web_testapp.get("/api/v2/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
         assert content["status"] == "closed-deprecated"
         assert content["is_editable"] is False
 
-    def test_api__set_thread_status__ok_400__wrong_status(self) -> None:
+    def test_api__set_thread_status__ok_400__wrong_status(self, web_testapp) -> None:
         """
         Set thread status
         """
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "unexistant-status"}
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/threads/7/status", params=params, status=400
         )
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
@@ -4063,11 +4107,11 @@ class TestThreads(FunctionalTest):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__set_thread_status__err_400__same_status(self) -> None:
-        self.testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+    def test_api__set_thread_status__err_400__same_status(self, web_testapp) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "open"}
 
-        res = self.testapp.put_json(
+        res = web_testapp.put_json(
             "/api/v2/workspaces/2/threads/7/status", params=params, status=400
         )
         assert res.json_body

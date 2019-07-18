@@ -22,6 +22,7 @@ import {
   setCurrentNumberPage,
   appendSearchResultsList,
   setSearchResultsList,
+  setNumberResultsByPage,
   setSearchedKeywords,
   setBreadcrumbs
 } from '../action-creator.sync.js'
@@ -102,6 +103,7 @@ class SearchResult extends React.Component {
         props.dispatch(setSearchedKeywords(searchObject.searchedKeywords))
         props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage))
+        props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         this.setState({totalHits: fetchGetSearchedKeywords.json.total_hits})
         break
       default:
