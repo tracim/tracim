@@ -436,8 +436,6 @@ search.engine = simple
 ####
 collaborative_document_edition.activated = False
 collaborative_document_edition.software = collabora
-# list of extensions of file to no process with collabora.
-collaborative_document_edition.collabora.extension_blacklist = png,jpeg,pdf,gif,bmp,tiff
 # base url where collabora server exist
 collaborative_document_edition.collabora.base_url = http://localhost:9980
 collaborafile_document_edition.file_template_dir =  %(basic_setup.file_template_dir)s

@@ -550,12 +550,6 @@ class CFG(object):
         self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
             "collaborative_document_edition.software"
         )
-        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__EXTENSION_BLACKLIST = string_to_list(
-            self.get_raw_config("collaborative_document_edition.collabora.extension_blacklist", ""),
-            separator=",",
-            cast_func=str,
-            do_strip=True,
-        )
         self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
             "collaborative_document_edition.collabora.base_url"
         )
