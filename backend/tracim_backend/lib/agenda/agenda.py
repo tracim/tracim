@@ -47,7 +47,7 @@ class CalendarDescription(ValuedBaseElement):
 
 
 class AgendaApi(object):
-    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG):
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         self._user = current_user
         self._session = session
         self._config = config
@@ -108,7 +108,7 @@ class AgendaApi(object):
         except Exception as exc:
             raise AgendaPropsUpdateFailed("Failed to update props of agenda") from exc
 
-    def _get_agenda_base_url(self, use_proxy: bool):
+    def _get_agenda_base_url(self, use_proxy: bool) -> str:
         if use_proxy:
             base_url = self._config.WEBSITE__BASE_URL
         else:
