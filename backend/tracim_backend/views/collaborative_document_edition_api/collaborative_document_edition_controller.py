@@ -28,9 +28,6 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
-    CollaboraDiscoverySchema,
-)
-from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
     CollaborativeDocumentEditionToken,
 )
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
@@ -41,6 +38,7 @@ from tracim_backend.views.collaborative_document_edition_api.collaborative_docum
 )
 from tracim_backend.views.contents_api.file_controller import can_create_file
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import CollaborativeFileTypeSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
@@ -67,7 +65,7 @@ class CollaborativeDocumentEditionController(Controller):
         return collabora_api.get_token(access_token=access_token)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
-    @hapic.output_body(CollaboraDiscoverySchema(many=True))
+    @hapic.output_body(CollaborativeFileTypeSchema(many=True))
     def discovery(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
         collabora_api = CollaborativeDocumentEditionApi(

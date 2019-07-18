@@ -1,7 +1,7 @@
 import typing
 
 
-class CollaboraFileType(object):
+class CollaborativeDocumentEditionFileType(object):
     def __init__(self, mimetype, extension, associated_action, url_source):
         self.mimetype = mimetype
         self.extension = extension
@@ -17,3 +17,11 @@ class CollaborativeDocumentEditionToken(object):
 class FileTemplateList(object):
     def __init__(self, file_templates: typing.List[str]):
         self.file_templates = file_templates
+
+
+class CollaborativeDocumentEditionConfig(object):
+    def __init__(
+        self, software: str, supported_file_types: typing.List[CollaborativeDocumentEditionFileType]
+    ):
+        self.software = software
+        self.supported_file_types = supported_file_types

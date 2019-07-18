@@ -15,6 +15,9 @@ from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
+from tracim_backend.lib.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionConfig,
+)
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
@@ -49,11 +52,13 @@ class ConfigModel(object):
         new_user_invitation_do_notify: bool,
         webdav_enabled: bool,
         webdav_url: str,
+        collaborative_document_edition: CollaborativeDocumentEditionConfig,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
         self.webdav_enabled = webdav_enabled
         self.webdav_url = webdav_url
+        self.collaborative_document_edition = collaborative_document_edition
 
 
 class ErrorCodeModel(object):

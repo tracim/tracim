@@ -12,7 +12,12 @@ from tracim_backend import CFG
 from tracim_backend.exceptions import FileTemplateNotAvailable
 from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableFile
-from tracim_backend.lib.collaborative_document_edition.models import CollaboraFileType
+from tracim_backend.lib.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionConfig,
+)
+from tracim_backend.lib.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionFileType,
+)
 from tracim_backend.lib.collaborative_document_edition.models import (
     CollaborativeDocumentEditionToken,
 )
@@ -32,12 +37,12 @@ class CollaborativeDocumentEditionApi(object):
         self._user = current_user
         self._config = config
 
-    def discover(self) -> typing.List[CollaboraFileType]:
+    def discover(self) -> typing.List[CollaborativeDocumentEditionFileType]:
         response = requests.get(
             self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery"
         )
         root = ElementTree.fromstring(response.text)
-        supported_collabora_file = []  # type: typing.List[CollaboraFileType]
+        supported_collabora_file = []  # type: typing.List[CollaborativeDocumentEditionFileType]
         for xml_app in root.findall("net-zone/app"):
             mimetype = xml_app.get("name")
             # INFO - G.M - 2019-07-17 - this list return also a non mimetype type,
@@ -49,7 +54,7 @@ class CollaborativeDocumentEditionApi(object):
                 url_source = xml_action.get("urlsrc")
                 associated_action = xml_action.get("name")
                 supported_collabora_file.append(
-                    CollaboraFileType(
+                    CollaborativeDocumentEditionFileType(
                         mimetype=mimetype,
                         extension=extension,
                         associated_action=associated_action,
@@ -57,6 +62,12 @@ class CollaborativeDocumentEditionApi(object):
                     )
                 )
         return supported_collabora_file
+
+    def get_collaboration_document_edition_config(self) -> CollaborativeDocumentEditionConfig:
+        return CollaborativeDocumentEditionConfig(
+            software=self._config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE,
+            supported_file_types=self.discover(),
+        )
 
     def get_file_template_list(self) -> FileTemplateList:
         return FileTemplateList(file_templates=self._get_template_list())
