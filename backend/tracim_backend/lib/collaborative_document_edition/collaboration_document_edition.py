@@ -5,14 +5,14 @@ import requests
 from sqlalchemy.orm import Session
 
 from tracim_backend import CFG
-from tracim_backend.lib.collabora.models import CollaboraFileType
-from tracim_backend.lib.collabora.models import CollaborativeDocumentEditionToken
+from tracim_backend.lib.collaborative_document_edition.models import CollaboraFileType
+from tracim_backend.lib.collaborative_document_edition.models import (
+    CollaborativeDocumentEditionToken,
+)
 from tracim_backend.models.auth import User
 
-COLLABORA_ACTION_EDIT = "edit"
 
-
-class CollaboraApi(object):
+class CollaborativeDocumentEditionApi(object):
     def __init__(self, current_user: typing.Optional[User], session: Session, config: CFG) -> None:
         self._session = session
         self._user = current_user

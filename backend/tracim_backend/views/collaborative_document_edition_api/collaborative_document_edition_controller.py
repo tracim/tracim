@@ -3,7 +3,9 @@ from pyramid.config import Configurator
 from tracim_backend import TracimRequest
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.collabora.collabora import CollaboraApi
+from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition import (
+    CollaborativeDocumentEditionApi,
+)
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.views.collaborative_document_edition_api.collaborative_document_edition_schema import (
@@ -30,7 +32,7 @@ class CollaborativeDocumentEditionController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        collabora_api = CollaboraApi(
+        collabora_api = CollaborativeDocumentEditionApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
@@ -40,7 +42,7 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.output_body(CollaboraDiscoverySchema(many=True))
     def discovery(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        collabora_api = CollaboraApi(
+        collabora_api = CollaborativeDocumentEditionApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         return collabora_api.discover()
