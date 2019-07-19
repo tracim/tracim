@@ -151,6 +151,18 @@ class TracimContext(object):
         )
         return wapi.get_one(workspace_id)
 
+    def _get_workspace_id_in_request(self) -> typing.Optional[int]:
+        """
+        Return workspace_id if exist, return None if workspace_id doesn't exist
+        This differ from _get_current_workspace_id as it does not raise exception
+        but None in case workspace_id doesn't exist
+        :return:
+        """
+        try:
+            return self._get_current_workspace_id()
+        except WorkspaceNotFoundInTracimRequest:
+            return None
+
     def _get_content(self, content_id_fetcher):
         content_id = content_id_fetcher()
         api = ContentApi(
@@ -161,13 +173,10 @@ class TracimContext(object):
             config=self.app_config,
         )
         # INFO - G.M - 2019-07-18 - code to allow get current_content according to current_workspace
-        # only if there is a current workspace
+        # only if there is a current workspace id.
         current_workspace = None
-        try:
-            self._get_current_workspace_id()
+        if self._get_workspace_id_in_request():
             current_workspace = self.current_workspace
-        except WorkspaceNotFoundInTracimRequest:
-            pass
 
         return api.get_one(
             content_id=content_id,

@@ -78,7 +78,7 @@ class TestCollaborativeDocumentEdition(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/collaborative-document-edition/workspaces/{}/create".format(
+        url = "/api/v2/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )
         template_filename = collaborative_document_edition_api.get_file_template_list().file_templates[
@@ -140,7 +140,7 @@ class TestCollaborativeDocumentEdition(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        url = "/api/v2/collaborative-document-edition/workspaces/{}/create".format(
+        url = "/api/v2/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )
         template_filename = "unexistent_template"
