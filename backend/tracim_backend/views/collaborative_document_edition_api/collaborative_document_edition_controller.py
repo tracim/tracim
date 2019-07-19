@@ -135,7 +135,7 @@ class CollaborativeDocumentEditionController(Controller):
 
         configurator.add_route(
             "create_file_from_template",
-            "/{}/".format(COLLABORATIVE_DOCUMENT_EDITION_BASE) + "workspaces/{workspace_id}/create",
+            "/{}/".format(COLLABORATIVE_DOCUMENT_EDITION_BASE) + "workspaces/{workspace_id}/files",
             request_method="POST",
         )
         configurator.add_view(
