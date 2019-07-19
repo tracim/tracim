@@ -26,16 +26,12 @@ class SystemApi(object):
     def get_config(self) -> ConfigModel:
         collaborative_document_edition_config = None
         if self._config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
-            try:
-                collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
-                    session=None, current_user=None, config=self._config
-                )
-                collaborative_document_edition_config = (
-                    collaborative_document_edition_api.get_collaboration_document_edition_config()
-                )
-            except Exception:
-                # TODO - G.M - 2019-07-18 - better handling exception here
-                pass
+            collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_lib(
+                session=None, current_user=None, config=self._config
+            )
+            collaborative_document_edition_config = (
+                collaborative_document_edition_api.get_collaboration_document_edition_config()
+            )
         return ConfigModel(
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,
