@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { FETCH_CONFIG, ROLE, PROFILE } from './helper.js'
+import { FETCH_CONFIG, ROLE, PROFILE, PAGE } from './helper.js'
 import i18n from './i18n.js'
 
 const mapStateToProps = ({ system }) => ({ system })
@@ -53,7 +53,8 @@ export function appFactory (WrappedComponent) {
         system: this.props.system,
         roleList: ROLE,
         profileObject: PROFILE,
-        history: this.props.history
+        history: this.props.history,
+        PAGE: PAGE
       },
       workspaceId,
       folderId: folderId === 'null' ? null : folderId

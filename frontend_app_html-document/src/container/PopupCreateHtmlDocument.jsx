@@ -6,7 +6,7 @@ import {
   addAllResourceI18n,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import { postODP } from '../action.async.js'
+import { postHtmlDocContent } from '../action.async.js'
 import i18n from '../i18n.js'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066

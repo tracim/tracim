@@ -694,7 +694,7 @@ class File extends React.Component {
                 />
               }
 
-              {state.loggedUser.idRoleUserWorkspace >= 2 && state.isEditable &&
+              {state.loggedUser.userRoleIdInWorkspace >= 2 && state.isEditable &&
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickEdit}
