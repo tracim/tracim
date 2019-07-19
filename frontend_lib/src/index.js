@@ -9,7 +9,8 @@ import {
   generateRandomPassword,
   appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
-  FETCH_CONFIG
+  FETCH_CONFIG,
+  displayFileSize
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -105,6 +106,7 @@ export {
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
   FETCH_CONFIG,
+  displayFileSize,
   defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,

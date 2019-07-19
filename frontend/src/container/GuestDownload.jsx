@@ -11,12 +11,12 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 class GuestDownload extends React.Component {
   constructor (props) {
     super(props)
-    this.popoverToggle = this.popoverToggle.bind(this)
+
     this.state = {
       popoverOpen: false,
-      userName: 'USER',
+      userName: '',
       file: {
-        fileName: 'FILE',
+        fileName: '',
         fileSize: 0
       },
       guestPassword: {
@@ -26,7 +26,7 @@ class GuestDownload extends React.Component {
     }
   }
 
-  popoverToggle () {
+  popoverToggle = () => {
     this.setState({
       popoverOpen: !this.state.popoverOpen
     })
@@ -67,12 +67,17 @@ class GuestDownload extends React.Component {
                 />
                 <button
                   type='button'
-                  className='guestupload__card__form__groupepw__question mb-3'
+                  className='guestupload__card__form__groupepw__question'
                   id='popoverQuestion'
                 >
                   <i className='fa fa-fw fa-question-circle' />
                 </button>
-                <Popover placement='bottom' isOpen={this.state.popoverOpen} target='popoverQuestion' toggle={this.popoverToggle}>
+                <Popover
+                  placement='bottom'
+                  isOpen={this.state.popoverOpen}
+                  target='popoverQuestion'
+                  toggle={this.popoverToggle}
+                >
                   <PopoverBody>{props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}</PopoverBody>
                 </Popover>
               </div>
@@ -80,7 +85,7 @@ class GuestDownload extends React.Component {
                 <Button
                   htmlType='button'
                   bootstrapType=''
-                  customClass='guestupload__card__form__btndownload btn highlightBtn primaryColorBg primaryColorBgDarkenHover ml-auto'
+                  customClass='guestupload__card__form__right__btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
                   label={props.t('Download')}
                   onClick={this.handleClickDownload}
                 />

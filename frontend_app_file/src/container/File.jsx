@@ -21,12 +21,12 @@ import {
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
   CUSTOM_EVENT,
-  ShareDownload
+  ShareDownload,
+  displayFileSize
 } from 'tracim_frontend_lib'
 import {
   MODE,
-  removeExtensionOfFilename,
-  displayFileSize
+  removeExtensionOfFilename
 } from '../helper.js'
 import { debug } from '../debug.js'
 import {

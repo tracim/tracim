@@ -51,7 +51,7 @@ class ShareLink extends React.Component {
         </button>
         <button
           className='iconBtn'
-          key='delete_share_link'
+          key='deleteShareLink'
           style={{
             ':hover': {
               color: props.hexcolor

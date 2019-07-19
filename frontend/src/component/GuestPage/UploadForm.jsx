@@ -3,18 +3,17 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
 import InputTextArea from '../common/Input/InputTextArea.jsx'
-import { FileDropzone } from 'tracim_frontend_lib'
+import { FileDropzone, displayFileSize } from 'tracim_frontend_lib'
 
 class UploadForm extends React.Component {
   constructor (props) {
     super(props)
-    this.popoverToggle = this.popoverToggle.bind(this)
     this.state = {
       popoverOpen: false
     }
   }
 
-  popoverToggle () {
+  popoverToggle = () => {
     this.setState({
       popoverOpen: !this.state.popoverOpen
     })
@@ -28,7 +27,7 @@ class UploadForm extends React.Component {
         <div className='guestupload__card__form__left'>
           <InputGroupText
             parentClassName='guestupload__card__form__fullname'
-            customClass='mb-3'
+            customClass=''
             type='text'
             placeHolder={props.t('Full name')}
             value={props.guestName}
@@ -50,7 +49,7 @@ class UploadForm extends React.Component {
 
             <button
               type='button'
-              className='guestupload__card__form__groupepw__question mb-3'
+              className='guestupload__card__form__groupepw__question'
               id='popoverQuestion'
             >
               <i className='fa fa-fw fa-question-circle' />
@@ -75,7 +74,7 @@ class UploadForm extends React.Component {
             multipleFiles
           />
 
-          <div className='font-weight-bold m-1'>
+          <div className='font-weight-bold'>
             {props.uploadFileList.length > 0
               ? props.t('Attached files')
               : props.t('You have not yet chosen any files to upload.')
@@ -85,7 +84,7 @@ class UploadForm extends React.Component {
             {(props.uploadFileList.map(file =>
               <div className='d-flex' key={file.name}>
                 <i className='fa fa-fw fa-file-o m-1' />
-                {file.name} ({file.size} bytes)
+                {file.name} ({displayFileSize(file.size)})
                 <button
                   className='iconBtn ml-auto primaryColorFontHover'
                   onClick={() => props.onDeleteFile(file)}
@@ -98,7 +97,7 @@ class UploadForm extends React.Component {
           </div>
 
           <button type='button'
-            className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover ml-auto'
+            className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
             onClick={props.onClickSend}
           >
             {props.t('Send')} <i className='fa fa-fw fa-paper-plane-o' />

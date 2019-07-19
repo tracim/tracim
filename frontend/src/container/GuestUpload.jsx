@@ -5,7 +5,6 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
-import ProgressBarMultipleFiles from '../component/GuestPage/ProgressBarMultipleFiles.jsx'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
 
@@ -132,11 +131,11 @@ class GuestUpload extends React.Component {
                 uploadFilePreview={state.uploadFilePreview}
               />
               : state.progressUpload.display === this.UPLOAD_STATUS.LOADING
-                ? state.uploadFileList.map(file =>
-                  <ProgressBarMultipleFiles
-                    fileName={file.name}
-                  />)
-                : <ImportConfirmation />
+              // ? state.uploadFileList.map(file =>
+              //   <ProgressBar
+              //     fileName={file.name}
+              //   />)
+              // : <ImportConfirmation />
             }
           </CardBody>
         </Card>

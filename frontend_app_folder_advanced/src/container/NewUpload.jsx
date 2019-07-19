@@ -8,7 +8,6 @@ import { generateRandomPassword } from 'tracim_frontend_lib'
 class NewUpload extends React.Component {
   constructor (props) {
     super(props)
-    this.popoverToggle = this.popoverToggle.bind(this)
     this.state = {
       popoverOpen: false,
       emails: '',
@@ -17,7 +16,7 @@ class NewUpload extends React.Component {
     }
   }
 
-  popoverToggle () {
+  popoverToggle = () => {
     this.setState({
       popoverOpen: !this.state.popoverOpen
     })
@@ -40,7 +39,7 @@ class NewUpload extends React.Component {
 
   render () {
     const { props, state } = this
-    const customColor = props.tracimContentTypeList[1] ? props.tracimContentTypeList[1].hexcolor : props.customColor
+    const customColor = (props.tracimContentTypeList.find(type => type.slug === 'file') || {hexcolor: props.customColor}).hexcolor
 
     return (
       <div className='newUpload'>

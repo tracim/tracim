@@ -23,7 +23,7 @@ class PopinFixedRightPart extends React.Component {
               className={classnames(`${props.customClass}__header`, 'wsContentGeneric__content__right__header nav')} >
               {props.menuItemList.map(menuItem =>
                 <button
-                  className={classnames('wsContentGeneric__content__right__header__icon nav-item iconBtn m-0', {'active': menuItem.id === this.state.currentChildren})}
+                  className={classnames('iconBtn wsContentGeneric__content__right__header__icon nav-item', {'active': menuItem.id === this.state.currentChildren})}
                   title={menuItem.label}
                   onClick={() => this.handleChangeRightChildren(menuItem.id)}
                 >
@@ -35,7 +35,7 @@ class PopinFixedRightPart extends React.Component {
                 <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
               </div>
             </div>
-            {props.menuItemList.find(menuItem => menuItem.id === this.state.currentChildren).children}
+            {(props.menuItemList.find(menuItem => menuItem.id === this.state.currentChildren) || {children: null}).children}
           </div>
       )
   }

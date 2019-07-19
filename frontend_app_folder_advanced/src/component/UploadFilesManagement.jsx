@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 // import { ShareLink } from 'tracim_frontend_lib'
 
 const UploadFilesManagement = props => {
-  const customColor = props.tracimContentTypeList[1] ? props.tracimContentTypeList[1].hexcolor : props.customColor
+  const customColor = (props.tracimContentTypeList.find(type => type.slug === 'file') || {hexcolor: props.customColor}).hexcolor
   return (
     <div className='folder_advanced-content'>
       <div className='d-flex justify-content-between'>
@@ -16,7 +16,7 @@ const UploadFilesManagement = props => {
 
         <button
           className='folder_advanced__content__btnupload btn highlightBtn'
-          key='new_upload'
+          key='newUpload'
           style={{
             backgroundColor: customColor,
             ':hover': {

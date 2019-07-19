@@ -1,15 +1,15 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../../i18n.js'
 import Radium from 'radium'
 import color from 'color'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from '../../helper.js'
 
+
 class NewShareDownload extends React.Component {
   constructor (props) {
     super(props)
-    this.popoverToggle = this.popoverToggle.bind(this)
+
     this.state = {
       passwordActive: false,
       popoverOpen: false,
@@ -17,20 +17,14 @@ class NewShareDownload extends React.Component {
     }
   }
 
-  popoverToggle () {
+  popoverToggle = () => {
     this.setState({
       popoverOpen: !this.state.popoverOpen
     })
   }
 
   handleSeePassword = () => {
-    const passwordInput = document.getElementsByClassName('shareDownload__password__input')[0]
     this.setState({hidePassword: !this.state.hidePassword})
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text'
-    } else {
-      passwordInput.type = 'password'
-    }
   }
 
   handleRandomPassword = () => {
@@ -85,7 +79,7 @@ class NewShareDownload extends React.Component {
             <button
               type='button'
               className='shareDownload__password__icon'
-              key='see_share_password'
+              key='seeSharePassword'
               title={props.t('Show password')}
               style={{':hover': {color: props.hexcolor}}}
               onClick={this.handleSeePassword}
@@ -104,7 +98,7 @@ class NewShareDownload extends React.Component {
           <button
             type='button'
             className='shareDownload__password__icon'
-            key='random_share_password'
+            key='randomSharePassword'
             title={props.t('Generate random password')}
             style={{':hover': {color: props.hexcolor}}}
             onClick={this.handleRandomPassword}
