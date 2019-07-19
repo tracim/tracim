@@ -166,7 +166,7 @@ class TracimContext(object):
         try:
             self._get_current_workspace_id()
             current_workspace = self.current_workspace
-        except InvalidWorkspaceId:
+        except WorkspaceNotFoundInTracimRequest:
             pass
 
         return api.get_one(
