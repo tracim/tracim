@@ -74,22 +74,7 @@ class File extends React.Component {
       },
       shareEmails: '',
       sharePassword: '',
-      shareLinkList: [
-        {
-          email: 'test0@test.test',
-          link: 'https://test.test.tst',
-          id: 0
-        },
-        {
-          email: 'test1@test.test',
-          link: 'https://test.test.tst',
-          id: 1
-        },
-        {
-          email: 'test2@test.test',
-          link: 'https://test.test.tst',
-          id: 2
-        }]
+      shareLinkList: []
     }
 
     // i18n has been init, add resources from frontend

@@ -35,7 +35,7 @@ class NewShareDownload extends React.Component {
     }
   }
 
-  handlehidePassword = () => {
+  handleSeePasswordInput = () => {
     this.setState({passwordActive: true})
   }
 
@@ -107,7 +107,7 @@ class NewShareDownload extends React.Component {
           </button>
         </div>
         : <div className='shareDownload__password'>
-          <span className='shareDownload__password__link' onClick={this.handlehidePassword}>
+          <span className='shareDownload__password__link' onClick={this.handleSeePasswordInput}>
             {props.t('Protect by password')}
           </span>
         </div>

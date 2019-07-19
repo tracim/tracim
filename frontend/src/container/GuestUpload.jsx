@@ -4,7 +4,7 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, ProgressBar } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
 
@@ -29,8 +29,8 @@ class GuestUpload extends React.Component {
       uploadFileList: [],
       uploadFilePreview: null,
       progressUpload: {
-        display: this.UPLOAD_STATUS.BEFORE_LOAD,
-        percentList: []
+        display: this.UPLOAD_STATUS.LOADING,
+        percent: 0
       }
     }
   }
@@ -66,43 +66,40 @@ class GuestUpload extends React.Component {
 
   handleClickSend = async () => {
     const { props, state } = this
+    const formData = new FormData()
 
     state.uploadFileList.forEach(uploadFile => {
-      const formData = new FormData()
       formData.append('files', uploadFile)
+    })
+    // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
+    const xhr = new XMLHttpRequest()
+    xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0}}), false)
+    const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: this.UPLOAD_STATUS.LOADING, percent: Math.round(e.loaded / e.total * 100)}})
+    xhr.upload.addEventListener('progress', uploadInProgress, false)
+    xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0}}), false)
 
-      // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
-      const xhr = new XMLHttpRequest()
-      xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.BEFORE_LOAD, percentList: []}}), false)
-      const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: this.UPLOAD_STATUS.LOADING, percentList: [...this.state.percentList, {id: uploadFile.name, percent: Math.round(e.loaded / e.total * 100)}]}})
-      xhr.upload.addEventListener('progress', uploadInProgress, false)
-      xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.AFTER_LOAD, percentList: []}}), false)
+    // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
+    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.withCredentials = true
 
-      // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
-      xhr.setRequestHeader('Accept', 'application/json')
-      xhr.withCredentials = true
-
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) {
-          switch (xhr.status) {
-            case 204:
-              this.setState(previousState => ({
-                uploadFileList: previousState.uploadFileList.filter(file => uploadFile.name !== file.name)
-              }))
-              break
-            case 400:
-              const jsonResult400 = JSON.parse(xhr.responseText)
-              switch (jsonResult400.code) {
-                case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
-                default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
-              }
-              break
-            default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
-          }
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        switch (xhr.status) {
+          case 204:
+            this.setState({uploadFileList: []})
+            break
+          case 400:
+            const jsonResult400 = JSON.parse(xhr.responseText)
+            switch (jsonResult400.code) {
+              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+            }
+            break
+          default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
       }
-      xhr.send(formData)
-    })
+    }
+    xhr.send(formData)
   }
 
   render () {
@@ -131,11 +128,10 @@ class GuestUpload extends React.Component {
                 uploadFilePreview={state.uploadFilePreview}
               />
               : state.progressUpload.display === this.UPLOAD_STATUS.LOADING
-              // ? state.uploadFileList.map(file =>
-              //   <ProgressBar
-              //     fileName={file.name}
-              //   />)
-              // : <ImportConfirmation />
+                ? <ProgressBar
+                  percent={state.progressUpload.percent}
+                />
+                : <ImportConfirmation />
             }
           </CardBody>
         </Card>

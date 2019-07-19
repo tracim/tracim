@@ -116,6 +116,7 @@
             outline 0
           &.active
             margin 0
+            padding 7px 5px
             background-color grey
           &__close
             text-align center
@@ -123,8 +124,12 @@
             margin auto 0 15px
 
 .rightPartClose
-  .wsContentGeneric__content__left
-    width calc(50% - 43px) // 43px is the width of the rightPart header without the right border
+  .wsContentGeneric__content
+    &__left
+      width calc(50% - 43px) // 43px is the width of the rightPart header without the right border
+    &__right__header__icon.active
+      background-color grey-hover
+
 
 @media (max-width: max-lg)
   .rightPartClose
@@ -167,6 +172,9 @@ responsiveColumnStyle()
             margin 10px
             &__close
               display none
+  .rightPartClose
+    .wsContentGeneric__content__right__header__icon.active
+        background-color grey
 
 @media (min-width: min-lg) and (max-width: max-lg)
   responsiveColumnStyle()

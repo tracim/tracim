@@ -60,6 +60,8 @@ import FileDropzone from './component/FileDropzone/FileDropzone.jsx'
 import ShareDownload from './component/ShareDownload/ShareDownload.jsx'
 import ShareLink from './component/ShareLink/ShareLink.jsx'
 
+import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
+
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
     case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: i18n.changeLanguage(data); break
@@ -115,5 +117,6 @@ export {
   DisplayState,
   FileDropzone,
   ShareLink,
-  ShareDownload
+  ShareDownload,
+  ProgressBar
 }

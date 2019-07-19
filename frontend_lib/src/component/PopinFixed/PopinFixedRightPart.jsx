@@ -11,6 +11,9 @@ class PopinFixedRightPart extends React.Component {
   }
 
   handleChangeRightChildren = (newCurrentChildren) => {
+    const { props } = this
+    if (!props.rightPartOpen) props.toggleRightPart()
+
     this.setState({currentChildren: newCurrentChildren})
   }
 
