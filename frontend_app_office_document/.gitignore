@@ -1,4 +1,4 @@
 .idea/
 .git/
 node_modules/
-dist/file.app.js
+dist/office_document.app.js

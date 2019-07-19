@@ -39,7 +39,7 @@ SWAGGER_TAG__CONTENT_WOPI_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_WOPI_SECTION
 )
 # FIXME - H.D. - 2019/07/03 - put in global tracim config
-COLLABORA_URL = "http://localhost:9980"
+COLLABORA_URL = "http://192.168.1.228:9980"
 WOPI_BASE = "workspaces/{workspace_id}/wopi"
 WOPI_FILES = WOPI_BASE + "/files/{content_id}"
 
@@ -92,6 +92,7 @@ class WOPIController(Controller):
     @hapic.input_body(WOPICreateFromTemplateSchema())
     @hapic.output_body(WOPIEditFileSchema())
     def create_from_template(self, context, request: TracimRequest, hapic_data=None):
+        import ipdb; ipdb.set_trace()
         template = hapic_data.body.get("template")
         file_name = "{}.{}".format(hapic_data.body.get("title"), template.split(".")[-1])
         parent_id = hapic_data.body.get("parent_id")

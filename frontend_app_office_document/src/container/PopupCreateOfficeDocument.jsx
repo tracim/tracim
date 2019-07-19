@@ -3,12 +3,19 @@ import { translate } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
-  addAllResourceI18n
+  addAllResourceI18n,
+  RadioBtnGroup
 } from 'tracim_frontend_lib'
 import { postODP } from '../action.async.js'
 import i18n from '../i18n.js'
+import {
+  getAvaibleTypes,
+  getTemplateFromFileType,
+  getIconUrlFromType
+} from '../helper.js'
 
 const CONTENT_TYPE_FILE = 'file'
+const EDITOR = 'collabora'
 
 class PopupCreateOfficeDocument extends React.Component {
   constructor (props) {
@@ -20,18 +27,22 @@ class PopupCreateOfficeDocument extends React.Component {
       workspaceId: props.data.workspaceId,
       idFolder: props.data.idFolder,
       newContentName: '',
-      options: []
+      availableTypes: [],
+      availableTemplates: [],
+      selectedType: ''
     }
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
-
-    document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
   componentWillUnmount () {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+  componentDidMount () {
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+    this.setDocumentOptions()
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -49,9 +60,7 @@ class PopupCreateOfficeDocument extends React.Component {
     }
   }
 
-  handleChangeNewContentName = (e) => {
-    this.setState({newContentName: e.target.value}
-  )}
+  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
@@ -61,12 +70,11 @@ class PopupCreateOfficeDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    console.log('TROLL')
-    console.log(this.state)
-    const { config, workspaceId, idFolder, newContentName } = this.state
+    const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedType } = this.state
     const { history, PAGE } = this.props.data.config
+    const templateName = getTemplateFromFileType(EDITOR, selectedType, availableTemplates)
 
-    const request = postODP(config.apiUrl, workspaceId, idFolder, config.slug, newContentName)
+    const request = postODP(config.apiUrl, workspaceId, idFolder, config.slug, newContentName, templateName)
 
     const response = await handleFetchResult(await request)
 
@@ -101,16 +109,35 @@ class PopupCreateOfficeDocument extends React.Component {
     }
   }
 
-  // const setTemplates = async () => ({
-  //   return {
-  //     available_types: ['spreadsheet', 'text', 'presentation'],
-  //     available_templates: {
-  //       spreadsheet: ['default.ods'],
-  //       text: ['default.odt'],
-  //       presentation: ['default.odp']
-  //     }
-  //   }
-  // })
+  getAvaibleTemplates = async () => {
+    return ['default.odt', 'default.odp', 'default.ods', 'default.odg']
+  }
+
+  setDocumentOptions = async () => {
+    const availableTemplates = await this.getAvaibleTemplates()
+    const availableTypes = getAvaibleTypes(EDITOR, availableTemplates)
+    this.setState({
+      availableTemplates: availableTemplates,
+      availableTypes: availableTypes
+    })
+  }
+
+  setSelectedType = type => this.setState({selectedType: type})
+
+  buildOptions () {
+    return this.state.availableTypes.map(
+      (type) => ({
+        text: type,
+        value: type,
+        img: {
+          alt: type,
+          src: getIconUrlFromType(EDITOR, type),
+          height: 42,
+          width: 42
+        }
+      })
+    )
+  }
 
   render () {
     return (
@@ -131,6 +158,11 @@ class PopupCreateOfficeDocument extends React.Component {
           value={this.state.newContentName}
           onChange={this.handleChangeNewContentName}
           autoFocus
+        />
+        <RadioBtnGroup
+          data-cy='popup__office__radiogrp'
+          options={this.buildOptions()}
+          handleNewSelectedValue={this.setSelectedType}
         />
       </CardPopupCreateContent>
     )
