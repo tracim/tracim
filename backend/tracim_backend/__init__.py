@@ -31,11 +31,15 @@ from tracim_backend.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.agenda import CaldavAppFactory
 from tracim_backend.lib.agenda.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.lib.collaborative_document_edition.collaboration_document_edition_factory import (
+    CollaborativeDocumentEditionFactory,
+)
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
@@ -53,7 +57,6 @@ from tracim_backend.views.contents_api.file_controller import FileController
 from tracim_backend.views.contents_api.folder_controller import FolderController
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController
 from tracim_backend.views.contents_api.threads_controller import ThreadController
-from tracim_backend.views.contents_api.wopi_controller import WOPIController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
@@ -98,6 +101,7 @@ def web(global_config, **local_settings):
     policies.append(
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION__REISSUE_TIME)
     )
+    policies.append(QueryTokenAuthentificationPolicy())
     if app_config.API__KEY:
         policies.append(
             ApiTokenAuthentificationPolicy(
@@ -187,7 +191,6 @@ def web(global_config, **local_settings):
     thread_controller = ThreadController()
     file_controller = FileController()
     folder_controller = FolderController()
-    wopi_controller = WOPIController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -199,7 +202,23 @@ def web(global_config, **local_settings):
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
-    configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+    if app_config.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+        # TODO - G.M - 2019-07-17 - check if possible to avoid this import here,
+        # import is here because import WOPI of Collabora controller without adding it to
+        # pyramid make trouble in hapic which try to get view related
+        # to controller but failed.
+        from tracim_backend.views.collaborative_document_edition_api.wopi_api.wopi_controller import (
+            WOPIController,
+        )
+
+        wopi_controller = WOPIController()
+        configurator.include(wopi_controller.bind, route_prefix=BASE_API_V2)
+        collaborative_document_edition_controller = CollaborativeDocumentEditionFactory().get_collaborative_document_edition_controller(
+            app_config
+        )
+        configurator.include(
+            collaborative_document_edition_controller.bind, route_prefix=BASE_API_V2
+        )
     configurator.scan("tracim_backend.lib.utils.authentification")
     if app_config.CALDAV__ENABLED:
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,

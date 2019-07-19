@@ -1,12 +1,4 @@
-import { timelineDebugData } from './timelineDebugData.js'
 import i18n from './i18n.js'
-
-export const FETCH_CONFIG = {
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
-}
 
 export const MODE = {
   VIEW: 'view',

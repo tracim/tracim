@@ -13,7 +13,9 @@ import pytz
 from redis import Redis
 from rq import Queue
 
+from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
+from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 
 if typing.TYPE_CHECKING:
@@ -345,5 +347,21 @@ def is_dir_readable(path: str) -> bool:
     if not os.access(
         path=path, mode=os.R_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
     ):
-        raise NotReadableDirectory("{} is not a writable directory".format(path))
+        raise NotReadableDirectory("{} is not a readable directory".format(path))
+    return True
+
+
+def is_file_exist(path: str) -> bool:
+    if not os.path.isfile(path):
+        raise NotAFileError("{} is not a file".format(path))
+    return True
+
+
+def is_file_readable(path: str) -> bool:
+    """
+    Check if path given is a writable dir for current user(the one which run
+    the process)
+    """
+    if not os.access(path=path, mode=os.R_OK, effective_ids=os.supports_effective_ids):
+        raise NotReadableFile("{} is not a readable file".format(path))
     return True

@@ -160,9 +160,18 @@ class TracimContext(object):
             session=self.dbsession,
             config=self.app_config,
         )
+        # INFO - G.M - 2019-07-18 - code to allow get current_content according to current_workspace
+        # only if there is a current workspace
+        current_workspace = None
+        try:
+            self._get_current_workspace_id()
+            current_workspace = self.current_workspace
+        except WorkspaceNotFoundInTracimRequest:
+            pass
+
         return api.get_one(
             content_id=content_id,
-            workspace=self.current_workspace,
+            workspace=current_workspace,
             content_type=content_type_list.Any_SLUG,
         )
 

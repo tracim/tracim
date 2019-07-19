@@ -82,6 +82,25 @@ class StrippedString(String):
         return value.strip()
 
 
+class CollaborativeFileTypeSchema(marshmallow.Schema):
+    mimetype = marshmallow.fields.String(
+        example="application/vnd.oasis.opendocument.text",
+        required=True,
+        description="Collabora Online file mimetype",
+    )
+    extension = marshmallow.fields.String(
+        example="odt", required=True, description="Collabora Online file extensions"
+    )
+    associated_action = marshmallow.fields.String(
+        example="edit", required=True, description="Collabora Online action allowed"
+    )
+    url_source = marshmallow.fields.URL(
+        required=True,
+        description="URL of the collabora online editor for this type of file",
+        example="http://localhost:9980/loleaflet/305832f/loleaflet.html",
+    )
+
+
 class SimpleFileSchema(marshmallow.Schema):
     """
     Just a simple schema for file
@@ -784,13 +803,6 @@ class AboutSchema(marshmallow.Schema):
     website = marshmallow.fields.URL(allow_none=True)
 
 
-class ConfigSchema(marshmallow.Schema):
-    email_notification_activated = marshmallow.fields.Bool()
-    new_user_invitation_do_notify = marshmallow.fields.Bool()
-    webdav_enabled = marshmallow.fields.Bool()
-    webdav_url = marshmallow.fields.String()
-
-
 class ErrorCodeSchema(marshmallow.Schema):
     name = marshmallow.fields.Str()
     code = marshmallow.fields.Int()
@@ -991,100 +1003,6 @@ class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
     pass
 
 
-TEMPLATES = {
-    "default.ods": "application/vnd.oasis.opendocument.spreadsheet",
-    "default.odt": "application/vnd.oasis.opendocument.text",
-    "default.odp": "application/vnd.oasis.opendocument.presentation",
-}
-
-
-class WOPICreateFromTemplateSchema(marshmallow.Schema):
-    template = StrippedString(
-        validate=OneOf(set(TEMPLATES.keys())),
-        example=list(TEMPLATES.keys())[0],
-        description="The template of the file you want to create",
-        required=True,
-    )
-    title = StrippedString(
-        required=True,
-        example=list(TEMPLATES.keys())[0],
-        description="The file name, as saved in the workspace",
-    )
-    parent_id = marshmallow.fields.Int(
-        example=42,
-        description="id of the new parent content id.",
-        default=None,
-        allow_none=True,
-        validate=positive_int_validator,
-    )
-
-
-class WOPIEditFileSchema(marshmallow.Schema):
-    # FIXME - H.D. - 2019/07/05 - extensions not useful for file edition, see with frontend
-    extensions = marshmallow.fields.List(
-        marshmallow.fields.String(example="odt"),
-        required=True,
-        description="Collabora Online supported file extensions",
-    )
-    urlsrc = marshmallow.fields.URL(
-        required=True,
-        description="URL of the collabora online editor",
-        example="http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc="
-        "http://172.16.20.7:6543/api/v2/workspaces/1/wopi/files/1",
-    )
-    access_token = marshmallow.fields.String(
-        required=True,
-        description="The access token which should be sent to collabora online and "
-        "which uniquely identifies the user",
-    )
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-
-
-class WOPIDiscoverySchema(marshmallow.Schema):
-    extensions = marshmallow.fields.List(
-        marshmallow.fields.String(example="odt"),
-        required=True,
-        description="Collabora Online supported file extensions",
-    )
-    urlsrc = marshmallow.fields.URL(
-        required=True,
-        description="URL of the collabora online editor",
-        example="http://localhost:9980/loleaflet/305832f/loleaflet.html?WOPISrc="
-        "http://172.16.20.7:6543/api/v2/workspaces/1/wopi/files/1",
-    )
-
-
-class WOPITokenQuerySchema(marshmallow.Schema):
-    access_token = marshmallow.fields.String(
-        required=True, description="Access token which uniquely identifies a user"
-    )
-
-
-class WOPICheckFileInfoSchema(marshmallow.Schema):
-    BaseFileName = marshmallow.fields.String(
-        required=True, description="Filename as shown in collabora Online"
-    )
-    Size = marshmallow.fields.Int(required=True, description="File length, in bytes")
-    OwnerId = marshmallow.fields.Int(description="Owner's database identifier")
-    UserId = marshmallow.fields.Int(description="User's database identifier")
-    UserFriendlyName = marshmallow.fields.String(description="User's display name")
-    Version = marshmallow.fields.String(description="Version of the file (the revision_id)")
-    UserCanWrite = marshmallow.fields.Boolean(
-        description="Whether the user can (or can't) edit the file in libreoffice online"
-    )
-    UserCanNotWriteRelative = marshmallow.fields.Boolean(
-        default=True,
-        description="Whether it's possible to save the document as a new name ("
-        "Save As functionality)",
-    )
-    LastModifiedTime = marshmallow.fields.DateTime(description="Last time the file was modified")
-
-
-class WOPILastModifiedTime(marshmallow.Schema):
-    LastModifiedTime = marshmallow.fields.DateTime(description="Last time the file was modified")
-
-
 #####
 # Revision
 #####
@@ -1110,6 +1028,13 @@ class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
 
 class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
+
+
+class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
+    software = marshmallow.fields.String()
+    supported_file_types = marshmallow.fields.List(
+        marshmallow.fields.Nested(CollaborativeFileTypeSchema())
+    )
 
 
 class CommentSchema(marshmallow.Schema):
@@ -1179,3 +1104,13 @@ class SetContentStatusSchema(marshmallow.Schema):
     @post_load
     def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
+
+
+class ConfigSchema(marshmallow.Schema):
+    email_notification_activated = marshmallow.fields.Bool()
+    new_user_invitation_do_notify = marshmallow.fields.Bool()
+    webdav_enabled = marshmallow.fields.Bool()
+    webdav_url = marshmallow.fields.String()
+    collaborative_document_edition = marshmallow.fields.Nested(
+        CollaborativeDocumentEditionConfigSchema(), allow_none=True
+    )

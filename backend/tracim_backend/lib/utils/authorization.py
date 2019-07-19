@@ -124,6 +124,23 @@ class RoleChecker(AuthorizationChecker):
         raise InsufficientUserRoleInWorkspace()
 
 
+class CurrentContentRoleChecker(AuthorizationChecker):
+    """
+    Check if current_user as correct role in workspace of current_content
+    """
+
+    def __init__(self, role_level: int):
+        self.role_level = role_level
+
+    def check(self, tracim_context: TracimContext) -> bool:
+        if (
+            tracim_context.current_content.workspace.get_user_role(tracim_context.current_user)
+            >= self.role_level
+        ):
+            return True
+        raise InsufficientUserRoleInWorkspace()
+
+
 class CandidateWorkspaceRoleChecker(AuthorizationChecker):
     """
     Check if current_user in candidate_workspace role
@@ -248,6 +265,8 @@ is_user = ProfileChecker(Group.TIM_USER)
 is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
 is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
 is_reader = RoleChecker(WorkspaceRoles.READER.level)
+is_current_content_reader = CurrentContentRoleChecker(WorkspaceRoles.READER.level)
+is_current_content_contributor = CurrentContentRoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
 has_personal_access = OrAuthorizationChecker(SameUserChecker(), is_administrator)

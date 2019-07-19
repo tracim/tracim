@@ -100,6 +100,13 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
+    def get_one_by_token(self, token: str) -> User:
+        try:
+            user = self._base_query().filter(User.auth_token == token).one()
+        except NoResultFound as exc:
+            raise UserDoesNotExist("User with given token not found in database") from exc
+        return user
+
     def get_one_by_email(self, email: typing.Optional[str]) -> User:
         """
         Get one user by email
@@ -197,7 +204,7 @@ class UserApi(object):
         return query.all()
 
     def find(
-        self, user_id: int = None, email: str = None, public_name: str = None
+        self, user_id: int = None, email: str = None, public_name: str = None, token: str = None
     ) -> typing.Tuple[TypeUser, User]:
         """
         Find existing user from all theses params.
@@ -210,6 +217,12 @@ class UserApi(object):
             try:
                 user = self.get_one(user_id)
                 return TypeUser.USER_ID, user
+            except UserDoesNotExist:
+                pass
+        if token:
+            try:
+                user = self.get_one_by_token(token)
+                return TypeUser.TOKEN, user
             except UserDoesNotExist:
                 pass
         if email:
@@ -844,6 +857,11 @@ class UserApi(object):
 
         This method do post-update user actions
         """
+
+        # TODO - G.M - 04-04-2018 - [auth]
+        # Check if this is already needed with
+        # new auth system
+        user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
 
         # FIXME - G.M - 2019-03-18 - move this code to another place when
         # event mecanism is ready, see https://github.com/tracim/tracim/issues/1487

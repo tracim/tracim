@@ -15,6 +15,7 @@ from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
+from tracim_backend.lib.collaborative_document_edition.data import COLLABORA_DOCUMENT_EDITION_SLUG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import translator_marker as _
@@ -145,6 +146,7 @@ class CFG(object):
         self._load_webdav_config()
         self._load_caldav_config()
         self._load_search_config()
+        self._load_collaborative_document_edition_config()
 
     def _load_global_config(self) -> None:
         """
@@ -180,7 +182,6 @@ class CFG(object):
         self.DEPOT_STORAGE_DIR = self.get_raw_config("depot_storage_dir")
         self.DEPOT_STORAGE_NAME = self.get_raw_config("depot_storage_name")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir")
-
         self.AUTH_TYPES = string_to_list(
             self.get_raw_config("auth_types", "internal"),
             separator=",",
@@ -542,6 +543,20 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
 
+    def _load_collaborative_document_edition_config(self):
+        self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED = asbool(
+            self.get_raw_config("collaborative_document_edition.activated", "false")
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE = self.get_raw_config(
+            "collaborative_document_edition.software"
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL = self.get_raw_config(
+            "collaborative_document_edition.collabora.base_url"
+        )
+        self.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = self.get_raw_config(
+            "collaborative_document_edition.file_template_dir"
+        )
+
     # INFO - G.M - 2019-04-05 - Config validation methods
 
     def check_config_validity(self) -> None:
@@ -552,6 +567,16 @@ class CFG(object):
         self._check_email_config_validity()
         self._check_caldav_config_validity()
         self._check_search_config_validity()
+        self._check_collaborative_document_edition_config_validity()
+
+    def _check_collaborative_document_edition_config_validity(self) -> None:
+        if self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED:
+            if self.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
+                self.check_mandatory_param(
+                    "COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL",
+                    self.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
+                    when_str="if collabora feature is activated",
+                )
 
     def _check_global_config_validity(self) -> None:
         """

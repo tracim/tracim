@@ -13,7 +13,7 @@ import {
   ArchiveDeleteContent,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
-import { debug } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   getFolder,
   getContentTypeList,

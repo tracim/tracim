@@ -1,13 +1,10 @@
 import datetime
 import typing
 
-import pyramid_beaker
-from pyramid import config
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
-from pyramid.events import subscriber, NewRequest
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
@@ -23,7 +20,7 @@ from tracim_backend.models.auth import User
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_EMAIL_LOGIN_HEADER = "Tracim-Api-Login"
-COLLABORA_TOKEN = "access_token"
+AUTH_TOKEN_QUERY_PARAMETER = "access_token"
 
 
 class TracimAuthenticationPolicy(object):
@@ -36,6 +33,7 @@ class TracimAuthenticationPolicy(object):
         request: Request,
         email: typing.Optional[str] = None,
         user_id: typing.Optional[int] = None,
+        token: typing.Optional[str] = None,
     ) -> typing.Optional[User]:
         """
         Helper to get user from email or user_id in pyramid request
@@ -48,7 +46,7 @@ class TracimAuthenticationPolicy(object):
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config)
         try:
-            _, user = uapi.find(user_id=user_id, email=email)
+            _, user = uapi.find(user_id=user_id, email=email, token=token)
             return user
         except UserDoesNotExist:
             return None
@@ -223,24 +221,35 @@ class ApiTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthent
 
 
 ###
-# Collabora access_token authentication
+# QueryTokenAuthPolicy
 ###
 
 
-@subscriber(NewRequest)
-def add_access_token_for_collabora(event):
-    access_token = event.request.GET.get(COLLABORA_TOKEN)
-    if not access_token:
-        return
+@implementer(IAuthenticationPolicy)
+class QueryTokenAuthentificationPolicy(CallbackAuthenticationPolicy, TracimAuthenticationPolicy):
+    def __init__(self):
+        self.callback = None
 
-    from tracim_backend import sliced_dict
+    def authenticated_userid(self, request):
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        # check if user is correct
+        token = self.unauthenticated_userid(request)
+        if not token:
+            return None
+        user = self._get_auth_unsafe_user(request=request, token=token)
+        if not user:
+            return None
+        if not user.validate_auth_token(token, app_config.USER__AUTH_TOKEN__VALIDITY):
+            return None
+        if not user.is_active or user.is_deleted:
+            return None
+        return user.user_id
 
-    # FIXME - H.D. - 2019/07/02 - quick fix to retrieve user from cookie, to clean
-    event.request.cookies["session_key"] = access_token
-    settings = config.global_registries.last.settings
-    app_config = CFG(settings)
-    tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
-    tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
-    tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
-    session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
-    event.request.session = session_factory(event.request)
+    def unauthenticated_userid(self, request) -> str:
+        return request.params.get(AUTH_TOKEN_QUERY_PARAMETER)
+
+    def remember(self, request, userid, **kw):
+        return []
+
+    def forget(self, request):
+        return []
