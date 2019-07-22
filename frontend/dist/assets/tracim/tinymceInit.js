@@ -73,6 +73,7 @@
             fileTag.id = 'hidden_tinymce_fileinput'
             fileTag.type = 'file'
             $('body').append(fileTag)
+            $(`#${fileTag.id}`).hide()
 
             $('#hidden_tinymce_fileinput').on('change', function () {
               base64EncodeAndTinyMceInsert($(this)[0].files)
