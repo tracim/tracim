@@ -110,7 +110,15 @@ class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = match.params.idws
 
-    this.loadContentList(wsToLoad)
+    this.loadContentList(wsToLoad).then(() => {
+      const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
+      if (folderIdToOpen.length > 0) {
+        const hash = folderIdToOpen[folderIdToOpen.length - 1]
+        if (document.getElementById(hash)) {
+          document.getElementById(hash).scrollIntoView()
+        }
+      }
+    })
     this.buildBreadcrumbs()
   }
 
@@ -444,6 +452,8 @@ class WorkspaceContent extends React.Component {
 
     const isWorkspaceEmpty = workspaceContentList.length === 0
     const isFilteredWorkspaceEmpty = rootContentList.length === 0
+
+    const folderIdOpen = this.getFolderIdToOpenInUrl(location.search)
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight'>
