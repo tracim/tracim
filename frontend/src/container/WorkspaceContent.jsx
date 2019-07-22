@@ -453,8 +453,6 @@ class WorkspaceContent extends React.Component {
     const isWorkspaceEmpty = workspaceContentList.length === 0
     const isFilteredWorkspaceEmpty = rootContentList.length === 0
 
-    const folderIdOpen = this.getFolderIdToOpenInUrl(location.search)
-
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight'>
         <div className='WorkspaceContent'>
