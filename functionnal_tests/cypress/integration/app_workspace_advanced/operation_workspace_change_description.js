@@ -1,11 +1,12 @@
-describe('content :: workspace > dashboard > workspace_advanced', function () {
-    beforeEach(function () {
+describe('content :: workspace > dashboard', function () {
+    before(() => {
         cy.resetDB()
         cy.setupBaseDB()
+    })
+
+    beforeEach(function () {
         cy.loginAs('administrators')
-        cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-            cy.visit(`/ui/workspaces/${workspace.workspace_id}/dashboard`)
-        })
+        cy.visit('/ui/workspaces/1/dashboard')
     })
 
     it('workspace_advanced > change description', function () {
