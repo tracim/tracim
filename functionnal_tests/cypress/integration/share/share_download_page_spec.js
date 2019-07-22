@@ -4,8 +4,6 @@ const fileTitle = 'FileForSearch'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
-
-
 let workspaceId
 
 describe('Open a file', () => {
@@ -32,10 +30,18 @@ describe('Open a file', () => {
       cy.get('.file__contentpage__content__right').contains('File share').should('be.visible')
     })
 
-    describe('and clicking on the New button',() =>{
+    describe('and clicking on the New button',() => {
       it('Should redirect to new share page at the right part',() => {
         cy.get('.shareDownload__btn').click()
         cy.get('.file__contentpage__content__right').contains('New share').should('be.visible')
+      })
+
+      describe('and clicking on the Cancel button',() => {
+        it('Should redirect to share page at the right part',() => {
+          cy.get('.shareDownload__btn').click()
+          cy.get('.shareDownload__cancel').click()
+          cy.get('.file__contentpage__content__right').contains('File share').should('be.visible')
+        })
       })
     })
   })

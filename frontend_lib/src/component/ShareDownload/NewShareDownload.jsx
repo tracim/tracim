@@ -83,6 +83,7 @@ class NewShareDownload extends React.Component {
               title={props.t('Show password')}
               style={{':hover': {color: props.hexcolor}}}
               onClick={this.handleSeePassword}
+              data-cy='seePassword'
             >
               <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
             </button>
