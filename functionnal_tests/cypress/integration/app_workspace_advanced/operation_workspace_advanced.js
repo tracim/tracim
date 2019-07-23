@@ -21,15 +21,15 @@ describe('App Workspace Advanced', function () {
                 .click()
 
             cy.wait(1000)
-            cy.getTag({selectorName: s.APP_FEATURE_CONTAINER})
+            cy.getTag({selectorName: s.CONTENT_FRAME})
                 .find('.workspace_advanced__description__text__textarea')
                 .clear()
 
-            cy.getTag({selectorName: s.APP_FEATURE_CONTAINER})
+            cy.getTag({selectorName: s.CONTENT_FRAME})
                 .find('.workspace_advanced__description__text__textarea')
                 .type(newDescription)
 
-            cy.getTag({selectorName: s.APP_FEATURE_CONTAINER})
+            cy.getTag({selectorName: s.CONTENT_FRAME})
                 .find('.workspace_advanced__description__bottom__btn')
                 .click()
 
