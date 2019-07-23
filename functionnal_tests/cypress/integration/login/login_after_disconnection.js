@@ -26,6 +26,7 @@ describe('Login after a disconnection ', function () {
     })
 
     it('should able to add user', function () {
+        cy.wait(2000)
         cy.getTag({selectorName: s.HEADER})
             .find('.adminlink__btn.btn')
             .click()
@@ -33,6 +34,7 @@ describe('Login after a disconnection ', function () {
         cy.getTag({selectorName: s.HEADER})
             .find('a[href="/ui/admin/user"]')
             .click()
+
 
         cy.getTag({selectorName: s.ADMIN_USER_PAGE})
             .find('.adminUser__adduser__button')
