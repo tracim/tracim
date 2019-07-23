@@ -49,7 +49,8 @@ export const PAGE = {
     USER: '/ui/admin/user',
     USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
   },
-  SEARCH_RESULT: '/ui/search-result'
+  SEARCH_RESULT: '/ui/search-result',
+  ONLINE_EDITION: (contentId) => `/api/v2/collaborative-document-edition/wopi/files/${contentId}/contents`
 }
 
 export const unLoggedAllowedPageList = [PAGE.LOGIN, PAGE.FORGOT_PASSWORD, PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF, PAGE.RESET_PASSWORD]

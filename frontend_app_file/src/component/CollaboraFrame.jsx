@@ -5,13 +5,15 @@ import {
   handleFetchResult
 } from 'tracim_frontend_lib'
 import {
-  getWOPIDiscovery,
+  getWOPIToken,
   getFileContent
 } from '../action.async.js'
 
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
 const CONTENT_TYPE_FILE = 'file'
+const ACTION_EDIT = 'edit'
+const HOST = 'http://192.168.1.228:6543'
 
 class CollaboraFrame extends React.Component {
   constructor (props) {
@@ -29,21 +31,18 @@ class CollaboraFrame extends React.Component {
         zIndex: 100,
         ...props.iframeStyle
       },
-      content: props.content
+      accessToken: '',
+      editorUrl: ''
     }
   }
 
-  buildCompleteIframeUrl = (iframeUrl) => {
-    return `${iframeUrl}&closebutton=1`
+  buildCompleteIframeUrl = (urlSource, accessToken) => {
+    const { state } = this
+    return `${urlSource}WOPISrc=${HOST}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
   }
 
   handleIframeIsClosing = (event) => {
     if (JSON.parse(event.data).MessageId === 'close') {
-      console.log('TEST')
-      console.log(this.state.content.workspace_id)
-      console.log(CONTENT_TYPE_FILE)
-      console.log(this.state.content.content_id)
-      console.log(PAGE.WORKSPACE.CONTENT(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id))
       this.props.history.push(
         PAGE.WORKSPACE.CONTENT(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id)
       )
@@ -63,13 +62,14 @@ class CollaboraFrame extends React.Component {
   }
 
   componentWillUnmount () {
-    console.log('%c<File> will Unmount', `color: ${this.props.config.hexcolor}`)
+    console.log('%c<CollaboraFrame> will Unmount', `color: ${this.props.config.hexcolor}`)
     document.removeEventListener('message', this.handleIframeIsClosing)
   }
 
   loadContent = async () => {
-    const { content } = this.state
-    const fetchResultFile = await handleFetchResult(await getFileContent(this.props.config.apiUrl, content.workspace_id, content.content_id))
+    const fetchResultFile = await handleFetchResult(
+      await getFileContent(this.props.config.apiUrl, this.props.content.workspace_id, this.props.content.content_id)
+    )
 
     switch (fetchResultFile.apiResponse.status) {
       case 200:
@@ -86,26 +86,33 @@ class CollaboraFrame extends React.Component {
 
   setIframeConf = async () => {
     const { state, props } = this
+
     if (!state.content.file_extension) {
       return
     }
+    const editorType = props.config.system.config.collaborative_document_edition.supported_file_types.filter(
+      (type) => type.extension === state.content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
+    )
+
+    if (editorType.length === 0) {
+      this.props.history.push(
+        PAGE.WORKSPACE.CONTENT(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id)
+      )
+    }
 
     const response = await handleFetchResult(
-      await getWOPIDiscovery(props.config.apiUrl, state.content.workspace_id, state.content.content_id)
+      await getWOPIToken(props.config.apiUrl)
     )
     switch (response.apiResponse.status) {
       case 200:
-        if (response.body.extensions.includes(state.content.file_extension.substr(1))) {
-          this.setState({
-            accessToken: response.body.access_token,
-            iframeUrl: this.buildCompleteIframeUrl(response.body.urlsrc)
-          })
-        } else {
-          console.log('lol')
-        }
+        this.setState({
+          accessToken: response.body.access_token,
+          editorUrl: editorType[0].url_source,
+          iframeUrl: this.buildCompleteIframeUrl(editorType[0].url_source, response.body.access_token)
+        })
         break
       default:
-        console.log('lol')
+        console.log('Error while loading token')
         break
     }
   }

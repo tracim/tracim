@@ -6,16 +6,16 @@ import {
   addAllResourceI18n,
   RadioBtnGroup
 } from 'tracim_frontend_lib'
-import { postODP } from '../action.async.js'
+import { postOfficeDocumentFromTemplate, getOfficeTemplates } from '../action.async.js'
 import i18n from '../i18n.js'
 import {
   getAvaibleTypes,
   getTemplateFromFileType,
-  getIconUrlFromType
+  getIconUrlFromType,
+  getExtensionFromFileType
 } from '../helper.js'
 
 const CONTENT_TYPE_FILE = 'file'
-const EDITOR = 'collabora'
 
 class PopupCreateOfficeDocument extends React.Component {
   constructor (props) {
@@ -29,7 +29,8 @@ class PopupCreateOfficeDocument extends React.Component {
       newContentName: '',
       availableTypes: [],
       availableTemplates: [],
-      selectedType: ''
+      selectedOption: '',
+      editor: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -70,11 +71,11 @@ class PopupCreateOfficeDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedType } = this.state
+    const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, editor } = this.state
     const { history, PAGE } = this.props.data.config
-    const templateName = getTemplateFromFileType(EDITOR, selectedType, availableTemplates)
-
-    const request = postODP(config.apiUrl, workspaceId, idFolder, config.slug, newContentName, templateName)
+    const templateName = getTemplateFromFileType(editor, selectedOption.value, availableTemplates)
+    const filename = newContentName + '.' + getExtensionFromFileType(editor, selectedOption.value)
+    const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, idFolder, config.slug, filename, templateName)
 
     const response = await handleFetchResult(await request)
 
@@ -110,19 +111,27 @@ class PopupCreateOfficeDocument extends React.Component {
   }
 
   getAvaibleTemplates = async () => {
-    return ['default.odt', 'default.odp', 'default.ods', 'default.odg']
+    const { state } = this
+    const request = getOfficeTemplates(state.config.apiUrl, state.workspaceId)
+    const response = await handleFetchResult(await request)
+    switch (response.apiResponse.status) {
+      case 200: return response.body.file_templates
+      default: return []
+    }
   }
 
   setDocumentOptions = async () => {
     const availableTemplates = await this.getAvaibleTemplates()
-    const availableTypes = getAvaibleTypes(EDITOR, availableTemplates)
+    const editor = this.state.config.system.config.collaborative_document_edition.software
+    const availableTypes = getAvaibleTypes(editor, availableTemplates)
     this.setState({
       availableTemplates: availableTemplates,
-      availableTypes: availableTypes
+      availableTypes: availableTypes,
+      editor: editor
     })
   }
 
-  setSelectedType = type => this.setState({selectedType: type})
+  setSelectedOption = type => this.setState({selectedOption: type})
 
   buildOptions () {
     return this.state.availableTypes.map(
@@ -131,7 +140,7 @@ class PopupCreateOfficeDocument extends React.Component {
         value: type,
         img: {
           alt: type,
-          src: getIconUrlFromType(EDITOR, type),
+          src: getIconUrlFromType(this.state.editor, type),
           height: 42,
           width: 42
         }
@@ -162,7 +171,7 @@ class PopupCreateOfficeDocument extends React.Component {
         <RadioBtnGroup
           data-cy='popup__office__radiogrp'
           options={this.buildOptions()}
-          handleNewSelectedValue={this.setSelectedType}
+          handleNewSelectedValue={this.setSelectedOption}
         />
       </CardPopupCreateContent>
     )

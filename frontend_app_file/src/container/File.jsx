@@ -25,10 +25,8 @@ import {
   MODE,
   removeExtensionOfFilename,
   displayFileSize,
-  debug,
   PAGE
 } from '../helper.js'
-import { debug } from '../debug.js'
 import {
   getFileContent,
   getFileComment,
@@ -40,11 +38,11 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putMyselfFileRead,
-  getWOPIDiscovery
+  putMyselfFileRead
 } from '../action.async.js'
 
 const CONTENT_TYPE_FILE = 'file'
+const ACTION_EDIT = 'edit'
 
 class File extends React.Component {
   constructor (props) {
@@ -52,9 +50,9 @@ class File extends React.Component {
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      content: props.data ? props.data.content : debug.content,
+      config: props.data ? props.data.config : null,
+      loggedUser: props.data ? props.data.loggedUser : null,
+      content: props.data ? props.data.content : null,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -75,9 +73,7 @@ class File extends React.Component {
         percent: 0
       },
       isEditable: false,
-      isCollaboraShown: false,
-      accessToken: '',
-      collaboraSrc: ''
+      editUrl: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -111,11 +107,11 @@ class File extends React.Component {
       case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
-
         const previouslyUnsavedComment = localStorage.getItem(
           generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
         )
-
+        console.log('RELOAD')
+        console.log(this)
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
@@ -163,6 +159,8 @@ class File extends React.Component {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('UPDATE')
+    console.log(this)
 
     if (!prevState.content || !state.content) return
 
@@ -265,6 +263,7 @@ class File extends React.Component {
         }))
       ], [])
 
+    
     this.setState({
       timeline: revisionWithComment
     })
@@ -326,8 +325,9 @@ class File extends React.Component {
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
 
   handleClickEdit = () => {
+    const { state } = this
     this.props.data.config.history.push(
-      PAGE.WORKSPACE.CONTENT_EDITION(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id)
+      PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, CONTENT_TYPE_FILE, state.content.content_id)
     )
   }
 
@@ -632,28 +632,15 @@ class File extends React.Component {
 
   setIsEditable = async () => {
     const { state } = this
-
-    const response = await handleFetchResult(
-      await getWOPIDiscovery(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    )
-    switch (response.apiResponse.status) {
-      case 200:
-        if (response.body.extensions.includes(state.content.file_extension.substr(1))) {
-          this.setState({
-            isEditable: true
-          })
-        } else {
-          this.setState({ isEditable: false })
-        }
-        break
-      default:
-        this.setState({ isEditable: false })
-        break
+    if (!state.content.file_extension) {
+      return
     }
-  }
-
-  showCollaboraFrame = (isCollaboraShown) => {
-    this.setState({isCollaboraShown: isCollaboraShown})
+    const editorType = state.config.system.config.collaborative_document_edition.supported_file_types.filter(
+      (type) => type.extension === state.content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
+    )
+    this.setState({
+      isEditable: editorType.length >= 1
+    })
   }
 
   render () {

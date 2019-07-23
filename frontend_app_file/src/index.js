@@ -16,18 +16,32 @@ const appInterface = {
   name: 'file',
   isRendered: false,
   renderAppFeature: data => {
+    console.log('INDEX')
+    console.log(data)
     return ReactDOM.render(
       <Router history={data.config.history}>
         <Switch>
-          <Route path='*/online_edition' render={() =>
-            <CollaboraFrame
-              content={data.content}
-              config={data.config}
-              history={data.config.history}
-            />
+          <Route path='/ui/workspaces/:workspaceId/contents/file/:contentId/online_edition' render={
+            ({ match }) => {
+              data.content.workspace_id = match.params.workspaceId
+              data.content.content_id = match.params.contentId
+              return (
+                <CollaboraFrame
+                  content={data.content}
+                  config={data.config}
+                  history={data.config.history}
+                />
+              )
+            }
           } />
-          <Route path='*' render={() =>
-            <File data={data} />
+          <Route path='/ui/workspaces/:workspaceId/contents/file/:contentId' render={
+            ({ match }) => {
+              data.content.workspace_id = match.params.workspaceId
+              data.content.content_id = match.params.contentId
+              return (
+                <File data={data} />
+              )
+            }
           } />
         </Switch>
       </Router>

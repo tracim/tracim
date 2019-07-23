@@ -95,11 +95,6 @@ class WOPIController(Controller):
     @hapic.output_body(WopiPutResponse())
     def put_content(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
-        if (
-            hapic_data.headers.wopi_lool_timestamp
-            and hapic_data.headers.wopi_lool_timestamp < request.current_content.updated
-        ):
-            return Response(status=HTTPStatus.CONFLICT, json_body={"LOOLStatusCode": 1010})
         api = ContentApi(
             show_archived=True,
             show_deleted=True,

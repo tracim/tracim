@@ -21,12 +21,6 @@ export const FILE_TYPES = {
       ext: 'odg',
       img: DRAW
     }
-  },
-  other: {
-    spreadsheet: 'ods',
-    text: 'odt',
-    presentation: 'odp',
-    draw: 'odg'
   }
 }
 
@@ -44,12 +38,19 @@ export const getTemplateFromFileType = (editor, type, availableTemplates) => {
   return template.length === 1 ? template[0] : null
 }
 
+export const getExtensionFromFileType = (editor, type) => {
+  const editorSupportedTypes = FILE_TYPES[editor] ? FILE_TYPES[editor] : {}
+  return editorSupportedTypes[type] ? editorSupportedTypes[type].ext : ''
+}
+
 export const getEditorTypesAsList = (editor) => {
   return FILE_TYPES[editor] ? Object.keys(FILE_TYPES[editor]) : []
 }
 
 export const getAvaibleTypes = (editor, availableTemplates) => {
-  return getEditorTypesAsList(editor).filter((type) => getTemplateFromFileType(editor, type, availableTemplates) !== null)
+  return getEditorTypesAsList(editor).filter(
+    (type) => getTemplateFromFileType(editor, type, availableTemplates) !== null
+  )
 }
 
 export const getIconUrlFromType = (editor, type) => {
