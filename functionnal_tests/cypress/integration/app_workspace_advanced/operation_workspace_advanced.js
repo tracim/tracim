@@ -33,7 +33,7 @@ describe('app workspace advanced', function () {
             .click()
 
         cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
-            .find('.dashboard__header__advancedmode__button.btn')
+            .find('.dashboard__workspace__detail__description')
             .contains(newDescription)
     })
 })
