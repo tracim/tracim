@@ -1,14 +1,17 @@
 import React from 'react'
-import color from 'color'
 import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
-import {DRAG_AND_DROP, ROLE_OBJECT} from '../../helper.js'
+import {
+  DRAG_AND_DROP,
+  ROLE_OBJECT
+} from '../../helper.js'
 
 const qs = require('query-string')
+const color = require('color')
 
 class WorkspaceListItem extends React.Component {
   shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {
@@ -30,7 +33,7 @@ class WorkspaceListItem extends React.Component {
     // But "type" already is in allowedAppList.route, so we need to remove it before passing props.location.search
     let urlSearch = qs.parse(search)
     delete urlSearch.type
-    urlSearch = qs.stringify(urlSearch, {encode: false})
+    urlSearch = qs.stringify(urlSearch, { encode: false })
 
     return `${route}${route.includes('?') ? '&' : '?'}${urlSearch}`
   }
@@ -67,7 +70,7 @@ class WorkspaceListItem extends React.Component {
             className='sidebar__content__navigation__workspace__item__number'
             style={{
               backgroundColor: GLOBAL_primaryColor,
-              color: color(GLOBAL_primaryColor).light() ? '#333333' : '#fdfdfd'
+              color: color(GLOBAL_primaryColor).isLight() ? '#333333' : '#fdfdfd'
             }}
           >
             {this.getIcon()}
@@ -95,9 +98,9 @@ class WorkspaceListItem extends React.Component {
                 <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}>
                   <div className={classnames(
                     'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                    {'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp)}
+                    { 'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) }
                   )}>
-                    <div className='dropdown__icon' style={{backgroundColor: allowedApp.hexcolor}}>
+                    <div className='dropdown__icon' style={{ backgroundColor: allowedApp.hexcolor }}>
                       <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
                     </div>
 
@@ -133,7 +136,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
   draggedItem: monitor.getItem()
 })
 
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(translate()(WorkspaceListItem)))
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(withTranslation()(WorkspaceListItem)))
 
 WorkspaceListItem.propTypes = {
   workspaceId: PropTypes.number.isRequired,

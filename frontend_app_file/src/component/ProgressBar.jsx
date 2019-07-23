@@ -9,14 +9,14 @@ export const ProgressBar = props => {
   return (
     <div className='progress blue'>
       <span className='progress-left'>
-        <span className='progress-bar' style={{transform: `rotate(${rotateLeft}deg)`}} />
+        <span className='progress-bar' style={{ transform: `rotate(${rotateLeft}deg)` }} />
       </span>
 
       <span className='progress-right'>
-        <span className='progress-bar' style={{transform: `rotate(${rotateRight}deg)`}} />
+        <span className='progress-bar' style={{ transform: `rotate(${rotateRight}deg)` }} />
       </span>
 
-      <div className='progress-value' style={{backgroundColor: props.color}}>
+      <div className='progress-value' style={{ backgroundColor: props.color }}>
         {props.percent}%
       </div>
     </div>

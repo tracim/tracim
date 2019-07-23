@@ -4,7 +4,7 @@ import {
   DisplayState
 } from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const HtmlDocument = props => {
   return (
@@ -51,7 +51,7 @@ const HtmlDocument = props => {
           <div>
             <div className='html-document__contentpage__textnote__version'>
               version n°
-              <div dangerouslySetInnerHTML={{__html: props.mode === MODE.VIEW ? props.lastVersion : props.version}} />
+              <div dangerouslySetInnerHTML={{ __html: props.mode === MODE.VIEW ? props.lastVersion : props.version }} />
               {props.mode === MODE.REVISION &&
                 <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
                   ({props.t('latest version :')} {props.lastVersion})
@@ -59,7 +59,7 @@ const HtmlDocument = props => {
               }
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
-            <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
+            <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{ __html: props.text }} />
           </div>
         )}
 
@@ -80,4 +80,4 @@ const HtmlDocument = props => {
   )
 }
 
-export default translate()(HtmlDocument)
+export default withTranslation()(HtmlDocument)

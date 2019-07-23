@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Badge, Avatar } from 'tracim_frontend_lib'
@@ -7,7 +7,7 @@ import { Badge, Avatar } from 'tracim_frontend_lib'
 require('./ContentItemSearch.styl')
 
 const ContentItemSearch = props => {
-  const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {hexcolor: '', label: '', faIcon: ''}
+  const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || { hexcolor: '', label: '', faIcon: '' }
 
   return (
     <Link
@@ -15,7 +15,7 @@ const ContentItemSearch = props => {
       className='content__item'
       data-cy={'content__item'}
     >
-      <div className='content__type' title={props.t(props.contentType.label)} style={{color: props.contentType.hexcolor}}>
+      <div className='content__type' title={props.t(props.contentType.label)} style={{ color: props.contentType.hexcolor }}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
 
@@ -47,7 +47,7 @@ const ContentItemSearch = props => {
 
       <div
         className='content__status d-sm-flex justify-content-between align-items-center'
-        style={{color: status.hexcolor}}
+        style={{ color: status.hexcolor }}
         title={props.t(status.label)}
       >
         <div className='content__status__text d-none d-sm-block'>
@@ -61,7 +61,7 @@ const ContentItemSearch = props => {
   )
 }
 
-export default translate()(ContentItemSearch)
+export default withTranslation()(ContentItemSearch)
 
 ContentItemSearch.propTypes = {
   statusSlug: PropTypes.string.isRequired,

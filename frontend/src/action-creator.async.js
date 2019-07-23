@@ -66,8 +66,8 @@ import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
  */
 // Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
 // 08/09/2018 - maybe not since this fetchWrapper also dispatch redux actions whether it succeed or failed
-const fetchWrapper = async ({url, param, actionName, dispatch}) => {
-  dispatch({type: `${param.method}/${actionName}/PENDING`})
+const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
+  dispatch({ type: `${param.method}/${actionName}/PENDING` })
 
   try {
     const fetchResult = await fetch(url, param)
@@ -98,9 +98,9 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
 
     const status = fetchResult.status
     if (status >= 200 && status <= 399) {
-      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+      dispatch({ type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json })
     } else {
-      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+      dispatch({ type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json })
     }
 
     return fetchResult
@@ -109,7 +109,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
       dispatch(newFlashMessage(i18n.t('Server unreachable'), 'danger'))
       console.error(e)
     }
-    return {status: 'failedToFetch'} // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
+    return { status: 'failedToFetch' } // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
   }
 }
 
@@ -118,7 +118,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
     url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: login,
@@ -136,7 +136,7 @@ export const postForgotPassword = email => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: email
@@ -152,7 +152,7 @@ export const postResetPassword = (newPassword, newPassword2, email, token) => as
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/modify`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: email,
@@ -171,7 +171,7 @@ export const postUserLogout = () => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/auth/logout`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST'
     },
     actionName: USER_LOGOUT,
@@ -569,7 +569,7 @@ export const deleteWorkspaceMember = (user, workspaceId, memberId) => dispatch =
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
     actionName: WORKSPACE_MEMBER_REMOVE,
@@ -582,7 +582,7 @@ export const getFolderContent = (workspaceId, folderId) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?parent_id=${folderId}`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'GET'
     },
     actionName: `${WORKSPACE}/${FOLDER}`,

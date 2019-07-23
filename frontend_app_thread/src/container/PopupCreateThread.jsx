@@ -1,5 +1,6 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
+import { withTranslation } from 'react-i18next'
 import {
   addAllResourceI18n,
   CardPopupCreateContent,
@@ -7,7 +8,6 @@ import {
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
-import i18n from '../i18n.js'
 // FIXME - GB - 2019-07-04 - The debug process for creation popups are outdated
 // https://github.com/tracim/tracim/issues/2066
 import { debug } from '../debug.js'
@@ -50,7 +50,7 @@ class PopupCreateThread extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
@@ -123,4 +123,4 @@ class PopupCreateThread extends React.Component {
   }
 }
 
-export default translate()(PopupCreateThread)
+export default withTranslation()(PopupCreateThread)
