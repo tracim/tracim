@@ -6,16 +6,14 @@ import PropTypes from 'prop-types'
 // import { ShareLink } from 'tracim_frontend_lib'
 
 const UploadFilesManagement = props => {
-  const customColor = (props.tracimContentTypeList.find(type => type.slug === 'file') || {hexcolor: props.customColor}).hexcolor
+  const customColor = props.customColor
   return (
-    <div className='folder_advanced-content'>
-      <div className='d-flex justify-content-between'>
-        <div className='formBlock__title folder_advanced__content__title'>
-          {props.t('Import authorizations')}
-        </div>
+    <div className='share_folder_advanced__content'>
+      <div className='share_folder_advanced__content__title'>
+        {props.t('Import authorizations')}
 
         <button
-          className='folder_advanced__content__btnupload btn highlightBtn'
+          className='share_folder_advanced__content__btnupload btn highlightBtn'
           key='newUpload'
           style={{
             backgroundColor: customColor,
@@ -23,6 +21,7 @@ const UploadFilesManagement = props => {
               backgroundColor: color(customColor).darken(0.15).hexString()
             }
           }}
+          onClick={props.onClickNewUploadComponent}
         >
           {props.t('New')}
           <i className='fa fa-fw fa-plus-circle' />
@@ -47,9 +46,11 @@ export default translate()(Radium(UploadFilesManagement))
 
 UploadFilesManagement.propTypes = {
   // shareLinkList: PropTypes.array.isRequired,
+  // onClickDeleteShareLink: PropTypes.func,
   customColor: PropTypes.string
 }
 
 UploadFilesManagement.defaultProps = {
+  // onClickDeleteShareLink: () => {},
   customColor: ''
 }

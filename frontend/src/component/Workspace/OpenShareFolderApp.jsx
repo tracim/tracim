@@ -31,8 +31,14 @@ export class OpenShareFolderApp extends React.Component {
       // if another app is already visible, hide it
       if (appOpenedType !== false) dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(appOpenedType), {})
       // open app
+      const shareConfig = {
+        slug: 'share_folder',
+        faIcon: 'share-alt',
+        hexcolor: '#414548',
+        label: 'Share folder'
+      }
       renderAppFeature(
-        {slug: 'share_folder'},
+        shareConfig,
         user,
         findUserRoleIdInWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
         contentToOpen

@@ -67,7 +67,7 @@ class GuestDownload extends React.Component {
                 />
                 <button
                   type='button'
-                  className='guestupload__card__form__groupepw__question'
+                  className='guestdownload__card__form__groupepw__question'
                   id='popoverQuestion'
                 >
                   <i className='fa fa-fw fa-question-circle' />
@@ -85,7 +85,7 @@ class GuestDownload extends React.Component {
                 <Button
                   htmlType='button'
                   bootstrapType=''
-                  customClass='guestupload__card__form__right__btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
+                  customClass='guestdownload__card__form__right__btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
                   label={props.t('Download')}
                   onClick={this.handleClickDownload}
                 />

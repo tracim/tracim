@@ -4,14 +4,13 @@ import Radium from 'radium'
 import color from 'color'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from 'tracim_frontend_lib'
+import PropTypes from 'prop-types'
 
 class NewUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       popoverOpen: false,
-      emails: '',
-      password: '',
       hidePassword: true
     }
   }
@@ -22,16 +21,14 @@ class NewUpload extends React.Component {
     })
   }
 
-  handleChangeEmails = e => this.setState({emails: e.target.value})
-  handleChangePassword = e => this.setState({password: e.target.value})
-
   handleSeePassword = () => {
     this.setState({hidePassword: !this.state.hidePassword})
   }
 
   handleRandomPassword = () => {
-    this.props.sharePassword = generateRandomPassword()
+    this.props.onChangeSharePassword = generateRandomPassword()
     const passwordInput = document.getElementsByClassName('newUpload__password__input')[0]
+
     if (passwordInput.type === 'password') {
       this.handleSeePassword()
     }
@@ -39,21 +36,23 @@ class NewUpload extends React.Component {
 
   render () {
     const { props, state } = this
-    const customColor = (props.tracimContentTypeList.find(type => type.slug === 'file') || {hexcolor: props.customColor}).hexcolor
+    const customColor = props.customColor
 
     return (
       <div className='newUpload'>
-        <div className='formBlock__title folder_advanced__content__title'>
+        <div className='newUpload__title share_folder_advanced__content__title'>
           {props.t('New authorization')}
         </div>
 
         <div className='newUpload__email'>
-          <input
+          <textarea
             type='text'
             className='newUpload__email__input form-control'
             placeholder={props.t('Enter the email address of the recipient(s)')}
-            value={state.emails}
-            onChange={this.handleChangeEmails}
+            rows='10'
+            value={props.shareEmails}
+            onChange={props.onChangeShareEmails}
+            onKeyDown={props.convertSpaceAndCommaToNewLines}
           />
           <button
             type='button'
@@ -85,8 +84,8 @@ class NewUpload extends React.Component {
               type={state.hidePassword ? 'password' : 'text'}
               className='newUpload__password__input form-control'
               placeholder={props.t('Password to share link (optional)')}
-              value={state.password}
-              onChange={this.handleChangePassword}
+              value={props.sharePassword}
+              onChange={props.onChangeSharePassword}
             />
           </div>
           <button
@@ -110,6 +109,7 @@ class NewUpload extends React.Component {
                 backgroundColor: customColor
               }
             }}
+            onClick={props.onClickReturnToManagement}
           >
             {props.t('Cancel')}
             <i className='fa fa-fw fa-times' />
@@ -123,6 +123,7 @@ class NewUpload extends React.Component {
                 backgroundColor: color(customColor).darken(0.15).hexString()
               }
             }}
+            onClick={props.onClickNewUpload}
           >
             {props.t('New')}
             <i className='fa fa-fw fa-plus-circle' />
@@ -134,3 +135,26 @@ class NewUpload extends React.Component {
 }
 
 export default translate()(Radium(NewUpload))
+
+NewUpload.propTypes = {
+  // shareLinkList: PropTypes.array.isRequired,
+  customColor: PropTypes.string,
+  shareEmails: PropTypes.string,
+  onChangeShareEmails: PropTypes.func,
+  convertSpaceAndCommaToNewLines: PropTypes.func,
+  sharePassword: PropTypes.string,
+  onChangeSharePassword: PropTypes.func,
+  onClickReturnToManagement: PropTypes.func,
+  onClickNewUpload: PropTypes.func
+}
+
+NewUpload.defaultProps = {
+  customColor: '',
+  shareEmails: '',
+  onChangeShareEmails: () => {},
+  convertSpaceAndCommaToNewLines: () => {},
+  sharePassword: '',
+  onChangeSharePassword: () => {},
+  onClickReturnToManagement: () => {},
+  onClickNewUpload: () => {}
+}

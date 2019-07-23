@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import FolderAdvanced from './container/FolderAdvanced.jsx'
+import ShareFolderAdvanced from './container/ShareFolderAdvanced.jsx'
 
 require('./css/index.styl')
 
@@ -8,10 +8,10 @@ const appInterface = {
   name: 'share_folder',
   isRendered: false,
   renderAppFeature: data => {
-    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < 4) return //TODO error
+    if (data && data.loggedUser && data.loggedUser.userRoleIdInWorkspace < 4) return // TODO error
 
     return ReactDOM.render(
-      <FolderAdvanced data={data} />
+      <ShareFolderAdvanced data={data} />
       , document.getElementById(data.config.domContainer)
     )
   },

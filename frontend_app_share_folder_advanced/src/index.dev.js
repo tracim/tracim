@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import FolderAdvanced from './container/FolderAdvanced.jsx'
+import ShareFolderAdvanced from './container/ShareFolderAdvanced.jsx'
 
 require('./css/index.styl')
 
 ReactDOM.render(
-  <FolderAdvanced data={undefined} />
+  <ShareFolderAdvanced data={undefined} />
   , document.getElementById('content')
 )
