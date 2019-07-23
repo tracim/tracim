@@ -50,7 +50,9 @@ export class MarkdownField extends React.Component {
           </p>
         )}
         {(p.disabled || this.state.tab === 'preview') && (
-          <article id='preview' />
+          <div style={{position: 'relative'}}>
+            <article id='preview' />
+          </div>
         )}
         {(!p.disabled && this.state.tab === 'write') && (
           <ReactMde
