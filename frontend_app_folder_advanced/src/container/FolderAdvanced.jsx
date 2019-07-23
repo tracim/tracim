@@ -1,5 +1,5 @@
 import React from 'react'
-import FolderAdvancedComponent from './NewUpload.jsx'
+import FolderAdvancedComponent from '../component/FolderAdvanced.jsx'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
@@ -230,20 +230,6 @@ class FolderAdvanced extends React.Component {
     }
   }
 
-  handleClickDeleteShareLink = () => { // = async shareLinkId => {
-    // const { config, content } = this.state
-
-    // const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    // switch (fetchResultArchive.status) {
-    //   case 204:
-    //     this.setState(previousState => ({
-    //       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
-    //     }))
-    //     break
-    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
-    // }
-  }
-
   render () {
     const { state } = this
 
@@ -295,8 +281,6 @@ class FolderAdvanced extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            customColor={state.config.hexcolor}
-            onClickDeleteShareLink={this.handleClickDeleteShareLink}
           />
         </PopinFixedContent>
       </PopinFixed>

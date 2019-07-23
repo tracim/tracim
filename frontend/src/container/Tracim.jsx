@@ -130,7 +130,20 @@ class Tracim extends React.Component {
     if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
 
     const fetchGetAppList = await props.dispatch(getAppList())
-    if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
+    // FIXME - GB - 2019-07-23 - Hack to add the share folder app at appList while he still doesn't exist in backend
+    if (fetchGetAppList.status === 200) {
+      fetchGetAppList.json.push(
+        {
+          hexcolor: '#414548',
+          slug: 'contents/share_folder',
+          config: {},
+          fa_icon: 'share-alt',
+          is_active: true,
+          label: 'Share Folder'
+        }
+      )
+      props.dispatch(setAppList(fetchGetAppList.json))
+    }
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
@@ -238,7 +251,8 @@ class Tracim extends React.Component {
             <Route
               path={[
                 PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
-                PAGE.WORKSPACE.CONTENT_LIST(':idws')
+                PAGE.WORKSPACE.CONTENT_LIST(':idws'),
+                PAGE.WORKSPACE.SHARE_FOLDER(':idws')
               ]}
               key='workspace_contentlist'
               render={() =>

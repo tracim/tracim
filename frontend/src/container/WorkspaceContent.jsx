@@ -15,6 +15,7 @@ import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
+import OpenShareFolderApp from '../component/Workspace/OpenShareFolderApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
 import {
   PageWrapper,
@@ -455,6 +456,17 @@ class WorkspaceContent extends React.Component {
               appOpenedType={state.appOpenedType}
               updateAppOpenedType={this.handleUpdateAppOpenedType}
             />
+          )}
+
+          {state.contentLoaded && (
+            <Route path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')} component={() =>
+              <OpenShareFolderApp
+                // automatically open the share folder advanced
+                workspaceId={state.workspaceIdInUrl}
+                appOpenedType={state.appOpenedType}
+                updateAppOpenedType={this.handleUpdateAppOpenedType}
+              />
+            } />
           )}
 
           {state.contentLoaded && (
