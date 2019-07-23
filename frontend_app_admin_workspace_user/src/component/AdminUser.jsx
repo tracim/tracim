@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   Delimiter,
@@ -8,7 +8,8 @@ import {
   PageTitle,
   PageContent,
   BtnSwitch,
-  IconWithWarning
+  IconWithWarning,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -26,15 +27,15 @@ export class AdminUser extends React.Component {
     displayAddUser: !prevState.displayAddUser
   }))
 
-  handleToggleUser = (e, idUser, toggle) => {
+  handleToggleUser = (e, userId, toggle) => {
     e.preventDefault()
     e.stopPropagation()
 
     const { props } = this
 
-    if (props.idLoggedUser === idUser) {
+    if (props.loggedUserId === userId) {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t("You can't deactivate your own account"),
           type: 'warning',
@@ -44,18 +45,18 @@ export class AdminUser extends React.Component {
       return
     }
 
-    this.props.onClickToggleUserBtn(idUser, toggle)
+    this.props.onClickToggleUserBtn(userId, toggle)
   }
 
-  handleToggleProfileManager = (e, idUser, toggle) => {
+  handleToggleProfileManager = (e, userId, toggle) => {
     e.preventDefault()
     e.stopPropagation()
 
     const { props } = this
 
-    if (props.userList.find(u => u.user_id === idUser).profile === 'administrators') {
+    if (props.userList.find(u => u.user_id === userId).profile === 'administrators') {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t('An administrator can always create shared spaces'),
           type: 'warning',
@@ -65,19 +66,19 @@ export class AdminUser extends React.Component {
       return
     }
 
-    if (toggle) props.onChangeProfile(idUser, 'trusted-users')
-    else props.onChangeProfile(idUser, 'users')
+    if (toggle) props.onChangeProfile(userId, 'trusted-users')
+    else props.onChangeProfile(userId, 'users')
   }
 
-  handleToggleProfileAdministrator = (e, idUser, toggle) => {
+  handleToggleProfileAdministrator = (e, userId, toggle) => {
     e.preventDefault()
     e.stopPropagation()
 
     const { props } = this
 
-    if (!toggle && props.idLoggedUser === idUser) {
+    if (!toggle && props.loggedUserId === userId) {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t("You can't remove yourself from Administrator"),
           type: 'warning',
@@ -87,8 +88,8 @@ export class AdminUser extends React.Component {
       return
     }
 
-    if (toggle) this.props.onChangeProfile(idUser, 'administrators')
-    else this.props.onChangeProfile(idUser, 'trusted-users')
+    if (toggle) this.props.onChangeProfile(userId, 'administrators')
+    else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
   handleClickAddUser = async (name, email, profile, password) => {
@@ -164,7 +165,7 @@ export class AdminUser extends React.Component {
                   const userProfile = getUserProfile(props.profile, u.profile)
                   return (
                     <tr
-                      className={classnames('adminUser__table__tr', {'user-deactivated': !u.is_active})}
+                      className={classnames('adminUser__table__tr', { 'user-deactivated': !u.is_active })}
                       key={u.user_id}
                       data-cy='adminUser__table__tr'
                     >
@@ -180,7 +181,7 @@ export class AdminUser extends React.Component {
                       <td>
                         <i
                           className={`fa fa-fw fa-2x fa-${userProfile.faIcon}`}
-                          style={{color: userProfile.hexcolor}}
+                          style={{ color: userProfile.hexcolor }}
                           title={props.t(userProfile.label)}
                         />
                       </td>
@@ -228,4 +229,4 @@ export class AdminUser extends React.Component {
   }
 }
 
-export default translate()(AdminUser)
+export default withTranslation()(AdminUser)

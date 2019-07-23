@@ -1,7 +1,7 @@
 import React from 'react'
 import Select from 'react-select'
 import 'react-select/dist/react-select.css'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 export const Timezone = props => {
   const handleChangeTimezone = selectedTimezone => props.onChangeTimezone(props.timezone.find(t => t.place === selectedTimezone.place))
@@ -33,4 +33,4 @@ export const Timezone = props => {
   )
 }
 
-export default translate()(Timezone)
+export default withTranslation()(Timezone)

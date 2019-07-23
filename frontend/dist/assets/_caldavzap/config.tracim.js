@@ -20,7 +20,7 @@ var globalAccountSettings = configObj.globalAccountSettings.agendaList.map(c => 
   ignoreAlarms: false,
   backgroundCalendars: [],
   basehref: c.href.split('/')[2], // const [protocol, empty, hostname, ...path] = c.href.split('/')
-  idWorkspace: c.idWorkspace,
+  workspaceId: c.workspaceId,
   loggedUserRole: c.loggedUserRole
 }))
 

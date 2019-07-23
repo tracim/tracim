@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import {
   Delimiter,
   PageWrapper,
@@ -40,7 +40,7 @@ const AdminWorkspace = props =>
               <th className='table__id' scope='col'>Id</th>
               <th className='table__sharedSpace' scope='col'>{props.t('Shared space')}</th>
               <th className='table__description' scope='col'>{props.t('Description')}</th>
-              <th className='table__memberCount' scope='col'>{props.t('Member count')}</th>
+              <th className='table__memberCount' scope='col'>{props.t('Members')}</th>
               {/* <th scope='col'>Calendar</th> */}
               <th className='table__delete' scope='col'>{props.t('Delete')}</th>
             </tr>
@@ -96,4 +96,4 @@ const AdminWorkspace = props =>
     </PageContent>
   </PageWrapper>
 
-export default translate()(AdminWorkspace)
+export default withTranslation()(AdminWorkspace)

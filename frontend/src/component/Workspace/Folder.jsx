@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
@@ -41,7 +41,7 @@ class Folder extends React.Component {
   render () {
     const { props } = this
 
-    const folderContentList = props.workspaceContentList.filter(c => c.idParent === props.folderData.id)
+    const folderContentList = props.workspaceContentList.filter(c => c.parentId === props.folderData.id)
 
     const folderAvailableApp = props.availableApp.filter(a => props.folderData.subContentTypeList.includes(a.slug))
 
@@ -70,7 +70,7 @@ class Folder extends React.Component {
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
-              style={{top: '18px', left: '-2px', padding: '0 7px'}}
+              style={{ top: '18px', left: '-2px', padding: '0 7px' }}
             />
           )}
 
@@ -80,7 +80,7 @@ class Folder extends React.Component {
           >
             <div className='folder__header__icon'
               title={props.t('Folder')}
-              style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}
+              style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
             >
               <i className={classnames('fa fa-fw', this.calculateIcon())} />
             </div>
@@ -124,9 +124,9 @@ class Folder extends React.Component {
 
                     <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                       <SubDropdownCreateButton
-                        idFolder={props.folderData.id}
+                        folderId={props.folderData.id}
                         availableApp={folderAvailableApp}
-                        onClickCreateContent={(e, idFolder, slug) => props.onClickCreateContent(e, idFolder, slug)}
+                        onClickCreateContent={(e, folderId, slug) => props.onClickCreateContent(e, folderId, slug)}
                       />
                     </div>
                   </div>
@@ -179,8 +179,8 @@ class Folder extends React.Component {
             : (
               <ContentItem
                 contentId={content.id}
-                workspaceId={content.idWorkspace}
-                parentId={content.idParent}
+                workspaceId={content.workspaceId}
+                parentId={content.parentId}
                 label={content.label}
                 type={content.type}
                 fileName={content.fileName}
@@ -189,7 +189,7 @@ class Folder extends React.Component {
                 statusSlug={content.statusSlug}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                urlContent={`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${props.location.search}`}
+                urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
                   edit: e => props.onClickExtendedAction.edit(e, content),
@@ -212,9 +212,9 @@ class Folder extends React.Component {
 const folderDragAndDropTarget = {
   drop: props => {
     return {
-      workspaceId: props.folderData.idWorkspace,
+      workspaceId: props.folderData.workspaceId,
       contentId: props.folderData.id,
-      parentId: props.folderData.idParent
+      parentId: props.folderData.parentId
     }
   }
 }
@@ -223,7 +223,7 @@ const folderDragAndDropTargetCollect = (connect, monitor) => {
   return {
     connectDropTarget: connect.dropTarget(),
     canDrop: monitor.canDrop(),
-    isOver: monitor.isOver({shallow: false}),
+    isOver: monitor.isOver({ shallow: false }),
     draggedItem: monitor.getItem()
   }
 }
@@ -231,9 +231,9 @@ const folderDragAndDropTargetCollect = (connect, monitor) => {
 const folderDragAndDropSource = {
   beginDrag: props => {
     return {
-      workspaceId: props.folderData.idWorkspace,
+      workspaceId: props.folderData.workspaceId,
       contentId: props.folderData.id,
-      parentId: props.folderData.idParent || 0
+      parentId: props.folderData.parentId || 0
     }
   },
   endDrag: (props, monitor) => {
@@ -261,7 +261,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
   )
 )
 
-export default translate()(FolderContainer)
+export default withTranslation()(FolderContainer)
 
 Folder.propTypes = {
   folderData: PropTypes.object,

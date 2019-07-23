@@ -46,7 +46,7 @@ export const PAGE = {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
-    USER_EDIT: (idUser = ':iduser') => `/ui/admin/user/${idUser}`
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
   },
   SEARCH_RESULT: '/ui/search-result'
 }
@@ -84,8 +84,8 @@ export const ROLE = [{
 }]
 
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
-  const user = memberList.find(u => u.id === userId) || {role: 'reader'}
-  return (roleList.find(r => user.role === r.slug) || {id: 1}).id
+  const user = memberList.find(u => u.id === userId) || { role: 'reader' }
+  return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }
 
 export const ROLE_OBJECT = {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
@@ -37,7 +37,7 @@ class ContentItem extends React.Component {
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
-            style={{top: '18px', left: '-2px', padding: '0 7px'}}
+            style={{ top: '18px', left: '-2px', padding: '0 7px' }}
           />
         )}
 
@@ -52,7 +52,7 @@ class ContentItem extends React.Component {
           >
             <div className='content__type'
               title={props.t(props.contentType.label)}
-              style={{color: props.contentType.hexcolor}}
+              style={{ color: props.contentType.hexcolor }}
             >
               <i className={`fa fa-fw fa-${props.faIcon}`} />
             </div>
@@ -76,7 +76,7 @@ class ContentItem extends React.Component {
 
           <div
             className='content__status d-sm-flex justify-content-between align-items-center'
-            style={{color: status.hexcolor}}
+            style={{ color: status.hexcolor }}
             title={props.t(status.label)}
           >
             <div className='content__status__text d-none d-sm-block'>
@@ -115,7 +115,7 @@ const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
   isDragging: monitor.isDragging()
 })
 
-export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(translate()(ContentItem))
+export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(withTranslation()(ContentItem))
 
 ContentItem.propTypes = {
   statusSlug: PropTypes.string.isRequired,

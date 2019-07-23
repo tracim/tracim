@@ -1,7 +1,7 @@
-import { FETCH_CONFIG } from './helper.js'
+import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
-export const getFolder = (apiUrl, idWorkspace, idFolder) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/folders/${idFolder}`, {
+export const getFolder = (apiUrl, workspaceId, folderId) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/folders/${folderId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -18,23 +18,23 @@ export const getContentTypeList = apiUrl =>
     method: 'GET'
   })
 
-export const postFolder = (apiUrl, idWorkspace, idFolder, contentType, newFolderName) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
+export const postFolder = (apiUrl, workspaceId, folderId, contentType, newFolderName) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/contents`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
     method: 'POST',
     body: JSON.stringify({
-      parent_id: idFolder,
+      parent_id: folderId,
       content_type: contentType,
       label: newFolderName
     })
   })
 
-export const putFolder = (apiUrl, idWorkspace, idFolder, newLabel, description, availableAppList) =>
+export const putFolder = (apiUrl, workspaceId, folderId, newLabel, description, availableAppList) =>
   // Côme - 2018/11/20 - description NYI
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/folders/${idFolder}`, {
+  fetch(`${apiUrl}/workspaces/${workspaceId}/folders/${folderId}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -47,8 +47,8 @@ export const putFolder = (apiUrl, idWorkspace, idFolder, newLabel, description, 
     })
   })
 
-export const putFolderStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/folders/${idContent}/status`, {
+export const putFolderStatus = (apiUrl, workspaceId, contentId, newStatus) =>
+  fetch(`${apiUrl}/workspaces/${workspaceId}/folders/${contentId}/status`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -59,8 +59,8 @@ export const putFolderStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
     })
   })
 
-export const putFolderIsArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`, {
+export const putFolderIsArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -69,8 +69,8 @@ export const putFolderIsArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFolderIsDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`, {
+export const putFolderIsDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -79,8 +79,8 @@ export const putFolderIsDeleted = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFolderRestoreArchived = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived/restore`, {
+export const putFolderRestoreArchived = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -89,8 +89,8 @@ export const putFolderRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   })
 }
 
-export const putFolderRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
-  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed/restore`, {
+export const putFolderRestoreDeleted = (apiUrl, workspaceId, contentId) => {
+  return fetch(`${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed/restore`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

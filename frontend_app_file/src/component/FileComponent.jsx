@@ -1,16 +1,17 @@
 import React from 'react'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
 import FileDropzone from './FileDropzone.jsx'
 import PopupProgressUpload from './PopupProgressUpload.jsx'
 import { DisplayState } from 'tracim_frontend_lib'
 
+const color = require('color')
+
 export const FileComponent = props =>
-  <div className={classnames('file__contentpage__statewrapper', {'displayState': props.isArchived || props.isDeleted})}>
+  <div className={classnames('file__contentpage__statewrapper', { 'displayState': props.isArchived || props.isDeleted })}>
     {props.isArchived && (
       <DisplayState
         msg={props.t('This content is archived')}
@@ -54,7 +55,7 @@ export const FileComponent = props =>
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
-        displayChangeDescriptionBtn={props.loggedUser.idRoleUserWorkspace >= 2}
+        displayChangeDescriptionBtn={props.loggedUser.userRoleIdInWorkspace >= 2}
         disableChangeDescription={!props.isEditable}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
@@ -84,7 +85,7 @@ export const FileComponent = props =>
           <button
             type='button'
             className='file__contentpage__dropzone__btn__cancel btn outlineTextBtn nohover'
-            style={{borderColor: props.customColor}}
+            style={{ borderColor: props.customColor }}
             onClick={props.onClickDropzoneCancel}
           >
             {props.t('Cancel')}
@@ -96,7 +97,7 @@ export const FileComponent = props =>
             style={{
               backgroundColor: props.customColor,
               ':hover': {
-                backgroundColor: color(props.customColor).darken(0.15).hexString()
+                backgroundColor: color(props.customColor).darken(0.15).hex()
               }
             }}
             onClick={props.onClickDropzoneValidate}
@@ -109,4 +110,4 @@ export const FileComponent = props =>
     }
   </div>
 
-export default translate()(Radium(FileComponent))
+export default withTranslation()(Radium(FileComponent))

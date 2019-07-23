@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 import typing
+from typing import List
 
 ####
 # Content Status
@@ -25,14 +26,16 @@ class ContentStatus(object):
     ContentStatus object class
     """
 
-    def __init__(self, slug: str, global_status: str, label: str, fa_icon: str, hexcolor: str):
+    def __init__(
+        self, slug: str, global_status: str, label: str, fa_icon: str, hexcolor: str
+    ) -> None:
         self.slug = slug
         self.global_status = global_status
         self.label = label
         self.fa_icon = fa_icon
         self.hexcolor = hexcolor
 
-    def is_editable(self):
+    def is_editable(self) -> bool:
         return self.global_status == GlobalStatus.OPEN.value
 
 
@@ -119,7 +122,7 @@ class ContentType(object):
         allow_sub_content: bool = False,
         file_extension: typing.Optional[str] = None,
         minimal_role_content_creation: WorkspaceRoles = WorkspaceRoles.CONTRIBUTOR,
-    ):
+    ) -> None:
         self.slug = slug
         self.fa_icon = fa_icon
         self.hexcolor = hexcolor
@@ -169,19 +172,19 @@ class ContentTypeList(object):
     Event = event_type
 
     @property
-    def Folder(self):
+    def Folder(self) -> ContentType:
         return self.get_one_by_slug(FOLDER_TYPE)
 
     @property
-    def File(self):
+    def File(self) -> ContentType:
         return self.get_one_by_slug(FILE_TYPE)
 
     @property
-    def Page(self):
+    def Page(self) -> ContentType:
         return self.get_one_by_slug(HTML_DOCUMENTS_TYPE)
 
     @property
-    def Thread(self):
+    def Thread(self) -> ContentType:
         return self.get_one_by_slug(THREAD_TYPE)
 
     def __init__(self, app_list: typing.List["Application"]):
@@ -190,7 +193,7 @@ class ContentTypeList(object):
         self._extra_slugs = [self.Any_SLUG]
 
     @property
-    def _content_types(self):
+    def _content_types(self) -> List[ContentType]:
         app_api = ApplicationApi(self.app_list)
         content_types = app_api.get_content_types()
         return content_types
@@ -252,7 +255,7 @@ class ContentTypeList(object):
         allowed_types_slug.extend(self._extra_slugs)
         return allowed_types_slug
 
-    def default_allowed_content_properties(self, slug) -> dict:
+    def default_allowed_content_properties(self, slug: str) -> dict:
         content_type = self.get_one_by_slug(slug)
         if content_type.allow_sub_content:
             sub_content_allowed = self.endpoint_allowed_types_slug()

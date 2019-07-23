@@ -4,35 +4,26 @@ import typing
 import pytest
 import transaction
 
-# TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
-# TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
-# TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.workspace import RoleApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.tests import DefaultTest
-from tracim_backend.tests import eq_
+from tracim_backend.tests.fixtures import *  # noqa F403,F401
+from tracim_backend.tests.utils import eq_
 
 
-class TestContentApi(DefaultTest):
-    def test_compare_content_for_sorting_by_type(self):
+class TestSortContentApi(object):
+    def test_compare_content_for_sorting_by_type(self, content_type_list, app_config):
         c1 = Content()
         c1.label = ""
         c1.type = "file"
@@ -43,9 +34,9 @@ class TestContentApi(DefaultTest):
 
         c11 = c1
 
-        eq_(1, compare_content_for_sorting_by_type_and_name(c1, c2))
-        eq_(-1, compare_content_for_sorting_by_type_and_name(c2, c1))
-        eq_(0, compare_content_for_sorting_by_type_and_name(c1, c11))
+        assert 1 == compare_content_for_sorting_by_type_and_name(c1, c2)
+        assert -1 == compare_content_for_sorting_by_type_and_name(c2, c1)
+        assert 0 == compare_content_for_sorting_by_type_and_name(c1, c11)
 
     def test_compare_content_for_sorting_by_label(self):
         c1 = Content()
@@ -58,9 +49,9 @@ class TestContentApi(DefaultTest):
 
         c11 = c1
 
-        eq_(1, compare_content_for_sorting_by_type_and_name(c1, c2))
-        eq_(-1, compare_content_for_sorting_by_type_and_name(c2, c1))
-        eq_(0, compare_content_for_sorting_by_type_and_name(c1, c11))
+        assert 1 == compare_content_for_sorting_by_type_and_name(c1, c2)
+        assert -1 == compare_content_for_sorting_by_type_and_name(c2, c1)
+        assert 0 == compare_content_for_sorting_by_type_and_name(c1, c11)
 
     def test_sort_by_label_or_filename(self):
         c1 = Content()
@@ -79,9 +70,9 @@ class TestContentApi(DefaultTest):
         items = [c1, c2, c3]
         sorteds = ContentApi.sort_content(items)
 
-        eq_(sorteds[0], c2)
-        eq_(sorteds[1], c1)
-        eq_(sorteds[2], c3)
+        assert sorteds[0] == c2
+        assert sorteds[1] == c1
+        assert sorteds[2] == c3
 
     def test_sort_by_content_type(self):
         c1 = Content()
@@ -95,16 +86,24 @@ class TestContentApi(DefaultTest):
         items = [c1, c2]
         sorteds = ContentApi.sort_content(items)
 
-        eq_(
-            sorteds[0], c2, "value is {} instead of {}".format(sorteds[0].content_id, c2.content_id)
-        )
-        eq_(
-            sorteds[1], c1, "value is {} instead of {}".format(sorteds[1].content_id, c1.content_id)
-        )
+        assert sorteds[0] == c2
+        assert sorteds[1] == c1
 
-    def test_unit__create_content__OK_nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+
+@pytest.mark.usefixtures("base_fixture")
+class TestContentApi(object):
+    def test_unit__create_content__OK_nominal_case(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        group_api_factory,
+        admin_user,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -112,10 +111,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         item = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -125,9 +124,17 @@ class TestContentApi(DefaultTest):
         )
         assert isinstance(item, Content)
 
-    def test_unit__create_content__err_empty_label(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__create_content__err_empty_label(
+        self,
+        user_api_factory,
+        group_api_factory,
+        session,
+        app_config,
+        workspace_api_factory,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -135,10 +142,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         with pytest.raises(EmptyLabelNotAllowed):
             api.create(
                 content_type_slug=content_type_list.Thread.slug,
@@ -148,9 +155,17 @@ class TestContentApi(DefaultTest):
                 do_save=True,
             )
 
-    def test_unit__create_content__err_content_type_not_allowed_in_this_folder(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__create_content__err_content_type_not_allowed_in_this_folder(
+        self,
+        user_api_factory,
+        group_api_factory,
+        session,
+        app_config,
+        workspace_api_factory,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -158,10 +173,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -202,9 +217,17 @@ class TestContentApi(DefaultTest):
             do_save=True,
         )
 
-    def test_unit__create_content__err_content_type_not_allowed_in_this_workspace(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__create_content__err_content_type_not_allowed_in_this_workspace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        session,
+        app_config,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -212,10 +235,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         with pytest.raises(UnallowedSubContent):
             api.create(
                 content_type_slug=content_type_list.Event.slug,
@@ -225,9 +248,17 @@ class TestContentApi(DefaultTest):
                 do_save=True,
             )
 
-    def test_unit__create_content__err_same_label_as_another_content(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__create_content__err_same_label_as_another_content(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -235,10 +266,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
@@ -255,9 +286,17 @@ class TestContentApi(DefaultTest):
                 do_save=True,
             )
 
-    def test_unit__is_filename_available__ok__nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__is_filename_available__ok__nominal_case(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -265,10 +304,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
@@ -277,7 +316,7 @@ class TestContentApi(DefaultTest):
         content.workspace = workspace
         content.type = content_type_list.Page.slug
         content.revision_type = ActionDescription.CREATION
-        self.session.add(content)
+        session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert api._is_filename_available("test", workspace, parent=None) is False
         content = Content()
@@ -287,13 +326,21 @@ class TestContentApi(DefaultTest):
         content.workspace = workspace
         content.type = content_type_list.Page.slug
         content.revision_type = ActionDescription.CREATION
-        self.session.add(content)
+        session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert api._is_filename_available("test", workspace, parent=None) is False
 
-    def test_unit__is_filename_available__ok__different_workspace(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__is_filename_available__ok__different_workspace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -301,13 +348,13 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(user).create_workspace(
+            "test workspace", save_now=True
+        )
+        workspace2 = workspace_api_factory.get(user).create_workspace(
+            "test workspace2", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
@@ -316,13 +363,21 @@ class TestContentApi(DefaultTest):
         content.workspace = workspace2
         content.type = content_type_list.Page.slug
         content.revision_type = ActionDescription.CREATION
-        self.session.add(content)
+        session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert api._is_filename_available("test", workspace, parent=None) is True
 
-    def test_unit__is_filename_available__ok__different_parent(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__is_filename_available__ok__different_parent(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -330,13 +385,13 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace2", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = Content()
         folder.label = "folder"
         folder.owner = user
@@ -344,7 +399,7 @@ class TestContentApi(DefaultTest):
         folder.workspace = workspace
         folder.type = content_type_list.Folder.slug
         folder.revision_type = ActionDescription.CREATION
-        self.session.add(folder)
+        session.add(folder)
         folder2 = Content()
         folder2.label = "folder2"
         folder2.owner = user
@@ -352,7 +407,7 @@ class TestContentApi(DefaultTest):
         folder2.workspace = workspace
         folder2.type = content_type_list.Folder.slug
         folder2.revision_type = ActionDescription.CREATION
-        self.session.add(folder)
+        session.add(folder)
         assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
         content.label = "test"
@@ -361,7 +416,7 @@ class TestContentApi(DefaultTest):
         content.workspace = workspace
         content.type = content_type_list.Page.slug
         content.revision_type = ActionDescription.CREATION
-        self.session.add(content)
+        session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
@@ -371,7 +426,7 @@ class TestContentApi(DefaultTest):
         content.workspace = workspace
         content.type = content_type_list.Page.slug
         content.revision_type = ActionDescription.CREATION
-        self.session.add(content)
+        session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert api._is_filename_available("test", workspace, parent=None) is True
         content = Content()
@@ -381,13 +436,21 @@ class TestContentApi(DefaultTest):
         content.workspace = workspace
         content.type = content_type_list.Page.slug
         content.revision_type = ActionDescription.CREATION
-        self.session.add(content)
+        session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert api._is_filename_available("test", workspace, parent=None) is False
 
-    def test_unit__set_allowed_content__ok__private_method(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__set_allowed_content__ok__private_method(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -395,10 +458,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -417,9 +480,17 @@ class TestContentApi(DefaultTest):
             content_type_list.File.slug: False,
         }
 
-    def test_unit__set_allowed_content__ok__nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__set_allowed_content__ok__nominal_case(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -427,10 +498,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -451,9 +522,17 @@ class TestContentApi(DefaultTest):
             content_type_list.File.slug: True,
         }
 
-    def test_unit__restore_content_default_allowed_content__ok__nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__restore_content_default_allowed_content__ok__nominal_case(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -461,10 +540,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -490,9 +569,17 @@ class TestContentApi(DefaultTest):
             "allowed_content"
         ] == content_type_list.default_allowed_content_properties(folder.type)
 
-    def test_unit__get_allowed_content_type__ok__html_document(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_allowed_content_type__ok__html_document(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -500,18 +587,26 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         allowed_content_type_dict = {"html-document": True, "file": False}
         allowed_content_types = api._get_allowed_content_type(allowed_content_type_dict)
         assert len(allowed_content_types) == 1
         assert allowed_content_types[0] == content_type_list.get_one_by_slug("html-document")
 
-    def test_unit__get_allowed_content_type__ok__page_legacy_alias(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_allowed_content_type__ok__page_legacy_alias(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -519,18 +614,26 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         allowed_content_type_dict = {"page": True, "file": False}
         allowed_content_types = api._get_allowed_content_type(allowed_content_type_dict)
         assert len(allowed_content_types) == 1
         assert allowed_content_types[0] == content_type_list.get_one_by_slug("html-document")
 
-    def test_unit___check_valid_content_type_in_dir__ok__nominal(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit___check_valid_content_type_in_dir__ok__nominal(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -538,10 +641,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -557,9 +660,17 @@ class TestContentApi(DefaultTest):
             content_type=content_type_list.Folder, parent=folder, workspace=workspace
         )
 
-    def test_unit___check_valid_content_type_in_dir__err__not_valid_in_folder(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit___check_valid_content_type_in_dir__err__not_valid_in_folder(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -567,10 +678,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -587,9 +698,17 @@ class TestContentApi(DefaultTest):
                 content_type=content_type_list.File, parent=folder, workspace=workspace
             )
 
-    def test_unit___check_valid_content_type_in_dir__err__not_valid_in_workspace(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit___check_valid_content_type_in_dir__err__not_valid_in_workspace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -597,9 +716,9 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
 
         # INFO - G.M - 2019-01-16 - override get_allowed_content_types methods
         # to allow setting allowed content types of workspaces as tracim doesn't
@@ -609,7 +728,7 @@ class TestContentApi(DefaultTest):
 
         workspace.get_allowed_content_types = fake_get_allowed_content_types
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         api._check_valid_content_type_in_dir(
             content_type=content_type_list.File, parent=None, workspace=workspace
         )
@@ -618,9 +737,17 @@ class TestContentApi(DefaultTest):
                 content_type=content_type_list.Folder, parent=None, workspace=workspace
             )
 
-    def test_delete(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_delete(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -628,10 +755,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -652,26 +779,22 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
 
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=items[0]):
+        with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.delete(items[0])
         transaction.commit()
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(1, len(items))
         transaction.commit()
@@ -679,18 +802,22 @@ class TestContentApi(DefaultTest):
         # Test that the item is still available if "show deleted" is activated
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
-        api = ContentApi(
-            current_user=user, session=self.session, config=self.app_config, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
+        api = ContentApi(current_user=user, session=session, config=app_config, show_deleted=True)
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
 
-    def test_unit__delete__ok__do_not_change_file_extension(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__delete__ok__do_not_change_file_extension(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -698,10 +825,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         html_doc = api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
@@ -724,19 +851,27 @@ class TestContentApi(DefaultTest):
         assert thread.file_extension == ".thread.html"
         assert thread.file_name == "superdiscussion.thread.html"
 
-        with new_revision(session=self.session, tm=transaction.manager, content=html_doc):
+        with new_revision(session=session, tm=transaction.manager, content=html_doc):
             api.delete(html_doc)
         assert html_doc.label != "superdoc"
         assert html_doc.file_extension == ".document.html"
 
-        with new_revision(session=self.session, tm=transaction.manager, content=thread):
+        with new_revision(session=session, tm=transaction.manager, content=thread):
             api.delete(thread)
         assert thread.label != "superdiscussion"
         assert thread.file_extension == ".thread.html"
 
-    def test_unit__archive__ok__do_not_change_file_extension(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__archive__ok__do_not_change_file_extension(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -744,10 +879,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         html_doc = api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
@@ -770,19 +905,27 @@ class TestContentApi(DefaultTest):
         assert thread.file_extension == ".thread.html"
         assert thread.file_name == "superdiscussion.thread.html"
 
-        with new_revision(session=self.session, tm=transaction.manager, content=html_doc):
+        with new_revision(session=session, tm=transaction.manager, content=html_doc):
             api.archive(html_doc)
         assert html_doc.label != "superdoc"
         assert html_doc.file_extension == ".document.html"
 
-        with new_revision(session=self.session, tm=transaction.manager, content=thread):
+        with new_revision(session=session, tm=transaction.manager, content=thread):
             api.archive(thread)
         assert thread.label != "superdiscussion"
         assert thread.file_extension == ".thread.html"
 
-    def test_archive(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_archive(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -790,11 +933,9 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -814,26 +955,22 @@ class TestContentApi(DefaultTest):
         transaction.commit()
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
-        api = ContentApi(session=self.session, current_user=user, config=self.app_config)
+        workspace_api = workspace_api_factory.get(current_user=user)
+        api = ContentApi(session=session, current_user=user, config=app_config)
 
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
 
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=items[0]):
+        with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.archive(items[0])
         transaction.commit()
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
 
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(1, len(items))
@@ -841,22 +978,26 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
 
         # Test that the item is still available if "show deleted" is activated
-        api = ContentApi(
-            current_user=None, session=self.session, config=self.app_config, show_archived=True
-        )
+        api = ContentApi(current_user=None, session=session, config=app_config, show_archived=True)
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
 
-    def test_get_all_with_filter(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_get_all_with_filter(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -864,11 +1005,11 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
@@ -889,11 +1030,9 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
 
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(2, len(items))
@@ -906,9 +1045,17 @@ class TestContentApi(DefaultTest):
         eq_(1, len(items3))
         eq_("thefolder", items3[0].label)
 
-    def test_get_all_with_parent_id(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_get_all_with_parent_id(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -916,10 +1063,10 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         item = api.create(content_type_list.Folder.slug, workspace, None, "parent", do_save=True)
         item2 = api.create(content_type_list.File.slug, workspace, item, "file1", do_save=True)
         api.create(content_type_list.File.slug, workspace, None, "file2", do_save=True)
@@ -931,11 +1078,9 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
 
         items = api.get_all(None, content_type_list.Any_SLUG, workspace)
         eq_(3, len(items))
@@ -944,9 +1089,17 @@ class TestContentApi(DefaultTest):
         eq_(1, len(items2))
         eq_(child_id, items2[0].content_id)
 
-    def test_set_status_unknown_status(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_set_status_unknown_status(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -955,18 +1108,27 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         c = api.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
-        with new_revision(session=self.session, tm=transaction.manager, content=c):
+        with new_revision(session=session, tm=transaction.manager, content=c):
             with pytest.raises(ValueError):
                 api.set_status(c, "unknown-status")
 
-    def test_unit__set_status__ok__nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__set_status__ok__nominal_case(
+        self,
+        user_api_factory,
+        group_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -976,17 +1138,17 @@ class TestContentApi(DefaultTest):
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="another@user", groups=groups, save_now=True)
 
-        workspace = WorkspaceApi(
-            current_user=user2, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        rapi = RoleApi(current_user=user2, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user2).create_workspace(
+            "test workspace", save_now=True
+        )
+        rapi = role_api_factory.get(current_user=user2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
         c = api2.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
         assert c.owner_id == user2.user_id
         assert c.get_current_revision().owner_id == user2.user_id
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        with new_revision(session=self.session, tm=transaction.manager, content=c):
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        with new_revision(session=session, tm=transaction.manager, content=c):
             for new_status in [
                 "open",
                 "closed-validated",
@@ -1000,9 +1162,17 @@ class TestContentApi(DefaultTest):
         assert ActionDescription.STATUS_UPDATE == c.revision_type
         assert c.get_current_revision().owner_id == user.user_id
 
-    def test_create_comment_ok(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.config)
+    def test_create_comment_ok(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1011,11 +1181,11 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         p = api.create(content_type_list.Page.slug, workspace, None, "this_is_a_page", do_save=True)
         c = api.create_comment(workspace, p, "this is the comment", True)
 
@@ -1028,12 +1198,21 @@ class TestContentApi(DefaultTest):
         eq_("", c.label)
         eq_(ActionDescription.COMMENT, c.revision_type)
 
-    def test_unit_move_file_with_comments__different_parent_same_workspace(self):
+    def test_unit_move_file_with_comments__different_parent_same_workspace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
         """
         Check if move of content does proper copy of subcontent.
         """
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1042,15 +1221,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1065,8 +1244,8 @@ class TestContentApi(DefaultTest):
         )
         folderb = api.create(content_type_list.Folder.slug, workspace, None, "folder b", "", True)
         comment_before_move_id = text_file.children[0].id
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
-        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
+        with new_revision(content=text_file, tm=transaction.manager, session=session):
             api2.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
             api2.save(text_file)
         transaction.commit()
@@ -1077,12 +1256,21 @@ class TestContentApi(DefaultTest):
         assert text_file_after_move.revision_type == ActionDescription.MOVE
         assert text_file_after_move.get_current_revision().owner_id == user2.user_id
 
-    def test_unit_move_file_with_comments__different_parent_different_workspace(self):
+    def test_unit_move_file_with_comments__different_parent_different_workspace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
         """
         Check if copy of content does proper copy of subcontent.
         """
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1091,15 +1279,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1115,11 +1303,11 @@ class TestContentApi(DefaultTest):
         comment_before_move_id = text_file.children[0].id
         comment_before_move_workspace_id = text_file.children[0].workspace_id
         assert text_file.children[0].description == "just a comment"
-        workspace2 = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace2", save_now=True
+        )
         folderb = api.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
-        with new_revision(content=text_file, tm=transaction.manager, session=self.session):
+        with new_revision(content=text_file, tm=transaction.manager, session=session):
             api.move(
                 item=text_file,
                 new_parent=folderb,
@@ -1128,15 +1316,24 @@ class TestContentApi(DefaultTest):
             )
             api.save(text_file)
         transaction.commit()
-        api2 = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api2 = ContentApi(current_user=user, session=session, config=app_config)
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
         assert text_file_after_move.children[0].description == "just a comment"
         assert text_file_after_move.children[0].id == comment_before_move_id
         assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
 
-    def test_unit_copy_file_different_label_different_parent_ok(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit_copy_file_different_label_different_parent_ok(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1145,15 +1342,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1164,10 +1361,10 @@ class TestContentApi(DefaultTest):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
 
         api.save(text_file, ActionDescription.CREATION)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
-        workspace2 = WorkspaceApi(
-            current_user=user2, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
+        workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
+            "test workspace2", save_now=True
+        )
         folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
 
         api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
@@ -1191,12 +1388,21 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
-    def test_unit_copy_file_with_comments_different_label_different_parent_ok(self):
+    def test_unit_copy_file_with_comments_different_label_different_parent_ok(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
         """
         Check if copy of content does proper copy of subcontent.
         """
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1205,15 +1411,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1226,7 +1432,7 @@ class TestContentApi(DefaultTest):
         api.create_comment(
             workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
         )
-        with new_revision(self.session, transaction.manager, content=text_file):
+        with new_revision(session, transaction.manager, content=text_file):
             api.update_content(text_file, text_file.label, new_content="just a description")
             api.save(
                 content=text_file, action_description=ActionDescription.EDITION, do_notify=False
@@ -1238,10 +1444,10 @@ class TestContentApi(DefaultTest):
             do_save=True,
             do_notify=False,
         )
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
-        workspace2 = WorkspaceApi(
-            current_user=user2, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
+        workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
+            "test workspace2", save_now=True
+        )
         folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
 
         api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
@@ -1272,9 +1478,18 @@ class TestContentApi(DefaultTest):
         for revision in text_file_copy.get_tree_revisions()[-3:]:
             assert revision.revision_type == ActionDescription.COPY
 
-    def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit_copy_file_different_label_different_parent__err__allowed_subcontent(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1283,15 +1498,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1302,10 +1517,10 @@ class TestContentApi(DefaultTest):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
 
         api.save(text_file, ActionDescription.CREATION)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
-        workspace2 = WorkspaceApi(
-            current_user=user2, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
+        workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
+            "test workspace2", save_now=True
+        )
         folderb = api2.create(
             content_type_list.Folder.slug, workspace2, None, "folder b", "", False
         )
@@ -1315,9 +1530,18 @@ class TestContentApi(DefaultTest):
         with pytest.raises(UnallowedSubContent):
             api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
 
-    def test_unit_copy_file__same_label_different_parent_ok(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit_copy_file__same_label_different_parent_ok(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1326,15 +1550,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1345,10 +1569,10 @@ class TestContentApi(DefaultTest):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
 
         api.save(text_file, ActionDescription.CREATION)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
-        workspace2 = WorkspaceApi(
-            current_user=user2, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
+        workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
+            "test workspace2", save_now=True
+        )
         folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
         api2.copy(item=text_file, new_parent=folderb)
 
@@ -1370,9 +1594,18 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
-    def test_unit_copy_file_different_label_same_parent_ok(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit_copy_file_different_label_same_parent_ok(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1381,15 +1614,15 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1400,7 +1633,7 @@ class TestContentApi(DefaultTest):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
 
         api.save(text_file, ActionDescription.CREATION)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
 
         api2.copy(item=text_file, new_label="test_file_copy")
 
@@ -1422,13 +1655,22 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
-    def test_unit_copy_file_different_label_same_parent__err__subcontent_not_allowed(self):
+    def test_unit_copy_file_different_label_same_parent__err__subcontent_not_allowed(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
         """
         re
         :return:
         """
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1437,16 +1679,16 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
 
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1456,17 +1698,26 @@ class TestContentApi(DefaultTest):
             )
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
-        with new_revision(self.session, transaction.manager, foldera):
+        with new_revision(session, transaction.manager, foldera):
             api.set_allowed_content(foldera, [])
             api.save(foldera)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
 
         with pytest.raises(UnallowedSubContent):
             api2.copy(item=text_file, new_label="test_file_copy")
 
-    def test_unit_copy_file_different_label_same_parent__err__label_already_used(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit_copy_file_different_label_same_parent__err__label_already_used(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1475,18 +1726,18 @@ class TestContentApi(DefaultTest):
 
         user = uapi.create_minimal_user(email="user1@user", groups=groups, save_now=True)
         user2 = uapi.create_minimal_user(email="user2@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        RoleApi(current_user=user, session=self.session, config=self.app_config).create_one(
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
         already_exist = api.create(
             content_type_list.Folder.slug, workspace, foldera, "already_exist", "", True
         )
-        with self.session.no_autoflush:
+        with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
@@ -1497,7 +1748,7 @@ class TestContentApi(DefaultTest):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
 
         api.save(text_file, ActionDescription.CREATION)
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             api2.copy(item=text_file, new_label="already_exist")
 
@@ -1507,9 +1758,18 @@ class TestContentApi(DefaultTest):
         # file has no changed
         assert new_already_exist.content_id == already_exist.content_id
 
-    def test_mark_read__workspace(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_mark_read__workspace(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1521,18 +1781,18 @@ class TestContentApi(DefaultTest):
             email="this.is@another.user", groups=groups, save_now=True
         )
 
-        wapi = WorkspaceApi(current_user=user_a, session=self.session, config=self.app_config)
+        wapi = workspace_api_factory.get(current_user=user_a)
         workspace1 = wapi.create_workspace("test workspace n°1", save_now=True)
         workspace2 = wapi.create_workspace("test workspace n°2", save_now=True)
 
-        role_api1 = RoleApi(current_user=user_a, session=self.session, config=self.app_config)
+        role_api1 = role_api_factory.get(current_user=user_a)
         role_api1.create_one(user_b, workspace1, UserRoleInWorkspace.READER, False)
 
-        role_api2 = RoleApi(current_user=user_b, session=self.session, config=self.app_config)
+        role_api2 = role_api_factory.get(current_user=user_b)
         role_api2.create_one(user_b, workspace2, UserRoleInWorkspace.READER, False)
 
-        cont_api_a = ContentApi(current_user=user_a, session=self.session, config=self.app_config)
-        cont_api_b = ContentApi(current_user=user_b, session=self.session, config=self.app_config)
+        cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
+        cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
         # Creates page_1 & page_2 in workspace 1
         #     and page_3 & page_4 in workspace 2
@@ -1582,9 +1842,18 @@ class TestContentApi(DefaultTest):
         for rev in page_4.revisions:
             eq_(user_b in rev.read_by.keys(), True)
 
-    def test_mark_read(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_mark_read(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1596,13 +1865,13 @@ class TestContentApi(DefaultTest):
             email="this.is@another.user", groups=groups, save_now=True
         )
 
-        wapi = WorkspaceApi(current_user=user_a, session=self.session, config=self.app_config)
+        wapi = workspace_api_factory.get(current_user=user_a)
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
-        role_api = RoleApi(current_user=user_a, session=self.session, config=self.app_config)
+        role_api = role_api_factory.get(current_user=user_a)
         role_api.create_one(user_b, workspace, UserRoleInWorkspace.READER, False)
-        cont_api_a = ContentApi(current_user=user_a, session=self.session, config=self.app_config)
-        cont_api_b = ContentApi(current_user=user_b, session=self.session, config=self.app_config)
+        cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
+        cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
         page_1 = cont_api_a.create(
             content_type_list.Page.slug, workspace, None, "this is a page", do_save=True
@@ -1616,9 +1885,18 @@ class TestContentApi(DefaultTest):
         for rev in page_1.revisions:
             eq_(user_b in rev.read_by.keys(), True)
 
-    def test_mark_read__all(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_mark_read__all(
+        self,
+        user_api_factory,
+        group_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1630,13 +1908,13 @@ class TestContentApi(DefaultTest):
             email="this.is@another.user", groups=groups, save_now=True
         )
 
-        wapi = WorkspaceApi(current_user=user_a, session=self.session, config=self.app_config)
+        wapi = workspace_api_factory.get(current_user=user_a)
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
-        role_api = RoleApi(current_user=user_a, session=self.session, config=self.app_config)
+        role_api = role_api_factory.get(current_user=user_a)
         role_api.create_one(user_b, workspace, UserRoleInWorkspace.READER, False)
-        cont_api_a = ContentApi(current_user=user_a, session=self.session, config=self.app_config)
-        cont_api_b = ContentApi(current_user=user_b, session=self.session, config=self.app_config)
+        cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
+        cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
         page_2 = cont_api_a.create(
             content_type_list.Page.slug, workspace, None, "this is page1", do_save=True
@@ -1655,9 +1933,9 @@ class TestContentApi(DefaultTest):
         for rev in page_4.revisions:
             eq_(user_b not in rev.read_by.keys(), True)
 
-        self.session.refresh(page_2)
-        self.session.refresh(page_3)
-        self.session.refresh(page_4)
+        session.refresh(page_2)
+        session.refresh(page_3)
+        session.refresh(page_4)
 
         cont_api_b.mark_read__all()
 
@@ -1668,9 +1946,18 @@ class TestContentApi(DefaultTest):
         for rev in page_4.revisions:
             eq_(user_b in rev.read_by.keys(), True)
 
-    def test_unit__update__ok__nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__update__ok__nominal_case(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1679,9 +1966,7 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
         wid = workspace.workspace_id
@@ -1689,13 +1974,13 @@ class TestContentApi(DefaultTest):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
         )
 
         # Test starts here
 
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         p = api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -1714,29 +1999,25 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(session=self.session, config=self.app_config, current_user=None).get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=self.session, config=self.app_config)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=content2):
+        with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.update_content(content2, "this is an updated page", "new content")
         api2.save(content2)
         transaction.commit()
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(
@@ -1748,9 +2029,18 @@ class TestContentApi(DefaultTest):
         eq_("new content", updated.description)
         eq_(ActionDescription.EDITION, updated.revision_type)
 
-    def test_unit__update__err__status_closed(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__update__err__status_closed(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1759,9 +2049,7 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
         wid = workspace.workspace_id
@@ -1769,13 +2057,13 @@ class TestContentApi(DefaultTest):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
         )
 
         # Test starts here
 
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         p = api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -1795,29 +2083,36 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(session=self.session, config=self.app_config, current_user=None).get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=self.session, config=self.app_config)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=self.session, tm=transaction.manager, content=content2):
+            with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this is an updated page", "new content")
         content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
-    def test_unit__update__err__label_already_used(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__update__err__label_already_used(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1826,9 +2121,7 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
         wid = workspace.workspace_id
@@ -1836,13 +2129,13 @@ class TestContentApi(DefaultTest):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
         )
 
         # Test starts here
 
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         p = api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -1867,30 +2160,37 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(session=self.session, config=self.app_config, current_user=None).get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=self.session, config=self.app_config)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
-            with new_revision(session=self.session, tm=transaction.manager, content=content2):
+            with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this_is_a_page2", "new content")
             api2.save(content2)
         content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
-    def test_unit__update__err__label_dont_change(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__update__err__label_dont_change(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1899,9 +2199,7 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
         wid = workspace.workspace_id
@@ -1909,13 +2207,13 @@ class TestContentApi(DefaultTest):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
         )
 
         # Test starts here
 
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         p = api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -1940,30 +2238,37 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(session=self.session, config=self.app_config, current_user=None).get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=self.session, config=self.app_config)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(SameValueError):
-            with new_revision(session=self.session, tm=transaction.manager, content=content2):
+            with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this_is_a_page", "")
         api2.save(content2)
         content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
-    def test_update_file_data__ok_nominal(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_update_file_data__ok_nominal(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -1972,21 +2277,19 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         wid = workspace.workspace_id
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
         )
 
         # Test starts here
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2005,29 +2308,25 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace_api2 = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api2 = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=self.session, config=self.app_config)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=content2):
+        with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.update_file_data(content2, "index.html", "text/html", b"<html>hello world</html>")
         api2.save(content2)
         transaction.commit()
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
         updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(
@@ -2040,9 +2339,18 @@ class TestContentApi(DefaultTest):
         eq_(b"<html>hello world</html>", updated.depot_file.file.read())
         eq_(ActionDescription.REVISION, updated.revision_type)
 
-    def test_update_file_data__err__content_status_closed(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_update_file_data__err__content_status_closed(
+        self,
+        workspace_api_factory,
+        role_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        user_api_factory,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2051,21 +2359,19 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         wid = workspace.workspace_id
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
         )
 
         # Test starts here
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2086,22 +2392,20 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace_api2 = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api2 = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user1, session=session, config=app_config)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=self.session, config=self.app_config)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=self.session, tm=transaction.manager, content=content2):
+            with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
@@ -2109,9 +2413,18 @@ class TestContentApi(DefaultTest):
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
-    def test_update_file_data__err__content_archived(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_update_file_data__err__content_archived(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        app_config,
+        session,
+        group_api_factory,
+        role_api_factory,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2120,23 +2433,19 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         wid = workspace.workspace_id
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
         )
 
         # Test starts here
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_archived=True
-        )
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2157,26 +2466,20 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace_api2 = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api2 = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_archived=True
-        )
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api2 = ContentApi(
-            current_user=u2, session=self.session, config=self.app_config, show_archived=True
-        )
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=self.session, tm=transaction.manager, content=content2):
+            with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
@@ -2184,9 +2487,18 @@ class TestContentApi(DefaultTest):
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
-    def test_update_file_data__err__content_deleted(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_update_file_data__err__content_deleted(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2195,23 +2507,18 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         wid = workspace.workspace_id
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
-
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
         )
 
         # Test starts here
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_deleted=True
-        )
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2232,26 +2539,20 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace_api2 = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api2 = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_deleted=True
-        )
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api2 = ContentApi(
-            current_user=u2, session=self.session, config=self.app_config, show_deleted=True
-        )
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=self.session, tm=transaction.manager, content=content2):
+            with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
@@ -2260,9 +2561,18 @@ class TestContentApi(DefaultTest):
         assert content2_nb_rev == len(content3.revisions)
 
     @pytest.mark.xfail(reason="Broken feature dues to pyramid behaviour")
-    def test_update_no_change(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_update_no_change(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2271,19 +2581,17 @@ class TestContentApi(DefaultTest):
 
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
         )
-        api = ContentApi(current_user=user1, session=self.session, config=self.app_config)
-        with self.session.no_autoflush:
+        api = ContentApi(current_user=user1, session=session, config=app_config)
+        with session.no_autoflush:
             page = api.create(
                 content_type_slug=content_type_list.Page.slug,
                 workspace=workspace,
@@ -2294,10 +2602,10 @@ class TestContentApi(DefaultTest):
         api.save(page, ActionDescription.CREATION, do_notify=True)
         transaction.commit()
 
-        api2 = ContentApi(current_user=user2, session=self.session, config=self.app_config)
+        api2 = ContentApi(current_user=user2, session=session, config=app_config)
         content2 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
         content2_nb_rev = len(content2.revisions)
-        with new_revision(session=self.session, tm=transaction.manager, content=content2):
+        with new_revision(session=session, tm=transaction.manager, content=content2):
             with pytest.raises(SameValueError):
                 api2.update_file_data(
                     page, "index.html", "text/html", b"<html>Same Content Here</html>"
@@ -2308,9 +2616,18 @@ class TestContentApi(DefaultTest):
         assert content3.label == "index"
         assert content2_nb_rev == len(content3.revisions)
 
-    def test_archive_unarchive(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_archive_unarchive(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+        role_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2320,23 +2637,19 @@ class TestContentApi(DefaultTest):
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
         u1id = user1.user_id
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         wid = workspace.workspace_id
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
         )
 
         # show archived is used at the top end of the test
-        api = ContentApi(
-            current_user=user1, session=self.session, show_archived=True, config=self.app_config
-        )
+        api = ContentApi(current_user=user1, session=session, show_archived=True, config=app_config)
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2355,42 +2668,28 @@ class TestContentApi(DefaultTest):
         ####
 
         # refresh after commit
-        user1 = UserApi(current_user=None, config=self.app_config, session=self.session).get_one(
-            u1id
-        )
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
+        user1 = uapi.get_one(u1id)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2api = UserApi(session=self.session, config=self.app_config, current_user=None)
+        u2api = user_api_factory.get()
         u2 = u2api.get_one(u2id)
-        api2 = ContentApi(
-            current_user=u2, session=self.session, config=self.app_config, show_archived=True
-        )
+        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=content2):
+        with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.archive(content2)
         api2.save(content2)
         transaction.commit()
 
         # refresh after commit
-        user1 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(
-            u1id
-        )
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_archived=True
-        )
-        api2 = ContentApi(
-            current_user=u2, session=self.session, config=self.app_config, show_archived=True
-        )
+        user1 = uapi.get_one(u1id)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
+        u2 = uapi.get_one(u2id)
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
 
         updated = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(
@@ -2404,16 +2703,25 @@ class TestContentApi(DefaultTest):
         ####
 
         updated2 = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=updated):
+        with new_revision(session=session, tm=transaction.manager, content=updated):
             api.unarchive(updated)
         api.save(updated2)
         eq_(False, updated2.is_archived)
         eq_(ActionDescription.UNARCHIVING, updated2.revision_type)
         eq_(u1id, updated2.owner_id)
 
-    def test_delete_undelete(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_delete_undelete(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2423,23 +2731,19 @@ class TestContentApi(DefaultTest):
         user1 = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
         u1id = user1.user_id
 
-        workspace_api = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        )
+        workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         wid = workspace.workspace_id
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        RoleApi(current_user=user1, session=self.session, config=self.app_config).create_one(
+        role_api_factory.get(current_user=user1).create_one(
             user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
         )
 
         # show archived is used at the top end of the test
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_deleted=True
-        )
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2456,43 +2760,29 @@ class TestContentApi(DefaultTest):
         transaction.commit()
 
         ####
-        user1 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(
-            u1id
-        )
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
+        user1 = uapi.get_one(u1id)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
         content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api2 = ContentApi(
-            current_user=u2, session=self.session, config=self.app_config, show_deleted=True
-        )
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
         content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(session=self.session, tm=transaction.manager, content=content2):
+        with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.delete(content2)
         api2.save(content2)
         transaction.commit()
 
         ####
 
-        user1 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(
-            u1id
-        )
-        workspace = WorkspaceApi(
-            current_user=user1, session=self.session, config=self.app_config
-        ).get_one(wid)
+        user1 = uapi.get_one(u1id)
+        workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         # show archived is used at the top end of the test
-        api = ContentApi(
-            current_user=user1, session=self.session, config=self.app_config, show_deleted=True
-        )
-        u2 = UserApi(current_user=None, session=self.session, config=self.app_config).get_one(u2id)
-        api2 = ContentApi(
-            current_user=u2, session=self.session, config=self.app_config, show_deleted=True
-        )
+        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
+        u2 = uapi.get_one(u2id)
+        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
 
         updated = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
         eq_(
@@ -2506,16 +2796,24 @@ class TestContentApi(DefaultTest):
         ####
 
         updated2 = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
-        with new_revision(tm=transaction.manager, session=self.session, content=updated2):
+        with new_revision(tm=transaction.manager, session=session, content=updated2):
             api.undelete(updated2)
         api.save(updated2)
         eq_(False, updated2.is_deleted)
         eq_(ActionDescription.UNDELETION, updated2.revision_type)
         eq_(u1id, updated2.owner_id)
 
-    def test_unit__get_last_active__ok__nominal_case(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_last_active__ok__nominal_case(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2523,14 +2821,14 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace2", save_now=True
+        )
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder_workspace2 = api.create(
             content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
         )
@@ -2562,9 +2860,7 @@ class TestContentApi(DefaultTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -2617,9 +2913,17 @@ class TestContentApi(DefaultTest):
         # (workspace2)
         assert last_actives[8] == main_folder_workspace2
 
-    def test_unit__get_last_active__ok__do_no_show_deleted_archived(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_last_active__ok__do_no_show_deleted_archived(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        group_api_factory,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2627,17 +2931,17 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace2", save_now=True
+        )
 
         api = ContentApi(
             current_user=user,
-            session=self.session,
-            config=self.app_config,
+            session=session,
+            config=app_config,
             show_deleted=False,
             show_archived=False,
         )
@@ -2652,11 +2956,11 @@ class TestContentApi(DefaultTest):
         )
         api.create_comment(workspace, parent=archived, content="just a comment", do_save=True)
         api.create_comment(workspace, parent=deleted, content="just a comment", do_save=True)
-        with new_revision(session=self.session, tm=transaction.manager, content=archived):
+        with new_revision(session=session, tm=transaction.manager, content=archived):
             api.archive(archived)
             api.save(archived)
 
-        with new_revision(session=self.session, tm=transaction.manager, content=deleted):
+        with new_revision(session=session, tm=transaction.manager, content=deleted):
             api.delete(deleted)
             api.save(deleted)
         normal = api.create(content_type_list.Page.slug, workspace, main_folder, "normal", "", True)
@@ -2692,9 +2996,17 @@ class TestContentApi(DefaultTest):
         assert last_actives[2] == archived
         assert last_actives[3] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_full(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_last_active__ok__workspace_filter_workspace_full(
+        self,
+        user_api_factory,
+        session,
+        app_config,
+        workspace_api_factory,
+        group_api_factory,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2702,11 +3014,11 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -2735,9 +3047,7 @@ class TestContentApi(DefaultTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -2777,9 +3087,17 @@ class TestContentApi(DefaultTest):
         # folder subcontent modification does not change folder order
         assert last_actives[6] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_content_ids(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_last_active__ok__workspace_filter_workspace_content_ids(
+        self,
+        session,
+        user_api_factory,
+        workspace_api_factory,
+        app_config,
+        content_type_list,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2787,11 +3105,11 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -2820,9 +3138,7 @@ class TestContentApi(DefaultTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -2869,9 +3185,17 @@ class TestContentApi(DefaultTest):
         # folder subcontent modification does not change folder order
         assert last_actives[3] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(
+        self,
+        session,
+        user_api_factory,
+        workspace_api_factory,
+        app_config,
+        content_type_list,
+        group_api_factory,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2879,11 +3203,11 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
 
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -2912,9 +3236,7 @@ class TestContentApi(DefaultTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -2969,9 +3291,17 @@ class TestContentApi(DefaultTest):
         # folder subcontent modification does not change folder order
         assert last_actives[0] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_empty(self):
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
+    def test_unit__get_last_active__ok__workspace_filter_workspace_empty(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        group_api_factory,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+        group_api = group_api_factory.get()
         groups = [
             group_api.get_one(Group.TIM_USER),
             group_api.get_one(Group.TIM_MANAGER),
@@ -2979,13 +3309,13 @@ class TestContentApi(DefaultTest):
         ]
 
         user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-        workspace2 = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace2", save_now=True)
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace2", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
             content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
         )
@@ -3014,9 +3344,7 @@ class TestContentApi(DefaultTest):
             True,
         )
         with new_revision(
-            session=self.session,
-            tm=transaction.manager,
-            content=firstly_created_but_recently_updated,
+            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -3044,114 +3372,36 @@ class TestContentApi(DefaultTest):
         last_actives = api.get_last_active(workspace=workspace2)
         assert len(last_actives) == 0
 
-    def test_unit__search_in_label__ok__nominal_case(self):
-        # HACK - D.A. - 2015-03-09
-        # This test is based on a bug which does NOT return results found
-        # at root of a workspace (eg a folder)
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
 
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
+@pytest.mark.usefixtures("test_fixture")
+class TestContentApiSecurity(object):
+    def test_unit__cant_get_non_access_content__ok__nominal_case(
+        self, session, workspace_api_factory, admin_user, app_config, content_type_list
+    ):
+        bob = session.query(User).filter(User.email == "bob@fsf.local").one()
 
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        a = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+        bob_workspace = workspace_api_factory.get(current_user=bob).create_workspace(
+            "bob_workspace", save_now=True
         )
-        p = api.create(content_type_list.Page.slug, workspace, a, "this is another thing", "", True)
-
-        with new_revision(session=self.session, tm=transaction.manager, content=p):
-            p.description = "This is some other test"
-
-        api.save(p)
-        original_id = a.content_id
-
-        res = api._search_query(["randomized"])
-        eq_(1, len(res.all()))
-        item = res.all()[0]
-        eq_(original_id, item.content_id)
-
-    def test_unit__search_in_filename__nominal_case(self):
-
-        uapi = UserApi(session=self.session, config=self.app_config, current_user=None)
-        group_api = GroupApi(current_user=None, session=self.session, config=self.app_config)
-        groups = [
-            group_api.get_one(Group.TIM_USER),
-            group_api.get_one(Group.TIM_MANAGER),
-            group_api.get_one(Group.TIM_ADMIN),
-        ]
-
-        user = uapi.create_minimal_user(email="this.is@user", groups=groups, save_now=True)
-
-        workspace = WorkspaceApi(
-            current_user=user, session=self.session, config=self.app_config
-        ).create_workspace("test workspace", save_now=True)
-
-        api = ContentApi(current_user=user, session=self.session, config=self.app_config)
-        a = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        p = api.create(
-            content_type_list.Page.slug, workspace, a, "this is dummy label content", "", True
+        admin_workspace = workspace_api_factory.get(current_user=admin_user).create_workspace(
+            "admin_workspace", save_now=True
         )
 
-        with new_revision(tm=transaction.manager, session=self.session, content=p):
-            p.description = "This is some amazing test"
-
-        api.save(p)
-        original_id = a.content_id
-
-        res = api._search_query(["this is randomized folder"])
-        eq_(1, len(res.all()))
-        item = res.all()[0]
-        eq_(original_id, item.content_id)
-
-        original_id = p.content_id
-        res = api._search_query(["this is dummy label content.document.html"])
-        eq_(1, len(res.all()))
-        item = res.all()[0]
-        eq_(original_id, item.content_id)
-
-
-class TestContentApiSecurity(DefaultTest):
-    fixtures = [FixtureTest]
-
-    def test_unit__cant_get_non_access_content__ok__nominal_case(self):
-        admin = self.session.query(User).filter(User.email == "admin@admin.admin").one()
-        bob = self.session.query(User).filter(User.email == "bob@fsf.local").one()
-
-        bob_workspace = WorkspaceApi(
-            current_user=bob, session=self.session, config=self.app_config
-        ).create_workspace("bob_workspace", save_now=True)
-        admin_workspace = WorkspaceApi(
-            current_user=admin, session=self.session, config=self.app_config
-        ).create_workspace("admin_workspace", save_now=True)
-
-        ContentApi(current_user=bob, session=self.session, config=self.app_config).create(
+        ContentApi(current_user=bob, session=session, config=app_config).create(
             content_type_slug=content_type_list.Page.slug,
             workspace=bob_workspace,
             label="bob_page",
             do_save=True,
         )
 
-        ContentApi(current_user=admin, session=self.session, config=self.app_config).create(
+        ContentApi(current_user=admin_user, session=session, config=app_config).create(
             content_type_slug=content_type_list.Page.slug,
             workspace=admin_workspace,
             label="admin_page",
             do_save=True,
         )
 
-        bob_viewable = ContentApi(
-            current_user=bob, session=self.session, config=self.app_config
-        ).get_all()
+        bob_viewable = ContentApi(current_user=bob, session=session, config=app_config).get_all()
         eq_(1, len(bob_viewable), "Bob should view only one content")
         eq_(
             "bob_page",

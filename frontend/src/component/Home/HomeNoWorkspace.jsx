@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 require('./Home.styl')
 
@@ -44,4 +44,4 @@ export const HomeNoWorkspace = props =>
     </div>
   </div>
 
-export default translate()(HomeNoWorkspace)
+export default withTranslation()(HomeNoWorkspace)

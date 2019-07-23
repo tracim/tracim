@@ -66,8 +66,8 @@ import { ErrorFlashMessageTemplateHtml } from 'tracim_frontend_lib'
  */
 // Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
 // 08/09/2018 - maybe not since this fetchWrapper also dispatch redux actions whether it succeed or failed
-const fetchWrapper = async ({url, param, actionName, dispatch}) => {
-  dispatch({type: `${param.method}/${actionName}/PENDING`})
+const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
+  dispatch({ type: `${param.method}/${actionName}/PENDING` })
 
   try {
     const fetchResult = await fetch(url, param)
@@ -98,9 +98,9 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
 
     const status = fetchResult.status
     if (status >= 200 && status <= 399) {
-      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+      dispatch({ type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json })
     } else {
-      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+      dispatch({ type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json })
     }
 
     return fetchResult
@@ -109,7 +109,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch}) => {
       dispatch(newFlashMessage(i18n.t('Server unreachable'), 'danger'))
       console.error(e)
     }
-    return {status: 'failedToFetch'} // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
+    return { status: 'failedToFetch' } // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
   }
 }
 
@@ -118,7 +118,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
     url: `${FETCH_CONFIG.apiUrl}/auth/login`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: login,
@@ -136,7 +136,7 @@ export const postForgotPassword = email => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/request`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: email
@@ -152,7 +152,7 @@ export const postResetPassword = (newPassword, newPassword2, email, token) => as
     url: `${FETCH_CONFIG.apiUrl}/auth/password/reset/modify`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST',
       body: JSON.stringify({
         email: email,
@@ -171,7 +171,7 @@ export const postUserLogout = () => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/auth/logout`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'POST'
     },
     actionName: USER_LOGOUT,
@@ -179,9 +179,9 @@ export const postUserLogout = () => async dispatch => {
   })
 }
 
-export const getUser = idUser => async dispatch => {
+export const getUser = userId => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -194,9 +194,9 @@ export const getUser = idUser => async dispatch => {
   })
 }
 
-export const getUserWorkspaceList = idUser => async dispatch => {
+export const getUserWorkspaceList = userId => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
     param: {
       credentials: 'include',
       headers: {
@@ -224,9 +224,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getMyselfKnownMember = (userNameToSearch, idWorkspaceToExclude) => dispatch => {
+export const getMyselfKnownMember = (userNameToSearch, workspaceIdToExclude) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${idWorkspaceToExclude}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`,
     param: {
       credentials: 'include',
       headers: {
@@ -377,9 +377,9 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceRead = idWorkspace => dispatch => {
+export const putMyselfWorkspaceRead = workspaceId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/read`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/read`,
     param: {
       credentials: 'include',
       headers: {
@@ -392,9 +392,9 @@ export const putMyselfWorkspaceRead = idWorkspace => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceDoNotify = (idWorkspace, doNotify) => dispatch => {
+export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
     param: {
       credentials: 'include',
       headers: {
@@ -407,9 +407,9 @@ export const putMyselfWorkspaceDoNotify = (idWorkspace, doNotify) => dispatch =>
   })
 }
 
-export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatch => {
+export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
     param: {
       credentials: 'include',
       headers: {
@@ -437,9 +437,9 @@ export const getMyselfWorkspaceList = () => dispatch => {
   })
 }
 
-export const getWorkspaceDetail = (user, idWorkspace) => dispatch => {
+export const getWorkspaceDetail = (user, workspaceId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -452,9 +452,9 @@ export const getWorkspaceDetail = (user, idWorkspace) => dispatch => {
   })
 }
 
-export const getWorkspaceMemberList = idWorkspace => dispatch => {
+export const getWorkspaceMemberList = workspaceId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
     param: {
       credentials: 'include',
       headers: {
@@ -467,10 +467,10 @@ export const getWorkspaceMemberList = idWorkspace => dispatch => {
   })
 }
 
-export const getContent = (idWorkspace, idContent, typeContent) => dispatch => {
+export const getContent = (workspaceId, contentId, contentType) => dispatch => {
   return fetchWrapper({
     // @FIXME - Côme - 2018/11/06 - find better solution for the -s in string bellow
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/${typeContent}s/${idContent}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -483,9 +483,9 @@ export const getContent = (idWorkspace, idContent, typeContent) => dispatch => {
   })
 }
 
-export const getFolderContentList = (idWorkspace, idFolderList) => dispatch => {
+export const getFolderContentList = (workspaceId, folderIdList) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_ids=${idFolderList.join(',')}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?parent_ids=${folderIdList.join(',')}`,
     param: {
       credentials: 'include',
       headers: {
@@ -498,9 +498,9 @@ export const getFolderContentList = (idWorkspace, idFolderList) => dispatch => {
   })
 }
 
-export const getContentPathList = (idWorkspace, idContent, idFolderList) => dispatch => {
+export const getContentPathList = (workspaceId, contentId, folderIdList) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?complete_path_to_id=${idContent}&parent_ids=${idFolderList.join(',')}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?complete_path_to_id=${contentId}&parent_ids=${folderIdList.join(',')}`,
     param: {
       credentials: 'include',
       headers: {
@@ -513,9 +513,9 @@ export const getContentPathList = (idWorkspace, idContent, idFolderList) => disp
   })
 }
 
-export const getMyselfWorkspaceRecentActivityList = (idWorkspace, beforeId = null) => dispatch => {
+export const getMyselfWorkspaceRecentActivityList = (workspaceId, beforeId = null) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
     param: {
       credentials: 'include',
       headers: {
@@ -528,9 +528,9 @@ export const getMyselfWorkspaceRecentActivityList = (idWorkspace, beforeId = nul
   })
 }
 
-export const getMyselfWorkspaceReadStatusList = idWorkspace => dispatch => {
+export const getMyselfWorkspaceReadStatusList = workspaceId => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${idWorkspace}/contents/read_status`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/contents/read_status`,
     param: {
       credentials: 'include',
       headers: {
@@ -543,9 +543,9 @@ export const getMyselfWorkspaceReadStatusList = idWorkspace => dispatch => {
   })
 }
 
-export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch => {
+export const postWorkspaceMember = (user, workspaceId, newMember) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
     param: {
       credentials: 'include',
       headers: {
@@ -564,12 +564,12 @@ export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch =>
   })
 }
 
-export const deleteWorkspaceMember = (user, idWorkspace, idMember) => dispatch => {
+export const deleteWorkspaceMember = (user, workspaceId, memberId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${idMember}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
     actionName: WORKSPACE_MEMBER_REMOVE,
@@ -577,12 +577,12 @@ export const deleteWorkspaceMember = (user, idWorkspace, idMember) => dispatch =
   })
 }
 
-export const getFolderContent = (idWorkspace, idFolder) => dispatch => {
+export const getFolderContent = (workspaceId, folderId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idFolder}`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?parent_id=${folderId}`,
     param: {
       credentials: 'include',
-      headers: {...FETCH_CONFIG.headers},
+      headers: { ...FETCH_CONFIG.headers },
       method: 'GET'
     },
     actionName: `${WORKSPACE}/${FOLDER}`,
@@ -635,9 +635,9 @@ export const getContentTypeList = () => dispatch => {
   })
 }
 
-export const putWorkspaceContentArchived = (idWorkspace, idContent) => dispatch => {
+export const putWorkspaceContentArchived = (workspaceId, contentId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archived`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`,
     param: {
       credentials: 'include',
       headers: {
@@ -650,9 +650,9 @@ export const putWorkspaceContentArchived = (idWorkspace, idContent) => dispatch 
   })
 }
 
-export const putWorkspaceContentDeleted = (idWorkspace, idContent) => dispatch => {
+export const putWorkspaceContentDeleted = (workspaceId, contentId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/trashed`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`,
     param: {
       credentials: 'include',
       headers: {
@@ -665,9 +665,9 @@ export const putWorkspaceContentDeleted = (idWorkspace, idContent) => dispatch =
   })
 }
 
-export const putFolderRead = (idUser, idWorkspace, idContent) => dispatch => {
+export const putFolderRead = (userId, workspaceId, contentId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces/${idWorkspace}/contents/${idContent}/read`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces/${workspaceId}/contents/${contentId}/read`,
     param: {
       credentials: 'include',
       headers: {

@@ -1,5 +1,6 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
   constructor (props) {
@@ -13,20 +14,20 @@ export class AddUserForm extends React.Component {
     }
   }
 
-  handleChangeNewUserName = e => this.setState({newUserName: e.target.value})
+  handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
 
-  handleChangeNewUserEmail = e => this.setState({newUserEmail: e.target.value})
+  handleChangeNewUserEmail = e => this.setState({ newUserEmail: e.target.value })
 
-  handleChangeNewUserPassword = e => this.setState({newUserPassword: e.target.value})
+  handleChangeNewUserPassword = e => this.setState({ newUserPassword: e.target.value })
 
-  handleChangeNewUserProfile = e => this.setState({newUserProfile: e.currentTarget.value})
+  handleChangeNewUserProfile = e => this.setState({ newUserProfile: e.currentTarget.value })
 
   handleClickAddUser = () => {
     const { props, state } = this
 
     if (state.newUserName === '' || state.newUserEmail === '' || state.newUserProfile === '') {
       GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: props.t('Please type a name, an email, a password and select a profile'),
           type: 'warning',
@@ -122,7 +123,7 @@ export class AddUserForm extends React.Component {
                 />
 
                 <div className='d-flex align-items-center'>
-                  <div className='userrole__role__icon mx-2' style={{color: p.hexcolor}}>
+                  <div className='userrole__role__icon mx-2' style={{ color: p.hexcolor }}>
                     <i className={`fa fa-fw fa-${p.faIcon}`} />
                   </div>
                   {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
@@ -148,4 +149,4 @@ export class AddUserForm extends React.Component {
   }
 }
 
-export default translate()(AddUserForm)
+export default withTranslation()(AddUserForm)

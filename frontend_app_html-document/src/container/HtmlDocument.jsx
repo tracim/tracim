@@ -1,6 +1,6 @@
 import React from 'react'
 import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -17,13 +17,14 @@ import {
   convertBackslashNToBr,
   generateLocalStorageContentId,
   BREADCRUMBS_TYPE,
-  appFeatureCustomEventHandlerShowApp
+  appFeatureCustomEventHandlerShowApp,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   MODE,
-  debug,
   initWysiwyg
 } from '../helper.js'
+import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocComment,
@@ -67,22 +68,22 @@ class HtmlDocument extends React.Component {
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     const { state } = this
     switch (type) {
-      case 'html-document_showApp':
+      case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
-          this.setState({isVisible: true})
+          this.setState({ isVisible: true })
           this.buildBreadcrumbs()
         }
         break
 
-      case 'html-document_hideApp':
+      case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
@@ -92,19 +93,19 @@ class HtmlDocument extends React.Component {
         })
         break
 
-      case 'html-document_reloadContent':
+      case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         tinymce.remove('#wysiwygTimelineComment')
         tinymce.remove('#wysiwygNewVersion')
 
         this.setState(prev => ({
-          content: {...prev.content, ...data},
+          content: { ...prev.content, ...data },
           isVisible: true,
           timelineWysiwyg: false
         }))
         break
 
-      case 'allApp_changeLang':
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
 
         initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
@@ -160,11 +161,11 @@ class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
     tinymce.remove('#wysiwygNewVersion')
     tinymce.remove('#wysiwygTimelineComment')
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
       type: 'warning',
@@ -203,7 +204,7 @@ class HtmlDocument extends React.Component {
     const { state } = this
 
     GLOBAL_dispatchEvent({
-      type: 'appendBreadcrumbs',
+      type: CUSTOM_EVENT.APPEND_BREADCRUMBS,
       data: {
         breadcrumbs: [{
           url: `/ui/workspaces/${state.content.workspace_id}/contents/${state.config.slug}/${state.content.content_id}`,
@@ -265,7 +266,7 @@ class HtmlDocument extends React.Component {
     // @fixme Côme - 2018/12/04 - this might not be a great idea
     const modeToRender = (
       resRevision.body.length === 1 && // if content has only one revision
-      loggedUser.idRoleUserWorkspace >= 2 && // if user has EDIT authorization
+      loggedUser.userRoleIdInWorkspace >= 2 && // if user has EDIT authorization
       resRevision.body[0].raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
     )
       ? MODE.EDIT
@@ -291,12 +292,12 @@ class HtmlDocument extends React.Component {
     })
 
     await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
-    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -309,7 +310,7 @@ class HtmlDocument extends React.Component {
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
       case 200:
         this.loadContent()
-        GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       case 400:
         switch (fetchResultSaveHtmlDoc.body.code) {
@@ -378,14 +379,14 @@ class HtmlDocument extends React.Component {
 
   handleChangeText = e => {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
-    this.setState(prev => ({content: {...prev.content, raw_content: newText}}))
+    this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
     this.setLocalStorageItem('rawContent', newText)
   }
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
-    this.setState({newComment})
+    this.setState({ newComment })
 
     this.setLocalStorageItem('comment', newComment)
   }
@@ -402,7 +403,7 @@ class HtmlDocument extends React.Component {
     const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
-        this.setState({newComment: ''})
+        this.setState({ newComment: '' })
         localStorage.removeItem(
           generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
         )
@@ -423,7 +424,7 @@ class HtmlDocument extends React.Component {
     }
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
+  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { state, props } = this
@@ -446,11 +447,11 @@ class HtmlDocument extends React.Component {
     const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true }, mode: MODE.VIEW }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while archiving document'),
           type: 'warning',
@@ -466,11 +467,11 @@ class HtmlDocument extends React.Component {
     const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: MODE.VIEW }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while deleting document'),
           type: 'warning',
@@ -486,11 +487,11 @@ class HtmlDocument extends React.Component {
     const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while restoring document'),
           type: 'warning',
@@ -506,11 +507,11 @@ class HtmlDocument extends React.Component {
     const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
           msg: this.props.t('Error while restoring document'),
           type: 'warning',
@@ -549,7 +550,7 @@ class HtmlDocument extends React.Component {
 
   handleClickLastVersion = () => {
     this.loadContent()
-    this.setState({mode: MODE.VIEW})
+    this.setState({ mode: MODE.VIEW })
   }
 
   render () {
@@ -569,7 +570,7 @@ class HtmlDocument extends React.Component {
           faIcon={config.faIcon}
           rawTitle={content.label}
           componentTitle={<div>{content.label}</div>}
-          idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
+          userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!content.is_editable}
@@ -582,7 +583,7 @@ class HtmlDocument extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.idRoleUserWorkspace >= 2 &&
+              {loggedUser.userRoleIdInWorkspace >= 2 &&
                 <NewVersionBtn
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
@@ -595,7 +596,7 @@ class HtmlDocument extends React.Component {
                 <button
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
-                  style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
+                  style={{ backgroundColor: config.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fa fa-history' />
                   {t('Last version')}
@@ -604,7 +605,7 @@ class HtmlDocument extends React.Component {
             </div>
 
             <div className='d-flex'>
-              {loggedUser.idRoleUserWorkspace >= 2 &&
+              {loggedUser.userRoleIdInWorkspace >= 2 &&
                 <SelectStatus
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
@@ -613,7 +614,7 @@ class HtmlDocument extends React.Component {
                 />
               }
 
-              {loggedUser.idRoleUserWorkspace >= 4 &&
+              {loggedUser.userRoleIdInWorkspace >= 4 &&
                 <ArchiveDeleteContent
                   customColor={config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
@@ -645,7 +646,7 @@ class HtmlDocument extends React.Component {
             isDeleted={content.is_deleted}
             isDeprecated={content.status === config.availableStatuses[3].slug}
             deprecatedStatus={config.availableStatuses[3]}
-            isDraftAvailable={mode === MODE.VIEW && loggedUser.idRoleUserWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
+            isDraftAvailable={mode === MODE.VIEW && loggedUser.userRoleIdInWorkspace >= 2 && this.getLocalStorageItem('rawContent')}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             onClickShowDraft={this.handleClickNewVersion}
@@ -674,4 +675,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(HtmlDocument))
+export default withTranslation()(Radium(HtmlDocument))

@@ -14,7 +14,7 @@ export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone }
 export const FLASH_MESSAGE = 'FlashMessage'
 export const newFlashMessage = (msgText = '', msgType = 'info', msgDelay = 5000) => dispatch => {
   if (msgDelay !== 0) window.setTimeout(() => dispatch(removeFlashMessage(msgText)), msgDelay)
-  return dispatch(addFlashMessage({message: msgText, type: msgType}))
+  return dispatch(addFlashMessage({ message: msgText, type: msgType }))
 }
 const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg }) // only newFlashMsg should be used by component and app so dont export this
 export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, msg })
@@ -48,18 +48,18 @@ export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
 export const PATH = 'Path'
 export const WORKSPACE_CONTENT_PATH = `${WORKSPACE_CONTENT}/${PATH}`
-export const setWorkspaceContentList = (workspaceContentList, idFolderToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, idFolderToOpenList })
+export const setWorkspaceContentList = (workspaceContentList, folderIdToOpenList) => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, folderIdToOpenList })
 export const addWorkspaceContentList = workspaceContentList => ({ type: `${ADD}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
-export const updateUserWorkspaceSubscriptionNotif = (idUser, idWorkspace, doNotify) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, idUser, idWorkspace, doNotify })
+export const updateUserWorkspaceSubscriptionNotif = (userId, workspaceId, doNotify) =>
+  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, userId, workspaceId, doNotify })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
-export const setWorkspaceContentArchived = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, idWorkspace, idContent })
-export const setWorkspaceContentDeleted = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, idWorkspace, idContent })
+export const setWorkspaceContentArchived = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, workspaceId, contentId })
+export const setWorkspaceContentDeleted = (workspaceId, contentId) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, workspaceId, contentId })
 
 export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
 export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })
@@ -82,7 +82,7 @@ export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const removeWorkspaceMember = idMember => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, idMember })
+export const removeWorkspaceMember = memberId => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId })
 
 export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
 export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
@@ -98,9 +98,9 @@ export const setWorkspaceAgendaUrl = agendaUrl => ({ type: `${SET}/${WORKSPACE_A
 
 export const FOLDER = 'Folder'
 export const READ = 'Read'
-export const toggleFolderOpen = idFolder => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, idFolder })
+export const toggleFolderOpen = folderId => ({ type: `${TOGGLE}/${WORKSPACE}/${FOLDER}`, folderId })
 export const FOLDER_READ = `${FOLDER}/${READ}`
-export const setWorkspaceContentRead = idFolder => ({ type: `${SET}/${FOLDER_READ}`, idFolder })
+export const setWorkspaceContentRead = folderId => ({ type: `${SET}/${FOLDER_READ}`, folderId })
 
 export const APP = 'App'
 export const APP_FEATURE = `${APP}Feature`

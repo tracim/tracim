@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
 
 // require('./SelectStatus.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -51,4 +51,4 @@ export const SelectStatus = props => {
   )
 }
 
-export default Radium(translate()(SelectStatus))
+export default withTranslation()(Radium(SelectStatus))
