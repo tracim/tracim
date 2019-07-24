@@ -226,7 +226,7 @@ jobs:
         - npm run test
         - cd $TRAVIS_BUILD_DIR/frontend_app_admin_workspace_user
         - npm run test
-          cd $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: functional
