@@ -206,7 +206,27 @@ jobs:
       env:
         - TRAVIS_NODE_VERSION="10"
       script:
-        - ./run_frontend_unit_test.sh
+        - cd $TRAVIS_BUILD_DIR/frontend_lib
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_html-document
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_file
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_thread
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_folder_advanced
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_workspace
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_workspace_advanced
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_agenda
+        - npm run test
+        - cd $TRAVIS_BUILD_DIR/frontend_app_admin_workspace_user
+        - npm run test
+          cd $TRAVIS_BUILD_DIR
       if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: functional
