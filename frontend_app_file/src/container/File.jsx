@@ -110,8 +110,6 @@ class File extends React.Component {
         const previouslyUnsavedComment = localStorage.getItem(
           generateLocalStorageContentId(data.workspace_id, data.content_id, state.appName, 'comment')
         )
-        console.log('RELOAD')
-        console.log(this)
         this.setState(prev => ({
           content: {...prev.content, ...data},
           isVisible: true,
@@ -159,9 +157,6 @@ class File extends React.Component {
     const { state } = this
 
     console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
-    console.log('UPDATE')
-    console.log(this)
-
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
@@ -263,7 +258,6 @@ class File extends React.Component {
         }))
       ], [])
 
-    
     this.setState({
       timeline: revisionWithComment
     })

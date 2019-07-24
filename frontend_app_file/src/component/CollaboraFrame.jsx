@@ -2,7 +2,8 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import { PAGE } from '../helper.js'
 import {
-  handleFetchResult
+  handleFetchResult,
+  CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import {
   getWOPIToken,
@@ -43,9 +44,14 @@ class CollaboraFrame extends React.Component {
 
   handleIframeIsClosing = (event) => {
     if (JSON.parse(event.data).MessageId === 'close') {
-      this.props.history.push(
-        PAGE.WORKSPACE.CONTENT(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id)
-      )
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+        data: {
+          workspaceId: this.props.content.workspace_id,
+          contentType: this.state.content.content_type,
+          contentId: this.props.content.content_id
+        }
+      })
     }
   }
 
@@ -70,7 +76,6 @@ class CollaboraFrame extends React.Component {
     const fetchResultFile = await handleFetchResult(
       await getFileContent(this.props.config.apiUrl, this.props.content.workspace_id, this.props.content.content_id)
     )
-
     switch (fetchResultFile.apiResponse.status) {
       case 200:
         this.setState({

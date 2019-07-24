@@ -16,8 +16,6 @@ const appInterface = {
   name: 'file',
   isRendered: false,
   renderAppFeature: data => {
-    console.log('INDEX')
-    console.log(data)
     return ReactDOM.render(
       <Router history={data.config.history}>
         <Switch>
