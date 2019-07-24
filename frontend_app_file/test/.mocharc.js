@@ -2,13 +2,12 @@
 
 module.exports = {
   require: [
-    '@babel/polyfill',
+    'regenerator-runtime',
     '@babel/register',
     'ignore-styles',
     'test/setup'
   ],
   reporter: 'spec',
   colors: true,
-  recursive: true,
-  extension: ['.spec.js']
+  recursive: true
 }

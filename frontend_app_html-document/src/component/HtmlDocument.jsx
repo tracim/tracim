@@ -7,7 +7,7 @@ import {
 import { MODE } from '../helper.js'
 import { withTranslation } from 'react-i18next'
 
-const HtmlDocument = props => {
+export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.isArchived && (

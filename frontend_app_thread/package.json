@@ -43,6 +43,7 @@
     "enzyme-adapter-react-16": "^1.14.0",
     "file-loader": "^4.0.0",
     "i18next-scanner": "^2.10.2",
+    "ignore-styles": "^5.0.1",
     "jsdom": "^15.1.1",
     "mocha": "^6.1.4",
     "standard": "^12.0.1",
