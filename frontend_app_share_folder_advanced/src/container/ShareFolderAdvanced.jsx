@@ -14,6 +14,7 @@ import {
 import { debug } from '../debug'
 import {
   // getShareFolder,
+  // putShareLinkList,
   getContentTypeList
 } from '../action.async.js'
 
@@ -37,6 +38,7 @@ class ShareFolderAdvanced extends React.Component {
       ],
       tracimContentTypeList: [],
       currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT,
+      shareLinkList: [],
       shareEmails: '',
       sharePassword: ''
     }
@@ -128,15 +130,20 @@ class ShareFolderAdvanced extends React.Component {
     GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
   }
 
-  handleClickDeleteShareLink = () => { // = async shareLinkId => {
-    // const { config, content } = this.state
+  handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
+    const { config, content } = this.state
 
-    // const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    // switch (fetchResultArchive.status) {
+    this.setState(previousState => ({
+      shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
+    }))
+
+    // const fetchResultSaveNewShareLinkList = await handleFetchResult(
+    //   await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
+    // )
+
+    // switch (fetchResultSaveNewShareLinkList.status) {
     //   case 204:
-    //     this.setState(previousState => ({
-    //       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
-    //     }))
+    //     ??
     //     break
     //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
     // }
@@ -146,8 +153,38 @@ class ShareFolderAdvanced extends React.Component {
     this.setState({currentPage: this.UPLOAD_STATUS.NEW_UPLOAD})
   }
 
-  handleClickNewUpload = () => {
-    // TODO New Upload
+  handleClickNewUpload = () => { // = async () => {
+    const { state } = this
+
+    this.convertSpaceAndCommaToNewLines()
+    const shareEmailList = state.shareEmails.split('\n').filter(shareEmail => shareEmail !== '')
+
+    shareEmailList.forEach(shareEmail => {
+      this.setState(previousState => ({
+        shareLinkList: [...previousState.shareLinkList,
+          {
+            email: shareEmail,
+            link: '?',
+            id: new Date()
+            // password bool?
+          }
+        ]
+      }))
+    })
+    // console.log(shareEmailList)
+    // this.setState({shareLinkList: newShareLinkList})
+
+    // const fetchResultSaveNewShareLinkList = await handleFetchResult(
+    //   await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
+    // )
+
+    // switch (fetchResultSaveNewShareLinkList.status) {
+    //   case 204:
+         this.setState({shareEmails: '', sharePassword: ''})
+    //     break
+    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+    // }
+
     this.setState({currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT})
   }
 
@@ -155,14 +192,18 @@ class ShareFolderAdvanced extends React.Component {
     this.setState({currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT})
   }
 
-  convertSpaceAndCommaToNewLines = e => {
-    if (e.key === 'Enter') {
-      const emailList = this.state.shareEmails.split(' ').join(',').split(',')
-      emailList.forEach(email => !this.checkEmailValid(email) &&
-        this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
+  handleKeyDownEnter = e => e.key === 'Enter' && this.convertSpaceAndCommaToNewLines()
 
-      this.setState({shareEmails: emailList.join('\n')})
-    }
+  convertSpaceAndCommaToNewLines = () => {
+    let emailList = this.state.shareEmails.split(' ').join(',')
+    emailList = emailList.split('\n').join(',').split(',')
+
+    emailList = emailList.filter(email => email !== '')
+    emailList.forEach(email => !this.checkEmailValid(email) &&
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
+    console.log(emailList.join('\n'))
+    this.setState({shareEmails: emailList.join('\n')})
+    console.log(this.state.shareEmails)
   }
 
   checkEmailValid = email => {
@@ -200,6 +241,7 @@ class ShareFolderAdvanced extends React.Component {
           {state.currentPage === this.UPLOAD_STATUS.UPLOAD_MANAGEMENT
             ? <UploadFilesManagement
               customColor={customColor}
+              shareLinkList={state.shareLinkList}
               onClickDeleteShareLink={this.handleClickDeleteShareLink}
               onClickNewUploadComponent={this.handleClickNewUploadComponent}
             />
@@ -212,7 +254,7 @@ class ShareFolderAdvanced extends React.Component {
               onChangeShareEmails={this.handleChangeEmails}
               sharePassword={state.sharePassword}
               onChangeSharePassword={this.handleChangePassword}
-              convertSpaceAndCommaToNewLines={this.convertSpaceAndCommaToNewLines}
+              onKeyDownEnter={this.handleKeyDownEnter}
             />
           }
         </PopinFixedContent>

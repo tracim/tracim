@@ -52,7 +52,7 @@ class NewUpload extends React.Component {
             rows='10'
             value={props.shareEmails}
             onChange={props.onChangeShareEmails}
-            onKeyDown={props.convertSpaceAndCommaToNewLines}
+            onKeyDown={props.onKeyDownEnter}
           />
           <button
             type='button'
@@ -142,7 +142,7 @@ NewUpload.propTypes = {
   customColor: PropTypes.string,
   shareEmails: PropTypes.string,
   onChangeShareEmails: PropTypes.func,
-  convertSpaceAndCommaToNewLines: PropTypes.func,
+  onKeyDownEnter: PropTypes.func,
   sharePassword: PropTypes.string,
   onChangeSharePassword: PropTypes.func,
   onClickReturnToManagement: PropTypes.func,
@@ -153,7 +153,7 @@ NewUpload.defaultProps = {
   customColor: '',
   shareEmails: '',
   onChangeShareEmails: () => {},
-  convertSpaceAndCommaToNewLines: () => {},
+  onKeyDownEnter: () => {},
   sharePassword: '',
   onChangeSharePassword: () => {},
   onClickReturnToManagement: () => {},

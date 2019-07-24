@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import color from 'color'
 import PropTypes from 'prop-types'
-// import { ShareLink } from 'tracim_frontend_lib'
+import { ShareLink } from 'tracim_frontend_lib'
 
 const UploadFilesManagement = props => {
   const customColor = props.customColor
@@ -27,7 +27,7 @@ const UploadFilesManagement = props => {
           <i className='fa fa-fw fa-plus-circle' />
         </button>
       </div>
-      {/* {props.shareLinkList.length > 0
+      {props.shareLinkList.length > 0
         ? props.shareLinkList.map(shareLink =>
           <ShareLink
             email={shareLink.email}
@@ -36,8 +36,8 @@ const UploadFilesManagement = props => {
             hexcolor={customColor}
           />
         )
-        : <div className='m-auto'>No upload link has been created yet.</div>
-      } */}
+        : <div className='share_folder_advanced__content__empty'>No upload link has been created yet.</div>
+      }
     </div>
   )
 }
@@ -45,12 +45,12 @@ const UploadFilesManagement = props => {
 export default translate()(Radium(UploadFilesManagement))
 
 UploadFilesManagement.propTypes = {
-  // shareLinkList: PropTypes.array.isRequired,
-  // onClickDeleteShareLink: PropTypes.func,
+  shareLinkList: PropTypes.array.isRequired,
+  onClickDeleteShareLink: PropTypes.func,
   customColor: PropTypes.string
 }
 
 UploadFilesManagement.defaultProps = {
-  // onClickDeleteShareLink: () => {},
+  onClickDeleteShareLink: () => {},
   customColor: ''
 }

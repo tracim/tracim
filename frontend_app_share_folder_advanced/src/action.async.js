@@ -1,7 +1,7 @@
 import { FETCH_CONFIG } from 'tracim_frontend_lib'
 
-// FIXME - FolderID?
-export const getSharedFolder = (apiUrl, workspaceId, folderId) =>
+// FIXME - GB - 2019-07-24 - FolderID?
+export const getShareFolder = (apiUrl, workspaceId, folderId) =>
   fetch(`${apiUrl}/workspaces/${workspaceId}/folders/${folderId}`, {
     credentials: 'include',
     headers: {
@@ -18,3 +18,15 @@ export const getContentTypeList = apiUrl =>
     },
     method: 'GET'
   })
+
+// export const putShareLinkList = (apiUrl, workspaceId, shareLinkList) =>
+//   fetch(`${apiUrl}/workspaces/${workspaceId}/share_folder`, {
+//     credentials: 'include',
+//     headers: {
+//       ...FETCH_CONFIG.headers
+//     },
+//     method: 'PUT',
+//     body: JSON.stringify({
+//       share_link_list: shareLinkList
+//     })
+//   })
