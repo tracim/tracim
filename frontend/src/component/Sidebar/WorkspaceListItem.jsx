@@ -150,6 +150,7 @@ WorkspaceListItem.propTypes = {
 }
 
 WorkspaceListItem.defaultProps = {
+  allowedAppList: [],
   onClickTitle: () => {},
   onClickAllContent: () => {},
   isOpenInSidebar: false,

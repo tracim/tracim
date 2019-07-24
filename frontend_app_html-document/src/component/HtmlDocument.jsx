@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {
   TextAreaApp,
   DisplayState
@@ -6,7 +7,7 @@ import {
 import { MODE } from '../helper.js'
 import { withTranslation } from 'react-i18next'
 
-const HtmlDocument = props => {
+export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.isArchived && (
@@ -81,3 +82,24 @@ const HtmlDocument = props => {
 }
 
 export default withTranslation()(HtmlDocument)
+
+HtmlDocument.propTypes = {
+  mode: PropTypes.string,
+  customColor: PropTypes.string,
+  wysiwygNewVersion: PropTypes.string,
+  disableValidateBtn: PropTypes.bool,
+  version: PropTypes.string,
+  lastVersion: PropTypes.string,
+  text: PropTypes.string,
+  isArchived: PropTypes.bool,
+  isDeleted: PropTypes.bool,
+  isDeprecated: PropTypes.bool,
+  deprecatedStatus: PropTypes.object,
+  isDraftAvailable: PropTypes.bool,
+  onClickValidateBtn: PropTypes.func,
+  onChangeText: PropTypes.func,
+  onClickCloseEditMode: PropTypes.func,
+  onClickRestoreArchived: PropTypes.func,
+  onClickRestoreDeleted: PropTypes.func,
+  onClickShowDraft: PropTypes.func
+}
