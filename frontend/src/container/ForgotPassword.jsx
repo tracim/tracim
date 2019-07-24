@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -31,7 +31,7 @@ export class ForgotPassword extends React.Component {
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
-  handleChangeBackupEmail = e => this.setState({backupEmail: {value: e.target.value, isInvalid: false}})
+  handleChangeBackupEmail = e => this.setState({ backupEmail: { value: e.target.value, isInvalid: false } })
 
   handleClickCancel = () => this.props.history.push(PAGE.LOGIN)
 
@@ -114,4 +114,4 @@ export class ForgotPassword extends React.Component {
 }
 
 const mapStateToProps = () => ({})
-export default connect(mapStateToProps)(translate()(ForgotPassword))
+export default connect(mapStateToProps)(withTranslation()(ForgotPassword))

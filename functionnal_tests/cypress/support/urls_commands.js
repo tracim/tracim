@@ -3,7 +3,8 @@ const PAGES = {
   CONTENTS: 'contents',
   DASHBOARD: 'dashboard',
   AGENDA: 'agenda',
-  EDIT_FOLDER: 'editFolder'
+  EDIT_FOLDER: 'editFolder',
+  SEARCH: 'search'
 }
 
 const URLS = {
@@ -11,7 +12,8 @@ const URLS = {
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
-  [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`
+  [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
+  [PAGES.SEARCH]: ({searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes}) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`
 }
 
 /**

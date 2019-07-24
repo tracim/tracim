@@ -16,9 +16,9 @@ const serializeContent = c => ({
   type: c.content_type,
   fileName: c.filename,
   fileExtension: c.file_extension,
-  idWorkspace: c.workspace_id,
+  workspaceId: c.workspace_id,
   isArchived: c.is_archived,
-  idParent: c.parent_id,
+  parentId: c.parent_id,
   isDeleted: c.is_deleted,
   showInUi: c.show_in_ui,
   statusSlug: c.status,
@@ -31,34 +31,34 @@ export default function workspaceContentList (state = [], action) {
     case `${SET}/${WORKSPACE_CONTENT}`:
       return action.workspaceContentList.map(c => ({
         ...serializeContent(c),
-        isOpen: action.idFolderToOpenList.includes(c.content_id)
+        isOpen: action.folderIdToOpenList.includes(c.content_id)
       }))
 
     case `${ADD}/${WORKSPACE_CONTENT}`:
-      const idParentList = [
-        ...state.filter(c => c.idParent),
-        ...action.workspaceContentList.filter(c => c.idParent)
+      const parentIdList = [
+        ...state.filter(c => c.parentId),
+        ...action.workspaceContentList.filter(c => c.parentId)
       ]
       return [
         ...state,
         ...action.workspaceContentList.map(c => ({
           ...serializeContent(c),
-          isOpen: idParentList.includes(c.content_id)
+          isOpen: parentIdList.includes(c.content_id)
         }))
       ]
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
-      return state.map(c => c.id === action.idFolder ? {...c, isOpen: !c.isOpen} : c)
+      return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
 
     case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
-      return state.map(wsc => wsc.idWorkspace === action.idWorkspace && wsc.id === action.idContent
-        ? {...wsc, isArchived: true}
+      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
+        ? { ...wsc, isArchived: true }
         : wsc
       )
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
-      return state.map(wsc => wsc.idWorkspace === action.idWorkspace && wsc.id === action.idContent
-        ? {...wsc, isDeleted: true}
+      return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
+        ? { ...wsc, isDeleted: true }
         : wsc
       )
 

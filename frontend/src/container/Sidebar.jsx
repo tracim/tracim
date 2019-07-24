@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
@@ -17,6 +17,7 @@ import {
   ROLE,
   TRACIM_APP_VERSION
 } from '../helper.js'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -25,12 +26,12 @@ class Sidebar extends React.Component {
       sidebarClose: false
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer)
+    document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
-      case 'showCreateWorkspacePopup':
+      case CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP:
         this.handleClickNewWorkspace()
         break
     }
@@ -45,16 +46,16 @@ class Sidebar extends React.Component {
       props.match.params.idws &&
       props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
     ) {
-      const idWorkspaceInUrl = parseInt(props.match.params.idws)
+      const workspaceIdInUrl = parseInt(props.match.params.idws)
 
-      if (props.workspaceList.find(ws => ws.id === idWorkspaceInUrl) !== undefined) {
-        props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceInUrl, true))
+      if (props.workspaceList.find(ws => ws.id === workspaceIdInUrl) !== undefined) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl, true))
       }
     }
   }
 
   componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
+    document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
   shouldDisplaySidebar = props => { // pass props to allow to pass nextProps in shouldComponentUpdate
@@ -69,9 +70,9 @@ class Sidebar extends React.Component {
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
-  handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
+  handleClickToggleSidebar = () => this.setState(prev => ({ sidebarClose: !prev.sidebarClose }))
 
-  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({block: 'start', inline: 'nearest', behavior: 'smooth'})
+  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
@@ -82,7 +83,7 @@ class Sidebar extends React.Component {
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
-      <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
+      <div className={classnames('sidebar', { 'sidebarclose': sidebarClose })}>
         <div className='sidebar__scrollview'>
           <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
             {sidebarClose
@@ -100,17 +101,17 @@ class Sidebar extends React.Component {
           */}
 
           <div className='sidebar__content'>
-            <div id='sidebar__content__scrolltopmarker' style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
+            <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-            <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
+            <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
               <ul className='sidebar__content__navigation__workspace'>
                 { workspaceList.map(ws =>
                   <WorkspaceListItem
                     workspaceId={ws.id}
-                    userWorkspaceRoleId={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE)}
+                    userRoleIdInWorkspace={findUserRoleIdInWorkspace(user.user_id, ws.memberList, ROLE)}
                     label={ws.label}
                     allowedAppList={ws.sidebarEntry}
-                    activeIdWorkspace={parseInt(this.props.match.params.idws) || -1}
+                    activeWorkspaceId={parseInt(this.props.match.params.idws) || -1}
                     isOpenInSidebar={ws.isOpenInSidebar}
                     onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                     onClickAllContent={this.handleClickAllContent}
@@ -151,4 +152,4 @@ class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))
+export default withRouter(connect(mapStateToProps)(appFactory(withTranslation()(Sidebar))))

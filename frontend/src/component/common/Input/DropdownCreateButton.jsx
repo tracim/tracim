@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import SubDropdownCreateButton from './SubDropdownCreateButton.jsx'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const DropdownCreateButton = props => {
   return (
@@ -26,7 +26,7 @@ const DropdownCreateButton = props => {
         aria-labelledby='dropdownCreateBtn'
       >
         <SubDropdownCreateButton
-          idFolder={props.idFolder}
+          folderId={props.folderId}
           availableApp={props.availableApp}
           onClickCreateContent={props.onClickCreateContent}
         />
@@ -35,14 +35,14 @@ const DropdownCreateButton = props => {
   )
 }
 
-export default translate()(DropdownCreateButton)
+export default withTranslation()(DropdownCreateButton)
 
 DropdownCreateButton.propTypes = {
   availableApp: PropTypes.array.isRequired,
   onClickCreateContent: PropTypes.func.isRequired,
   parentClass: PropTypes.string,
   customClass: PropTypes.string,
-  idFolder: PropTypes.number
+  folderId: PropTypes.number
 }
 
 DropdownCreateButton.defaultProps = {

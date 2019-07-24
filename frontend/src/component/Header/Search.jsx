@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 require('./Search.styl')
 
@@ -12,7 +12,7 @@ class Search extends React.Component {
     }
   }
 
-  handleNewSearch = e => this.setState({searchedKeywords: e.target.value})
+  handleNewSearch = e => this.setState({ searchedKeywords: e.target.value })
 
   handleClickSearch = () => {
     this.props.onClickSearch(this.state.searchedKeywords)
@@ -45,4 +45,4 @@ class Search extends React.Component {
     )
   }
 }
-export default translate()(Search)
+export default withTranslation()(Search)

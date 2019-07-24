@@ -1,0 +1,22 @@
+import { defaultDebug } from 'tracim_frontend_lib'
+
+export const debug = {
+  config: {
+    ...defaultDebug.config,
+    apiUrl: '',
+    slug: 'html-document',
+    faIcon: 'file-text-o',
+    hexcolor: '#00CC00',
+    creationLabel: 'Write a document',
+    label: 'Text Document'
+  },
+  content: {
+    ...defaultDebug.content,
+    content_id: 0,
+    content_type: 'html-document',
+    workspace_id: 0
+  },
+  loggedUser: {
+    ...defaultDebug.loggedUser
+  }
+}

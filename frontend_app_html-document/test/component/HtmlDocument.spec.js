@@ -1,8 +1,8 @@
 import React from 'react'
-import {expect, assert} from 'chai'
-import {shallow, mount, configure} from 'enzyme'
-import {HtmlDocument} from '../../src/component/HtmlDocument.jsx'
-import {MODE} from '../../src/helper.js'
+import { expect, assert } from 'chai'
+import { shallow, mount, configure } from 'enzyme'
+import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
+import { MODE } from '../../src/helper.js'
 import {
   TextAreaApp,
   DisplayState

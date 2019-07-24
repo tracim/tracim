@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
 
 export class Password extends React.Component {
@@ -20,7 +20,7 @@ export class Password extends React.Component {
       props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
       return
     }
-    this.setState({oldPassword: e.target.value})
+    this.setState({ oldPassword: e.target.value })
   }
 
   handleChangeNewPassword = e => {
@@ -29,7 +29,7 @@ export class Password extends React.Component {
       props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
       return
     }
-    this.setState({newPassword: e.target.value})
+    this.setState({ newPassword: e.target.value })
   }
 
   handleChangeNewPassword2 = e => {
@@ -38,10 +38,10 @@ export class Password extends React.Component {
       props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
       return
     }
-    this.setState({newPassword2: e.target.value})
+    this.setState({ newPassword2: e.target.value })
   }
 
-  handleChangeCheckAdminPassword = e => this.setState({checkAdminPassword: e.target.value})
+  handleChangeCheckAdminPassword = e => this.setState({ checkAdminPassword: e.target.value })
 
   handleClickSubmit = async () => {
     const { props, state } = this
@@ -161,7 +161,7 @@ export class Password extends React.Component {
 }
 
 const mapStateToProps = () => ({})
-export default connect(mapStateToProps)(translate()(Password))
+export default connect(mapStateToProps)(withTranslation()(Password))
 
 Password.defaultProps = {
   displayAdminInfo: false

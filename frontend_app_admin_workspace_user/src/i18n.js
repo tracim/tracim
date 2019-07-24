@@ -1,8 +1,8 @@
 import i18n from 'i18next'
-import { reactI18nextModule } from 'react-i18next'
+import { initReactI18next } from 'react-i18next'
 
 i18n
-  .use(reactI18nextModule)
+  .use(initReactI18next)
   .init({
     fallbackLng: 'fr',
     // have a common namespace used around the full app
@@ -20,6 +20,6 @@ i18n
     resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
-i18n.idTracim = 'frontend_app_admin_workspace_user'
+i18n.tracimId = 'frontend_app_admin_workspace_user'
 
 export default i18n

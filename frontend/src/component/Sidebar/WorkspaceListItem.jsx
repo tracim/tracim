@@ -1,8 +1,7 @@
 import React from 'react'
-import color from 'color'
 import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 import { DropTarget } from 'react-dnd'
@@ -12,10 +11,11 @@ import {
 } from '../../helper.js'
 
 const qs = require('query-string')
+const color = require('color')
 
-export class WorkspaceListItem extends React.Component {
-  shouldDisplayAsActive = (location, workspaceId, activeIdWorkspace, app) => {
-    if (workspaceId !== activeIdWorkspace) return false
+class WorkspaceListItem extends React.Component {
+  shouldDisplayAsActive = (location, workspaceId, activeWorkspaceId, app) => {
+    if (workspaceId !== activeWorkspaceId) return false
 
     const filterType = qs.parse(location.search).type
 
@@ -24,8 +24,8 @@ export class WorkspaceListItem extends React.Component {
       : location.pathname.includes(app.route)
   }
 
-  buildLink = (route, search, workspaceId, activeIdWorkspace) => {
-    if (workspaceId !== activeIdWorkspace) return route
+  buildLink = (route, search, workspaceId, activeWorkspaceId) => {
+    if (workspaceId !== activeWorkspaceId) return route
 
     if (search === '') return route
 
@@ -33,7 +33,7 @@ export class WorkspaceListItem extends React.Component {
     // But "type" already is in allowedAppList.route, so we need to remove it before passing props.location.search
     let urlSearch = qs.parse(search)
     delete urlSearch.type
-    urlSearch = qs.stringify(urlSearch, {encode: false})
+    urlSearch = qs.stringify(urlSearch, { encode: false })
 
     return `${route}${route.includes('?') ? '&' : '?'}${urlSearch}`
   }
@@ -44,7 +44,7 @@ export class WorkspaceListItem extends React.Component {
     const isDropActive = props.canDrop && props.isOver
 
     if (isDropActive) {
-      const isDropAllowed = props.userWorkspaceRoleId >= ROLE_OBJECT.contributor.id
+      const isDropAllowed = props.userRoleIdInWorkspace >= ROLE_OBJECT.contributor.id
       const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
 
       if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return <i className='fa fa-arrow-circle-down' />
@@ -70,7 +70,7 @@ export class WorkspaceListItem extends React.Component {
             className='sidebar__content__navigation__workspace__item__number'
             style={{
               backgroundColor: GLOBAL_primaryColor,
-              color: color(GLOBAL_primaryColor).light() ? '#333333' : '#fdfdfd'
+              color: color(GLOBAL_primaryColor).isLight() ? '#333333' : '#fdfdfd'
             }}
           >
             {this.getIcon()}
@@ -95,12 +95,12 @@ export class WorkspaceListItem extends React.Component {
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
               >
-                <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeIdWorkspace)}>
+                <Link to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}>
                   <div className={classnames(
                     'sidebar__content__navigation__workspace__item__submenu__dropdown',
-                    {'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeIdWorkspace, allowedApp)}
+                    { 'activeFilter': this.shouldDisplayAsActive(props.location, props.workspaceId, props.activeWorkspaceId, allowedApp) }
                   )}>
-                    <div className='dropdown__icon' style={{backgroundColor: allowedApp.hexcolor}}>
+                    <div className='dropdown__icon' style={{ backgroundColor: allowedApp.hexcolor }}>
                       <i className={classnames(`fa fa-${allowedApp.faIcon}`)} />
                     </div>
 
@@ -136,23 +136,24 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
   draggedItem: monitor.getItem()
 })
 
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(translate()(WorkspaceListItem)))
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(withTranslation()(WorkspaceListItem)))
 
 WorkspaceListItem.propTypes = {
   workspaceId: PropTypes.number.isRequired,
-  userWorkspaceRoleId: PropTypes.number,
   label: PropTypes.string.isRequired,
   allowedAppList: PropTypes.array,
   onClickTitle: PropTypes.func,
+  onClickAllContent: PropTypes.func,
   isOpenInSidebar: PropTypes.bool,
-  activeIdWorkspace: PropTypes.number
+  activeFilterList: PropTypes.array,
+  activeWorkspaceId: PropTypes.number
 }
 
 WorkspaceListItem.defaultProps = {
-  userWorkspaceRoleId: 1,
-  label: '',
   allowedAppList: [],
   onClickTitle: () => {},
+  onClickAllContent: () => {},
   isOpenInSidebar: false,
-  activeIdWorkspace: -1
+  activeFilterList: [],
+  activeWorkspaceId: -1
 }

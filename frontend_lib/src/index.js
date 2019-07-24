@@ -7,9 +7,12 @@ import {
   revisionTypeList,
   generateLocalStorageContentId,
   appFeatureCustomEventHandlerShowApp,
-  BREADCRUMBS_TYPE
+  BREADCRUMBS_TYPE,
+  FETCH_CONFIG
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
+
+import { defaultDebug } from './debug.js'
 
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
@@ -51,12 +54,12 @@ import DisplayState from './component/DisplayState/DisplayState.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
-    case 'allApp_changeLang': i18n.changeLanguage(data); break
+    case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: i18n.changeLanguage(data); break
     default: break
   }
 }
 
-document.addEventListener('appCustomEvent', customEventReducer)
+document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEventReducer)
 
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
@@ -92,6 +95,8 @@ export {
   NewMemberForm,
   CUSTOM_EVENT,
   BREADCRUMBS_TYPE,
+  FETCH_CONFIG,
+  defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,
   IconButton,

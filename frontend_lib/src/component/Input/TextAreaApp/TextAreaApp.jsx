@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 
 // require('./TextAreaApp.styl') // see https://github.com/tracim/tracim/issues/1156
+const color = require('color')
 
 export const TextAreaApp = props =>
   <form className={`${props.customClass} editionmode`}>
@@ -45,7 +45,7 @@ export const TextAreaApp = props =>
           color: '#fdfdfd',
           borderColor: props.customColor,
           ':hover': {
-            backgroundColor: color(props.customColor).darken(0.15).hexString()
+            backgroundColor: color(props.customColor).darken(0.15).hex()
           }
         }}
         key='TextAreaApp__validate'
@@ -55,7 +55,7 @@ export const TextAreaApp = props =>
     </div>
   </form>
 
-export default translate()(Radium(TextAreaApp))
+export default withTranslation()(Radium(TextAreaApp))
 
 TextAreaApp.propTypes = {
   text: PropTypes.string.isRequired,
