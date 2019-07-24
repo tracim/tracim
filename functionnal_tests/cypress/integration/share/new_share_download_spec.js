@@ -5,9 +5,9 @@ const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
 const emailInput = '.shareDownload__email__input'
-const email1 = 'email1@email1.com'
-const email2 = 'email2@email2.com'
-const email3 = 'email1@email3.com'
+const email1 = 'email1@email1.email1'
+const email2 = 'email2@email2.email2'
+const email3 = 'email1@email3.email3'
 
 let workspaceId
 

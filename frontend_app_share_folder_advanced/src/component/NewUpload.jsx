@@ -76,6 +76,7 @@ class NewUpload extends React.Component {
               className='newUpload__password__icon'
               key='seeSharePassword'
               style={{':hover': {color: customColor}}}
+              data-cy='seePassword'
               onClick={this.handleSeePassword}
             >
               <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
@@ -101,7 +102,7 @@ class NewUpload extends React.Component {
 
         <div className='d-flex'>
           <button
-            className='newUpload__btnDelete btn outlineTextBtn'
+            className='newUpload__btnCancel btn outlineTextBtn'
             key='deleteAllShares'
             style={{
               borderColor: customColor,
