@@ -9,7 +9,9 @@ import {
   PopinFixedContent,
   addAllResourceI18n,
   handleFetchResult,
-  CUSTOM_EVENT
+  CUSTOM_EVENT,
+  checkEmailValid,
+  parserStringtoList
 } from 'tracim_frontend_lib'
 import { debug } from '../debug'
 import {
@@ -81,6 +83,7 @@ class ShareFolderAdvanced extends React.Component {
 
   componentDidMount () {
     this.loadContent()
+    // this.loadShareLinkList()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -122,6 +125,25 @@ class ShareFolderAdvanced extends React.Component {
     }
   }
 
+  // loadShareLinkList = async () => {
+  //   const { content, config } = this.state
+
+  //   const fetchResultShareLinkList = await handleFetchResult(await getShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
+
+  //   switch (fetchResultShareLinkList.apiResponse.status) {
+  //     case 200:
+  //       this.setState({
+  //         shareLinkList: fetchResultShareLinkList.links
+  //       })
+  //       break
+  //     default:
+  //       this.sendGlobalFlashMessage(this.props.t('Error while loading share links list'))
+  //       return
+  //   }
+
+  //   GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}}) // Needed?
+  // }
+
   handleChangeEmails = e => this.setState({shareEmails: e.target.value})
   handleChangePassword = e => this.setState({sharePassword: e.target.value})
 
@@ -131,7 +153,7 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
-    const { config, content } = this.state
+    // const { config, content } = this.state
 
     this.setState(previousState => ({
       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
@@ -156,20 +178,23 @@ class ShareFolderAdvanced extends React.Component {
   handleClickNewUpload = () => { // = async () => {
     const { state } = this
 
-    this.convertSpaceAndCommaToNewLines()
-    const shareEmailList = state.shareEmails.split('\n').filter(shareEmail => shareEmail !== '')
+    const shareEmailList = parserStringtoList(state.shareEmails).filter(shareEmail => shareEmail !== '')
 
     shareEmailList.forEach(shareEmail => {
-      this.setState(previousState => ({
-        shareLinkList: [...previousState.shareLinkList,
-          {
-            email: shareEmail,
-            link: '?',
-            id: new Date()
-            // password bool?
-          }
-        ]
-      }))
+      if (!checkEmailValid(shareEmail)) {
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${shareEmail} are not valid`))
+      } else {
+        this.setState(previousState => ({
+          shareLinkList: [...previousState.shareLinkList,
+            {
+              email: shareEmail,
+              link: '?',
+              id: new Date()
+              // password bool?
+            }
+          ]
+        }))
+      }
     })
     // console.log(shareEmailList)
     // this.setState({shareLinkList: newShareLinkList})
@@ -192,31 +217,16 @@ class ShareFolderAdvanced extends React.Component {
     this.setState({currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT})
   }
 
-  handleKeyDownEnter = e => e.key === 'Enter' && this.convertSpaceAndCommaToNewLines()
+  handleKeyDownEnter = e => {
+    if (e.key === 'Enter') {
+      let emailList = parserStringtoList(this.state.shareEmails)
 
-  convertSpaceAndCommaToNewLines = () => {
-    let emailList = this.state.shareEmails.split(' ').join(',')
-    emailList = emailList.split('\n').join(',').split(',')
+      emailList = emailList.filter(email => email !== '')
+      emailList.forEach(email => !checkEmailValid(email) &&
+          this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
 
-    emailList = emailList.filter(email => email !== '')
-    emailList.forEach(email => !this.checkEmailValid(email) &&
-        this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
-    console.log(emailList.join('\n'))
-    this.setState({shareEmails: emailList.join('\n')})
-    console.log(this.state.shareEmails)
-  }
-
-  checkEmailValid = email => {
-    const parts = email.split('@')
-    if (parts.length !== 2) {
-      return false
-    } else {
-      const domainParts = parts[1].split('.')
-      if (domainParts.length !== 2) {
-        return false
-      }
+      this.setState({shareEmails: emailList.join('\n')})
     }
-    return true
   }
 
   render () {

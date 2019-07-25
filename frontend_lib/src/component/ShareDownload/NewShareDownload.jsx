@@ -56,7 +56,7 @@ class NewShareDownload extends React.Component {
             rows='10'
             value={props.shareEmails}
             onChange={props.onChangeEmails}
-            onKeyDown={props.convertSpaceAndCommaToNewLines}
+            onKeyDown={props.onKeyDownEnter}
           />
           <button
             type='button'
@@ -93,7 +93,7 @@ class NewShareDownload extends React.Component {
               placeholder={props.t('Password to share link (optional)')}
               value={props.sharePassword}
               onChange={props.onChangePassword}
-              onFocus={props.convertSpaceAndCommaToNewLines}
+              onFocus={props.onKeyDownEnter}
             />
           </div>
           <button
@@ -132,7 +132,7 @@ class NewShareDownload extends React.Component {
           <button
             className='btn highlightBtn'
             key='newShareDownload'
-            onClick={props.onClickReturnToManagement}
+            onClick={props.onClickNewShare}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {

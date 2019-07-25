@@ -154,3 +154,18 @@ export const displayFileSize = (bytes, decimals) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
+
+export const parserStringtoList = string => string.split(' ').join(',').split('\n').join(',').split(',')
+
+export const checkEmailValid = email => {
+  const parts = email.split('@')
+  if (parts.length !== 2) {
+    return false
+  } else {
+    const domainParts = parts[1].split('.')
+    if (domainParts.length !== 2) {
+      return false
+    }
+  }
+  return true
+}

@@ -10,7 +10,9 @@ import {
   appFeatureCustomEventHandlerShowApp,
   BREADCRUMBS_TYPE,
   FETCH_CONFIG,
-  displayFileSize
+  displayFileSize,
+  parserStringtoList,
+  checkEmailValid
 } from './helper.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 
@@ -109,6 +111,8 @@ export {
   BREADCRUMBS_TYPE,
   FETCH_CONFIG,
   displayFileSize,
+  parserStringtoList,
+  checkEmailValid,
   defaultDebug,
   appFeatureCustomEventHandlerShowApp,
   ListItemWrapper,

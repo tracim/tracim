@@ -24,6 +24,11 @@ class ShareDownload extends React.Component {
     this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
   }
 
+  handleNewShare = () => {
+    this.props.onClickNewShare()
+    this.handleReturnToManagement()
+  }
+
   render () {
     const { props, state } = this
 
@@ -42,9 +47,10 @@ class ShareDownload extends React.Component {
             onClickReturnToManagement={this.handleReturnToManagement}
             shareEmails={props.shareEmails}
             onChangeEmails={props.onChangeEmails}
-            convertSpaceAndCommaToNewLines={props.convertSpaceAndCommaToNewLines}
+            onKeyDownEnter={props.onKeyDownEnter}
             sharePassword={props.sharePassword}
             onChangePassword={props.onChangePassword}
+            onClickNewShare={this.handleNewShare}
           />
         }
       </div>

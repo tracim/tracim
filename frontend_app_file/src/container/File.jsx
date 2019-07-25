@@ -22,7 +22,9 @@ import {
   appFeatureCustomEventHandlerShowApp,
   CUSTOM_EVENT,
   ShareDownload,
-  displayFileSize
+  displayFileSize,
+  checkEmailValid,
+  parserStringtoList
 } from 'tracim_frontend_lib'
 import {
   MODE,
@@ -34,6 +36,7 @@ import {
   getFileComment,
   getFileRevision,
   // getShareLinkList,
+  // putShareLinkList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -153,6 +156,7 @@ class File extends React.Component {
     await this.loadContent()
     this.loadTimeline()
     this.buildBreadcrumbs()
+    // this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -610,48 +614,47 @@ class File extends React.Component {
     }))
   }
 
-  checkEmailValid = email => {
-    const parts = email.split('@')
-    if (parts.length !== 2) {
-      return false
-    } else {
-      const domainParts = parts[1].split('.')
-      if (domainParts.length !== 2) {
-        return false
-      }
-    }
-    return true
+  handleClickNewShare = () => { // = async () => {
+    const { state } = this
+
+    const shareEmailList = parserStringtoList(state.shareEmails).filter(shareEmail => shareEmail !== '')
+
+    shareEmailList.forEach(shareEmail => {
+      this.setState(previousState => ({
+        shareLinkList: [...previousState.shareLinkList,
+          {
+            email: shareEmail,
+            link: '?',
+            id: new Date()
+            // password bool?
+          }
+        ]
+      }))
+    })
+    // console.log(shareEmailList)
+    // this.setState({shareLinkList: newShareLinkList})
+
+    // const fetchResultSaveNewShareLinkList = await handleFetchResult(
+    //   await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
+    // )
+
+    // switch (fetchResultSaveNewShareLinkList.status) {
+    //   case 204:
+         this.setState({shareEmails: '', sharePassword: ''})
+    //     break
+    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+    // }
   }
-
-  // handleClickNewShare = async () => {
-  //   const { content, config } = this.state
-  //   this.convertSpaceAndCommaToNewLines()
-  //   const emailList = this.state.shareEmails.split('\n')
-
-  //   emailList.forEach(email => {
-  //   const fetchResultShareLinkList = await handleFetchResult(await postShareLinkList(config.apiUrl, content.workspace_id, content.content_id))
-
-  //   switch (fetchResultShareLinkList.apiResponse.status) {
-  //     case 200:
-  //       this.setState({
-  //         shareEmails: '',
-  //         sharePassword: ''
-  //       })
-  //       break
-  //     default:
-  //       this.sendGlobalFlashMessage(this.props.t('Error while creating new share link'))
-  //       return
-  //   }})
-  // }
 
   handleChangeEmails = e => this.setState({shareEmails: e.target.value})
   handleChangePassword = e => this.setState({sharePassword: e.target.value})
-
-  convertSpaceAndCommaToNewLines = e => {
+  handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
-      const emailList = this.state.shareEmails.split(' ').join(',').split(',')
-      emailList.forEach(email => !this.checkEmailValid(email) &&
-        this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
+      let emailList = parserStringtoList(this.state.shareEmails)
+
+      emailList = emailList.filter(email => email !== '')
+      emailList.forEach(email => !checkEmailValid(email) &&
+          this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
 
       this.setState({shareEmails: emailList.join('\n')})
     }
@@ -660,12 +663,17 @@ class File extends React.Component {
   handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
     // const { config, content } = this.state
 
-    // const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
-    // switch (fetchResultArchive.status) {
+    this.setState(previousState => ({
+      shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
+    }))
+
+    // const fetchResultSaveNewShareLinkList = await handleFetchResult(
+    //   await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
+    // )
+
+    // switch (fetchResultSaveNewShareLinkList.status) {
     //   case 204:
-    //     this.setState(previousState => ({
-    //       shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
-    //     }))
+    //     ??
     //     break
     //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
     // }
@@ -827,11 +835,12 @@ class File extends React.Component {
                   hexcolor={state.config.hexcolor}
                   shareEmails={state.shareEmails}
                   onChangeEmails={this.handleChangeEmails}
-                  convertSpaceAndCommaToNewLines={this.convertSpaceAndCommaToNewLines}
+                  onKeyDownEnter={this.handleKeyDownEnter}
                   sharePassword={state.sharePassword}
                   onChangePassword={this.handleChangePassword}
                   shareLinkList={state.shareLinkList}
                   onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                  onClickNewShare={this.handleClickNewShare}
                 />
               },
               {
