@@ -140,6 +140,11 @@ export const NewMemberForm = props => {
                   </div>
                 </div>
               </label>
+
+              <div className='name__adminmsg'>
+                <i className='fa fa-lightbulb-o' />
+                {r.description}
+              </div>
             </li>
           )}
         </ul>
