@@ -50,54 +50,6 @@ import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
-    props.appList.push({
-      label: 'Office Doc',
-      slug: 'office_document',
-      isActive: true,
-      faIcon: 'comments-o',
-      hexcolor: '#428BCA'
-    })
-
-    props.contentType.push(
-      {
-        availableStatuses: [
-          {
-            faIcon: 'square-o',
-            globalStatus: 'open',
-            hexcolor: '#5c3dcc',
-            label: 'Open',
-            slug: 'open'
-          },
-          {
-            faIcon: "check-square-o",
-            globalStatus: "closed",
-            hexcolor: "#008000",
-            label: "Validated",
-            slug: "closed-validated"
-          },
-          {
-            faIcon: "close",
-            globalStatus: "closed",
-            hexcolor: "#f63434",
-            label: "Cancelled",
-            slug: "closed-unvalidated"
-          },
-          {
-            faIcon: "warning",
-            globalStatus: "closed",
-            hexcolor: "#ababab",
-            label: "Deprecated",
-            slug: "closed-deprecated"
-          }
-        ],
-            creationLabel: "Create a doc",
-            faIcon: "comments-o",
-            hexcolor: "#5c3dcc",
-            label: "Office Doc",
-            slug: "office_document"
-      }
-    )
-
     super(props)
     this.state = {
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
