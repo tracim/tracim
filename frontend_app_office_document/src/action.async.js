@@ -14,7 +14,7 @@ export const postOfficeDocumentFromTemplate = (apiUrl, workspaceId, folderId, co
     })
   })
 
-export const getOfficeTemplates = (apiUrl, workspaceId) =>
+export const getOfficeDocumentTemplates = (apiUrl, workspaceId) =>
   fetch(`${apiUrl}/collaborative-document-edition/templates`, {
     credentials: 'include',
     headers: {

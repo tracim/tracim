@@ -8,7 +8,7 @@ const option = require('../i18next.option.js')
 // this issue seems related : https://github.com/i18next/i18next-scanner/issues/88
 // --------------------
 
-vfs.src(['./src/**/*.jsx'])
+vfs.src(['./src/**/*.jsx', './src/**/*.js'])
 // .pipe(sort()) // Sort files in stream by path
   .pipe(scanner(option))
   .pipe(vfs.dest('./i18next.scanner'))

@@ -320,7 +320,7 @@ class File extends React.Component {
 
   handleClickEdit = () => {
     const { state } = this
-    this.props.data.config.history.push(
+    state.config.history.push(
       PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, CONTENT_TYPE_FILE, state.content.content_id)
     )
   }
@@ -626,7 +626,7 @@ class File extends React.Component {
 
   setIsEditable = async () => {
     const { state } = this
-    if (!state.content.file_extension) {
+    if (!(state.content.file_extension && state.config.system.config.collaborative_document_edition)) {
       return
     }
     const editorType = state.config.system.config.collaborative_document_edition.supported_file_types.filter(

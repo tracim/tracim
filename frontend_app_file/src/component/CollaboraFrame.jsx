@@ -12,9 +12,7 @@ import {
 
 const FORM_ID = 'loleafletform'
 const IFRAME_ID = 'loleafletframe'
-const CONTENT_TYPE_FILE = 'file'
 const ACTION_EDIT = 'edit'
-const HOST = 'http://192.168.1.228:6543'
 
 class CollaboraFrame extends React.Component {
   constructor (props) {
@@ -33,13 +31,15 @@ class CollaboraFrame extends React.Component {
         ...props.iframeStyle
       },
       accessToken: '',
-      editorUrl: ''
+      onlineEditorUrl: '',
+      ready: false
     }
   }
 
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
-    return `${urlSource}WOPISrc=${HOST}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
+    const host = window.location.host
+    return `${urlSource}WOPISrc=${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
   }
 
   handleIframeIsClosing = (event) => {
@@ -56,13 +56,15 @@ class CollaboraFrame extends React.Component {
   }
 
   showIframe = () => {
-    document.getElementById(this.state.formId).submit()
+    if (this.state.ready) {
+      document.getElementById(this.state.formId).submit()
+    }
   }
 
   async componentDidMount () {
     console.log('%c<CollaboraFrame> did mount', `color: ${this.props.config.hexcolor}`)
     await this.loadContent()
-    await this.setIframeConf()
+    await this.setIframeConfig()
     this.showIframe()
     window.addEventListener('message', this.handleIframeIsClosing, false)
   }
@@ -89,20 +91,38 @@ class CollaboraFrame extends React.Component {
     }
   }
 
-  setIframeConf = async () => {
+  setIframeConfig = async () => {
     const { state, props } = this
 
     if (!state.content.file_extension) {
       return
     }
-    const editorType = props.config.system.config.collaborative_document_edition.supported_file_types.filter(
+
+    if (!props.config.system.config.collaborative_document_edition) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+        data: {
+          workspaceId: this.props.content.workspace_id,
+          contentType: this.state.content.content_type,
+          contentId: this.props.content.content_id
+        }
+      })
+      return
+    }
+    const softwareFileType = props.config.system.config.collaborative_document_edition.supported_file_types.find(
       (type) => type.extension === state.content.file_extension.substr(1) && type.associated_action === ACTION_EDIT
     )
 
-    if (editorType.length === 0) {
-      this.props.history.push(
-        PAGE.WORKSPACE.CONTENT(this.state.content.workspace_id, CONTENT_TYPE_FILE, this.state.content.content_id)
-      )
+    if (!softwareFileType) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+        data: {
+          workspaceId: this.props.content.workspace_id,
+          contentType: this.state.content.content_type,
+          contentId: this.props.content.content_id
+        }
+      })
+      return
     }
 
     const response = await handleFetchResult(
@@ -112,8 +132,9 @@ class CollaboraFrame extends React.Component {
       case 200:
         this.setState({
           accessToken: response.body.access_token,
-          editorUrl: editorType[0].url_source,
-          iframeUrl: this.buildCompleteIframeUrl(editorType[0].url_source, response.body.access_token)
+          onlineEditorUrl: softwareFileType.url_source,
+          iframeUrl: this.buildCompleteIframeUrl(softwareFileType.url_source, response.body.access_token),
+          ready: true
         })
         break
       default:

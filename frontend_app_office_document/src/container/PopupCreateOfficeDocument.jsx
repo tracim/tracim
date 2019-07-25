@@ -6,13 +6,13 @@ import {
   addAllResourceI18n,
   RadioBtnGroup
 } from 'tracim_frontend_lib'
-import { postOfficeDocumentFromTemplate, getOfficeTemplates } from '../action.async.js'
+import { postOfficeDocumentFromTemplate, getOfficeDocumentTemplates } from '../action.async.js'
 import i18n from '../i18n.js'
 import {
-  getAvaibleTypes,
+  getAvaibleFileTypes,
   getTemplateFromFileType,
-  getIconUrlFromType,
-  getExtensionFromFileType
+  getIconUrlFromFileType,
+  getTranslationFromFileType
 } from '../helper.js'
 
 const CONTENT_TYPE_FILE = 'file'
@@ -27,10 +27,10 @@ class PopupCreateOfficeDocument extends React.Component {
       workspaceId: props.data.workspaceId,
       idFolder: props.data.idFolder,
       newContentName: '',
-      availableTypes: [],
+      availableFileTypes: [],
       availableTemplates: [],
       selectedOption: '',
-      editor: ''
+      software: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -38,12 +38,13 @@ class PopupCreateOfficeDocument extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
   }
 
-  componentWillUnmount () {
-    document.removeEventListener('appCustomEvent', this.customEventReducer)
-  }
   componentDidMount () {
     document.addEventListener('appCustomEvent', this.customEventReducer)
     this.setDocumentOptions()
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -71,10 +72,10 @@ class PopupCreateOfficeDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, editor } = this.state
+    const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, software } = this.state
     const { history, PAGE } = this.props.data.config
-    const templateName = getTemplateFromFileType(editor, selectedOption.value, availableTemplates)
-    const filename = newContentName + '.' + getExtensionFromFileType(editor, selectedOption.value)
+    const templateName = getTemplateFromFileType(software, selectedOption.value, availableTemplates)
+    const filename = newContentName + '.' + getIconUrlFromFileType(software, selectedOption.value)
     const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, idFolder, config.slug, filename, templateName)
 
     const response = await handleFetchResult(await request)
@@ -112,7 +113,7 @@ class PopupCreateOfficeDocument extends React.Component {
 
   getAvaibleTemplates = async () => {
     const { state } = this
-    const request = getOfficeTemplates(state.config.apiUrl, state.workspaceId)
+    const request = getOfficeDocumentTemplates(state.config.apiUrl, state.workspaceId)
     const response = await handleFetchResult(await request)
     switch (response.apiResponse.status) {
       case 200: return response.body.file_templates
@@ -122,25 +123,26 @@ class PopupCreateOfficeDocument extends React.Component {
 
   setDocumentOptions = async () => {
     const availableTemplates = await this.getAvaibleTemplates()
-    const editor = this.state.config.system.config.collaborative_document_edition.software
-    const availableTypes = getAvaibleTypes(editor, availableTemplates)
+    const software = this.state.config.system.config.collaborative_document_edition.software
+    const availableFileTypes = getAvaibleFileTypes(software, availableTemplates)
     this.setState({
       availableTemplates: availableTemplates,
-      availableTypes: availableTypes,
-      editor: editor
+      availableFileTypes: availableFileTypes,
+      software: software
     })
   }
 
   setSelectedOption = type => this.setState({selectedOption: type})
 
   buildOptions () {
-    return this.state.availableTypes.map(
+    const { software } = this.state
+    return this.state.availableFileTypes.map(
       (type) => ({
-        text: type,
+        text: getTranslationFromFileType(software, type),
         value: type,
         img: {
           alt: type,
-          src: getIconUrlFromType(this.state.editor, type),
+          src: getIconUrlFromFileType(software, type),
           height: 42,
           width: 42
         }

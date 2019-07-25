@@ -1,7 +1,11 @@
 {
-  "A content with the same name already exists": "__NOT_TRANSLATED__",
-  "Error while creating document": "__NOT_TRANSLATED__",
-  "New Office Document": "__NOT_TRANSLATED__",
-  "Validate and create": "__NOT_TRANSLATED__",
-  "Office Document's title": "__NOT_TRANSLATED__"
+  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
+  "Error while creating document": "Erreur lors de la création du document",
+  "New Office Document": "Nouveau document bureautique",
+  "Validate and create": "Valider et créer",
+  "Office Document's title": "Titre du document bureautique",
+  "Spreadsheet": "Tableur",
+  "Text": "Texte",
+  "Presentation": "Présentation",
+  "Draw": "Graphique"
 }

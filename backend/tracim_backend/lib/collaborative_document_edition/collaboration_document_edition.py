@@ -39,7 +39,8 @@ class CollaborativeDocumentEditionApi(object):
 
     def discover(self) -> typing.List[CollaborativeDocumentEditionFileType]:
         response = requests.get(
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery"
+            self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery",
+            timeout=2
         )
         root = ElementTree.fromstring(response.text)
         supported_collabora_file = []  # type: typing.List[CollaborativeDocumentEditionFileType]

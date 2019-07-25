@@ -3,5 +3,9 @@
   "Error while creating document": "Error while creating document",
   "New Office Document": "New Office Document",
   "Validate and create": "Validate and create",
-  "Office Document's title": "Office Document's title"
+  "Office Document's title": "Office Document's title",
+  "Spreadsheet": "Spreadsheet",
+  "Text": "Text",
+  "Presentation": "Presentation",
+  "Draw": "Draw"
 }

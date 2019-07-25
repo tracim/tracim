@@ -13,12 +13,6 @@ require('./css/index.styl')
 const appInterface = {
   name: 'office_document',
   isRendered: false,
-  // renderAppFeature: data => {
-  //   return ReactDOM.render(
-  //     <HtmlDocument data={data} />
-  //     , document.getElementById(data.config.domContainer)
-  //   )
-  // },
   unmountApp: domId => {
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   },

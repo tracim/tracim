@@ -1,3 +1,5 @@
+import i18n from './i18n.js'
+
 import DRAW from './images/libreoffice_icons/draw.png'
 import CALC from './images/libreoffice_icons/spreadsheet.png'
 import WRITER from './images/libreoffice_icons/text.png'
@@ -6,20 +8,24 @@ import IMPRESS from './images/libreoffice_icons/presentation.png'
 export const FILE_TYPES = {
   collabora: {
     spreadsheet: {
-      ext: 'ods',
-      img: CALC
+      ext: '.ods',
+      img: CALC,
+      translation: i18n.t('Spreadsheet')
     },
     text: {
-      ext: 'odt',
-      img: WRITER
+      ext: '.odt',
+      img: WRITER,
+      translation: i18n.t('Text')
     },
     presentation: {
-      ext: 'odp',
-      img: IMPRESS
+      ext: '.odp',
+      img: IMPRESS,
+      translation: i18n.t('Presentation')
     },
     draw: {
-      ext: 'odg',
-      img: DRAW
+      ext: '.odg',
+      img: DRAW,
+      translation: i18n.t('Draw')
     }
   }
 }
@@ -31,29 +37,34 @@ export const FETCH_CONFIG = {
   }
 }
 
-export const getTemplateFromFileType = (editor, type, availableTemplates) => {
-  const editorSupportedTypes = FILE_TYPES[editor] ? FILE_TYPES[editor] : {}
-  const extension = editorSupportedTypes[type] ? editorSupportedTypes[type].ext : 'notAnExtension'
+export const getTemplateFromFileType = (software, fileType, availableTemplates) => {
+  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  const extension = softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].ext : 'notAnExtension'
   const template = availableTemplates.filter((template) => template.endsWith(extension))
   return template.length === 1 ? template[0] : null
 }
 
-export const getExtensionFromFileType = (editor, type) => {
-  const editorSupportedTypes = FILE_TYPES[editor] ? FILE_TYPES[editor] : {}
-  return editorSupportedTypes[type] ? editorSupportedTypes[type].ext : ''
+export const getTranslationFromFileType = (software, fileType) => {
+  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  return softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].translation : ''
 }
 
-export const getEditorTypesAsList = (editor) => {
-  return FILE_TYPES[editor] ? Object.keys(FILE_TYPES[editor]) : []
+export const getExtensionFromFileType = (software, fileType) => {
+  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  return softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].ext : ''
 }
 
-export const getAvaibleTypes = (editor, availableTemplates) => {
-  return getEditorTypesAsList(editor).filter(
-    (type) => getTemplateFromFileType(editor, type, availableTemplates) !== null
+export const getSoftwareFileTypesAsList = (software) => {
+  return FILE_TYPES[software] ? Object.keys(FILE_TYPES[software]) : []
+}
+
+export const getAvaibleFileTypes = (software, availableTemplates) => {
+  return getSoftwareFileTypesAsList(software).filter(
+    (fileType) => getTemplateFromFileType(software, fileType, availableTemplates) !== null
   )
 }
 
-export const getIconUrlFromType = (editor, type) => {
-  const editorSupportedTypes = FILE_TYPES[editor] ? FILE_TYPES[editor] : {}
-  return editorSupportedTypes[type] ? editorSupportedTypes[type].img : null
+export const getIconUrlFromFileType = (software, fileType) => {
+  const softwareSupportedFileTypes = FILE_TYPES[software] ? FILE_TYPES[software] : {}
+  return softwareSupportedFileTypes[fileType] ? softwareSupportedFileTypes[fileType].img : null
 }
