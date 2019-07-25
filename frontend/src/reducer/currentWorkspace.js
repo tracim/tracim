@@ -115,7 +115,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ? {
           ...state,
           memberList: state.memberList.map(u => u.id === action.userId
-            ? {...u, doNotify: action.doNotify}
+            ? { ...u, doNotify: action.doNotify }
             : u
           )
         }
@@ -130,7 +130,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         }
 
     case `${SET}/${WORKSPACE_AGENDA_URL}`:
-      return {...state, agendaUrl: action.agendaUrl}
+      return { ...state, agendaUrl: action.agendaUrl }
 
     default:
       return state

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
@@ -85,7 +85,7 @@ class File extends React.Component {
         console.log('%c<File> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
-          this.setState({isVisible: true})
+          this.setState({ isVisible: true })
           this.buildBreadcrumbs()
         }
         break
@@ -108,7 +108,7 @@ class File extends React.Component {
         )
 
         this.setState(prev => ({
-          content: {...prev.content, ...data},
+          content: { ...prev.content, ...data },
           isVisible: true,
           timelineWysiwyg: false,
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
@@ -142,7 +142,7 @@ class File extends React.Component {
     const previouslyUnsavedComment = localStorage.getItem(
       generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
     )
-    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
+    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
     this.loadTimeline()
@@ -207,7 +207,7 @@ class File extends React.Component {
     }
 
     await putMyselfFileRead(config.apiUrl, content.workspace_id, content.content_id)
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   loadTimeline = async () => {
@@ -282,7 +282,7 @@ class File extends React.Component {
     }
 
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -309,7 +309,7 @@ class File extends React.Component {
     }
   }
 
-  handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
+  handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
 
   handleClickValidateNewDescription = async newDescription => {
     const { props, state } = this
@@ -318,7 +318,7 @@ class File extends React.Component {
       await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
+      case 200: this.setState(prev => ({ content: { ...prev.content, raw_content: newDescription } })); break
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
@@ -331,7 +331,7 @@ class File extends React.Component {
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
-    this.setState({newComment})
+    this.setState({ newComment })
 
     const { appName, content } = this.state
     localStorage.setItem(
@@ -353,7 +353,7 @@ class File extends React.Component {
 
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
-        this.setState({newComment: ''})
+        this.setState({ newComment: '' })
         localStorage.removeItem(
           generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
         )
@@ -375,7 +375,7 @@ class File extends React.Component {
     }
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
+  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { state, props } = this
@@ -401,7 +401,7 @@ class File extends React.Component {
     const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
         this.loadContent()
         this.loadTimeline()
         break
@@ -415,7 +415,7 @@ class File extends React.Component {
     const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
         this.loadContent()
         this.loadTimeline()
         break
@@ -429,7 +429,7 @@ class File extends React.Component {
     const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
         this.loadContent()
         this.loadTimeline()
         break
@@ -443,7 +443,7 @@ class File extends React.Component {
     const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
         this.loadContent()
         this.loadTimeline()
         break
@@ -495,7 +495,7 @@ class File extends React.Component {
     this.loadContent(1)
   }
 
-  handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
+  handleClickProperty = () => this.setState(prev => ({ displayProperty: !prev.displayProperty }))
 
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
@@ -503,14 +503,14 @@ class File extends React.Component {
     const fileToSave = newFile[0]
 
     if (fileToSave.type.includes('image') && fileToSave.size > 2000000) { // allow preview
-      this.setState({newFile: fileToSave})
+      this.setState({ newFile: fileToSave })
 
       var reader = new FileReader()
       reader.onload = e => {
-        this.setState({newFilePreview: e.total > 0 ? e.target.result : false})
+        this.setState({ newFilePreview: e.total > 0 ? e.target.result : false })
         const img = new Image()
         img.src = e.target.result
-        img.onerror = () => this.setState({newFilePreview: false})
+        img.onerror = () => this.setState({ newFilePreview: false })
       }
       reader.readAsDataURL(fileToSave)
     } else { // no preview
@@ -521,7 +521,7 @@ class File extends React.Component {
     }
   }
 
-  handleClickDropzoneCancel = () => this.setState({mode: MODE.VIEW, newFile: '', newFilePreview: null})
+  handleClickDropzoneCancel = () => this.setState({ mode: MODE.VIEW, newFile: '', newFilePreview: null })
 
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
@@ -531,10 +531,10 @@ class File extends React.Component {
 
     // fetch still doesn't handle event progress. So we need to use old school xhr object :scream:
     const xhr = new XMLHttpRequest()
-    xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
-    const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
+    xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
+    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: true, percent: Math.round(e.loaded / e.total * 100) } })
     xhr.upload.addEventListener('progress', uploadInProgress, false)
-    xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+    xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: false, percent: 0 } }), false)
 
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
@@ -594,13 +594,13 @@ class File extends React.Component {
 
   // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
   // see https://github.com/tracim/tracim/issues/1804
-  getDownloadRawUrl = ({config: {apiUrl}, content, mode}) =>
+  getDownloadRawUrl = ({ config: { apiUrl }, content, mode }) =>
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
 
-  getDownloadPdfPageUrl = ({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+  getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) =>
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
 
-  getDownloadPdfFullUrl = ({config: {apiUrl}, content, mode}) =>
+  getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) =>
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
   render () {
@@ -645,7 +645,7 @@ class File extends React.Component {
                 <button
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
-                  style={{backgroundColor: state.config.hexcolor, color: '#fdfdfd'}}
+                  style={{ backgroundColor: state.config.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fa fa-history' />
                   {props.t('Last version')}
@@ -738,4 +738,4 @@ class File extends React.Component {
   }
 }
 
-export default translate()(File)
+export default withTranslation()(File)

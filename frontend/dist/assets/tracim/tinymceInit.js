@@ -72,6 +72,7 @@
             fileTag = document.createElement('input')
             fileTag.id = 'hidden_tinymce_fileinput'
             fileTag.type = 'file'
+            fileTag.style.display = 'none'
             $('body').append(fileTag)
 
             $('#hidden_tinymce_fileinput').on('change', function () {

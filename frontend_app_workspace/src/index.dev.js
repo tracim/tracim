@@ -1,5 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
 // import Workspace from './container/Workspace.jsx'
 import PopupCreateWorkspace from './container/PopupCreateWorkspace.jsx'
 

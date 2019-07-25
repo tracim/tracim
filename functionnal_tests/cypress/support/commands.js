@@ -1,4 +1,5 @@
 import 'cypress-wait-until'
+import 'cypress-file-upload'
 
 const userFixtures = {
   'administrators': 'defaultAdmin',
@@ -77,25 +78,28 @@ Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
   )
 })
 
-// INFO - CH - 2019-05-20 - see https://github.com/cypress-io/cypress/issues/170
 Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZoneSelector, fileTitle) => {
-  const dropEvent = { dataTransfer: { files: [] } }
-  cy.fixture(fixturePath, 'base64').then(fixture => {
-    cy.window().then(window => {
-      Cypress.Blob.base64StringToBlob(fixture, fixtureMime).then(blob => {
-        const testFile = new window.File([blob], fileTitle)
-        dropEvent.dataTransfer.files = [testFile]
-      })
-    })
-  })
-
   // INFO - CH - 2019-06-12 - Adding a handler that bypass exception here because Cypress generates the following
   // "Uncaught Invariant Violation: Cannot call hover while not dragging."
   // Cypress then fail the test because it got an exception
   // Since the tests can continue even with this error, I bypass it, at least for now, because I can't find an
   // easy to fix it
   Cypress.on('uncaught:exception', (err, runnable) => false)
-  cy.get(dropZoneSelector).trigger('drop', dropEvent)
+
+  cy.fixture(fixturePath, 'base64').then(fixture => {
+    cy.get(dropZoneSelector).upload( // INFO - CH - 2019-07-10 - upload() is from cypress-file-upload
+      {
+        fileContent: fixture,
+        fileName: fileTitle,
+        mimeType: fixtureMime
+      },
+      {
+        subjectType: 'drag-n-drop',
+        subjectNature: 'dom'
+      },
+    )
+  })
+
   cy.removeAllListeners('uncaught:exception')
 })
 

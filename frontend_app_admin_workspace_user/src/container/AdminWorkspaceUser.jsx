@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -27,6 +26,7 @@ import {
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
 import AdminUser from '../component/AdminUser.jsx'
 
+const color = require('color')
 require('../css/index.styl')
 
 class AdminWorkspaceUser extends React.Component {
@@ -56,7 +56,7 @@ class AdminWorkspaceUser extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(this.state.config.slug):
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState({config: data.config})
+        this.setState({ config: data.config })
         break
       case CUSTOM_EVENT.REFRESH_WORKSPACE_LIST:
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
@@ -133,7 +133,7 @@ class AdminWorkspaceUser extends React.Component {
             ...prev.content,
             workspaceList: workspaceList.body.map(ws => ({
               ...ws,
-              memberList: (fetchWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || {body: []}).body
+              memberList: (fetchWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || { body: [] }).body
             }))
           }
         }))
@@ -194,7 +194,7 @@ class AdminWorkspaceUser extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({breadcrumbsList: breadcrumbsList})
+    this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
   handleDeleteWorkspace = async () => {
@@ -219,7 +219,7 @@ class AdminWorkspaceUser extends React.Component {
     workspaceToDelete: workspaceId
   })
 
-  handleClosePopupDeleteWorkspace = () => this.setState({popupDeleteWorkspaceDisplay: false})
+  handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
   handleToggleUser = async (userId, toggle) => {
     const { props, state } = this
@@ -315,20 +315,20 @@ class AdminWorkspaceUser extends React.Component {
           apiHeader: state.config.apiHeader,
           roleList: state.config.roleList,
           profileObject: state.config.profileObject,
-          system: {...state.config.system},
+          system: { ...state.config.system },
           translation: state.config.translation
         },
         content: {
           workspace_id: workspaceId
         }
       })
-    } else GLOBAL_dispatchEvent({type: CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data: {workspace_id: workspaceId}})
+    } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data: { workspace_id: workspaceId } })
 
-    this.setState({workspaceIdOpened: workspaceId})
+    this.setState({ workspaceIdOpened: workspaceId })
   }
 
   handleClickNewWorkspace = () => {
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
   render () {
@@ -384,7 +384,7 @@ class AdminWorkspaceUser extends React.Component {
                   onClick={this.handleDeleteWorkspace}
                   style={{
                     ':hover': {
-                      backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hexString()
+                      backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hex()
                     }
                   }}
                 >
@@ -399,4 +399,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(Radium(AdminWorkspaceUser))
+export default withTranslation()(Radium(AdminWorkspaceUser))

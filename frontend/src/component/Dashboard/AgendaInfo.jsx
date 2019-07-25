@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 require('./AgendaInfo.styl')
@@ -37,7 +37,7 @@ export const AgendaInfo = props => (
   </div>
 )
 
-export default translate()(AgendaInfo)
+export default withTranslation()(AgendaInfo)
 
 AgendaInfo.propTypes = {
   introText: PropTypes.string,
@@ -47,5 +47,6 @@ AgendaInfo.propTypes = {
 
 AgendaInfo.defaultProps = {
   introText: '',
+  caldavText: '',
   agendaUrl: ''
 }
