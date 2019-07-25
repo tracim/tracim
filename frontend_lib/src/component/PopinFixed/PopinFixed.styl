@@ -105,19 +105,20 @@
         background-color grey-hover
         font-size 20px
         color darkGrey
-        border-right 3px solid grey
         &__icon
           text-align center
           cursor pointer
           padding-top 2px
           padding-bottom 2px
+          border none
           &:focus
             border-color transparent
             outline 0
           &.active
             margin 0
-            padding 7px 5px
-            background-color grey
+            padding 7px 5px 7px 3px
+            background-color lightGrey
+            border-left 5px solid
           &__close
             text-align center
             cursor pointer
@@ -126,9 +127,10 @@
 .rightPartClose
   .wsContentGeneric__content
     &__left
-      width calc(50% - 43px) // 43px is the width of the rightPart header without the right border
+      width calc(50% - 45px) // 45px is the width of the rightPart header
     &__right__header__icon.active
       background-color grey-hover
+      border none
 
 
 @media (max-width: max-lg)
@@ -161,20 +163,24 @@ responsiveColumnStyle()
           flex-direction row
           width 100%
           min-height 50px
-          cursor auto
           justify-content flex-end
-          padding-left 10px
-          border-right none
-          border-bottom 3px solid grey
           &__icon
             display flex
             transform none
             margin 10px
+            padding 10px
+            &.active
+              border none
+              border-top 5px solid
+              padding 10px
             &__close
               display none
   .rightPartClose
     .wsContentGeneric__content__right__header__icon.active
-        background-color grey
+        background-color lightGrey
+        border none
+        border-top 5px solid
+        padding 10px
 
 @media (min-width: min-lg) and (max-width: max-lg)
   responsiveColumnStyle()

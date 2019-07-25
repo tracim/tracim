@@ -656,6 +656,7 @@ class HtmlDocument extends React.Component {
 
           <PopinFixedRightPart
             customClass={`${config.slug}__contentpage`}
+            customColor={config.hexcolor}
             menuItemList={[
               {
                 id: 'timeline',

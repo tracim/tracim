@@ -77,6 +77,7 @@ ReactDOM.render(
 
         <PopinFixedRightPart
             customClass={`${'randomClass'}__contentpage`}
+            customColor={'#3f52e3'}
             menuItemList={[
               {
                 id: 'timeline',

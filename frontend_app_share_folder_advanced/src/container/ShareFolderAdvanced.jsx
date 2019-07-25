@@ -214,6 +214,7 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   handleReturnToManagement = () => {
+    this.setState({shareEmails: '', sharePassword: ''})
     this.setState({currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT})
   }
 

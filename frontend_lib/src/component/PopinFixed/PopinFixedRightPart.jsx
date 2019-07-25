@@ -29,6 +29,7 @@ class PopinFixedRightPart extends React.Component {
                   className={classnames('iconBtn wsContentGeneric__content__right__header__icon nav-item', {'active': menuItem.id === this.state.currentChildren})}
                   title={menuItem.label}
                   onClick={() => this.handleChangeRightChildren(menuItem.id)}
+                  style={{borderColor: props.customColor}}
                 >
                   <i className={`fa fa-fw ${menuItem.icon}`} />
                 </button>

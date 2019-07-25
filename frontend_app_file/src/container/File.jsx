@@ -805,6 +805,7 @@ class File extends React.Component {
 
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
             menuItemList={[
               {
                 id: 'timeline',

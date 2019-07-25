@@ -28,7 +28,7 @@ class NewShareDownload extends React.Component {
   }
 
   handleRandomPassword = () => {
-    this.props.sharePassword = generateRandomPassword()
+    this.props.onChangePassword({target: {value: generateRandomPassword()}})
     const passwordInput = document.getElementsByClassName('shareDownload__password__input')[0]
     if (passwordInput.type === 'password') {
       this.handleSeePassword()
@@ -76,17 +76,6 @@ class NewShareDownload extends React.Component {
         ? <div className='shareDownload__password'>
           <div className='shareDownload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
-            <button
-              type='button'
-              className='shareDownload__password__icon'
-              key='seeSharePassword'
-              title={props.t('Show password')}
-              style={{':hover': {color: props.hexcolor}}}
-              onClick={this.handleSeePassword}
-              data-cy='seePassword'
-            >
-              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
-            </button>
             <input
               type={state.hidePassword ? 'password' : 'text'}
               className='shareDownload__password__input form-control'
@@ -95,6 +84,17 @@ class NewShareDownload extends React.Component {
               onChange={props.onChangePassword}
               onFocus={props.onKeyDownEnter}
             />
+            <button
+              type='button'
+              className='shareDownload__password__icon'
+              key='seeSharePassword'
+              title={props.t('Show password')}
+              style={{':hover': {color: props.hexcolor}}}
+              data-cy='seePassword'
+              onClick={this.handleSeePassword}
+            >
+              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+            </button>
           </div>
           <button
             type='button'

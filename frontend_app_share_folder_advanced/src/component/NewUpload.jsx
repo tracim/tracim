@@ -26,7 +26,7 @@ class NewUpload extends React.Component {
   }
 
   handleRandomPassword = () => {
-    this.props.onChangeSharePassword = generateRandomPassword()
+    this.props.onChangeSharePassword({target: {value: generateRandomPassword()}})
     const passwordInput = document.getElementsByClassName('newUpload__password__input')[0]
 
     if (passwordInput.type === 'password') {
@@ -71,16 +71,6 @@ class NewUpload extends React.Component {
         <div className='newUpload__password'>
           <div className='newUpload__password__wrapper'>
             <i className='fa fa-fw fa-lock' />
-            <button
-              type='button'
-              className='newUpload__password__icon'
-              key='seeSharePassword'
-              style={{':hover': {color: customColor}}}
-              data-cy='seePassword'
-              onClick={this.handleSeePassword}
-            >
-              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
-            </button>
             <input
               type={state.hidePassword ? 'password' : 'text'}
               className='newUpload__password__input form-control'
@@ -88,11 +78,23 @@ class NewUpload extends React.Component {
               value={props.sharePassword}
               onChange={props.onChangeSharePassword}
             />
+            <button
+              type='button'
+              className='newUpload__password__icon'
+              key='seeSharePassword'
+              title={props.t('Show password')}
+              style={{':hover': {color: customColor}}}
+              data-cy='seePassword'
+              onClick={this.handleSeePassword}
+            >
+              <i className={state.hidePassword ? 'fa fa-fw fa-eye' : 'fa fa-fw fa-eye-slash'} />
+            </button>
           </div>
           <button
             type='button'
             className='newUpload__password__icon'
             key='randomSharePassword'
+            title={props.t('Generate random password')}
             style={{':hover': {color: customColor}}}
             onClick={this.handleRandomPassword}
           >

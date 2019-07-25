@@ -66,7 +66,9 @@ import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
   switch (type) {
-    case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE: i18n.changeLanguage(data); break
+    case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+      i18n.changeLanguage(data)
+      break
     default: break
   }
 }

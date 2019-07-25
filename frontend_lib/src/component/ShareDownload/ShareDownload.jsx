@@ -21,6 +21,8 @@ class ShareDownload extends React.Component {
   }
 
   handleReturnToManagement = () => {
+    this.props.onChangeEmails({target: {value: ''}})
+    this.props.onChangePassword({target: {value: ''}})
     this.setState({currentPage: this.SHARE_STATUS.SHARE_MANAGE})
   }
 

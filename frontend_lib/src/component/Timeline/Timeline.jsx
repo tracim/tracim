@@ -52,6 +52,9 @@ class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
+        <div className='timeline__title'>
+          {props.t('Timeline')}
+        </div>
         <div className='timeline__body'>
           <div className='timeline__body__warning'>
             {props.isDeprecated && !props.isArchived && !props.isDeleted && (

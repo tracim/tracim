@@ -2,5 +2,8 @@
   "To add multiple recipients, separate the email addresses with a comma or space.": "Pour ajouter plusieurs destinataires, séparez les adresses email par une virgule ou un espace.",
   "Cancel": "Annuler",
   "New": "Nouveau",
-  "Share Folder": "Dossier Partagé"
+  "Share Folder": "Dossier Partagé",
+  "New authorization": "Nouvelle autorisation",
+  "Import authorizations": "Autorisations d'importation",
+  "No upload link has been created yet.": "Aucun lien de téléchargement n'a encore été créé."
 }
