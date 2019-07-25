@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import logoFooter from '../img/logoFooter.svg'
 
 // @fixme: Côme - 2018/07/16 - component deprecated since footer is now inside sidebarleft
@@ -14,4 +14,4 @@ const Footer = ({ t }) => {
   )
 }
 
-export default translate()(Footer)
+export default withTranslation()(Footer)

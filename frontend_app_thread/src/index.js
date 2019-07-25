@@ -1,5 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
 import Thread from './container/Thread.jsx'
 import PopupCreateThread from './container/PopupCreateThread.jsx'
 

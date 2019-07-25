@@ -1,6 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const NewVersionBtn = props => {
   return (
@@ -28,4 +28,4 @@ const NewVersionBtn = props => {
   )
 }
 
-export default translate()(Radium(NewVersionBtn))
+export default withTranslation()(Radium(NewVersionBtn))

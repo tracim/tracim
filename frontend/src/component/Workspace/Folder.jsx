@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
@@ -70,7 +70,7 @@ class Folder extends React.Component {
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
-              style={{top: '18px', left: '-2px', padding: '0 7px'}}
+              style={{ top: '18px', left: '-2px', padding: '0 7px' }}
             />
           )}
 
@@ -80,7 +80,7 @@ class Folder extends React.Component {
           >
             <div className='folder__header__icon'
               title={props.t('Folder')}
-              style={{color: props.contentType.find(c => c.slug === 'folder').hexcolor}}
+              style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
             >
               <i className={classnames('fa fa-fw', this.calculateIcon())} />
             </div>
@@ -223,7 +223,7 @@ const folderDragAndDropTargetCollect = (connect, monitor) => {
   return {
     connectDropTarget: connect.dropTarget(),
     canDrop: monitor.canDrop(),
-    isOver: monitor.isOver({shallow: false}),
+    isOver: monitor.isOver({ shallow: false }),
     draggedItem: monitor.getItem()
   }
 }
@@ -261,7 +261,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
   )
 )
 
-export default translate()(FolderContainer)
+export default withTranslation()(FolderContainer)
 
 Folder.propTypes = {
   folderData: PropTypes.object,

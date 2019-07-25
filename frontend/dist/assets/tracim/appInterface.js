@@ -66,6 +66,8 @@ function GLOBAL_renderAppFeature (app, retryCount) {
   if (selectedApp.isRendered) {
     GLOBAL_dispatchEvent({type: app.config.slug + '_showApp', data: app})
   } else {
+    if (previouslySelectedAppFeature !== selectedApp.name) GLOBAL_dispatchEvent({type: 'unmount_appFeature', data: {}})
+
     selectedApp.renderAppFeature(app)
     selectedApp.isRendered = true
     ;(getSelectedApp(previouslySelectedAppFeature) || {isRendered: null}).isRendered = false
@@ -140,6 +142,25 @@ function GLOBAL_eventReducer (event) {
   var type = event.detail.type
   var data = event.detail.data
 
+  var unMountAppFeature = function () {
+    if (previouslySelectedAppFeature !== '') {
+      selectedApp = getSelectedApp(previouslySelectedAppFeature)
+      selectedApp.unmountApp('appFeatureContainer')
+      selectedApp.unmountApp('popupCreateContentContainer')
+      selectedApp.isRendered = false
+      previouslySelectedAppFeature = ''
+    }
+  }
+
+  var unMountAppFullscreen = function () {
+    if (previouslySelectedAppFullScreen !== '') {
+      selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
+      selectedApp.unmountApp('appFullscreenContainer')
+      selectedApp.isRendered = false
+      previouslySelectedAppFullScreen = ''
+    }
+  }
+
   switch (type) {
     case 'hide_popupCreateContent':
     case 'hide_popupCreateWorkspace':
@@ -148,23 +169,12 @@ function GLOBAL_eventReducer (event) {
       break
     case 'unmount_app':
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
-
-      var selectedApp
-
-      if (previouslySelectedAppFeature !== '') {
-        selectedApp = getSelectedApp(previouslySelectedAppFeature)
-        selectedApp.unmountApp('appFeatureContainer')
-        selectedApp.unmountApp('popupCreateContentContainer')
-        selectedApp.isRendered = false
-        previouslySelectedAppFeature = ''
-      }
-
-      if (previouslySelectedAppFullScreen !== '') {
-        selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
-        selectedApp.unmountApp('appFullscreenContainer')
-        selectedApp.isRendered = false
-        previouslySelectedAppFullScreen = ''
-      }
+      unMountAppFeature()
+      unMountAppFullscreen()
+      break
+    case 'unmount_appFeature':
+      console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
+      unMountAppFeature()
       break
   }
 }

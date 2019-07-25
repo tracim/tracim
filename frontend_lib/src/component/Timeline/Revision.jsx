@@ -1,12 +1,12 @@
 import Avatar from '../Avatar/Avatar.jsx'
 import React from 'react'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import { revisionTypeList } from '../../helper.js'
 
 // require('./Revision.styl') // see https://github.com/tracim/tracim/issues/1156
+const color = require('color')
 
 const Revision = props => {
   const revisionType = revisionTypeList.find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
@@ -24,7 +24,7 @@ const Revision = props => {
         ...(props.allowClickOnRevision
           ? {
             ':hover': {
-              backgroundColor: color(props.customColor).lighten(0.60).hexString()
+              backgroundColor: color(props.customColor).lighten(0.60).hex()
             }
           }
           : {}
@@ -51,4 +51,4 @@ const Revision = props => {
   )
 }
 
-export default translate()(Radium(Revision))
+export default withTranslation()(Radium(Revision))

@@ -86,8 +86,8 @@ export const ROLE = [{
 }]
 
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
-  const user = memberList.find(u => u.id === userId) || {role: 'reader'}
-  return (roleList.find(r => user.role === r.slug) || {id: 1}).id
+  const user = memberList.find(u => u.id === userId) || { role: 'reader' }
+  return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
 }
 
 export const ROLE_OBJECT = {
