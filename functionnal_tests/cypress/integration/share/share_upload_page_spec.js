@@ -27,6 +27,10 @@ describe('Open the share folder advanced', () => {
     cy.get('.share_folder_advanced__content').contains('Import authorizations').should('be.visible')
   })
 
+  it('Should have a "no uploads" message', () => {
+    cy.get('.share_folder_advanced__content__empty').contains('No upload link has been created yet.').should('be.visible')
+  })
+
   describe('and clicking on the New button',() => {
     it('Should redirect to new share page',() => {
       cy.get('.share_folder_advanced__content__btnupload').click()
@@ -38,6 +42,18 @@ describe('Open the share folder advanced', () => {
         cy.get('.share_folder_advanced__content__btnupload').click()
         cy.get('.newUpload__btnCancel').click()
         cy.get('.share_folder_advanced__content').contains('Import authorizations').should('be.visible')
+      })
+    })
+
+    describe('and creating a share link',() => {
+      describe('and clicking to delete share link',() => {
+        it('Should delete the share link',() => {
+          cy.get('.share_folder_advanced__content__btnupload').click()
+          cy.get('.newUpload__email__input').type('email@email.email')
+          cy.get('.newUpload__btnNew').click()
+          cy.get('[data-cy=deleteShareLink]').click()
+          cy.get('.share_folder_advanced__content__empty').contains('No upload link has been created yet.').should('be.visible')
+        })
       })
     })
   })

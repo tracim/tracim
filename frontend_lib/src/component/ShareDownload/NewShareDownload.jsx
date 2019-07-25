@@ -130,7 +130,7 @@ class NewShareDownload extends React.Component {
           </button>
 
           <button
-            className='btn highlightBtn'
+            className='shareDownload__newBtn btn highlightBtn'
             key='newShareDownload'
             onClick={props.onClickNewShare}
             style={{

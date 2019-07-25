@@ -15,6 +15,7 @@ describe('Open a file', () => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     })
+    cy.wait(1000)
   })
 
   beforeEach(function () {
@@ -30,6 +31,10 @@ describe('Open a file', () => {
       cy.get('.file__contentpage__content__right').contains('File share').should('be.visible')
     })
 
+    it('Should have a "no share link" message', () => {
+      cy.get('.shareDownload').contains('No share link has been created yet.').should('be.visible')
+    })
+
     describe('and clicking on the New button',() => {
       it('Should redirect to new share page at the right part',() => {
         cy.get('.shareDownload__btn').click()
@@ -41,6 +46,18 @@ describe('Open a file', () => {
           cy.get('.shareDownload__btn').click()
           cy.get('.shareDownload__cancel').click()
           cy.get('.file__contentpage__content__right').contains('File share').should('be.visible')
+        })
+      })
+
+      describe('and creating a share link',() => {
+        describe('and clicking to delete share link',() => {
+          it('Should delete the share link',() => {
+            cy.get('.shareDownload__btn').click()
+            cy.get('.shareDownload__email__input').type('email@email.email')
+            cy.get('.shareDownload__newBtn').click()
+            cy.get('[data-cy=deleteShareLink]').click()
+            cy.get('.shareDownload').contains('No share link has been created yet.').should('be.visible')
+          })
         })
       })
     })

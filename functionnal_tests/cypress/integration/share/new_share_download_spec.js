@@ -20,6 +20,7 @@ describe('Open a file', () => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     })
+    cy.wait(1000)
   })
 
   beforeEach(function () {
@@ -60,6 +61,16 @@ describe('Open a file', () => {
               cy.get('[data-cy=seePassword]').click()
               cy.get('.shareDownload__password__input').should('have.value','Password')
             })
+          })
+        })
+      })
+
+      describe('and writing a mail',() => {
+        describe('and clicking at New button',() => {
+          it('Should create share link at the main authorizations page',() => {
+            cy.get(emailInput).type(`${email1}`)
+            cy.get('.shareDownload__newBtn').click()
+            cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
           })
         })
       })
