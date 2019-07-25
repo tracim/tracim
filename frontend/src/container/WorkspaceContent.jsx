@@ -113,10 +113,8 @@ class WorkspaceContent extends React.Component {
     this.loadContentList(wsToLoad).then(() => {
       const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
       if (folderIdToOpen.length > 0) {
-        const hash = folderIdToOpen[folderIdToOpen.length - 1]
-        if (document.getElementById(hash)) {
-          document.getElementById(hash).scrollIntoView()
-        }
+        const lastFolderOpen = folderIdToOpen[folderIdToOpen.length - 1]
+        if (document.getElementById(lastFolderOpen)) document.getElementById(lastFolderOpen).scrollIntoView()
       }
     })
     this.buildBreadcrumbs()
