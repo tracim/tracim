@@ -59,6 +59,10 @@ class WOPIController(Controller):
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_file([])
     def get_content(self, context, request: TracimRequest, hapic_data=None):
+        """
+        WOPI GetFile endpoint :
+        https://wopi.readthedocs.io/projects/wopirest/en/latest/files/GetFile.html#getfile
+        """
         try:
             file_ = DepotManager.get().get(request.current_content.depot_file)
         except IOError as exc:
@@ -82,6 +86,10 @@ class WOPIController(Controller):
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_body(WOPICheckFileInfoSchema())
     def check_file_info(self, context, request: TracimRequest, hapic_data=None):
+        """
+        WOPI CheckFileInfo endpoint
+        https://wopi.readthedocs.io/projects/wopirest/en/latest/files/CheckFileInfo.html#checkfileinfo
+        """
         app_config = request.registry.settings["CFG"]  # type: CFG
         return WopiApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
@@ -94,6 +102,10 @@ class WOPIController(Controller):
     @hapic.input_headers(WopiPutHeadersSchema())
     @hapic.output_body(WopiPutResponse())
     def put_content(self, context, request: TracimRequest, hapic_data=None):
+        """
+        WOPI PutRelativeFile endpoint
+        https://wopi.readthedocs.io/projects/wopirest/en/latest/files/PutRelativeFile.html#putrelativefile
+        """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
