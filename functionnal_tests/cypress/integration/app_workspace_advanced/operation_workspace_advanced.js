@@ -20,9 +20,9 @@ describe('App Workspace Advanced', function () {
                 .find('.dashboard__header__advancedmode__button.btn')
                 .click()
 
-            cy.wait(1000)
             cy.getTag({selectorName: s.CONTENT_FRAME})
                 .find('.workspace_advanced__description__text__textarea')
+                .should('be.visible')
                 .clear()
 
             cy.getTag({selectorName: s.CONTENT_FRAME})
@@ -35,6 +35,7 @@ describe('App Workspace Advanced', function () {
 
             cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
                 .find('.dashboard__workspace__detail__description')
+                .should('be.visible')
                 .contains(newDescription)
         })
     })
