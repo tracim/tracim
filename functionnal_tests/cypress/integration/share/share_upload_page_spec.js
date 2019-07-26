@@ -50,7 +50,7 @@ describe('Open the share folder advanced', () => {
         it('Should delete the share link',() => {
           cy.get('.share_folder_advanced__content__btnupload').click()
           cy.get('.newUpload__email__input').type('email@email.email')
-          cy.get('.newUpload__btnNew').click()
+          cy.get('.newUpload__newBtn').click()
           cy.get('[data-cy=deleteShareLink]').click()
           cy.get('.share_folder_advanced__content__empty').contains('No upload link has been created yet.').should('be.visible')
         })

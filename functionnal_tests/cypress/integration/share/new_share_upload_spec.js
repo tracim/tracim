@@ -57,7 +57,7 @@ describe('Open the share folder advanced', () => {
       describe('and clicking at New button',() => {
         it('Should create share link at the main authorizations page',() => {
           cy.get(emailInput).type(`${email1}`)
-          cy.get('.newUpload__btnNew').click()
+          cy.get('.newUpload__newBtn').click()
           cy.get('.shareLink__linkInfos__email').contains(email1).should('be.visible')
         })
       })

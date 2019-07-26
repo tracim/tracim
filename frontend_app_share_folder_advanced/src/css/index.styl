@@ -24,6 +24,7 @@
   &__contentpage
     &__content
       width 100%
+      height calc(100% - 63px) // 63px = header height
 
 .newUpload
   padding 10px
@@ -70,8 +71,10 @@
         box-shadow 0 0 0 0
         border 0 none
         outline 0
-  &__btnNew
+  &__newBtn
     margin-top 15px
+    &:disabled
+      cursor not-allowed
   &__btnCancel
     display flex
     margin 15px 15px 0 auto

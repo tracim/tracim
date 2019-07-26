@@ -118,7 +118,7 @@ class NewUpload extends React.Component {
             <i className='fa fa-fw fa-times' />
           </button>
           <button
-            className='newUpload__btnNew btn highlightBtn'
+            className='newUpload__newBtn btn highlightBtn'
             key='newShareFile'
             style={{
               backgroundColor: customColor,
@@ -127,6 +127,7 @@ class NewUpload extends React.Component {
               }
             }}
             onClick={props.onClickNewUpload}
+            disabled={props.shareEmails === ''}
           >
             {props.t('New')}
             <i className='fa fa-fw fa-plus-circle' />

@@ -133,6 +133,7 @@ class NewShareDownload extends React.Component {
             className='shareDownload__newBtn btn highlightBtn'
             key='newShareDownload'
             onClick={props.onClickNewShare}
+            disabled={props.shareEmails === ''}
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
