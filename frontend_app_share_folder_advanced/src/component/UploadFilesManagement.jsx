@@ -34,6 +34,7 @@ const UploadFilesManagement = props => {
             link={shareLink.link}
             onClickDeleteShareLink={() => props.onClickDeleteShareLink(shareLink.id)}
             hexcolor={customColor}
+            isProtected={shareLink.isProtected}
           />
         )
         : <div className='share_folder_advanced__content__empty'>No upload link has been created yet.</div>

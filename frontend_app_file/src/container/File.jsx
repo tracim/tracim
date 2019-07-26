@@ -625,8 +625,8 @@ class File extends React.Component {
           {
             email: shareEmail,
             link: '?',
-            id: new Date()
-            // password bool?
+            id: new Date(),
+            isProtected: state.sharePassword !== ''
           }
         ]
       }))

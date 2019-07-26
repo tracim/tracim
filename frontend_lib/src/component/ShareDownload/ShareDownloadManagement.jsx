@@ -56,6 +56,7 @@ class ShareDownloadManagement extends React.Component {
                 email={shareLink.email}
                 link={shareLink.link}
                 id={shareLink.id}
+                isProtected={shareLink.isProtected}
                 onClickDeleteShareLink={props.onClickDeleteShareLink}
                 hexcolor={props.hexcolor}
               />
