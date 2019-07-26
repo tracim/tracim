@@ -1,4 +1,4 @@
-"""add creator to workspace
+"""add owner to workspace
 
 Revision ID: cd79614189ac
 Revises: 32e629b17e2e

@@ -75,7 +75,7 @@ class Workspace(DeclarativeBase):
     revisions = relationship("ContentRevisionRO")
     agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
-    creator = relationship("User", remote_side=[User.user_id])
+    owner = relationship("User", remote_side=[User.user_id])
 
     @hybrid_property
     def contents(self) -> ["Content"]:

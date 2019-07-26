@@ -770,7 +770,7 @@ class WorkspaceSchema(WorkspaceDigestSchema):
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
-    creator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
+    owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
 
     class Meta:
         description = "Full workspace informations"

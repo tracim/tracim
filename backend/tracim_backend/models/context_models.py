@@ -700,10 +700,10 @@ class WorkspaceInContext(object):
         return root_frontend_url + workspace_frontend_url
 
     @property
-    def creator(self) -> typing.Optional[UserInContext]:
-        if self.workspace.creator:
+    def owner(self) -> typing.Optional[UserInContext]:
+        if self.workspace.owner:
             return UserInContext(
-                dbsession=self.dbsession, config=self.config, user=self.workspace.creator
+                dbsession=self.dbsession, config=self.config, user=self.workspace.owner
             )
         return None
 
