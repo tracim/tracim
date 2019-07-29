@@ -69,7 +69,6 @@ class Login extends React.Component {
     if (query.dc && query.dc === '1') {
       props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
       props.history.push(props.location.pathname)
-      return
     }
 
     await this.loadConfig()
