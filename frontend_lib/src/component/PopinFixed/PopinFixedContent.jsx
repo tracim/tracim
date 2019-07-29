@@ -13,7 +13,7 @@ class PopinFixedContent extends React.Component {
   handleToggleRightPart = () => {
     if (window.innerWidth < 1200) return
 
-    this.setState(prev => ({rightPartOpen: !prev.rightPartOpen}))
+    this.setState(prev => ({ rightPartOpen: !prev.rightPartOpen }))
   }
 
   render () {
@@ -22,7 +22,7 @@ class PopinFixedContent extends React.Component {
         <div className={classnames(
           'wsContentGeneric__content',
           `${this.props.customClass}__content`,
-          {'rightPartOpen': this.state.rightPartOpen, 'rightPartClose': !this.state.rightPartOpen}
+          { 'rightPartOpen': this.state.rightPartOpen, 'rightPartClose': !this.state.rightPartOpen }
         )}>
           <div className={classnames('wsContentGeneric__content__left', `${this.props.customClass}__content__left`)}>
             {this.props.children[0]}

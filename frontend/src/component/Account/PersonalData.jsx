@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { editableUserAuthTypeList } from '../../helper.js'
 
@@ -17,11 +17,11 @@ export class PersonalData extends React.Component {
     }
   }
 
-  handleChangeName = e => this.setState({newName: e.target.value})
+  handleChangeName = e => this.setState({ newName: e.target.value })
 
-  handleChangeEmail = e => this.setState({newEmail: e.target.value})
+  handleChangeEmail = e => this.setState({ newEmail: e.target.value })
 
-  handleChangeCheckPassword = e => this.setState({checkPassword: e.target.value})
+  handleChangeCheckPassword = e => this.setState({ checkPassword: e.target.value })
 
   handleClickSubmit = async () => {
     const { props, state } = this
@@ -112,4 +112,4 @@ PersonalData.propTypes = {
 }
 
 const mapStateToProps = () => ({}) // connect for .dispatch()
-export default connect(mapStateToProps)(translate()(PersonalData))
+export default connect(mapStateToProps)(withTranslation()(PersonalData))

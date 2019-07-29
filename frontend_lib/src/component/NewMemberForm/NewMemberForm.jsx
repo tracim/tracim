@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Avatar from '../Avatar/Avatar.jsx'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
@@ -133,7 +133,7 @@ export const NewMemberForm = props => {
                 </div>
 
                 <div className='item__text'>
-                  <div className='item__text__icon mr-1' style={{color: r.hexcolor}}>
+                  <div className='item__text__icon mr-1' style={{ color: r.hexcolor }}>
                     <i className={`fa fa-fw fa-${r.faIcon}`} />
                   </div>
 
@@ -161,4 +161,4 @@ export const NewMemberForm = props => {
   )
 }
 
-export default translate()(NewMemberForm)
+export default withTranslation()(NewMemberForm)

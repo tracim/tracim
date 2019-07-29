@@ -10,7 +10,7 @@ export function appFactory (WrappedComponent) {
   return withRouter(connect(mapStateToProps)(class AppFactory extends React.Component {
     renderAppFeature = (appConfig, user, userRoleIdInWorkspace, content) => GLOBAL_renderAppFeature({
       loggedUser: user.logged
-        ? {...user, userRoleIdInWorkspace}
+        ? { ...user, userRoleIdInWorkspace }
         : {},
       config: {
         ...appConfig,

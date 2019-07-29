@@ -27,7 +27,7 @@ export function workspaceList (state = [], action) {
       }))
 
     case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
-      return state.map(ws => ({...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar}))
+      return state.map(ws => ({ ...ws, isOpenInSidebar: ws.id === action.workspaceId ? action.isOpenInSidebar : ws.isOpenInSidebar }))
 
     case `${SET}/${WORKSPACE_LIST_MEMBER}`:
       return state.map(ws => ({
@@ -46,7 +46,7 @@ export function workspaceList (state = [], action) {
         ? {
           ...ws,
           memberList: ws.memberList.map(u => u.id === action.userId
-            ? {...u, doNotify: action.doNotify}
+            ? { ...u, doNotify: action.doNotify }
             : u
           )
         }

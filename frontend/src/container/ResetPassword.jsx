@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -35,9 +35,9 @@ export class ResetPassword extends React.Component {
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
-  handleChangePassword = e => this.setState({newPassword: e.target.value})
+  handleChangePassword = e => this.setState({ newPassword: e.target.value })
 
-  handleChangePassword2 = e => this.setState({newPassword2: e.target.value})
+  handleChangePassword2 = e => this.setState({ newPassword2: e.target.value })
 
   handleClickSubmit = async () => {
     const { props, state } = this
@@ -130,4 +130,4 @@ export class ResetPassword extends React.Component {
 }
 
 const mapStateToProps = () => ({})
-export default connect(mapStateToProps)(withRouter(translate()(ResetPassword)))
+export default connect(mapStateToProps)(withRouter(withTranslation()(ResetPassword)))

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import {
   PAGE,
   ROLE,
@@ -89,8 +89,8 @@ class WorkspaceContent extends React.Component {
           folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
         }
 
-        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, {encode: false}))
-        this.setState({appOpenedType: false})
+        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
+        this.setState({ appOpenedType: false })
 
         this.props.dispatch(resetBreadcrumbsAppFeature())
         break
@@ -131,7 +131,7 @@ class WorkspaceContent extends React.Component {
     const currentFilter = qs.parse(props.location.search).type
 
     if (prevState.workspaceIdInUrl !== workspaceId || prevFilter !== currentFilter) {
-      this.setState({workspaceIdInUrl: workspaceId})
+      this.setState({ workspaceIdInUrl: workspaceId })
       this.loadContentList(workspaceId)
       this.buildBreadcrumbs()
     }
@@ -163,7 +163,7 @@ class WorkspaceContent extends React.Component {
       breadcrumbsList.push({
         link: (
           <Link to={`${PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl)}?type=${urlFilter}`}>
-            {props.t((props.contentType.find(ct => ct.slug === urlFilter) || {label: ''}).label + 's')}
+            { props.t((props.contentType.find(ct => ct.slug === urlFilter) || { label: '' }).label + 's') }
           </Link>
         ),
         type: BREADCRUMBS_TYPE.CORE
@@ -223,7 +223,7 @@ class WorkspaceContent extends React.Component {
       default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
     }
 
-    this.setState({contentLoaded: true})
+    this.setState({ contentLoaded: true })
   }
 
   handleClickContentItem = content => {
@@ -279,7 +279,7 @@ class WorkspaceContent extends React.Component {
     const { props, state } = this
 
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
-    const newUrlSearchList = (props.workspaceContentList.find(c => c.id === folderId) || {isOpen: false}).isOpen
+    const newUrlSearchList = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
       ? folderListInUrl.filter(id => id !== folderId)
       : uniq([...folderListInUrl, folderId])
 
@@ -289,7 +289,7 @@ class WorkspaceContent extends React.Component {
     }
 
     props.dispatch(toggleFolderOpen(folderId))
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, {encode: false}))
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
 
     if (!props.workspaceContentList.some(c => c.parentId === folderId)) {
       const fetchContentList = await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
@@ -300,7 +300,7 @@ class WorkspaceContent extends React.Component {
   handleClickCreateContent = (e, folderId, contentType) => {
     const { props, state } = this
 
-    const folderOpen = (props.workspaceContentList.find(c => c.id === folderId) || {isOpen: false}).isOpen
+    const folderOpen = (props.workspaceContentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
 
     const urlSearch = qs.parse(props.location.search)
     delete urlSearch.parent_id
@@ -317,7 +317,7 @@ class WorkspaceContent extends React.Component {
 
     if (!folderOpen) this.handleClickFolder(folderId)
 
-    props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, {encode: false})}&parent_id=${folderId}`)
+    props.history.push(`${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`)
   }
 
   getContentParentList = (content, contentList) => {
@@ -354,7 +354,7 @@ class WorkspaceContent extends React.Component {
     const fetchMoveContent = await props.dispatch(putContentItemMove(source, destination))
     switch (fetchMoveContent.status) {
       case 200:
-        const {dropEffect, ...actionDestination} = destination
+        const { dropEffect, ...actionDestination } = destination
         props.dispatch(moveWorkspaceContent(source, actionDestination))
         this.loadContentList(state.workspaceIdInUrl)
         break
@@ -375,7 +375,7 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
+  handleUpdateAppOpenedType = openedAppType => this.setState({ appOpenedType: openedAppType })
 
   handleSetFolderRead = async folderId => {
     const { props, state } = this
@@ -578,4 +578,4 @@ class WorkspaceContent extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
   breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceList, contentType
 })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
+export default withRouter(connect(mapStateToProps)(appFactory(withTranslation()(WorkspaceContent))))

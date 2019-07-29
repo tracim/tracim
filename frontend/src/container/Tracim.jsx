@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../i18n.js'
 import {
@@ -106,16 +106,16 @@ class Tracim extends React.Component {
           logged: true
         }))
 
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchGetUserIsConnected.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
 
         i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
 
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
-      case 401: props.dispatch(setUserConnected({logged: false})); break
-      default: props.dispatch(setUserConnected({logged: false})); break
+      case 401: props.dispatch(setUserConnected({ logged: false })); break
+      default: props.dispatch(setUserConnected({ logged: false })); break
     }
   }
 
@@ -157,11 +157,11 @@ class Tracim extends React.Component {
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList())
 
     if (fetchGetWorkspaceList.status === 200) {
-      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen}))
+      const wsListWithOpenedStatus = fetchGetWorkspaceList.json.map(ws => ({ ...ws, isOpenInSidebar: ws.workspace_id === idWsToOpen }))
 
       props.dispatch(setWorkspaceList(wsListWithOpenedStatus))
       this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-      this.setState({workspaceListLoaded: true})
+      this.setState({ workspaceListLoaded: true })
 
       return true
     }
@@ -234,44 +234,40 @@ class Tracim extends React.Component {
 
           <Route exact path={PAGE.HOME} component={() => <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />} />
 
-          <Route path='/ui/workspaces/:idws?' render={() => [// Workspace Router
-            // @FIXME - CH - 2018-03-26 - the use of array in a render function avoid having to wrap everything into
-            // a wrapper div.
-            // This is required here to avoid having the div.tracim__content in the agendas pages.
-            // To fix this, upgrade React to at least 16.2.0 and use the first class component React.Fragment instead
-            // of the array syntax that is kind of misleading. Also remove the key props
-            <Route exact path={PAGE.WORKSPACE.ROOT} key='workspace_root' render={() =>
-              <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
-            } />,
+          <Route path='/ui/workspaces/:idws?' render={() =>
+            <>
+              <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
+                <Redirect to={{ pathname: PAGE.HOME, state: { from: props.location } }} />
+              } />
 
-            <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} key='workspace_redirect_to_contentlist' render={props2 => // handle '/workspaces/:id' and add '/contents'
-              <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
-            } />,
+              <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
+                <Redirect to={{ pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: { from: props.location } }} />
+              } />
 
-            <Route
-              path={[
-                PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
-                PAGE.WORKSPACE.CONTENT_LIST(':idws'),
-                PAGE.WORKSPACE.SHARE_FOLDER(':idws')
-              ]}
-              key='workspace_contentlist'
-              render={() =>
+              <Route
+                path={[
+                  PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts'),
+                  PAGE.WORKSPACE.CONTENT_LIST(':idws'),
+                  PAGE.WORKSPACE.SHARE_FOLDER(':idws')
+                ]}
+                render={() =>
+                  <div className='tracim__content fullWidthFullHeight'>
+                    <WorkspaceContent />
+                  </div>
+                }
+              />
+
+              <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} render={() =>
                 <div className='tracim__content fullWidthFullHeight'>
-                  <WorkspaceContent />
+                  <Dashboard />
                 </div>
-              }
-            />,
+              } />
 
-            <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} key='workspace_dashboard' render={() =>
-              <div className='tracim__content fullWidthFullHeight'>
-                <Dashboard />
-              </div>
-            } />,
-
-            <Route path={PAGE.WORKSPACE.AGENDA(':idws')} key='workspace_agenda' render={() =>
-              <AppFullscreenRouter />
-            } />
-          ]} />
+              <Route path={PAGE.WORKSPACE.AGENDA(':idws')} render={() =>
+                <AppFullscreenRouter />
+              } />
+            </>
+          } />
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />
 
@@ -303,4 +299,4 @@ class Tracim extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system }) => ({
   breadcrumbs, user, appList, contentType, currentWorkspace, workspaceList, flashMessage, system
 })
-export default withRouter(connect(mapStateToProps)(translate()(Tracim)))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Tracim)))

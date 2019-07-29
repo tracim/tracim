@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Checkbox } from 'tracim_frontend_lib'
 
 const FolderAdvanced = props => {
@@ -49,14 +49,14 @@ const FolderAdvanced = props => {
                 name={app.label}
                 checked={props.folderSubContentType.includes(app.slug)}
                 onClickCheckbox={() => props.onClickApp(app.slug)}
-                styleLabel={{margin: '0 8px 0 0'}}
-                styleCheck={{top: '-5px'}}
+                styleLabel={{ margin: '0 8px 0 0' }}
+                styleCheck={{ top: '-5px' }}
                 disabled={props.isArchived || props.isDeleted}
               />
 
               <i
                 className={`folder_advanced__content__form__type__icon fa fa-fw fa-${app.fa_icon}`}
-                style={{color: app.hexcolor}}
+                style={{ color: app.hexcolor }}
               />
 
               <div className='folder_advanced__content__form__type__label'>
@@ -70,4 +70,4 @@ const FolderAdvanced = props => {
   )
 }
 
-export default translate()(FolderAdvanced)
+export default withTranslation()(FolderAdvanced)

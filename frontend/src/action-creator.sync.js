@@ -14,7 +14,7 @@ export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone }
 export const FLASH_MESSAGE = 'FlashMessage'
 export const newFlashMessage = (msgText = '', msgType = 'info', msgDelay = 5000) => dispatch => {
   if (msgDelay !== 0) window.setTimeout(() => dispatch(removeFlashMessage(msgText)), msgDelay)
-  return dispatch(addFlashMessage({message: msgText, type: msgType}))
+  return dispatch(addFlashMessage({ message: msgText, type: msgType }))
 }
 const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg }) // only newFlashMsg should be used by component and app so dont export this
 export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, msg })

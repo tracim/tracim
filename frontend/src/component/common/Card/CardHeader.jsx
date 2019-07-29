@@ -6,7 +6,7 @@ const CardHeader = props => {
   return (
     <div
       className={classnames('card-header', props.customClass)}
-      style={props.displayHeader ? undefined : {display: 'none'}}
+      style={props.displayHeader ? undefined : { display: 'none' }}
     >
       {props.children}
     </div>

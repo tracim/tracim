@@ -1,6 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const ArchiveDeleteContent = props => {
   const styleColorBtn = {
@@ -41,4 +41,4 @@ const ArchiveDeleteContent = props => {
   )
 }
 
-export default translate()(Radium(ArchiveDeleteContent))
+export default withTranslation()(Radium(ArchiveDeleteContent))

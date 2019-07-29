@@ -1,8 +1,9 @@
 import React from 'react'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import Lightbox from 'react-images'
+import Lightbox from 'react-image-lightbox'
+import 'react-image-lightbox/style.css'
 
 require('./PreviewComponent.styl')
 
@@ -24,24 +25,28 @@ export class PreviewComponent extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { props } = this
+    const { props, state } = this
 
-    if (prevProps.previewUrl !== props.previewUrl) {
-      this.setState({isJpegPreviewDisplayable: true})
+    if (prevProps.previewUrl !== props.previewUrl && state.displayLightbox === false) {
+      this.setState({ isJpegPreviewDisplayable: true })
       this.isJpegPreviewDisplayable()
     }
     // if (prevProps.downloadPdfPageUrl !== props.downloadPdfPageUrl) {
-    //   this.setState({isPdfPageDisplayable: true})
+    //   this.setState({ isPdfPageDisplayable: true })
     //   this.isPdfPageDisplayable()
     // }
     // if (prevProps.downloadPdfFullUrl !== props.downloadPdfFullUrl) {
-    //   this.setState({isPdfFullDisplayable: true})
+    //   this.setState({ isPdfFullDisplayable: true })
     //   this.isPdfFullDisplayable()
     // }
   }
 
-  handleClickShowImageRaw = async () => {
-    this.setState({displayLightbox: true})
+  handleClickShowImageRaw = () => {
+    this.setState({ displayLightbox: true })
+  }
+
+  handleClickHideImageRaw = () => {
+    this.setState({ displayLightbox: false })
   }
 
   isJpegPreviewDisplayable = () => {
@@ -50,7 +55,7 @@ export class PreviewComponent extends React.Component {
     if (props.isJpegAvailable) {
       const img = document.createElement('img')
       img.src = props.previewUrl
-      img.onerror = () => this.setState({isJpegPreviewDisplayable: false})
+      img.onerror = () => this.setState({ isJpegPreviewDisplayable: false })
     }
   }
 
@@ -61,7 +66,7 @@ export class PreviewComponent extends React.Component {
   //
   //   if (props.isPdfAvailable) {
   //     const fetchPdfPage = await handleFetchResult(await getFilePdf(props.downloadPdfPageUrl))
-  //     if (fetchPdfPage.status !== 200) this.setState({isPdfPageDisplayable: false})
+  //     if (fetchPdfPage.status !== 200) this.setState({ isPdfPageDisplayable: false })
   //   }
   // }
   //
@@ -70,7 +75,7 @@ export class PreviewComponent extends React.Component {
   //
   //   if (props.isPdfAvailable) {
   //     const fetchPdfFull = await handleFetchResult(await getFilePdf(props.downloadPdfFullUrl))
-  //     if (fetchPdfFull.status !== 200) this.setState({isPdfFullDisplayable: false})
+  //     if (fetchPdfFull.status !== 200) this.setState({ isPdfFullDisplayable: false })
   //   }
   // }
 
@@ -86,7 +91,7 @@ export class PreviewComponent extends React.Component {
               href={props.downloadPdfPageUrl}
               target='_blank'
               download
-              style={{':hover': {color: props.color}}}
+              style={{ ':hover': { color: props.color } }}
               title={props.t('Download current page as PDF')}
               key={'file_btn_dl_pdfall'}
             >
@@ -100,7 +105,7 @@ export class PreviewComponent extends React.Component {
               href={props.downloadPdfFullUrl}
               target='_blank'
               download
-              style={{':hover': {color: props.color}}}
+              style={{ ':hover': { color: props.color } }}
               title={props.t('Download as PDF')}
               key={'file_btn_dl_pdfpage'}
             >
@@ -113,7 +118,7 @@ export class PreviewComponent extends React.Component {
             href={props.downloadRawUrl}
             target='_blank'
             download
-            style={{':hover': {color: props.color}}}
+            style={{ ':hover': { color: props.color } }}
             title={props.t('Download file')}
             key={'file_btn_dl_raw'}
           >
@@ -155,18 +160,21 @@ export class PreviewComponent extends React.Component {
             )
           }
 
-          {state.isJpegPreviewDisplayable && props.isJpegAvailable && (
-            <Lightbox
-              isOpen={state.displayLightbox}
-              images={(props.lightboxUrlList || []).map(url => ({src: url}))}
-              currentImage={props.fileCurrentPage - 1}
-              onClose={() => this.setState({displayLightbox: false})}
-              onClickPrev={props.onClickPreviousPage}
-              onClickNext={props.onClickNextPage}
-              showImageCount
-              imageCountSeparator={props.t(' of ')}
-            />
-          )}
+          {state.isJpegPreviewDisplayable && props.isJpegAvailable && state.displayLightbox
+            ? (
+              <Lightbox
+                prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
+                mainSrc={props.lightboxUrlList[props.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                nextSrc={props.lightboxUrlList[props.fileCurrentPage]}
+                onCloseRequest={this.handleClickHideImageRaw}
+                onMovePrevRequest={props.onClickPreviousPage}
+                onMoveNextRequest={props.onClickNextPage}
+                imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
+                imagePadding={55}
+              />
+            )
+            : null
+          }
         </div>
 
         {state.isJpegPreviewDisplayable && props.filePageNb > 1 && (
@@ -193,4 +201,4 @@ export class PreviewComponent extends React.Component {
   }
 }
 
-export default translate()(Radium(PreviewComponent))
+export default withTranslation()(Radium(PreviewComponent))

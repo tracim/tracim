@@ -11,42 +11,52 @@
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build-devwindoz": "set NODE_ENV=production&& webpack",
     "build-translation": "node i18next.scanner.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.1.6",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-object-assign": "^7.0.0",
-    "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.1.6",
+    "@babel/core": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.2",
+    "@babel/plugin-transform-object-assign": "^7.2.0",
+    "@babel/preset-env": "^7.5.2",
     "@babel/preset-react": "^7.0.0",
-    "babel-eslint": "^8.2.6",
-    "babel-loader": "^8.0.4",
-    "classnames": "^2.2.5",
-    "css-loader": "^0.28.7",
-    "file-loader": "^1.1.5",
-    "i18next": "^10.5.0",
-    "prop-types": "^15.6.0",
-    "radium": "^0.24.1",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
-    "react-i18next": "^7.5.0",
-    "standard": "^11.0.0",
-    "standard-loader": "^6.0.1",
-    "style-loader": "^0.19.0",
+    "babel-eslint": "^10.0.2",
+    "babel-loader": "^8.0.6",
+    "classnames": "^2.2.6",
+    "color": "^3.1.2",
+    "core-js": "^3.1.4",
+    "css-loader": "^3.0.0",
+    "file-loader": "^4.0.0",
+    "i18next": "^17.0.6",
+    "prop-types": "^15.7.2",
+    "radium": "^0.25.2",
+    "react": "file:../frontend/node_modules/react",
+    "react-dom": "file:../frontend/node_modules/react-dom",
+    "react-i18next": "^10.11.4",
+    "regenerator-runtime": "^0.13.2",
+    "standard": "^12.0.1",
+    "standard-loader": "^7.0.0",
+    "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.1",
-    "url-loader": "^0.6.2",
-    "webpack": "^4.26.1",
-    "webpack-cli": "^3.1.2",
-    "whatwg-fetch": "^2.0.3"
+    "stylus-loader": "^3.0.2",
+    "url-loader": "^2.0.1",
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.5",
+    "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
-    "i18next-scanner": "^2.6.1",
-    "webpack-dev-server": "^3.1.10"
+    "@babel/register": "^7.4.4",
+    "chai": "^4.2.0",
+    "chai-enzyme": "^1.0.0-beta.1",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "i18next-scanner": "^2.10.2",
+    "ignore-styles": "^5.0.1",
+    "jsdom": "^15.1.1",
+    "mocha": "^6.1.4",
+    "webpack-dev-server": "^3.7.2"
   },
   "standard": {
     "globals": [
@@ -62,5 +72,20 @@
     ],
     "parser": "babel-eslint",
     "ignore": []
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@babel/preset-env",
+          "@babel/preset-react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-proposal-object-rest-spread",
+          "@babel/plugin-transform-object-assign"
+        ]
+      }
+    }
   }
 }

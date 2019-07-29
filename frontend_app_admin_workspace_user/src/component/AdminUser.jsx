@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   Delimiter,
@@ -167,7 +167,7 @@ export class AdminUser extends React.Component {
                   const userProfile = getUserProfile(props.profile, u.profile)
                   return (
                     <tr
-                      className={classnames('adminUser__table__tr', {'user-deactivated': !u.is_active})}
+                      className={classnames('adminUser__table__tr', { 'user-deactivated': !u.is_active })}
                       key={u.user_id}
                       data-cy='adminUser__table__tr'
                     >
@@ -183,7 +183,7 @@ export class AdminUser extends React.Component {
                       <td>
                         <i
                           className={`fa fa-fw fa-2x fa-${userProfile.faIcon}`}
-                          style={{color: userProfile.hexcolor}}
+                          style={{ color: userProfile.hexcolor }}
                           title={props.t(userProfile.label)}
                         />
                       </td>
@@ -231,4 +231,4 @@ export class AdminUser extends React.Component {
   }
 }
 
-export default translate()(AdminUser)
+export default withTranslation()(AdminUser)

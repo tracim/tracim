@@ -1,6 +1,6 @@
 import React from 'react'
 import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -79,7 +79,7 @@ class HtmlDocument extends React.Component {
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
-          this.setState({isVisible: true})
+          this.setState({ isVisible: true })
           this.buildBreadcrumbs()
         }
         break
@@ -100,7 +100,7 @@ class HtmlDocument extends React.Component {
         tinymce.remove('#wysiwygNewVersion')
 
         this.setState(prev => ({
-          content: {...prev.content, ...data},
+          content: { ...prev.content, ...data },
           isVisible: true,
           timelineWysiwyg: false
         }))
@@ -293,12 +293,12 @@ class HtmlDocument extends React.Component {
     })
 
     await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}}) // await above makes sure that we will reload workspace content after the read status update
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -380,14 +380,14 @@ class HtmlDocument extends React.Component {
 
   handleChangeText = e => {
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
-    this.setState(prev => ({content: {...prev.content, raw_content: newText}}))
+    this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
     this.setLocalStorageItem('rawContent', newText)
   }
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
-    this.setState({newComment})
+    this.setState({ newComment })
 
     this.setLocalStorageItem('comment', newComment)
   }
@@ -404,7 +404,7 @@ class HtmlDocument extends React.Component {
     const fetchResultSaveNewComment = await handleFetchResult(await postHtmlDocNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
-        this.setState({newComment: ''})
+        this.setState({ newComment: '' })
         localStorage.removeItem(
           generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
         )
@@ -425,7 +425,7 @@ class HtmlDocument extends React.Component {
     }
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
+  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { state, props } = this
@@ -448,7 +448,7 @@ class HtmlDocument extends React.Component {
     const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true }, mode: MODE.VIEW }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -468,7 +468,7 @@ class HtmlDocument extends React.Component {
     const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: true }, mode: MODE.VIEW }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -488,7 +488,7 @@ class HtmlDocument extends React.Component {
     const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -508,7 +508,7 @@ class HtmlDocument extends React.Component {
     const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -551,7 +551,7 @@ class HtmlDocument extends React.Component {
 
   handleClickLastVersion = () => {
     this.loadContent()
-    this.setState({mode: MODE.VIEW})
+    this.setState({ mode: MODE.VIEW })
   }
 
   render () {
@@ -597,7 +597,7 @@ class HtmlDocument extends React.Component {
                 <button
                   className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
-                  style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
+                  style={{ backgroundColor: config.hexcolor, color: '#fdfdfd' }}
                 >
                   <i className='fa fa-history' />
                   {t('Last version')}
@@ -686,4 +686,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(HtmlDocument))
+export default withTranslation()(Radium(HtmlDocument))

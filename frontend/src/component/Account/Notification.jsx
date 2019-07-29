@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { BtnSwitch } from 'tracim_frontend_lib'
 import { ROLE } from '../../helper.js'
 
@@ -24,7 +24,7 @@ export const Notification = props =>
         <tbody>
           {props.workspaceList.length > 0
             ? props.workspaceList.map(ws => {
-              const mySelf = ws.memberList.find(u => u.id === props.userLoggedId)
+              const mySelf = ws.memberList.find(u => u.user_id === props.userLoggedId)
               const myRole = ROLE.find(r => r.slug === mySelf.role)
               return (
                 <tr key={`ws_${ws.id}`}>
@@ -37,7 +37,7 @@ export const Notification = props =>
                   <td>
                     <div className='notification__table__role'>
                       <div className='notification__table__role__icon'>
-                        <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
+                        <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{ color: myRole.hexcolor }} />
                       </div>
                       <div className='notification__table__role__text d-none d-sm-flex'>
                         {props.t(myRole.label)}
@@ -67,4 +67,4 @@ export const Notification = props =>
     </div>
   </div>
 
-export default translate()(Notification)
+export default withTranslation()(Notification)

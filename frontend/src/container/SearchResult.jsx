@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   PageWrapper,
@@ -104,7 +104,7 @@ class SearchResult extends React.Component {
         props.dispatch(setSearchResultsList(fetchGetSearchedKeywords.json.contents))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
-        this.setState({totalHits: fetchGetSearchedKeywords.json.total_hits})
+        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -153,8 +153,8 @@ class SearchResult extends React.Component {
       case 200:
         props.dispatch(setCurrentNumberPage(NEXT_PAGE))
         props.dispatch(appendSearchResultsList(fetchGetSearchedKeywords.json.contents))
-        this.setState({totalHits: fetchGetSearchedKeywords.json.total_hits})
-        props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify({...qs.parse(props.location.search), p: NEXT_PAGE}, {encode: true}))
+        this.setState({ totalHits: fetchGetSearchedKeywords.json.total_hits })
+        props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify({ ...qs.parse(props.location.search), p: NEXT_PAGE }, { encode: true }))
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
@@ -279,4 +279,4 @@ class SearchResult extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, searchResult, contentType, user }) => ({ breadcrumbs, searchResult, contentType, user })
-export default connect(mapStateToProps)(translate()(SearchResult))
+export default connect(mapStateToProps)(withTranslation()(SearchResult))

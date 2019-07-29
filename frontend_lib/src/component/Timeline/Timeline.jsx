@@ -2,15 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
-import color from 'color'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../../i18n.js'
 import DisplayState from '../DisplayState/DisplayState.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
+const color = require('color')
 
 class Timeline extends React.Component {
   constructor (props) {
@@ -164,7 +164,7 @@ class Timeline extends React.Component {
                       backgroundColor: props.customColor,
                       color: '#fdfdfd',
                       ':hover': {
-                        backgroundColor: color(props.customColor).darken(0.15).hexString()
+                        backgroundColor: color(props.customColor).darken(0.15).hex()
                       }
                     }}
                     key={'timeline__comment__send'}
@@ -185,7 +185,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default translate()(Radium(Timeline))
+export default withTranslation()(Radium(Timeline))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
