@@ -48,17 +48,17 @@ export default function workspaceContentList (state = [], action) {
       ]
 
     case `${TOGGLE}/${WORKSPACE}/${FOLDER}`:
-      return state.map(c => c.id === action.folderId ? {...c, isOpen: !c.isOpen} : c)
+      return state.map(c => c.id === action.folderId ? { ...c, isOpen: !c.isOpen } : c)
 
     case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
       return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? {...wsc, isArchived: true}
+        ? { ...wsc, isArchived: true }
         : wsc
       )
 
     case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
       return state.map(wsc => wsc.workspaceId === action.workspaceId && wsc.id === action.contentId
-        ? {...wsc, isDeleted: true}
+        ? { ...wsc, isDeleted: true }
         : wsc
       )
 

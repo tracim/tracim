@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 require('./ErrorFlashMessageTemplateHtml.styl')
 
@@ -18,7 +18,7 @@ export const ErrorFlashMessageTemplateHtml = props => (
   </div>
 )
 
-export default translate()(ErrorFlashMessageTemplateHtml)
+export default withTranslation()(ErrorFlashMessageTemplateHtml)
 
 ErrorFlashMessageTemplateHtml.propTypes = {
   errorMsg: PropTypes.string

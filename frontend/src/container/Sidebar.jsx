@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import classnames from 'classnames'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
@@ -70,9 +70,9 @@ class Sidebar extends React.Component {
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
-  handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
+  handleClickToggleSidebar = () => this.setState(prev => ({ sidebarClose: !prev.sidebarClose }))
 
-  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({block: 'start', inline: 'nearest', behavior: 'smooth'})
+  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
@@ -83,7 +83,7 @@ class Sidebar extends React.Component {
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     return (
-      <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
+      <div className={classnames('sidebar', { 'sidebarclose': sidebarClose })}>
         <div className='sidebar__scrollview'>
           <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
             {sidebarClose
@@ -101,9 +101,9 @@ class Sidebar extends React.Component {
           */}
 
           <div className='sidebar__content'>
-            <div id='sidebar__content__scrolltopmarker' style={{visibility: 'hidden'}} ref={el => { this.workspaceListTop = el }} />
+            <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
-            <nav className={classnames('sidebar__content__navigation', {'sidebarclose': sidebarClose})}>
+            <nav className={classnames('sidebar__content__navigation', { 'sidebarclose': sidebarClose })}>
               <ul className='sidebar__content__navigation__workspace'>
                 { workspaceList.map(ws =>
                   <WorkspaceListItem
@@ -152,4 +152,4 @@ class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, system }) => ({ user, workspaceList, system })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))
+export default withRouter(connect(mapStateToProps)(appFactory(withTranslation()(Sidebar))))

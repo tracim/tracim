@@ -49,11 +49,3 @@ class SearchController(Controller):
             "search_content", "/search/content", request_method="GET"
         )  # noqa: W605
         configurator.add_view(self.search_content, route_name="search_content")
-
-
-class ESSearchController(SearchController):
-    pass
-
-
-class SimpleSearchController(SearchController):
-    pass

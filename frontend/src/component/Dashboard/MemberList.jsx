@@ -6,7 +6,7 @@ import { NewMemberForm, Avatar } from 'tracim_frontend_lib'
 require('./MemberList.styl')
 
 export class MemberList extends React.Component {
-  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({displayNewMemberList: true})
+  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({ displayNewMemberList: true })
 
   render () {
     const { props } = this
@@ -42,7 +42,7 @@ export class MemberList extends React.Component {
             )
             : (
               <div>
-                <ul className={classnames('memberlist__list', {'withAddBtn': props.userRoleIdInWorkspace >= 8})}>
+                <ul className={classnames('memberlist__list', { 'withAddBtn': props.userRoleIdInWorkspace >= 8 })}>
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>

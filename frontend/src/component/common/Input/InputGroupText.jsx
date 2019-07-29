@@ -12,7 +12,7 @@ const InputGroupText = props => {
       </div>
       <input
         type={props.type}
-        className={classnames(`inputGroupText__input ${props.parentClassName}__input`, 'form-control', {'is-invalid': props.isInvalid})}
+        className={classnames(`inputGroupText__input ${props.parentClassName}__input`, 'form-control', { 'is-invalid': props.isInvalid })}
         placeholder={props.placeHolder}
         value={props.value}
         onChange={props.onChange}

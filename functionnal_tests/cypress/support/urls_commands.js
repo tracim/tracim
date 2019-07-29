@@ -6,6 +6,7 @@ const PAGES = {
   AGENDA: 'agenda',
   EDIT_FOLDER: 'editFolder',
   SEARCH: 'search',
+  ADMIN_WORKSPACE: 'adminWorkspace'
 }
 
 const URLS = {
@@ -15,7 +16,8 @@ const URLS = {
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
   [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
-  [PAGES.SEARCH]: ({searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes}) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`
+  [PAGES.SEARCH]: ({searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes}) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,
+  [PAGES.ADMIN_WORKSPACE]: () => '/ui/admin/workspace'
 }
 
 /**

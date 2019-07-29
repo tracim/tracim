@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -93,7 +93,7 @@ class Account extends React.Component {
     const fetchUserAgenda = await props.dispatch(getLoggedUserCalendar())
     switch (fetchUserAgenda.status) {
       case 200:
-        const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || {agenda_url: ''}).agenda_url
+        const newAgendaUrl = (fetchUserAgenda.json.find(a => a.agenda_type === 'private') || { agenda_url: '' }).agenda_url
         props.dispatch(updateUserAgendaUrl(newAgendaUrl))
         break
       default:
@@ -138,7 +138,7 @@ class Account extends React.Component {
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName}))
+    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
   handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
@@ -230,7 +230,7 @@ class Account extends React.Component {
 
                 <div className='account__userpreference__setting'>
                   {(() => {
-                    switch (state.subComponentMenu.find(({active}) => active).name) {
+                    switch (state.subComponentMenu.find(({ active }) => active).name) {
                       case 'personalData':
                         return (
                           <PersonalData
@@ -276,4 +276,4 @@ class Account extends React.Component {
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system, appList }) => ({
   breadcrumbs, user, workspaceList, timezone, system, appList
 })
-export default connect(mapStateToProps)(translate()(Account))
+export default connect(mapStateToProps)(withTranslation()(Account))

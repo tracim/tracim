@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const ExtandedAction = props => {
   return (
@@ -85,7 +85,7 @@ const ExtandedAction = props => {
   )
 }
 
-export default translate()(ExtandedAction)
+export default withTranslation()(ExtandedAction)
 
 ExtandedAction.propTypes = {
   onClickExtendedAction: PropTypes.object.isRequired,

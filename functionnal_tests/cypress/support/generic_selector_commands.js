@@ -6,7 +6,8 @@ const SELECTORS = {
   CONTENT_IN_SEARCH: 'contentInSearch',
   LOGIN_PAGE_CARD: 'loginPageCard',
   HEADER: 'header',
-  ADMIN_USER_PAGE: 'adminUserPage'
+  ADMIN_USER_PAGE: 'adminUserPage',
+  TRACIM_CONTENT: 'tracimContent'
 }
 
 const TAGS = {
@@ -17,7 +18,8 @@ const TAGS = {
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`,
   [SELECTORS.LOGIN_PAGE_CARD]: () => '.loginpage__card.card',
   [SELECTORS.HEADER]: () => '.header',
-  [SELECTORS.ADMIN_USER_PAGE]: () => '.adminUser.pageContentGeneric'
+  [SELECTORS.ADMIN_USER_PAGE]: () => '.adminUser.pageContentGeneric',
+  [SELECTORS.TRACIM_CONTENT]: () => `.tracim__content-scrollview`
 }
 
 /**

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
@@ -50,7 +50,7 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
@@ -124,4 +124,4 @@ class PopupCreateHtmlDocument extends React.Component {
   }
 }
 
-export default translate()(PopupCreateHtmlDocument)
+export default withTranslation()(PopupCreateHtmlDocument)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { PAGE, workspaceConfig } from '../../../helper.js'
 
@@ -41,4 +41,4 @@ const AdminLink = props => {
   )
 }
 
-export default translate()(AdminLink)
+export default withTranslation()(AdminLink)

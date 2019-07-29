@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../i18n.js'
 import * as Cookies from 'js-cookie'
 import Card from '../component/common/Card/Card.jsx'
@@ -74,12 +74,12 @@ class Login extends React.Component {
     await this.loadConfig()
   }
 
-  handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
-  handleChangePassword = e => this.setState({inputPassword: {...this.state.inputPassword, value: e.target.value}})
+  handleChangeLogin = e => this.setState({ inputLogin: { ...this.state.inputLogin, value: e.target.value } })
+  handleChangePassword = e => this.setState({ inputPassword: { ...this.state.inputPassword, value: e.target.value } })
   handleChangeRememberMe = e => {
     e.preventDefault()
     e.stopPropagation()
-    this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
+    this.setState(prev => ({ inputRememberMe: !prev.inputRememberMe }))
   }
 
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
@@ -103,10 +103,10 @@ class Login extends React.Component {
 
         if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
 
-        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.LAST_CONNECTION, '1', { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         props.dispatch(setUserConnected(loggedUser))
 
-        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, {expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME})
+        Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         i18n.changeLanguage(loggedUser.lang)
 
         this.loadAppList()
@@ -199,7 +199,7 @@ class Login extends React.Component {
 
   render () {
     const { props, state } = this
-    if (props.user.logged) return <Redirect to={{pathname: '/ui'}} />
+    if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
       <section className='loginpage primaryColorBg'>
@@ -269,4 +269,4 @@ class Login extends React.Component {
 }
 
 const mapStateToProps = ({ user, system, breadcrumbs }) => ({ user, system, breadcrumbs })
-export default withRouter(connect(mapStateToProps)(translate()(Login)))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Login)))

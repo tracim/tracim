@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Radium from 'radium'
-import color from 'color'
 import classnames from 'classnames'
 
 require('./ContentTypeBtn.styl')
+const color = require('color')
 
 export const ContentTypeBtn = props =>
   <div
@@ -13,7 +13,7 @@ export const ContentTypeBtn = props =>
     style={{
       backgroundColor: props.hexcolor,
       ':hover': {
-        backgroundColor: color(props.hexcolor).darken(0.15).hexString()
+        backgroundColor: color(props.hexcolor).darken(0.15).hex()
       }
     }}
     onClick={props.onClickBtn}
