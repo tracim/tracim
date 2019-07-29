@@ -24,7 +24,7 @@ export const Notification = props =>
         <tbody>
           {props.workspaceList.length > 0
             ? props.workspaceList.map(ws => {
-              const mySelf = ws.memberList.find(u => u.user_id === props.userLoggedId)
+              const mySelf = ws.memberList.find(u => u.id === props.userLoggedId)
               const myRole = ROLE.find(r => r.slug === mySelf.role)
               return (
                 <tr key={`ws_${ws.id}`}>
