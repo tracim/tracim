@@ -98,7 +98,7 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { workspaceList, match } = this.props
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
@@ -110,13 +110,14 @@ class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = match.params.idws
 
-    this.loadContentList(wsToLoad).then(() => {
-      const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
-      if (folderIdToOpen.length > 0) {
-        const lastFolderOpen = folderIdToOpen[folderIdToOpen.length - 1]
-        if (document.getElementById(lastFolderOpen)) document.getElementById(lastFolderOpen).scrollIntoView()
-      }
-    })
+    await this.loadContentList(wsToLoad)
+
+    const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
+    if (folderIdToOpen.length > 0) {
+      const lastFolderOpen = folderIdToOpen[folderIdToOpen.length - 1]
+      if (document.getElementById(lastFolderOpen)) document.getElementById(lastFolderOpen).scrollIntoView()
+    }
+
     this.buildBreadcrumbs()
   }
 
