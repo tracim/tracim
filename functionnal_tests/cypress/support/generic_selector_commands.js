@@ -4,6 +4,9 @@ const SELECTORS = {
   FOLDER_IN_LIST: 'folderInList',
   WORKSPACE_MENU: 'workspaceMenu',
   CONTENT_IN_SEARCH: 'contentInSearch',
+  LOGIN_PAGE_CARD: 'loginPageCard',
+  HEADER: 'header',
+  ADMIN_USER_PAGE: 'adminUserPage',
   TRACIM_CONTENT: 'tracimContent'
 }
 
@@ -13,6 +16,9 @@ const TAGS = {
   [SELECTORS.CONTENT_IN_SEARCH]: () => `.content__name`,
   [SELECTORS.FOLDER_IN_LIST]: ({ folderId }) => `[data-cy=folder_${folderId}]`,
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`,
+  [SELECTORS.LOGIN_PAGE_CARD]: () => '.loginpage__card.card',
+  [SELECTORS.HEADER]: () => '.header',
+  [SELECTORS.ADMIN_USER_PAGE]: () => '.adminUser.pageContentGeneric',
   [SELECTORS.TRACIM_CONTENT]: () => `.tracim__content-scrollview`
 }
 
