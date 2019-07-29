@@ -2,7 +2,7 @@ import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
 describe('App Workspace Advanced', function () {
-    const newDescription = 'myNewDescription'
+    const newDescription = 'description'
     let workspaceId = 1
     let workspaceDescription = ''
 
@@ -27,11 +27,7 @@ describe('App Workspace Advanced', function () {
 
             cy.getTag({selectorName: s.CONTENT_FRAME})
                 .find('.workspace_advanced__description__text__textarea')
-                .contains(workspaceDescription)
                 .clear()
-
-            cy.getTag({selectorName: s.CONTENT_FRAME})
-                .find('.workspace_advanced__description__text__textarea')
                 .type(newDescription)
 
             cy.getTag({selectorName: s.CONTENT_FRAME})
@@ -40,7 +36,7 @@ describe('App Workspace Advanced', function () {
 
             cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
                 .find('.dashboard__workspace__detail__description')
-                .contains( newDescription)
+                .contains(newDescription)
         })
     })
 })
