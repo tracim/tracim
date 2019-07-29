@@ -22,19 +22,19 @@ function uniqueResults (allResults) {
 export default function searchResult (state = defaultResult, action) {
   switch (action.type) {
     case `${SET}/${SEARCH_RESULTS_LIST}`:
-      return {...state, resultsList: uniqueResults(action.newSearchResultsList)}
+      return { ...state, resultsList: uniqueResults(action.newSearchResultsList) }
 
     case `${APPEND}/${SEARCH_RESULTS_LIST}`:
-      return {...state, resultsList: uniqueResults([...state.resultsList, ...action.appendSearchResultsList])}
+      return { ...state, resultsList: uniqueResults([...state.resultsList, ...action.appendSearchResultsList]) }
 
     case `${SET}/${SEARCHED_KEYWORDS}`:
-      return {...state, searchedKeywords: action.searchedKeywords}
+      return { ...state, searchedKeywords: action.searchedKeywords }
 
     case `${SET}/${SEARCH_RESULTS_BY_PAGE}`:
-      return {...state, numberResultsByPage: action.numberResultsByPage}
+      return { ...state, numberResultsByPage: action.numberResultsByPage }
 
     case `${SET}/${SEARCH_CURRENT_PAGE}`:
-      return {...state, currentNumberPage: action.currentNumberPage}
+      return { ...state, currentNumberPage: action.currentNumberPage }
 
     default:
       return state

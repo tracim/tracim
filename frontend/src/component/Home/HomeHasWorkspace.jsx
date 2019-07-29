@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Avatar } from 'tracim_frontend_lib'
 
 require('./Home.styl')
@@ -31,4 +31,4 @@ export const HomeHasWorkspace = props =>
     </div>
   </div>
 
-export default translate()(HomeHasWorkspace)
+export default withTranslation()(HomeHasWorkspace)

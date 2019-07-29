@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import {
   CardPopupCreateContent,
   handleFetchResult,
@@ -59,7 +59,7 @@ class PopupCreateFolder extends React.Component {
     }
   })
 
-  handleChangeNewFolderName = e => this.setState({newFolderName: e.target.value})
+  handleChangeNewFolderName = e => this.setState({ newFolderName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
@@ -106,4 +106,4 @@ class PopupCreateFolder extends React.Component {
   }
 }
 
-export default translate()(PopupCreateFolder)
+export default withTranslation()(PopupCreateFolder)

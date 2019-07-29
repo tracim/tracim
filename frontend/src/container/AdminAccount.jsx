@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link, withRouter } from 'react-router-dom'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -145,13 +145,19 @@ class Account extends React.Component {
       userToEditWorkspaceList: wsList.map(ws => ({
         ...ws,
         id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
-        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId).memberList
+        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.workspaceId).memberList.map(m => ({
+          id: m.user_id,
+          publicName: m.user.public_name,
+          role: m.role,
+          isActive: m.is_active,
+          doNotify: m.do_notify
+        }))
       }))
     })
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName}))
+    subComponentMenu: prev.subComponentMenu.map(m => ({ ...m, active: m.name === subMenuItemName }))
   }))
 
   handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
@@ -166,7 +172,7 @@ class Account extends React.Component {
       const fetchPutUserName = await props.dispatch(putUserName(state.userToEdit, newName))
       switch (fetchPutUserName.status) {
         case 200:
-          this.setState(prev => ({userToEdit: {...prev.userToEdit, public_name: newName}}))
+          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, public_name: newName } }))
           if (newEmail === '') {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
@@ -181,7 +187,7 @@ class Account extends React.Component {
       const fetchPutUserEmail = await props.dispatch(putUserEmail(state.userToEdit, newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          this.setState(prev => ({userToEdit: {...prev.userToEdit, email: newEmail}}))
+          this.setState(prev => ({ userToEdit: { ...prev.userToEdit, email: newEmail } }))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Email has been changed'), 'info'))
           return true
@@ -197,11 +203,13 @@ class Account extends React.Component {
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, workspaceId, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: this.setState(prev => ({
-        userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === workspaceId
-          ? {...ws, memberList: ws.memberList.map(u => u.user_id === state.userToEdit.user_id ? {...u, do_notify: doNotify} : u)}
-          : ws
-        )}))
+      case 204:
+        this.setState(prev => ({
+          userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === workspaceId
+            ? { ...ws, memberList: ws.memberList.map(u => u.id === state.userToEdit.user_id ? { ...u, doNotify: doNotify } : u) }
+            : ws
+          )
+        }))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
@@ -225,10 +233,13 @@ class Account extends React.Component {
   setTitle () {
     const { props, state } = this
 
-    return <div dangerouslySetInnerHTML={
-      {__html: props.t('{{userName}} account edition',
-        {userName: state.userToEdit.public_name, interpolation: {escapeValue: false}}
-      )}} />
+    return (
+      <div
+        dangerouslySetInnerHTML={{
+          __html: props.t('{{userName}} account edition', { userName: state.userToEdit.public_name, interpolation: { escapeValue: false } })
+        }}
+      />
+    )
   }
 
   render () {
@@ -258,7 +269,7 @@ class Account extends React.Component {
 
                 <div className='account__userpreference__setting'>
                   {(() => {
-                    switch (state.subComponentMenu.find(({active}) => active).name) {
+                    switch (state.subComponentMenu.find(({ active }) => active).name) {
                       case 'personalData':
                         return <PersonalData
                           userAuthType={state.userToEdit.auth_type}
@@ -289,4 +300,4 @@ class Account extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, user, workspaceList, timezone, system }) => ({ breadcrumbs, user, workspaceList, timezone, system })
-export default withRouter(connect(mapStateToProps)(translate()(Account)))
+export default withRouter(connect(mapStateToProps)(withTranslation()(Account)))

@@ -1,12 +1,13 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {
   TextAreaApp,
   DisplayState
 } from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
-const HtmlDocument = props => {
+export const HtmlDocument = props => {
   return (
     <div className='html-document__contentpage__left__wrapper'>
       {props.isArchived && (
@@ -51,7 +52,7 @@ const HtmlDocument = props => {
           <div>
             <div className='html-document__contentpage__textnote__version'>
               version n°
-              <div dangerouslySetInnerHTML={{__html: props.mode === MODE.VIEW ? props.lastVersion : props.version}} />
+              <div dangerouslySetInnerHTML={{ __html: props.mode === MODE.VIEW ? props.lastVersion : props.version }} />
               {props.mode === MODE.REVISION &&
                 <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
                   ({props.t('latest version :')} {props.lastVersion})
@@ -59,7 +60,7 @@ const HtmlDocument = props => {
               }
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
-            <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
+            <div className='html-document__contentpage__textnote__text' dangerouslySetInnerHTML={{ __html: props.text }} />
           </div>
         )}
 
@@ -80,4 +81,25 @@ const HtmlDocument = props => {
   )
 }
 
-export default translate()(HtmlDocument)
+export default withTranslation()(HtmlDocument)
+
+HtmlDocument.propTypes = {
+  mode: PropTypes.string,
+  customColor: PropTypes.string,
+  wysiwygNewVersion: PropTypes.string,
+  disableValidateBtn: PropTypes.bool,
+  version: PropTypes.string,
+  lastVersion: PropTypes.string,
+  text: PropTypes.string,
+  isArchived: PropTypes.bool,
+  isDeleted: PropTypes.bool,
+  isDeprecated: PropTypes.bool,
+  deprecatedStatus: PropTypes.object,
+  isDraftAvailable: PropTypes.bool,
+  onClickValidateBtn: PropTypes.func,
+  onChangeText: PropTypes.func,
+  onClickCloseEditMode: PropTypes.func,
+  onClickRestoreArchived: PropTypes.func,
+  onClickRestoreDeleted: PropTypes.func,
+  onClickShowDraft: PropTypes.func
+}

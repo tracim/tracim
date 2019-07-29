@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -261,4 +261,4 @@ class Agenda extends React.Component {
   }
 }
 
-export default translate()(Agenda)
+export default withTranslation()(Agenda)

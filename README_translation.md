@@ -64,7 +64,7 @@ III) Check that `t` in available in your component, meanings your component must
 
 ``` javascript
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 class MyComponent extends React.Component {
   render () {
@@ -72,7 +72,7 @@ class MyComponent extends React.Component {
   }
 }
 
-export default translate()(MyComponent)
+export default withTranslation()(MyComponent)
 ```
 
 IV) You can destruct `t` from `this.props` in the `render()` like it is done in most components.

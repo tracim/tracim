@@ -6,7 +6,7 @@ console.log('isPoduction: ', isProduction)
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    app: ['@babel/polyfill', './src/index.js']
+    app: ['./src/index.js']
   },
   output: {
     path: path.resolve(__dirname, 'dist/assets'),

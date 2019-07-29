@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { getUserProfile } from '../../helper.js'
 import { Avatar } from 'tracim_frontend_lib'
 
@@ -23,11 +23,11 @@ export const UserInfo = props =>
       <div className='userinfo__profile mb-3' data-cy='userinfo__profile'>
         <i
           className={`fa fa-${getUserProfile(props.user.profile).faIcon} mr-2`}
-          style={{color: getUserProfile(props.user.profile).hexcolor}}
+          style={{ color: getUserProfile(props.user.profile).hexcolor }}
         />
         {props.t(getUserProfile(props.user.profile).label)}
       </div>
     </div>
   </div>
 
-export default translate()(UserInfo)
+export default withTranslation()(UserInfo)

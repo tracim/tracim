@@ -5,6 +5,7 @@ const SELECTORS = {
   WORKSPACE_MENU: 'workspaceMenu',
   CONTENT_IN_SEARCH: 'contentInSearch',
   WORKSPACE_DASHBOARD: 'workspaceDashboard',
+  TRACIM_CONTENT: 'tracimContent'
 }
 
 const TAGS = {
@@ -14,6 +15,7 @@ const TAGS = {
   [SELECTORS.FOLDER_IN_LIST]: ({ folderId }) => `[data-cy=folder_${folderId}]`,
   [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`,
   [SELECTORS.WORKSPACE_DASHBOARD]: () => '.dashboard.pageWrapperGeneric',
+  [SELECTORS.TRACIM_CONTENT]: () => `.tracim__content-scrollview`
 }
 
 /**

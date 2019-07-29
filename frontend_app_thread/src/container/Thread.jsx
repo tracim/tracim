@@ -1,6 +1,6 @@
 import React from 'react'
 import i18n from '../i18n.js'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { debug } from '../debug.js'
 import {
   addAllResourceI18n,
@@ -68,7 +68,7 @@ class Thread extends React.Component {
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         const isSameContentId = appFeatureCustomEventHandlerShowApp(data.content, state.content.content_id, state.content.content_type)
         if (isSameContentId) {
-          this.setState({isVisible: true})
+          this.setState({ isVisible: true })
           this.buildBreadcrumbs()
         }
         break
@@ -91,7 +91,7 @@ class Thread extends React.Component {
         )
 
         this.setState(prev => ({
-          content: {...prev.content, ...data},
+          content: { ...prev.content, ...data },
           isVisible: true,
           timelineWysiwyg: false,
           newComment: prev.content.content_id === data.content_id ? prev.newComment : previouslyUnsavedComment || ''
@@ -125,7 +125,7 @@ class Thread extends React.Component {
     const previouslyUnsavedComment = localStorage.getItem(
       generateLocalStorageContentId(content.workspace_id, content.content_id, appName, 'comment')
     )
-    if (previouslyUnsavedComment) this.setState({newComment: previouslyUnsavedComment})
+    if (previouslyUnsavedComment) this.setState({ newComment: previouslyUnsavedComment })
 
     await this.loadContent()
     this.buildBreadcrumbs()
@@ -212,7 +212,7 @@ class Thread extends React.Component {
     })
 
     await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
   buildBreadcrumbs = () => {
@@ -233,7 +233,7 @@ class Thread extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -261,7 +261,7 @@ class Thread extends React.Component {
 
   handleChangeNewComment = e => {
     const newComment = e.target.value
-    this.setState({newComment})
+    this.setState({ newComment })
 
     const { appName, content } = this.state
     localStorage.setItem(
@@ -283,7 +283,7 @@ class Thread extends React.Component {
 
     switch (fetchResultSaveNewComment.apiResponse.status) {
       case 200:
-        this.setState({newComment: ''})
+        this.setState({ newComment: '' })
         localStorage.removeItem(
           generateLocalStorageContentId(state.content.workspace_id, state.content.content_id, state.appName, 'comment')
         )
@@ -304,7 +304,7 @@ class Thread extends React.Component {
     }
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
+  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { state, props } = this
@@ -327,7 +327,7 @@ class Thread extends React.Component {
     const fetchResultArchive = await putThreadIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: true } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -347,7 +347,7 @@ class Thread extends React.Component {
     const fetchResultArchive = await putThreadIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -367,7 +367,7 @@ class Thread extends React.Component {
     const fetchResultRestore = await putThreadRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_archived: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -387,7 +387,7 @@ class Thread extends React.Component {
     const fetchResultRestore = await putThreadRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204:
-        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.setState(prev => ({ content: { ...prev.content, is_deleted: false } }))
         this.loadContent()
         break
       default: GLOBAL_dispatchEvent({
@@ -478,4 +478,4 @@ class Thread extends React.Component {
   }
 }
 
-export default translate()(Thread)
+export default withTranslation()(Thread)
