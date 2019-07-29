@@ -322,7 +322,7 @@ class AdminWorkspaceUser extends React.Component {
           workspace_id: workspaceId
         }
       })
-    } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data: { workspace_id: workspaceId } })
+    } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
 
     this.setState({ workspaceIdOpened: workspaceId })
   }
