@@ -26,13 +26,13 @@ describe('Login after a disconnection ', function () {
     })
 
     it('should able to add user', function () {
-        cy.wait(2000)
         cy.getTag({selectorName: s.HEADER})
-            .find('.adminlink__btn.btn')
+            .get('[data-cy=adminlink__dropdown__btn]')
+            .should('be.visible')
             .click()
 
         cy.getTag({selectorName: s.HEADER})
-            .find('a[href="/ui/admin/user"]')
+            .find('[data-cy=adminlink__user__link]')
             .click()
 
 
