@@ -14,16 +14,17 @@
     padding 10px
 
 .workspace_advanced
-  width 1000px
+  // width 1000px
   height 100%
   overflow-y auto
   &-content
-    width 50%
     padding 10px 10px 0 10px
   &__contentpage__content
     // Côme - 2018/09/19 - the rule bellow get override by other apps including frontend_lib, so !important
-    height calc(100% - 134px) !important
+    height calc(100% - 107px) !important
     overflow-y auto
+    &__left
+      background-color offWhite
   &__description
     &__text
       padding 10px
@@ -34,6 +35,8 @@
       justify-content end
   &__userlist
     position relative
+    width 100%
+    padding-top 10px
     &__list
       margin 0
       padding 0
@@ -110,6 +113,15 @@
         &__text
           font-size 18px
           cursor pointer
+    &__title
+      padding-left 20px
+  &__optionalfunctionalities
+    width 100%
+    padding-top 10px
+    &__title
+      padding-left 20px
+    &__content
+      padding-left 20px
 
 .workspace_advanced__popup
   .cardPopup__container

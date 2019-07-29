@@ -1,5 +1,5 @@
 import React from 'react'
-import WorkspaceAdvancedComponent from '../component/WorkspaceAdvancedComponent.jsx'
+import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfiguration.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -9,6 +9,7 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
+  PopinFixedRightPart,
   CUSTOM_EVENT
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
@@ -26,6 +27,8 @@ import {
   getAppList
 } from '../action.async.js'
 import Radium from 'radium'
+import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
+import OptionalFunctionalities from '../component/OptionalFunctionalities.jsx'
 
 class WorkspaceAdvanced extends React.Component {
   constructor (props) {
@@ -474,46 +477,67 @@ class WorkspaceAdvanced extends React.Component {
         <PopinFixedContent
           customClass={`${state.config.slug}__contentpage`}
         >
-          <WorkspaceAdvancedComponent
+          <WorkspaceAdvancedConfiguration
             customColor={state.config.hexcolor}
             description={state.content.description}
-            roleList={state.config.roleList}
-            memberList={state.content.memberList}
-            agendaEnabled={state.content.agenda_enabled}
-            uploadEnabled // ={state.content.upload_enabled}
-            downloadEnabled // ={state.content.download_enabled}
-            appAgendaAvailable={state.content.appAgendaAvailable}
-            displayFormNewMember={state.displayFormNewMember}
-            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            newMemberName={state.newMember.nameOrEmail}
-            isEmail={state.newMember.isEmail}
-            newMemberRole={state.newMember.role}
-            searchedKnownMemberList={state.searchedKnownMemberList}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
-            loggedUser={state.loggedUser}
-            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            canSendInviteNewUser={
-              [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
-            }
-            emailNotifActivated={state.config.system.config.email_notification_activated}
-            autoCompleteClicked={state.autoCompleteClicked}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
-            onClickNewRole={this.handleClickNewRole}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickDeleteMember={this.handleClickDeleteMember}
-            onClickKnownMember={this.handleClickKnownMember}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
-            onClickAutoComplete={this.handleClickAutoComplete}
             onChangeDescription={this.handleChangeDescription}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
-            onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-            onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-            onToggleUploadEnabled={this.handleToggleUploadEnabled}
             key={'workspace_advanced'}
+          />
+
+          <PopinFixedRightPart
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            menuItemList={[
+              {
+                id: 'members_list',
+                label: this.props.t('Members List'),
+                icon: 'fa-users',
+                children: <WorkspaceMembersList
+                  displayFormNewMember={state.displayFormNewMember}
+                  memberList={state.content.memberList}
+                  roleList={state.config.roleList}
+                  onClickNewRole={this.handleClickNewRole}
+                  loggedUser={state.loggedUser}
+                  onClickDeleteMember={this.handleClickDeleteMember}
+                  onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                  newMemberName={state.newMember.nameOrEmail}
+                  isEmail={state.newMember.isEmail}
+                  onChangeNewMemberName={this.handleChangeNewMemberName}
+                  searchedKnownMemberList={state.searchedKnownMemberList}
+                  onClickKnownMember={this.handleClickKnownMember}
+                  newMemberRole={state.newMember.role}
+                  onClickNewMemberRole={this.handleClickNewMemberRole}
+                  onClickValidateNewMember={this.handleClickValidateNewMember}
+                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                  emailNotifActivated={state.config.system.config.email_notification_activated}
+                  canSendInviteNewUser={
+                    [state.config.profileObject.ADMINISTRATOR.slug, state.config.profileObject.MANAGER.slug].includes(state.loggedUser.profile)
+                  }
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  autoCompleteClicked={state.autoCompleteClicked}
+                  onClickAutoComplete={this.handleClickAutoComplete}
+                />
+              },
+              {
+                id: 'optional_functionalities',
+                label: this.props.t('Optional Functionalities'),
+                icon: 'fa-cog',
+                children: <OptionalFunctionalities
+                  appAgendaAvailable={state.content.appAgendaAvailable}
+                  agendaEnabled={state.content.agenda_enabled}
+                  onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+                  downloadEnabled // ={state.content.download_enabled}
+                  onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+                  uploadEnabled // ={state.content.upload_enabled}
+                  onToggleUploadEnabled={this.handleToggleUploadEnabled}
+                />
+              }
+            ]}
           />
         </PopinFixedContent>
       </PopinFixed>
