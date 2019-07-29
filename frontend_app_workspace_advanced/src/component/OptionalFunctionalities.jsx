@@ -1,6 +1,6 @@
 import React from 'react'
 import { BtnSwitch } from 'tracim_frontend_lib'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const OptionalFunctionalities = props => {
   return (
@@ -38,4 +38,4 @@ const OptionalFunctionalities = props => {
   )
 }
 
-export default translate()(OptionalFunctionalities)
+export default withTranslation()(OptionalFunctionalities)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
 import InputTextArea from '../common/Input/InputTextArea.jsx'
@@ -108,4 +108,4 @@ class UploadForm extends React.Component {
   }
 }
 
-export default translate()(UploadForm)
+export default withTranslation()(UploadForm)

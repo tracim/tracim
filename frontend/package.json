@@ -36,14 +36,9 @@
     "react-redux": "^7.1.0",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
-<<<<<<< HEAD
-    "react-select": "^1.2.1",
     "reactstrap": "^8.0.0",
-    "redux": "^3.7.2",
-=======
     "react-select": "^3.0.4",
     "redux": "^4.0.1",
->>>>>>> c5bdc5e651dbc743a7b67950eda6524a24f533f6
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "regenerator-runtime": "^0.13.2"

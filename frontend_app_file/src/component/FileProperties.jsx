@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
 
 require('./FileProperties.styl')
@@ -18,11 +18,11 @@ export class FileProperties extends React.Component {
     newDescription: this.props.description
   }))
 
-  handleChangeDescription = e => this.setState({newDescription: e.target.value})
+  handleChangeDescription = e => this.setState({ newDescription: e.target.value })
 
   handleClickValidateNewDescription = () => {
     this.props.onClickValidateNewDescription(this.state.newDescription)
-    this.setState({displayFormNewDescription: false})
+    this.setState({ displayFormNewDescription: false })
   }
 
   render () {
@@ -104,4 +104,4 @@ export class FileProperties extends React.Component {
   }
 }
 
-export default translate()(Radium(FileProperties))
+export default withTranslation()(Radium(FileProperties))

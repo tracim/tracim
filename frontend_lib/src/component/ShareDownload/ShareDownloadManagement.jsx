@@ -1,10 +1,11 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import i18n from '../../i18n.js'
 import Radium from 'radium'
-import color from 'color'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import ShareLink from '../ShareLink/ShareLink.jsx'
+
+const color = require('color')
 
 class ShareDownloadManagement extends React.Component {
   constructor (props) {
@@ -42,7 +43,7 @@ class ShareDownloadManagement extends React.Component {
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
-                backgroundColor: color(props.hexcolor).darken(0.15).hexString()
+                backgroundColor: color(props.hexcolor).darken(0.15).hex()
               }
             }}
           >
@@ -68,4 +69,4 @@ class ShareDownloadManagement extends React.Component {
   }
 }
 
-export default translate()(Radium(ShareDownloadManagement))
+export default withTranslation()(Radium(ShareDownloadManagement))

@@ -3,7 +3,7 @@ import {
   NewMemberForm,
   Avatar
 } from 'tracim_frontend_lib'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 const WorkspaceMembersList = props => {
   return (
@@ -28,7 +28,7 @@ const WorkspaceMembersList = props => {
 
                   <div className='workspace_advanced__userlist__list__item__namerole__role dropdown'>
                     {(() => {
-                      const role = props.roleList.find(r => r.slug === m.role) || {label: 'unknown', hexcolor: '#333', faIcon: ''}
+                      const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                       return (
                         <button
                           className='btndropdown dropdown-toggle'
@@ -38,7 +38,7 @@ const WorkspaceMembersList = props => {
                           aria-haspopup='true'
                           aria-expanded='false'
                         >
-                          <div className='btndropdown__icon mr-3' style={{color: role.hexcolor}}>
+                          <div className='btndropdown__icon mr-3' style={{ color: role.hexcolor }}>
                             <i className={`fa fa-${role.faIcon}`} />
                           </div>
 
@@ -56,7 +56,7 @@ const WorkspaceMembersList = props => {
                           onClick={() => props.onClickNewRole(m.user_id, r.slug)}
                           key={`role_${r.id}`}
                         >
-                          <div className='subdropdown__item__icon' style={{color: r.hexcolor}}>
+                          <div className='subdropdown__item__icon' style={{ color: r.hexcolor }}>
                             <i className={`fa fa-fw fa-${r.faIcon}`} />
                           </div>
 
@@ -127,4 +127,4 @@ const WorkspaceMembersList = props => {
   )
 }
 
-export default translate()(WorkspaceMembersList)
+export default withTranslation()(WorkspaceMembersList)

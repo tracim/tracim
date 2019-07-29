@@ -296,7 +296,7 @@ class WorkspaceAdvanced extends React.Component {
   //   }
   // }
 
-  handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: {...prev.newMember, role: slugRole } }))
+  handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
 
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 

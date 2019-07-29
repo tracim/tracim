@@ -1,10 +1,10 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from '../../helper.js'
 
+const color = require('color')
 
 class NewShareDownload extends React.Component {
   constructor (props) {
@@ -137,7 +137,7 @@ class NewShareDownload extends React.Component {
             style={{
               backgroundColor: props.hexcolor,
               ':hover': {
-                backgroundColor: color(props.hexcolor).darken(0.15).hexString()
+                backgroundColor: color(props.hexcolor).darken(0.15).hex()
               }
             }}
           >
@@ -150,4 +150,4 @@ class NewShareDownload extends React.Component {
   }
 }
 
-export default translate()(Radium(NewShareDownload))
+export default withTranslation()(Radium(NewShareDownload))

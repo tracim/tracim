@@ -7,7 +7,7 @@ module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: isProduction
     ? './src/index.js' // only one instance of babel-polyfill is allowed
-    : ['@babel/polyfill', './src/index.dev.js'],
+    : ['./src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'share_folder.app.js' : 'share_folder.app.dev.js',
@@ -19,7 +19,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     host: '0.0.0.0',
-    port: 8077, // TODO: Change
+    port: 8080,
     hot: true,
     noInfo: true,
     overlay: {

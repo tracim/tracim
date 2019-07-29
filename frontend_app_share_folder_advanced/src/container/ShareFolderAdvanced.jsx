@@ -2,7 +2,7 @@ import React from 'react'
 import UploadFilesManagement from '../component/UploadFilesManagement.jsx'
 import NewUpload from '../component/NewUpload.jsx'
 import i18n from '../i18n'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import {
   PopinFixed,
   PopinFixedHeader,
@@ -57,11 +57,11 @@ class ShareFolderAdvanced extends React.Component {
     switch (type) {
       case CUSTOM_EVENT.SHOW_APP(state.config.slug):
         console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState(prev => ({content: {...prev.content, ...data.content}, isVisible: true}))
+        this.setState(prev => ({ content: { ...prev.content, ...data.content }, isVisible: true }))
         break
       case CUSTOM_EVENT.HIDE_APP(state.config.slug):
         console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
-        this.setState({isVisible: false})
+        this.setState({ isVisible: false })
         break
       // case CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug):
       //   console.log('%c<ShareFolderAdvanced> Custom event', 'color: #28a745', type, data)
@@ -120,7 +120,7 @@ class ShareFolderAdvanced extends React.Component {
     // }
 
     switch (fetchContentTypeList.apiResponse.status) {
-      case 200: this.setState({tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment')}); break
+      case 200: this.setState({ tracimContentTypeList: fetchContentTypeList.body.filter(ct => ct.slug !== 'comment') }); break
       default: this.sendGlobalFlashMessage(props.t("Error while loading tracim's content type list"), 'warning')
     }
   }
@@ -144,12 +144,12 @@ class ShareFolderAdvanced extends React.Component {
   //   GLOBAL_dispatchEvent({type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {}}) // Needed?
   // }
 
-  handleChangeEmails = e => this.setState({shareEmails: e.target.value})
-  handleChangePassword = e => this.setState({sharePassword: e.target.value})
+  handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
+  handleChangePassword = e => this.setState({ sharePassword: e.target.value })
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({type: CUSTOM_EVENT.APP_CLOSED, data: {}})
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
   handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
@@ -172,7 +172,7 @@ class ShareFolderAdvanced extends React.Component {
   }
 
   handleClickNewUploadComponent = () => {
-    this.setState({currentPage: this.UPLOAD_STATUS.NEW_UPLOAD})
+    this.setState({ currentPage: this.UPLOAD_STATUS.NEW_UPLOAD })
   }
 
   handleClickNewUpload = () => { // = async () => {
@@ -205,17 +205,17 @@ class ShareFolderAdvanced extends React.Component {
 
     // switch (fetchResultSaveNewShareLinkList.status) {
     //   case 204:
-         this.setState({shareEmails: '', sharePassword: ''})
+         this.setState({ shareEmails: '', sharePassword: '' })
     //     break
     //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
     // }
 
-    this.setState({currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT})
+    this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
   }
 
   handleReturnToManagement = () => {
-    this.setState({shareEmails: '', sharePassword: ''})
-    this.setState({currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT})
+    this.setState({ shareEmails: '', sharePassword: '' })
+    this.setState({ currentPage: this.UPLOAD_STATUS.UPLOAD_MANAGEMENT })
   }
 
   handleKeyDownEnter = e => {
@@ -226,13 +226,13 @@ class ShareFolderAdvanced extends React.Component {
       emailList.forEach(email => !checkEmailValid(email) &&
           this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
 
-      this.setState({shareEmails: emailList.join('\n')})
+      this.setState({ shareEmails: emailList.join('\n') })
     }
   }
 
   render () {
     const { state } = this
-    const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || {hexcolor: state.config.hexcolor}).hexcolor
+    const customColor = (state.tracimContentTypeList.find(type => type.slug === 'file') || { hexcolor: state.config.hexcolor }).hexcolor
 
     if (!state.isVisible) return null
 
@@ -274,4 +274,4 @@ class ShareFolderAdvanced extends React.Component {
   }
 }
 
-export default translate()(ShareFolderAdvanced)
+export default withTranslation()(ShareFolderAdvanced)

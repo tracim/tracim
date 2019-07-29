@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
@@ -32,7 +32,7 @@ class GuestDownload extends React.Component {
     })
   }
 
-  handleChangePassword = e => this.setState({guestPassword: {...this.state.guestPassword, value: e.target.value}})
+  handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
   handleClickDownload = () => {}
 
@@ -50,7 +50,7 @@ class GuestDownload extends React.Component {
             <form>
               <div className='guestdownload__card__form__text'>
                 {props.t('{{userName}} shared with you the file {{fileName}}',
-                  {userName: state.userName, fileName: state.file.fileName, interpolation: {escapeValue: false}}
+                  { userName: state.userName, fileName: state.file.fileName, interpolation: { escapeValue: false } }
                 )} ({state.file.fileSize})
               </div>
               <div className='d-flex'>
@@ -99,4 +99,4 @@ class GuestDownload extends React.Component {
     )
   }
 }
-export default translate()(GuestDownload)
+export default withTranslation()(GuestDownload)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -44,9 +44,9 @@ class GuestUpload extends React.Component {
     }
   })
 
-  handleChangeFullName = e => this.setState({guestName: e.target.value})
-  handleChangeComment = e => this.setState({guestComment: e.target.value})
-  handleChangePassword = e => this.setState({guestPassword: {...this.state.guestPassword, value: e.target.value}})
+  handleChangeFullName = e => this.setState({ guestName: e.target.value })
+  handleChangeComment = e => this.setState({ guestComment: e.target.value })
+  handleChangePassword = e => this.setState({ guestPassword: { ...this.state.guestPassword, value: e.target.value } })
 
   handleAddFile = uploadFileList => {
     if (!uploadFileList || !uploadFileList[0]) return
@@ -73,10 +73,10 @@ class GuestUpload extends React.Component {
     })
     // INFO - GB - 2019-07-09 - Fetch still doesn't handle event progress, so we need to use old school xhr object.
     const xhr = new XMLHttpRequest()
-    xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0}}), false)
-    const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: this.UPLOAD_STATUS.LOADING, percent: Math.round(e.loaded / e.total * 100)}})
+    xhr.upload.addEventListener('loadstart', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } }), false)
+    const uploadInProgress = e => e.lengthComputable && this.setState({ progressUpload: { display: this.UPLOAD_STATUS.LOADING, percent: Math.round(e.loaded / e.total * 100) } })
     xhr.upload.addEventListener('progress', uploadInProgress, false)
-    xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0}}), false)
+    xhr.upload.addEventListener('load', () => this.setState({ progressUpload: { display: this.UPLOAD_STATUS.AFTER_LOAD, percent: 0 } }), false)
 
     // TODO xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw/${state.content.filename}`, true)
     xhr.setRequestHeader('Accept', 'application/json')
@@ -86,7 +86,7 @@ class GuestUpload extends React.Component {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
           case 204:
-            this.setState({uploadFileList: []})
+            this.setState({ uploadFileList: [] })
             break
           case 400:
             const jsonResult400 = JSON.parse(xhr.responseText)
@@ -142,4 +142,4 @@ class GuestUpload extends React.Component {
   }
 }
 
-export default translate()(GuestUpload)
+export default withTranslation()(GuestUpload)

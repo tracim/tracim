@@ -1,9 +1,10 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import PropTypes from 'prop-types'
 import { ShareLink } from 'tracim_frontend_lib'
+
+const color = require('color')
 
 const UploadFilesManagement = props => {
   const customColor = props.customColor
@@ -18,7 +19,7 @@ const UploadFilesManagement = props => {
           style={{
             backgroundColor: customColor,
             ':hover': {
-              backgroundColor: color(customColor).darken(0.15).hexString()
+              backgroundColor: color(customColor).darken(0.15).hex()
             }
           }}
           onClick={props.onClickNewUploadComponent}
@@ -43,7 +44,7 @@ const UploadFilesManagement = props => {
   )
 }
 
-export default translate()(Radium(UploadFilesManagement))
+export default withTranslation()(Radium(UploadFilesManagement))
 
 UploadFilesManagement.propTypes = {
   shareLinkList: PropTypes.array.isRequired,

@@ -1,10 +1,11 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import Radium from 'radium'
-import color from 'color'
 import { Popover, PopoverBody } from 'reactstrap'
 import { generateRandomPassword } from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
+
+const color = require('color')
 
 class NewUpload extends React.Component {
   constructor (props) {
@@ -22,11 +23,11 @@ class NewUpload extends React.Component {
   }
 
   handleSeePassword = () => {
-    this.setState({hidePassword: !this.state.hidePassword})
+    this.setState({ hidePassword: !this.state.hidePassword })
   }
 
   handleRandomPassword = () => {
-    this.props.onChangeSharePassword({target: {value: generateRandomPassword()}})
+    this.props.onChangeSharePassword({ target: { value: generateRandomPassword() } })
     const passwordInput = document.getElementsByClassName('newUpload__password__input')[0]
 
     if (passwordInput.type === 'password') {
@@ -59,7 +60,7 @@ class NewUpload extends React.Component {
             className='newUpload__email__icon'
             id='popoverMultipleEmails'
             key='shareEmails'
-            style={{':hover': {color: customColor}}}
+            style={{ ':hover': { color: customColor } }}
           >
             <i className='fa fa-fw fa-question-circle' />
           </button>
@@ -83,7 +84,7 @@ class NewUpload extends React.Component {
               className='newUpload__password__icon'
               key='seeSharePassword'
               title={props.t('Show password')}
-              style={{':hover': {color: customColor}}}
+              style={{ ':hover': { color: customColor } }}
               data-cy='seePassword'
               onClick={this.handleSeePassword}
             >
@@ -95,7 +96,7 @@ class NewUpload extends React.Component {
             className='newUpload__password__icon'
             key='randomSharePassword'
             title={props.t('Generate random password')}
-            style={{':hover': {color: customColor}}}
+            style={{ ':hover': { color: customColor } }}
             onClick={this.handleRandomPassword}
           >
             <i className='fa fa-fw fa-repeat' />
@@ -123,7 +124,7 @@ class NewUpload extends React.Component {
             style={{
               backgroundColor: customColor,
               ':hover': {
-                backgroundColor: color(customColor).darken(0.15).hexString()
+                backgroundColor: color(customColor).darken(0.15).hex()
               }
             }}
             onClick={props.onClickNewUpload}
@@ -138,7 +139,7 @@ class NewUpload extends React.Component {
   }
 }
 
-export default translate()(Radium(NewUpload))
+export default withTranslation()(Radium(NewUpload))
 
 NewUpload.propTypes = {
   // shareLinkList: PropTypes.array.isRequired,

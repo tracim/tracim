@@ -640,14 +640,14 @@ class File extends React.Component {
 
     // switch (fetchResultSaveNewShareLinkList.status) {
     //   case 204:
-         this.setState({shareEmails: '', sharePassword: ''})
+         this.setState({ shareEmails: '', sharePassword: '' })
     //     break
     //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
     // }
   }
 
-  handleChangeEmails = e => this.setState({shareEmails: e.target.value})
-  handleChangePassword = e => this.setState({sharePassword: e.target.value})
+  handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
+  handleChangePassword = e => this.setState({ sharePassword: e.target.value })
   handleKeyDownEnter = e => {
     if (e.key === 'Enter') {
       let emailList = parserStringtoList(this.state.shareEmails)
@@ -656,7 +656,7 @@ class File extends React.Component {
       emailList.forEach(email => !checkEmailValid(email) &&
           this.sendGlobalFlashMessage(this.props.t(`Error: ${email} are not valid`)))
 
-      this.setState({shareEmails: emailList.join('\n')})
+      this.setState({ shareEmails: emailList.join('\n') })
     }
   }
 

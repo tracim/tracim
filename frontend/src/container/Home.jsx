@@ -29,7 +29,7 @@ class Home extends React.Component {
         <div className='tracim__content-scrollview fullWidthFullHeight'>
           <section
             className='homepage'
-            style={{backgroundColor: props.workspaceList.length === 0 ? 'gray' : 'white'}}
+            style={{ backgroundColor: props.workspaceList.length === 0 ? 'gray' : 'white' }}
           >
             <Card customClass='homepagecard'>
               <CardHeader displayHeader={false} />

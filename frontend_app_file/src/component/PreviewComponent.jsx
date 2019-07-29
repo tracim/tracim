@@ -131,7 +131,7 @@ export class PreviewComponent extends React.Component {
             type='button'
             className='previewcomponent__icon btn iconBtn'
             onClick={props.onClickPreviousPage}
-            style={{':hover': {color: props.color}}}
+            style={{ ':hover': { color: props.color } }}
             title={props.t('Previous page')}
             disabled={props.fileCurrentPage === 1}
             key={'file_btn_previouspage'}
@@ -142,7 +142,7 @@ export class PreviewComponent extends React.Component {
 
         <div
           className={
-            classnames('previewcomponent__fileimg', {'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable})
+            classnames('previewcomponent__fileimg', { 'previewAvailable': state.isJpegPreviewDisplayable && props.isJpegAvailable })
           }
           onClick={state.isJpegPreviewDisplayable && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
         >
@@ -152,7 +152,7 @@ export class PreviewComponent extends React.Component {
             )
             : (
               <div className='filecontent__preview' drop='true'>
-                <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{color: props.color}} />
+                <i className='filecontent__preview__nopreview-icon fa fa-eye-slash' style={{ color: props.color }} />
                 <div className='filecontent__preview__nopreview-msg'>
                   {props.t('No preview available')}
                 </div>
@@ -182,7 +182,7 @@ export class PreviewComponent extends React.Component {
             type='button'
             className='previewcomponent__icon btn iconBtn'
             onClick={props.onClickNextPage}
-            style={{':hover': {color: props.color}}}
+            style={{ ':hover': { color: props.color } }}
             title={props.t('Next page')}
             disabled={props.fileCurrentPage === props.filePageNb}
             key={'file_btn_nextpage'}

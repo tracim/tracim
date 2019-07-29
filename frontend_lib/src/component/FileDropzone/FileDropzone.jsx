@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 
 export const FileDropzone = props => {
   return (
@@ -84,7 +84,7 @@ export const FileDropzone = props => {
   )
 }
 
-export default translate()(FileDropzone)
+export default withTranslation()(FileDropzone)
 
 FileDropzone.propTypes = {
   onDrop: PropTypes.func.isRequired,
