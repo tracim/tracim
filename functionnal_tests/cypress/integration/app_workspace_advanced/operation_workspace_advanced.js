@@ -3,11 +3,16 @@ import { PAGES as p } from '../../support/urls_commands'
 
 describe('App Workspace Advanced', function () {
     const newDescription = 'myNewDescription'
-    const workspaceId = 1
+    let workspaceId = 1
+    let workspaceDescription = ''
 
     before(() => {
         cy.resetDB()
         cy.setupBaseDB()
+        cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+            workspaceId = workspace.workspace_id
+            workspaceDescription = workspace.description
+        })
     })
 
     beforeEach(function () {
@@ -22,7 +27,7 @@ describe('App Workspace Advanced', function () {
 
             cy.getTag({selectorName: s.CONTENT_FRAME})
                 .find('.workspace_advanced__description__text__textarea')
-                .should('be.visible')
+                .contains(workspaceDescription)
                 .clear()
 
             cy.getTag({selectorName: s.CONTENT_FRAME})
@@ -35,8 +40,7 @@ describe('App Workspace Advanced', function () {
 
             cy.getTag({selectorName: s.WORKSPACE_DASHBOARD})
                 .find('.dashboard__workspace__detail__description')
-                .should('be.visible')
-                .contains(newDescription)
+                .contains( newDescription)
         })
     })
 })
