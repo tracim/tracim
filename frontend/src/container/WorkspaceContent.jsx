@@ -112,11 +112,13 @@ class WorkspaceContent extends React.Component {
 
     await this.loadContentList(wsToLoad)
 
-    const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
-    if (folderIdToOpen.length > 0) {
-      const lastFolderOpen = folderIdToOpen[folderIdToOpen.length - 1]
-      if (document.getElementById(lastFolderOpen)) document.getElementById(lastFolderOpen).scrollIntoView()
+    let contentToJump = this.getContentIdOpenedInUrl(match.params)
+
+    if (contentToJump === undefined) {
+      const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
+      if (folderIdToOpen.length > 0) contentToJump = folderIdToOpen[folderIdToOpen.length - 1]
     }
+    if (document.getElementById(contentToJump)) document.getElementById(contentToJump).scrollIntoView()
 
     this.buildBreadcrumbs()
   }
@@ -393,6 +395,14 @@ class WorkspaceContent extends React.Component {
   }
 
   getFolderIdToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
+
+  getContentIdOpenedInUrl = params => {
+    if (params === undefined) return undefined
+    if (Object.keys(CONTENT_TYPE).find(key => CONTENT_TYPE[key] === params.type)) {
+      return params.idcts
+    }
+    return undefined
+  }
 
   getTitle = urlFilter => {
     const { props } = this
