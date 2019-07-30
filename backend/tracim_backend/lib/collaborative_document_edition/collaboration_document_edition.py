@@ -40,7 +40,7 @@ class CollaborativeDocumentEditionApi(object):
     def discover(self) -> typing.List[CollaborativeDocumentEditionFileType]:
         response = requests.get(
             self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery",
-            timeout=2
+            timeout=2,
         )
         root = ElementTree.fromstring(response.text)
         supported_collabora_file = []  # type: typing.List[CollaborativeDocumentEditionFileType]
@@ -82,7 +82,6 @@ class CollaborativeDocumentEditionApi(object):
     def _get_template_list(self) -> typing.List[str]:
         template_list = []
         try:
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = '/home/basile/work/tracim/backend/tracim_backend/templates/open_documents/'
             is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
             is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
         except (NotADirectoryError) as exc:
@@ -96,7 +95,6 @@ class CollaborativeDocumentEditionApi(object):
         return template_list
 
     def _get_file_template_path(self, template_filename) -> str:
-        self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = '/home/basile/work/tracim/backend/tracim_backend/templates/open_documents/'
         template_path = "{}/{}".format(
             self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
         )
