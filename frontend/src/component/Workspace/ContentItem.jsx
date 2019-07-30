@@ -57,12 +57,12 @@ class ContentItem extends React.Component {
             >
               {props.isShared
                 ? <ComposedIcon
-                    mainIcon={props.faIcon}
-                    smallIcon='share-alt'
-                    // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
-                    // https://github.com/tracim/tracim/issues/2098
-                    smallIconStyle={{color: '#252525'}}
-                  />
+                  mainIcon={props.faIcon}
+                  smallIcon='share-alt'
+                  // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+                  // https://github.com/tracim/tracim/issues/2098
+                  smallIconStyle={{ color: '#252525' }}
+                />
                 : <i className={`fa fa-${props.faIcon}`} />
               }
             </div>

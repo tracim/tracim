@@ -52,9 +52,11 @@ class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
-        <div className='timeline__title'>
-          {props.t('Timeline')}
-        </div>
+        {props.showTitle &&
+          <div className='timeline__title'>
+            {props.t('Timeline')}
+          </div>
+        }
         <div className='timeline__body'>
           <div className='timeline__body__warning'>
             {props.isDeprecated && !props.isArchived && !props.isDeleted && (
@@ -205,8 +207,8 @@ Timeline.propTypes = {
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
-  onClickRestoreDeleted: PropTypes.func
-  // toggleRightPart: PropsTypes.func // this props comes from PopinFixedContent
+  onClickRestoreDeleted: PropTypes.func,
+  showTitle: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -226,5 +228,6 @@ Timeline.defaultProps = {
   shouldScrollToBottom: true,
   rightPartOpen: false,
   isArchived: false,
-  isDeleted: false
+  isDeleted: false,
+  showTitle: true
 }
