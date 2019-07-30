@@ -620,16 +620,20 @@ class File extends React.Component {
     const shareEmailList = parserStringtoList(state.shareEmails).filter(shareEmail => shareEmail !== '')
 
     shareEmailList.forEach(shareEmail => {
-      this.setState(previousState => ({
-        shareLinkList: [...previousState.shareLinkList,
-          {
-            email: shareEmail,
-            link: '?',
-            id: new Date(),
-            isProtected: state.sharePassword !== ''
-          }
-        ]
-      }))
+      if (!checkEmailValid(shareEmail)) {
+        this.sendGlobalFlashMessage(this.props.t(`Error: ${shareEmail} are not valid`))
+      } else {
+        this.setState(previousState => ({
+          shareLinkList: [...previousState.shareLinkList,
+            {
+              email: shareEmail,
+              link: '?',
+              id: new Date(),
+              isProtected: state.sharePassword !== ''
+            }
+          ]
+        }))
+      }
     })
     // console.log(shareEmailList)
     // this.setState({shareLinkList: newShareLinkList})
@@ -709,6 +713,7 @@ class File extends React.Component {
           customClass={`${state.config.slug}`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
+          // isShared={state.config.isShared}
           rawTitle={state.content.label}
           componentTitle={<span>{state.content.label} <Badge text={state.content.file_extension} /></span>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}

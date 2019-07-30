@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { withTranslation } from 'react-i18next'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -50,13 +51,19 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
+    const { isShared, customClass, customColor, faIcon, rawTitle, componentTitle, userRoleIdInWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
     const { state } = this
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{ backgroundColor: customColor }}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`fa fa-${faIcon}`} />
+          {isShared
+            ? <ComposedIcon
+                mainIcon={faIcon}
+                smallIcon='share-alt'
+              />
+            : <i className={`fa fa-${faIcon}`} />
+          }
         </div>
 
         <div
@@ -117,7 +124,8 @@ PopinFixedHeader.propTypes = {
   componentTitle: PropTypes.element,
   userRoleIdInWorkspace: PropTypes.number,
   onValidateChangeTitle: PropTypes.func,
-  disableChangeTitle: PropTypes.bool
+  disableChangeTitle: PropTypes.bool,
+  isShared: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -127,5 +135,6 @@ PopinFixedHeader.defaultProps = {
   componentTitle: <div />,
   userRoleIdInWorkspace: 1,
   onChangeTitle: () => {},
-  disableChangeTitle: false
+  disableChangeTitle: false,
+  isShared: false
 }

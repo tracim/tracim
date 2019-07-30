@@ -24,8 +24,9 @@ class ShareLink extends React.Component {
             ? <ComposedIcon
               mainIcon='link'
               smallIcon='lock'
-              // mainIconStyle={{color: '#ababab'}}     // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
-              smallIconStyle={{color: '#252525'}}    // https://github.com/tracim/tracim/issues/2098
+              // FIXME - GB - 2019-07-26 - Replace this hardcoded values to webpack variables
+              // https://github.com/tracim/tracim/issues/2098
+              smallIconStyle={{color: '#252525'}}
             />
             : <i className='shareLink__icon__unprotected fa fa-fw fa-link'/>
           }
