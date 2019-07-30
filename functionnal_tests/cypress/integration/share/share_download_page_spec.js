@@ -4,6 +4,8 @@ const fileTitle = 'FileForSearch'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
+const emptyPhrase = 'No share link has been created yet'
+
 let workspaceId
 
 describe('Open a file', () => {
@@ -15,7 +17,7 @@ describe('Open a file', () => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     })
-    cy.wait(1000)
+    cy.wait(2000)
   })
 
   beforeEach(function () {
@@ -32,7 +34,7 @@ describe('Open a file', () => {
     })
 
     it('Should have a "no share link" message', () => {
-      cy.get('.shareDownload').contains('No share link has been created yet.').should('be.visible')
+      cy.get('.shareDownload').contains(emptyPhrase).should('be.visible')
     })
 
     describe('and clicking on the New button',() => {
@@ -56,7 +58,7 @@ describe('Open a file', () => {
             cy.get('.shareDownload__email__input').type('email@email.email')
             cy.get('.shareDownload__newBtn').click()
             cy.get('[data-cy=deleteShareLink]').click()
-            cy.get('.shareDownload').contains('No share link has been created yet.').should('be.visible')
+            cy.get('.shareDownload').contains(emptyPhrase).should('be.visible')
           })
         })
       })

@@ -4,6 +4,8 @@ const fileTitle = 'FileForSearch'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
 
+const emptyPhrase = 'No upload link has been created yet'
+
 let workspaceId
 
 describe('Open the share folder advanced', () => {
@@ -28,7 +30,7 @@ describe('Open the share folder advanced', () => {
   })
 
   it('Should have a "no uploads" message', () => {
-    cy.get('.share_folder_advanced__content__empty').contains('No upload link has been created yet.').should('be.visible')
+    cy.get('.share_folder_advanced__content__empty').contains(emptyPhrase).should('be.visible')
   })
 
   describe('and clicking on the New button',() => {
@@ -52,7 +54,7 @@ describe('Open the share folder advanced', () => {
           cy.get('.newUpload__email__input').type('email@email.email')
           cy.get('.newUpload__newBtn').click()
           cy.get('[data-cy=deleteShareLink]').click()
-          cy.get('.share_folder_advanced__content__empty').contains('No upload link has been created yet.').should('be.visible')
+          cy.get('.share_folder_advanced__content__empty').contains(emptyPhrase).should('be.visible')
         })
       })
     })

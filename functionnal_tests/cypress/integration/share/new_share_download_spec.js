@@ -20,7 +20,7 @@ describe('Open a file', () => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     })
-    cy.wait(1000)
+    cy.wait(2000)
   })
 
   beforeEach(function () {
