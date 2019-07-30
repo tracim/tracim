@@ -63,6 +63,7 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
+from tracim_backend.views.share_api.share_controller import ShareController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -188,6 +189,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     thread_controller = ThreadController()
     file_controller = FileController()
     folder_controller = FolderController()
+    share_controller = ShareController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -199,6 +201,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(share_controller.bind, route_prefix=BASE_API_V2)
     if app_config.CALDAV__ENABLED:
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to

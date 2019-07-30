@@ -15,6 +15,7 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.content_share import ContentShare
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.views.agenda_api.models import AgendaType
@@ -95,6 +96,10 @@ agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
 user_email_validator = Length(min=User.MIN_EMAIL_LENGTH, max=User.MAX_EMAIL_LENGTH)
 user_password_validator = Length(min=User.MIN_PASSWORD_LENGTH, max=User.MAX_PASSWORD_LENGTH)
+share_email_validator = Length(min=ContentShare.MIN_EMAIL_LENGTH, max=ContentShare.MAX_EMAIL_LENGTH)
+share_password_validator = Length(
+    min=ContentShare.MIN_PASSWORD_LENGTH, max=ContentShare.MAX_PASSWORD_LENGTH
+)
 user_public_name_validator = Length(
     min=User.MIN_PUBLIC_NAME_LENGTH, max=User.MAX_PUBLIC_NAME_LENGTH
 )

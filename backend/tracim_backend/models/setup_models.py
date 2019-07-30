@@ -16,6 +16,7 @@ from tracim_backend.lib.utils.utils import sliced_dict
 from tracim_backend.models.auth import Group  # noqa: F401
 from tracim_backend.models.auth import Permission  # noqa: F401
 from tracim_backend.models.auth import User  # noqa: F401
+from tracim_backend.models.content_share import ContentShare  # noqa: F401
 from tracim_backend.models.data import Content  # noqa: F401
 from tracim_backend.models.data import ContentRevisionRO  # noqa: F401
 from tracim_backend.models.meta import DeclarativeBase  # noqa: F401

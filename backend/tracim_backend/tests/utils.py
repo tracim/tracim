@@ -25,6 +25,7 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
+from tracim_backend.lib.share.share import ShareApi
 from tracim_backend.lib.webdav import Provider
 from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 from tracim_backend.models.auth import User
@@ -52,6 +53,20 @@ class ContentApiFactory(object):
             show_active=show_active,
             show_deleted=show_deleted,
             show_archived=show_archived,
+        )
+
+
+class ShareApiFactory(object):
+    def __init__(self, session: Session, app_config: CFG, admin_user: User):
+        self.session = session
+        self.app_config = app_config
+        self.admin_user = admin_user
+
+    def get(self, current_user: typing.Optional[User] = None) -> ShareApi:
+        return ShareApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=current_user or self.admin_user,
         )
 
 
