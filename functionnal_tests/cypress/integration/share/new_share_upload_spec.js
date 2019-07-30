@@ -28,6 +28,10 @@ describe('Open the share folder advanced', () => {
     cy.get('.share_folder_advanced__content__btnupload').click()
   })
 
+  afterEach(function () {
+    cy.cancelXHR()
+  })
+
   describe('and clicking on the New button',() => {
     describe('and writing three emails separated by space and clicking Enter',() =>{
       it('Should separate the emails by new line',() => {

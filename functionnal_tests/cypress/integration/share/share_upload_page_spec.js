@@ -24,6 +24,9 @@ describe('Open the share folder advanced', () => {
     cy.visitPage({pageName: PAGES.SHARE_FOLDER, params: {workspaceId: workspaceId}})
   })
 
+  afterEach(function () {
+    cy.cancelXHR()
+  })
 
   it('Should redirect to share page', () => {
     cy.get('.share_folder_advanced__content').contains('Import authorizations').should('be.visible')

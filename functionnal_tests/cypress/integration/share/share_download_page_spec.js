@@ -27,6 +27,9 @@ describe('Open a file', () => {
     cy.get('.wsContentGeneric__content__right__header .fa-share-alt').click()
   })
 
+  afterEach(function () {
+    cy.cancelXHR()
+  })
 
   describe('and clicking on the share icon', () => {
     it('Should redirect to share page at the right part', () => {
