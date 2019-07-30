@@ -1,20 +1,24 @@
 const PAGES = {
   HOME: 'home',
+  LOGIN: 'login',
   CONTENTS: 'contents',
   DASHBOARD: 'dashboard',
   AGENDA: 'agenda',
   EDIT_FOLDER: 'editFolder',
-  SEARCH: 'search'
+  SEARCH: 'search',
+  ADMIN_WORKSPACE: 'adminWorkspace'
 }
 
 const URLS = {
   [PAGES.HOME]: () => '/ui',
+  [PAGES.LOGIN]: ({ loginParam }) => `/ui/login${loginParam}`,
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
   [PAGES.EDIT_FOLDER]: ({ workspaceId, folderId }) => `/ui/workspaces/${workspaceId}/contents/folder/${folderId}`,
   [PAGES.SEARCH]: ({searchedKeywords, pageNumber, numberByPage, actived, deleted, archived, contentTypes}) => `/ui/search-result?act=${actived}&arc=${archived}&del=${deleted}&nr=${numberByPage}&p=${pageNumber}&q=${searchedKeywords}&t=${contentTypes}`,
-  [PAGES.SHARE_FOLDER]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/share_folder`
+  [PAGES.SHARE_FOLDER]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/share_folder`,
+  [PAGES.ADMIN_WORKSPACE]: () => '/ui/admin/workspace'
 }
 
 /**
