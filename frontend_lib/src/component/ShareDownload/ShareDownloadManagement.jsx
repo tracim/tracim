@@ -36,33 +36,37 @@ class ShareDownloadManagement extends React.Component {
           <div className='shareDownload__title'>
             {props.t('{{label}} share', {label: props.label, interpolation: {escapeValue: false}})}
           </div>
-          <button
-            className='shareDownload__btn btn highlightBtn'
-            key='newShareDownload'
-            onClick={props.onClickNewShareDownload}
-            style={{
-              backgroundColor: props.hexcolor,
-              ':hover': {
-                backgroundColor: color(props.hexcolor).darken(0.15).hex()
-              }
-            }}
-          >
-            {props.t('New')}
-            <i className='fa fa-fw fa-plus-circle' />
-          </button>
+          {props.userRoleIdInWorkspace >= 4 &&
+            <button
+              className='shareDownload__btn btn highlightBtn'
+              key='newShareDownload'
+              onClick={props.onClickNewShareDownload}
+              style={{
+                backgroundColor: props.hexcolor,
+                ':hover': {
+                  backgroundColor: color(props.hexcolor).darken(0.15).hex()
+                }
+              }}
+            >
+              {props.t('New')}
+              <i className='fa fa-fw fa-plus-circle' />
+            </button>
+          }
         </div>
         {props.shareLinkList.length > 0
-          ? props.shareLinkList.map(shareLink =>
-              <ShareLink
-                email={shareLink.email}
-                link={shareLink.link}
-                id={shareLink.id}
-                isProtected={shareLink.isProtected}
-                onClickDeleteShareLink={props.onClickDeleteShareLink}
-                hexcolor={props.hexcolor}
-              />
-            )
-          : <div className='m-auto'>{props.t('No share link has been created yet.')}</div>
+          ? props.userRoleIdInWorkspace >= 4
+            ? props.shareLinkList.map(shareLink =>
+                <ShareLink
+                  email={shareLink.email}
+                  link={shareLink.link}
+                  id={shareLink.id}
+                  isProtected={shareLink.isProtected}
+                  onClickDeleteShareLink={props.onClickDeleteShareLink}
+                  hexcolor={props.hexcolor}
+                />
+              )
+            : <div className='m-auto'>{props.t('This file has {{numberLinks}} share links', { numberLinks: props.shareLinkList.length })}</div>
+          : <div className='m-auto'>{props.t('No share link has been created yet')}</div>
         }
       </div>
     )

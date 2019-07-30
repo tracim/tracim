@@ -38,6 +38,7 @@ class ShareDownload extends React.Component {
       <div className='shareDownload'>
         {state.currentPage === this.SHARE_STATUS.SHARE_MANAGE
           ? <ShareDownloadManagement
+            userRoleIdInWorkspace={props.userRoleIdInWorkspace}
             shareLinkList={props.shareLinkList}
             label={props.label}
             hexcolor={props.hexcolor}

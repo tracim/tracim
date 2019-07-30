@@ -842,6 +842,7 @@ class File extends React.Component {
                   shareLinkList={state.shareLinkList}
                   onClickDeleteShareLink={this.handleClickDeleteShareLink}
                   onClickNewShare={this.handleClickNewShare}
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
                 />
               },
               {

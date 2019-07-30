@@ -48,8 +48,9 @@
   "Protect by password": "Protect by password",
   "{{label}} share": "{{label}} share",
   "New": "New",
-  "No share link has been created yet.": "No share link has been created yet.",
+  "No share link has been created yet": "No share link has been created yet",
   "Password to share link (optional)": "Password to share link (optional)",
   "Generate random password": "Generate random password",
-  "Show password": "Show password"
+  "Show password": "Show password",
+  "This file has {{numberLinks}} share links": "This file has {{numberLinks}} share links"
 }
