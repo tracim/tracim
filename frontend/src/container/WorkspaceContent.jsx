@@ -112,14 +112,7 @@ class WorkspaceContent extends React.Component {
 
     await this.loadContentList(wsToLoad)
 
-    let contentToJump = this.getContentIdOpenedInUrl(match.params)
-
-    if (contentToJump === undefined) {
-      const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
-      if (folderIdToOpen.length > 0) contentToJump = folderIdToOpen[folderIdToOpen.length - 1]
-    }
-    if (document.getElementById(contentToJump)) document.getElementById(contentToJump).scrollIntoView()
-
+    this.scrollToActiveContent()
     this.buildBreadcrumbs()
   }
 
@@ -439,6 +432,16 @@ class WorkspaceContent extends React.Component {
         {userRoleIdInWorkspace > 1 ? creationAllowedMessage : creationNotAllowedMessage}
       </div>
     )
+  }
+
+  scrollToActiveContent = () => {
+    let contentToScrollTo = this.getContentIdOpenedInUrl(this.props.match.params)
+
+    if (contentToScrollTo === undefined) {
+      const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
+      if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
+    }
+    if (document.getElementById(contentToScrollTo)) document.getElementById(contentToScrollTo).scrollIntoView()
   }
 
   render () {
