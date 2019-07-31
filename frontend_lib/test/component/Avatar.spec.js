@@ -1,34 +1,37 @@
 import React from 'react'
-import { expect } from 'chai'
-import { shallow, configure } from 'enzyme'
+import {expect} from 'chai'
+import {shallow, configure} from 'enzyme'
 import Avatar from '../../src/component/Avatar/Avatar.jsx'
+
 require('../../src/component/Avatar/Avatar.styl')
 
 describe('<Avatar />', () => {
-  describe('<Avatar /> with a normal name (no space, no point, no dash)', () => {
-    const props = {
-      publicName: 'myName',
-      publicNameTwoLetterUpperCase: 'MY',
-      width: '100px',
-      style: {
-        color: 'yellow'
-      }
+  let publicName
+  let expectedNameResult
+  let twoLetterPublicName
+
+  const props = {
+    publicName: 'myName',
+    width: '100px',
+    style: {
+      color: 'yellow'
     }
+  }
+  const publicNameTwoLetterResult = 'MY'
 
-    const wrapper = shallow(
-      <Avatar
-        publicName={props.publicName}
-        width={props.width}
-        style={props.style}
-      />
-    )
+  const wrapper = shallow(
+    <Avatar
+      {...props}
+    />
+  )
 
+  describe('Static design test', () => {
     it(`should have the title : "${props.publicName}"`, () => {
       expect(wrapper.find('.avatar-wrapper').prop('title')).to.equal(props.publicName)
     })
 
-    it(`should have the text : "${props.publicNameTwoLetterUpperCase}"`, () => {
-      expect(wrapper.find('.avatar')).to.have.text().equal(props.publicNameTwoLetterUpperCase)
+    it(`should have the text : "${publicNameTwoLetterResult}"`, () => {
+      expect(wrapper.find('.avatar')).to.have.text().equal(publicNameTwoLetterResult)
     })
 
     it(`should have the same style object`, () => {
@@ -42,84 +45,71 @@ describe('<Avatar />', () => {
     })
   })
 
-  describe('<Avatar /> with a name with a space', () => {
-    const props = {
-      publicName: 'my Name',
-      publicNameTwoLetterUpperCase: 'MN',
-      width: '100px',
-      style: {
-        color: 'yellow'
-      }
-    }
+  describe(`Component's function test`, () => {
+    describe('Test Avatar.getTwoLetter(name) with a name with space', () => {
+      it(`name : "${publicName = 'public name'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
 
-    const wrapper = shallow(
-      <Avatar
-        publicName={props.publicName}
-        width={props.width}
-        style={props.style}
-      />
-    )
 
-    it(`should have the title : "${props.publicName}"`, () => {
-      expect(wrapper.find('.avatar-wrapper').prop('title')).to.equal(props.publicName)
+      it(`name : "${publicName = ''}" should return "${expectedNameResult = ''}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+
+      it(`name : "${publicName = 'publicname'}" should return "${expectedNameResult = 'pu'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+
+      it(`name : "${publicName = 'public name test'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
     })
 
-    it(`should have the text : "${props.publicNameTwoLetterUpperCase}"`, () => {
-      expect(wrapper.find('.avatar')).to.have.text().equal(props.publicNameTwoLetterUpperCase)
-    })
-  })
+    describe('Test Avatar.getTwoLetter(name) with a name with dash', () => {
+      it(`name : "${publicName = 'public-name'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
 
-  describe('<Avatar /> with a name with a point', () => {
-    const props = {
-      publicName: 'myNa.me',
-      publicNameTwoLetterUpperCase: 'MM',
-      width: '100px',
-      style: {
-        color: 'yellow'
-      }
-    }
-
-    const wrapper = shallow(
-      <Avatar
-        publicName={props.publicName}
-        width={props.width}
-        style={props.style}
-      />
-    )
-
-    it(`should have the title : "${props.publicName}"`, () => {
-      expect(wrapper.find('.avatar-wrapper').prop('title')).to.equal(props.publicName)
+      it(`name : "${publicName = 'public-name-test'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
     })
 
-    it(`should have the text : "${props.publicNameTwoLetterUpperCase}"`, () => {
-      expect(wrapper.find('.avatar')).to.have.text().equal(props.publicNameTwoLetterUpperCase)
-    })
-  })
+    describe('Test Avatar.getTwoLetter(name) with a name with dot', () => {
+      it(`name : "${publicName = 'public.name'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
 
-  describe('<Avatar /> with a name with a dash', () => {
-    const props = {
-      publicName: 'myNam-e',
-      publicNameTwoLetterUpperCase: 'ME',
-      width: '100px',
-      style: {
-        color: 'yellow'
-      }
-    }
-
-    const wrapper = shallow(
-      <Avatar
-        publicName={props.publicName}
-        width={props.width}
-        style={props.style}
-      />
-    )
-
-    it(`should have the title : "${props.publicName}"`, () => {
-      expect(wrapper.find('.avatar-wrapper').prop('title')).to.equal(props.publicName)
+      it(`name : "${publicName = 'public.name.test'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
     })
 
-    it(`should have the text : "${props.publicNameTwoLetterUpperCase}"`, () => {
-      expect(wrapper.find('.avatar')).to.have.text().equal(props.publicNameTwoLetterUpperCase)
+    describe('Test Avatar.getTwoLetter(name) with a name with mixed separator', () => {
+      it(`name : "${publicName = 'public.name-test'}" should return "${expectedNameResult = 'pt'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+
+      it(`name : "${publicName = 'public name-test'}" should return "${expectedNameResult = 'pn'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+    })
+
+    describe('Test Avatar.getTwoLetter(name) with a name without separator', () => {
+      it(`name : "${publicName = 'publicName'}" should return "${expectedNameResult = 'pu'}"`, () => {
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
     })
   })
 })

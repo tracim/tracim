@@ -6,10 +6,10 @@ require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
 describe('<CardPopupCreateContent />', () => {
   const props = {
-    onClose: () => {},
-    onValidate: () => {},
+    onClose: () => { return 1 },
+    onValidate: () => { return 2 },
     contentName: 'randomContentName',
-    onChangeContentName: () => {},
+    onChangeContentName: () => { return 3 },
     label: 'randomLabel',
     customColor: 'yellow',
     faIcon: 'randomIcon',
@@ -22,63 +22,67 @@ describe('<CardPopupCreateContent />', () => {
 
   const wrapper = shallow(
     <CardPopupCreateContent
-      onClose={props.onClose}
-      onValidate={props.onValidate}
-      contentName={props.contentName}
-      onChangeContentName={props.onChangeContentName}
-      label={props.label}
-      customColor={props.customColor}
-      faIcon={props.faIcon}
-      btnValidateLabel={props.btnValidateLabel}
-      customStyle={props.customStyle}
-      inputPlaceholder={props.inputPlaceholder}
+      {...props}
     />
   )
 
-  it(`should display "${props.label}"`, () =>
-    expect(wrapper.find('.createcontent__contentname__title')).to.have.text().equal(props.label)
-  )
+  describe('Static design test', () => {
+    it(`should display "${props.label}"`, () =>
+      expect(wrapper.find('.createcontent__contentname__title')).to.have.text().equal(props.label)
+    )
 
-  it(`should have the customColor "${props.customColor}"`, () => {
-    expect(wrapper.find(`.fa-${props.faIcon}`).prop('style').color).to.equal(props.customColor)
-    expect(wrapper.find(`.createcontent__contentname__title`).prop('style').color).to.equal(props.customColor)
-    expect(wrapper.find(`.createcontent__form__button.btn`).prop('style').backgroundColor).to.equal(props.customColor)
-    expect(wrapper.find(`.createcontent__form__button.btn`).prop('style').borderColor).to.equal(props.customColor)
+    it(`.createcontent__form__button.btn should have the customColor "${props.customColor}"`, () => {
+      expect(wrapper.find(`.createcontent__form__button.btn`).prop('style').borderColor).to.equal(props.customColor)
+    })
+
+    it(`.fa-${props.faIcon} should have the customColor "${props.customColor}"`, () =>
+      expect(wrapper.find(`.fa-${props.faIcon}`).prop('style').color).to.equal(props.customColor)
+    )
+
+    it(`.createcontent__contentname__title should have the customColor "${props.customColor}"`, () =>
+      expect(wrapper.find(`.createcontent__contentname__title`).prop('style').color).to.equal(props.customColor)
+    )
+
+    it(`.createcontent__form__button.btn should have the customColor "${props.customColor}"`, () =>
+      expect(wrapper.find(`.createcontent__form__button.btn`).prop('style').backgroundColor).to.equal(props.customColor)
+    )
+
+    it(`should display the icon "${props.faIcon}"`, () =>
+      expect(wrapper.find(`i.fa.fa-${props.faIcon}`)).to.have.lengthOf(1)
+    )
+
+    it(`CardPopup should have the good custom style`, () =>
+      expect(wrapper.find(`CardPopup`).prop('customStyle')).to.deep.equal(props.customStyle)
+    )
+
+    it(`CardPopup should have the good customColor "${props.customColor}"`, () =>
+      expect(wrapper.find(`CardPopup`).prop('customColor')).to.deep.equal(props.customColor)
+    )
+
+    it(`should display the validate label "${props.btnValidateLabel}"`, () =>
+      expect(wrapper.find('.createcontent__form__button.btn')).to.have.text().equal(props.btnValidateLabel)
+    )
+
+    it(`should display the input placeholder "${props.inputPlaceholder}"`, () =>
+      expect(wrapper.find('.createcontent__form__input').prop('placeholder')).to.have.equal(props.inputPlaceholder)
+    )
+
+    it(`should display the content name "${props.contentName}"`, () =>
+      expect(wrapper.find('.createcontent__form__input').prop('value')).to.have.equal(props.contentName)
+    )
   })
 
-  it(`should display the icon "${props.faIcon}"`, () =>
-    expect(wrapper.find(`.fa-${props.faIcon}`)).to.have.lengthOf(1)
-  )
+  describe('Handlers test', () => {
+    it(`onChange handler should call the proper handler`, () =>
+      expect(wrapper.find(`.createcontent__form__input`).prop('onChange')()).to.equal(props.onChangeContentName())
+    )
 
-  it(`should have the good custom style`, () =>
-    expect(wrapper.find(`CardPopup`).prop('customStyle')).to.deep.equal(props.customStyle)
-  )
+    it(`onClick handler should call the proper handler`, () =>
+      expect(wrapper.find(`.createcontent__form__button.btn`).prop('onClick')()).to.equal(props.onValidate())
+    )
 
-  it(`should have the good custom color`, () =>
-    expect(wrapper.find(`CardPopup`).prop('customColor')).to.deep.equal(props.customColor)
-  )
-
-  it(`should have the good onClose function`, () =>
-    expect(wrapper.find(`CardPopup`).prop('onClose')).to.deep.equal(props.onClose)
-  )
-
-  it(`should display the validate label "${props.btnValidateLabel}"`, () =>
-    expect(wrapper.find('.createcontent__form__button.btn')).to.have.text().equal(props.btnValidateLabel)
-  )
-
-  it(`should display the input placeholder "${props.inputPlaceholder}"`, () =>
-    expect(wrapper.find('.createcontent__form__input').prop('placeholder')).to.have.equal(props.inputPlaceholder)
-  )
-
-  it(`should display the content name "${props.contentName}"`, () =>
-    expect(wrapper.find('.createcontent__form__input').prop('value')).to.have.equal(props.contentName)
-  )
-
-  it(`should have the good onChangeContentName function`, () =>
-    expect(wrapper.find(`.createcontent__form__input`).prop('onChange')).to.deep.equal(props.onChangeContentName)
-  )
-
-  it(`should have the good onValidate function`, () =>
-    expect(wrapper.find(`.createcontent__form__button.btn`).prop('onClick')).to.deep.equal(props.onValidate)
-  )
+    it(`onClose handler should call the proper handle`, () =>
+      expect(wrapper.find(`CardPopup`).prop('onClose')()).to.equal(props.onClose())
+    )
+  })
 })

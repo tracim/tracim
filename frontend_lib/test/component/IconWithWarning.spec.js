@@ -15,21 +15,21 @@ describe('<IconWithWarning />', () => {
 
   const wrapper = shallow(
     <IconWithWarning
-      icon={props.icon}
-      customClass={props.customClass}
-      style={props.style}
+      {...props}
     />
   )
 
-  it(`should display the icon "${props.icon}"`, () =>
-    expect(wrapper.find(`.fa-${props.icon}`)).to.have.lengthOf(1)
-  )
+  describe('Static design test', () => {
+    it(`<i> should display the icon "${props.icon}"`, () =>
+      expect(wrapper.find(`i.fa-${props.icon}`)).to.have.lengthOf(1)
+    )
 
-  it(`should have the class "${props.customClass}"`, () =>
-    expect(wrapper.find(`.${props.customClass}`)).to.have.lengthOf(1)
-  )
+    it(`should have the class "${props.customClass}"`, () =>
+      expect(wrapper.find(`i.fa.iconWithWarning.${props.customClass}`)).to.have.lengthOf(1)
+    )
 
-  it(`should display its text in color ${props.style.color}`, () =>
-    expect(wrapper.find(`.fa-${props.icon}`).prop('style')).to.deep.equal(props.style)
-  )
+    it(`should display its text in color ${props.style.color}`, () =>
+      expect(wrapper.find(`i.fa-${props.icon}`).prop('style')).to.deep.equal(props.style)
+    )
+  })
 })

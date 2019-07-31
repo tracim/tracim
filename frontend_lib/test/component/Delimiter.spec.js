@@ -11,11 +11,13 @@ describe('<Delimiter />', () => {
 
   const wrapper = shallow(
     <Delimiter
-      customClass={props.customClass}
+      {...props}
     />
   )
 
-  it(`should have the class "${props.customClass}"`, () =>
-    expect(wrapper.find(`.${props.customClass}`)).to.have.lengthOf(1)
-  )
+  describe('Static design test', () => {
+    it(`should have the class "${props.customClass}"`, () =>
+      expect(wrapper.find(`div.${props.customClass}.delimiter`)).to.have.lengthOf(1)
+    )
+  })
 })
