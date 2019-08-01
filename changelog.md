@@ -15,6 +15,13 @@
 -
 -
 
+## 2.3.2 / 2019-08-01
+
+### Fixed issues
+
+- Email notifications: #2134
+
+
 ## 2.3.1 / 2019-07-05
 
 ### Fixed issues
