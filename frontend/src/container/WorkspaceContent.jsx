@@ -98,7 +98,7 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const { workspaceList, match } = this.props
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
@@ -110,7 +110,9 @@ class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = match.params.idws
 
-    this.loadContentList(wsToLoad)
+    await this.loadContentList(wsToLoad)
+
+    this.scrollToActiveContent()
     this.buildBreadcrumbs()
   }
 
@@ -387,6 +389,14 @@ class WorkspaceContent extends React.Component {
 
   getFolderIdToOpenInUrl = urlSearch => (qs.parse(urlSearch).folder_open || '').split(',').filter(str => str !== '').map(str => parseInt(str))
 
+  getContentIdOpenedInUrl = params => {
+    if (params === undefined) return undefined
+    if (Object.keys(CONTENT_TYPE).find(key => CONTENT_TYPE[key] === params.type)) {
+      return params.idcts
+    }
+    return undefined
+  }
+
   getTitle = urlFilter => {
     const { props } = this
     const contentType = props.contentType.find(ct => ct.slug === urlFilter)
@@ -422,6 +432,16 @@ class WorkspaceContent extends React.Component {
         {userRoleIdInWorkspace > 1 ? creationAllowedMessage : creationNotAllowedMessage}
       </div>
     )
+  }
+
+  scrollToActiveContent = () => {
+    let contentToScrollTo = this.getContentIdOpenedInUrl(this.props.match.params)
+
+    if (contentToScrollTo === undefined) {
+      const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
+      if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
+    }
+    if (document.getElementById(contentToScrollTo)) document.getElementById(contentToScrollTo).scrollIntoView()
   }
 
   render () {

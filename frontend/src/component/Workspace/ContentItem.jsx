@@ -32,6 +32,7 @@ class ContentItem extends React.Component {
         contentType={props.contentType}
         isLast={props.isLast}
         key={props.id}
+        id={props.contentId}
       >
         {props.userRoleIdInWorkspace >= ROLE_OBJECT.contentManager.id && (
           <DragHandle
