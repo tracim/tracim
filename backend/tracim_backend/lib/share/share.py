@@ -6,6 +6,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.content_share import ContentShare
@@ -80,6 +81,15 @@ class ShareApi(object):
         return (
             self._session.query(ContentShare).filter(ContentShare.share_token == share_token).one()
         )
+
+    def check_password(self, content_share: ContentShare, password: typing.Optional[str]) -> None:
+        if content_share.password:
+            if not password or not content_share.validate_password(password):
+                raise WrongSharePassword(
+                    'given password for  Share "{}" of content "{}" is incorrect'.format(
+                        content_share.share_id, content_share.content.content_id
+                    )
+                )
 
     def get_content_share(self, content: Content, share_id: int) -> ContentShare:
         return (

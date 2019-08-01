@@ -8,7 +8,9 @@ from pyramid.config import Configurator
 from tracim_backend import TracimRequest
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import TracimFileNotFound
+from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.share.share import ShareApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
@@ -28,13 +30,15 @@ from tracim_backend.views.share_api.schema import ShareIdPathSchema
 from tracim_backend.views.share_api.schema import ShareListQuerySchema
 from tracim_backend.views.share_api.schema import ShareTokenPathSchema
 from tracim_backend.views.share_api.schema import ShareTokenWithFilenamePathSchema
+from tracim_backend.views.share_api.schema import TracimSharePasswordHeaderSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
 SWAGGER_TAG__CONTENT_SHARE_SECTION = "Share"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_SHARE_SECTION
 )
-is_shareable_content_type = ContentTypeChecker([FILE_TYPE])
+shareables_content_type = [FILE_TYPE]
+is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
 
 class ShareController(Controller):
@@ -115,14 +119,18 @@ class ShareController(Controller):
         content_share = api.get_content_share_by_token(
             share_token=hapic_data.path.share_token
         )  # type: ContentShare
-        if content_share.content.type != FILE_TYPE:
-            # TODO - G.M - 2019-07-31 - deal with exception here
-            raise Exception()
-        else:
-            return api.get_content_share_in_context(content_share)
+
+        # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
+        # we should considered do these check at decorator level
+        if content_share.content.type not in shareables_content_type:
+            raise ContentTypeNotAllowed()
+
+        return api.get_content_share_in_context(content_share)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
+    @hapic.input_headers(TracimSharePasswordHeaderSchema())
     @hapic.output_file([])
     def guest_download_file(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
         """
@@ -133,29 +141,32 @@ class ShareController(Controller):
         content_share = api.get_content_share_by_token(
             share_token=hapic_data.path.share_token
         )  # type: ContentShare
-        if content_share.content.type != FILE_TYPE:
-            # TODO - G.M - 2019-07-31 - deal with exception here
-            raise Exception()
-        else:
-            try:
-                file = DepotManager.get().get(content_share.content.depot_file)
-            except IOError as exc:
-                raise TracimFileNotFound(
-                    "file related to revision {} of content {} not found in depot.".format(
-                        content_share.content.revision_id, content_share.content.content_id
-                    )
-                ) from exc
-            filename = hapic_data.path.filename
-            if not filename or filename == "raw":
-                filename = content_share.content.file_name
-            return HapicFile(
-                file_object=file,
-                mimetype=file.content_type,
-                filename=filename,
-                as_attachment=True,
-                content_length=file.content_length,
-                last_modified=content_share.content.updated,
-            )
+
+        # TODO - G.M - 2019-08-01 - verify in access to content share can be granted
+        # we should considered do these check at decorator level
+        api.check_password(content_share, password=hapic_data.headers.tracim_share_password)
+        if content_share.content.type not in shareables_content_type:
+            raise ContentTypeNotAllowed()
+
+        try:
+            file = DepotManager.get().get(content_share.content.depot_file)
+        except IOError as exc:
+            raise TracimFileNotFound(
+                "file related to revision {} of content {} not found in depot.".format(
+                    content_share.content.revision_id, content_share.content.content_id
+                )
+            ) from exc
+        filename = hapic_data.path.filename
+        if not filename or filename == "raw":
+            filename = content_share.content.file_name
+        return HapicFile(
+            file_object=file,
+            mimetype=file.content_type,
+            filename=filename,
+            as_attachment=True,
+            content_length=file.content_length,
+            last_modified=content_share.content.updated,
+        )
 
     def bind(self, configurator: Configurator) -> None:
         """
