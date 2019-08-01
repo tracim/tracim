@@ -32,7 +32,7 @@ describe('<TextAreaApp />', () => {
       customClass={props.customClass}
       customColor={props.customColor}
     />
-  )
+  ).dive()
 
   // it(`should display "${props.text}"`, () =>
   //

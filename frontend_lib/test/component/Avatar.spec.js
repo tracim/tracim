@@ -1,5 +1,5 @@
 import React from 'react'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import {shallow, configure} from 'enzyme'
 import Avatar from '../../src/component/Avatar/Avatar.jsx'
 
@@ -17,7 +17,6 @@ describe('<Avatar />', () => {
       color: 'yellow'
     }
   }
-  const publicNameTwoLetterResult = 'MY'
 
   const wrapper = shallow(
     <Avatar
@@ -25,10 +24,12 @@ describe('<Avatar />', () => {
     />
   )
 
-  describe('Static design test', () => {
+  describe('Static design', () => {
     it(`should have the title : "${props.publicName}"`, () => {
       expect(wrapper.find('.avatar-wrapper').prop('title')).to.equal(props.publicName)
     })
+
+    const publicNameTwoLetterResult = 'MY'
 
     it(`should have the text : "${publicNameTwoLetterResult}"`, () => {
       expect(wrapper.find('.avatar')).to.have.text().equal(publicNameTwoLetterResult)
@@ -45,68 +46,89 @@ describe('<Avatar />', () => {
     })
   })
 
-  describe(`Component's function test`, () => {
-    describe('Test Avatar.getTwoLetter(name) with a name with space', () => {
-      it(`name : "${publicName = 'public name'}" should return "${expectedNameResult = 'pn'}"`, () => {
+  describe(`Component's function`, () => {
+    describe('getTwoLetter(name) with a name with space', () => {
+      it(`name : "public name" should return "pn"`, () => {
+        publicName='public name'
+        expectedNameResult = 'pn'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
 
-
-      it(`name : "${publicName = ''}" should return "${expectedNameResult = ''}"`, () => {
+      it(`name : "" should return ""`, () => {
+        publicName = ''
+        expectedNameResult = ''
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
 
-      it(`name : "${publicName = 'publicname'}" should return "${expectedNameResult = 'pu'}"`, () => {
+      it(`name : "publicname" should return "pu"`, () => {
+        publicName = 'publicname'
+        expectedNameResult = 'pu'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
 
-      it(`name : "${publicName = 'public name test'}" should return "${expectedNameResult = 'pn'}"`, () => {
-        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
-        expect(twoLetterPublicName).to.equal(expectedNameResult)
-      })
-    })
-
-    describe('Test Avatar.getTwoLetter(name) with a name with dash', () => {
-      it(`name : "${publicName = 'public-name'}" should return "${expectedNameResult = 'pn'}"`, () => {
-        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
-        expect(twoLetterPublicName).to.equal(expectedNameResult)
-      })
-
-      it(`name : "${publicName = 'public-name-test'}" should return "${expectedNameResult = 'pn'}"`, () => {
+      it(`name : "public name test" should return "pn"`, () => {
+        publicName = 'public name test'
+        expectedNameResult = 'pn'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
     })
 
-    describe('Test Avatar.getTwoLetter(name) with a name with dot', () => {
-      it(`name : "${publicName = 'public.name'}" should return "${expectedNameResult = 'pn'}"`, () => {
+    describe('getTwoLetter(name) with a name with dash', () => {
+      it(`name : "public-name" should return "pn"`, () => {
+        publicName = 'public-name'
+        expectedNameResult = 'pn'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
 
-      it(`name : "${publicName = 'public.name.test'}" should return "${expectedNameResult = 'pn'}"`, () => {
-        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
-        expect(twoLetterPublicName).to.equal(expectedNameResult)
-      })
-    })
-
-    describe('Test Avatar.getTwoLetter(name) with a name with mixed separator', () => {
-      it(`name : "${publicName = 'public.name-test'}" should return "${expectedNameResult = 'pt'}"`, () => {
-        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
-        expect(twoLetterPublicName).to.equal(expectedNameResult)
-      })
-
-      it(`name : "${publicName = 'public name-test'}" should return "${expectedNameResult = 'pn'}"`, () => {
+      it(`name : "public-name-test" should return "pn"`, () => {
+        publicName = 'public-name-test'
+        expectedNameResult = 'pn'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })
     })
 
-    describe('Test Avatar.getTwoLetter(name) with a name without separator', () => {
-      it(`name : "${publicName = 'publicName'}" should return "${expectedNameResult = 'pu'}"`, () => {
+    describe('getTwoLetter(name) with a name with dot', () => {
+      it(`name : "public.name" should return "pn"`, () => {
+        publicName = 'public.name'
+        expectedNameResult = 'pn'
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+
+      it(`name : "public.name.test" should return "pn"`, () => {
+        publicName = 'public.name.test'
+        expectedNameResult = 'pn'
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+    })
+
+    describe('getTwoLetter(name) with a name with mixed separator', () => {
+      it(`name : "public.name-test" should return "pt"`, () => {
+        publicName = 'public.name-test'
+        expectedNameResult = 'pt'
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+
+      it(`name : "public name-test" should return "pn"`, () => {
+        publicName = 'public name-test'
+        expectedNameResult = 'pn'
+        twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
+        expect(twoLetterPublicName).to.equal(expectedNameResult)
+      })
+    })
+
+    describe('getTwoLetter(name) with a name without separator', () => {
+      it(`name : "publicName" should return "pu"`, () => {
+        publicName = 'publicName'
+        expectedNameResult = 'pu'
         twoLetterPublicName = wrapper.instance().getTwoLetter(publicName)
         expect(twoLetterPublicName).to.equal(expectedNameResult)
       })

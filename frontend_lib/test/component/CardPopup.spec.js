@@ -1,38 +1,41 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow, configure } from 'enzyme'
+import sinon from 'sinon'
 import CardPopup from '../../src/component/CardPopup/CardPopup.jsx'
 require('../../src/component/CardPopup/CardPopup.styl')
 
 describe('<CardPopup />', () => {
+  const onCloseCallBack = sinon.stub()
+
   const props = {
     customClass: 'randomCustomClass',
     customHeaderClass: 'RandomCustomHeaderClass',
     customColor: 'yellow',
-    onClose: () => { return 1 },
+    onClose: onCloseCallBack,
     hideCloseBtn: false,
     customStyle: {
       color: 'yellow'
     }
   }
 
-  const children = <div><h1>Random title</h1>I am a children of CardPopup</div>
+  const Children = () => <div><h1>Random title</h1>I am a children of CardPopup</div>
 
   const wrapper = shallow(
     <CardPopup
-      {...props}
+      { ...props }
     >
-      <div><h1>Random title</h1>I am a children of CardPopup</div>
+      <Children />
     </CardPopup>
   )
 
-  describe('Static design test', () => {
+  describe('Static design', () => {
     it(`should have the customClass  in the right DOM element"${props.customClass}"`, () =>
-      expect(wrapper.find(`.${props.customClass}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`.${props.customClass}.cardPopup`)).to.have.lengthOf(1)
     )
 
     it(`should have the customHeaderClass in the right DOM element "${props.customHeaderClass}"`, () =>
-      expect(wrapper.find(`.${props.customHeaderClass}`)).to.have.lengthOf(1)
+      expect(wrapper.find(`.${props.customHeaderClass}.cardPopup__header`)).to.have.lengthOf(1)
     )
 
     it(`should display its text in color ${props.customStyle.color}`, () =>
@@ -43,8 +46,8 @@ describe('<CardPopup />', () => {
       expect(wrapper.find(`.${props.customHeaderClass}.cardPopup__header`).prop('style').backgroundColor).to.equal(props.customColor)
     )
 
-    it(`should have its children ${children}   ${wrapper.find(`.cardPopup__body`).children()}`, () =>
-      expect(wrapper.find(`.cardPopup__body`).children().contains(children)).to.equal(true)
+    it(`should have its children`, () =>
+      expect(wrapper.find('.cardPopup__body').find(Children).length).equal(1)
     )
 
     it(`should be set hideCloseBtn to : ${props.hideCloseBtn}`, () => {
@@ -52,9 +55,10 @@ describe('<CardPopup />', () => {
     })
   })
 
-  describe('Handlers test', () => {
-    it(`onClick handler should call the proper handler`, () =>
-      expect(wrapper.find(`.cardPopup__close`).prop('onClick')()).to.equal(props.onClose())
-    )
+  describe('Handlers', () => {
+    it(`onClick handler should call the proper handler`, () => {
+      wrapper.find(`.cardPopup__close`).simulate('click')
+      expect(onCloseCallBack.called).to.true
+    })
   })
 })

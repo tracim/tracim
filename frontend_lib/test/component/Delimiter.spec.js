@@ -15,7 +15,7 @@ describe('<Delimiter />', () => {
     />
   )
 
-  describe('Static design test', () => {
+  describe('Static design', () => {
     it(`should have the class "${props.customClass}"`, () =>
       expect(wrapper.find(`div.${props.customClass}.delimiter`)).to.have.lengthOf(1)
     )

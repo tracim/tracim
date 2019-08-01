@@ -19,7 +19,7 @@ describe('<IconWithWarning />', () => {
     />
   )
 
-  describe('Static design test', () => {
+  describe('Static design', () => {
     it(`<i> should display the icon "${props.icon}"`, () =>
       expect(wrapper.find(`i.fa-${props.icon}`)).to.have.lengthOf(1)
     )

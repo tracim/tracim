@@ -2,12 +2,15 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow, configure } from 'enzyme'
 import IconButton from '../../src/component/Button/IconButton.jsx'
+import sinon from "sinon";
 
 describe('<IconButton />', () => {
+  const onClickCallBack = sinon.stub()
+
   const props = {
     icon: 'test',
     className: 'ramdom_class',
-    onClick: () => { return 1 },
+    onClick: onClickCallBack,
     disabled: false,
     text: 'randomText',
     style: {
@@ -21,8 +24,8 @@ describe('<IconButton />', () => {
     />
   )
 
-  describe('Static design test', () => {
-    it(`should display " ${props.text}"`, () =>
+  describe('Static design', () => {
+    it(`should display "${props.text}"`, () =>
       // Is it normal to have a space before the text ?
       expect(wrapper.find(`button.${props.className}.btn`)).to.have.text().equal(' ' + props.text)
     )
@@ -44,9 +47,10 @@ describe('<IconButton />', () => {
     )
   })
 
-  describe('Handlers test', () => {
-    it(`onClick handler should call the proper handler`, () =>
-      expect(wrapper.find(`.${props.className}`).prop('onClick')()).to.equal(props.onClick())
-    )
+  describe('Handlers', () => {
+    it(`onClick handler should call the proper handler`, () => {
+      wrapper.find(`button.${props.className}.btn`).simulate('click')
+      expect(onClickCallBack.called).to.true
+    })
   })
 })

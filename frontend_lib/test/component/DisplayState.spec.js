@@ -3,18 +3,19 @@ import {expect} from 'chai'
 import {shallow, configure} from 'enzyme'
 import DisplayState from '../../src/component/DisplayState/DisplayState.jsx'
 import PropTypes from "prop-types";
+import sinon from "sinon";
 
 require('../../src/component/DisplayState/DisplayState.styl')
 
-describe('<DisplayState />"', function () {
+describe('<DisplayState />', function () {
+  const onClickBtnCallBack = sinon.stub()
+
   const props = {
     msg: 'randomMessage',
     btnType: 'button',
     icon: 'randomIcon',
     btnLabel: 'randomBtnLabel',
-    onClickBtn: () => {
-      return 1
-    }
+    onClickBtn: onClickBtnCallBack
   }
 
   const wrapper = shallow(
@@ -23,7 +24,7 @@ describe('<DisplayState />"', function () {
     />
   )
 
-  describe('Static design test', () => {
+  describe('Static design', () => {
     it(`should display "${props.msg}"`, () =>
       expect(wrapper.find('.displaystate__msg')).to.have.text().equal(props.msg)
     )
@@ -51,9 +52,10 @@ describe('<DisplayState />"', function () {
     })
   })
 
-  describe('Handlers test', () => {
-    it(`onClick handler should call the proper handler`, () =>
-      expect(wrapper.find(`.displaystate__btn`).prop('onClick')()).to.equal(props.onClickBtn())
-    )
+  describe('Handlers', () => {
+    it(`onClick handler should call the proper handler`, () => {
+      wrapper.find(`.displaystate__btn`).simulate('click')
+      expect(onClickBtnCallBack.called).to.true
+    })
   })
 })

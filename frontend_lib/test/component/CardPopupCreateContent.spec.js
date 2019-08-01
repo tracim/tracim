@@ -2,14 +2,19 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow, configure } from 'enzyme'
 import CardPopupCreateContent from '../../src/component/CardPopup/CardPopupCreateContent.jsx'
+import sinon from "sinon";
 require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
 describe('<CardPopupCreateContent />', () => {
+  const onCloseCallBack = sinon.stub()
+  const onValidateCallBack = sinon.stub()
+  const onChangeContentNameCallBack = sinon.stub()
+
   const props = {
-    onClose: () => { return 1 },
-    onValidate: () => { return 2 },
+    onClose: onCloseCallBack,
+    onValidate: onValidateCallBack,
     contentName: 'randomContentName',
-    onChangeContentName: () => { return 3 },
+    onChangeContentName: onChangeContentNameCallBack,
     label: 'randomLabel',
     customColor: 'yellow',
     faIcon: 'randomIcon',
@@ -26,7 +31,7 @@ describe('<CardPopupCreateContent />', () => {
     />
   )
 
-  describe('Static design test', () => {
+  describe('Static design', () => {
     it(`should display "${props.label}"`, () =>
       expect(wrapper.find('.createcontent__contentname__title')).to.have.text().equal(props.label)
     )
@@ -72,17 +77,20 @@ describe('<CardPopupCreateContent />', () => {
     )
   })
 
-  describe('Handlers test', () => {
-    it(`onChange handler should call the proper handler`, () =>
-      expect(wrapper.find(`.createcontent__form__input`).prop('onChange')()).to.equal(props.onChangeContentName())
-    )
+  describe('Handlers', () => {
+    it(`onChange handler should call the proper handler`, () => {
+      wrapper.find(`.createcontent__form__input`).simulate('keyDown', { key: 'Enter', preventDefault: () => {} })
+      expect(onValidateCallBack.called).to.true
+    })
 
-    it(`onClick handler should call the proper handler`, () =>
-      expect(wrapper.find(`.createcontent__form__button.btn`).prop('onClick')()).to.equal(props.onValidate())
-    )
+    it(`onClick handler should call the proper handler`, () => {
+      wrapper.find(`.createcontent__form__input`).simulate('keyDown', { key: 'Escape', preventDefault: () => {} })
+      expect(onCloseCallBack.called).to.true
+    })
 
-    it(`onClose handler should call the proper handle`, () =>
-      expect(wrapper.find(`CardPopup`).prop('onClose')()).to.equal(props.onClose())
-    )
+    it(`onClick handler should call the proper handler`, () => {
+      wrapper.find(`.createcontent__form__input`).simulate('change', { value: 'randomText' })
+      expect(onChangeContentNameCallBack.called).to.true
+    })
   })
 })
