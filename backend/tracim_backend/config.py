@@ -169,7 +169,8 @@ class CFG(object):
             "contents/file,"
             "contents/html-document,"
             "contents/folder,"
-            "agenda"
+            "agenda,"
+            "office_document"
         )
 
         self.APP__ENABLED = string_to_list(
@@ -823,6 +824,22 @@ class CFG(object):
             app_config=self,
         )
 
+        office_document = Application(
+            label="Office Document",
+            slug="office_document",
+            fa_icon="comments-o",
+            is_active=self.COLLABORATIVE_DOCUMENT_EDITION__ACTIVATED,
+            config={},
+            main_route="/ui/workspaces/{workspace_id}/office",
+            app_config=self,
+        )
+        office_document.add_content_type(
+            slug="office_document",
+            label="Office Document",
+            creation_label="Create an office document",
+            available_statuses=content_status_list.get_all(),
+        )
+
         # process activated app list
         available_apps = OrderedDict(
             [
@@ -832,6 +849,7 @@ class CFG(object):
                 (folder.slug, folder),
                 (markdownpluspage.slug, markdownpluspage),
                 (agenda.slug, agenda),
+                (office_document.slug, office_document),
             ]
         )
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
