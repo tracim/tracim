@@ -1,5 +1,5 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { PAGE } from '../helper.js'
 import {
   handleFetchResult,
@@ -38,8 +38,10 @@ class CollaboraFrame extends React.Component {
 
   buildCompleteIframeUrl = (urlSource, accessToken) => {
     const { state } = this
+    const protocol = window.location.protocol
+    // INFO - B.L - 2019.08.01 - We assume frontend is on the same host than the API
     const host = window.location.host
-    return `${urlSource}WOPISrc=${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
+    return `${urlSource}WOPISrc=${protocol}//${host}${PAGE.ONLINE_EDITION(state.content.content_id)}&access_token=${accessToken}&closebutton=1`
   }
 
   handleIframeIsClosing = (event) => {
@@ -93,18 +95,16 @@ class CollaboraFrame extends React.Component {
 
   setIframeConfig = async () => {
     const { state, props } = this
-
     if (!state.content.file_extension) {
       return
     }
-
     if (!props.config.system.config.collaborative_document_edition) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.OPEN_CONTENT_URL,
         data: {
-          workspaceId: this.props.content.workspace_id,
-          contentType: this.state.content.content_type,
-          contentId: this.props.content.content_id
+          workspaceId: props.content.workspace_id,
+          contentType: state.content.content_type,
+          contentId: props.content.content_id
         }
       })
       return
@@ -117,9 +117,9 @@ class CollaboraFrame extends React.Component {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.OPEN_CONTENT_URL,
         data: {
-          workspaceId: this.props.content.workspace_id,
-          contentType: this.state.content.content_type,
-          contentId: this.props.content.content_id
+          workspaceId: props.content.workspace_id,
+          contentType: state.content.content_type,
+          contentId: props.content.content_id
         }
       })
       return
@@ -155,4 +155,4 @@ class CollaboraFrame extends React.Component {
   }
 }
 
-export default translate()(CollaboraFrame)
+export default withTranslation()(CollaboraFrame)

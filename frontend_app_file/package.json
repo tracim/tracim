@@ -27,6 +27,8 @@
     "react-dropzone": "^10.1.5",
     "react-i18next": "^10.11.4",
     "react-image-lightbox": "^5.1.0",
+    "react-router": "^5.0.1",
+    "react-router-dom": "^5.0.1",
     "regenerator-runtime": "^0.13.2",
     "whatwg-fetch": "^3.0.0"
   },
@@ -55,8 +57,6 @@
     "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
-    "react-router": "^5.0.1",
-    "react-router-dom": "^5.0.1",
     "url-loader": "^2.0.1",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5",

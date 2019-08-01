@@ -17,7 +17,7 @@ require('./css/index.styl')
 const appInterface = {
   name: 'file',
   isRendered: false,
-  renderAppFeature: data => {
+  renderAppFeature: (data) => {
     return ReactDOM.render(
       <Router history={data.config.history}>
         <Switch>

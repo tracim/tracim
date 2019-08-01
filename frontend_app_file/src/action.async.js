@@ -137,7 +137,7 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) => {
   })
 }
 
-export const getWOPIToken = (apiUrl) =>
+export const getWOPIToken = apiUrl =>
   fetch(`${apiUrl}/collaborative-document-edition/token`, {
     credentials: 'include',
     headers: {

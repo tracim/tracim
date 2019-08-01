@@ -25,7 +25,8 @@ import {
   MODE,
   removeExtensionOfFilename,
   displayFileSize,
-  PAGE
+  PAGE,
+  debug
 } from '../helper.js'
 import {
   getFileContent,
@@ -50,9 +51,9 @@ class File extends React.Component {
     this.state = {
       appName: 'file',
       isVisible: true,
-      config: props.data ? props.data.config : null,
-      loggedUser: props.data ? props.data.loggedUser : null,
-      content: props.data ? props.data.content : null,
+      config: props.data ? props.data.config : debug.config,
+      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTranslationList: [
         props.t('File'),
@@ -612,15 +613,15 @@ class File extends React.Component {
 
   // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
   // see https://github.com/tracim/tracim/issues/1804
-  getDownloadRawUrl = ({config: {apiUrl}, content, mode}) =>
+  getDownloadRawUrl = ({ config: { apiUrl }, content, mode }) =>
     // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${content.filenameNoExtension}${content.file_extension}?force_download=1&revision_id=${content.current_revision_id}`
 
-  getDownloadPdfPageUrl = ({config: {apiUrl}, content, mode, fileCurrentPage}) =>
+  getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) =>
     // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${content.filenameNoExtension + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
 
-  getDownloadPdfFullUrl = ({config: {apiUrl}, content, mode}) =>
+  getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) =>
     // FIXME - b.l - refactor urls
     `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${content.filenameNoExtension + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
 
