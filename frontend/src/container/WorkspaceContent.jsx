@@ -539,7 +539,7 @@ class WorkspaceContent extends React.Component {
                         fileName={content.fileName}
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                        // isShared={contentType.length ? contentType.find(a => a.slug === content.type).isShared : false}
+                        isShared={content.activedShares !== 0}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}

@@ -36,7 +36,7 @@ import {
   getFileComment,
   getFileRevision,
   getShareLinksList,
-  // putShareLinkList,
+  postShareLinksList,
   postFileNewComment,
   putFileContent,
   putFileStatus,
@@ -156,7 +156,7 @@ class File extends React.Component {
     await this.loadContent()
     this.loadTimeline()
     this.buildBreadcrumbs()
-    // this.loadShareLinkList()
+    this.loadShareLinkList()
   }
 
   async componentDidUpdate (prevProps, prevState) {
@@ -611,8 +611,8 @@ class File extends React.Component {
     }))
   }
 
-  handleClickNewShare = () => { // = async () => {
-    const { state } = this
+  handleClickNewShare = async () => {
+    const { state, props } = this
 
     let shareEmailList = parserStringToList(state.shareEmails)
     let invalidEmails = []
@@ -623,34 +623,28 @@ class File extends React.Component {
 
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
-    this.setState(previousState => ({
-      shareLinkList: [
-        ...previousState.shareLinkList,
-        {
-          emails: shareEmailList,
-          url: '?',
-          share_id: new Date(),
-          has_password: state.sharePassword !== ''
-        }
-      ]
-    }))
-
     if (invalidEmails.length > 0) {
-      this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+      this.sendGlobalFlashMessage(props.t(`Error: ${invalidEmails} are not valid`))
     }
-    // console.log(shareEmailList)
-    // this.setState({shareLinkList: newShareLinkList})
 
-    // const fetchResultSaveNewShareLinkList = await handleFetchResult(
-    //   await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
-    // )
+    const fetchResultPostShareLinks = await postShareLinksList(
+      config.apiUrl, 
+      content.workspace_id, 
+      content.content_id, 
+      shareEmailList,
+      state.sharePassword !== '' ? state.sharePassword : null
+    )
 
-    // switch (fetchResultSaveNewShareLinkList.status) {
-    //   case 204:
-         this.setState({ shareEmails: '', sharePassword: '' })
-    //     break
-    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
-    // }
+    switch (fetchResultPostShareLinks.status) {
+      case 204:
+        this.setState({
+          shareLinkList: fetchResultShareLinkList.json,
+          shareEmails: '',
+          sharePassword: ''
+        })
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+    }
   }
 
   handleChangeEmails = e => this.setState({ shareEmails: e.target.value })
@@ -672,23 +666,19 @@ class File extends React.Component {
     }
   }
 
-  handleClickDeleteShareLink = shareLinkId => { // = async shareLinkId => {
-    // const { config, content } = this.state
+  handleClickDeleteShareLink = async shareLinkId => {
+    const { config, content } = this.state
 
-    this.setState(previousState => ({
-      shareLinkList: previousState.shareLinkList.filter(shareLink => shareLink.id !== shareLinkId)
-    }))
+    const fetchResultDeleteShareLink = await handleFetchResult(
+      await deleteShareLink(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.shareLinkList)
+    )
 
-    // const fetchResultSaveNewShareLinkList = await handleFetchResult(
-    //   await putShareLinkList(state.config.apiUrl, state.content.workspace_id, state.shareLinkList)
-    // )
-
-    // switch (fetchResultSaveNewShareLinkList.status) {
-    //   case 204:
-    //     ??
-    //     break
-    //   default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
-    // }
+    switch (fetchResultDeleteShareLink.status) {
+      case 204:
+        this.loadShareLinkList()
+        break
+      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting share link'))
+    }
   }
 
   getDownloadBaseUrl = (apiUrl, content, mode) => {
