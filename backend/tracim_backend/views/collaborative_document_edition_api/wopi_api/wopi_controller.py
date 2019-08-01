@@ -1,4 +1,5 @@
 # coding=utf-8
+from datetime import timezone
 from http import HTTPStatus
 
 from depot.manager import DepotManager
@@ -106,6 +107,23 @@ class WOPIController(Controller):
         WOPI PutRelativeFile endpoint
         https://wopi.readthedocs.io/projects/wopirest/en/latest/files/PutRelativeFile.html#putrelativefile
         """
+        # INFO - G.M - 2019-08-01 - libreoffice-online/collabora update support feature
+        # check for timestamp to avoid erase new content unknown. This allow to choose
+        # between erase and discard option.
+        # see https://www.collaboraoffice.com/libreoffice-online-api/ section "Detecting external document change"
+
+        if hapic_data.headers.wopi_lool_timestamp:
+            # INFO - G.M - 2019-08-01 - as libreoffice online return timezone aware datetime,
+            # we need to be sure both datetime are compared with timezone, if none exist, use utc as default.
+            timezone_aware_wopi_lool_timestamp = hapic_data.headers.wopi_lool_timestamp.replace(
+                tzinfo=hapic_data.headers.wopi_lool_timestamp.tzinfo or timezone.utc
+            )
+            timezone_aware_current_content_updated = request.current_content.updated.replace(
+                tzinfo=request.current_content.updated.tzinfo or timezone.utc
+            )
+            if timezone_aware_wopi_lool_timestamp < timezone_aware_current_content_updated:
+                return Response(status=HTTPStatus.CONFLICT, json_body={"LOOLStatusCode": 1010})
+
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
