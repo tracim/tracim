@@ -12,7 +12,8 @@ import {
   getAvaibleFileTypes,
   getTemplateFromFileType,
   getIconUrlFromFileType,
-  getTranslationFromFileType
+  getTranslationFromFileType,
+  getExtensionFromFileType
 } from '../helper.js'
 
 const CONTENT_TYPE_FILE = 'file'
@@ -62,7 +63,7 @@ class PopupCreateOfficeDocument extends React.Component {
     }
   }
 
-  handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
@@ -75,7 +76,7 @@ class PopupCreateOfficeDocument extends React.Component {
     const { config, workspaceId, idFolder, newContentName, availableTemplates, selectedOption, software } = this.state
     const { history, PAGE } = this.props.data.config
     const templateName = getTemplateFromFileType(software, selectedOption.value, availableTemplates)
-    const filename = newContentName + '.' + getIconUrlFromFileType(software, selectedOption.value)
+    const filename = newContentName + getExtensionFromFileType(software, selectedOption.value)
     const request = postOfficeDocumentFromTemplate(config.apiUrl, workspaceId, idFolder, config.slug, filename, templateName)
 
     const response = await handleFetchResult(await request)
@@ -132,17 +133,17 @@ class PopupCreateOfficeDocument extends React.Component {
     })
   }
 
-  setSelectedOption = type => this.setState({selectedOption: type})
+  setSelectedOption = fileType => this.setState({ selectedOption: fileType })
 
   buildOptions () {
     const { software } = this.state
     return this.state.availableFileTypes.map(
-      (type) => ({
-        text: getTranslationFromFileType(software, type),
-        value: type,
+      (fileType) => ({
+        text: getTranslationFromFileType(software, fileType),
+        value: fileType,
         img: {
-          alt: type,
-          src: getIconUrlFromFileType(software, type),
+          alt: fileType,
+          src: getIconUrlFromFileType(software, fileType),
           height: 42,
           width: 42
         }
