@@ -1,5 +1,6 @@
 const PAGES = {
   HOME: 'home',
+  LOGIN: 'login',
   CONTENTS: 'contents',
   DASHBOARD: 'dashboard',
   AGENDA: 'agenda',
@@ -8,6 +9,7 @@ const PAGES = {
 
 const URLS = {
   [PAGES.HOME]: () => '/ui',
+  [PAGES.LOGIN]: ({ loginParam }) => `/ui/login${loginParam}`,
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
   [PAGES.AGENDA]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/agenda/`,
